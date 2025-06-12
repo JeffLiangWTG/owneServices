@@ -1,0 +1,52 @@
+FROM microsoft/dotnet:2.1.301-sdk AS ocmpoc-restore
+ENV HTTPS_PROXY=http://sydco-spxy-1.wtg.zone:8080
+WORKDIR /src
+
+COPY OcmPoc.sln .
+COPY Components/EventProcessor/*.csproj ./Components/EventProcessor/
+COPY Components/Orchestrator/*.csproj ./Components/Orchestrator/
+COPY Components/Paralleliser/*.csproj ./Components/Paralleliser/
+COPY Components/Correlator/*.csproj ./Components/Correlator/
+COPY Core/Services/*.csproj ./Core/Services/
+COPY FrontEnd/Api/*.csproj ./FrontEnd/Api/
+COPY FrontEnd/Bootstrapper/*.csproj ./FrontEnd/Bootstrapper/
+COPY Infrastructure/MessageHistory.SqlServer/*.csproj ./Infrastructure/MessageHistory.SqlServer/
+COPY Infrastructure/MessageInterfaces/*.csproj ./Infrastructure/MessageInterfaces/
+COPY Infrastructure/MessageQueue.Rabbit/*.csproj ./Infrastructure/MessageQueue.Rabbit/
+COPY Infrastructure/MessageRepository.Mongo/*.csproj ./Infrastructure/MessageRepository.Mongo/
+COPY Infrastructure/MessageTracking.Kafka/*.csproj ./Infrastructure/MessageTracking.Kafka/
+COPY Mapping/Mapper/*.csproj ./Mapping/Mapper/
+COPY Mapping/Mapping.Interface/*.csproj ./Mapping/Mapping.Interface/
+COPY Mapping/Mapping1/*.csproj ./Mapping/Mapping1/
+COPY Mapping/Providers/CW1/*.csproj ./Mapping/Providers/CW1/
+COPY Mapping/Providers/Provider-A/*.csproj ./Mapping/Providers/Provider-A/
+COPY Mapping/Providers/Provider-B/*.csproj ./Mapping/Providers/Provider-B/
+COPY Miscellaneous/Utils/*.csproj ./Miscellaneous/Utils/
+COPY Tests/Components/Paralleliser/*.csproj ./Tests/Components/Paralleliser/
+COPY Tests/FrontEnd/API/*.csproj ./Tests/FrontEnd/API/
+COPY Tests/Components/EventProcessor/*.csproj ./Tests/Components/EventProcessor/
+COPY Tests/Components/Orchestrator/*.csproj ./Tests/Components/Orchestrator/
+COPY Tests/Components/Paralleliser/*.csproj ./Tests/Components/Paralleliser/
+COPY Tests/Components/Correlator/*.csproj ./Tests/Components/Correlator/
+COPY Tests/Infrastructure/MessageHistory.SqlServer/*.csproj ./Tests/Infrastructure/MessageHistory.SqlServer/
+COPY Tests/Infrastructure/MessageQueue.Rabbit/*.csproj ./Tests/Infrastructure/MessageQueue.Rabbit/
+COPY Tests/Infrastructure/MessageRepository.Mongo/*.csproj ./Tests/Infrastructure/MessageRepository.Mongo/
+COPY Tests/Infrastructure/MessageTracking.Kafka/*.csproj ./Tests/Infrastructure/MessageTracking.Kafka/
+COPY Tests/Mapping/Mapper/*.csproj ./Tests/Mapping/Mapper/
+COPY Tests/Mapping/Providers/CW1/*.csproj ./Tests/Mapping/Providers/CW1/
+COPY Tests/Mapping/Providers/Provider-A/*.csproj ./Tests/Mapping/Providers/Provider-A/
+COPY Tests/Mapping/Providers/Provider-B/*.csproj ./Tests/Mapping/Providers/Provider-B/
+COPY Tests/Transceivers/FileSystem/*.csproj ./Tests/Transceivers/FileSystem/
+COPY Tests/Transceivers/Ftp/*.csproj ./Tests/Transceivers/Ftp/
+COPY Tests/Transceivers/Transceiver/*.csproj ./Tests/Transceivers/Transceiver/
+COPY Tests/Scenario/*.csproj ./Tests/Scenario/
+COPY Transceivers/FileSystem/*.csproj ./Transceivers/FileSystem/
+COPY Transceivers/Ftp/*.csproj ./Transceivers/Ftp/
+COPY Transceivers/Transceiver/*.csproj ./Transceivers/Transceiver/
+
+RUN dotnet restore
+
+FROM ocmpoc-restore as ocmpoc-build
+WORKDIR /src
+COPY . .
+RUN dotnet build OcmPoc.sln

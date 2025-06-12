@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Title: "Debtors Invoice"                                  		 -->
+<!--                                                                 -->
+<!-- Purpose:                                                        -->
+<!-- This message type is used by the CoreFreight system to send     -->
+<!-- Debtors Invoice Details          			                     -->
+<!--                                                                 -->
+<!-- Created by: Nishaal Paparam                                     -->
+<!-- Version: 1.02                                                   -->
+<!-- Last updated: 11 Feb 2015                                       -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           elementFormDefault="qualified">
+
+	<!-- Upfront declarations: -->
+
+	<xs:simpleType name="Str35">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="35"/>
+		</xs:restriction>
+	</xs:simpleType>    
+	<!-- "Str35" -->
+
+	<xs:simpleType name="Str12">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="12"/>
+		</xs:restriction>
+	</xs:simpleType>    
+	<!-- "Str12" -->
+
+	<xs:simpleType name="Str255">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="255"/>
+		</xs:restriction>
+	</xs:simpleType>    
+	<!-- "Str255" -->
+
+	<xs:simpleType name="MsgTypeConstant">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CFXML_DEBTORS_INVOICE" />
+		</xs:restriction>
+	</xs:simpleType>    
+	<!-- "MsgTypeConstant" -->
+
+	<xs:simpleType name="MsgHdrActionType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Add" />
+			<xs:enumeration value="Update" />
+			<xs:enumeration value="Delete" />
+		</xs:restriction>
+	</xs:simpleType>    
+	<!-- "MsgHdrActionType" -->
+
+	<xs:complexType name="MessageHeaderType">
+		<xs:sequence>
+			<xs:element name="SenderID"    type="Str35" />
+			<xs:element name="RecipientID" type="Str35" />
+			<xs:element name="MessageID"   type="xs:positiveInteger" />
+			<xs:element name="MessageType" type="MsgTypeConstant" />
+			<xs:element name="Timestamp"   type="xs:dateTime" />
+			<xs:element name="Action"      type="MsgHdrActionType" />
+		</xs:sequence>
+	</xs:complexType>    
+	<!-- "MessageHeaderType" -->
+
+	<xs:complexType name="AddressType">
+		<xs:sequence>
+			<xs:element name="StreetAddress" 	type="Str255"/>
+			<xs:element name="Suburb" 			type="Str255"/>
+			<xs:element name="Province" 		type="Str255"/>
+			<xs:element name="ZipCode" 			type="Str12" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- "AddressType" -->
+
+	<xs:complexType name="DebtorDocAddInfoType">
+		<xs:sequence>
+			<xs:element name="VoucherType"         type="xs:string" />
+			<xs:element name="DebtorDocNo"         type="xs:string" />
+			<xs:element name="DebtorName"          type="xs:string" />	
+			<xs:element name="DebtorAddress" 	   type="AddressType" minOccurs="0"/>
+			<xs:element name="ClientReference"     type="xs:string" minOccurs="0" />
+			<xs:element name="MasterBillNo"        type="xs:string" minOccurs="0" />
+			<xs:element name="HouseBillNo"         type="xs:string" minOccurs="0" />
+			<xs:element name="ActualVoyageCode"    type="xs:string" minOccurs="0" />
+			<xs:element name="ActualDepartureDate" type="xs:dateTime" minOccurs="0" />
+			<xs:element name="CustomsValue"        type="xs:decimal" minOccurs="0" />
+			<xs:element name="HBGrossWeight"       type="xs:decimal" minOccurs="0" />
+			<xs:element name="Volume"              type="xs:decimal" minOccurs="0" />
+			<xs:element name="NoOfPackages"        type="xs:int" minOccurs="0" />
+			<xs:element name="NoOfContainers"      type="xs:int" minOccurs="0" />
+			<xs:element name="VoyageLabel"         type="xs:string" minOccurs="0" />
+			<xs:element name="ETA"                 type="xs:dateTime" minOccurs="0" />
+			<xs:element name="AddRef1"             type="xs:string" minOccurs="0" />
+			<xs:element name="AddRef2"             type="xs:string" minOccurs="0" />
+			<xs:element name="AddRef3"             type="xs:string" minOccurs="0" />
+			<xs:element name="AddRef4"             type="xs:string" minOccurs="0" />
+			<xs:element name="SuppliersName"       type="xs:string" minOccurs="0" />
+			<xs:element name="ActualVesselName"    type="xs:string" minOccurs="0" />
+			<xs:element name="CustomsBOENo"        type="xs:string" minOccurs="0" />
+			<xs:element name="FirstContainer"      type="xs:string" minOccurs="0" />
+			<xs:element name="DebtorVATNo"         type="xs:string" minOccurs="0" />
+			<xs:element name="ChargeBreakdown"     type="xs:string" minOccurs="0" />
+			<xs:element name="BranchCode"          type="xs:string" minOccurs="0" />
+			<xs:element name="HouseBillFileNumber" type="xs:string" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>    
+	<!-- "DebtorDocAddInfoType" -->
+
+	<xs:complexType name="DebtorsInvoiceLineType">
+		<xs:sequence>
+			<xs:element name="LineNo"        	   		type="xs:int" />
+			<xs:element name="InvoicesectionDesc"   	type="xs:string" />
+			<xs:element name="InvoiceSubsectionDesc"	type="xs:string" />
+			<xs:element name="TaxTypeCode"    			type="xs:string" />
+			<xs:element name="RATaxCode"    			type="xs:string" />
+			<xs:element name="TaxAmount"                type="xs:decimal" />
+			<xs:element name="LineAmountExTax"        	type="xs:decimal" />
+			<xs:element name="LineAmount"        		type="xs:decimal" />
+			<xs:element name="Quantity"        			type="xs:decimal" />
+		</xs:sequence>
+	</xs:complexType>    
+	<!-- "DebtorsInvoiceLineType" -->
+
+	<xs:complexType name="DebtorDocType">
+		<xs:sequence>
+			<xs:element name="DebtorDocNo"            type="xs:string" />
+			<xs:element name="VoucherType"            type="xs:string" />
+			<xs:element name="DebtorCode"             type="xs:string" />
+			<xs:element name="BranchCode"             type="xs:string" />
+			<xs:element name="DebtorMessage"          type="xs:string" />
+			<xs:element name="PaymentRef"             type="xs:string" />
+			<xs:element name="DueDate"                type="xs:dateTime" />
+			<xs:element name="DocDate"                type="xs:dateTime" />
+			<xs:element name="DocAmnt"                type="xs:decimal" />
+			<xs:element name="OutstandingAmnt"        type="xs:decimal" />
+			<xs:element name="ChqRetnReasonCode"      type="xs:string" minOccurs="0" />
+			<xs:element name="FinDate"                type="xs:dateTime" />
+			<xs:element name="DrPaymentType"          type="xs:string" minOccurs="0" />
+			<xs:element name="UserCode"               type="xs:string" />
+			<xs:element name="ActualFileNumber"       type="xs:string" />
+			<xs:element name="CurrencyCode"           type="xs:string" />
+			<xs:element name="SrcDocAmnt"             type="xs:decimal" />
+			<xs:element name="SrcOutstandingAmnt"     type="xs:decimal" />
+			<xs:element name="ExchangeRate"           type="xs:decimal" />
+			<xs:element name="ExchangeRateType"       type="xs:string" minOccurs="0" />
+			<xs:element name="DepositRef"             type="xs:string" minOccurs="0" />
+			<xs:element name="DocReasonCode"          type="xs:string" minOccurs="0" />
+			<xs:element name="GeneratedFromIndicator" type="xs:string" minOccurs="0" />
+			<xs:element name="DepositRefBranchCode"   type="xs:string" minOccurs="0" />
+			<xs:element name="ExternalUniqueID" 		type="xs:string" minOccurs="0" />
+			<xs:element name="DebtorDocAddInfo"   	  type="DebtorDocAddInfoType"/>
+			<xs:element name="DebtorsInvoiceLine"  	  type="DebtorsInvoiceLineType" maxOccurs="unbounded"/>
+			<xs:element name="DebtorDocument" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:base64Binary">	
+						<!-- Base64 encoded string -->
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>    
+	<!-- "DebtorDocType" -->
+
+	<xs:element name="DebtorsInvoice">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="MessageHeader"     type="MessageHeaderType" />
+				<xs:element name="DebtorDoc"         type="DebtorDocType" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>    
+	<!-- "DebtorsInvoice" -->
+</xs:schema>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="install">
+
+  <PropertyGroup>
+    <CommonScriptsPath>$(MSBuildThisFileDirectory)Common\</CommonScriptsPath>
+    <ProfilesPropsDirectory>$(MSBuildThisFileDirectory)Profiles\</ProfilesPropsDirectory>
+    <BizTalkCommonDirectory>$(MSBuildThisFileDirectory)BizTalkCommon\</BizTalkCommonDirectory>
+
+    <ProgramDataWiseTech>$(PROGRAMDATA)\WiseTech\</ProgramDataWiseTech>
+    <BizTalkBackupDirectory>$(ProgramDataWiseTech)BizTalk\</BizTalkBackupDirectory>
+    <GacBackupDirectory>$(BizTalkBackupDirectory)Gac\</GacBackupDirectory>
+
+    <GacDirectory>$(WINDIR)\Microsoft.NET\assembly\GAC_MSIL\</GacDirectory>
+    <TempDirectory>$([System.IO.Path]::GetFullPath('$(TEMP)'))</TempDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RelativeBinPath>Bin\</RelativeBinPath>
+    <BinPath>$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(RelativeBinPath)'))</BinPath>
+
+    <MSBuildCommonTasks>$(CommonScriptsPath)MSBuildCommon.tasks</MSBuildCommonTasks>
+    <BizTalkCommonTasks>$(BizTalkCommonDirectory)BizTalkCommon.tasks</BizTalkCommonTasks>
+    <ProfilesTasks>$(ProfilesPropsDirectory)Profiles.tasks</ProfilesTasks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DeployFilesDirectory>$(MSBuildThisFileDirectory)Deploy</DeployFilesDirectory>
+    <AssemblyInfosFilePath>$(BinPath)AssemblyInfos.props</AssemblyInfosFilePath>
+    <OutputPath>$(MSBuildThisFileDirectory)Output\</OutputPath>
+    <GacOutputPath>$(OutputPath)Gac\</GacOutputPath>
+    <BizTalkOutputPath>$(OutputPath)BizTalk\</BizTalkOutputPath>
+    <HostOutputPath>$(OutputPath)BizTalk\</HostOutputPath>
+    <SortedAssemblyFileNamesFilePath>$(MSBuildThisFileDirectory)Logs\SortedAssemblyFileNames.txt</SortedAssemblyFileNamesFilePath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TimeStampFormat>[yyyy-MM-dd HH:mm:ss.fff]</TimeStampFormat>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(ProfilesTasks)" Condition="'$(ProfilesIncluded)'==''" />
+  <Import Project="$(BizTalkCommonTasks)" Condition="'$(BizTalkCommonImported)'==''"/>
+  <Import Project="$(AssemblyInfosFilePath)" Condition="'$(AssemblyInfosPropsImported)'==''"/>
+
+  <Target Name="install" DependsOnTargets="this:init;assemblies:load-items;system:backup">
+    <Message Text="$([System.DateTime]::Now.ToString(`$(TimeStampFormat)`)): started" />
+
+    <CallTarget Targets="StopApplications;StopHostInstances" />
+    <CallTarget Targets="BizTalkAssemblies:RemoveAll" />
+    <CallTarget Targets="GacAssemblies;BizTalkAssemblies" />
+    <CallTarget Targets="StartHostInstances;StartApplications" />
+
+    <Message Text="$([System.DateTime]::Now.ToString(`$(TimeStampFormat)`)): completed" />
+  </Target>
+
+  <!-- AssemblyVersion,FileVersion,FullName,PublicKeyToken,AssemblyInformationalVersion,AssemblyFileName,Length,SortOrder -->
+  <Target Name="assemblies:load-items">
+    <!-- add the application name to the assembly item group -->
+    <AddMetadataToItemGroup
+      Items="@(Assembly)"
+      Metadata="Application"
+      MetadataValue="$(eHubApplication)">
+      <Output TaskParameter="UpdatedItems" ItemName="InstallingAssemblies" />
+    </AddMetadataToItemGroup>
+
+  </Target>
+
+  <Target Name="this:init">
+    <PropertyGroup>
+      <timeStamp>$([System.DateTime]::Now.ToString(`yyyyMMdd_HHmmss`))</timeStamp>
+      <gacBackupZipFileName>gac-backup-$(timeStamp)</gacBackupZipFileName>
+      <gacBackupZipFilePath>$(GacBackupDirectory)$(gacBackupZipFileName).zip</gacBackupZipFilePath>
+      <gacBackupWorkingDirectory>$(TempDirectory)\$(gacBackupZipFileName)</gacBackupWorkingDirectory>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <RequiredDirectories Include="$(ProgramDataWiseTech)" />
+      <RequiredDirectories Include="$(BizTalkBackupDirectory)" />
+      <RequiredDirectories Include="$(GacBackupDirectory)" />
+      <RequiredDirectories Include="$(gacBackupWorkingDirectory)" />
+
+      <RequiredDirectories Include="$(OutputPath)" />
+
+      <OutputPathSubDir Include="$(GacOutputPath)" />
+      <OutputPathSubDir Include="$(BizTalkOutputPath)" />
+      <OutputPathSubDir Include="$(HostOutputPath)" />
+
+      <RequiredDirectories Include="@(OutputPathSubDir)" />
+    </ItemGroup>
+
+    <RemoveDir Directories="%(OutputPathSubDir.Identity)" Condition="Exists('%(OutputPathSubDir.Identity)')" />
+    <MakeDir Directories="%(RequiredDirectories.Identity)" Condition="!Exists('%(RequiredDirectories.Identity)')" />
+  </Target>
+
+  <Target Name="system:backup" DependsOnTargets="this:init;assemblies:load-items">
+    <CallTarget Targets="gac:backup" />
+  </Target>
+
+  <Target Name="gac:backup">
+
+    <GetGacedAssemblies
+      GacDir="$(GacDirectory)"
+      InstallingAssemblies="@(InstallingAssemblies)">
+      <Output TaskParameter="GacedAssemblies" ItemName="GacedAssemblies" />
+    </GetGacedAssemblies>
+
+    <Copy
+      SourceFiles="@(GacedAssemblies)"
+      DestinationFolder="$(gacBackupWorkingDirectory)" />
+
+    <Zip
+      TaskAction="Create"
+      RemoveRoot="$(gacBackupWorkingDirectory)"
+      CompressPath="$(gacBackupWorkingDirectory)"
+      ZipFileName="$(gacBackupZipFilePath)" />
+
+    <RemoveDir Directories="$(gacBackupWorkingDirectory)" Condition="Exists('$(gacBackupWorkingDirectory)')" />
+
+    <Message Text="Previous versions of files to be installed onto GAC have been backed up from GAC to:" />
+    <Message Text="$(gacBackupZipFilePath)" Importance="High" />
+  </Target>
+
+  <Target Name="gac:restore" DependsOnTargets="this:init">
+
+    <CallTarget Targets="gac:backup:history" Condition="'$(gac-backup-zip-file)'=='' or !Exists('$(gac-backup-zip-file)')" />
+    <Error Text="Please specify a history gac backup zip file to use in the property: /p:gac-backup-zip-file=$(path-to-gac-backup-file)" Condition="'$(gac-backup-zip-file)'=='' or !Exists('$(gac-backup-zip-file)')" />
+
+    <Zip TaskAction="Extract" ExtractPath="$(gacBackupWorkingDirectory)" ZipFileName="$(gac-backup-zip-file)" />
+
+    <CallTarget Targets="gac:restore:list;StopApplications;StopHostInstances;BizTalkAssemblies;StartHostInstances;StartApplications" />
+    <RemoveDir Directories="$(gacBackupWorkingDirectory)" Condition="!Exists('$(gacBackupWorkingDirectory)')" />
+  </Target>
+
+  <Target Name="gac:restore:list">
+    <ItemGroup>
+      <RestoreAssemblies Include="$(gacBackupWorkingDirectory)\*.dll" />
+    </ItemGroup>
+
+    <CreateItem
+      Include="%(RestoreAssemblies.Identity)"
+      AdditionalMetadata="Application=$(eHubApplication)">
+      <Output
+        TaskParameter="Include"
+        ItemName="InstallingAssemblies"/>
+    </CreateItem>
+
+  </Target>
+
+  <Target Name="gac:backup:history">
+    <ItemGroup>
+      <GacBackupZipFiles Include="$(GacBackupDirectory)*.zip" />
+    </ItemGroup>
+    <Message Text="History GAC backup zip files listed below:" Importance="High" />
+    <Message Text="%(GacBackupZipFiles.FullPath)" />
+  </Target>
+
+  <UsingTask
+    TaskName="GetGacedAssemblies"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <GacDir ParameterType="System.String" Required="true" />
+      <InstallingAssemblies ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <GacedAssemblies ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+    <![CDATA[
+      Add-Type -AssemblyName "Microsoft.Build.Framework"
+      [string[]] $GacedAssemblies = @()
+
+      $InstallingAssemblies | % {
+
+        $fileName = $_.GetMetadata("AssemblyFileName")
+        $assemblyVersion = $_.GetMetadata("AssemblyVersion")
+
+        Get-ChildItem -Path $GacDir -Filter  $fileName -Recurse | % {
+
+          try {
+                $_ | Add-Member NoteProperty AssemblyVersion ( [Reflection.AssemblyName]::GetAssemblyName($_.FullName).Version )
+            } catch {}
+
+          if ($_.AssemblyVersion -eq $assemblyVersion) {
+            $GacedAssemblies += $_.FullName
+          }
+        }
+      }
+    ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask
+    TaskName="AddMetadataToItemGroup"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <Items ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <Metadata ParameterType="System.String" Required="true" />
+      <MetadataValue ParameterType="System.String" Required="true" />
+      <UpdatedItems ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+    <![CDATA[
+      if ($null -ne $error) { $error.Clear() }
+      [Microsoft.Build.Framework.ITaskItem[]] $UpdatedItems = @()
+
+      try {
+        $Items | % {
+          $_.SetMetadata($Metadata, $MetadataValue)
+          $UpdatedItems += $_
+        }
+      } catch {
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", $error)
+      }
+    ]]>
+    </Task>
+  </UsingTask>
+
+</Project>

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp1 (http://www.altova.com) by XMLSpy 2008 Professional Ed. Release 2, Installed for 4 users (Australia Post) -->
+<xs:schema xmlns="http://www.auspost.com.au/Schema/CommonMessageModel/ActivityEvent:v3" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns0="http://www.auspost.com.au/Schema/CommonDataModel/Event:v1" xmlns:ns1="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" xmlns:ns2="http://www.auspost.com.au/Schema/CommonDataModel/Mail_Product:v1" xmlns:ns3="http://www.auspost.com.au/Schema/SAP/Common:v1" targetNamespace="http://www.auspost.com.au/Schema/CommonMessageModel/ActivityEvent:v3" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.5">
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" schemaLocation="CommonTypes_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Event:v1" schemaLocation="ActivityEvent_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Mail_Product:v1" schemaLocation="Mail_Product_v3.xsd"/>
+	<!-- Added import by PI Resource - to include BusinessDocumentHeader definitions -->
+	<xs:import namespace="http://www.auspost.com.au/Schema/SAP/Common:v1" schemaLocation="BusinessDocumentMessageHeaderMainSchema_v3.xsd"/>
+	<!-- End added import -->
+	<xs:complexType name="TrackableObjectMessage"/>
+	<xs:complexType name="ManifestEnvelope">
+		<xs:annotation>
+			<xs:documentation>Datatype of an envelope to carry a manifest, associated events and associated consignments</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="TrackableObjectMessage">
+				<xs:sequence>
+					<xs:element name="Manifest" type="ns2:Manifest"/>
+					<xs:element name="ConsignmentEnvelope" type="ConsignmentEnvelope" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:CommunicationEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:DeviceEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:MailEvent" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ConsignmentEnvelope">
+		<xs:annotation>
+			<xs:documentation>Datatype of an envelope to carry a consignment, associated events and associated articles</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="TrackableObjectMessage">
+				<xs:sequence>
+					<xs:element name="Consignment" type="ns2:Consignment"/>
+					<xs:element name="ArticleEnvelope" type="ArticleEnvelope" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:MailEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:DeviceEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:CommunicationEvent" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ArticleEnvelope">
+		<xs:annotation>
+			<xs:documentation>Datatype of an envelope to carry an article and associated events</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="TrackableObjectMessage">
+				<xs:sequence>
+					<xs:element name="Article" type="ns2:Article"/>
+					<xs:element ref="ns0:CommunicationEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:DeviceEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:MailEvent" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="EventMessage">
+		<xs:annotation>
+			<xs:documentation>Datatype of an envelope to carry an event message and associated trackable objects</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="ns0:CommunicationEvent" minOccurs="0"/>
+			<xs:element ref="ns0:DeviceEvent" minOccurs="0"/>
+			<xs:element ref="ns0:MailEvent" minOccurs="0"/>
+			<xs:element ref="ns2:Article" minOccurs="0"/>
+			<xs:element ref="ns2:BulkDeliveryManifest" minOccurs="0"/>
+			<xs:element ref="ns2:Consignment" minOccurs="0"/>
+			<xs:element ref="ns2:Device" minOccurs="0"/>
+			<xs:element ref="ns2:InternationalReceptacle" minOccurs="0"/>
+			<xs:element ref="ns2:Manifest" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="EventMessage" type="EventMessage">
+		<xs:annotation>
+			<xs:documentation>Denormalised view of an event and associated trackable objects</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ManifestEnvelope" type="ManifestEnvelope">
+		<xs:annotation>
+			<xs:documentation>Normalised view of a manifest including events</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ArticleEnvelope" type="ArticleEnvelope">
+		<xs:annotation>
+			<xs:documentation>Normalised view of an article including events</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="EventMessages">
+		<xs:sequence>
+			<!-- added for PI messaging -->
+			<xs:element ref="ns3:MessageHeader" minOccurs="0"/>
+			<xs:element ref="OutboundRoutingHeader" minOccurs="0"/>
+			<!-- end addition -->
+			<xs:element name="MessageDescriptor" type="MessageDecriptor" minOccurs="0"/>
+			<xs:element ref="EventMessage" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="EventMessages" type="EventMessages"/>
+	<xs:element name="ConsignmentEnvelope" type="ConsignmentEnvelope"/>
+	<xs:complexType name="MessageDecriptor">
+		<xs:annotation>
+			<xs:documentation>Datatype to define complex element which carries message metadata</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Comment" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BulkDeliveryManifestEnvelope">
+		<xs:complexContent>
+			<xs:extension base="TrackableObjectMessage">
+				<xs:sequence>
+					<xs:element name="BulkDeliveryManifest" type="ns2:BulkDeliveryManifest"/>
+					<xs:element name="ArticleEnvelope" type="ArticleEnvelope" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:CommunicationEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:DeviceEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:MailEvent" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="DespatchEnvelope">
+		<xs:complexContent>
+			<xs:extension base="TrackableObjectMessage">
+				<xs:sequence>
+					<xs:element name="Despatch" type="ns2:Despatch"/>
+					<xs:element name="ArticleEnvelope" type="ArticleEnvelope" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:CommunicationEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:DeviceEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:MailEvent" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="BulkDeliveryManifestEnvelope" type="BulkDeliveryManifestEnvelope"/>
+	<xs:complexType name="DeviceEnvelope">
+		<xs:complexContent>
+			<xs:extension base="TrackableObjectMessage">
+				<xs:sequence>
+					<xs:element name="Device" type="ns2:Device"/>
+					<xs:element ref="ns0:CommunicationEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:DeviceEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:MailEvent" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="DeviceEnvelope" type="DeviceEnvelope"/>
+	<xs:element name="TrackableObjectMessage" type="TrackableObjectMessage"/>
+	<xs:element name="PublishTrackableObjectMessage">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ArticleEnvelope" type="ArticleEnvelope" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="BulkDeliveryManifestEnvelope" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ConsignmentEnvelope" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="DeviceEnvelope" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ManifestEnvelope" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="InternationalReceptacleEnvelope">
+		<xs:complexContent>
+			<xs:extension base="TrackableObjectMessage">
+				<xs:sequence>
+					<xs:element name="InternationalReceptacle" type="ns2:InternationalReceptacle"/>
+					<xs:element ref="ArticleEnvelope" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:CommunicationEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:DeviceEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="ns0:MailEvent" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="InternationalReceptacleEnvelope" type="InternationalReceptacleEnvelope"/>
+	<!-- Added for PI interface development -->
+	<xs:complexType name="ManifestMessages">
+		<xs:sequence>
+			<xs:element ref="ns3:MessageHeader" minOccurs="0"/>
+			<xs:element ref="ManifestEnvelope" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ManifestMessages" type="ManifestMessages"/>
+	<!-- Definitions added by PI resource to enable external messaging headers/routers within the Messages 
+		  defined in CMM external definitions.-->
+	<xs:element name="OutboundRoutingHeader" type="OutboundRoutingHeader"/>
+	<xs:complexType name="OutboundRoutingHeader">
+		<xs:annotation>
+			<xs:documentation>
+		  Additional Rounting information for Merchant. Used interface Header
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="InterfaceId" type="xs:string"/>
+			<xs:element ref="FileDetails"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="FileDetails" type="FileDetails"/>
+	<xs:complexType name="FileDetails">
+		<xs:annotation>
+			<xs:documentation>
+		  File name and folder data used for Merchant verification.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="APSTCredential" type="xs:string"/>
+			<xs:element name="FilePrefix" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- Definitions added by PI resource - TrackableObjectsSCEMMessage - for Interface I60 -->
+	<xs:element name="TrackableObjectSCEMMessages" type="TrackableObjectSCEMMessages"/>
+	<xs:complexType name="TrackableObjectSCEMMessages">
+		<xs:annotation>
+			<xs:documentation>
+		  TrackableObject Message type
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="ns3:MessageHeader" minOccurs="0"/>
+			<xs:element ref="PublishTrackableObjectMessage"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="TSW_WS_SUBMIT_LODGEMENT" 
+  targetNamespace="http://customs.govt.nz/jbms/msggate/match/v1" 
+  xmlns:match="http://customs.govt.nz/jbms/msggate/match/v1" 
+  xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" 
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:dochdr="http://customs.govt.nz/jbms/msggate/dochdr/v2" 
+  xmlns:ackresp="http://customs.govt.nz/jbms/msggate/ackresp/v1" 
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+  xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
+
+  <!-- X509V3 Certificate Sign Only WS Security Policy -->
+  <wsp:Policy wsu:Id="X509V3SignOnly" 
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" 
+    xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:AsymmetricBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <wsp:Policy>
+            <sp:InitiatorToken>
+              <wsp:Policy>
+                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Always">
+                  <wsp:Policy>
+                    <sp:WssX509V3Token10 />
+                  </wsp:Policy>
+                </sp:X509Token>
+              </wsp:Policy>
+            </sp:InitiatorToken>
+            <sp:RecipientToken>
+              <wsp:Policy>
+                <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Always">
+                  <wsp:Policy>
+                    <sp:WssX509V3Token10 />
+                  </wsp:Policy>
+                </sp:X509Token>
+              </wsp:Policy>
+            </sp:RecipientToken>
+            <sp:AlgorithmSuite>
+              <wsp:Policy>
+                <sp:Basic128Rsa15 />
+              </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+              <wsp:Policy>
+                <sp:Strict />
+              </wsp:Policy>
+            </sp:Layout>
+            <sp:IncludeTimestamp />
+            <sp:OnlySignEntireHeadersAndBody />
+          </wsp:Policy>
+        </sp:AsymmetricBinding>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:SignedParts>
+        <sp:Wss10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <wsp:Policy>
+          </wsp:Policy>
+        </sp:Wss10>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+
+  <!-- WSDL Schema Types -->
+  <wsdl:types>
+  
+    <!-- Schema binary message attachments. --> 
+    <xs:schema attributeFormDefault="unqualified" 
+      elementFormDefault="qualified" 
+      targetNamespace="http://customs.govt.nz/jbms/msggate/match/v1" 
+      xmlns:match="http://customs.govt.nz/jbms/msggate/match/v1" 
+      xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="Binary">
+        <xs:simpleContent>
+          <xs:extension base="xs:base64Binary">
+            <xs:attribute name="href" type="xs:anyURI" />
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
+      <xs:element name="attachment" type="match:Binary" />
+      <xs:element name="inlineAttachment" type="xs:base64Binary" />
+      <xs:complexType name="ProcessData">
+        <xs:sequence>
+          <xs:any />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="Fault" type="match:Fault" />
+      <xs:complexType name="Fault">
+        <xs:sequence>
+          <xs:element name="code" />
+          <xs:element name="message" />
+          <xs:element name="statusReport" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="processData" type="match:ProcessData" />
+      <xs:element name="documents">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" ref="match:attachment" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+    
+    <!-- Schema supplying an attachment document manifest as a standard document header. -->
+    <xs:schema attributeFormDefault="unqualified" 
+      elementFormDefault="unqualified" 
+      targetNamespace="http://customs.govt.nz/jbms/msggate/dochdr/v2" 
+      xmlns:dochdr="http://customs.govt.nz/jbms/msggate/dochdr/v2" 
+      xmlns="http://customs.govt.nz/jbms/msggate/dochdr/v2"
+      xmlns:clmIANAMIMEMediaType="urn:un:unece:uncefact:codelist:standard:IANA:MIMEMediaType:2008-11-12" 
+      xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+      <xs:import namespace="urn:un:unece:uncefact:codelist:standard:IANA:MIMEMediaType:2008-11-12" 
+        schemaLocation="./IANA_MIMEMediaType_20081112.xsd" />
+
+      <xs:element name="DocumentManifest" type="Manifest" />
+
+      <xs:complexType name="Manifest">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="NumberOfItems" type="xs:integer" />
+          <xs:element maxOccurs="unbounded" name="ManifestItem" type="ManifestItem" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ManifestItem">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="Type" type="ManifestType" />
+          <xs:element minOccurs="1" maxOccurs="1" name="MimeTypeQualifierCode" type="clmIANAMIMEMediaType:MIMEMediaTypeContentType" />
+          <xs:element minOccurs="1" maxOccurs="1" name="UniformResourceIdentifier" type="xs:anyURI" />
+          <xs:element minOccurs="0" maxOccurs="1" name="AdditionalDocumentIdentification" type="xs:string" />
+ 		  <xs:element minOccurs="0" maxOccurs="1" name="Authentication" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="ManifestType">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="DEC"></xs:enumeration>
+          <xs:enumeration value="BWD"></xs:enumeration>
+          <xs:enumeration value="CDF"></xs:enumeration>
+          <xs:enumeration value="CRW"></xs:enumeration>
+          <xs:enumeration value="GFL"></xs:enumeration>
+          <xs:enumeration value="GMI"></xs:enumeration>
+          <xs:enumeration value="ICD"></xs:enumeration>
+          <xs:enumeration value="GIL"></xs:enumeration>
+          <xs:enumeration value="PAX"></xs:enumeration>
+          <xs:enumeration value="POC"></xs:enumeration>
+          <xs:enumeration value="MDH"></xs:enumeration>
+          <xs:enumeration value="SST"></xs:enumeration>
+          <xs:enumeration value="CDO"></xs:enumeration>
+          <xs:enumeration value="BAC"></xs:enumeration>
+          <xs:enumeration value="IFC"></xs:enumeration>
+          <xs:enumeration value="OTH"></xs:enumeration>
+          <xs:enumeration value="CQD"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:schema>
+    
+    <!-- Schema for responding with a processing acknowledgement. -->
+    <xs:schema elementFormDefault="qualified" 
+      targetNamespace="http://customs.govt.nz/jbms/msggate/ackresp/v1" 
+      xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="MessageInfo">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Document" type="xs:string" />
+            <xs:element minOccurs="0" name="DeliveryMethod" type="xs:string" />
+            <xs:element minOccurs="0" name="Direction" type="xs:string" />
+            <xs:element minOccurs="0" name="DocumentSize" type="xs:string" />
+            <xs:element minOccurs="0" name="DateReceived" type="xs:dateTime" />
+            <xs:element minOccurs="0" name="Status" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  
+  <wsdl:message name="Fault">
+    <wsdl:part element="match:Fault" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="SubmitLodgementResponse">
+    <wsdl:part element="ackresp:MessageInfo" name="messageinfo" />
+    <wsdl:part element="match:attachment" name="attachment" />
+  </wsdl:message>
+  <wsdl:message name="SubmitLodgementRequest">
+    <wsdl:part element="dochdr:DocumentManifest" name="manifest" />
+    <wsdl:part element="match:attachment" name="attachment" />
+  </wsdl:message>
+
+  <wsdl:portType name="SubmitLodgementPortType">
+    <wsdl:operation name="executeTSW_BP_SUBMIT_WS_LODGEMENT">
+      <wsdl:input message="match:SubmitLodgementRequest" />
+      <wsdl:output message="match:SubmitLodgementResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+  
+  <!-- Binding that references the  X509V3SignOnly WS Security Policy -->
+  <wsdl:binding name="SubmitLodgementBinding" type="match:SubmitLodgementPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="executeTSW_BP_SUBMIT_WS_LODGEMENT">
+      <soap:operation soapAction="sii:TSW_BP_SUBMIT_WS_LODGEMENT" style="document" />
+      <wsdl:input>
+        <wsp:PolicyReference URI="X509V3SignOnly"/>
+        <mime:multipartRelated>
+          <mime:part>
+            <soap:body parts="manifest" use="literal" />
+          </mime:part>
+          <mime:part>
+            <mime:content part="attachment" type="application/octetstream" />
+          </mime:part>
+        </mime:multipartRelated>
+      </wsdl:input>
+      <wsdl:output>
+        <wsp:PolicyReference URI="X509V3SignOnly"/>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TSW_WS_SUBMIT_LODGEMENT_SEC">
+    <wsdl:port binding="match:SubmitLodgementBinding" 
+      name="SubmitLodgementPort">
+      <soap:address location="http://localhost:8042/TP1?service=TSW_WS_SUBMIT_LODGEMENT_SEC" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,53 @@
+<Project DefaultTargets="bat:package">
+  <PropertyGroup>
+    <RootDirectory>..</RootDirectory>
+    <RootLevelBin>$(RootDirectory)\bin</RootLevelBin>
+    <ProjectId Condition="'$(ProjectId)'==''">Project</ProjectId>
+    <MSBuildCommonTasks >$(RootLevelBin)\Deployment\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <_TempPackageFolder>$(RootLevelBin)\temp</_TempPackageFolder>
+    <_OutputDirectory Condition="$(_OutputDirectory) == ''">$(RootLevelBin)\BAT</_OutputDirectory>
+    <_XtDeployment>$(RootLevelBin)\Deployment\Bin\XT.REST.Deployment\</_XtDeployment>
+    <_DeployProjFile>$(RootLevelBin)\Deployment\WebFrontendService\Deploy.proj</_DeployProjFile>
+    <_PackageZipFilePath>$(_OutputDirectory)\$(ProjectId).zip</_PackageZipFilePath>
+  </PropertyGroup>
+
+  <Target Name="bat:package">
+    <!--Remove existing temp folder-->
+    <RemoveDir Directories="$(_TempPackageFolder)" />
+
+    <!--Create temp folder-->
+    <MakeDir Directories="$(_TempPackageFolder)" Condition="!Exists('$(_TempPackageFolder)')" />
+
+    <!--Create BAT folder if not exist-->
+    <MakeDir Directories="$(_OutputDirectory)" Condition="!Exists('$(_OutputDirectory)')" />
+    <ItemGroup>
+      <_CommonScripts Include="$(RootLevelBin)\Deployment\CommonScripts\**\*" />
+      <_XtDeploymentFiles Include="$(_XtDeployment)net472\**\*.*" />
+      <_DistFiles Include="$(RootDirectory)\dist\**\*" Exclude="$(RootDirectory)\dist\**\*.uiproj" />
+      <_DeploymentFiles Include="$(RootDirectory)\deployment\**\*" />
+    </ItemGroup>
+
+    <!--Copy all common deployment scripts-->
+    <Copy SourceFiles="@(_CommonScripts)" DestinationFolder="$(_TempPackageFolder)\%(RecursiveDir)" />
+
+    <!-- Copy dist files -->
+    <Copy SourceFiles="@(_DistFiles)" DestinationFolder="$(_TempPackageFolder)\dist\%(RecursiveDir)" />
+    <ZipDirectory SourceDirectory="$(_TempPackageFolder)\dist" DestinationFile="$(_TempPackageFolder)\package.zip" Overwrite="True" />
+    <RemoveDir Directories="$(_TempPackageFolder)\dist" ContinueOnError="True" />
+
+    <!--Copy all files from Deployment directory (incl. Profiles)-->
+    <Copy SourceFiles="@(_DeploymentFiles)" DestinationFolder="$(_TempPackageFolder)\Deployment\%(RecursiveDir)" />
+
+    <!--Copy Deploy.proj-->
+    <Copy SourceFiles="$(_DeployProjFile)" DestinationFolder="$(_TempPackageFolder)\" />
+
+    <!--Copy MsBuildCommonTasks-->
+    <Copy SourceFiles="$(MSBuildCommonTasks)" DestinationFolder="$(_TempPackageFolder)\" />
+
+    <!--Create the zip file-->
+    <ZipDirectory SourceDirectory="$(_TempPackageFolder)" DestinationFile="$(_PackageZipFilePath)" Overwrite="True" />
+
+    <!--Remove temp folder-->
+    <RemoveDir Directories="$(_TempPackageFolder)" ContinueOnError="True" />
+  </Target>
+</Project>

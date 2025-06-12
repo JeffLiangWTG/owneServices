@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="test">
+
+  <PropertyGroup>
+    <SQLCmdExe>SQLCMD.EXE</SQLCmdExe>
+    <ProgramFiles>$([System.IO.Path]::GetFullPath('$(ProgramW6432)'))</ProgramFiles>
+    <DeploymentPath>$(MSBuildThisFileDirectory)..\..\Bin\Deployment\</DeploymentPath>
+    <MSBuildCommonTasks>$(DeploymentPath)Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <TestTargets Include="bat:package:test" />
+    <TestTargets Include="bat:deploy:test" />
+    <TestTargets Include="bat:remove:test" />
+
+    <TargetProjects Include="$(MSBuildThisFileDirectory)..\..\Database\Database\CargoWise.eServices.Billing.Database.sqlproj" />
+
+    <SqlCmdExeFiles Include="$(MSBuildProgramFiles32)/Microsoft SQL Server/Client SDK/ODBC/**/$(SQLCmdExe)" />
+    <SqlCmdExeFiles Include="$(ProgramFiles)/Microsoft SQL Server/Client SDK/ODBC/**/$(SQLCmdExe)" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+
+  <Target Name="test">
+    <Message Text="Testing $(MSBuildThisFileFullPath)" Importance="high" />
+    <CallTarget Targets="@(TestTargets)" />
+  </Target>
+
+  <Target Name="test:init" Returns="@(TargetProjectsFilePath)">
+    <ItemGroup>
+      <TargetProjectsFilePath Include="$([System.IO.Path]::GetFullPath('%(TargetProjects.Identity)'))" />
+    </ItemGroup>
+
+    <GetLastItem Items="@(SqlCmdExeFiles)">
+      <Output TaskParameter="LastItem" PropertyName="SqlCmdExeFilePath"/>
+    </GetLastItem>
+  </Target>
+
+  <Target Name="bat:package:test" DependsOnTargets="test:init">
+    <MSBuild
+      Targets="bat:package"
+      Projects="%(TargetProjectsFilePath.Identity)">
+      <Output TaskParameter="TargetOutputs" PropertyName="PackageFilePath" />
+    </MSBuild>
+
+    <Error
+      Text="The expected package file '$(PackageFilePath) is not found."
+      Condition="!Exists('$(PackageFilePath)')" />
+    <Message Text="Passed" Condition="Exists('$(PackageFilePath)')" Importance="high" />
+  </Target>
+
+  <Target Name="bat:deploy:test" DependsOnTargets="test:init">
+    <MSBuild
+      Targets="bat:deploy"
+      Projects="%(TargetProjectsFilePath.Identity)">
+      <Output TaskParameter="TargetOutputs" PropertyName="DatabaseName" />
+    </MSBuild>
+
+    <Exec
+      ConsoleToMsBuild="true"
+      Command="&quot;$(SqlCmdExeFilePath)&quot; -h -1 -Q &quot;set nocount on; SELECT NAME FROM SYS.DATABASES WHERE NAME = '$(DatabaseName)'&quot;">
+      <Output TaskParameter="ConsoleOutput" PropertyName="ExecOutput" />
+    </Exec>
+
+    <Error Text="Expected database '$(DatabaseName)' is not found." Condition="'$(ExecOutput)'!='$(DatabaseName)'" />
+    <Message Text="Passed" Condition="'$(ExecOutput)'=='$(DatabaseName)'" Importance="high" />
+  </Target>
+
+  <Target Name="bat:remove:test" DependsOnTargets="test:init">
+    <MSBuild
+      Targets="bat:remove"
+      Projects="%(TargetProjectsFilePath.Identity)">
+      <Output TaskParameter="TargetOutputs" PropertyName="DatabaseName" />
+    </MSBuild>
+
+    <Exec
+      ConsoleToMsBuild="true"
+      Command="&quot;$(SqlCmdExeFilePath)&quot; -h -1 -Q &quot;set nocount on; SELECT NAME FROM SYS.DATABASES WHERE NAME = '$(DatabaseName)'&quot;">
+      <Output TaskParameter="ConsoleOutput" PropertyName="ExecOutput" />
+    </Exec>
+
+    <Error Text="Database '$(DatabaseName)' to be removed still exist." Condition="'$(ExecOutput)'=='$(DatabaseName)'" />
+    <Message Text="Passed" Condition="'$(ExecOutput)'==''" Importance="high" />
+  </Target>
+
+  <UsingTask
+    TaskName="GetLastItem"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="$(MSBuildTasksToolsFilePath)">
+    <ParameterGroup>
+      <Items ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <LastItem ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <Using Namespace="System.Linq"/>
+      <Code Type="Fragment" Language="cs">LastItem = Items.Last().ItemSpec;</Code>
+    </Task>
+  </UsingTask>
+
+</Project>

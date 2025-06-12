@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--EXTERNAL_PROPERTIES: Profile;UserName;Password;_Server;_DatabaseFilesPath;_ManifestFileName;_SqlDeploymentConfigFilePath;TargetDatabase-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	
+	<PropertyGroup>
+		<MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(MSBuildExtensionsPath)\ExtensionPack\4.0</MSBuildExtensionsPackPath>
+	</PropertyGroup>
+
+	<Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks"/>
+
+	<Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props"/>
+	<Import Project="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Deployment.props" Condition="'$(Profile)' != ''"/>
+
+	<PropertyGroup>
+		<_SourceFilePath>$(_DatabaseFilesPath)\$(_SourceFileName)</_SourceFilePath>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<_Credentials Condition="'$(UserName)' == '' Or '$(Password)' == ''">Integrated Security=True</_Credentials>
+		<_Credentials Condition="'$(UserName)' != '' And '$(Password)' != ''">User ID=$(UserName);Password='$(Password)'</_Credentials>
+		<ConnectionString Condition="'$(ConnectionString)' == ''">Data Source=$(_Server);Database=$(_TargetDatabaseName);$(_Credentials);Pooling=False</ConnectionString>
+		<VersionCheckConnectionString>Data Source=localhost;Integrated Security=True;Pooling=False</VersionCheckConnectionString>
+	</PropertyGroup>
+	
+	<Target Name="bat:deploy">
+			<PropertyGroup>
+				<SqlPackageExists Condition="Exists('$(PROGRAMFILES) (x86)\Microsoft Visual Studio 14.0')">True</SqlPackageExists>
+				<SqlPackageExists Condition="Exists('C:\PROGRAM FILES (x86)\Microsoft Visual Studio 14.0') AND '$(SqlPackageExists)' == ''">True</SqlPackageExists>
+				<SQLPackagePath Condition="'$(SQLPackagePath)' == ''">%programfiles(x86)%\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\Microsoft\SQLDB\DAC\120\SqlPackage.exe</SQLPackagePath>
+		</PropertyGroup>
+		<Error Condition="'$(SqlPackageExists)' == ''" Text="Visual Studio 2015 is required." />
+		<Exec Command="&quot;$(SQLPackagePath)&quot; /Action:Publish /SourceFile:&quot;$(_SourceFilePath)&quot; /TargetConnectionString:&quot;$(ConnectionString)&quot; /Profile:&quot;$(_SqlDeploymentConfigFilePath)&quot;"/>
+	</Target>
+
+	<Target Name="bat:remove">
+		<Error Condition="'$(_TargetDatabaseName)' == 'master'"
+					 Text="'master' database cannot be deleted."/>
+		<PropertyGroup>
+			<SqlCmdLogOn Condition="'$(UserName)' != '' And '$(Password)' != ''">$(UserName)</SqlCmdLogOn>
+			<SqlCmdPassword Condition="'$(UserName)' != '' And '$(Password)' != ''">$(Password)</SqlCmdPassword>
+		</PropertyGroup>
+		<SqlCmd TaskAction="Execute"
+						Server="$(_Server)"
+						LogOn="$(SqlCmdLogOn)"
+						Password="$(SqlCmdPassword)"
+						CommandLineQuery="
+						alter database [$(_TargetDatabaseName)] set single_user with rollback immediate;
+						drop database [$(_TargetDatabaseName)];"/>
+	</Target>
+
+</Project>

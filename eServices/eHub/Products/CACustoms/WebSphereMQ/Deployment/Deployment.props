@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <_DeploymentPropsImported>$true</_DeploymentPropsImported>
+  </PropertyGroup>
+
+  <!-- Queue Manager -->
+  <ItemGroup>
+    <_QueueManagerName Include="$(_QueueManagerName)">
+      <_MQSC_DESCR>'CA Customs Test'</_MQSC_DESCR>
+      <_MQSC_AUTHOREV>ENABLED</_MQSC_AUTHOREV>
+      <_MQSC_MONACLS>LOW</_MQSC_MONACLS>
+      <_MQSC_lp>100</_MQSC_lp>
+      <_MQSC_ls>100</_MQSC_ls>
+      <_MQSCOPT_sa>sa</_MQSCOPT_sa>
+    </_QueueManagerName>
+  </ItemGroup>
+
+  <ItemDefinitionGroup>
+    <_ListenerName>
+      <_QueueManagerName>$(_QueueManagerName)</_QueueManagerName>
+    </_ListenerName>
+    <_QueueName>
+      <_QueueManagerName>$(_QueueManagerName)</_QueueManagerName>
+    </_QueueName>
+    <_ChannelName>
+      <_QueueManagerName>$(_QueueManagerName)</_QueueManagerName>
+    </_ChannelName>
+  </ItemDefinitionGroup>
+
+  <!-- listener -->
+  <ItemGroup>
+    <_ListenerName Include="LISTENER.TCP">
+      <_Type>TCP</_Type>
+      <_MQSC_CONTROL>QMGR</_MQSC_CONTROL>
+      <_MQSC_PORT>1415</_MQSC_PORT>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_ListenerName>
+  </ItemGroup>
+
+  <!-- Local queue -->
+  <ItemGroup>
+    <_QueueName Include="CAC_RECEIVE_TEST">
+      <_Type>Local</_Type>
+      <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+      <_MQSC_DISTL>NO</_MQSC_DISTL>
+      <_MQSC_MAXDEPTH>5000</_MQSC_MAXDEPTH>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_QueueName>
+    <_QueueName Include="DLQ">
+      <_Type>Local</_Type>
+      <_MQSC_DISTL>NO</_MQSC_DISTL>
+      <_MQSC_MAXDEPTH>5000</_MQSC_MAXDEPTH>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_QueueName>
+    <_QueueName Include="FROM_CBSA">
+      <_Type>Local</_Type>
+      <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+      <_MQSC_DISTL>NO</_MQSC_DISTL>
+      <_MQSC_MAXDEPTH>5000</_MQSC_MAXDEPTH>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_QueueName>
+    <_QueueName Include="FROM_CBSA_RTR">
+      <_Type>Local</_Type>
+      <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+      <_MQSC_DISTL>NO</_MQSC_DISTL>
+      <_MQSC_MAXDEPTH>5000</_MQSC_MAXDEPTH>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_QueueName>
+    <_QueueName Include="MQTCBSA">
+      <_Type>Local</_Type>
+      <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+      <_MQSC_INITQ>SYSTEM.CHANNEL.INITQ</_MQSC_INITQ>
+      <_MQSC_MAXDEPTH>5000</_MQSC_MAXDEPTH>
+      <_MQSC_USAGE>XMITQ</_MQSC_USAGE>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_QueueName>
+  </ItemGroup>
+
+  <!-- Remote queue -->
+  <ItemGroup>
+    <_QueueName Include="CAC_TRANSMIT_TEST">
+      <_Type>Remote</_Type>
+      <_MQSC_RQMNAME>MQTCBSA</_MQSC_RQMNAME>
+      <_MQSC_RNAME>XEQ1_FR_XTWT_W1_EC_INBOUND</_MQSC_RNAME>
+      <_MQSC_XMITQ>MQTCBSA</_MQSC_XMITQ>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_QueueName>
+    <_QueueName Include="CAC_TRANSMIT_TEST_CAD_PTR">
+      <_Type>Remote</_Type>
+      <_MQSC_RQMNAME>MQTCBSA</_MQSC_RQMNAME>
+      <_MQSC_RNAME>XEQ1_FR_XTWT_W1_CDAS_INBOUND</_MQSC_RNAME>
+      <_MQSC_XMITQ>MQTCBSA</_MQSC_XMITQ>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_QueueName>
+    <_QueueName Include="CAC_TRANSMIT_TEST_CAD_RTR">
+      <_Type>Remote</_Type>
+      <_MQSC_RQMNAME>MQTCBSA</_MQSC_RQMNAME>
+      <_MQSC_RNAME>XEQ1_FR_XTWT_T1_CDAS_INBOUND</_MQSC_RNAME>
+      <_MQSC_XMITQ>MQTCBSA</_MQSC_XMITQ>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_QueueName>
+    <_QueueName Include="CAC_TRANSMIT_TEST_RTR">
+      <_Type>Remote</_Type>
+      <_MQSC_RQMNAME>MQTCBSA</_MQSC_RQMNAME>
+      <_MQSC_RNAME>XEQ1_FR_XTWT_T1_EC_INBOUND</_MQSC_RNAME>
+      <_MQSC_XMITQ>MQTCBSA</_MQSC_XMITQ>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_QueueName>
+  </ItemGroup>
+
+  <!-- channel -->
+  <ItemGroup>
+    <_ChannelName Include="EHUBT.SVRCONN">
+      <_Type>SVRCONN</_Type>
+      <_MQSC_TRPTYPE>TCP</_MQSC_TRPTYPE>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_ChannelName>
+    <_ChannelName Include="MQGWTWTG_MQTCBSA">
+      <_Type>SDR</_Type>
+      <_MQSC_CONNAME>'205.193.99.49(1415)'</_MQSC_CONNAME>
+      <_MQSC_TRPTYPE>TCP</_MQSC_TRPTYPE>
+      <_MQSC_XMITQ>MQTCBSA</_MQSC_XMITQ>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_ChannelName>
+    <_ChannelName Include="MQTCBSA_MQGWTWTG">
+      <_Type>RCVR</_Type>
+      <_MQSC_TRPTYPE>TCP</_MQSC_TRPTYPE>
+      <_MQSCOPT_REPLACE>REPLACE</_MQSCOPT_REPLACE>
+    </_ChannelName>
+  </ItemGroup>
+</Project>

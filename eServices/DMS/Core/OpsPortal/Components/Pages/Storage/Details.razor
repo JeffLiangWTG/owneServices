@@ -1,0 +1,75 @@
+﻿@page "/storage/{owner}/details/{tablename}"
+
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<DmsStorageContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>@Owner.@TableName Details</PageTitle>
+
+<h1>@Owner.@TableName</h1>
+
+<div>
+    <h4>Details</h4>
+    <hr />
+    @if (dmsstoragecatalog is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Owner</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_Schema</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Table Name</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_Name</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Type</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_Type</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Version</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_Version</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Expiration Days</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_ExpirationDays</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Create Time</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_CreateTime.ToString("u")</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Create User</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_CreateUser</dd>
+        </dl>
+        <div>
+            <a href="@($"/storage/{Owner}/edit/{TableName}")">Edit</a> |
+                <a href="@($"/storage/{Owner}")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    DmsStorageCatalog? dmsstoragecatalog;
+
+    [Parameter]
+    public required string Owner { get; set; }
+
+    [Parameter]
+    public required string TableName { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        dmsstoragecatalog = await context.DmsStorageCatalog
+            .FirstOrDefaultAsync(m => m.SC_Schema == Owner && m.SC_Name == TableName);
+
+        if (dmsstoragecatalog is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bat:package">
+
+  <PropertyGroup>
+    <DeploymentRootPath>$(MSBuildThisFileDirectory)..\..\..\Bin\Deployment\</DeploymentRootPath>
+    <CommonScriptsPath>$(DeploymentRootPath)Common\</CommonScriptsPath>
+    <InstallCommonPath>$(DeploymentRootPath)Install\</InstallCommonPath>
+    <ProfilesPropsDirectory>$(MSBuildThisFileDirectory)..\Profiles\</ProfilesPropsDirectory>
+    <BizTalkCommonDirectory>$(MSBuildThisFileDirectory)..\BizTalkCommon\</BizTalkCommonDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <_ProjectId>BizTalkHosts</_ProjectId>
+
+    <RelativeBinPath>..\..\..\Bin\</RelativeBinPath>
+    <OutputPath>$(RelativeBinPath)</OutputPath>
+
+    <BinPath Condition="'$(BinPath)'==''">$(MSBuildThisFileDirectory)$(RelativeBinPath)</BinPath>
+    <SourcePath Condition="'$(SourcePath)'==''">$(MSBuildThisFileDirectory)..\..\..\</SourcePath>
+    <BizTalkAdaptersSolutionDirectory>$(SourcePath)BizTalkAdapters\</BizTalkAdaptersSolutionDirectory>
+
+    <RegistryScriptsDirectory>$(DeploymentRootPath)Registry\</RegistryScriptsDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DeployCommonPath Condition="Exists('$(CommonScriptsPath)Deploy.tasks')">$(CommonScriptsPath)</DeployCommonPath>
+    <DeployCommonPath Condition="'$(DeployCommonPath)' == ''">$(MSBuildThisFileDirectory)Common\</DeployCommonPath>
+    <DeployTasks>$(DeployCommonPath)Deploy.tasks</DeployTasks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(CommonScriptsPath)MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(DeploymentRootPath)package-common.tasks</PackageCommonTasks>
+    <BizTalkCommonTasks>$(BizTalkCommonDirectory)BizTalkCommon.tasks</BizTalkCommonTasks>
+    <ProfilesTasks>$(ProfilesPropsDirectory)Profiles.tasks</ProfilesTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+  <Import Project="$(ProfilesTasks)" Condition="'$(ProfilesIncluded)'==''" />
+  <Import Project="$(BizTalkCommonTasks)" Condition="'$(BizTalkCommonImported)'==''"/>
+  <Import Project="$(DeployTasks)" Condition="'$(DeployCommonImported)'==''"/>
+
+  <Target Name="bat:package" Returns="$(_TargetZipFilePath)" DependsOnTargets="bat:package:init">
+    <ItemGroup>
+      <Scripts Include="$(MSBuildThisFileDirectory)Scripts\**\*" />
+      <InstallCommonFiles Include="$(InstallCommonPath)**\*" />
+      <DeployCommonFiles Include="$(DeployCommonPath)**\*" />
+    </ItemGroup>
+
+    <RemoveDir Directories="$(_ZipContentsDirectory)" Condition="Exists($(_ZipContentsDirectory))" />
+    <MakeDir Directories="$(_ZipContentsDirectory)" />
+
+    <!-- Copy package files -->
+    <CallTarget Targets="bat:profiles:copy-output" />
+
+    <Copy SourceFiles="@(Scripts)" DestinationFolder="$(_ZipContentsDirectory)\%(RecursiveDir)" />
+    <Copy SourceFiles="@(DeployCommonFiles)" DestinationFolder="$(_ZipContentsDirectory)\Common\%(RecursiveDir)" />
+    <Copy SourceFiles="@(InstallCommonFiles)" DestinationFolder="$(_ZipContentsDirectory)\%(RecursiveDir)" />
+
+    <Copy SourceFiles="$(BizTalkCommonTasks)" DestinationFolder="$(_ZipContentsDirectory)\BizTalkCommon" />
+    <!-- End package files -->
+
+    <!-- zip the package -->
+    <CallTarget Targets="bat:package:zip" />
+  </Target>
+
+</Project>

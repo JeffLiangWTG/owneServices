@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bat:package">
+
+  <PropertyGroup>
+    <_ProjectId>SqlAssemblies</_ProjectId>
+
+    <RelativeBinPath>..\..\..\Bin\</RelativeBinPath>
+    <OutputPath>$(RelativeBinPath)</OutputPath>
+
+    <BinPath Condition="'$(BinPath)'==''">$(MSBuildThisFileDirectory)$(RelativeBinPath)</BinPath>
+    <SourcePath Condition="'$(SourcePath)'==''">$(MSBuildThisFileDirectory)..\..\..\</SourcePath>
+
+    <DeploymentRootPath>$(BinPath)Deployment\</DeploymentRootPath>
+    <CommonScriptsPath>$(DeploymentRootPath)Common\</CommonScriptsPath>
+    <InstallCommonPath>$(DeploymentRootPath)Install\</InstallCommonPath>
+    <ProfilesPath>$(MSBuildThisFileDirectory)Profiles\</ProfilesPath>
+    <CommonScriptsPath>$(DeploymentRootPath)Common\</CommonScriptsPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(CommonScriptsPath)MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(DeploymentRootPath)package-common.tasks</PackageCommonTasks>
+    <ProfilesTasks>$(ProfilesPath)Profiles.tasks</ProfilesTasks>
+    <DeployTasks>$(CommonScriptsPath)Deploy.tasks</DeployTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+  <Import Project="$(ProfilesTasks)" Condition="'$(ProfilesIncluded)'==''"/>
+  <Import Project="$(DeployTasks)" Condition="'$(DeployCommonImported)'==''"/>
+
+  <Target Name="bat:package" Returns="$(_TargetZipFilePath)">
+    <CallTarget Targets="bat:package:init;bat:profiles:copy-output" />
+
+    <ItemGroup>
+      <Scripts Include="$(MSBuildThisFileDirectory)Scripts\**\*" />
+      <InstallCommonFiles Include="$(InstallCommonPath)**\*" />
+    </ItemGroup>
+
+    <!-- generate and copy sql scripts to zip content -->
+    <CallTarget Targets="GenerateAndCopySqlScripts" />
+
+    <!-- start copy files to be packed -->
+    <Copy SourceFiles="@(Scripts)" DestinationFolder="$(_ZipContentsDirectory)\%(RecursiveDir)" />
+    <Copy SourceFiles="@(InstallCommonFiles)" DestinationFolder="$(_ZipContentsDirectory)\%(RecursiveDir)" />
+    <!-- end copy files to be packed -->
+
+    <CallTarget Targets="bat:package:zip" />
+  </Target>
+
+  <Target Name="GenerateAndCopySqlScripts">
+
+    <PropertyGroup>
+      <ClrDacpac>CargoWise.eHub.DataAccess.CLRFunctions.dacpac</ClrDacpac>
+      <_sqlFilesPath>$(_ZipContentsDirectory)\SQL</_sqlFilesPath>
+      <_binFilesPath>$(_ZipContentsDirectory)\Bin</_binFilesPath>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(_sqlFilesPath)" Condition="!Exists($(_sqlFilesPath))" />
+
+    <!-- prepare the dacpac files -->
+    <ExtractDacpac zipFile="$(BinPath)\$(ClrDacpac)" outputDir="$(_binFilesPath)">
+        <Output TaskParameter="assemblyFiles" ItemName="dacpacAssemblyFiles" />
+    </ExtractDacpac>
+
+    <ItemGroup>
+      <assemblies Include="Common.Logging.Core.dll" />
+      <assemblies Include="Common.Logging.dll" />
+      <assemblies Include="ServiceBroker.Common.dll" />
+      <assemblies Include="ServiceBroker.Interface.dll" />
+      <assemblies Include="CargoWise.eHub.Integration.dll" />
+      <assemblies Include="CargoWise.eHub.Products.AirMessaging.ServiceBroker.Services.dll" />
+      <assemblies Include="CargoWise.eServices.USCustoms.Common.dll" />
+      <assemblies Include="CargoWise.eServices.USCustoms.Integration.dll" />
+      <assemblies Include="CargoWise.eServices.USCustoms.MessageHandler.dll" />
+      <assemblies Include="CargoWise.eServices.USCustoms.MessageHandlerABIACE.dll" />
+      <assemblies Include="CargoWise.eServices.USCustoms.MessageHandlerAES.dll" />
+      <assemblies Include="CargoWise.eServices.USCustoms.MessageHandlerAMA.dll" />
+      <assemblies Include="CargoWise.eServices.USCustoms.MessageHandlerAMS.dll" />
+      <assemblies Include="CargoWise.eServices.USCustoms.MessageHandlerMAN.dll" />
+      <assemblies Include="CargoWise.eServices.USCustoms.Services.dll" />
+      <assemblies Include="@(dacpacAssemblyFiles)" />
+    </ItemGroup>
+    
+    <ExcludeNonExistFiles BinPath="$(BinPath)" assemblies="@(assemblies)">
+      <Output TaskParameter="assemblyFiles" ItemName="assemblyFiles" />
+    </ExcludeNonExistFiles>
+
+    <Message Text="%(assemblyFiles.Identity)" />
+
+    <!-- generate sql script to create the clr assembly and copy onto the output path -->
+    <Message Text="Generating sql scripts for creating SqlAssemblies..." Importance="High" />
+    <GenerateCreateSqlAssemblyScript assemblyFilePath="%(assemblyFiles.Identity)" outputDir="$(_sqlFilesPath)" />
+    <Copy SourceFiles="@(assemblyFiles)" DestinationFolder="$(_binFilesPath)" />
+
+  </Target>
+
+  <UsingTask
+    TaskName="ExcludeNonExistFiles"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <BinPath ParameterType="System.String" Required="true" />
+      <assemblies ParameterType="System.String[]" Required="true" />
+      <assemblyFiles ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        $assemblyFiles = @()
+        $assemblies | % {
+          $filePath = Join-Path $BinPath $_
+
+          if (Test-Path $filePath) {
+            $file = Get-Item $filePath
+            $assemblyFiles += $file.FullName
+          }
+        }
+      ]]>
+    </Task>
+
+  </UsingTask>
+
+  <!-- unzip zip file contents, a work around since powershell 4.0 version doesn't have Expand-Archive -->
+  <UsingTask
+    TaskName="ExtractDacpac"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <zipFile ParameterType="System.String" Required="true" />
+      <outputDir ParameterType="System.String" Required="true" />
+      <assemblyFiles ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+        $file = Get-Item $zipFile
+        $dir = $outputDir
+        if ($null -eq $dir) {
+          $dir = Split-Path $zipFile -Parent
+        }
+
+        $folderName = $file.BaseName.Replace(".", "_")
+        $destDir = Join-Path $dir $folderName
+        New-Item -ItemType directory $destDir
+
+        [io.compression.zipfile]::ExtractToDirectory($zipFile, $destDir)
+
+        $modelXmlFile= Join-Path $destDir "model.xml"
+        if (!(Test-Path $modelXmlFile)) {
+          throw "$modelXmlFile not found"
+        }
+
+        $assemblyFiles = @()
+        [xml]$xml = Get-Content -Raw $modelXmlFile
+        $xml.DataSchemaModel.Header.CustomData.Where({($_.Category -eq "Reference") -and ($_.Type -eq "Assembly")}).ChildNodes | % {
+          if ($_.Name -eq "LogicalName") {
+            $assemblyFiles += $_.Value
+          }
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask
+    TaskName="GenerateCreateSqlAssemblyScript"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <assemblyFilePath ParameterType="System.String" Required="true" />
+      <outputDir ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        $file = Get-Item $assemblyFilePath
+        $assemblyName = $file.BaseName
+
+        $contentBuilder = New-Object -Type System.Text.StringBuilder
+        $fileStream = [IO.File]::OpenRead($file.FullName)
+        while (($byte = $fileStream.ReadByte()) -gt -1) {
+            $contentBuilder.Append($byte.ToString("X2")) | Out-Null
+        }
+
+          $formatString = "
+IF EXISTS (
+  SELECT 1 FROM SYS.ASSEMBLIES
+  WHERE NAME = '{0}'
+) 
+BEGIN
+IF NOT EXISTS (
+  SELECT 1 
+  FROM SYS.ASSEMBLY_FILES
+  WHERE NAME = '{0}'
+  AND 
+  CONTENT = 0x{1}
+)
+BEGIN
+PRINT 'ALTER ASSEMBLY [{0}]'
+ALTER ASSEMBLY [{0}]
+  FROM 0x{1}
+  WITH PERMISSION_SET = UNSAFE
+END
+ELSE
+BEGIN
+  PRINT 'No update required for SQL assembly [{0}].'
+END
+END
+ELSE
+BEGIN
+PRINT 'CREATE ASSEMBLY [{0}]'
+CREATE ASSEMBLY [{0}]
+  AUTHORIZATION [dbo]
+  FROM 0x{1}
+  WITH PERMISSION_SET = UNSAFE
+END
+
+GO";
+
+        $stringBuilder = New-Object -Type System.Text.StringBuilder;
+        $stringBuilder.AppendFormat($formatString, $assemblyName, $contentBuilder.ToString());
+        $sqlScriptFile = $assemblyName + ".sql";
+        $sqlScriptFilePath = Join-Path $outputDir $sqlScriptFile
+        $stringBuilder.ToString() -join "" | Out-File $sqlScriptFilePath
+      ]]>
+    </Task>
+  </UsingTask>
+  
+</Project>

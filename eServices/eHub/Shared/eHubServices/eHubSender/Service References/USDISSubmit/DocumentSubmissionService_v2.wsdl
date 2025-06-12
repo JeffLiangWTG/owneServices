@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:IWS="http://iws.cbp.dhs.gov/ITDSServices/IWS" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://iws.cbp.dhs.gov/ITDSServices/IWS" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:documentation>
+           Service Name: DISWebService
+		   Purpose: DIS Web Service WSDL to be implemented by Trade Partners to submit DIS documents and accomopanying meta-data to CBP. 
+		   Hosted by: CBP DIS
+		   Created by CBP DIS team
+			  POC: Shailesh Sardesai, shailesh.s.sardesai@cbp.dhs.gov
+			  POC: Rahul Patel, rahul.patel@cbp.dhs.gov
+		   WSDL Specification: 1.1
+		   Usage: Please see operations and signature definitions provided below
+		      Note: Arguments to operations are deliberately defined as strings rather than XML types to minimize code impact to top-down implementations when 'types' change.
+   </wsdl:documentation>
+  <wsdl:types>
+    <xs:schema elementFormDefault="qualified" targetNamespace="http://iws.cbp.dhs.gov/ITDSServices/IWS">
+      <xs:element name="CredentialData" type="IWS:CredentialData" />
+      <xs:complexType name="CredentialData">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="UserID" type="xs:string" />
+          <xs:element minOccurs="1" maxOccurs="1" name="Password" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="SecurityToken">
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+      <xs:simpleType name="ServiceStatus">
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+      <xs:simpleType name="DocumentSubmissionMessage">
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+      <xs:simpleType name="ResponseMessage">
+        <xs:restriction base="xs:string" />
+      </xs:simpleType>
+      <xs:simpleType name="enumServiceStatus">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="SUCCESS" />
+          <xs:enumeration value="FAILURE" />
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="enumReturnCode">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="SUCCESS" />
+          <xs:enumeration value="FAILURE" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="GetSecurityToken_IN">
+    <wsdl:part name="CredentialData" type="IWS:CredentialData" />
+  </wsdl:message>
+  <wsdl:message name="GetSecurityToken_OUT">
+    <wsdl:part name="SecurityToken" type="IWS:SecurityToken" />
+  </wsdl:message>
+  <wsdl:message name="CheckServiceStatus_IN">
+    <wsdl:part name="SecurityToken" type="IWS:SecurityToken" />
+  </wsdl:message>
+  <wsdl:message name="CheckServiceStatus_OUT">
+    <wsdl:part name="ServiceStatus" type="IWS:ServiceStatus" />
+  </wsdl:message>
+  <wsdl:message name="SubmitDocument_IN">
+    <wsdl:part name="SecurityToken" type="IWS:SecurityToken" />
+    <wsdl:part name="DocumentSubmissionMessage" type="IWS:DocumentSubmissionMessage" />
+  </wsdl:message>
+  <wsdl:message name="SubmitDocument_OUT">
+    <wsdl:part name="ResponseMessage" type="IWS:ResponseMessage" />
+  </wsdl:message>
+  <wsdl:portType name="DocumentSubmissionServicePortType">
+    <wsdl:operation name="GetSecurityToken" parameterOrder="CredentialData">
+      <wsdl:input message="IWS:GetSecurityToken_IN" />
+      <wsdl:output message="IWS:GetSecurityToken_OUT" />
+    </wsdl:operation>
+    <wsdl:operation name="CheckServiceStatus" parameterOrder="SecurityToken">
+      <wsdl:input message="IWS:CheckServiceStatus_IN" />
+      <wsdl:output message="IWS:CheckServiceStatus_OUT" />
+    </wsdl:operation>
+    <wsdl:operation name="SubmitDocument" parameterOrder="SecurityToken DocumentSubmissionMessage">
+      <wsdl:input message="IWS:SubmitDocument_IN" />
+      <wsdl:output message="IWS:SubmitDocument_OUT" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="DocumentSubmissionServiceSOAPBinding" type="IWS:DocumentSubmissionServicePortType">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="rpc" />
+    <wsdl:operation name="GetSecurityToken">
+      <soap12:operation soapAction="https://iws.cbp.dhs.gov/ITDSServices/IWS/DataPushService//GetSecurityToken" />
+      <wsdl:input>
+        <soap12:body use="literal" namespace="http://iws.cbp.dhs.gov/ITDSServices/IWS" parts="CredentialData" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" namespace="http://iws.cbp.dhs.gov/ITDSServices/IWS" parts="SecurityToken" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CheckServiceStatus">
+      <soap12:operation soapAction="https://iws.cbp.dhs.gov/ITDSServices/IWS/DataPushService//CheckServiceStatus" />
+      <wsdl:input>
+        <soap12:body use="literal" namespace="http://iws.cbp.dhs.gov/ITDSServices/IWS" parts="SecurityToken" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" namespace="http://iws.cbp.dhs.gov/ITDSServices/IWS" parts="ServiceStatus" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SubmitDocument">
+      <soap12:operation soapAction="https://iws.cbp.dhs.gov/ITDSServices/IWS/DataPushService//SubmitDocument" />
+      <wsdl:input>
+        <soap12:body use="literal" namespace="http://iws.cbp.dhs.gov/ITDSServices/IWS" parts="SecurityToken DocumentSubmissionMessage" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" namespace="http://iws.cbp.dhs.gov/ITDSServices/IWS" parts="ResponseMessage" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DocumentSubmissionService">
+    <wsdl:port name="DocumentSubmissionServiceEndPoint" binding="IWS:DocumentSubmissionServiceSOAPBinding">
+      <soap12:address location="https://fnwg-dp-internet05.cbp.dhs.gov:2933/ITDSServices/IWS/DocumentSubmissionService" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

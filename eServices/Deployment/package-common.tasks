@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <PackageCommonTasksImported>True</PackageCommonTasksImported>
+    <DeploymentPropsFilePath>$(MSBuildProjectDirectory)\Deployment\Deployment.props</DeploymentPropsFilePath>
+    <ProfiledDeploymentPropsFilePath>$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Deployment.props</ProfiledDeploymentPropsFilePath>
+  </PropertyGroup>
+
+  <Import Project="$(DeploymentPropsFilePath)" Condition="Exists('$(DeploymentPropsFilePath)') and '$(_DeploymentPropsImported)'==''"/>
+  <Import Project="$(ProfiledDeploymentPropsFilePath)" Condition="'$(Profile)'!='' and '$(_ProfilePropsImported)'=='' and Exists('$(ProfiledDeploymentPropsFilePath)')"/>
+
+  <PropertyGroup>
+    <PackageOutputPath Condition="'$(PackageOutputPath)'==''">$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(OutputPath)'))</PackageOutputPath>
+    <PackageOutputPath>$([System.IO.Path]::GetFullPath('$(PackageOutputPath)'))</PackageOutputPath>
+    <PackageOutputPath Condition="$(PackageOutputPath.EndsWith('\\'))">$(PackageOutputPath.TrimEnd('\\'))</PackageOutputPath>
+
+    <MSBuildCommonTasks Condition="'$(MSBuildCommonTasks)'=='' or !Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <Operator Condition="'$(Operator)'==''">$(USERNAME.ToLower())</Operator>
+    <DATOperator Condition="'$(Operator)'=='s_datservice' or '$(Operator)'=='datbackground'">true</DATOperator>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <_ProjectId Condition="'$(_ProjectId)'==''">$(MSBuildProjectName)</_ProjectId>
+    <_TimeStamp>$([System.DateTime]::Now.ToString(`yyyyMMdd_HHmmss`))</_TimeStamp>
+    <_TempDirectory>$([System.IO.Path]::GetFullPath('$(TEMP)'))</_TempDirectory>
+    <_ZipContentsDirectory>$([System.IO.Path]::Combine('$(_TempDirectory)', '$(_ProjectId)', '$(_TimeStamp)'))</_ZipContentsDirectory>
+    <_ZipFileName>$(_ProjectId).zip</_ZipFileName>
+    <_ZipFilesDirectory>$(_TempDirectory)</_ZipFilesDirectory>
+    <_ZipFilePath>$([System.IO.Path]::Combine('$(_ZipFilesDirectory)', '$(_ZipFileName)'))</_ZipFilePath>
+    <_TargetZipFilePath>$([System.IO.Path]::Combine('$(PackageOutputPath)', '$(_ZipFileName)'))</_TargetZipFilePath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+
+  <!-- prepare and initialize variables for packaging -->
+  <Target Name="bat:package:init" Returns="$(_ZipContentsDirectory)">
+    <Error Text="The OutputPath variable is not set, since the value is '$(OutputPath)'"
+           Condition="'$(OutputPath)'==''" />
+    <Error Text="The specified OutputPath '$(OutputPath)' is an absolute path, a relative path to $(MSBuildThisFileDirectory)"
+           Condition="$([System.IO.Path]::IsPathRooted('$(OutputPath)'))" />
+
+    <Delete Files="$(_ZipFilePath)" Condition="Exists($(_ZipFilePath))" />
+    <Delete Files="$(_TargetZipFilePath)" Condition="Exists($(_TargetZipFilePath))" />
+
+    <RemoveDir Directories="$(_ZipContentsDirectory)" Condition="Exists($(_ZipContentsDirectory))" />
+    <MakeDir Directories="$(_ZipContentsDirectory)" />
+
+    <Message Text="_ProjectId: $(_ProjectId)" Importance="High" />
+    <Message Text="_ZipContentsDirectory: $(_ZipContentsDirectory)" Importance="High" />
+  </Target>
+
+  <!-- assume $(_ZipContentsDirectory) contains all files to be packed -->
+  <Target Name="bat:package:zip" Returns="$(_TargetZipFilePath)">
+    <Delete Files="$(_ZipFilePath)" Condition="Exists($(_ZipFilePath))" />
+
+    <Message Text="Zip $(_ZipContentsDirectory) to zip file $(_ZipFilePath)" />
+    <Zip
+      TaskAction="Create"
+      ZipFileName="$(_ZipFilePath)"
+      CompressPath="$(_ZipContentsDirectory)"
+      Removeroot="$(_ZipContentsDirectory)" />
+
+    <!-- copy over to $(PackageOutputPath) and remove the temp folder and zip file if $(PackageOutputPath) exists -->
+    <Copy
+      SourceFiles="$(_ZipFilePath)"
+      DestinationFolder="$(PackageOutputPath)"
+      ContinueOnError="true" />
+    <!-- end copy over to $(PackageOutputPath) and remove -->
+
+    <Delete Files="'$(_ZipFilePath)'" Condition="Exists('$(_ZipFilePath)')" />
+    <RemoveDir Directories="$(_ZipContentsDirectory)" Condition="Exists('$(_ZipContentsDirectory)')" />
+
+    <Message Text="[Package Zip File]" Importance="High" />
+    <Message Text="$(_TargetZipFilePath)" />
+  </Target>
+
+  <Target Name="dir:create-temp-path" Returns="$(newTempDir)">
+    <PropertyGroup>
+      <currentTimeStamp>$([System.DateTime]::Now.ToString(`yyyyMMdd_HHmmss_fff`))</currentTimeStamp>
+      <newTempDir>$([System.IO.Path]::Combine('$(_TempDirectory)', '$(currentTimeStamp)'))</newTempDir>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(newTempDir)" />
+  </Target>
+</Project>

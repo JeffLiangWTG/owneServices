@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bat:package">
+
+  <PropertyGroup>
+    <RelativeBinPath>..\..\..\Bin\</RelativeBinPath>
+    <OutputPath>$(RelativeBinPath)</OutputPath>
+
+    <BinPath Condition="'$(BinPath)'==''">$(MSBuildThisFileDirectory)$(RelativeBinPath)</BinPath>
+    <SourcePath Condition="'$(SourcePath)'==''">$(MSBuildThisFileDirectory)..\..\..\</SourcePath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BinPath Condition="$(BinPath.EndsWith('\\'))">$(BinPath.TrimEnd('\\'))</BinPath>
+    <DestinationDirectory>$(BinPath)</DestinationDirectory>
+
+    <DeploymentRootPath>$(BinPath)\Deployment\</DeploymentRootPath>
+    <CommonScriptsPath>$(DeploymentRootPath)Common\</CommonScriptsPath>
+    <InstallCommonPath>$(DeploymentRootPath)Install\</InstallCommonPath>
+    <ProfilesPropsDirectory>$(MSBuildThisFileDirectory)..\Profiles\</ProfilesPropsDirectory>
+    <BizTalkCommonDirectory>$(MSBuildThisFileDirectory)..\BizTalkCommon\</BizTalkCommonDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <_ProjectId>BizTalkAssemblies</_ProjectId>
+
+    <BizTalkAdaptersSolutionDirectory>$(SourcePath)BizTalkAdapters\</BizTalkAdaptersSolutionDirectory>
+
+    <RegistryScriptsDirectory>$(DeploymentRootPath)Registry\</RegistryScriptsDirectory>
+    <RegistryFilesPath>$(BizTalkAdaptersSolutionDirectory)Setup\Registry</RegistryFilesPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DeployCommonPath Condition="Exists('$(CommonScriptsPath)Deploy.tasks')">$(CommonScriptsPath)</DeployCommonPath>
+    <DeployCommonPath Condition="'$(DeployCommonPath)' == ''">$(MSBuildThisFileDirectory)Common\</DeployCommonPath>
+    <DeployTasks>$(DeployCommonPath)Deploy.tasks</DeployTasks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(CommonScriptsPath)MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(DeploymentRootPath)package-common.tasks</PackageCommonTasks>
+    <BizTalkCommonTasks>$(BizTalkCommonDirectory)BizTalkCommon.tasks</BizTalkCommonTasks>
+    <ProfilesTasks>$(ProfilesPropsDirectory)Profiles.tasks</ProfilesTasks>
+    <BizTalkAssembliesPackTasks>$(MSBuildThisFileDirectory)BizTalkAssembliesPack.tasks</BizTalkAssembliesPackTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+  <Import Project="$(ProfilesTasks)" Condition="'$(ProfilesIncluded)'==''" />
+  <Import Project="$(BizTalkCommonTasks)" Condition="'$(BizTalkCommonImported)'==''"/>
+  <Import Project="$(DeployTasks)" Condition="'$(DeployCommonImported)'==''"/>
+
+  <PropertyGroup>
+    <TargetBinDir>$(_ZipContentsDirectory)\Bin</TargetBinDir>
+  </PropertyGroup>
+
+  <Target Name="paket">
+    <Exec Command="paket.exe restore" WorkingDirectory="$(SourcePath)" />
+  </Target>
+
+  <Target Name="bat:package" Returns="$(_TargetZipFilePath)" DependsOnTargets="bat:package:init">
+    <ItemGroup>
+      <Scripts Include="$(MSBuildThisFileDirectory)Scripts\**\*" />
+      <Profiles Include="$(BizTalkCommonProfilesDirectory)\**\*" />
+
+      <InstallCommonFiles Include="$(InstallCommonPath)**\*" />
+      <DeployCommonFiles Include="$(DeployCommonPath)**\*" />
+
+      <Tools Include="$(BinPath)\Tools\*.dll" />
+    </ItemGroup>
+
+    <Error Text="No files found from $(BinPath)\Tools\. Please make sure the full build has been completed successfully." Condition="'@(Tools->Count())' &lt; '1'" />
+
+    <!-- copy assembly files -->
+    <CallTarget Targets="assemblies:pack-to-bin;assemblies:generate-file-infos" />
+
+    <!-- Copy package files -->
+    <CallTarget Targets="bat:profiles:copy-output" />
+
+    <Copy SourceFiles="@(Scripts)" DestinationFolder="$(_ZipContentsDirectory)\%(RecursiveDir)" />
+    <Copy SourceFiles="@(DeployCommonFiles)" DestinationFolder="$(_ZipContentsDirectory)\Common\%(RecursiveDir)" />
+    <Copy SourceFiles="$(BizTalkCommonTasks)" DestinationFolder="$(_ZipContentsDirectory)\BizTalkCommon" />
+    <Copy SourceFiles="$(BizTalkAdminFilePath)" DestinationFolder="$(_ZipContentsDirectory)\BizTalkCommon" />
+    <Copy SourceFiles="@(InstallCommonFiles)" DestinationFolder="$(_ZipContentsDirectory)\%(RecursiveDir)" />
+    <Copy SourceFiles="@(Tools)" DestinationFolder="$(_ZipContentsDirectory)\Bin\Tools" />
+    <!-- End package files -->
+
+    <!-- zip the package -->
+    <CallTarget Targets="bat:package:zip" />
+  </Target>
+
+  <!-- call the BizTalkAssembliesPack tasks to filter out BizTalk assemblies and their dependents reference assemblies, excluding unit tests and not strong-name signed assemblies -->
+  <!-- and then, copy to temporary $(_ZipContentsDirectory) bin folder for packaging -->
+  <Target Name="assemblies:pack-to-bin" Returns="@(SelectedAssemblyFileNames)" DependsOnTargets="bat:package:init">
+    <MSBuild Projects="$(BizTalkAssembliesPackTasks)" Targets="assemblies:select-biztalk-assemblies" Properties="_ZipContentsDirectory=$(_ZipContentsDirectory)">
+      <Output
+        TaskParameter="TargetOutputs"
+        ItemName="SelectedAssemblyFileNames" />
+    </MSBuild>
+
+    <Message Text="SelectedAssemblyFileNames:" />
+    <Message Text="%(SelectedAssemblyFileNames.Identity)" />
+    <Copy SourceFiles="@(SelectedAssemblyFileNames->'$(BinPath)\%(Identity)')" DestinationFolder="$(TargetBinDir)" />
+  </Target>
+
+  <!-- generate file info on the final selected assembly files -->
+  <Target Name="assemblies:generate-file-infos" Returns="$(AssemblyInfosFilePath)" DependsOnTargets="assemblies:pack-to-bin">
+    <Error Text="Please provide the directory path where the assemblies are located." Condition="'$(TargetBinDir)'=='' or !Exists('$(TargetBinDir)')" />
+
+    <ItemGroup>
+      <AssemblyFiles Include="$(TargetBinDir)\*.dll" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <AssemblyInfosFilePath Condition="'$(AssemblyInfosFilePath)'==''">$(TargetBinDir)\AssemblyInfos.props</AssemblyInfosFilePath>
+    </PropertyGroup>
+
+    <!-- OutputItems provides the following metadata: 
+      AssemblyVersion, FileVersion, Culture, CultureDisplayName, FullName, PublicKeyToken, AssemblyInformationalVersion -->
+    <MSBuild.ExtensionPack.Framework.Assembly TaskAction="GetInfo" NetAssembly="%(AssemblyFiles.FullPath)">
+      <Output TaskParameter="OutputItems" ItemName="AssemblyInfo"/>
+    </MSBuild.ExtensionPack.Framework.Assembly>
+
+    <WriteItemGroupToFile
+      Items="@(AssemblyInfo)"
+      ItemName="Assembly"
+      IdentityMetadata="FullName"
+      Metadata="AssemblyVersion,FileVersion,Culture,FullName,PublicKeyToken,AssemblyInformationalVersion"
+      File="$(AssemblyInfosFilePath)"
+      Overwrite="true"
+      SortedAssemblyFileNames="@(SelectedAssemblyFileNames)" />
+  </Target>
+
+  <UsingTask
+    TaskName="WriteItemGroupToFile"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <Items ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <ItemName ParameterType="System.String" Required="true" />
+      <IdentityMetadata ParameterType="System.String" Required="true" />
+      <Metadata ParameterType="System.String" Required="true" />
+      <File ParameterType="System.String" Required="true" />
+      <Overwrite ParameterType="System.Boolean" Required="true" />
+      <SortedAssemblyFileNames ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+
+    <Task>
+    <![CDATA[
+      if ($null -ne $error) { $error.Clear() }
+
+      [string]$namespace = "http://schemas.microsoft.com/developer/msbuild/2003"
+      [xml]$xml = "<`?xml version='1.0' encoding='utf-8'`?><Project xmlns='$namespace'><PropertyGroup><AssemblyInfosPropsImported>true</AssemblyInfosPropsImported></PropertyGroup></Project>"
+
+      try {
+        if ($Overwrite -and (Test-Path $File)) { Remove-Item $File }
+
+        [string[]] $OrderedFileNames = @()
+        $SortedAssemblyFileNames | % {
+          $OrderedFileNames += $_.GetMetadata("Identity").ToLower()
+        }
+
+        [string]$LengthMetadata = "Length"
+        [string]$FileNameMetadata = "AssemblyFileName"
+        [string]$SortOrderMetadata = "SortOrder"
+
+        [string[]]$MetadataNames = $Metadata -split ","
+        ($FileNameMetadata, $LengthMetadata, $SortOrderMetadata) | % { $MetadataNames += $_ }
+
+        [string]$ItemGroup = "ItemGroup"
+        $itemGroupElement = $xml.CreateElement($ItemGroup, $namespace)
+        $xml.DocumentElement.AppendChild($itemGroupElement)
+        
+        $orderedChildElements = New-Object 'system.collections.generic.sorteddictionary[int,object]'
+        $Items | % {
+          $item = $_
+          $identity = $item.GetMetadata($IdentityMetadata)
+
+          if (![string]::IsNullOrEmpty($identity)) { 
+            $fileName =("{0}.dll" -f ($identity -split ",")[0])
+            $sortOrder = $OrderedFileNames.IndexOf($fileName.ToLower())
+
+            $item.SetMetadata($FileNameMetadata, $fileName)
+            $item.SetMetadata($LengthMetadata, $fileName.Length)
+            $item.SetMetadata($SortOrderMetadata, $sortOrder)
+
+            $itemElement = $xml.CreateElement($ItemName, $namespace)
+            $includeAttribute = $itemElement.OwnerDocument.CreateAttribute("Include")
+            $includeAttribute.Value = ("`$`(MSBuildThisFileDirectory`){0}" -f $fileName)
+            $itemElement.Attributes.Append($includeAttribute)
+
+            ($MetadataNames) | % {
+              $value = $item.GetMetadata($_)
+
+              if (![string]::IsNullOrEmpty($value)) { 
+                $childElement = $itemElement.OwnerDocument.CreateElement($_, $namespace)
+                $childElement.InnerText = $value
+                $itemElement.AppendChild($childElement)
+              }
+            }
+
+            $orderedChildElements.Add($sortOrder, $itemElement)
+          }
+        }
+
+        $orderedChildElements.Keys | % {
+          $itemGroupElement.AppendChild($orderedChildElements[$_])
+        }
+
+        # save the xml to file utf-8 encoding
+        $utf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
+        $streamWriter = New-Object System.IO.StreamWriter($File, $false, $utf8WithoutBom)
+
+        $xml.Save( $streamWriter )
+        $streamWriter.Close()
+      } catch {
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", $error)
+        throw $error
+      }
+    ]]>
+    </Task>
+  </UsingTask>
+
+</Project>

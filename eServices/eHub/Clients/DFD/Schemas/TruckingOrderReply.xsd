@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified"
+           targetNamespace="http://exworks.com/schema" xmlns="http://exworks.com/schema">
+
+    <xs:annotation>
+        <xs:appinfo>
+            <schemaInfo root_reference="TruckingOrderReply" displayroot_reference="TruckingOrderReply" xmlns="http://schemas.microsoft.com/BizTalk/2003" />
+        </xs:appinfo>
+    </xs:annotation>
+
+    <xs:include schemaLocation=".\ExWorksTypes.xsd"/>
+
+    <xs:element name="ShipmentIdentifiers">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="FileNumber" type="FileNumberType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Rejected">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="RejectReasons" minOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                            <xs:element name="RejectReason" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Accepted">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Warnings" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="Warning" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="TruckingOrderReply">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="TransactionHeader" type="ResponseTransactionHeaderType"/>
+                <xs:element ref="ShipmentIdentifiers"/>
+                <xs:choice>
+                    <xs:element ref="Accepted"/>
+                    <xs:element ref="Rejected"/>
+                </xs:choice>
+                <xs:element name="UserDefinedValues" type="UserDefinedValuesType" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="exworksVersion" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string"/>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
+	

@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageVersion>1.0.0</PackageVersion>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>esv-dattool</ToolCommandName>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CustomContentTarget</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <MSBuild Projects="..\DatDeploy\eServices.BuildTools.DatDeploy.csproj" Targets="Publish" Properties="NoBuild=true;Configuration=$(Configuration);TargetFramework=net48" />
+    <MSBuild Projects="..\DatDeploy\eServices.BuildTools.DatDeploy.csproj" Targets="Publish" Properties="NoBuild=true;Configuration=$(Configuration);TargetFramework=net8.0" />
+  </Target>
+
+  <Target Name="CustomContentTarget">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="..\Bin\Publish\eServices.BuildTools.DatDeploy\**\*">
+        <PackagePath>content\%(PublishedContent.RecursiveDir)</PackagePath>
+      </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
+  
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DatDeploy\eServices.BuildTools.DatDeploy.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="eServices.BuildTools.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100dd81107145159ef74a16159de9575e9d49a7038ce8abf4d12445c50b6ac89c71034e02e783d04ee4820779121ec441843d12f4103385a118911b98b33f3e32c2393f761299b87b38cf2825d8cd295c4d567e6dc46e4295c3850de6c39b21e8f9db896639a0a0b360e5f858112a5f15aad857633842e7bc692c6e5fa45d0e13ba" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="True" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

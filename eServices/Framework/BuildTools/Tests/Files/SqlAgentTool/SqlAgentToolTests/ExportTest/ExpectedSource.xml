@@ -1,0 +1,647 @@
+<Source>
+  <Folder Name="AlertBlockedProcess">
+    <File Name="SendAlert.sql"><![CDATA[SET ANSI_NULLS, QUOTED_IDENTIFIER ON;
+
+DECLARE @errorPK uniqueidentifier = NEWID();
+DECLARE @source varchar(3) = 'SQL';
+DECLARE @errorType varchar(3) = 'Fai';
+DECLARE @inboxPK varchar(36) = NULL;
+DECLARE @currentDateTimeUTC varchar(32) = convert(varchar(32), getutcdate(), 127);
+DECLARE @issueMessageDelimiter nvarchar(50) = '
+----------BIZTALK PROPERTIES----------
+';
+
+DECLARE @description nvarchar(max);
+DECLARE @textData nvarchar(max);
+DECLARE @graphXml xml;
+DECLARE @issueManagerKey nvarchar(max);
+DECLARE @clientAppName nvarchar(max);
+DECLARE @hostname nvarchar(max);
+
+SET @textData = REPLACE('$(ESCAPE_NONE(WMI(TextData)))', '&#x0A;', CHAR(10));
+SET @graphXml = @textData
+
+DECLARE @databaseName nvarchar(1000) = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/@currentdbname)[1]', 'nvarchar(1000)');
+DECLARE @logMessage nvarchar(max) = 'Blocked Process in database [' + @databaseName + ']: ' + @textData;
+DECLARE @pos int = 1, @len int = 1000;
+WHILE @pos <= LEN(@logMessage) BEGIN PRINT SUBSTRING(@logMessage, @pos, @len); SET @pos += @len; END
+IF @databaseName NOT IN ('BAMArchive','BAMPrimaryImport','BizTalkDTADb','BizTalkMgmtDb','BizTalkMsgBoxDb','SSISDB','SSODB')
+  RETURN;
+
+SELECT @issueManagerKey = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/inputbuf)[string-length()>0][1]', 'nvarchar(max)');
+
+IF @issueManagerKey IS NULL
+BEGIN
+	SET @clientAppName = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/@clientapp)[1]', 'nvarchar(max)');
+	SET @hostname = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/@hostname)[1]', 'nvarchar(max)');
+	SET @issueManagerKey = CONCAT(@clientAppName, '-', @hostname);
+END
+
+IF @issueManagerKey = '-'
+BEGIN
+	SET @issueManagerKey = @graphXml.value('(/TextData/blocked-process-report/blocking-process/process/inputbuf)[string-length()>0][1]', 'nvarchar(max)');
+END
+
+IF @issueManagerKey IS NULL
+BEGIN
+	SET @clientAppName = @graphXml.value('(/TextData/blocked-process-report/blocking-process/process/@clientapp)[1]', 'nvarchar(max)');
+	SET @hostname = @graphXml.value('(/TextData/blocked-process-report/blocking-process/process/@hostname)[1]', 'nvarchar(max)');
+	SET @issueManagerKey = CONCAT(@clientAppName, '-', @hostname);
+END
+
+SET @issueManagerKey = REPLACE(CONCAT('Blocked process: ', @issueManagerKey), CHAR(10), ' ')
+WHILE CHARINDEX('  ', @issueManagerKey) > 0 SET @issueManagerKey = REPLACE(@issueManagerKey, '  ', ' ')
+SET @description = CONCAT(@issueManagerKey, @issueMessageDelimiter, 'SERVERNAME: $(ESCAPE_NONE(A-SVR))', CHAR(10), 'REPORT:', CHAR(10),  @textData);
+
+EXECUTE [eHubTransactionsServer].[eHubTransactions].[dbo].[InsertError] 
+	 @ErrorPK = @errorPK
+	,@Source = @source
+	,@ErrorType = @errorType
+	,@Description = @description
+	,@InboxPK = @inboxPK
+	,@CurrentDateTimeUTC = @currentDateTimeUTC;
+
+PRINT 'Sent to issue manager.'
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>AlertBlockedProcess</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>No description available.</Description>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="SendAlert" Command="SendAlert.sql" Type="SQL" Database="msdb" />
+  </Steps>
+  <Schedules />
+  <Alerts>
+    <Alert Name="BlockedProcess" Enabled="true" WmiNamespace="\\.\root\Microsoft\SqlServer\ServerEvents\INSTANCE1" WmiQuery="SELECT * FROM BLOCKED_PROCESS_REPORT" />
+  </Alerts>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="AlertDeadlock">
+    <File Name="SendAlert.sql"><![CDATA[SET ANSI_NULLS, QUOTED_IDENTIFIER ON;
+
+DECLARE @errorPK uniqueidentifier = NEWID();
+DECLARE @source varchar(3) = 'SQL';
+DECLARE @errorType varchar(3) = 'Fai';
+DECLARE @description varchar(max);
+DECLARE @inboxPK varchar(36) = NULL;
+DECLARE @currentDateTimeUTC varchar(32) = convert(varchar(32), getutcdate(), 127);
+DECLARE @issueMessageDelimiter nvarchar(50) = '
+----------BIZTALK PROPERTIES----------
+';
+
+DECLARE @textData nvarchar(max);
+DECLARE @graphXml xml;
+DECLARE @issueManagerKey nvarchar(max);
+
+SET @textData = REPLACE('$(ESCAPE_NONE(WMI(TextData)))', '&#x0A;', CHAR(10));
+SET @graphXml = @textData
+
+DECLARE @databaseName nvarchar(1000) = @graphXml.value('(/TextData/deadlock-list/deadlock/process-list/process/@currentdbname)[1]', 'nvarchar(1000)');
+DECLARE @logMessage nvarchar(max) = 'Deadlock in database [' + @databaseName + ']: ' + @textData;
+DECLARE @pos int = 1, @len int = 1000;
+WHILE @pos <= LEN(@logMessage) BEGIN PRINT SUBSTRING(@logMessage, @pos, @len); SET @pos += @len; END
+IF @databaseName NOT IN ('BAMArchive','BAMPrimaryImport','BizTalkDTADb','BizTalkMgmtDb','BizTalkMsgBoxDb','SSISDB','SSODB')
+  RETURN;
+
+SELECT @issueManagerKey = @graphXml.value('(/TextData/deadlock-list/deadlock/process-list/process/inputbuf)[string-length()>0][1]', 'nvarchar(max)');
+IF @issueManagerKey IS NULL
+BEGIN
+	SELECT @issueManagerKey = @graphXml.value('(/TextData/deadlock-list/deadlock/process-list/process[1]/executionStack/frame)[last()]', 'nvarchar(max)');
+END
+
+SET @issueManagerKey = REPLACE(CONCAT('Deadlock: ', @issueManagerKey), CHAR(10), ' ')
+WHILE CHARINDEX('  ', @issueManagerKey) > 0 SET @issueManagerKey = REPLACE(@issueManagerKey, '  ', ' ')
+SET @description = CONCAT(@issueManagerKey, @issueMessageDelimiter, 'SERVERNAME: $(ESCAPE_NONE(A-SVR))', CHAR(10), 'REPORT:', CHAR(10),  @textData);
+
+EXECUTE [eHubTransactionsServer].[eHubTransactions].[dbo].[InsertError] 
+	 @ErrorPK = @errorPK
+	,@Source = @source
+	,@ErrorType = @errorType
+	,@Description = @description
+	,@InboxPK = @inboxPK
+	,@CurrentDateTimeUTC = @currentDateTimeUTC;
+
+PRINT 'Sent to issue manager.'
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>AlertDeadlock</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>No description available.</Description>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="SendAlert" Command="SendAlert.sql" Type="SQL" Database="msdb" />
+  </Steps>
+  <Schedules />
+  <Alerts>
+    <Alert Name="Deadlock" Enabled="true" WmiNamespace="\\.\root\Microsoft\SqlServer\ServerEvents\INSTANCE1" WmiQuery="SELECT * FROM DEADLOCK_GRAPH" />
+  </Alerts>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="BackupBizTalkServerBizTalkMgmtDb">
+    <File Name="BackupFull.sql"><![CDATA[exec [dbo].[sp_BackupAllFull_Schedule] 
+	'd' /* Frequency */, 
+	'BTS' /* Name */, 
+	'\\sydwp-sbak-2.wisecloud.zone\Other\Non_DPM_ToTape\WormHole\BIZTLK' /* location of backup files */, 
+	0 /* Force full backup after partial failure */,
+	21 /* backup hour */,
+	1 /* use local time */
+]]></File>
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="ClearBackupHistory.sql"><![CDATA[exec [dbo].[sp_DeleteBackupHistoryAndMarkLogsHistory] @DaysToKeep=14
+]]></File>
+    <File Name="MarkAndBackupLog.sql"><![CDATA[exec [dbo].[sp_MarkAll] 'BTS' /*  Log mark name */, 
+		      '\\sydwp-sbak-2.wisecloud.zone\Other\Non_DPM_ToTape\WormHole\BIZTLK' /* location of backup files */
+]]></File>
+    <File Name="SetCompressionOption.sql"><![CDATA[exec [dbo].[sp_SetBackupCompression] @bCompression = 1 /*0 - Do not use Compression, 1 - Use Compression */
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>Backup BizTalk Server (BizTalkMgmtDb)</DisplayName>
+  <Enabled>false</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>This job performs full database backups (step 1) and log backups (step 2) of BizTalk Server databases.</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="SetCompressionOption" Command="SetCompressionOption.sql" Type="SQL" Database="BizTalkMgmtDb" OnFail="GoToNextStep" />
+    <Step Name="BackupFull" Command="BackupFull.sql" Type="SQL" Database="BizTalkMgmtDb" />
+    <Step Name="MarkAndBackupLog" Command="MarkAndBackupLog.sql" Type="SQL" Database="BizTalkMgmtDb" />
+    <Step Name="ClearBackupHistory" Command="ClearBackupHistory.sql" Type="SQL" Database="BizTalkMgmtDb" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="MarkAndBackupLogSched" Enabled="true" Type="Daily" Interval="1" SubDayType="Minutes" SubDayInterval="15" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="CleanupBTFExpiredEntriesJob_BizTalkMgmtDb">
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>CleanupBTFExpiredEntriesJob_BizTalkMgmtDb</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>cleanup expired btf entries</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="step1" Command="step1.sql" Type="SQL" Database="BizTalkMgmtDb" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="sched" Enabled="true" Type="Daily" Interval="1" SubDayType="Hours" SubDayInterval="12" />
+  </Schedules>
+</SqlJob>]]></File>
+    <File Name="step1.sql"><![CDATA[exec btf_PurgeExpiredMessages
+]]></File>
+  </Folder>
+  <Folder Name="CommandLogCleanup">
+    <File Name="CommandLogCleanup.sql"><![CDATA[DELETE FROM [dbo].[CommandLog]
+WHERE StartTime < DATEADD(dd,-30,GETDATE())
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>CommandLog Cleanup</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>Source: https://ola.hallengren.com</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CommandLogCleanup" Command="CommandLogCleanup.sql" Type="SQL" Database="master" OutputFile="$(ESCAPE_SQUOTE(SQLLOGDIR))\$(ESCAPE_SQUOTE(JOBNAME))_$(ESCAPE_SQUOTE(STEPID))_$(ESCAPE_SQUOTE(DATE))_$(ESCAPE_SQUOTE(TIME)).txt" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="Cleanup" Enabled="true" Type="Weekly" Interval="1" SubDayType="AtSpecifiedTime" RecurrenceFactor="1" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="DatabaseIntegrityCheckSYSTEM_DATABASES">
+    <File Name="DatabaseIntegrityCheckSYSTEM_DATABASES.sql"><![CDATA[EXECUTE [dbo].[DatabaseIntegrityCheck]
+@Databases = 'SYSTEM_DATABASES',
+@LogToTable = 'Y'
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>DatabaseIntegrityCheck - SYSTEM_DATABASES</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>Source: https://ola.hallengren.com</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="DatabaseIntegrityCheckSYSTEM_DATABASES" Command="DatabaseIntegrityCheckSYSTEM_DATABASES.sql" Type="SQL" Database="master" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="IntegrityCheck_System" Enabled="true" Type="Weekly" Interval="1" SubDayType="AtSpecifiedTime" RecurrenceFactor="1" StartTime="013000" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="DatabaseIntegrityCheckUSER_DATABASES">
+    <File Name="DatabaseIntegrityCheckUSER_DATABASES.sql"><![CDATA[EXECUTE [dbo].[DatabaseIntegrityCheck]
+@Databases = 'BAMArchive,BAMPrimaryImport,BizTalkDTADb,BizTalkMgmtDb,BizTalkMsgBoxDb,SSISDB,SSODB',
+@LogToTable = 'Y'
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>DatabaseIntegrityCheck - USER_DATABASES</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>Source: https://ola.hallengren.com</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="DatabaseIntegrityCheckUSER_DATABASES" Command="DatabaseIntegrityCheckUSER_DATABASES.sql" Type="SQL" Database="master" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="IntegrityCheck_User" Enabled="true" Type="Weekly" Interval="1" SubDayType="AtSpecifiedTime" RecurrenceFactor="1" StartTime="010000" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="DTAPurgeandArchiveBizTalkDTADb">
+    <File Name="ArchiveandPurge.sql"><![CDATA[declare @dtLastBackup datetime = GetUTCDate()
+
+exec dtasp_PurgeTrackingDatabase
+	2, --@nLiveHours tinyint -- Any completed instance older than the live hours +live days
+	1, --@nLiveDays tinyint -- will be deleted along with all associated data
+	30, --@nHardDays tinyint -- All data older than this will be deleted.
+	@dtLastBackup, --@dtLastBackup datetime,
+	1  -- @fHardDeleteRunningInstances int
+]]></File>
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>DTA Purge and Archive (BizTalkDTADb)</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>Job to automate the purging and archiving of the tracking database</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="ArchiveandPurge" Command="ArchiveandPurge.sql" Type="SQL" Database="BizTalkDTADb" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="Archive and Purge Schedule" Enabled="true" Type="Daily" Interval="1" SubDayType="Minutes" SubDayInterval="1" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="IndexOptimizeUSER_DATABASES">
+    <File Name="IndexOptimizeUSER_DATABASES.sql"><![CDATA[EXECUTE [dbo].[IndexOptimize]
+@Databases = 'BAMArchive,BAMPrimaryImport,BizTalkMgmtDb,SSISDB,SSODB',
+@FragmentationMedium = 'INDEX_REORGANIZE,INDEX_REBUILD_ONLINE',
+@FragmentationHigh = 'INDEX_REBUILD_ONLINE',
+@LogToTable = 'Y'
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>IndexOptimize - USER_DATABASES</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>Source: https://ola.hallengren.com</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="IndexOptimizeUSER_DATABASES" Command="IndexOptimizeUSER_DATABASES.sql" Type="SQL" Database="master" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="IndexOptimize_User" Enabled="true" Type="Weekly" Interval="1" SubDayType="AtSpecifiedTime" RecurrenceFactor="1" StartTime="020000" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="MessageBox_DeadProcesses_Cleanup_BizTalkMsgBoxDb">
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="Purge.sql"><![CDATA[exec bts_CleanupDeadProcesses
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>MessageBox_DeadProcesses_Cleanup_BizTalkMsgBoxDb</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>PROD\mxu</OwnerLoginName>
+  <Description>This job detects when a host instance has stopped and releases all work locked by that host instance so it can be worked on by another host instance.</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="Purge" Command="Purge.sql" Type="SQL" Database="BizTalkMsgBoxDb" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="Schedule" Enabled="true" Type="Daily" Interval="1" SubDayType="Minutes" SubDayInterval="1" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="MessageBox_Message_Cleanup_BizTalkMsgBoxDb">
+    <File Name="Purge.sql"><![CDATA[exec bts_PurgeMessages
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>MessageBox_Message_Cleanup_BizTalkMsgBoxDb</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>PROD\mxu</OwnerLoginName>
+  <Description>This job removes all messages that are no longer being referenced by any subscribers in the BizTalk MessageBox database tables. This is an unscheduled job and is automatically started by the ManageRefCountLog job.</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="Purge" Command="Purge.sql" Type="SQL" Database="BizTalkMsgBoxDb" />
+  </Steps>
+  <Schedules />
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="MessageBox_Message_ManageRefCountLog_BizTalkMsgBoxDb">
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="Purge.sql"><![CDATA[exec bts_ManageMessageRefCountLog
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>MessageBox_Message_ManageRefCountLog_BizTalkMsgBoxDb</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>PROD\mxu</OwnerLoginName>
+  <Description>This job manages the reference count logs for messages and determines when a message is no longer referenced by any subscriber.</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="Purge" Command="Purge.sql" Type="SQL" Database="BizTalkMsgBoxDb" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="Schedule" Enabled="true" Type="Daily" Interval="1" SubDayType="Minutes" SubDayInterval="1" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="MessageBox_Parts_Cleanup_BizTalkMsgBoxDb">
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="Purge.sql"><![CDATA[exec bts_PurgeParts
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>MessageBox_Parts_Cleanup_BizTalkMsgBoxDb</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>PROD\mxu</OwnerLoginName>
+  <Description>This job removes all message parts that are no longer being referenced by any messages in the BizTalk MessageBox database tables.</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="Purge" Command="Purge.sql" Type="SQL" Database="BizTalkMsgBoxDb" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="Schedule" Enabled="true" Type="Daily" Interval="1" SubDayType="Minutes" SubDayInterval="1" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="MessageBox_UpdateStats_BizTalkMsgBoxDb">
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="Purge.sql"><![CDATA[set deadlock_priority low  exec sp_updatestats
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>MessageBox_UpdateStats_BizTalkMsgBoxDb</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>PROD\mxu</OwnerLoginName>
+  <Description>This job manually updates the statistics for the BizTalk MessageBox database.</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="Purge" Command="Purge.sql" Type="SQL" Database="BizTalkMsgBoxDb" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="Schedule" Enabled="true" Type="Daily" Interval="1" SubDayType="Minutes" SubDayInterval="5" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="MonitorBizTalkServerBizTalkMgmtDb">
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="CheckissuesinallMessageBoxesandDTA.sql"><![CDATA[exec [dbo].[btsmon_Inconsistent]
+]]></File>
+    <File Name="Generateerrorstringincaseofanyissue.sql"><![CDATA[begin try
+            exec [dbo].[btsmon_GenerateErrorString]
+end try
+begin catch
+            declare @error nvarchar(max) = 'The ''Monitor BizTalk Server (BizTalkMgmtDb)'' job has detected inconsistencies in the BizTalk databases. ' + 'Run BizTalk Health Monitor to correct them.' + char(13) + char(10) + + char(13) + char(10) + error_message();
+
+            exec msdb.dbo.sp_send_dbmail
+                        @profile_name = 'eservices@wisegrid.net',
+                        @recipients = 'brett.lyons@wisetechglobal.com',
+                        @from_address = 'eHubNoReply@wisecloud.zone',
+                        @subject = 'BizTalk Database Inconsistencies Report',
+                        @body = @error;
+end catch
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>Monitor BizTalk Server (BizTalkMgmtDb)</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>This job runs once every week and finds known issues in all MessageBox and DTA</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="CheckissuesinallMessageBoxesandDTA" Command="CheckissuesinallMessageBoxesandDTA.sql" Type="SQL" Database="BizTalkMgmtDb" />
+    <Step Name="Generateerrorstringincaseofanyissue" Command="Generateerrorstringincaseofanyissue.sql" Type="SQL" Database="BizTalkMgmtDb" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="WeeklySchedule" Enabled="true" Type="Weekly" Interval="1" SubDayType="AtSpecifiedTime" RecurrenceFactor="1" StartTime="000500" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="Operations_OperateOnInstances_OnMaster_BizTalkMsgBoxDb">
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="OperateOnInstsOnMaster.sql"><![CDATA[exec ops_OperateOnInstancesOnMasterMsgBox 'biztalk.db.wisegrid.net', 'BizTalkMsgBoxDb'
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>Operations_OperateOnInstances_OnMaster_BizTalkMsgBoxDb</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>This job is used for administration in multiple MessageBox deployments. It asynchronously performs operational actions (like bulk terminate) on the master MessageBox after it performs them on the subordinate MessageBox.</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="OperateOnInstsOnMaster" Command="OperateOnInstsOnMaster.sql" Type="SQL" Database="BizTalkMsgBoxDb" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="sched" Enabled="true" Type="Daily" Interval="1" SubDayType="Minutes" SubDayInterval="1" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="OutputFileCleanup">
+    <File Name="OutputFileCleanup.cmd"><![CDATA[cmd /q /c "For /F "tokens=1 delims=" %v In ('ForFiles /P "$(ESCAPE_SQUOTE(SQLLOGDIR))" /m *_*_*_*.txt /d -30 2^>^&1') do if EXIST "$(ESCAPE_SQUOTE(SQLLOGDIR))"\%v echo del "$(ESCAPE_SQUOTE(SQLLOGDIR))"\%v& del "$(ESCAPE_SQUOTE(SQLLOGDIR))"\%v"
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>Output File Cleanup</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>Source: https://ola.hallengren.com</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="OutputFileCleanup" Command="OutputFileCleanup.cmd" Type="CmdExec" OutputFile="$(ESCAPE_SQUOTE(SQLLOGDIR))\$(ESCAPE_SQUOTE(JOBNAME))_$(ESCAPE_SQUOTE(STEPID))_$(ESCAPE_SQUOTE(DATE))_$(ESCAPE_SQUOTE(TIME)).txt" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="Output_File_Cleanup" Enabled="true" Type="Weekly" Interval="1" SubDayType="AtSpecifiedTime" RecurrenceFactor="1" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="PurgeSubscriptionsJob_BizTalkMsgBoxDb">
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>PurgeSubscriptionsJob_BizTalkMsgBoxDb</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>PROD\mxu</OwnerLoginName>
+  <Description>This job purges unused subscription predicates from the BizTalk MessageBox database.</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="step1" Command="step1.sql" Type="SQL" Database="BizTalkMsgBoxDb" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="sched" Enabled="true" Type="Daily" Interval="1" SubDayType="Minutes" SubDayInterval="1" />
+  </Schedules>
+</SqlJob>]]></File>
+    <File Name="step1.sql"><![CDATA[exec bts_PurgeSubscriptions
+]]></File>
+  </Folder>
+  <Folder Name="sp_purge_jobhistory">
+    <File Name="sp_purge_jobhistory.sql"><![CDATA[DECLARE @CleanupDate datetime
+SET @CleanupDate = DATEADD(dd,-30,GETDATE())
+EXECUTE dbo.sp_purge_jobhistory @oldest_date = @CleanupDate
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>sp_purge_jobhistory</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>Source: https://ola.hallengren.com</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="sp_purge_jobhistory" Command="sp_purge_jobhistory.sql" Type="SQL" Database="msdb" OutputFile="$(ESCAPE_SQUOTE(SQLLOGDIR))\$(ESCAPE_SQUOTE(JOBNAME))_$(ESCAPE_SQUOTE(STEPID))_$(ESCAPE_SQUOTE(DATE))_$(ESCAPE_SQUOTE(TIME)).txt" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="Cleanup" Enabled="true" Type="Weekly" Interval="1" SubDayType="AtSpecifiedTime" RecurrenceFactor="1" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="SSISFailoverMonitorJob">
+    <File Name="AlwaysOnFailoverMonitor.sql"><![CDATA[
+	DECLARE @role int
+	DECLARE @status tinyint
+	SET @role = (SELECT [role] FROM [sys].[dm_hadr_availability_replica_states] hars INNER JOIN [sys].[availability_databases_cluster] adc ON hars.[group_id] = adc.[group_id] WHERE hars.[is_local] = 1 AND adc.[database_name] ='SSISDB')
+	IF @role = 1
+	BEGIN
+		EXEC [SSISDB].[internal].[refresh_replica_status] @server_name = @@SERVERNAME, @status = @status OUTPUT
+		IF @status = 1
+			EXEC [SSISDB].[catalog].[startup]
+	END
+]]></File>
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>SSIS Failover Monitor Job</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>Runs every 2 minutes. This job execute master.dbo.sp_ssis_startup if detect AlwaysOn failover on SSISDB.</Description>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="AlwaysOnFailoverMonitor" Command="AlwaysOnFailoverMonitor.sql" Type="SQL" Database="msdb" RetryAttempts="3" RetryInterval="3" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="Monitor Scheduler" Enabled="true" Type="Daily" Interval="1" SubDayType="Minutes" SubDayInterval="2" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="SSISServerMaintenanceJob">
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>SSIS Server Maintenance Job</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>Runs every day. The job removes operation records from the database that are outside the retention window and maintains a maximum number of versions per project.</Description>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="SSISServerOperationRecordsMaintenance" Command="SSISServerOperationRecordsMaintenance.sql" Type="SQL" Database="msdb" RetryAttempts="3" RetryInterval="3" />
+    <Step Name="SSISServerMaxVersionPerProjectMaintenance" Command="SSISServerMaxVersionPerProjectMaintenance.sql" Type="SQL" Database="msdb" RetryAttempts="3" RetryInterval="3" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="SSISDB Scheduler" Enabled="true" Type="Daily" Interval="1" SubDayType="AtSpecifiedTime" EndTime="120000" />
+  </Schedules>
+</SqlJob>]]></File>
+    <File Name="SSISServerMaxVersionPerProjectMaintenance.sql"><![CDATA[
+	DECLARE @role int
+	SET @role = (SELECT [role] FROM [sys].[dm_hadr_availability_replica_states] hars INNER JOIN [sys].[availability_databases_cluster] adc ON hars.[group_id] = adc.[group_id] WHERE hars.[is_local] = 1 AND adc.[database_name] ='SSISDB')
+	IF DB_ID('SSISDB') IS NOT NULL AND (@role IS NULL OR @role = 1)
+		EXEC [SSISDB].[internal].[cleanup_server_project_version]
+]]></File>
+    <File Name="SSISServerOperationRecordsMaintenance.sql"><![CDATA[
+	DECLARE @role int
+	SET @role = (SELECT [role] FROM [sys].[dm_hadr_availability_replica_states] hars INNER JOIN [sys].[availability_databases_cluster] adc ON hars.[group_id] = adc.[group_id] WHERE hars.[is_local] = 1 AND adc.[database_name] ='SSISDB')
+	IF DB_ID('SSISDB') IS NOT NULL AND (@role IS NULL OR @role = 1)
+		EXEC [SSISDB].[internal].[cleanup_server_retention_window]
+]]></File>
+  </Folder>
+  <Folder Name="syspolicy_purge_history">
+    <File Name="ErasePhantomSystemHealthRecords.ps1"><![CDATA[if ('$(ESCAPE_SQUOTE(INST))' -eq 'MSSQLSERVER') {$a = '\DEFAULT'} ELSE {$a = ''};
+(Get-Item SQLSERVER:\SQLPolicy\$(ESCAPE_NONE(SRVR))$a).EraseSystemHealthPhantomRecords()
+]]></File>
+    <File Name="Purgehistory.sql"><![CDATA[EXEC msdb.dbo.sp_syspolicy_purge_history
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>syspolicy_purge_history</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>No description available.</Description>
+  <NotifyLevelEmail>Never</NotifyLevelEmail>
+  <Steps>
+    <Step Name="Verifythatautomationisenabled" Command="Verifythatautomationisenabled.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="Purgehistory" Command="Purgehistory.sql" Type="SQL" Database="master" />
+    <Step Name="ErasePhantomSystemHealthRecords" Command="ErasePhantomSystemHealthRecords.ps1" Type="Powershell" Database="master" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="syspolicy_purge_history_schedule" Enabled="true" Type="Daily" Interval="1" SubDayType="AtSpecifiedTime" StartTime="020000" />
+  </Schedules>
+</SqlJob>]]></File>
+    <File Name="Verifythatautomationisenabled.sql"><![CDATA[IF (msdb.dbo.fn_syspolicy_is_automation_enabled() != 1)
+        BEGIN
+            RAISERROR(34022, 16, 1)
+        END
+]]></File>
+  </Folder>
+  <Folder Name="TrackedMessages_Copy_BizTalkMsgBoxDb">
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="Purge.sql"><![CDATA[exec bts_CopyTrackedMessagesToDTA 'biztalk.db.wisegrid.net', 'BizTalkDTADb'
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>TrackedMessages_Copy_BizTalkMsgBoxDb</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>This job copies the messages bodies of tracked messages from the BizTalk MessageBox database to the BizTalk Tracking database.</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="Purge" Command="Purge.sql" Type="SQL" Database="BizTalkMsgBoxDb" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="Schedule" Enabled="true" Type="Daily" Interval="1" SubDayType="Minutes" SubDayInterval="1" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+</Source>

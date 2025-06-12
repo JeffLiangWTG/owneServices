@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <NoWarn>NU5118</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageVersion>3.0.0</PackageVersion>
+    <DebugType>none</DebugType>
+    <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);PackageCustomBuildOutput</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+  <Target Name="PackageCustomBuildOutput">
+    <ItemGroup>
+      <BuildOutputInPackage Include="$(OutputPath)eServices.eHubRoutingRuleEngine.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)eServices.Routing.OceanCarrierMessaging.dll" />
+    </ItemGroup>
+  </Target>
+  <Target Name="UpdateBuildOutputInPackage" BeforeTargets="GenerateNuspec" Returns="@(_BuildOutputInPackage)">
+    <ItemGroup>
+      <_BuildOutputInPackage Remove="$([System.IO.Path]::GetFullPath('$(ProjectDir)$(IntermediateOutputPath)$(AssemblyName).dll'))" />
+    </ItemGroup>
+  </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\eHubRoutingRuleEngine\eServices.eHubRoutingRuleEngine.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Routing.OceanCarrierMessaging\eServices.Routing.OceanCarrierMessaging.csproj" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="eServices.eHubDataModel" />
+  </ItemGroup>
+</Project>

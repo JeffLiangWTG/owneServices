@@ -1,0 +1,132 @@
+﻿#if __DESIGNER_DATA
+#error Do not define __DESIGNER_DATA.
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<om:MetaModel MajorVersion="1" MinorVersion="3" Core="2b131234-7959-458d-834f-2dc0769ce683" ScheduleModel="66366196-361d-448d-976f-cab5e87496d2" xmlns:om="http://schemas.microsoft.com/BizTalk/2003/DesignerData">
+    <om:Element Type="Module" OID="7e7c5f20-8874-43f4-bb00-52fd131f6190" LowerBound="1.1" HigherBound="21.1">
+        <om:Property Name="ReportToAnalyst" Value="True" />
+        <om:Property Name="Name" Value="CargoWise.eHub.Core.Orchestrations.Mutex" />
+        <om:Property Name="Signal" Value="False" />
+        <om:Element Type="ServiceDeclaration" OID="50e0269a-bfb3-46f6-8fa7-0885f08c7d55" ParentLink="Module_ServiceDeclaration" LowerBound="4.1" HigherBound="20.1">
+            <om:Property Name="InitializedTransactionType" Value="True" />
+            <om:Property Name="IsInvokable" Value="True" />
+            <om:Property Name="TypeModifier" Value="Internal" />
+            <om:Property Name="ReportToAnalyst" Value="True" />
+            <om:Property Name="Name" Value="MutexSignaller" />
+            <om:Property Name="Signal" Value="True" />
+            <om:Element Type="CorrelationDeclaration" OID="7077f341-acce-4e5d-a0e8-a7f7724dd9d5" ParentLink="ServiceDeclaration_CorrelationDeclaration" LowerBound="9.1" HigherBound="10.1">
+                <om:Property Name="Type" Value="CargoWise.eHub.Core.Orchestrations.Mutex.RequestCorrelationType" />
+                <om:Property Name="ParamDirection" Value="In" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="RequestCorrelation" />
+                <om:Property Name="Signal" Value="True" />
+                <om:Element Type="StatementRef" OID="db1d67e6-1074-4ea0-af57-ffd7c57d8376" ParentLink="CorrelationDeclaration_StatementRef" LowerBound="13.49" HigherBound="13.78">
+                    <om:Property Name="Initializes" Value="True" />
+                    <om:Property Name="Ref" Value="5a22bc43-3456-45ea-8e10-758f056e2acf" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="StatementRef_1" />
+                    <om:Property Name="Signal" Value="False" />
+                </om:Element>
+            </om:Element>
+            <om:Element Type="ServiceBody" OID="929dc846-8134-4aaa-8225-08da99cc9b98" ParentLink="ServiceDeclaration_ServiceBody">
+                <om:Property Name="Signal" Value="False" />
+                <om:Element Type="VariableDeclaration" OID="51e5f94d-4e79-4a11-b595-de4fdb8aab24" ParentLink="ServiceBody_Declaration" LowerBound="10.15" HigherBound="10.38">
+                    <om:Property Name="UseDefaultConstructor" Value="False" />
+                    <om:Property Name="Type" Value="System.String" />
+                    <om:Property Name="ParamDirection" Value="In" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="LogPrefix" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+                <om:Element Type="VariableDeclaration" OID="2c676682-63d6-4936-9253-49f830bd15f6" ParentLink="ServiceBody_Declaration" LowerBound="10.40" HigherBound="10.94">
+                    <om:Property Name="UseDefaultConstructor" Value="True" />
+                    <om:Property Name="Type" Value="CargoWise.eHub.Core.Logging.OrchestrationLogger" />
+                    <om:Property Name="ParamDirection" Value="In" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="Logger" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+                <om:Element Type="MessageDeclaration" OID="6a8a5780-58ce-4ff7-be72-f0c503782a15" ParentLink="ServiceBody_Declaration" LowerBound="10.96" HigherBound="10.125">
+                    <om:Property Name="Type" Value="CargoWise.eHub.Core.Orchestrations.Mutex.MutexMessage" />
+                    <om:Property Name="ParamDirection" Value="In" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="MutexMsg" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+                <om:Element Type="VariableDeclaration" OID="facd91a0-b025-4dba-81ef-e5b1103c08f6" ParentLink="ServiceBody_Declaration" LowerBound="10.127" HigherBound="10.150">
+                    <om:Property Name="UseDefaultConstructor" Value="False" />
+                    <om:Property Name="Type" Value="System.String" />
+                    <om:Property Name="ParamDirection" Value="In" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="RequestID" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+                <om:Element Type="Send" OID="5a22bc43-3456-45ea-8e10-758f056e2acf" ParentLink="ServiceBody_Statement" LowerBound="12.1" HigherBound="14.1">
+                    <om:Property Name="PortName" Value="MutexSignal" />
+                    <om:Property Name="MessageName" Value="MutexMsg" />
+                    <om:Property Name="OperationName" Value="Signal" />
+                    <om:Property Name="OperationMessageName" Value="Request" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="Send Signal" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+                <om:Element Type="VariableAssignment" OID="87c44eb6-8ab9-4342-84be-a043d4ed9e9b" ParentLink="ServiceBody_Statement" LowerBound="14.1" HigherBound="16.1">
+                    <om:Property Name="Expression" Value="Logger.Log.DebugFormat(&quot;{0}Signalled request '{1}'&quot;, LogPrefix, RequestID);&#xD;&#xA;" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="Signal Sent" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+                <om:Element Type="Receive" OID="7d4321b4-fa11-4042-af9a-33540b5e7e4d" ParentLink="ServiceBody_Statement" LowerBound="16.1" HigherBound="18.1">
+                    <om:Property Name="Activate" Value="False" />
+                    <om:Property Name="PortName" Value="MutexSignal" />
+                    <om:Property Name="MessageName" Value="MutexMsg" />
+                    <om:Property Name="OperationName" Value="Signal" />
+                    <om:Property Name="OperationMessageName" Value="Response" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="Receive Release" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+            </om:Element>
+            <om:Element Type="PortDeclaration" OID="6c66dede-8dde-4cfd-840e-5a6082c24d8b" ParentLink="ServiceDeclaration_PortDeclaration" LowerBound="7.1" HigherBound="9.1">
+                <om:Property Name="PortModifier" Value="Uses" />
+                <om:Property Name="Orientation" Value="Left" />
+                <om:Property Name="PortIndex" Value="4" />
+                <om:Property Name="IsWebPort" Value="False" />
+                <om:Property Name="OrderedDelivery" Value="False" />
+                <om:Property Name="DeliveryNotification" Value="None" />
+                <om:Property Name="Type" Value="CargoWise.eHub.Core.Orchestrations.Mutex.MutexSignalPort" />
+                <om:Property Name="ParamDirection" Value="In" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="MutexSignal" />
+                <om:Property Name="Signal" Value="True" />
+                <om:Element Type="DirectBindingAttribute" OID="37e4ddc0-fe6b-4007-8d63-b1ae8c7de403" ParentLink="PortDeclaration_CLRAttribute" LowerBound="7.1" HigherBound="8.1">
+                    <om:Property Name="PartnerPort" Value="MutexSignal" />
+                    <om:Property Name="PartnerService" Value="CargoWise.eHub.Core.Orchestrations.Mutex.MutexSignaller" />
+                    <om:Property Name="DirectBindingType" Value="PartnerPort" />
+                    <om:Property Name="Signal" Value="False" />
+                </om:Element>
+            </om:Element>
+        </om:Element>
+    </om:Element>
+</om:MetaModel>
+#endif // __DESIGNER_DATA
+[Microsoft.XLANGs.BaseTypes.BPELExportable(false)]
+module CargoWise.eHub.Core.Orchestrations.Mutex
+{
+    [Microsoft.XLANGs.BaseTypes.BPELExportable(false)]
+    internal service MutexSignaller
+    {
+        [Microsoft.XLANGs.BaseTypes.DirectBinding(typeof(CargoWise.eHub.Core.Orchestrations.Mutex.MutexSignaller), "MutexSignal")]
+        port uses MutexSignalPort MutexSignal;
+        correlation RequestCorrelationType RequestCorrelation;
+        body (System.String LogPrefix, CargoWise.eHub.Core.Logging.OrchestrationLogger Logger, message MutexMessage MutexMsg, System.String RequestID)
+        {
+            [Microsoft.XLANGs.BaseTypes.DesignerPosition("5a22bc43-3456-45ea-8e10-758f056e2acf")]
+            send (MutexSignal.Signal, MutexMsg, initialize RequestCorrelation);
+            [Microsoft.XLANGs.BaseTypes.DesignerPosition("87c44eb6-8ab9-4342-84be-a043d4ed9e9b")]
+            Logger.Log.DebugFormat("{0}Signalled request '{1}'", LogPrefix, RequestID);
+            [Microsoft.XLANGs.BaseTypes.DesignerPosition("7d4321b4-fa11-4042-af9a-33540b5e7e4d")]
+            receive (MutexSignal.Signal, MutexMsg);
+        }
+    }
+}
+

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Build xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:xsd="http://www.w3.org/2001/XMLSchema" MSBuild="16.0" 
+       xmlns="http://wisetechglobal.com/DevTools/Build.xsd">
+  <Solutions>
+    <Solution Filename="eServices.LoggingEnhancement.log4net.sln" />
+  </Solutions>
+  <Tasks>
+    <Task Name="Initialize eServices.BuildTools.DatTool">
+      <Step><![CDATA[cmd /c "dotnet tool restore && dotnet esv-dattool init --output Bin\DatTool"]]></Step>
+    </Task>
+    <Task Name="Pack eServices.LoggingEnhancement.Log4netImpl">
+      <Dependency Type="Solution">eServices.LoggingEnhancement.log4net.sln</Dependency>
+      <Step>dotnet esv-pack --project eServices.LoggingEnhancement.Log4netImpl\eServices.LoggingEnhancement.Log4netImpl.csproj --package-source https://proget.wtg.zone/nuget/WTG-Internal</Step>
+    </Task>
+  </Tasks>
+  <BuildConfigurations>
+    <Configuration BuildOnDat="true" TestOnDat="true" Publishable="false">Release</Configuration>
+  </BuildConfigurations>
+  <DatSettings BuildDeployerType="eServices.BuildTools.DatDeploy.Deployer, eServices.BuildTools.DatDeploy" IntegrationAssembliesSubdir="DAT\net48">
+    <TestAdapters>
+      <TestAdapter Key="VSTest" Type="Dat.Implementation.VSTest.VSTestAdapter, Dat.Implementation.VSTest">
+        <Options>
+          <Option Name="TestAssemblyFileFilter">*.*Tests.dll</Option>
+        </Options>
+      </TestAdapter>
+    </TestAdapters>
+    <DeploymentTargets>
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.LoggingEnhancement.Log4netImpl-Prerelease" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.LoggingEnhancement.Log4netImpl" />
+    </DeploymentTargets>
+  </DatSettings>
+</Build>

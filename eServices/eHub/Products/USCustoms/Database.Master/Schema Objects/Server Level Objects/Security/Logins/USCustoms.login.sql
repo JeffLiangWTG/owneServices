@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [USCustoms]
+    WITH PASSWORD = N'c#%5yZI^A^w1', DEFAULT_DATABASE = [master], DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

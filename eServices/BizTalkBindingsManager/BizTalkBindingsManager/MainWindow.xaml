@@ -1,0 +1,202 @@
+﻿<Window x:Class="BizTalkBindingsManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="BizTalk Bindings Manager"
+        Width="820"
+        Height="1000">
+    <Window.Resources>
+        <!-- This allows checkboxes to be toggled in a single click -->
+        <Style TargetType="DataGridCell" >
+            <Style.Triggers>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsMouseOver" Value="True" />
+                        <Condition Property="IsReadOnly" Value="False" />
+                    </MultiTrigger.Conditions>
+                    <Setter Property="IsEditing" Value="True"/>
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button" >
+            <Setter Property="Padding" Value="5,3,5,3"/>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="TFSCheckStyle">
+            <Setter Property="Foreground" Value="Blue"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding TFS}" Value="True">
+                    <Setter Property="Foreground" Value="#00dc00"/>
+                    <Setter Property="Text" Value= "✔️"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding TFS}" Value="False">
+                    <Setter Property="Foreground" Value="#dc0000"/>
+                    <Setter Property="Text" Value= "❌"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="BTCheckStyle">
+            <Setter Property="Foreground" Value="Blue"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding BT}" Value="True">
+                    <Setter Property="Foreground" Value="#00dc00"/>
+                    <Setter Property="Text" Value= "✔️"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding BT}" Value="False">
+                    <Setter Property="Foreground" Value="#dc0000"/>
+                    <Setter Property="Text" Value= "❌"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="SyncedCheckStyle">
+            <Setter Property="Foreground" Value="Blue"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Synced}" Value="True">
+                    <Setter Property="Foreground" Value="#00dc00"/>
+                    <Setter Property="Text" Value= "✔️"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Synced}" Value="False">
+                    <Setter Property="Foreground" Value="#dc0000"/>
+                    <Setter Property="Text" Value= "❌"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <DataTemplate x:Key="TFSCheck">
+            <TextBlock Style="{StaticResource TFSCheckStyle}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="BTCheck">
+            <TextBlock Style="{StaticResource BTCheckStyle}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="SyncedCheck">
+            <TextBlock Style="{StaticResource SyncedCheckStyle}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="SetPassword">
+            <Button Content="TFS Passwords" Click="SetPasswordButton"/>
+        </DataTemplate>
+        <DataTemplate x:Key="RunDiff">
+            <Button Content="Diff"/>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="100" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Label Grid.Column="0" Content="TFS Workspace"/>
+            <ComboBox Grid.Column="1" Name="TFSWorkspace" ItemsSource="{Binding Path=TFSWorkspaces}" SelectedValue="{Binding Path=TFSWorkspace}" DisplayMemberPath="Name"/>
+            <Button Grid.Column="2" Content="Load TFS" Margin="5, 0, 0, 0" Click="LoadTFSButton"/>
+            <Label Grid.Column="3" Content="BT Server"/>
+            <TextBox Grid.Column="4" Text="{Binding Path=BTServer}"/>
+            <Button Grid.Column="5" Content="Load BT" Margin="5, 0, 0, 0" Click="LoadBTButton"/>
+        </Grid>
+        <Grid Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TabControl Grid.Row="0" Grid.ColumnSpan="3">
+                <TabItem Header="Send Ports">
+                    <DataGrid ItemsSource="{Binding SendPorts}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn IsReadOnly="False" Header="Select" Binding="{Binding Selected, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Name}" Width="500"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="TFS" CellTemplate="{StaticResource TFSCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="BT" CellTemplate="{StaticResource BTCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="Synced" CellTemplate="{StaticResource SyncedCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="TFS Passwords" CellTemplate="{StaticResource SetPassword}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="Diff" CellTemplate="{StaticResource RunDiff}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="ReceivePorts">
+                    <DataGrid ItemsSource="{Binding ReceivePorts}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn IsReadOnly="False" Header="Select" Binding="{Binding Selected, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Name}" Width="500"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="TFS" CellTemplate="{StaticResource TFSCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="BT" CellTemplate="{StaticResource BTCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="Synced" CellTemplate="{StaticResource SyncedCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="TFS Passwords" CellTemplate="{StaticResource SetPassword}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="Diff" CellTemplate="{StaticResource RunDiff}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="Orchestrations">
+                    <DataGrid ItemsSource="{Binding Orchestrations}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn IsReadOnly="False" Header="Select" Binding="{Binding Selected, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Name}" Width="500"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="TFS" CellTemplate="{StaticResource TFSCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="BT" CellTemplate="{StaticResource BTCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="Synced" CellTemplate="{StaticResource SyncedCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="Diff" CellTemplate="{StaticResource RunDiff}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="Parties">
+                    <DataGrid ItemsSource="{Binding Parties}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn IsReadOnly="False" Header="Select" Binding="{Binding Selected, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Name}" Width="500"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="TFS" CellTemplate="{StaticResource TFSCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="BT" CellTemplate="{StaticResource BTCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="Synced" CellTemplate="{StaticResource SyncedCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="Diff" CellTemplate="{StaticResource RunDiff}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+                <TabItem Header="Agreements">
+                    <DataGrid ItemsSource="{Binding Agreements}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn IsReadOnly="False" Header="Select" Binding="{Binding Selected, UpdateSourceTrigger=PropertyChanged}"/>
+                            <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Name}" Width="500"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="TFS" CellTemplate="{StaticResource TFSCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="BT" CellTemplate="{StaticResource BTCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="Synced" CellTemplate="{StaticResource SyncedCheck}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="Diff" CellTemplate="{StaticResource RunDiff}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+            </TabControl>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                <Button Content="Select All" Margin="5, 5, 5, 5" Click="SelectAllButton"/>
+                <TextBlock Text="{Binding SelectSummary, Mode=OneWay}" Margin="0, 8, 0, 0"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                <Button Content="Copy BT to TFS" Margin="5, 0, 5, 5"/>
+                <Button Content="Copy TFS to BT" Margin="0, 0, 0, 5"/>
+            </StackPanel>
+        </Grid>
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="5" ShowsPreview="True" />
+        <TextBox Grid.Row="3" Text="Log errors here"/>
+    </Grid>
+</Window>

@@ -1,0 +1,1 @@
+﻿Using Areas functionality of MVC2 http://haacked.com/archive/2008/11/04/areas-in-aspnetmvc.aspx/

@@ -1,0 +1,44 @@
+Open http://intranet/development/Development%20Wiki/eHub%20Development.aspx
+
+Run step 3) till 21).
+
+
+Below are for reference only.
+
+0.  Install WCF LOB Adaptor SDK sp2 and BizTalk Adaptor Pack 2.0
+\\Syd-sarc-1\SoftwareStore\Microsoft.com\BizTalk\2009\WCF LOB Adapter SDK SP2 x64.exe or 32 bit
+
+According to http://mavenlog.wordpress.com/2009/07/30/installing-the-biztalk-adapter-pack-on-64-bit-platforms/
+and see http://sandroasp.spaces.live.com/blog/cns!98A008F39B7BBF8E!421.entry
+For a 64-bit BizTalk process:
+· Install 64-bit WCF LOB Adapter SDK. 
+· Install 64-bit BizTalk Adapter Pack. 
+· Install 64-bit LOB client and other required DLLs. 
+· Install 32-bit BizTalk Adapter Pack. 
+· Install 32-bit LOB client and other required DLLs.
+
+Important: Make sure you choose custom install, and select all components of this adaptor to install.  
+Note, if you are installing in a virtual environment, sometimes this install may stuck on working out the diskspace requirement. If this is the case, then you can open command prompt in elevated mode, and run 
+msiexec.exe -package AdapterFramework.msi -qr 
+which will install without the GUI prompts, and get around this problem.
+
+Install the BizTalk adaptor pack 2.0 from
+\\corporate.cargowise.com\globaldata\Applications\SoftwareStore\Microsoft.com\BizTalk\2009\en_biztalk_adapter_pack_2.0_x86_x64_cd_339765.iso
+
+To register the WCF-SQL adapter, open BizTalk Server Admin Consol, go to Platform settings, and go to Adapters, and add a new adaptor by choosing the WCF-SQL adapter from the dropdown. If no adapters appear in the list, you need to ensure that you have installed both 32 bit and 64 bit LOB Adapter pack, as per instruction above to work around a platform issue.
+
+
+1.	Download and install ESB Toolkit 2.0
+2.	Download and install ESB Toolkit 2.0 Documentation (if developer environment)
+3.	Download and install Microsoft .Net Framework 3.5 Chart Controls
+4.	Import and install Microsoft.Practices.ESB.ExceptionHandling_NOBINDING.msi (or 64 bit)
+5.	Install Microsoft.Practices.ESB.CORE.msi
+6.	Import edited Bindings\Microsoft.Practices.ESB.ExceptionHandling_Bindings.xml into Microsoft.Practices.ESB BizTalk application
+7.	Run Bin\ESBConfigurationTool.exe
+8.	Configure and apply all features
+9.	Unconfigure ‘Itinerary Database’ and then remove the database manually
+10.	Remove the following web service virtual directories from IIS:
+	a.	ESB.Itinerary*
+	b.	ESB.Resolver*
+	c.	ESB.Transform*
+11.	Deploy Bam\Microsoft.BizTalk.ESB.BAM.Exceptions.xml activities using bm.exe

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- properties defined in the imported $(var-file) take precedents -->
+  <Import Project="$(var-file)" Condition="'$(var-file)'!=''" />
+
+  <PropertyGroup>
+    <ProfilesIncluded>$true</ProfilesIncluded>
+    <ProfiledDirectory Condition="'$(Profile)'!=''">$(MSBuildThisFileDirectory)$(Profile)\</ProfiledDirectory>
+    <ThisFile>$(MSBuildThisFileDirectory)$(MSBuildThisFile)</ThisFile>
+    <DeploymentPropsFileName>Deployment.props</DeploymentPropsFileName>
+    <DeploymentProps>$(MSBuildThisFileDirectory)$(DeploymentPropsFileName)</DeploymentProps>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProfilesFiles Include="$(MSBuildThisFileDirectory)**\*" />
+    <ProfiledPropFiles Include="$(ProfiledDirectory)$(DeploymentPropsFileName)" Condition="'$(Profile)'!=''" />
+  </ItemGroup>
+
+  <Import Project="$(DeploymentProps)" Condition="'$(_DeploymentPropsImported)'==''" />
+  <Import Project="$(ProfiledPropFiles)" Condition="'$(Profile)'!='' and '$(_ProfilePropsImported)'==''" />
+
+  <Target Name="bat:profiles:copy-output">
+    <Error Text="Output path $(_ZipContentsDirectory} does not exist" Condition="!Exists($(_ZipContentsDirectory))" />
+    <Copy SourceFiles="@(ProfilesFiles)" DestinationFolder="$(_ZipContentsDirectory)\Profiles\%(RecursiveDir)" />
+  </Target>
+
+</Project>

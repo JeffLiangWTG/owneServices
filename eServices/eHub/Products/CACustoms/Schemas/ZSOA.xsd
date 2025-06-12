@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="1.0">
+    <xsd:include schemaLocation="ZCOMMON.xsd" />
+    <xsd:element name="ZSOA" type="ZSOA" />
+    <xsd:complexType name="ZSOA">
+        <xsd:annotation>
+            <xsd:documentation>Statement of Account</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="item" minOccurs="1" maxOccurs="1" type="SOAItem" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="SOAItem">
+        <xsd:annotation>
+            <xsd:documentation>Statement of Account Item</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="HEADER" minOccurs="1" maxOccurs="1" type="ZHEAD" />
+            <xsd:element name="DETAILS" minOccurs="1" maxOccurs="1" type="ZDETAILSTAB" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ZHEAD">
+        <xsd:annotation>
+            <xsd:documentation>Statement of Account Header</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="SOA_DATE" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>XSD Date: yyyy-mm-dd [ext.]</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:pattern value="....-..-.." />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="PER_START" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>XSD Date: yyyy-mm-dd [ext.]</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:pattern value="....-..-.." />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="PER_END" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>XSD Date: yyyy-mm-dd [ext.]</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:pattern value="....-..-.." />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="PAY_DUE" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>XSD Date: yyyy-mm-dd [ext.]</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:pattern value="....-..-.." />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="PARTY" minOccurs="1" maxOccurs="1" type="ZPARTY" />
+            <xsd:element name="TRANS_SITE" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Transmission site for CADEX transmission</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:maxLength value="8" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="GRAND_TOT" minOccurs="1" maxOccurs="1">
+              <xsd:annotation>
+                <xsd:documentation>Grand total owed to CBSA</xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:decimal">
+                  <xsd:totalDigits value="13"/>
+                  <xsd:fractionDigits value="2"/>
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ZDETAILSTAB">
+        <xsd:annotation>
+            <xsd:documentation>Details table on the Statement of Account</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="item" type="ZDETAILS" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ZDETAILS">
+        <xsd:annotation>
+            <xsd:documentation>Details on the Statement of Account</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="IMPORTER" minOccurs="1" maxOccurs="1" type="ZIMPORTER" />
+            <xsd:element name="IMP_TOTALS" minOccurs="1" maxOccurs="1" type="ZIMPTOT" />
+            <xsd:element name="LINEITEMS" minOccurs="0" maxOccurs="1" type="ZSOALINESTAB" />
+            <xsd:element name="TOTALS" minOccurs="0" maxOccurs="1" type="ZTOTALS" />
+            <xsd:element name="OTHERS" minOccurs="0" maxOccurs="1" type="ZOTHTAB" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ZIMPTOT">
+        <xsd:annotation>
+            <xsd:documentation>Totals per account</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="LAST_TOT" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Previous Statement of Account Total</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:decimal">
+                        <xsd:totalDigits value="13" />
+                        <xsd:fractionDigits value="2" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="PAY_LAST" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Payments since last SoA</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:decimal">
+                        <xsd:totalDigits value="13" />
+                        <xsd:fractionDigits value="2" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="REFUNDS" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Amount of refund issued to this client</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:decimal">
+                        <xsd:totalDigits value="13" />
+                        <xsd:fractionDigits value="2" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="UNPAID" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Unpaid Balance Forward</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:decimal">
+                        <xsd:totalDigits value="13" />
+                        <xsd:fractionDigits value="2" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="ARREARSINT" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Arrears Interest on SoA only</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:decimal">
+                        <xsd:totalDigits value="13" />
+                        <xsd:fractionDigits value="2" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="NEW_TOT" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>New transactions total</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:decimal">
+                        <xsd:totalDigits value="13" />
+                        <xsd:fractionDigits value="2" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="OTHER_TOT" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Other changes (new)</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:decimal">
+                        <xsd:totalDigits value="13" />
+                        <xsd:fractionDigits value="2" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="IMPORTERTOTPAY" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Total Payable</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:decimal">
+                        <xsd:totalDigits value="13" />
+                        <xsd:fractionDigits value="2" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="BROKERTOTPAY" minOccurs="1" maxOccurs="1">
+              <xsd:annotation>
+                <xsd:documentation>Broker Total Payable</xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:decimal">
+                  <xsd:totalDigits value="13" />
+                  <xsd:fractionDigits value="2" />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ZSOALINESTAB">
+        <xsd:annotation>
+            <xsd:documentation>SoA Line items</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="item" type="ZSOALINES" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ZSOALINES">
+        <xsd:annotation>
+            <xsd:documentation>Lines on the Statement of Account</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="LINES" minOccurs="1" maxOccurs="1" type="xsd:int">
+                <xsd:annotation>
+                    <xsd:documentation>Number of line items</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="ACC_DATE" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>XSD Date: yyyy-mm-dd [ext.]</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:pattern value="....-..-.." />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="AMOUNTS" minOccurs="1" maxOccurs="1" type="ZAMOUNTS" />
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>
+

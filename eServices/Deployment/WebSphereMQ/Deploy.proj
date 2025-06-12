@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+  </PropertyGroup>
+
+	<Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(MSBuildThisFileDirectory)\Admin.proj"/>
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props" Condition="'$(_DeploymentPropsImported)'==''"/>
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Deployment.props" Condition="'$(Profile)' != '' and '$(_ProfilePropsImported)'==''"/>
+
+  <PropertyGroup>
+    <_RemoveDependsOn>
+      bat:mq-preCheck;
+      bat:mq-queueManager-isExisting;
+      bat:mq-queueManager-isRunning;
+      bat:mq-listener-stop;
+      bat:mq-queueManager-end;
+      bat:mq-queueManager-delete;
+    </_RemoveDependsOn>
+    <_MQCertificateDependsOn>
+      $(_MQCertificateDependsOn)
+    </_MQCertificateDependsOn>
+    <_DeployDependsOn>
+      bat:mq-preCheck;
+      bat:mq-queueManager-isExisting;
+      bat:mq-queueManager-create;
+      $(_MQCertificateDependsOn);
+      bat:mq-queueManager-isRunning;
+      bat:mq-queueManager-start;
+    </_DeployDependsOn>
+  </PropertyGroup>
+
+  <Target Name="bat:remove" DependsOnTargets="$(_RemoveDependsOn)" />
+  <Target Name="bat:deploy" DependsOnTargets="$(_DeployDependsOn)">
+    <ItemGroup>
+      <_MQConfigFiles Condition="$(Profile)!=''" Include="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Config\*.cfg" />
+    </ItemGroup>
+    <Error Condition="'@(_MQConfigFiles->Count())' == 0" Text="MQ config file was not found" />
+
+    <ImportMQConfig ComputerName="$(_ComputerName)" 
+                    UserName="$(_UserName)" 
+                    UserPassword="$(_Password)" 
+                    QueueManagerName="$(_QueueManagerName)"
+                    ConfigFilePath="%(_MQConfigFiles.Identity)" />
+  </Target>
+</Project>

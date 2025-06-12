@@ -1,0 +1,62 @@
+﻿<SqlJobs><sysjob><name>AlertBlockedProcess</name><enabled>1</enabled><description>No description available.</description><start_step_id>1</start_step_id><notify_level_eventlog>0</notify_level_eventlog><notify_level_email>2</notify_level_email><category_name>[Uncategorized (Local)]</category_name><owner_login_name>sa</owner_login_name><notify_email_operator_name>eServices</notify_email_operator_name><sysjobstep><step_id>1</step_id><step_name>Send Alert</step_name><subsystem>TSQL</subsystem><command>SET ANSI_NULLS, QUOTED_IDENTIFIER ON;
+
+DECLARE @errorPK uniqueidentifier = NEWID();
+DECLARE @source varchar(3) = 'SQL';
+DECLARE @errorType varchar(3) = 'Fai';
+DECLARE @inboxPK varchar(36) = NULL;
+DECLARE @currentDateTimeUTC varchar(32) = convert(varchar(32), getutcdate(), 127);
+DECLARE @issueMessageDelimiter nvarchar(50) = '
+----------BIZTALK PROPERTIES----------
+';
+
+DECLARE @description nvarchar(max);
+DECLARE @textData nvarchar(max);
+DECLARE @graphXml xml;
+DECLARE @issueManagerKey nvarchar(max);
+DECLARE @clientAppName nvarchar(max);
+DECLARE @hostname nvarchar(max);
+
+SET @textData = REPLACE('$(ESCAPE_NONE(WMI(TextData)))', '&amp;#x0A;', CHAR(10));
+SET @graphXml = @textData
+
+DECLARE @databaseName nvarchar(1000) = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/@currentdbname)[1]', 'nvarchar(1000)');
+DECLARE @logMessage nvarchar(max) = 'Blocked Process in database [' + @databaseName + ']: ' + @textData;
+DECLARE @pos int = 1, @len int = 1000;
+WHILE @pos &lt;= LEN(@logMessage) BEGIN PRINT SUBSTRING(@logMessage, @pos, @len); SET @pos += @len; END
+IF @databaseName NOT IN ('BAMArchive','BAMPrimaryImport','BizTalkDTADb','BizTalkMgmtDb','BizTalkMsgBoxDb','SSISDB','SSODB')
+  RETURN;
+
+SELECT @issueManagerKey = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/inputbuf)[string-length()&gt;0][1]', 'nvarchar(max)');
+
+IF @issueManagerKey IS NULL
+BEGIN
+	SET @clientAppName = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/@clientapp)[1]', 'nvarchar(max)');
+	SET @hostname = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/@hostname)[1]', 'nvarchar(max)');
+	SET @issueManagerKey = CONCAT(@clientAppName, '-', @hostname);
+END
+
+IF @issueManagerKey = '-'
+BEGIN
+	SET @issueManagerKey = @graphXml.value('(/TextData/blocked-process-report/blocking-process/process/inputbuf)[string-length()&gt;0][1]', 'nvarchar(max)');
+END
+
+IF @issueManagerKey IS NULL
+BEGIN
+	SET @clientAppName = @graphXml.value('(/TextData/blocked-process-report/blocking-process/process/@clientapp)[1]', 'nvarchar(max)');
+	SET @hostname = @graphXml.value('(/TextData/blocked-process-report/blocking-process/process/@hostname)[1]', 'nvarchar(max)');
+	SET @issueManagerKey = CONCAT(@clientAppName, '-', @hostname);
+END
+
+SET @issueManagerKey = REPLACE(CONCAT('Blocked process: ', @issueManagerKey), CHAR(10), ' ')
+WHILE CHARINDEX('  ', @issueManagerKey) &gt; 0 SET @issueManagerKey = REPLACE(@issueManagerKey, '  ', ' ')
+SET @description = CONCAT(@issueManagerKey, @issueMessageDelimiter, 'SERVERNAME: $(ESCAPE_NONE(A-SVR))', CHAR(10), 'REPORT:', CHAR(10),  @textData);
+
+EXECUTE [eHubTransactionsServer].[eHubTransactions].[dbo].[InsertError] 
+	 @ErrorPK = @errorPK
+	,@Source = @source
+	,@ErrorType = @errorType
+	,@Description = @description
+	,@InboxPK = @inboxPK
+	,@CurrentDateTimeUTC = @currentDateTimeUTC;
+
+PRINT 'Sent to issue manager.'</command><flags>4</flags><cmdexec_success_code>0</cmdexec_success_code><on_success_action>1</on_success_action><on_success_step_id>0</on_success_step_id><on_fail_action>2</on_fail_action><on_fail_step_id>0</on_fail_step_id><database_name>msdb</database_name><retry_attempts>0</retry_attempts><retry_interval>0</retry_interval><os_run_priority>0</os_run_priority></sysjobstep><sysalert><id>1</id><name>BlockedProcess</name><event_source>MSSQLSERVER</event_source><event_id>8</event_id><message_id>0</message_id><severity>0</severity><enabled>1</enabled><delay_between_responses>0</delay_between_responses><include_event_description>1</include_event_description><database_name>\\.\root\Microsoft\SqlServer\ServerEvents\INSTANCE1</database_name><has_notification>0</has_notification><flags>0</flags><performance_condition>SELECT * FROM BLOCKED_PROCESS_REPORT</performance_condition><category_id>98</category_id></sysalert></sysjob></SqlJobs>

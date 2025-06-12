@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;net8.0</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>eServices.Configuration</PackageId>
+    <PackageVersion>3.0.0</PackageVersion>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <DebugType>none</DebugType>
+    <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);PackageCustomBuildOutput</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="..\Schemas\Configuration.xsd" Link="Configuration.xsd" />
+    <None Include="README.md" Pack="True" PackagePath="\" />
+  </ItemGroup>
+  <Target Name="PackageCustomBuildOutput">
+    <ItemGroup>
+      <BuildOutputInPackage Include="$(OutputPath)eServices.Configuration.*.dll" Exclude="$(TargetPath)" />
+    </ItemGroup>
+  </Target>
+  <Target Name="UpdateBuildOutputInPackage" BeforeTargets="GenerateNuspec" Returns="@(_BuildOutputInPackage)">
+    <ItemGroup>
+      <_TargetFrameworks Include="$(TargetFrameworks)" />
+      <_PackProjectAssemblies Include="$([System.IO.Path]::GetFullPath('$(ProjectDir)$(IntermediateOutputPath)%(_TargetFrameworks.Identity)\$(AssemblyName).dll'))" />
+      <_BuildOutputInPackage Remove="@(_PackProjectAssemblies)" />
+    </ItemGroup>
+  </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\Framework\eServices.Configuration.Framework.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Helper\eServices.Configuration.Helper.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Schemas\eServices.Configuration.Schemas.csproj" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CargoWise.eServices.Encryption.Server.Decryptor" />
+    <PackageReference Include="eServices.eHubDataModel" />
+  </ItemGroup>
+</Project>

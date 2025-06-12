@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified"
+           attributeFormDefault="
+           unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://www.cargowise.com/Schemas/FPM/APPLUS/ACQ"
+           xmlns:std="http://www.cargowise.com/Schemas/FPM/APPLUS"
+           targetNamespace="http://www.cargowise.com/Schemas/FPM/APPLUS/ACQ">
+
+  <xs:import namespace="http://www.cargowise.com/Schemas/FPM/APPLUS" schemaLocation="patterns.xsd"/>
+
+  <xs:complexType name="acq_error_type">
+    <xs:sequence>
+      <xs:element name="libelle" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Description littérale de l'erreur renvoyée parle système.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="code">
+      <xs:annotation>
+        <xs:documentation>Code erreur renvoyé par le SIC.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fatal" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="user_type">
+    <xs:attribute name="user" use="required">
+      <xs:annotation>
+        <xs:documentation>Code utilisateur du tiers profession du message.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tiersProf" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant tiers profession du message.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="response_type">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element ref="reference"/>
+    </xs:choice>
+    <xs:attribute name="statut" use="required">
+      <xs:annotation>
+        <xs:documentation>Statut de l'intégration (V=Validée R=Rejetée).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="action" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="CREATE|UPDATE|DELETE|ADD|ERASE"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="id" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant fonctionnel du document intégré ou rejeté.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" use="required">
+      <xs:annotation>
+        <xs:documentation>Type du document intégré ou réjeté (Codification SIC)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:element name="Response">
+    <xs:annotation>
+      <xs:documentation>Response précise la nature du document à acquitter.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="response_type"/>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Interchanges">
+    <xs:annotation>
+      <xs:documentation>Interchanges décrit le contexte de la transmission des données entre le SIC et le système partenaire.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="MessageSet" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant interchange</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="from" use="required">
+        <xs:annotation>
+          <xs:documentation>Nom du système émetteur</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="35"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="to" use="required">
+        <xs:annotation>
+          <xs:documentation>Nom du système destinataire</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="35"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MessageSet">
+    <xs:annotation>
+      <xs:documentation>MessageSet identifie le message et permet d'assurer le suivi des échanges.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Destinataire"/>
+        <xs:element ref="Emetteur"/>
+        <xs:element name="Messages" type="acq_messages_type">
+          <xs:annotation>
+            <xs:documentation>Messages contient le document à integrer, à notifier, à imprimer ou à acquitter</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant du message</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="icid" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant interchange de rattachement du message</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="date" type="std:DateLongue_type" use="required">
+        <xs:annotation>
+          <xs:documentation>"31/12/2004 23:59:59" Date d'envoi du message.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Destinataire" type="user_type">
+    <xs:annotation>
+      <xs:documentation>Identification du tiers destinataire du message</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Emetteur" type="user_type">
+    <xs:annotation>
+      <xs:documentation>Identification de l'émetteur du message</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="acq_messages_type">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element ref="Response"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="reference" type="response_element_type">
+    <xs:annotation>
+      <xs:documentation>Référence identifie les references SIC ou partenaire du document acquitte positivement ou negativement.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="response_element_type">
+    <xs:sequence>
+      <xs:element name="erreur" type="acq_error_type" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="tiers" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du tiers concerné par l'entité.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"> 
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="sic" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'entité à laquelle le SIC attribue un statut.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="date" type="std:DateLongue_type" use="required">
+      <xs:annotation>
+        <xs:documentation>Date à laquelle le SIC a attribué le statut à une entité.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="statut" use="required">
+      <xs:annotation>
+        <xs:documentation>Nature du statut attribué par le SIC à une entité.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ref" use="required">
+      <xs:annotation>
+        <xs:documentation>Référence du tiers pour laquelle un statut est attribué par le SIC.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+</xs:schema>

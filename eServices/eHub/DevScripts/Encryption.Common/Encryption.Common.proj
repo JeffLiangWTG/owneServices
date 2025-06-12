@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="encrypt:key-values">
+
+  <PropertyGroup>
+    <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(ProgramFiles)\MSBuild\ExtensionPack\4.0\</MSBuildExtensionsPackPath>
+    <MSBuildExtensionsPackPath Condition="!Exists('$(MSBuildExtensionsPackPath)')">$(ProgramFiles)\MSBuildExtensionPack\4.0\</MSBuildExtensionsPackPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks" Condition="'$(BuildPath)'==''"/>
+
+  <PropertyGroup>
+    <LocalEncryptionAssemblyFile>$(MSBuildThisFileDirectory)Encryption.Common\Encryption.Common.dll</LocalEncryptionAssemblyFile>
+    <BinPath Condition="Exists('$(LocalEncryptionAssemblyFile)')">$(MSBuildThisFileDirectory)</BinPath>
+
+    <BinPath Condition="'$(BinPath)'==''">$(MSBuildThisFileDirectory)..\..\Bin</BinPath>
+    <BinPath>$([System.IO.Path]::GetFullPath('$(BinPath)'))</BinPath>
+
+    <DatIntegrationAssemblyFilePath>$(BinPath)\Dat\Dat.Integration.dll</DatIntegrationAssemblyFilePath>
+    <DatIntegrationAssemblyFilePath>$([System.IO.Path]::GetFullPath('$(DatIntegrationAssemblyFilePath)'))</DatIntegrationAssemblyFilePath>
+    <EncryptionAssemblyFilePath>$(BinPath)\Encryption.Common\Encryption.Common.dll</EncryptionAssemblyFilePath>
+    <EncryptionAssemblyFilePath>$([System.IO.Path]::GetFullPath('$(EncryptionAssemblyFilePath)'))</EncryptionAssemblyFilePath>
+    <OutputFilePath>$([System.IO.Path]::GetTempFileName())</OutputFilePath>
+  </PropertyGroup>
+
+  <!--
+    free to generate a pair of public,  private key files
+    and then you can distribute the public key file to any one, install the private key file onto your server key container
+    so that public can encrypt their secretes for your to descrept only from your server where the private key has been installed -->
+  <Target Name="rsa:generate-keys" Returns="$(resultKeyFilePath)">
+    <PropertyGroup>
+      <OutputPath>$([System.IO.Path]::Combine('$(BinPath)', 'rsa-keys'))</OutputPath>
+      <PublicKeyFileName>$([System.DateTime]::Now.ToString(`RSA_yyyyMMdd_HHmmssfff`))</PublicKeyFileName>
+      <PrivateKeyFileName>$([System.IO.Path]::GetFileNameWithoutExtension('$(PublicKeyFileName)'))</PrivateKeyFileName>
+
+      <PublicKeyFilePath>$([System.IO.Path]::Combine('$(OutputPath)', '$(PublicKeyFileName)'))</PublicKeyFilePath>
+      <PrivateKeyFilePath>$([System.IO.Path]::Combine('$(OutputPath)', '$(PrivateKeyFileName)'))</PrivateKeyFilePath>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(OutputPath)" Condition="!Exists('$(OutputPath)')" />
+
+    <GenerateKeyPair publicKeyFilePath="$(PublicKeyFilePath)">
+      <Output TaskParameter="resultKeyFilePath" PropertyName="resultKeyFilePath" />
+    </GenerateKeyPair>
+
+    <Message Text="Public key pair files are generated at $(OutputPath)" Importance="High" Condition="'$(resultKeyFilePath)'!=''" />
+    <Message Text="Public key: $(resultKeyFilePath)" Condition="'$(resultKeyFilePath)'!=''" />
+    <Message Text="Private key: $(PrivateKeyFilePath)" Condition="'$(resultKeyFilePath)'!=''" />
+  </Target>
+
+  <Target Name="encrypt:key-values">
+    <PropertyGroup>
+      <ExampleContentOfSecretsCsvFile>
+      <![CDATA[user1,password1
+user2,password2
+user3,password3
+user4,password4
+user5,password5]]>
+      </ExampleContentOfSecretsCsvFile>
+    </PropertyGroup>
+
+    <Message Text="Example content of secrets is a csv file:" Importance="high" />
+    <Message Text="$(ExampleContentOfSecretsCsvFile)" />
+
+    <Message Text="Syntax from a command line:" Importance="high" />
+    <Message Text="msbuild /t:encrypt:key-values /p:key-values-file=(path-to-your-key-values-file);pub=(path-to-your-RSA-public-key-file)" />
+    <Message Text="Alternatively, you could just provide the password to encrypt like this:" Importance="High" />
+    <Message Text="msbuild /t:encrypt:key-values /p:password=(password1);pub=(path-to-your-RSA-public-key-file)" />
+
+    <Error Text="$(DatIntegrationAssemblyFilePath) is not found. Please run QGL to update your local sandbox." Condition="!Exists('$(DatIntegrationAssemblyFilePath)')" />
+    <Message Text="Dat.Integration.SecureStorage.PublicKey will be used instead since no public key file is specified" Condition="!Exists('$(pub)')" />
+
+    <Message Text="Encrypting your provided key values:" Importance="high" />
+    <Message Text="Using public key from file: $(pub)"  Condition="Exists('$(key-values-file)')"/>
+    <Message Text="Key values file specified is: $(key-values-file)" Condition="Exists('$(key-values-file)')"/>
+
+    <PropertyGroup>
+      <FileExtension Condition="Exists('$(key-values-file)')">$([System.IO.Path]::GetExtension('$(key-values-file)'))</FileExtension>
+      <KeyValuesFileDirectory Condition="Exists('$(key-values-file)')">$([System.IO.Path]::GetDirectoryName('$(key-values-file)'))</KeyValuesFileDirectory>
+      <EncryptedKeyValuesFileName Condition="Exists('$(key-values-file)')">Encrypted-$([System.IO.Path]::GetFileName('$(key-values-file)'))</EncryptedKeyValuesFileName>
+      <EncryptedKeyValuesFilePath Condition="Exists('$(key-values-file)')">$([System.IO.Path]::Combine('$(KeyValuesFileDirectory)', '$(EncryptedKeyValuesFileName)'))</EncryptedKeyValuesFilePath>
+
+      <EncryptedKeyValuesFilePath Condition="!Exists('$(key-values-file)')">$([System.IO.Path]::GetTempFileName())</EncryptedKeyValuesFilePath>
+    </PropertyGroup>
+
+    <!-- read csv lines from file -->
+    <ReadLinesFromFile File="$(key-values-file)" Condition="Exists('$(key-values-file)')">
+      <Output TaskParameter="Lines" ItemName="CsvLines"/>
+    </ReadLinesFromFile>
+
+    <!-- convert the csv to msbuild items -->
+    <CsvLinesToKeyValueItems CsvLines="@(CsvLines)">
+      <Output TaskParameter="KeyValueItems" ItemName="KeyValueItems" />
+    </CsvLinesToKeyValueItems>
+    <ItemGroup>
+      <KeyValueItems Include="password" Condition="'$(password)'!=''">
+        <Key>Password</Key>
+        <Value>$(password)</Value>
+      </KeyValueItems>
+    </ItemGroup>
+
+    <Error Text="No key values provided to encrypt" Condition="'@(KeyValueItems)'==''" />
+
+    <EncryptKeyValues
+       KeyValues="@(KeyValueItems)"
+       PublicKeyFile="$(pub)"
+       DatIntegrationAssemblyFilePath="$(DatIntegrationAssemblyFilePath)"
+       EncryptedKeyValuesFilePath="$(EncryptedKeyValuesFilePath)"
+       Condition="@(KeyValueItems->Count()) > 0" />
+
+    <Message Text="Encrypted Key values file is stored at:" Importance="High" />
+    <Message Text="$(EncryptedKeyValuesFilePath)" />
+    <Exec Command="Start $(EncryptedKeyValuesFilePath)" />
+  </Target>
+
+  <!-- unit test encrypt:key-values -->
+  <Target Name="test">
+
+    <Message Text="Demonstrating the usage of this script to encrypt key values by using a public key file" Importance="high" />
+
+    <PropertyGroup>
+      <TempKeyValueFilePath>$([System.IO.Path]::GetTempFileName())</TempKeyValueFilePath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <KeyValuesFilePath Include="$(TempKeyValueFile)" />
+      <MySecrets Include="user1,password1" />
+      <MySecrets Include="user2,password2" />
+      <MySecrets Include="user3,password3" />
+      <MySecrets Include="user4,password4" />
+      <MySecrets Include="user5,password5" />
+    </ItemGroup>
+
+    <WriteLinesToFile
+        File="$(TempKeyValueFilePath)"
+        Lines="@(MySecrets)"
+        Encoding="utf-8"/>
+
+    <CallTarget Targets="rsa:generate-keys">
+      <Output TaskParameter="TargetOutputs" PropertyName="publicKeyFilePath" />
+    </CallTarget>
+
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="encrypt:key-values" Properties="key-values-file=$(TempKeyValueFilePath);pub=$(publicKeyFilePath)" />
+
+  </Target>
+
+  <Target Name="install:private-key">
+
+    <Message Text="Syntax from a command line:" Importance="high" />
+    <Message Text="msbuild /t:install:private-key /p:key-file=(path-to-your-private-key-file);name=(key-container-name)" />
+
+    <Error Text="Please provide the private key file to be installed, e.g. /p:key-file=(path-to-your-private-key-file)" Condition="!Exists('$(key-file)')" />
+    <Error Text="Please specify a name for the key container, e.g. /p:name=(key-container-name)" Condition="'$(name)'==''" />
+
+    <Message Text="Install your provided private key file to the container named as $(name):" Importance="high" />
+    <Message Text="Private key file: $(key-file)" />
+
+    <InstallPrivateKey KeyFilePath="$(key-file)" ContainerName="$(name)">
+      <Output TaskParameter="Result" PropertyName="Result" />
+    </InstallPrivateKey>
+
+    <Message Text="Successfully installed the private key file to the local container named as '$(name)'" Importance="high" Condition="'$(Result)'=='True'" />
+    <Error Text="$(Result)" Importance="high" Condition="'$(Result)'!='True'" />
+  </Target>
+
+  <!-- unit test install:private-key -->
+  <Target Name="test:install:private-key">
+
+    <Message Text="Demonstrating the usage of this script to install private key onto local machine key container" Importance="high" />
+
+    <CallTarget Targets="rsa:generate-keys">
+      <Output TaskParameter="TargetOutputs" PropertyName="publicKeyFilePath" />
+    </CallTarget>
+
+    <PropertyGroup>
+      <KeyFileDirectory>$([System.IO.Path]::GetDirectoryName('$(publicKeyFilePath)'))</KeyFileDirectory>
+      <PrivateKeyFileName>$([System.IO.Path]::GetFileNameWithoutExtension('$(publicKeyFilePath)'))</PrivateKeyFileName>
+      <PrivateKeyFilePath>$([System.IO.Path]::Combine('$(KeyFileDirectory)', '$(PrivateKeyFileName)'))</PrivateKeyFilePath>
+      <ContainerName>$([System.DateTime]::Now.ToString(`TESTyyMMddHHmmss`))</ContainerName>
+    </PropertyGroup>
+
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="install:private-key" Properties="key-file=$(PrivateKeyFilePath);name=$(ContainerName)" />
+    <UninstallPrivateKey ContainerName="$(ContainerName)" />
+    <Message Text="The container '$(ContainerName)' has been uninstalled after test" Importance="high" />
+
+  </Target>
+
+  <UsingTask
+    TaskName="InstallPrivateKey"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <KeyFilePath ParameterType="System.String" Required="true" />
+      <ContainerName ParameterType="System.String" Required="true" />
+      <Result ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        Add-Type -Path $(EncryptionAssemblyFilePath)
+
+        $error.Clear()
+
+        try {
+          [Encryption.Common.RSACrypto]::InstallPrivateKey($ContainerName, $KeyFilePath)
+
+          $encryptor = New-Object Encryption.Common.RSACrypto -ArgumentList $ContainerName
+          $Result = ($null -ne $encryptor)
+
+        } catch {
+          $Result = [string] $error.ToString()
+        }
+      ]]>
+    </Task>
+
+  </UsingTask>
+
+  <UsingTask
+    TaskName="UninstallPrivateKey"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <ContainerName ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        Add-Type -Path $(EncryptionAssemblyFilePath)
+
+        $error.Clear()
+        try {
+          [Encryption.Common.RSACrypto]::UninstallPrivateKey($ContainerName)
+        } catch {
+          $Result = [string] $error.ToString()
+        }
+      ]]>
+    </Task>
+
+  </UsingTask>
+
+  <UsingTask
+    TaskName="CsvLinesToKeyValueItems"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <CsvLines ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <KeyMetadataName ParameterType="System.String" Required="false" />
+      <ValueMetadataName ParameterType="System.String" Required="false" />
+      <KeyValueItems ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+          Add-Type -AssemblyName "Microsoft.Build.Utilities, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL"
+
+          if ([string]::IsNullOrEmpty($KeyMetadataName)) { $KeyMetadataName = [String] "Key" }
+          if ([string]::IsNullOrEmpty($ValueMetadataName)) { $ValueMetadataName = [String] "Value" }
+
+          [Microsoft.Build.Framework.ITaskItem[]] $KeyValueItems = @()
+          $CsvLines | % {
+
+            if ($null -ne $_) {
+
+              $lineText = $_.GetMetadata("Identity")
+
+              if (-not [string]::IsNullOrEmpty($lineText)) {
+                $Key,$Value = $lineText.Trim().Split(',')
+
+                if (-not [string]::IsNullOrEmpty($Key)) {
+                  $item = New-Object -TypeName Microsoft.Build.Utilities.TaskItem -ArgumentList $Key
+
+                  $item.SetMetadata($KeyMetadataName, $Key)
+                  $item.SetMetadata($ValueMetadataName, $Value)
+
+                  $KeyValueItems += $item
+                }
+              }
+            }
+          }
+      ]]>
+    </Task>
+
+  </UsingTask>
+
+  <UsingTask
+    TaskName="EncryptKeyValues"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <KeyValues ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <KeyMetadataName ParameterType="System.String" Required="false" />
+      <ValueMetadataName ParameterType="System.String" Required="false" />
+      <PublicKeyFile ParameterType="System.String" Required="false" />
+      <DatIntegrationAssemblyFilePath ParameterType="System.String" Required="true" />
+      <EncryptedKeyValuesFilePath ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        Add-Type -AssemblyName "Microsoft.Build.Framework"
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "DatIntegrationAssemblyFilePath is at $DatIntegrationAssemblyFilePath")
+
+        if ( -not [string]::IsNullOrWhiteSpace("$(PublicKeyFile)") -and (Test-Path $PublicKeyFile ) ) {
+          $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Using custom encryption assembly from $EncryptionAssemblyFilePath")
+          Add-Type -Path $EncryptionAssemblyFilePath
+
+          $encryptor = New-Object Encryption.Common.RSACrypto
+          $encryptor.LoadPublicKey($PublicKeyFile)
+
+        } elseif ( -not [string]::IsNullOrWhiteSpace("$(DatIntegrationAssemblyFilePath)") -and (Test-Path $DatIntegrationAssemblyFilePath ) ) {
+          $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Using DAT SecureStorage from $DatIntegrationAssemblyFilePath")
+          Add-Type -Path $DatIntegrationAssemblyFilePath
+
+          $encryptor = New-Object Dat.Integration.SecureStorage
+        }
+
+        if ([string]::IsNullOrEmpty($KeyMetadataName)) { $KeyMetadataName = [String] "Key" }
+        if ([string]::IsNullOrEmpty($ValueMetadataName)) { $ValueMetadataName = [String] "Value" }
+
+        $encryptedKeyValues = @()
+        $KeyValues | % {
+
+          $Key = $_.GetMetadata($KeyMetadataName)
+          $Value = $_.GetMetadata($ValueMetadataName)
+          $encryptedValue = $encryptor.Encrypt($Value)
+
+          $encryptedKeyValues += [pscustomobject]@{
+              'Key'=$Key;
+              'Value'=$encryptedValue
+          }
+        }
+
+        if (-not [string]::IsNullOrEmpty($EncryptedKeyValuesFilePath)) {
+          $encryptedKeyValues | ConvertTo-Json | Out-File $EncryptedKeyValuesFilePath -Encoding utf8
+        }
+      ]]>
+    </Task>
+
+  </UsingTask>
+
+  <UsingTask
+    TaskName="GenerateKeyPair"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <publicKeyFilePath ParameterType="System.String" Required="true" />
+      <resultKeyFilePath ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+          Add-Type -Path $(EncryptionAssemblyFilePath)
+          $resultKeyFilePath = [Encryption.Common.RSACrypto]::GenerateKeyPair($publicKeyFilePath)
+      ]]>
+    </Task>
+
+  </UsingTask>
+
+  <UsingTask
+    TaskName="Encrypt"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <Passwords ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <MetadataName ParameterType="System.String" Required="false" />
+      <PublicKeyFile ParameterType="System.String" Required="true" />
+      <Encrypted ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+          Add-Type -Path $(EncryptionAssemblyFilePath)
+          $encryptor = New-Object Encryption.Common.RSACrypto
+          $encryptor.LoadPublicKey($PublicKeyFile)
+
+          if ([string]::IsNullOrEmpty($MetadataName)) { $MetadataName = [String] "Identity" }
+
+          $Encrypted = @()
+          $Encrypted += "{"
+          $Passwords | % {
+            $count = $Encrypted.Count
+            if ($count -gt 1) { $Encrypted[$count - 1] += "," }
+
+            $Encrypted += ("  ""{0}"": ""{1}""" -f $_, $encryptor.Encrypt($_.GetMetadata($MetadataName)))
+          }
+          $Encrypted += "}"
+      ]]>
+    </Task>
+
+  </UsingTask>
+
+</Project>

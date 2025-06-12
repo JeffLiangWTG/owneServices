@@ -1,0 +1,613 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 rel. 2 sp1 (x64) (http://www.altova.com) by Katherine Priore (private) -->
+<!--Authored by Celeste Catano (KEWILL) XML SCHEMA version 1.0-->
+<!--Edited by John Greco (SHEA) XML SCHEMA version 1.1-->
+<!--Edited by Celeste Catano (KEWILL) XML SCHEMA version 1.2-->
+<!--Edited by John Greco (SHEA) XML SCHEMA version 1.3-->
+<!--Edited by Nathan Baylor (AVALON) XML SCHEMA version 1.4-->
+<!--Edited by Fany Flores-Pastor (DESCARTES) XML SCHEMA version 1.6-->
+<!--Edited by Nathan Baylor (AVALON) XML SCHEMA version 1.13-->
+<!--Edited by Fany Flores-Pastor (DESCARTES) XML SCHEMA version 1.14-->
+<!--Edited by Katherine Priore (AVALON) XML SCHEMA version 1.15-->
+<!--Edited by Katherine Priore (AVALON) XML SCHEMA version 1.16-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="BrokerToSuretyMessage">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="BondHeader" type="BondHeaderT"/>
+				<xs:element name="EntryLines" type="EntryLinesT" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="BondHeaderT">
+		<xs:sequence>
+			<xs:element name="SuretyFilerCode">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="3"/>
+						<xs:maxLength value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ImporterNumber">
+				<xs:annotation>
+					<xs:documentation>Valid formats for the Principal ID Number are:
+
+NN-NNNNNNNXX
+Internal Revenue Service (IRS) Number
+
+YYDDPP-NNNNN
+CBP-Assigned Number
+
+NNN-NN-NNNN
+Social Security Number
+
+In these codes, N = number, X = alphanumeric, YY = the last two digits of the calendar year when the number is assigned, DDPP = the district/port code where the number is assigned.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+						<xs:minLength value="11"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ImporterName">
+				<xs:annotation>
+					<xs:documentation>Importers Name</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ImporterAddressLine1">
+				<xs:annotation>
+					<xs:documentation>Importers 1st line of physical address</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ImporterAddressLine2" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Importers 2nd line of physical address. Line 2 not required to be transmitted if blank.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ImporterAddressCity">
+				<xs:annotation>
+					<xs:documentation>Importers City of physical address</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ImporterAddressState">
+				<xs:annotation>
+					<xs:documentation>Importers State/Province of physical address</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ImporterAddressZipCode">
+				<xs:annotation>
+					<xs:documentation>Importers Zip Code of physical address</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ImporterAddressCountry">
+				<xs:annotation>
+					<xs:documentation>Importers Country of physical address. Use ISO Country Codes.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BondType">
+				<xs:annotation>
+					<xs:documentation>Always use 9</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BondActivityCode">
+				<xs:annotation>
+					<xs:documentation>Valid Bond Activity Codes include:
+					
+1 - Importer or Broker
+
+1A - Drawback Payments Refunds
+
+16 - Importer Security Filing (ISF)
+
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CBPBondNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Required when BondDesignationCode = V (void) or C (adjust bond amount).  Do not submit for any other BondDesignationCode.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="9"/>
+						<xs:minLength value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PortCode">
+				<xs:annotation>
+					<xs:documentation>Entry Port Code</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+						<xs:minLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BondDesignationCode">
+				<xs:annotation>
+					<xs:documentation>A code representing the general purpose of the bond and the action to be taken.  Valid codes are:
+
+B = Add a new basic bond.
+
+A = An additional bond; the bond that secures an AD/CVD, PGA or any other aspect not covered by the basic bond requirement. Applies to a Single Transaction Bond only.
+
+V = Void the Single Transaction Bond on file. 
+
+C = Adjust the bond amount of the Single Transaction Bond on file.
+
+U = Substitute for the bond presented at time of entry. Applies to a Single Transaction Bond only.
+
+E = Supersede the bond presented at time of entry. Applies to a Single Transaction Bond only.
+
+R = Bond Rider to take the following actions: US Virgin Islands.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TransactionIDType">
+				<xs:annotation>
+					<xs:documentation>1 = Entry Number, 2 = ISF Reference Number </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TransactionID">
+				<xs:annotation>
+					<xs:documentation>Entry Number: XXXNNNNNNNC, 
+ISF Transaction Number: Filed by a broker: FFFNNNNNNNNNNN or Filed by an Carrier or Service Center:= FFFFNNNNNNNNNNN= FFFF = Filer code / SCAC,= NNNNNNNNNNN = Numeric sequence number=</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="EntryType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Entry Types as Defined by CBP </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BondAmount">
+				<xs:annotation>
+					<xs:documentation>Bond Amount in whole US dollars. Must be greater than zero.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:positiveInteger"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="STBBondProducerAccount" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The Entry Filers identification number assigned by the Surety company of the STB. Dependent on surety practice; i.e., may be optional for some sureties.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="FirstSecondaryNotifyParty" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A code representing the first secondary notify party authorized to receive the bond status notification.
+
+The format must be NNNNXXXNN where NNNN is the Schedule D Code representing the CBP port of the second notify party; XXX is the filer code; and NN is the office code, if used by that filer.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SecondSecondaryNotifyParty" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A code representing the second secondary notify party authorized to receive the bond status notification.
+
+The format must be NNNNXXXNN where NNNN is the Schedule D Code representing the CBP port of the second notify party; XXX is the filer code; and NN is the office code, if used by that filer.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ThirdSecondaryNotifyParty" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A code representing the third secondary notify party authorized to receive the bond status notification.
+
+The format must be NNNNXXXNN where NNNN is the Schedule D Code representing the CBP port of the second notify party; XXX is the filer code; and NN is the office code, if used by that filer.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="FourthSecondaryNotifyParty" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A code representing the fourth secondary notify party authorized to receive the bond status notification.
+
+The format must be NNNNXXXNN where NNNN is the Schedule D Code representing the CBP port of the second notify party; XXX is the filer code; and NN is the office code, if used by that filer.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ExceptionContactName">
+				<xs:annotation>
+					<xs:documentation> The name of a contact at the broker/filers who can be contacted if there are issues/questions with processing the bond.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ExceptionContactEmail">
+				<xs:annotation>
+					<xs:documentation> The Email address of a contact at the broker/filers who can be contacted if there are issues/questions with processing the bond.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ExceptionContactPhone">
+				<xs:annotation>
+					<xs:documentation> The Phone Number of a contact at the broker/filers who can be contacted if there are issues/questions with processing the bond.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BrokerFilerReference" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A reference number provided by the broker/filer that will be returned with the response messages.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="25"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="EstimatedEnteredValue" type="xs:integer" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Estimated Entered Value in whole US dollars. Must be greater than zero.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ISFDetail" type="ISFDetailT" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EntryLinesT">
+		<xs:sequence>
+			<xs:element name="LineNo" type="xs:positiveInteger"/>
+			<xs:element name="EntryLineDetail" type="EntryLineDetailT" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EntryLineDetailT">
+		<xs:sequence>
+			<xs:element name="HTSNumber">
+				<xs:annotation>
+					<xs:documentation>Harmonized Tariff Schedule Number without format. A 6 digit number can be used for ISF, otherwise supply 8 or 10 digits based on what is being sent on the entry data.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CountryOfOrigin">
+				<xs:annotation>
+					<xs:documentation>Country of Origin. Use ISO Country Codes.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TradeAgreementSpecialProgramClaimCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A code that specifies an applicable trade agreement or applicable program that may reduce or eliminate duty and/or MPF(per CBP ACE ABI CATAIR – Entry Summary Create/Update)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="EstimatedEnteredValue" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Estimated Entered Value in whole US dollars for the line item. Must be greater than zero.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:positiveInteger"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="LineDutyAmount" type="xs:decimal" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Duty Amount for the line. 2 decimal places.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IRTaxAmount" type="xs:decimal" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>IR Tax Amount for the line. 2 decimal places.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CommodityFeeAmount" type="xs:decimal" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Commodity Fee Amount for the line. 2 decimal places. This includes fees like Cotton, Sugar, Potato and Raspberry.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OtherFeeAmount" type="xs:decimal" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Commodity Fee Amount for the line. 2 decimal places. This includes fees like MPF and HMF.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EntryLinesADCVD" type="EntryLinesADCVDT" minOccurs="0" maxOccurs="2"/>
+			<xs:element name="EntryLinesPGA" type="EntryLinesPGAT" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EntryLinesADCVDT">
+		<xs:sequence>
+			<xs:element name="CaseNumber">
+				<xs:annotation>
+					<xs:documentation>AD or CVD Case Number.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ADDutyAmount" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>AD Duty Amount for the line. 2 decimal places. Conditionally required when case is AD.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CVDutyAmount" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>CVD Duty Amount for the line. 2 decimal places. Conditionally required when case is CVD.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BondCashClaimCode">
+				<xs:annotation>
+					<xs:documentation>An indication as to whether the duty amount is to be collected as a cash deposit or considered as under a bond as prescribed by the case.
+
+B = The duty amount is to be covered under a surety bond.
+
+C = The duty amount is to be collected as a cash deposit.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CaseDepositRate">
+				<xs:annotation>
+					<xs:documentation>Case Depoist Rate from the AD/CVD Case Information. 2 decimal places.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CaseRateTypeQualifier">
+				<xs:annotation>
+					<xs:documentation>The type of rate prescribed by the case, which corresponds to the applicable deposit rate.
+
+A = The case rate is an ad valorem rate.
+
+S = The case rate is a specific rate.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ADCVDValueOfGoods">
+				<xs:annotation>
+					<xs:documentation> Value of the article, to be used exclusively and in lieu of any other article value for the specific purpose of calculating any estimated antidumping or countervailing duty (when an ad valorem rate applies), reported in whole U.S. dollars.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:positiveInteger"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ADCVDQuanity">
+				<xs:annotation>
+					<xs:documentation>Total number of primary units (which corresponds to the UOM Code prescribed by the case) to be used for calculating the estimated antidumping or countervailing duty (when a specific rate applies). Four decimal places.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ADCVDBondedDutyAmount" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Total bonded AD duty amount. Two decimal places.  Conditionally required when case is AD.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ADCVDCashDepositAmount" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Conditionally required when case is AD.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="NonReimbursementIndicator">
+				<xs:annotation>
+					<xs:documentation>Y = I hereby certify that I have not entered into any agreement or understanding for the payment or for the refunding to me, by the manufacturer, producer, seller, or exporter, of all or any part of the antidumping duties or countervailing duties assessed upon merchandise entered under this AD/CVD line of this entry summary. I further certify that U.S. Customs and Border Protection will be notified if there is any reimbursement of antidumping or countervailing duties by the manufacturer, producer, seller, or exporter to the importing company at any time in the future forthis AD/CVD line.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="DeclarationIdentifier">
+				<xs:annotation>
+					<xs:documentation>Identifier of the blanket AD/CVD Non-Reimbursement Declaration that includes this Case Number. </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ISFDetailT">
+		<xs:sequence>
+			<xs:element name="EstimatedVesselDepartureDate">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:date"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ActionReasonCode">
+				<xs:annotation>
+					<xs:documentation>CT = Complete Transaction
+
+FR = Flexible Range
+
+FT = Flexible Timing
+
+FX = Flexible Range and Flexible Timing</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ActionCode">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EntryLinesPGAT">
+		<xs:sequence>
+			<xs:element name="PGACode">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3"/>
+						<xs:minLength value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PGADisclaimerCode">
+				<xs:annotation>
+					<xs:documentation>Y or N.  A code of Y indicates that there is no agency delaration requirement.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

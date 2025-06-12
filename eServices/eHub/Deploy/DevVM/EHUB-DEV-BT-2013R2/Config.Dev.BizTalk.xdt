@@ -1,0 +1,68 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+
+  <configSections xdt:Transform="Remove"/>
+  <configSections xdt:Transform="InsertBefore(*)">
+    <sectionGroup name="eHub" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+    <sectionGroup name="common" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+    <section name="log4net" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+	
+    <sectionGroup name="eHub" xdt:Locator="Match(name)" xdt:Transform="Insert">
+      <section name="orchestrationLogging" type="CargoWise.eHub.Core.Logging.LoggerConfigSection, CargoWise.eHub.Core.Logging, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350, processorArchitecture=MSIL"/>
+      <section name="pipelineLogging" type="CargoWise.eHub.Core.Logging.LoggerConfigSection, CargoWise.eHub.Core.Logging, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350, processorArchitecture=MSIL"/>
+      <section name="hostLogging" type="CargoWise.eHub.Core.Logging.LoggerConfigSection, CargoWise.eHub.Core.Logging, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350, processorArchitecture=MSIL"/>
+    </sectionGroup>
+    <sectionGroup name="common" xdt:Locator="Match(name)" xdt:Transform="Insert">
+      <section name="logging" type="Common.Logging.ConfigurationSectionHandler, Common.Logging, Version=2.2.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+    </sectionGroup>
+    <section name="log4net" type="log4net.Config.Log4NetConfigurationSectionHandler, log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing"/>
+  </configSections>
+
+  <eHub xdt:Transform="Remove"/>
+  <eHub xdt:Transform="InsertAfter(configSections)">
+    <orchestrationLogging logDir="C:\Logs\BizTalk\Orchestrations">
+      <loggers>
+      </loggers>
+    </orchestrationLogging>
+    <pipelineLogging logDir="C:\Logs\BizTalk\Pipelines">
+      <loggers>
+        <add name="Gateway_SelectInboxMessageByStatus_WCF-SQL+Receive#RoutingRuleEngine" level="DEBUG" maxSizeRollBackups="25" maximumFileSize="5MB"/>
+      </loggers>
+    </pipelineLogging>
+    <hostLogging logDir="C:\Logs\BizTalk\Hosts">
+      <loggers>
+      </loggers>
+    </hostLogging>
+  </eHub>
+
+  <common xdt:Transform="Remove"/>
+  <common xdt:Transform="InsertAfter(eHub)">
+    <logging>
+      <factoryAdapter type="Common.Logging.Log4Net.Log4NetLoggerFactoryAdapter, Common.Logging.Log4Net1211, Version=2.2.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+        <arg key="configType" value="INLINE"/>
+      </factoryAdapter>
+    </logging>
+  </common>
+
+  <log4net xdt:Transform="Remove"/>
+  <log4net xdt:Transform="InsertAfter(common)">
+    <root>
+      <appender-ref ref="WindowsEventLog"/>
+    </root>
+    <appender name="WindowsEventLog" type="log4net.Appender.EventLogAppender">
+      <applicationName value="eHub BizTalk"/>
+      <layout type="log4net.Layout.PatternLayout"/>
+      <threshold value="WARN"/>
+    </appender>
+  </log4net>
+
+  <system.diagnostics xdt:Transform="Remove"/>
+  <system.diagnostics xdt:Transform="InsertAfter(log4net)">
+    <switches>
+      <!-- 0,1,2,3, and 4 correspond to Off, Error, Warning, Info, and Verbose -->
+      <add name="eHubTraceLevel" value="3" />
+      <add name="BizTalkESBToolkit20" value="3" />
+    </switches>
+  </system.diagnostics>
+
+</configuration>

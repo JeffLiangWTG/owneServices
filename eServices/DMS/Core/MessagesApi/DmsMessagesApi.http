@@ -1,0 +1,48 @@
+@MessagesApi_HostAddress = http://localhost:5213
+@Authorization_Header = Basic VVNDOkRNJHBoYXNlMQ==
+
+HEAD {{MessagesApi_HostAddress}}/wtg/alive
+Accept: application/json
+
+###
+GET {{MessagesApi_HostAddress}}/wtg/status
+Accept: application/json
+
+###
+POST {{MessagesApi_HostAddress}}/messages/USC
+Accept: application/json
+Content-Type: application/octet-stream
+Authorization: {{Authorization_Header}}
+x-dms-message-sender-id: USC
+
+<Message>
+	<Content>Message Content</Content>
+</Message>
+###
+POST {{MessagesApi_HostAddress}}/messages/USC
+Accept: application/json
+Content-Type: application/octet-stream
+Authorization: {{Authorization_Header}}
+x-dms-message-sender-id: USC
+x-dms-message-parent-id: 0a1849a4-1b53-4e94-a293-c6428a8d8828
+
+<Message>
+	<Content>Message Content</Content>
+</Message>
+###
+GET {{MessagesApi_HostAddress}}/messages/USC
+Accept: application/octet-stream
+Authorization: {{Authorization_Header}}
+x-dms-message-batch-id: c95015f6-29e6-43b4-ae29-bffdb0103694
+
+###
+PATCH {{MessagesApi_HostAddress}}/messages?id=c95015f6-29e6-43b4-ae29-bffdb0103694&status=Delivered
+Accept: application/octet-stream
+Authorization: {{Authorization_Header}}
+
+###
+PATCH {{MessagesApi_HostAddress}}/messages?id=66c571a6-3a65-4a8c-a5df-9af7b969e4a7&status=Failed&error=Error%20message&issue-manager-report-id=66c571a6-3a65-4a8c-a5df-9af7b969e4a7
+Accept: application/octet-stream
+Authorization: {{Authorization_Header}}
+
+###

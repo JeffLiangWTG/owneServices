@@ -1,0 +1,217 @@
+version: '3'
+services:
+
+  apps-shared:
+    image: nginx:alpine
+    container_name: apps-shared
+    ports:
+      - "6001:80"
+    volumes:
+      - ./nginx-apps-shared.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - message-cache
+      - tracking
+
+  apps-shared-1:
+    build: 
+      context: ../Apps/Shared.WebApi
+    container_name: apps-shared-1
+    env_file: ${ENVIRONMENT}.env
+    environment:
+      - HOSTNAME=apps-shared-1
+    depends_on:
+      - message-cache
+      - tracking
+
+  apps-shared-2:
+    build: 
+      context: ../Apps/Shared.WebApi
+    container_name: apps-shared-2
+    env_file: ${ENVIRONMENT}.env
+    environment:
+      - HOSTNAME=apps-shared-2
+    depends_on:
+      - message-cache
+      - tracking
+
+  message-cache:
+    image: nginx:alpine
+    container_name: message-cache
+    ports:
+      - "6002:80"
+    volumes:
+      - ./nginx-message-cache.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - message-cache-1
+      - message-cache-2
+      - message-cache-3
+
+  message-cache-1:
+    build: 
+      context: ../MessageCache.WebApi
+    container_name: message-cache-1
+    env_file: ${ENVIRONMENT}.env
+    environment:
+      - HOSTNAME=message-cache-1
+    depends_on:
+      - mongo
+      - redis
+
+  message-cache-2:
+    build: 
+      context: ../MessageCache.WebApi
+    container_name: message-cache-2
+    env_file: ${ENVIRONMENT}.env
+    environment:
+      - HOSTNAME=message-cache-2
+    depends_on:
+      - mongo
+      - redis
+
+  message-cache-3:
+    build: 
+      context: ../MessageCache.WebApi
+    container_name: message-cache-3
+    env_file: ${ENVIRONMENT}.env
+    environment:
+      - HOSTNAME=message-cache-3
+    depends_on:
+      - mongo
+      - redis
+
+  tracking:
+    build: 
+      context: ../Tracking.WebApi
+    container_name: tracking
+    env_file: ${ENVIRONMENT}.env
+    environment:
+      - HOSTNAME=tracking
+    ports:
+      - "6003:80"
+    depends_on:
+      - nats-streaming
+      - elasticsearch
+      - mongo-metrics
+
+  xxxxxx:
+    image: nginx:alpine
+    container_name: xxxxxx
+    ports:
+      - "6004:80"
+    volumes:
+      - ./nginx-xxxxxx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - xxxxxx-1
+      - xxxxxx-2
+
+  xxxxxx-1:
+    build: 
+      context: ../Apps/XXXXXX.Outbound
+    container_name: xxxxxx-1
+    env_file: ${ENVIRONMENT}.env
+    environment:
+      - HOSTNAME=xxxxxx-1
+    depends_on: 
+      - message-cache
+      - tracking
+
+  xxxxxx-2:
+    build: 
+      context: ../Apps/XXXXXX.Outbound
+    container_name: xxxxxx-2
+    env_file: ${ENVIRONMENT}.env
+    environment:
+      - HOSTNAME=xxxxxx-2
+    depends_on: 
+      - message-cache
+      - tracking
+
+  yyyyyy:
+    image: nginx:alpine
+    container_name: yyyyyy
+    ports:
+      - "6005:80"
+    volumes:
+      - ./nginx-yyyyyy.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - yyyyyy-1
+      - yyyyyy-2
+
+  yyyyyy-1:
+    build: 
+      context: ../Apps/YYYYYY.Outbound
+    container_name: yyyyyy-1
+    env_file: ${ENVIRONMENT}.env
+    environment:
+      - HOSTNAME=yyyyyy-1
+    depends_on: 
+      - message-cache
+      - tracking
+
+  yyyyyy-2:
+    build: 
+      context: ../Apps/YYYYYY.Outbound
+    container_name: yyyyyy-2
+    env_file: ${ENVIRONMENT}.env
+    environment:
+      - HOSTNAME=yyyyyy-2
+    depends_on: 
+      - message-cache
+      - tracking
+
+  cccccc:
+    build: 
+      context: ../Apps/CCCCCC.Inbound
+    container_name: cccccc
+    env_file: ${ENVIRONMENT}.env
+    environment:
+      - HOSTNAME=cccccc
+    depends_on: 
+      - message-cache
+      - tracking
+
+  nats-streaming:
+    image: "nats-streaming:latest"
+    container_name: nats-streaming
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+
+  mongo:
+    image: "mongo:latest"
+    container_name: mongo
+    ports:
+      - "27017:27017"
+
+  mongo-metrics:
+    image: "mongo:latest"
+    container_name: mongo-metrics
+    ports:
+      - "27117:27017"
+
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.1
+    container_name: elasticsearch
+    # volumes:
+    #   - ./elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:6.2.1
+    container_name: kibana
+    # volumes:
+    #   - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
+    depends_on: 
+      - elasticsearch

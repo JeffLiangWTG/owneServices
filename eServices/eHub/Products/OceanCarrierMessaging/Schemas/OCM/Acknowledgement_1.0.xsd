@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://www.cargowise.com/Schemas/OCM/Acknowledgement/1"
+  targetNamespace="http://www.cargowise.com/Schemas/OCM/Acknowledgement/1"
+  elementFormDefault="qualified" version="1.0">
+  <xs:element name="Acknowledgement">
+    <xs:complexType>
+      <xs:sequence minOccurs="0">
+        <xs:element name="MessageContext">
+          <xs:complexType>
+            <xs:sequence minOccurs="1">
+              <xs:element minOccurs="0" name="SenderID">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="36"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element minOccurs="0" name="RecipientID">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="36"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element minOccurs="0" name="MessageDateTime">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element minOccurs="0" name="MessageNumber">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="35"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element minOccurs="0" name="ServiceType" type="ServiceType"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="AcknowledgementDateTime" type="xs:string"/>
+        <xs:element minOccurs="0" name="AcknowledgementMessageType" type="AcknowledgmentMessageType"/>
+        <xs:element minOccurs="0" name="AcknowledgementStatus" type="AcknowledgmentStatus"/>
+        <xs:element minOccurs="0" name="ReferenceNumberCollection">
+          <xs:complexType>
+            <xs:sequence minOccurs="0">
+              <xs:element maxOccurs="unbounded" minOccurs="0" name="ReferenceNumber">
+                <xs:complexType mixed="true">
+                  <xs:sequence minOccurs="0">
+                    <xs:element minOccurs="0" name="Type" type="ReferenceNumberType"/>
+                    <xs:element minOccurs="0" name="Value" type="StringMaxLength35"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" name="RemarkCollection">
+          <xs:complexType>
+            <xs:sequence minOccurs="0">
+              <xs:element maxOccurs="unbounded" minOccurs="0" name="Remark">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element minOccurs="0" name="Type" type="RemarkType"/>
+                    <xs:element minOccurs="0" name="Value" type="StringMaxLength512"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="ServiceType">
+    <xs:annotation>
+      <xs:documentation>VOCC, NVOCC</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="VOCC"/>
+      <xs:enumeration value="NVOCC"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AcknowledgmentMessageType">
+    <xs:annotation>
+      <xs:documentation>BookingRequest, ShippingInstruction, VerifiedGrossMass</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="BookingRequest"/>
+      <xs:enumeration value="ShippingInstruction"/>
+      <xs:enumeration value="VerifiedGrossMass"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AcknowledgmentStatus">
+    <xs:annotation>
+      <xs:documentation>Acknowledged, Accepted, Rejected</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Acknowledged"/>
+      <xs:enumeration value="Accepted"/>
+      <xs:enumeration value="Rejected"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="RemarkType">
+    <xs:annotation>
+      <xs:documentation>GeneralRemarks, RejectionReason</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="GeneralRemarks"/>
+      <xs:enumeration value="RejectionReason"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ReferenceNumberType">
+    <xs:annotation>
+      <xs:documentation>MessageReference, BookingNumber, BillOfLadingNumber</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MessageReference"/>
+      <xs:enumeration value="BookingNumber"/>
+      <xs:enumeration value="BillOfLadingNumber"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="StringMaxLength35">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="0"/>
+      <xs:maxLength value="35"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="StringMaxLength512">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="0"/>
+      <xs:maxLength value="512"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

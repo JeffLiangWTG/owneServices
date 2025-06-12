@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Title: "Bill of Entry Details"                                  -->
+<!--                                                                 -->
+<!-- Purpose:                                                        -->
+<!-- This message type is used by the CoreFreight system to send     -->
+<!-- Bill of Entry Details             			                     -->
+<!--                                                                 -->
+<!-- Created by: Nishaal Paparam                                     -->
+<!-- Version: 1.07                                                   -->
+<!-- Last updated: 16 July 2014                                      -->
+<!--                                                                 -->
+<!-- Edited by: Sipho Mdhluli                                        -->
+<!-- Version: 1.08                                                   -->
+<!-- Last updated: 01 March 2017                                     -->
+
+<xs:schema targetNamespace = "http://cargowise.com/ehub/clients/common/cfxml/2017/11" 
+           xmlns           = "http://cargowise.com/ehub/clients/common/cfxml/2017/11"
+           xmlns:xs        = "http://www.w3.org/2001/XMLSchema" 
+           version         = "1.0">
+    
+    <xs:simpleType name="TransportMode">
+        <xs:annotation>
+            <xs:documentation>
+                This conforms to the UNECE recommendation 19 for Transport Mode Code
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:int">
+            <xs:enumeration id="Sea" value="1" >
+                <xs:annotation>
+                    <xs:documentation >
+                        Sea (Maritime Transport). Provision is made for separate reporting of inland water transport under code
+                        8, assuming that appropriate definitions and rules of application will be given,
+                        particularly when transport covers sea as well as inland waterways.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration id="Rail" value="2" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Rail Transport
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration id="Road" value="3" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Road Transport
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration id="Air" value="4" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Air Transport
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration id="Mail" value="5" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Post / Mail. (Active mode of transport unknown) – This code is provided for practical
+                        reasons, despite the fact that mail is not a genuine mode of transport. In many
+                        countries, the value of merchandise exported and imported by mail is considerable,
+                        but the exporter or importer concerned would be unable to state by which
+                        mode postal items had passed the national border.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration id="Multimodal" value="6" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Multi Modal Transport. (Active mode of transport unknown) – This code is provided for practical
+                        reasons, despite the fact that multimodal transport is not a genuine mode of
+                        transport. It can be used when goods are carried by at least two different modes
+                        from a place at which the goods are taken in charge by a transport operator to
+                        a place designated for delivery, on the basis of one transport contract. (Operations
+                        of pick-up and delivery of goods carried out in the performance of a
+                        unimodal transport, as defined in such a contract, shall not be considered as
+                        multimodal transport.)
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration id="Fixed" value="7" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Fixed Transport Installation. This code applies to installations for continuous transport such as pipelines,
+                        ropeways and electric power lines.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration id="InlandWater" value="8" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Inland Water Transport. This code is used only in such cases where the application of waterborne
+                        transport is reported separately within the framework of a one-digit code.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration id="Unknown" value="9" >
+                <xs:annotation>
+                    <xs:documentation>
+                        Mode Unknown. This code can be used when the mode is not known or when information on it
+                        is not available at the time of issuing the document concerned.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>  
+
+    <xs:complexType name="MessageHeader">
+        <xs:sequence>
+            <xs:element type="xs:token" name="Name" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:dateTime" name="DateTimeCreated" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="TransactionType">
+        <xs:restriction base="xs:int">
+            <xs:enumeration value="9" id="Original"/>
+            <xs:enumeration value="4" id="Change"/>
+            <xs:enumeration value="1" id="Cancellation"/>
+            <xs:enumeration value="5" id="Replace"/>
+        </xs:restriction>
+    </xs:simpleType>
+ 
+    <xs:complexType name="EntityHierarchy">
+        <xs:annotation>
+            <xs:documentation>
+                The owner entity code defines the entity which "owns" the master data element. Uniqueness of codes will be tested against this entity's immediate master data entity.
+                The entity codes is a list of entities which also have rights to view and edit the master data element.
+                By default the owner entity will always have rights to view the master data element.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element type="xs:token" name="OwnerEntityCode" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:token" name="EntityCode" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+  
+    <xs:complexType name="Product">
+        <xs:sequence>
+            <xs:element type="xs:token" name="ProductCode" minOccurs="1" maxOccurs="1"/>
+            <xs:element type="xs:token" name="ProductDescription" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+	
+	<xs:complexType name="ProductCodeList">
+		<xs:sequence>
+            <xs:element type="Product" name="Product" maxOccurs="unbounded"/>
+		</xs:sequence>
+    </xs:complexType>
+    
+    <xs:simpleType name="CountryCode">
+        <xs:annotation>
+            <xs:documentation>Must conform to ISO 3166-1 Representation of Countries.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:token">
+            <xs:pattern value="[A-Z][A-Z]"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="ClientReference">
+        <xs:annotation>
+            <xs:documentation>Standard Client Reference Information used on LSP Integration Messages</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element type="EntityHierarchy" name="EntityHierarchy"/>
+            <xs:element type="xs:token" name="PONumber" minOccurs="0"/>
+            <xs:element type="xs:token" name="DeliveryInstructionCode" minOccurs="0"/>
+            <xs:element type="xs:token" name="SupplierCode" minOccurs="0"/>
+            <xs:element type="xs:string" name="SupplierName" minOccurs="0"/>
+            <xs:element type="xs:token" name="SupplierInvoiceNumber" minOccurs="0"/>
+            <xs:element type="xs:token" name="DeliveryLocationCode" minOccurs="0"/>
+            <xs:element type="xs:token" name="SupplierInvoiceLineNo" minOccurs="0"/>
+            <xs:element type="xs:token" name="SupplierInvoiceDate" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BillOfEntry">
+        <xs:sequence>
+            <xs:element type="xs:string" name="ExternalUniqueID" minOccurs="0"/>
+            <xs:element type="xs:token" name="HWBNumber" minOccurs="0"/>
+            <xs:element type="xs:string" name="TransportDocumentNumber" minOccurs="0"/>
+            <xs:element type="xs:string" name="ActualFileNumber"/>
+            <xs:element type="xs:token" name="MRNNumber"/>
+            <xs:element type="xs:token" name="LRNNumber"/>
+            <xs:element type="xs:dateTime" name="BillOfEntryDate"/>
+            <xs:element type="xs:token" name="CPCCode" minOccurs="0"/>
+            <xs:element type="TransactionType" name="TransactionType"/>
+            <xs:element type="xs:token" name="ProcedureCategoryCode"/>
+            <xs:element type="xs:token" name="CustomsOfficeOfEntry"/>
+			<xs:element type="xs:string" name="ClientReference"    minOccurs="0" />
+            <xs:element type="xs:token" name="CustomsOfficeOfDestination" minOccurs="0"/>
+            <xs:element type="xs:token" name="ToWarehouseCode" minOccurs="0"/>
+            <xs:element type="xs:token" name="FromWarehouseCode" minOccurs="0"/>
+            <xs:element type="xs:string" name="DeclarantsReferenceNumber" minOccurs="0"/>
+            <xs:element type="xs:token" name="OriginalMRNNumber" minOccurs="0"/>
+            <xs:element type="TransportMode" name="TransportMode"/>
+            <xs:element type="xs:string" name="VoyageFlightNumber" minOccurs="0"/>
+            <xs:element type="xs:string" name="TransportName" minOccurs="0"/>
+            <xs:element type="xs:token" name="AgentCustomsCode"/>
+            <xs:element type="xs:token" name="ImporterCustomsCode" minOccurs="0"/>
+            <xs:element type="xs:token" name="ExporterCustomsCode" minOccurs="0"/>
+			<xs:element type="xs:boolean" name="IsVOC"/>
+            <xs:element type="BOELineList" name="BOELineList" minOccurs="0"/>
+            <xs:element type="xs:token" name="ImporterCode" minOccurs="0"/>
+            <xs:element type="xs:token" name="ExporterCode" minOccurs="0"/>
+            <xs:element type="xs:token" name="BusinessReference" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BOELine">
+        <xs:sequence>
+            <xs:element type="xs:positiveInteger" name="LineNumber" minOccurs="0"/>
+            <xs:element type="xs:token" name="LineDescription" minOccurs="0"/>
+            <xs:element type="xs:token" name="CPCCode" minOccurs="0"/>
+            <xs:element type="xs:token" name="PreviousCPCCode" minOccurs="0"/>
+            <xs:element type="xs:token" name="PreviousMRNNumber" minOccurs="0"/>
+            <xs:element type="xs:token" name="PreviousLineNumber" minOccurs="0"/>
+            <xs:element type="xs:token" name="TariffCode" minOccurs="0"/>
+            <xs:element type="xs:token" name="TradeAgreementCode" minOccurs="0"/>
+            <xs:element type="xs:token" name="ROONumber" minOccurs="0"/>
+            <xs:element type="xs:token" name="ProcedureMeasure" minOccurs="0"/>
+            <xs:element type="CountryCode" name="CountryOfOrigin" minOccurs="0"/>
+            <xs:element type="xs:decimal" name="CustomsValue" minOccurs="0"/>
+            <xs:element type="xs:decimal" name="ActualPrice" minOccurs="0"/>
+            <xs:element type="xs:decimal" name="EstimatedDuty" minOccurs="0"/>
+            <xs:element type="xs:decimal" name="EstimatedVAT" minOccurs="0"/>
+            <xs:element type="xs:decimal" name="PackSize" minOccurs="0"/>
+            <xs:element type="xs:token" name="CaseNo" minOccurs="0"/>
+			<xs:element type="xs:boolean" name="NewUsedIndicator"/>
+            <xs:element type="UnitOfMeasureList" name="UnitOfMeasureList" minOccurs="0"/>
+            <xs:element type="CustomsDutyList" name="CustomsDutyList" minOccurs="0"/>
+            <xs:element type="ClientReference" name="ClientReference" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element type="ProductCodeList" name="ProductCodeList" minOccurs="1"/>
+            <xs:element type="BOELineAdditionalInfoList" name="BOELineAddInfoList" minOccurs="0"/>
+            <xs:element type="xs:token" name="RebateCode" minOccurs="0"/>
+            <xs:element type="xs:decimal" name="VDPAmount" minOccurs="0"/>
+            <xs:element type="xs:token" name="Model" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="UnitOfMeasure">
+        <xs:sequence>
+            <xs:element type="xs:token" name="Type"/>
+            <xs:element type="xs:token" name="Code"/>
+            <xs:element type="xs:decimal" name="Quantity"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CustomsDuty">
+        <xs:sequence>
+            <xs:element type="xs:token" name="DependantCode" minOccurs="0"/>
+		    <xs:element type="xs:token" name="DutyTypeCode"/>
+            <xs:element type="xs:decimal" name="DutyValue"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BillOfEntryList">
+        <xs:sequence>
+            <xs:element type="BillOfEntry" name="BillOfEntry" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BOELineAdditionalInfoList">
+        <xs:sequence>
+            <xs:element type="BOELineAdditionalInfoType" name="BOELineAdditionalInfoType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BOELineAdditionalInfoType">
+        <xs:sequence>
+            <xs:element type="xs:integer" name="AdditionalInfoNumber"/>
+            <xs:element type="xs:token" name="AdditionalInfoCode"/>
+            <xs:element type="xs:token" name="AdditionalInfoValue"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BOELineList">
+        <xs:sequence>
+            <xs:element type="BOELine" name="BOELine" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="UnitOfMeasureList">
+        <xs:sequence>
+            <xs:element type="UnitOfMeasure" name="UnitOfMeasure" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+  
+    <xs:complexType name="CustomsDutyList">
+        <xs:sequence>
+            <xs:element type="CustomsDuty" name="CustomsDuty" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+  
+    <xs:complexType name="MessageHeaderType">
+        <xs:sequence>
+            <xs:element name="SenderID" type="xs:string"/>
+            <xs:element name="RecipientID" type="xs:string"/>
+            <xs:element name="MessageID" type="xs:positiveInteger"/>
+            <xs:element name="MessageType" type="MsgTypeConstant"/>
+            <xs:element name="Timestamp" type="xs:dateTime"/>
+            <xs:element name="Action" type="MsgHdrActionType"/>
+        </xs:sequence>
+    </xs:complexType>
+	
+    <xs:simpleType name="MsgTypeConstant">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="CFXML_BOE_DETAILS"/>
+        </xs:restriction>
+    </xs:simpleType>
+	
+    <xs:simpleType name="MsgHdrActionType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Add"/>
+            <xs:enumeration value="Update"/>
+            <xs:enumeration value="Delete"/>
+        </xs:restriction>
+    </xs:simpleType> 		
+  
+    <xs:element name="CFXML_BOE_DETAILS">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element type="MessageHeaderType" name="MessageHeader"/>
+                <xs:element type="BillOfEntryList"   name="BillOfEntryList" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

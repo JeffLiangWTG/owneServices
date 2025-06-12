@@ -1,0 +1,30 @@
+USE eHubTransactions
+BEGIN TRANSACTION
+
+UPDATE eHubTransactions..eHubCodeMapKey
+SET CK_Order = CK_Order + 1
+WHERE CK_Order > 4 AND CK_CS = '3EFA0148-5EC3-4ECB-8904-C2EBDC700E6A'
+
+INSERT INTO eHubTransactions..eHubCodeMapKey([CK_PK], [CK_CS], [CK_Order], [CK_Key1Value], [CK_Key2Value])
+SELECT N'6543B632-B13B-4E74-8FE5-BDA8EFD7FE91', N'3EFA0148-5EC3-4ECB-8904-C2EBDC700E6A', 5, N'GBCustoms-Direct', N'PullNotifications'
+
+INSERT INTO eHubTransactions..eHubCodeMapValue([CV_CK], [CV_CR], [CV_OutputCode], [CV_PassThroughKey])
+SELECT N'6543B632-B13B-4E74-8FE5-BDA8EFD7FE91', N'd19a9616-3872-4457-867b-0588affd034a', N'https://api.service.hmrc.gov.uk/notifications/', NULL
+
+UPDATE eHubTransactions..eHubCodeMapKey
+SET CK_Order = CK_Order + 1
+WHERE CK_Order > 11 AND CK_CS = '3EFA0148-5EC3-4ECB-8904-C2EBDC700E6A'
+
+INSERT INTO eHubTransactions..eHubCodeMapKey([CK_PK], [CK_CS], [CK_Order], [CK_Key1Value], [CK_Key2Value])
+SELECT N'70D4426A-5535-41B5-95C0-49A1AB8D5D5F', N'3EFA0148-5EC3-4ECB-8904-C2EBDC700E6A', 12, N'GBCustomsTest-Direct', N'PullNotifications'
+
+INSERT INTO eHubTransactions..eHubCodeMapValue([CV_CK], [CV_CR], [CV_OutputCode], [CV_PassThroughKey])
+SELECT N'70D4426A-5535-41B5-95C0-49A1AB8D5D5F', N'd19a9616-3872-4457-867b-0588affd034a', N'https://test-api.service.hmrc.gov.uk/notifications/', NULL
+
+INSERT INTO eHubTransactions..eHubClientRegistration([CX_PK], [CX_CC], [CX_RT], [CX_Qualifier], [CX_Code], [CX_Flag1])
+SELECT N'EE4744F6-21E9-4E68-8E61-04E3940D69A7', N'1009DE17-E13A-4D89-A3BF-F703EABA38BD', 'F84FD390-96F1-4B7C-810B-B45320C5A71B', N'PullNotification', N'b443b6879c2cd0ee842f1b27388bb211', 1 UNION ALL
+SELECT N'78D9EFC9-BE81-4E07-B7EC-F8ED25AF8BE9', N'AC9FE213-29C8-4273-A5B6-F74988B175BE', 'F84FD390-96F1-4B7C-810B-B45320C5A71B', N'PullNotification', N'e449d13065ea1a785a6fd64cee7522b', 0
+
+ROLLBACK TRANSACTION
+--COMMIT TRANSACTION
+

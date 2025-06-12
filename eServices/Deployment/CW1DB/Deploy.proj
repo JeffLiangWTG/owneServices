@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <CW1DBDeployProjImported>True</CW1DBDeployProjImported>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+
+    <MSBuildTaksToolsFilePath>$(MSBuildBinPath)\Microsoft.Build.Tasks.Core.dll</MSBuildTaksToolsFilePath>
+    <MSBuildTasksToolsFilePath Condition="!Exists('$(MSBuildTasksToolsFilePath)')">$(MSBuildProgramFiles32)\MSBuild\$(MSBuildToolsVersion)\Bin\Microsoft.Build.Tasks.v$(MSBuildUseVersion).dll</MSBuildTasksToolsFilePath>
+
+    <Configuration Condition="'$(Configuration)'==''">Debug</Configuration>
+    <DeployingFromUnzippedPackagePath Condition="Exists('$(MSBuildThisFileDirectory)Deployment')">True</DeployingFromUnzippedPackagePath>
+
+    <BaseDeploymentProps>$(MSBuildThisFileDirectory)\Deployment\Deployment.props</BaseDeploymentProps>
+    <ProfiledDeploymentProps>$(MSBuildThisFileDirectory)\Deployment\Profiles\$(Profile)\Deployment.props</ProfiledDeploymentProps>
+
+    <SqlHelpersProject>$(MSBuildThisFileDirectory)..\Helpers\SqlCmdHelpers.proj</SqlHelpersProject>
+    <SqlHelpersProject Condition="!Exists('$(SqlHelpersProject)')">$(MSBuildThisFileDirectory)\SqlCmdHelpers.proj</SqlHelpersProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CW1Logins Include="_CargoWiseReaderLogin" />
+    <CW1Logins Include="_CargoWiseWriterLogin" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(BaseDeploymentProps)" Condition="'$(_DeploymentPropsImported)'=='' and Exists('$(BaseDeploymentProps)')"/>
+  <Import Project="$(ProfiledDeploymentProps)" Condition="'$(Profile)' != '' and '$(_ProfilePropsImported)'=='' and Exists('$(ProfiledDeploymentProps)')"/>
+  <Import Project="$(SqlHelpersProject)" Condition="'$(SqlCmdHelpersImported)'==''"/>
+
+  <PropertyGroup>
+    <_TargetDatabaseName Condition="'$(TargetDatabaseName)'!=''">$(TargetDatabaseName)</_TargetDatabaseName>
+  </PropertyGroup>
+
+  <Target Name="bat:deploy" Returns="$(_TargetDatabaseName)">
+    <Error Text="Please specify a value for BackupFileName to the database backup file to restore database from" Condition="'$(BackupFileName)'==''" />
+    <Error Text="Please specify a value for TargetDatabaseName for the target database to restore the database" Condition="'$(_TargetDatabaseName)'==''" />
+
+    <PropertyGroup>
+      <_TargetDatabaseName Condition="'$(TargetDatabaseName)'!=''">$(TargetDatabaseName)</_TargetDatabaseName>
+
+      <_DatabaseBackUpFilesDir Condition="'$(OutputPath)'!=''">$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(OutputPath)'))</_DatabaseBackUpFilesDir>
+      <_DatabaseBackUpFilesDir Condition="!Exists('$(_DatabaseBackUpFilesDir)')">$(MSBuildThisFileDirectory)</_DatabaseBackUpFilesDir>
+      <_DatabaseBackUpFilesDir>$([System.IO.Path]::GetFullPath('$(_DatabaseBackUpFilesDir)'))</_DatabaseBackUpFilesDir>
+      <BackupFilePath>$([System.IO.Path]::Combine('$(_DatabaseBackUpFilesDir)', '$(BackupFileName)'))</BackupFilePath>
+    </PropertyGroup>
+
+    <Error Text="The database backup file '$(BackupFilePath)' cannot be found" Condition="!Exists('$(BackupFilePath)')" />
+
+    <MSBuild Projects="$(SqlHelpersProject)" Targets="bat:sql:restore_db" Properties="FromDisk=$(BackupFilePath);_Server=$(_Server);SqlCmdLogOn=$(SqlCmdLogOn);SqlCmdPassword=$(SqlCmdPassword);DatabaseName=$(_TargetDatabaseName)" />
+  </Target>
+
+  <Target Name="bat:remove">
+    <Error Text="Please specify a value for TargetDatabaseName to remove" Condition="'$(TargetDatabaseName)'==''" />
+
+    <ItemGroup>
+      <DropDatabases Include="$(TargetDatabaseName)" />
+      <DropDatabases Include="@(RefDbNames->'$(TargetDatabaseName)%(Identity)')" />
+
+      <DropLogins Include="@(CW1Logins->'$(TargetDatabaseName)%(Identity)')" />
+    </ItemGroup>
+
+    <!-- drop db specific reader and writer logins -->
+    <MSBuild
+      Projects="$(SqlHelpersProject)"
+      Targets="bat:sql:drop_login"
+      Properties="LoginName=%(DropLogins.Identity);SqlCmdLogOn=$(SqlCmdLogOn);SqlCmdPassword=$(SqlCmdPassword)"
+      Condition="'@(DropLogins)'!=''" />
+
+    <!-- drop db and ref dbs -->
+    <MSBuild
+      Projects="$(SqlHelpersProject)"
+      Targets="bat:sql:drop_databases_by_prefix"
+      Properties="DatabaseName=$(TargetDatabaseName);SqlCmdLogOn=$(SqlCmdLogOn);SqlCmdPassword=$(SqlCmdPassword)" />
+  </Target>
+
+</Project>

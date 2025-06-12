@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bat:package">
+
+	<PropertyGroup>
+		<_UseProject>false</_UseProject>
+		<_TempDeployFolder>$(MSBuildThisFileDirectory)_deploy</_TempDeployFolder>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<BatProjects Include="Common\CargoWise.eHub.BizTalkAdapters.Common.csproj" />
+		<BatProjects Include="Common.UI\CargoWise.eHub.BizTalkAdapters.Common.UI.csproj" />
+		<BatProjects Include="FluentFTP\FluentFTP.csproj" />
+		<BatProjects Include="FluentFTP\UnmodifiedSource\FluentFTP.csproj" />
+		<BatProjects Include="FluentFTP\UnmodifiedSource\FluentFTP_Core.csproj" />
+		<BatProjects Include="FtpEx\CargoWise.eHub.BizTalkAdapters.FtpEx.csproj" />
+		<BatProjects Include="FtpEx.Admin\CargoWise.eHub.BizTalkAdapters.FtpEx.Admin.csproj" />
+		<BatProjects Include="FtpExPolling\CargoWise.eHub.BizTalkAdapters.FtpExPolling.csproj" />
+		<BatProjects Include="FtpExPolling.Admin\CargoWise.eHub.BizTalkAdapters.FtpExPolling.Admin.csproj" />
+		<BatProjects Include="Loopback\CargoWise.eHub.BizTalkAdapters.Loopback.csproj" />
+		<BatProjects Include="Loopback.Admin\CargoWise.eHub.BizTalkAdapters.Loopback.Admin.csproj" />
+		<BatProjects Include="Microsoft.Samples.BizTalk.Adapter\Microsoft.Samples.BizTalk.Adapter.Common.csproj" />
+		<BatProjects Include="Null\CargoWise.eHub.BizTalkAdapters.Null.csproj" />
+		<BatProjects Include="Null.Admin\CargoWise.eHub.BizTalkAdapters.Null.Admin.csproj" />
+		<BatProjects Include="Renci.SshNet\Renci.SshNet.csproj" />
+		<BatProjects Include="Renci.SshNet\UnmodifiedSource\Renci.SshNet.csproj" />
+		<BatProjects Include="SftpEx\CargoWise.eHub.BizTalkAdapters.SftpEx.csproj" />
+		<BatProjects Include="SftpEx.Admin\CargoWise.eHub.BizTalkAdapters.SftpEx.Admin.csproj" />
+		<BatProjects Include="SftpExPolling\CargoWise.eHub.BizTalkAdapters.SftpExPolling.csproj" />
+		<BatProjects Include="SftpExPolling.Admin\CargoWise.eHub.BizTalkAdapters.SftpExPolling.Admin.csproj" />
+		<BatProjects Include="Tests\CargoWise.eHub.BizTalkAdapters.Tests.csproj" />
+		<BatProjects Include="Transferrer.Adapter\CargoWise.eHub.BizTalkAdapters.Transferrer.Adapter.csproj" />
+		<BatProjects Include="Transferrer.Core\CargoWise.eHub.BizTalkAdapters.Transferrer.Core.csproj" />
+		<BatProjects Include="Transferrer.Ftp\CargoWise.eHub.BizTalkAdapters.Transferrer.Ftp.csproj" />
+		<BatProjects Include="Transferrer.Sftp\CargoWise.eHub.BizTalkAdapters.Transferrer.Sftp.csproj" />
+		<BatProjects Include="WSHttpEx\CargoWise.eHub.BizTalkAdapters.WSHttpEx.csproj" />
+		<BatProjects Include="WSHttpEx.Admin\CargoWise.eHub.BizTalkAdapters.WSHttpEx.Admin.csproj" />
+
+		<PackageProject Include="$(MSBuildThisFileDirectory)..\Deploy\BizTalk\BizTalkAdapters\BizTalkAdapters.proj" />
+		<DeployProject Include="$(MSBuildThisFileDirectory)..\Deploy\BizTalk\BizTalkAdapters\BizTalkAdapters.proj" />
+	</ItemGroup>
+	
+	<Target Name="Build" DependsOnTargets="Clean">
+		<MSBuild Projects="CargoWise.eHub.BizTalkAdapters.sln" Targets="Build" />
+	</Target>
+
+	<Target Name="Clean">
+		<MSBuild Projects="CargoWise.eHub.BizTalkAdapters.sln" Targets="Clean" />
+	</Target>
+	
+	<Target Name="Rebuild" DependsOnTargets="Clean;Build" />
+
+	<Target Name="bat:package" Outputs="$(_PackageFilePath)" DependsOnTargets="Build">
+		<MSBuild Projects="@(PackageProject)" Targets="bat:package">
+			<Output ItemName="ProjectOutputs" TaskParameter="TargetOutputs"/>
+		</MSBuild>
+
+		<CreateProperty Value="@(ProjectOutputs)">
+			<Output TaskParameter="Value" PropertyName="_PackageFilePath"/>
+		</CreateProperty>
+
+		<Message Text="Package file created is: $(_PackageFilePath)" Importance="High" />
+	</Target>
+
+	<Target Name="bat:deploy" DependsOnTargets="bat:package">
+		<Message Text="Using package file: $(_PackageFilePath)" Importance="High" />
+		<MSBuild Projects="@(DeployProject)" Targets="bat:deploy" Properties="_PackageFilePath=$(_PackageFilePath);">
+			<Output ItemName="ProjectOutputs" TaskParameter="TargetOutputs"/>
+		</MSBuild>
+	</Target>
+
+</Project>

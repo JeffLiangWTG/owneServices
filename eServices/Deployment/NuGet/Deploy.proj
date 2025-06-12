@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--EXTERNAL_PROPERTIES: Profile;UserName;Password;_Server;_DatabaseFilesPath;_ManifestFileName;_SqlDeploymentConfigFilePath;TargetDatabase-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	
+	<PropertyGroup>
+        <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+        <MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+    </PropertyGroup>
+
+    <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+
+	<Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props"/>
+	<Import Project="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Deployment.props" Condition="'$(Profile)' != ''"/>
+	
+	<Target Name="bat:deploy">
+    <PropertyGroup>
+			<_OutputDirectory Condition="$(_OutputDirectory) == ''">.</_OutputDirectory>
+      <_NuGetExePath>$(MSBuildThisFileDirectory)NuGet.exe</_NuGetExePath>
+      <_ApiKeyCommand Condition="$(_ApiKey) != ''">-ApiKey $(_ApiKey)</_ApiKeyCommand>
+		</PropertyGroup>
+		
+		<Message Text="$(_NuGetExePath) push $(_OutputDirectory)\*.nupkg $(_ApiKeyCommand) -Source $(_Source) -SkipDuplicate" Importance="high"/>
+		
+		<Exec Command="$(_NuGetExePath) push $(_OutputDirectory)\*.nupkg $(_ApiKeyCommand) -Source $(_Source) -SkipDuplicate" Condition="'$(_Source)'!=''" />
+		
+		<Message Text="Please verify the packages are successfully deployed onto $(_Source)" Importance="high"/>
+	</Target>
+
+	<Target Name="bat:remove">
+	</Target>
+
+</Project>

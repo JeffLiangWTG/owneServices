@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp1 (http://www.altova.com) by XMLSpy 2008 Professional Ed. Release 2, Installed for 4 users (Australia Post) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty:v1" 
+	xmlns:ns0="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1"
+	xmlns:ns1="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" 
+	targetNamespace="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty:v1" 
+	elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" schemaLocation="CommonTypes_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" schemaLocation="Address_v3.xsd"/>
+	<xs:complexType name="IndividualName">
+		<xs:sequence>
+			<xs:element name="NameUsage" type="NameUsage" minOccurs="0"/>
+			<xs:element name="Title" type="NameTitleType" minOccurs="0"/>
+			<xs:element name="Suffix" type="NameSuffix" minOccurs="0"/>
+			<xs:element name="FamilyName" type="FamilyName" minOccurs="0"/>
+			<xs:element name="FullName" type="FullName" minOccurs="0"/>
+			<xs:element name="GivenName" type="GivenName" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="NameTitleType">
+		<xs:annotation>
+			<xs:documentation>Individual Name Title is a prefix to an individual's name. Intended use of this field is to use abbreviation of the title.  Eg. DR for Doctor, GEN for General, HON for Honourable, MR for Mister and if the individual has more than one title it will be entered as HON DR.  Increase field width is to accommodate full title description</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="80"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NameUsage">
+		<xs:annotation>
+			<xs:documentation>Name usage, defines the role that a name performs for an individual.  LGL: Legal, AKA: Alias (Also known as), BTH:  Name at birth, MDN: Maiden, NEW: New born identification, OTH: Other, PRV Previous name, PRF: Preferred, STG: Stage, TRB:Tribal</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="23"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FamilyName">
+		<xs:annotation>
+			<xs:documentation>Family Name of is an individual's family name or surname assigned by a person's parent or acquired via a formal change of name process</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="40"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FullName">
+		<xs:annotation>
+			<xs:documentation>This is a free text full name of a person.  This attribute should only be used when it is not possible to break the name down into these individual components (title, given name(s), family name, suffix </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="500"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SequenceNumber">
+		<xs:annotation>
+			<xs:documentation>When an individual has more than one given name this identifies the sequence of the name</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:totalDigits value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="GenderType">
+		<xs:annotation>
+			<xs:documentation>A code indicating sex ( or preferred sex role) that a person perceives themselves as regardles of biological characteristics.  As per AS4590-A1, gender codes are 1:Male, 2:Female, 3:Intersex or Indeterminate or 0: Not stated or inadequately  </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="TaxFileNumberType">
+		<xs:annotation>
+			<xs:documentation>An individuals Tax File Number</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="9"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TaxFileNumberExemptionCode">
+		<xs:annotation>
+			<xs:documentation>ATO TFN substitutes for individuals not required to present a TFN
+				333333333 - under sixteen
+				444444441 - pensioner
+				444444442 - recipient of other eligible Centrelink pension or benefit
+				555555555 - entity not required to lodge an income tax return
+				666666666 - investors in the business of providing consumer or business finance
+				777777777 - Norfolk Island residents
+				888888888 - non-residents
+				987654321 - alphabetic characters in quoted TFN
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="TaxFileNumberType">
+			<xs:enumeration value="333333333"/>
+			<xs:enumeration value="444444441"/>
+			<xs:enumeration value="444444442"/>
+			<xs:enumeration value="555555555"/>
+			<xs:enumeration value="666666666"/>
+			<xs:enumeration value="777777777"/>
+			<xs:enumeration value="888888888"/>
+			<xs:enumeration value="987654321"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MaritalStatusType">
+		<xs:annotation>
+			<xs:documentation>individuals marital status. Uses AS4590 values, codes can also be used however for XML document readability - and due to the short length - enumerations have been implemented instead.
+				01 - Never Married 
+				02 - Widowed
+				03 - Divorced
+				04 - Separated
+				05 - Married (registered and de facto)
+				06 - Not stated/inadequately described
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="AustralianResidentType">
+		<xs:annotation>
+			<xs:documentation>individuals australian residency status</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Resident"/>
+			<xs:enumeration value="Non-Resident"/>
+			<xs:enumeration value="Permanent Non-Resident"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AboriginalTorresStraitIslanderType">
+		<xs:annotation>
+			<xs:documentation>field to indicate whether individual is an Aboriginal and/or Torres Strait Islander</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Yes - Aboriginal"/>
+			<xs:enumeration value="Yes - Torres Strait Islander"/>
+			<xs:enumeration value="Yes - Aboriginal and Torres Strait Islander"/>
+			<xs:enumeration value="No"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="EmploymentDetailsType">
+		<xs:annotation>
+			<xs:documentation>Employment details of an Individual</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="EmploymentType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Details of the type of Employment.  Eg. Self employed, Paid Employee...</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="32"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PositionDescription" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Applicants job title or role in child-related work or position description of work</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GivenName">
+		<xs:annotation>
+			<xs:documentation>Given Name is an individual's first name,forename, christian name, middle name or second name assigned by a person's parent or acquired via a formal change of name process.  </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name">
+				<xs:annotation>
+					<xs:documentation>Name of theindividual</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SequenceNumber" type="xs:int">
+				<xs:annotation>
+					<xs:documentation>Where an individual name has more the one given name this identifies the sequence of the names</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IndividualType">
+		<xs:sequence>
+			<xs:element name="Name" type="IndividualName" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Gender" type="GenderType" minOccurs="0"/>
+			<xs:element name="Birthdate" type="xs:date" minOccurs="0"/>
+			<xs:element name="Deathdate" type="xs:date" minOccurs="0"/>
+			<xs:element name="Employment" type="EmploymentDetailsType" minOccurs="0"/>
+			<xs:element name="TaxFileNumber" type="TaxFileNumberType" minOccurs="0"/>
+			<xs:element name="TaxFileNumberExemption" type="TaxFileNumberExemptionCode" minOccurs="0"/>
+			<xs:element name="MaritalStatus" type="MaritalStatusType" minOccurs="0"/>
+			<xs:element name="AustralianResident" type="AustralianResidentType" minOccurs="0"/>
+			<xs:element name="AboriginalTorresStraitIslander" type="AboriginalTorresStraitIslanderType" minOccurs="0"/>
+			<xs:element name="Credentials" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Credentials of an individual.  NOTE: TO BE DEPRECATED.  PLEASE USE USERACCOUNT INSTEAD</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="UsageType" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>A code representing the role or usage of individual credentials such as CORP, CSSO, SAPCATS etc.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="ValidPeriod" type="ns0:ValidPeriod" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Valid Period of the user credentials.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:choice>
+							<xs:element name="LoginDetails" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="UserAccountID" type="ns0:UserID" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>A unique code to identify the user account.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="Username" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Username</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="ns0:Username"/>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Password" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Password</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="ns0:PasswordText"/>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="PasswordExpiryDate" type="ns0:GLOBAL_DateTime" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Date on which the password will get expired.</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="SecretQuestion" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Question" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>The question that is asked as a Secret Question.</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Answer" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>The answer that individual provides to the secret question</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="100"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:choice>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Individual" type="IndividualType"/>
+	<xs:simpleType name="NameSuffix">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="UsageType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

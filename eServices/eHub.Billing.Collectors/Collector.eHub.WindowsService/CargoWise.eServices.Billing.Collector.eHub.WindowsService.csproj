@@ -1,0 +1,244 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Net.Compilers\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers\build\Microsoft.Net.Compilers.props')" />
+  <Import Project="..\packages\librdkafka.redist\build\librdkafka.redist.props" Condition="Exists('..\packages\librdkafka.redist\build\librdkafka.redist.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{22C289C5-A590-4684-8BF5-E103C068920F}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CargoWise.eServices.Billing.Collector.eHub.WindowsService</RootNamespace>
+    <AssemblyName>CargoWise.eServices.Billing.Collector.eHub.WindowsService</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Billing\Collector\WindowsService</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Billing\Collector\WindowsService</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\EDI-Release-private.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.Billing.API">
+      <HintPath>..\bin\CargoWise.Billing.API.dll</HintPath>
+    </Reference>
+    <Reference Include="CargoWise.Billing.Client">
+      <HintPath>..\bin\CargoWise.Billing.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="CargoWise.Billing.CollectorService.Plugin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\CargoWise.Billing.CollectorService.Plugin.dll</HintPath>
+    </Reference>
+    <Reference Include="CargoWise.eServices.Billing.Collector.WindowsService.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\CargoWise.eServices.Billing.Collector.WindowsService.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="CsvHelper, Version=33.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\bin\CsvHelper.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="log4net">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Microsoft.Extensions.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=7.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore, Version=3.1.0.0, Culture=neutral, PublicKeyToken=5d1104efbd0e675d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Options, Version=7.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Microsoft.Extensions.Options.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\System.Memory.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.XML" />
+    <Reference Include="System.Xml.Linq" />
+    <None Include="..\EDI-Release-private.snk">
+      <Link>EDI-Release-private.snk</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Plugins\ACASMessaging\Plugin.cs" />
+    <Compile Include="Plugins\AirMessaging\Plugin.cs" />
+    <Compile Include="Plugins\ASYCUDA\Plugin.cs" />
+    <Compile Include="Plugins\ClientMappings\ClientMappingsInsecureFTP.cs" />
+    <Compile Include="Plugins\ClientMappings\Plugin.cs" />
+    <Compile Include="Plugins\E2ELegacy\Plugin.cs" />
+    <Compile Include="Plugins\E2E\Plugin.cs" />
+    <Compile Include="Plugins\ForwardAir\Plugin.cs" />
+    <Compile Include="Plugins\ForwardingPortMessaging\DAKOSY\Plugin.cs" />
+    <Compile Include="Plugins\ForwardingPortMessaging\NGB\Plugin.cs" />
+    <Compile Include="Plugins\ForwardingPortMessaging\PortBase\Plugin.cs" />
+    <Compile Include="Plugins\ForwardingPortMessaging\TNPA\Plugin.cs" />
+    <Compile Include="Plugins\ForwardingPortMessaging\TPT\Plugin.cs" />
+    <Compile Include="Plugins\JPCustoms\Plugin.cs" />
+    <Compile Include="Plugins\NZCustoms\Plugin.cs" />
+    <Compile Include="Plugins\OceanCarrierMessaging\CSIReceived\Plugin.cs" />
+    <Compile Include="Plugins\OceanCarrierMessaging\CSRSent\Plugin.cs" />
+    <Compile Include="Plugins\OceanCarrierMessaging\CBRReceived\Plugin.cs" />
+    <Compile Include="Plugins\OceanCarrierMessaging\ServiceProviderShippingInstructions\Plugin.cs" />
+    <Compile Include="Plugins\OceanCarrierMessaging\ShippingInstructionReceived\Plugin.cs" />
+    <Compile Include="Plugins\OceanCarrierMessaging\ShippingInstructionSent\Plugin.cs" />
+    <Compile Include="Plugins\OceanCarrierMessaging\VGMReceived\Plugin.cs" />
+    <Compile Include="Plugins\OceanCarrierMessaging\CVGReceived\Plugin.cs" />
+    <Compile Include="Plugins\OceanTracing\Plugin.cs" />
+    <Compile Include="Plugins\RailincMessaging\Plugin.cs" />
+    <Compile Include="Plugins\ShippingPortMessaging\Plugin.cs" />
+    <Compile Include="Plugins\Test\Plugin.cs" />
+    <Compile Include="Plugins\SGCustoms\Plugin.cs" />
+    <Compile Include="Plugins\ZACustoms\Plugin.cs" />
+    <Compile Include="Plugins\USCustoms\Plugin.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="ProjectInstaller.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ProjectInstaller.Designer.cs">
+      <DependentUpon>ProjectInstaller.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Deployment\Deployment.props">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Deployment\Profiles\Production\Files\plugins_settings.xml" />
+    <None Include="Deployment\Profiles\Production\App.config" />
+    <None Include="Deployment\Profiles\Production\Deployment.props" />
+    <None Include="Deployment\Profiles\Test\Files\plugins_settings.xml" />
+    <None Include="Deployment\Profiles\Test\App.config" />
+    <None Include="Deployment\Profiles\Test\Deployment.props" />
+    <None Include="log4net.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Plugins\ClientMappings\ClientMappingsInsecureFTP.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="plugins_settings.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ProjectInstaller.resx">
+      <DependentUpon>ProjectInstaller.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\AirMessaging\Query.sql" />
+    <EmbeddedResource Include="Plugins\ASYCUDA\Query.sql" />
+    <EmbeddedResource Include="Plugins\ClientMappings\Query.sql" />
+    <EmbeddedResource Include="Plugins\ForwardAir\Query.sql" />
+    <EmbeddedResource Include="Plugins\JPCustoms\Query.sql" />
+    <EmbeddedResource Include="Plugins\NZCustoms\Query.sql" />
+    <EmbeddedResource Include="Plugins\OceanTracing\Query.sql" />
+    <EmbeddedResource Include="Plugins\RailincMessaging\Query.sql" />
+    <EmbeddedResource Include="Plugins\ShippingPortMessaging\Query.sql" />
+    <EmbeddedResource Include="Plugins\USCustoms\Query.sql" />
+    <EmbeddedResource Include="Plugins\OceanCarrierMessaging\ShippingInstructionSent\Query.sql" />
+    <EmbeddedResource Include="Plugins\OceanCarrierMessaging\ShippingInstructionReceived\Query.sql" />
+    <EmbeddedResource Include="Plugins\OceanCarrierMessaging\VGMReceived\Query.sql" />
+    <EmbeddedResource Include="Plugins\OceanCarrierMessaging\CSIReceived\Query.sql" />
+    <EmbeddedResource Include="Plugins\OceanCarrierMessaging\CSRSent\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\ForwardingPortMessaging\DAKOSY\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\ForwardingPortMessaging\PortBase\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\E2E\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\ForwardingPortMessaging\TNPA\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\ZACustoms\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\ForwardingPortMessaging\TPT\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\SGCustoms\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\ForwardingPortMessaging\NGB\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\ACASMessaging\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\OceanCarrierMessaging\ServiceProviderShippingInstructions\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\E2ELegacy\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\OceanCarrierMessaging\CVGReceived\Query.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins\OceanCarrierMessaging\CBRReceived\Query.sql" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PackageProjectPath>..\Bin\Deployment\WindowsService\Package.proj</PackageProjectPath>
+    <DeploymentProjectPath>..\Bin\Deployment\WindowsService\Deploy.proj</DeploymentProjectPath>
+  </PropertyGroup>
+  <Import Project="$(PackageProjectPath)" Condition="Exists('$(PackageProjectPath)')" />
+  <Import Project="$(DeploymentProjectPath)" Condition="Exists('$(DeploymentProjectPath)')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

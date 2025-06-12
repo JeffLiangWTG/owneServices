@@ -1,0 +1,8 @@
+FROM ocmpoc-base as publish
+RUN dotnet publish -c Release -o /out FrontEnd/Api/OcmPoc.FrontEnd.Api.csproj
+
+FROM microsoft/dotnet:2.1.1-aspnetcore-runtime AS final
+EXPOSE 80
+WORKDIR /app
+COPY --from=publish /out .
+ENTRYPOINT ["dotnet", "OcmPoc.FrontEnd.Api.dll"]

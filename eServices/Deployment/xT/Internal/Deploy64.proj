@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+		<RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>
+		<CommonPowershellFunctionsFilePath>$(RootDirectory)Common.ps1</CommonPowershellFunctionsFilePath>
+		<_XtAPI Condition="'$(_XtAPI)' == ''">$(RootDirectory)XT.Internal.API\</_XtAPI>
+		<_XtBin Condition="'$(_XtBin)' == ''">$(RootDirectory)xT.Bin\</_XtBin>
+		<_XtInterface Condition="'$(_XtInterface)' == ''">$(RootDirectory)Interface\</_XtInterface>
+		<_NuGetExePath>$(RootDirectory)NuGet.exe</_NuGetExePath>
+		<MSBuildExtensionsPackPath>C:\Program Files (x86)\MSBuildExtensionPack\4.0</MSBuildExtensionsPackPath>
+		<ComponentsFolder>$(_XtInterface)\Components</ComponentsFolder>
+		<MSBuildTasksToolsFilePath Condition="'$(MSBuildTasksToolsFilePath)'==''">$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll</MSBuildTasksToolsFilePath>
+	</PropertyGroup>
+
+	<!--Import XT API Tasks-->
+	<Import Project="$(_XtAPI)XT.Internal.API.tasks" Condition="'$(_XtAPI)'!=''" />
+	<!--Import Interface definition-->
+	<Import Project="$(_XtInterface)Interface.props"/>
+
+	<!--Import Default deployment properties-->
+	<Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props" Condition="'$(_DeploymentPropsImported)'==''"/>
+	<!--Import Profile deployment properties (overrides default)-->
+	<Import Project="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Deployment.props" Condition="'$(Profile)' != '' and '$(_ProfilePropsImported)'==''"/>
+
+	<UsingTask TaskName="CopyFile" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+		<ParameterGroup>
+			<MachineName ParameterType="System.String" />
+			<UserName ParameterType="System.String" />
+			<UserPassword ParameterType="System.String" />
+			<LocalPath ParameterType="System.String" />
+			<TargetPath ParameterType="System.String" />
+		</ParameterGroup>
+		<Task>
+			<![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+			$session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword).Session
+			Try
+			{
+				Copy-Item $LocalPath -Destination $TargetPath -ToSession $session -Recurse -Force
+			}
+			Finally
+			{
+				$session | Remove-PSSession
+			}
+            ]]>
+		</Task>
+	</UsingTask>
+
+	<UsingTask
+		  TaskName="ProcessFileWithVariables"
+		  TaskFactory="CodeTaskFactory"
+		  AssemblyFile="$(MSBuildTasksToolsFilePath)" >
+		<ParameterGroup>
+			<FilePath ParameterType="System.String" />
+			<Variables ParameterType="Microsoft.Build.Framework.ITaskItem[]"/>
+			<VariableIdentity ParameterType="System.String" />
+		</ParameterGroup>
+		<Task>
+			<Using Namespace="System.Text.RegularExpressions"/>
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+				File.WriteAllText(FilePath, Regex.Replace(File.ReadAllText(FilePath), @"(?<VariableName>\$\(.*?\))", new MatchEvaluator(match =>
+                {
+                    var variableName = match.Groups["VariableName"].Value;
+					variableName = variableName.Substring(2, variableName.Length - 3);
+                    var item = Variables.SingleOrDefault(x => x.GetMetadata("Identity") == VariableIdentity && x.MetadataNames.OfType<string>().Contains(variableName));
+                    return item != null 
+						? item.GetMetadata(variableName)
+						: match.Value;
+                })));
+                ]]>
+			</Code>
+		</Task>
+	</UsingTask>
+
+	<UsingTask
+		  TaskName="OverrideItem"
+		  TaskFactory="CodeTaskFactory"
+		  AssemblyFile="$(MSBuildTasksToolsFilePath)" >
+		<ParameterGroup>
+			<Items ParameterType="Microsoft.Build.Framework.ITaskItem[]"/>
+			<OutputItems Output="true" ParameterType="Microsoft.Build.Framework.ITaskItem[]"/>
+		</ParameterGroup>
+		<Task>
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+                OutputItems = Items.Where(item => !(item.GetMetadata("Identity").Contains("_Override") || item.GetMetadata("Identity").Contains("_Remove"))).ToArray();
+                Items = Items.Except(OutputItems).ToArray();
+                OutputItems = OutputItems.Except(OutputItems.Where(item => Items.Where(x => x.GetMetadata("Identity") == item.GetMetadata("Identity") + "_Remove").Any()).ToArray()).ToArray();
+                foreach (var item in OutputItems)
+                {
+                    foreach (var overwriteItem in Items)
+                    {
+                        if (overwriteItem.GetMetadata("Identity") == item.GetMetadata("Identity") + "_Override")
+                        {
+                            foreach (string metadata in overwriteItem.MetadataNames)
+                            {
+                                if (metadata != "Identity")
+                                {
+                                    item.SetMetadata(metadata, overwriteItem.GetMetadata(metadata));
+                                }
+                            }
+                        }
+                    }
+                }
+                ]]>
+			</Code>
+		</Task>
+	</UsingTask>
+
+	<Target Name="prepare:component" Inputs="@(Component)" Outputs="%(Identity).Dummy">
+		<!--Override default value of variables by the values provided in profile's Deployment.props-->
+		<OverrideItem Items="@(Variables)">
+			<Output TaskParameter="OutputItems"
+						  ItemName="OverridenVariables" />
+		</OverrideItem>
+
+		<PropertyGroup>
+			<ProjectFile>$(ComponentsFolder)\%(Component.Identity)\Build\build.csproj</ProjectFile>
+			<AppConfig>$(ComponentsFolder)\%(Component.Identity)\app.config</AppConfig>
+		</PropertyGroup>
+
+		<!--Create project file-->
+		<ItemGroup>
+			<Line Include="&lt;Project Sdk=&quot;Microsoft.NET.Sdk&quot;&gt;"/>
+			<Line Include="&lt;ItemGroup&gt;"/>
+			<Line Include="&lt;PackageReference Include=&quot;%(Component.PackageID)&quot; Version=&quot;%(Component.Version)&quot;/&gt;"/>
+			<Line Include="&lt;/ItemGroup&gt;"/>
+			<Line Include="&lt;/Project&gt;"/>
+		</ItemGroup>
+		<WriteLinesToFile File="$(ProjectFile)" Lines="@(Line)" Overwrite="true"/>
+
+		<!--Build components-->
+		<MSBuild Projects="$(ProjectFile)" Targets="Restore;Rebuild" Properties="RestorePackagesPath=Packages;AppendTargetFrameworkToOutputPath=false;OutputType=Module;DebugType=none;OutputPath=..;TargetFramework=%(Component.TargetFramework)" />
+		<ItemGroup>
+			<Assemblies Include="$(ComponentsFolder)\%(Component.Identity)\*.dll"/>
+			<ComponentConfiguration Include="$(ComponentsFolder)\%(Component.Identity)\Configurations\*.json"/>
+		</ItemGroup>
+
+		<!--Copy assemblies of component-->
+		<Copy SourceFiles="@(Assemblies)" DestinationFolder="$(RootDirectory)\$(InterfaceName)\%(Component.Identity)"/>
+
+		<!--Process app.config file and replace variables with values-->
+		<ProcessFileWithVariables
+				FilePath="$(AppConfig)"
+				Variables="@(OverridenVariables)"
+				VariableIdentity="app.config"/>
+
+		<ProcessFileWithVariables
+		  FilePath="$(RootDirectory)\$(InterfaceName)\XH.Framework.Logging.dll.Config"
+		  Variables="@(OverridenVariables)"
+		  VariableIdentity="XH.Framework.Logging.dll.Config"/>
+
+		<!--Copy app.config file-->
+		<Copy SourceFiles="$(AppConfig)" DestinationFolder="$(RootDirectory)\$(InterfaceName)\%(Component.Identity)" />
+
+		<!--Process component configuration files and replace variables with values-->
+		<ProcessFileWithVariables
+				FilePath="%(ComponentConfiguration.Identity)"
+				Variables="@(OverridenVariables)"
+				VariableIdentity="ComponentConfiguration"/>
+
+		<!--Copy component configuration files-->
+		<Copy SourceFiles="@(ComponentConfiguration)" DestinationFolder="$(RootDirectory)\$(InterfaceName)\%(Component.Identity)" />
+
+	</Target>
+
+	<Target Name="pre:deploy" BeforeTargets="bat:deploy">
+
+
+		<CallTarget Targets="prepare:component" />
+
+		<!--Install XT assemblies required for deployment-->
+		<Exec Command="$(_NuGetExePath) install xT.Deployment -Version 5.1.1.61 -NoCache -DirectDownload -NonInteractive -OutputDirectory $(RootDirectory)\Packages\Deployment"/>
+		<ItemGroup>
+			<_XTDeploymentBin Include="$(RootDirectory)\Packages\Deployment\xT.Deployment.5.1.1.61\lib\net45\**\*" />
+		</ItemGroup>
+		<!--Copy XT deployment assemblies to _XtBin-->
+		<Copy SourceFiles="@(_XTDeploymentBin)" DestinationFolder="$(_XtBin)%(RecursiveDir)"/>
+
+		<!--Remove downloaded packages-->
+		<RemoveDir Directories="$(RootDirectory)\Packages" />
+
+		<!--Use _XtBin to resolve assemblies required by API tasks-->
+		<ResolveAssemblies SearchDirectory="$(_XtBin)" />
+
+		<StopService MachineName="$(ServerName)"
+						ServiceName="xtservice"
+						ThrowExceptionOnFailure="true"/>
+		<CreateSnapshot Condition="'$(Backend)'='SQLServer'" ConnectionString="$(DBConnectionString)" />
+		<!--Leave until backup process has been decided by DB Admin-->
+		<!--<CreateBackup Condition="'$(Backend)'='PostgreSQL'" />-->
+		<CreateXtProxy ConnectionString="$(xTConnectionString)"
+						xTUserName="$(xTUserName)"
+						xTPassword="$(xTPassword)"
+						ServerName="$(xTServerName)" />
+		<PreAnalysis />
+	</Target>
+
+	<Target Name="bat:deploy">
+		<CopyFile MachineName="$(ServerName)"
+					  UserName="$(UserName)"
+					  UserPassword="$(Password)"
+					  LocalPath="$(RootDirectory)$(InterfaceName)"
+					  TargetPath="$(InterfacesRootDirectory)\$(InterfaceName)" />
+
+		<ImportConfiguration ConfigurationFile="$(_XtInterface)Configuration.json" />
+
+	</Target>
+
+	<Target Name="post:deploy" AfterTargets="bat:deploy">
+		<DeleteSnapshot  Condition="'$(Backend)'='SQLServer'"/>
+		<StartService MachineName="$(ServerName)" 
+					  ServiceName="xtservice"
+					  ThrowExceptionOnFailure="true"/>
+		<PostDeploymentCheck />
+	</Target>
+
+</Project>

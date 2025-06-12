@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified"
+           targetNamespace="http://exworks.com/schema" xmlns="http://exworks.com/schema">
+
+    <xs:annotation>
+        <xs:appinfo>
+            <schemaInfo root_reference="ProofOfDelivery" displayroot_reference="ProofOfDelivery" xmlns="http://schemas.microsoft.com/BizTalk/2003" />
+        </xs:appinfo>
+    </xs:annotation>
+
+    <xs:include schemaLocation=".\ExWorksTypes.xsd"/>
+
+    <xs:element name="Shipment">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ShipmentIdentifiers">
+                    <xs:complexType>
+                        <xs:choice>
+                            <xs:element name="FileNumber" type="FileNumberType"/>
+                            <xs:element name="Xtag" type="XtagType"/>
+                        </xs:choice>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="AdditionalReferenceNumbers" type="ReferenceNumbersType" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="Origin" type="OriginType"/>
+                <xs:element name="Destination" type="DestinationType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Carrier">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Scac" type="ScacType"/>
+                <xs:element name="Name" type="CarrierNameType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="SubmissionInfo">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="SubmittedDateTime" type="EventDateTimeType"/>
+                <xs:element name="SubmittedBy" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="PickupInfo">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="PickupDateTime" type="EventDateTimeType"/>
+                <xs:element name="PickupPieces" type="PieceCountType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="DeliveryInfo">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="DeliveryDateTime" type="EventDateTimeType"/>
+                <xs:element name="DeliveryPieces" type="PieceCountType"/>
+                <xs:element name="DeliverySignature" type="xs:string"/>
+                <xs:element name="DeliveryComments" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="ProofOfDelivery">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="TransactionHeader" type="TransactionHeaderType"/>
+                <xs:element ref="Shipment"/>
+                <xs:element ref="Carrier"/>
+                <xs:element ref="SubmissionInfo"/>
+                <xs:element ref="PickupInfo" minOccurs="0"/>
+                <xs:element ref="DeliveryInfo"/>
+                <xs:element name="UserDefinedValues" type="UserDefinedValuesType" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="exworksVersion" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string"/>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

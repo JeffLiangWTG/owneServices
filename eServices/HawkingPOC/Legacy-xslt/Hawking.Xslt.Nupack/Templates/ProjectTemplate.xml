@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup Label="Globals">
+        <SccProjectName>SAK</SccProjectName>
+        <SccProvider>SAK</SccProvider>
+        <SccAuxPath>SAK</SccAuxPath>
+        <SccLocalPath>SAK</SccLocalPath>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <VersionPrefix>1.0.0</VersionPrefix>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Remove="*.vspscc" />
+        <None Remove="*.xsl" />
+        <None Remove="*.nuspec" />
+        <None Remove="*.dll" />
+    </ItemGroup>
+
+    <ItemGroup Group="EmbeddedResource">
+        <EmbeddedResource Include="APERAK2UInterchangeInclude.xsl" />
+    </ItemGroup>
+
+    <Target Name="bat:deploy" AfterTargets="Pack">
+        <PropertyGroup>
+            <_NuGetExePath>dotnet nuget</_NuGetExePath>
+            <_Source>http://localhost/repo/nuget?replace=true</_Source>
+            <_ApiKey>hawking</_ApiKey>
+            <_ApiKeyCommand>-k $(_ApiKey)</_ApiKeyCommand>
+            <_OutputDirectory>$(ProjectDir)bin\$(ConfigurationName)\</_OutputDirectory>
+        </PropertyGroup>
+
+        <Message Text="$(_NuGetExePath) push $(_OutputDirectory)*.nupkg $(_ApiKeyCommand) -s $(_Source)" Importance="high" />
+        <Exec Command="$(_NuGetExePath) push $(_OutputDirectory)*.nupkg $(_ApiKeyCommand) -s $(_Source)" Condition="'$(_Source)'!=''" />
+        <Message Text="Please verify package deployed successfully by query $(_Source)/FindPackagesById?id='$(PackageId)'&amp;version='$(PackageVersion)'" Importance="high" />
+    </Target>
+    <ItemGroup>
+        <PackageReference Include="Hawking.Xslt.Legacy" Version="1.0.0" />
+    </ItemGroup>
+</Project>

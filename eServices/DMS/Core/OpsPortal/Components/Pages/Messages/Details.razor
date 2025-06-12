@@ -1,0 +1,116 @@
+﻿@page "/messages/details"
+@using System.Net
+@using eServices.eHubDataModel.eHubTransactionsCore
+@attribute [Authorize(Policy = "MessagesUser")]
+@inject IHttpClientFactory ClientFactory
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
+@inject IDbContextFactory<eHubTransactionsContext> DbFactory
+
+<PageTitle>Message Details</PageTitle>
+
+<h2>Message Details</h2>
+
+<div>
+    <h4>Message Details</h4>
+    <hr />
+    @if (details is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Received</dt>
+            <dd class="col-sm-10">@details.Recieved.ToString("s")</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Sender</dt>
+            <dd class="col-sm-10">@details.SenderId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Recipient</dt>
+            <dd class="col-sm-10">@details.RecipientId</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Status</dt>
+            <dd class="col-sm-10">@details.Status</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Content</dt>
+            <dd class="col-sm-10">
+                <a href="/messages/content?id=@Id&format=text" target="_blank">View</a>,
+                <a href="/messages/content?id=@Id">Download</a>,
+            </dd>
+        </dl>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "id")]
+    public required Guid Id { get; set; }
+
+    private MessageDetails? details;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        if (context.Database.IsSqlServer())
+        {
+            if ((await context.eHubInboxMessage
+                .Include(i => i.EI_CC_SenderNavigation)
+                .Include(i => i.EI_CC_RecipientNavigation)
+                .FirstOrDefaultAsync(i => i.EI_PK == Id)) is var inbox and not null)
+            {
+                details = new MessageDetails
+                    {
+                        Recieved = inbox.EI_InsertUTC,
+                        SenderId = inbox.EI_CC_SenderNavigation.CC_ID,
+                        RecipientId = inbox.EI_CC_RecipientNavigation?.CC_ID ?? "",
+                        Status = inbox.EI_Status.ToString()
+                    };
+            }
+            else
+            {
+                NavigationManager.NavigateTo("not-found");
+            }
+        }
+        else
+        {
+            var messagesClient = ClientFactory.CreateClient("DmsMessagesApi");
+            var messagesResponse = await messagesClient.GetAsync($"/messages?id={Id}&info-only=true");
+            if (messagesResponse.StatusCode is HttpStatusCode.NotFound)
+            {
+                if (Configuration.GetValue<string>("eHubAdminMessageDetailsAddress") is var uri and not null)
+                {
+                    NavigationManager.NavigateTo($"{uri}?EI_PK={Id}", false);
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("not-found");
+                }
+                return;
+            }
+
+            messagesResponse.EnsureSuccessStatusCode();
+
+            details = new MessageDetails
+                {
+                    Recieved = messagesResponse.Headers.TryGetValues(DmsHeaders.MessageTimeReceived, out var receiveds) ? DateTimeOffset.Parse(receiveds.First()) : DateTimeOffset.MinValue,
+                    SenderId = messagesResponse.Headers.TryGetValues(DmsHeaders.MessageSenderId, out var senders) ? senders.First() : string.Empty,
+                    RecipientId = messagesResponse.Headers.TryGetValues(DmsHeaders.MessageRecipientId, out var recipients) ? recipients.First() : string.Empty,
+                    Status = messagesResponse.Headers.TryGetValues(DmsHeaders.MessageStatus, out var statuses) ? statuses.First() : string.Empty,
+                    Error = messagesResponse.Headers.TryGetValues(DmsHeaders.MessageError, out var error) ? error.First() : null
+                };
+        }
+    }
+
+    private class MessageDetails
+    {
+        public required DateTimeOffset Recieved { get; set; }
+        public required string SenderId { get; set; }
+        public required string RecipientId { get; set; }
+        public required string Status { get; set; }
+        public string? Error { get; set; }
+    }
+}

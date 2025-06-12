@@ -1,0 +1,217 @@
+{
+  "info": {
+    "_postman_id": "00dd7406-b2b7-40f4-b6a9-830c40929b97",
+    "name": "eHubAdapter Sample Requests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12818342"
+  },
+  "item": [
+    {
+      "name": "Ping",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "http://CargoWise.com/eHub/2010/06/eAdapterStreamedService/Ping"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:u=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n\t<s:Header>\n\t\t<o:Security s:mustUnderstand=\"1\" xmlns:o=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\n\t\t\t<o:UsernameToken u:Id=\"uuid-b3ccf94f-1e40-4b24-bfef-76861020f70e-7\">\n\t\t\t\t<o:Username>{{SenderID}}</o:Username>\n\t\t\t\t<o:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">{{Password}}</o:Password>\n\t\t\t</o:UsernameToken>\n\t\t</o:Security>\n\t</s:Header>\n\t<s:Body>\n\t\t<Ping xmlns=\"http://CargoWise.com/eHub/2010/06\"/>\n\t</s:Body>\n</s:Envelope>\n",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{eHubURL}}",
+          "host": [
+            "{{eHubURL}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "SendStream",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "http://CargoWise.com/eHub/2010/06/eAdapterStreamedService/SendStream"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:u=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n\t<s:Header>\n\t\t<o:Security s:mustUnderstand=\"1\" xmlns:o=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\n\t\t\t<o:UsernameToken u:Id=\"uuid-b3ccf94f-1e40-4b24-bfef-76861020f70e-7\">\n\t\t\t\t<o:Username>{{SenderID}}</o:Username>\n\t\t\t\t<o:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">{{Password}}</o:Password>\n\t\t\t</o:UsernameToken>\n\t\t</o:Security>\n\t</s:Header>\n\t<s:Body>\n\t\t<SendStreamRequest xmlns=\"http://CargoWise.com/eHub/2010/06\">\n\t\t\t<Payload>\n\t\t\t\t<Message ApplicationCode=\"{{ApplicationCode}}\" ClientID=\"{{RecipientID}}\" TrackingID=\"{{$guid}}\" SchemaName=\"{{SchemaName}}\" SchemaType=\"Xml\" EmailSubject=\"\" FileName=\"\">H4sIAAAAAAAEAK1WW2+qQBB+91cQ33UvRY41lASBqimK8dKcPjUrbJUcLmYXa/33Z0HFC1i1KZrAzu58883szuyo08j/pIyToBcllLkLEs2p9BUGEX+qLpJk2QJgvV7XXcLm8drntO7GIRi7CxoSDnJlgCFCAKHqVrUVcZirn6rSxWoG3JjRrQrEVSmF8OPoqYrqqKpV1C4lHmXiY0wj8dEzNWvwquN3SzdVkMsq6oi6/tKnUSJGhjOY6L2BNXqfjHTjpTfoqOB4vqKCHLYdexvxyslbn2LNz3zGmc+5A7gOUwcyQPE2SUKMWMT1az8axyvm0t1gyOJPX1CSJpslfapa6QYsmbDXM6uaCo6XCI0XutHaUDwINmUVpMOKmmpqxooncchN6gaEkUQwUUE2UdmC7I3uhgdGGc+JH1INQ/xQg40alCeo2YKPLdyoI6yCw4r96hR33B7tp7Zmsu+hMB5S4QPPiQlLxI9SDxlx//nR/ECsqNLjFk/8kCRU+yABpyo4klRU3fP81DcS7Bww4iCgbioqm/0+/Gn0zDSYGEF0EsznmK0J8wTXnH15NM+DWcbqMHsaj8EqnB3hvpJgJaJq/J2i7aOCrUgYKRgogPXGjhF79AwN4w4shQFlREFZ/IrCMue+dZgw5lNWQq9rG9NbvOy3Hbs0Wk7blhuyIjcUOf3diuUwf+5H04HtGM4Zom7p0+6tOCYVJzPKkq0cbDp+M28B6/4Sqe5vkhLpGvFlzBKbzs8wjs7meDUrOwMHcQGuXzwIY0s/YnSiWwTalwMvLUnOhy5O1ycJzk9+VsvkGlImELay/48tmHRJWLJiheza2YDoBzZEUO/Y8etg9277NcQg3ni8NOkeMZKbj83bsV4p5zQYiCJ/zkkaSn3Htq3RHWDxhsxpKTFZ0LoEBC6c029K67ZsnZcsfah3pJpk286bKemdWxJJd126TLgTBZvdVe7ldZuf4U/Yit5V+Euy6dmw78rvqwl55d7oi/3N9+TyzK7D2XcBaX/jKo2G0kCkhmQP1+SZItdmuIlrGBJZabr0gyhEBScoF1CPGtetvKrB00dc8opyG9iJrAj0gPCfIhC4HAaw7wXBabuZSnZ9KChrwbX/sKTXEpkLAAA=</Message>\n\t\t\t</Payload>\n\t\t</SendStreamRequest>\n\t</s:Body>\n</s:Envelope>\n",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{eHubURL}}",
+          "host": [
+            "{{eHubURL}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "RetrieveStream",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8",
+            "type": "text"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "http://CargoWise.com/eHub/2010/06/eHubStreamedService/RetrieveStream",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:u=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\r\n\t<s:Header>\r\n\t\t<o:Security s:mustUnderstand=\"1\" xmlns:o=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\r\n\t\t\t\t<o:UsernameToken u:Id=\"uuid-b3ccf94f-1e40-4b24-bfef-76861020f70e-7\">\r\n\t\t\t\t<o:Username>{{SenderID}}</o:Username>\r\n\t\t\t\t<o:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">{{Password}}</o:Password>\r\n\t\t\t</o:UsernameToken>\r\n\t\t</o:Security>\r\n\t</s:Header>\r\n\t<s:Body>\r\n\t\t<RetrieveStream xmlns=\"http://CargoWise.com/eHub/2010/06\"/>\r\n\t</s:Body>\r\n</s:Envelope>\r\n"
+        },
+        "url": {
+          "raw": "{{eHubURL}}",
+          "host": [
+            "{{eHubURL}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "FinaliseBatch",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8",
+            "type": "text"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "http://CargoWise.com/eHub/2010/06/eHubStreamedService/FinaliseBatch",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:u=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\r\n\t<s:Header>\r\n\t\t<o:Security s:mustUnderstand=\"1\" xmlns:o=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\r\n\t\t\t<o:UsernameToken u:Id=\"uuid-b3ccf94f-1e40-4b24-bfef-76861020f70e-7\">\r\n\t\t\t\t<o:Username>{{SenderID}}</o:Username>\r\n\t\t\t\t<o:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">{{Password}}</o:Password>\r\n\t\t\t</o:UsernameToken>\r\n\t\t</o:Security>\r\n\t</s:Header>\r\n\t<s:Body>\r\n    <FinaliseBatch xmlns=\"http://CargoWise.com/eHub/2010/06\">\r\n      <trackingID>Tracking ID from RetrieveSteam response header</trackingID>\r\n    </FinaliseBatch>\r\n\t</s:Body>\r\n</s:Envelope>\r\n"
+        },
+        "url": {
+          "raw": "{{eHubURL}}",
+          "host": [
+            "{{eHubURL}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "password",
+        "value": "{{Password}}",
+        "type": "string"
+      },
+      {
+        "key": "username",
+        "value": "{{SenderID}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "eHubURL",
+      "value": "https://ehub-integration-test.cargowise.net/eHubGateway/eHubStreamedService.svc"
+    },
+    {
+      "key": "SenderID",
+      "value": "SenderID"
+    },
+    {
+      "key": "Password",
+      "value": "Password"
+    },
+    {
+      "key": "RecipientID",
+      "value": "RecipientID"
+    },
+    {
+      "key": "ApplicationCode",
+      "value": "UDM",
+      "type": "string"
+    },
+    {
+      "key": "SchemaName",
+      "value": "http://www.cargowise.com/Schemas/Universal/2011/11#UniversalInterchange",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+/**
+ * cargowise eServices adapter exceptions.
+ *
+ * @author eServices
+ * @version 1.0.0
+ */
+package com.cargowise.eservices.adapter.exceptions;

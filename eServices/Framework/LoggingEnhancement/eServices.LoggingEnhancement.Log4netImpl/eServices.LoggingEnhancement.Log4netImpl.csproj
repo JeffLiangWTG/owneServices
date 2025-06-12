@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;net8.0</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Common.Logging.Core" />
+    <PackageReference Include="log4net" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PackageVersion>1.0.0</PackageVersion>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <DebugType>none</DebugType>
+    <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);PackageCustomBuildOutput</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+  <Target Name="PackageCustomBuildOutput">
+    <ItemGroup>
+      <BuildOutputInPackage Include="$(OutputPath)*.dll" Exclude="$(TargetPath)" />
+    </ItemGroup>
+  </Target>
+  <Target Name="UpdateBuildOutputInPackage" BeforeTargets="GenerateNuspec" Returns="@(_BuildOutputInPackage)">
+    <ItemGroup>
+      <_TargetFrameworks Include="$(TargetFrameworks)" />
+      <_PackProjectAssemblies Include="$([System.IO.Path]::GetFullPath('$(ProjectDir)$(IntermediateOutputPath)%(_TargetFrameworks.Identity)\$(AssemblyName).dll'))" />
+      <_BuildOutputInPackage Remove="@(_PackProjectAssemblies)" />
+    </ItemGroup>
+  </Target>
+</Project>

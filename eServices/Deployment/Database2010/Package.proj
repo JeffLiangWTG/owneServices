@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--EXTERNAL_PROPERTIES: DeploymentProjectPath;_DatabaseFilesPath;_ManifestFileName-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+		<MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(MSBuildExtensionsPath)\ExtensionPack\4.0</MSBuildExtensionsPackPath>
+	</PropertyGroup>
+
+	<Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks"/>
+
+	<Target Name="bat:package">
+		<PropertyGroup>
+			<_TempPackageFolder>$(MSBuildProjectDirectory)\bin\temp</_TempPackageFolder>
+			<_PackagePath>$(MSBuildProjectDirectory)\bin\$(MSBuildProjectName).zip</_PackagePath>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<_ProjectOutput Include="$(OutputPath)\**\*" Exclude="$(OutputPath)\**\*.sqldeployment"/>
+			<_DeploymentFiles Include="$(MSBuildProjectDirectory)\Deployment\**\*"/>
+			<_DeploymentProject Include="$(DeploymentProjectPath)" />
+			<MSBuildNamespaces Include="MSBuildNamespace">
+				<Prefix>x</Prefix>
+				<Uri>http://schemas.microsoft.com/developer/msbuild/2003</Uri>
+			</MSBuildNamespaces>
+		</ItemGroup>
+
+		<RemoveDir Directories="$(_TempPackageFolder)" />
+
+		<!-- Copy Project output -->
+		<Copy SourceFiles="@(_ProjectOutput)"
+					DestinationFolder="$(_TempPackageFolder)\$(OutputPath)\%(RecursiveDir)"/>
+		<XmlFile File="$(_TempPackageFolder)\$(OutputPath)\$(_ManifestFileName)"
+						 TaskAction="RemoveElement"
+						 Namespaces="@(MSBuildNamespaces)"
+						 XPath="//x:Project/x:PropertyGroup/x:TargetConnectionString"/>
+		<XmlFile File="$(_TempPackageFolder)\$(OutputPath)\$(_ManifestFileName)"
+						 TaskAction="RemoveElement"
+						 Namespaces="@(MSBuildNamespaces)"
+						 XPath="//x:Project/x:PropertyGroup/x:DeploymentConfigurationFile"/>
+
+		<!-- Copy Deployment files -->
+		<Copy SourceFiles="@(_DeploymentFiles)"
+					DestinationFolder="$(_TempPackageFolder)\Deployment\%(RecursiveDir)"/>
+		<XmlFile File="$(_TempPackageFolder)\Deployment\Deployment.props"
+						 TaskAction="UpdateElement"
+						 Namespaces="@(MSBuildNamespaces)"
+						 XPath="//x:Project/x:PropertyGroup/x:_DatabaseFilesPath"
+						 InnerText="$(_DatabaseFilesPath)" />
+		<XmlFile File="$(_TempPackageFolder)\Deployment\Deployment.props"
+						 TaskAction="UpdateElement"
+						 Namespaces="@(MSBuildNamespaces)"
+						 XPath="//x:Project/x:PropertyGroup/x:_ManifestFileName"
+						 InnerText="$(_ManifestFileName)" />
+
+		<!-- Copy Deployment project -->
+		<Copy SourceFiles="@(_DeploymentProject)"
+					DestinationFolder="$(_TempPackageFolder)"/>
+
+		<!-- Create package -->
+		<Zip TaskAction="Create"
+				 ZipFileName="$(_PackagePath)"
+				 CompressPath="$(_TempPackageFolder)"
+				 RemoveRoot="$(_TempPackageFolder)"/>
+		
+		<RemoveDir Directories="$(_TempPackageFolder)" />
+		
+	</Target>
+</Project>

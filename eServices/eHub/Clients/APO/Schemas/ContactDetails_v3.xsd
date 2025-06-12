@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--History-->
+<xs:schema xmlns="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<xs:complexType name="ElectronicContactType">
+		<xs:annotation>
+			<xs:documentation>Electronic contact information of the involved party which could be either Telephone or Internet</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ContactUsage" type="ElectronicContactUsageType" minOccurs="0"/>
+			<xs:element name="Preference" type="ElectronicContactPreferenceType" minOccurs="0"/>
+			<xs:choice>
+				<xs:element name="Telephone" type="TelephoneType"/>
+				<xs:element name="Internet" type="InternetType"/>
+			</xs:choice>
+			<xs:element name="Comments" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="ElectronicContactPreferenceType">
+		<xs:annotation>
+			<xs:documentation>Preference code indicates if the electronic contact is preferred over other electronic contacts a party may have. 01:Preferred, 02:Not Preferred, 03:Not defined, 04:Unknown </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="PREFERRED"/>
+			<xs:enumeration value="NOT PREFERRED"/>
+			<xs:enumeration value="NOT DEFINED"/>
+			<xs:enumeration value="UNKNOWN"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ElectronicContactUsageType">
+		<xs:annotation>
+			<xs:documentation>A code that defines the primary usage for an electronic contact.  01:Personal, 02: Business, 03:Other, 04:Unknown, 05:Daytime, 06:Evening</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:complexType name="TelephoneType">
+		<xs:annotation>
+			<xs:documentation>Telephone Contact details of the involved party</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ServiceLine" type="TelephoneServiceLineType"/>
+			<xs:element name="AreaCodeNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Telephone Area code details.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TelephoneNumber">
+				<xs:annotation>
+					<xs:documentation>Telephone number </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CommunicationType" type="TelephoneCommunicationType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="TelephoneServiceLineType">
+		<xs:annotation>
+			<xs:documentation>Describes of telephone service is physicaly provided to a paryEg. 01:mobile,  02:landline 03:Pager 09:unknown</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="MOBILE"/>
+			<xs:enumeration value="LANDLINE"/>
+			<xs:enumeration value="PAGER"/>
+			<xs:enumeration value="UNKNOWN"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TelephoneCommunicationType">
+		<xs:annotation>
+			<xs:documentation>Well known communication features available through the telephone. 01: Voice Enabled, 02: Facsimile (FAX) , 03: Short message service (SMS), 04: Mulitmedia messaging service (MMS) 08: Other </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="VOICE ENABLED"/>
+			<xs:enumeration value="FAX"/>
+			<xs:enumeration value="SMS"/>
+			<xs:enumeration value="MMS"/>
+			<xs:enumeration value="OTHER"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="InternetType">
+		<xs:annotation>
+			<xs:documentation>Internet contact details of an Individual party</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ContactType" type="InternetContactType"/>
+			<xs:element name="ContactDetail">
+				<xs:annotation>
+					<xs:documentation>Email Address of the contact</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="InternetContactType">
+		<xs:annotation>
+			<xs:documentation>Identifies the type of internet contact</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="32"/>
+			<xs:enumeration value="EMAIL"/>
+			<xs:enumeration value="WEB"/>
+			<xs:enumeration value="INTERNET VOICE"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="ElectronicContact" type="ElectronicContactType"/>
+</xs:schema>

@@ -1,0 +1,11 @@
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
+using Microsoft.BizTalk.XLANGs.BTXEngine;
+
+[assembly: AssemblyTitle("CargoWise.eHub.Products.ComplianceTaxReport.ItalyBlackList.Schemas")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: Microsoft.XLANGs.BaseTypes.BizTalkAssemblyAttribute(typeof(BTXService))]
+[assembly: Guid("377c8d60-ad7e-47f2-9a51-e928aae5d667")]
+[assembly: AssemblyVersion("3.0.0.0")]
+[assembly: AssemblyFileVersion("3.0.0.0")]

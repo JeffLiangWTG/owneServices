@@ -1,0 +1,533 @@
+
+<Project DefaultTargets="DeployBtsSolutionDev" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\ExtensionPack\MSBuild.ExtensionPack.tasks"/>
+  <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
+
+  <!--Settings-->
+  <PropertyGroup>
+    <BtsInstallLocation>c:\Program Files (x86)\Microsoft BizTalk Server 2013 R2</BtsInstallLocation>
+    <MSSQLDataLocation>C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\DATA</MSSQLDataLocation>
+    <DatabaseBackupLocation>C:\Backups\Biztalk</DatabaseBackupLocation>
+    <GacUtilFilePath>c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe</GacUtilFilePath>
+
+    <BizTalkMachineName>SYD-WIKB-1</BizTalkMachineName>
+    <BinPath>C:\eServices\eHub\bin</BinPath>
+    <DevBindingBasePath>c:\eServices\eHub\Bin\Bindings</DevBindingBasePath>
+    <MSIBasePath>c:\eServices\eHub\Bin\Msi</MSIBasePath>
+
+    <ConnectionString>Server=SYD-WIKB-1;Integrated Security=True</ConnectionString>
+    <eHubDBName>eHubTransactions</eHubDBName>
+    <eHubDBSqlScriptFile>C:\eServices\eHub\DataAccess\Sql\eHubTransactions.sql</eHubDBSqlScriptFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SqlScriptFiles Include="$(eHubDBSqlScriptFile)"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <DataBaseList Include ="BizTalkDTADb">
+      <BackupName>BizTalkDTADb.bak</BackupName>
+    </DataBaseList>
+    <DataBaseList Include ="BizTalkMgmtDb">
+      <BackupName>BizTalkMgmtDb.bak</BackupName>
+    </DataBaseList>
+    <DataBaseList Include ="BizTalkMsgBoxDb">
+      <BackupName>BizTalkMsgBoxDb.bak</BackupName>
+    </DataBaseList>
+    <DataBaseList Include ="BizTalkRuleEngineDb">
+      <BackupName>BizTalkRuleEngineDb.bak</BackupName>
+    </DataBaseList>
+  </ItemGroup>
+
+  <!--Applications-->
+  <ItemGroup>
+    <BtsApplicationList Include="CargoWise.eHub"/>
+  </ItemGroup>
+
+  <!-- Bindings -->
+  <ItemGroup>
+    <DevBindingList Include ="CargoWise.eHub.Core.BindingInfo.LOCAL.xml">
+      <Application>CargoWise.eHub</Application>
+    </DevBindingList>
+    <DevBindingList Include ="CargoWise.eHub.Gateway.BindingInfo.LOCAL.xml">
+      <Application>CargoWise.eHub</Application>
+    </DevBindingList>
+    <DevBindingList Include ="CargoWise.eHub.AlertService.BindingInfo.xml">
+      <Application>CargoWise.eHub</Application>
+    </DevBindingList>
+  </ItemGroup>
+
+  <!--Pipelines Components Dev Only-->
+  <ItemGroup>
+    <PipelineComponentsAssemblyListDevOnly Include="CargoWise.eHub.Core.PipelineComponents.dll"/>
+    <PipelineComponentsAssemblyListDevOnly Include="CargoWise.eHub.AlertService.PipelineComponents.dll"/>
+  </ItemGroup>
+
+  <!--Resource for CargoWise.eHub.Shared Application -->
+  <ItemGroup>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Core.Pipelines.dll">
+      <AssemblyName>CargoWise.eHub.Core.Pipelines</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Core.PropertySchemas.dll">
+      <AssemblyName>CargoWise.eHub.Core.PropertySchemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Gateway.Pipelines.dll">
+      <AssemblyName>CargoWise.eHub.Gateway.Pipelines</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+  </ItemGroup>
+
+  <!--Resource for CargoWise.eHub Application -->
+  <ItemGroup>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.AlertService.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.AlertService.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.AlertService.Orchestrations.dll">
+      <AssemblyName>CargoWise.eHub.AlertService.Orchestrations</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.AlertService.Pipelines.dll">
+      <AssemblyName>CargoWise.eHub.AlertService.Pipelines</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.AlertService.Transformations.dll">
+      <AssemblyName>CargoWise.eHub.AlertService.Transformations</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Core.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Core.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Core.Transforms.dll">
+      <AssemblyName>CargoWise.eHub.Core.Transforms</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Gateway.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Gateway.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Gateway.Transforms.dbo_SelectInboxMessagesByStatus2SendRequestStream.dll">
+      <AssemblyName>CargoWise.eHub.Gateway.Transforms.dbo_SelectInboxMessagesByStatus2SendRequestStream</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+  </ItemGroup>
+
+  <!--Resource for CargoWise.eHub.Clients Application -->
+  <ItemGroup>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Schemas.CargoImp.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Schemas.CargoImp</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Schemas.Native.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Schemas.Native</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.X12.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.X12.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    
+    
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.AGS.Pipelines.dll">
+      <AssemblyName>CargoWise.eHub.Clients.AGS.Pipelines</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.AGS.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.AGS.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.AGS.Transforms.EDIConsolInternal2WWAShipmentStatus.dll">
+      <AssemblyName>CargoWise.eHub.Clients.AGS.Transforms.EDIConsolInternal2WWAShipmentStatus</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.CCN.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.CCN.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.CCN.Transforms.EDIFSU2CCNFSU.dll">
+      <AssemblyName>CargoWise.eHub.Clients.CCN.Transforms.EDIFSU2CCNFSU</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.CSL.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.CSL.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.CSL.Transforms.CSLFECL2EDIConsolsInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.CSL.Transforms.CSLFECL2EDIConsolsInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.CSL.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.CSL.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.DFD.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.DFD.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.DFD.Transforms.DFD_IDoc.MATMAS02.701.2_to_EDIProductInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.DFD.Transforms.DFD_IDoc.MATMAS02.701.2_to_EDIProductInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.DFD.Transforms.EDIWhsDocketInternal_2_IDocDELVRY03.dll">
+      <AssemblyName>CargoWise.eHub.Clients.DFD.Transforms.EDIWhsDocketInternal_2_IDocDELVRY03</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.DFD.Transforms.IDocDESADV01_2_EDIWhsDocketInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.DFD.Transforms.IDocDESADV01_2_EDIWhsDocketInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.DFD.Transforms.IDocSHPMNT01_2_EDIWhsDocketInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.DFD.Transforms.IDocSHPMNT01_2_EDIWhsDocketInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.DOL.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.DOL.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.DOL.Transforms.EDIConsolsInternal2X12_00401_315.dll">
+      <AssemblyName>CargoWise.eHub.Clients.DOL.Transforms.EDIConsolsInternal2X12_00401_315</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.DOL.Transforms.MedlineProduct2EDIProductsInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.DOL.Transforms.MedlineProduct2EDIProductsInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.DOL.Transforms.X12_00401_856_2EDIConsolsInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.DOL.Transforms.X12_00401_856_2EDIConsolsInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.ECU.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.ECU.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.ECU.Transforms.ECUManifest2EDIConsolsInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.ECU.Transforms.ECUManifest2EDIConsolsInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.CargoImp.FSU_FSA122NativeEventInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.CargoImp.FSU_FSA122NativeEventInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.CargoImp.FSU_FSA122UniversalInterchangeInclude.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.CargoImp.FSU_FSA122UniversalInterchangeInclude</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIAgencyBillsOfLadingInternal2EDIXmlInterchange.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIAgencyBillsOfLadingInternal2EDIXmlInterchange</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIConsolsInternal2EDIXmlInterchange.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIConsolsInternal2EDIXmlInterchange</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIContainerMovementInternal2EDIXmlInterchange.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIContainerMovementInternal2EDIXmlInterchange</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIEventsInternal2EDIXmlInterchange.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIEventsInternal2EDIXmlInterchange</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIFinancialInvoicesInternal2EDIXmlInterchange.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIFinancialInvoicesInternal2EDIXmlInterchange</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIFinancialTransactionsInternal2EDIXmlInterchange.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIFinancialTransactionsInternal2EDIXmlInterchange</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIOrdersInternal2EDIXmlInterchange.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIOrdersInternal2EDIXmlInterchange</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIProductsInternal2EDIXmlInterchange.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIProductsInternal2EDIXmlInterchange</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIShipmentsInternal2EDIXmlInterchange.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIShipmentsInternal2EDIXmlInterchange</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIWhsDocketsInternal2EDIXmlInterchange.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIWhsDocketsInternal2EDIXmlInterchange</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIAgencyBillsOfLadingInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIAgencyBillsOfLadingInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIConsolsInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIConsolsInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIContainerMovementInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIContainerMovementInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIEventsInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIEventsInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIFinancialInvoicesInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIFinancialInvoicesInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIFinancialTransactionsInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIFinancialTransactionsInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIOrdersInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIOrdersInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIProductsInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIProductsInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIShipmentsInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIShipmentsInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIWhsDocketsInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.EDIXmlInterchange2EDIWhsDocketsInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.Native.NativeEventInternal2NativeEventHeader.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.Native.NativeEventInternal2NativeEventHeader</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.EDI.Transforms.Native.UniversalEventsInternal2UniversalInterchange.dll">
+      <AssemblyName>CargoWise.eHub.Clients.EDI.Transforms.Native.UniversalEventsInternal2UniversalInterchange</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.HHE.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.HHE.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.HHE.Transforms.EDIConsolInternal2HankyuAirWaybill.dll">
+      <AssemblyName>CargoWise.eHub.Clients.HHE.Transforms.EDIConsolInternal2HankyuAirWaybill</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.HHE.Transforms.EDIConsolInternal2HankyuStatus.dll">
+      <AssemblyName>CargoWise.eHub.Clients.HHE.Transforms.EDIConsolInternal2HankyuStatus</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.HHE.Transforms.HankyuAirWaybill2EDIConsolInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.HHE.Transforms.HankyuAirWaybill2EDIConsolInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.HPO.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.HPO.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.PML.Transforms.EDIShipmentInternal2X12_00401_214.dll">
+      <AssemblyName>CargoWise.eHub.Clients.PML.Transforms.EDIShipmentInternal2X12_00401_214</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.PSA.Transforms.EDIAgencyBillsOfLadingInternal2HPOIFCSUM.dll">
+      <AssemblyName>CargoWise.eHub.Clients.PSA.Transforms.EDIAgencyBillsOfLadingInternal2HPOIFCSUM</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.PSA.Transforms.HPOIFCSUM2EDIAgencyBillsOfLadingInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.PSA.Transforms.HPOIFCSUM2EDIAgencyBillsOfLadingInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.TPE.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.TPE.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.SWL.Transforms.EDIAgencyBillsOfLadingInternal2TPEBLLIST.dll">
+      <AssemblyName>CargoWise.eHub.Clients.SWL.Transforms.EDIAgencyBillsOfLadingInternal2TPEBLLIST</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.SWL.Transforms.TPEBLLIST2EDIAgencyBillsOfLadingInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.SWL.Transforms.TPEBLLIST2EDIAgencyBillsOfLadingInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.TCF.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.TCF.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.TCF.Transforms.RAGOrderCSV2EDIOrder.dll">
+      <AssemblyName>CargoWise.eHub.Clients.TCF.RAGOrderCSV2EDIOrder</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.TSF.Schemas.dll">
+      <AssemblyName>CargoWise.eHub.Clients.TSF.Schemas</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.TSF.Transforms.EDIConsolsInternal2TSFIFTMIN5.dll">
+      <AssemblyName>CargoWise.eHub.Clients.TSF.Transforms.EDIConsolsInternal2TSFIFTMIN5</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.TSF.Transforms.Sitro2EDIWhsDocketsInternal.dll">
+      <AssemblyName>CargoWise.eHub.Clients.TSF.Transforms.Sitro2EDIWhsDocketsInternal</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.YAS.Schema.dll">
+      <AssemblyName>CargoWise.eHub.Clients.YAS.Schema</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.YAS.Transforms.ConsolsInternal2AirlineWarehouseManifest.dll">
+      <AssemblyName>CargoWise.eHub.Clients.YAS.Transforms.ConsolsInternal2AirlineWarehouseManifest</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.YAS.Transforms.EDIFHL2EDIFHL.dll">
+      <AssemblyName>CargoWise.eHub.Clients.YAS.Transforms.EDIFHL2EDIFHL</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.YAS.Transforms.ImpChrgCst2EDIShip.dll">
+      <AssemblyName>CargoWise.eHub.Clients.YAS.Transforms.ImpChrgCst2EDIShip</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+    <BtsResourceAssemplyList Include ="CargoWise.eHub.Clients.YAS.Transforms.NACCS2EDIEvents.dll">
+      <AssemblyName>CargoWise.eHub.Clients.YAS.Transforms.NACCS2EDIEvents</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </BtsResourceAssemplyList>
+  </ItemGroup>
+
+  <!--Gac Assemply -->
+  <ItemGroup>
+    <GacAssemplyList Include ="CargoWise.eHub.Common.dll">
+      <AssemblyName>CargoWise.eHub.Common</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </GacAssemplyList>
+    <GacAssemplyList Include ="CargoWise.eHub.DataAccess.Cache.dll">
+      <AssemblyName>CargoWise.eHub.DataAccess.Cache</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </GacAssemplyList>
+    <GacAssemplyList Include ="CargoWise.eHub.DataAccess.Integration.dll">
+      <AssemblyName>CargoWise.eHub.DataAccess.Integration</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </GacAssemplyList>
+    <GacAssemplyList Include ="CargoWise.eHub.DataAccess.Sql.dll">
+      <AssemblyName>CargoWise.eHub.DataAccess.Sql</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </GacAssemplyList>
+    <GacAssemplyList Include ="CargoWise.eHub.Core.PipelineComponents.dll">
+      <AssemblyName>CargoWise.eHub.Core.PipelineComponents.dll</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </GacAssemplyList>
+    <GacAssemplyList Include ="CargoWise.eHub.AlertService.PipelineComponents.dll">
+      <AssemblyName>CargoWise.eHub.AlertService.PipelineComponents</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </GacAssemplyList>
+    <GacAssemplyList Include ="CargoWise.eHub.Core.Transforms.Helper.dll">
+      <AssemblyName>CargoWise.eHub.Core.Transforms.Helper</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </GacAssemplyList>
+    <GacAssemplyList Include ="CargoWise.eHub.Clients.ECU.Transforms.Helper.dll">
+      <AssemblyName>CargoWise.eHub.Clients.ECU.Transforms.Helper</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </GacAssemplyList>
+    <GacAssemplyList Include ="CargoWise.eHub.Clients.PSA.Transforms.Helper.dll">
+      <AssemblyName>CargoWise.eHub.Clients.PSA.Transforms.Helper</AssemblyName>
+      <Application>CargoWise.eHub</Application>
+    </GacAssemplyList>
+  </ItemGroup>
+
+  <!-- Run Targets -->
+  <Target Name="Clean">
+    <CallTarget Targets="StopApplication"/>
+    <CallTarget Targets="DeletingApplication"/>
+    <CallTarget Targets="RemoveGacAssemblyDevOnly"/>
+  </Target>
+
+
+  <Target Name="DeployBtsSolutionDev">
+    <CallTarget Targets="Clean"/>
+    <CallTarget Targets="CreateApplication"/>
+    <CallTarget Targets="CopyPipelineComponentsDelvelpmentOnnly"/>
+    <CallTarget Targets="AddGacAssemblyDevOnly"/>
+    <CallTarget Targets="DeployBtsResources"/>
+    <CallTarget Targets="DeployDevBindings" />
+    <CallTarget Targets="StartApplication" />
+  </Target>
+
+
+  <!-- Task Private Targets -->
+  <Target Name="StopApplication">
+    <MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="StopAll" Applications="@(BtsApplicationList)" MachineName="$(BizTalkMachineName)" />
+  </Target>
+
+  <Target Name="StartApplication">
+    <MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="StartAll" Applications="@(BtsApplicationList)" MachineName="$(BizTalkMachineName)"/>
+  </Target>
+
+
+  <Target Name="DeletingApplication">
+    <MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="Delete" Applications="@(BtsApplicationList)" MachineName="$(BizTalkMachineName)" />
+  </Target>
+  <Target Name="CreateApplication">
+    <MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="Create" Applications="@(BtsApplicationList)" MachineName="$(BizTalkMachineName)" Force="true" />
+  </Target>
+
+  <Target Name="AddResourceReference">
+    <MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="AddReference"  Application="%(BtsResourceAssemplyReferenceList.Identity)" MachineName="$(BizTalkMachineName)" References="%(BtsResourceAssemplyReferenceList.Reference)" Force="true"/>
+  </Target>
+
+  <Target Name="DeployBtsResources">
+    <MSBuild.ExtensionPack.BizTalk.BizTalkAssembly TaskAction="Add" Assemblies="$(BinPath)\%(BtsResourceAssemplyList.Identity)" Application="%(BtsResourceAssemplyList.Application)" MachineName="$(BizTalkMachineName)" Gac="false" Force="true"/>
+  </Target>
+
+  <Target Name="DeployDevBindings">
+    <Exec Command ='"$(BtsInstallLocation)\BTSTask" ImportBindings /Source:"$(DevBindingBasePath)\%(DevBindingList.Identity)" /ApplicationName:%(DevBindingList.Application)' />
+  </Target>
+
+  <Target Name="ExportMsi">
+    <Exec Command ='"$(BtsInstallLocation)\BTSTask" ExportApp /ApplicationName:%(BtsApplicationList.Identity) /Package:"$(MSIBasePath)\%(BtsApplicationList.Identity).msi"' />
+  </Target>
+
+  <!--Developemnt Only Targets-->
+  <Target Name="CopyPipelineComponentsDelvelpmentOnnly">
+    <Copy SourceFiles="$(BinPath)\%(PipelineComponentsAssemblyListDevOnly.Identity)" DestinationFolder="$(BtsInstallLocation)\Pipeline Components" />
+  </Target>
+
+  <Target Name="RemoveGacAssemblyDevOnly">
+    <Exec Command="%22$(GacUtilFilePath)%22 -u %(GacAssemplyList.AssemblyName) /f /nologo" IgnoreExitCode="true"/>
+  </Target>
+
+  <Target Name="AddGacAssemblyDevOnly">
+    <Exec Command="%22$(GacUtilFilePath)%22 -i $(BinPath)\%(GacAssemplyList.Identity) /f /nologo" IgnoreExitCode="true"/>
+  </Target>
+
+  <Target Name="CreateeHubTransactionDB">
+    <MSBuild.ExtensionPack.Sql2008.Database TaskAction="CheckExists" DatabaseItem="$(eHubDBName)">
+      <Output TaskParameter="Exists" PropertyName="DoesExist"/>
+    </MSBuild.ExtensionPack.Sql2008.Database>
+    <Message Text="Database Exists: $(DoesExist)"/>
+    <MSBuild.ExtensionPack.Sql2008.Database TaskAction="Delete" DatabaseItem="$(eHubDBName)" Condition="$(DoesExist)==true"/>
+    <MSBuild.ExtensionPack.Sql2008.Database TaskAction="Create" DatabaseItem="$(eHubDBName)"/>
+    <MSBuild.ExtensionPack.SqlServer.SqlExecute TaskAction="Execute" Retry="true" UseTransaction="true" Files="@(SqlScriptFiles)" ConnectionString="$(ConnectionString)"/>
+  </Target>
+
+  <Target Name="RestoreBiztalkDB">
+    <MSBuild.ExtensionPack.Sql2008.Database TaskAction="Restore" DatabaseItem="%(DataBaseList.Identity)" DataFilePath="$(DatabaseBackupLocation)\%(DataBaseList.BackupName)" NewDataFilePath="$(MSSQLDataLocation)\%(DataBaseList.Identity).mdf" LogFilePath="$(MSSQLDataLocation)\%(DataBaseList.Identity)_log.ldf" ReplaceDatabase="True"/>
+  </Target>
+
+</Project>

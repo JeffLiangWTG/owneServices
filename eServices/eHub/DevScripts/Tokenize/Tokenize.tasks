@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bat:tokenize">
+
+  <PropertyGroup>
+    <TokenizeTasksImported>true</TokenizeTasksImported>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)..\..\Bin\Deployment\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+
+    <JsonXPathFilePath Condition="'$(JsonXPathFilePath)'==''">$(MSBuildThisFileDirectory)Config\BizTalkBindingInfo-XPath.json</JsonXPathFilePath>
+    <TokenizePs1>$(MSBuildThisFileDirectory)Scripts\Tokenize.ps1</TokenizePs1>
+
+    <DeploymentItemsPath>$(MSBuildProjectDirectory)\Deployment\</DeploymentItemsPath>
+    <BindingFilesDirectory>$(DeploymentItemsPath)Bindings\</BindingFilesDirectory>
+    <AssemblyReferencesFileName>AssemblyFiles.json</AssemblyReferencesFileName>
+    <AssemblyReferencesFilePath Condition="'$(AssemblyReferencesFilePath)'==''">$(DeploymentItemsPath)$(AssemblyReferencesFileName)</AssemblyReferencesFilePath>
+    <AssemblyReferencesFileExist>$([System.IO.File]::Exists('$(AssemblyReferencesFilePath)'))</AssemblyReferencesFileExist>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+
+  <ItemGroup>
+    <TokenFiles Include="$(BindingFilesDirectory)**\*.xml" />
+  </ItemGroup>
+
+  <Target Name="bat:tokenize">
+
+    <Message Text="XPath config file is : $(JsonXPathFilePath)" Importance="High" />
+    <CallTarget Targets="validate:xpath-json-config" />
+
+    <!-- check out for editing -->
+    <MSBuild Projects="$(MSBuildProjectFile)" Targets="tfs:checkout" Properties="ItemsPath=$(DeploymentItemsPath)" />
+
+    <!-- tokenize xml files, produce json token values, and AssemblyReferencesFile extracted from the xml files -->
+    <Tokenize XmlFiles="@(TokenFiles)" JsonXPathFilePath="$(JsonXPathFilePath)" AssemblyReferencesFilePath="$(AssemblyReferencesFilePath)">
+      <Output TaskParameter="ProcessedFiles" ItemName="ProcessedFiles" />
+    </Tokenize>
+
+    <MSBuild.ExtensionPack.VisualStudio.TfsSource
+      TaskAction="Add"
+      ItemPath="$(AssemblyReferencesFilePath)"
+      Version="2017"
+      Recursive="true"
+      ContinueOnError="true"
+      Condition="'$(AssemblyReferencesFileExist)'!='True'" />
+
+    <Message Text="Processed Files:" Importance="High" />
+    <Message Text="%(ProcessedFiles.Identity)" />
+  </Target>
+
+  <Target Name="validate:xpath-json-config">
+    <Message Text="Validate xpath config in the file '$(JsonXPathFilePath)'." Importance="High" />
+
+    <ValidateXPathJsonConfig JsonXPathFilePath="$(JsonXPathFilePath)">
+      <Output TaskParameter="InvalidConfigs" ItemName="InvalidConfigs" />
+    </ValidateXPathJsonConfig>
+
+    <Message Text="There are duplicate configs as shown below:" Importance="High" Condition="(@(InvalidConfigs->Count()) > 0)" />
+    <Message Text="%(InvalidConfigs.Identity)" Condition="@(InvalidConfigs->Count()) > 0" />
+    <Error Text="Please correct the duplicates in the $(JsonXPathFilePath) file" Condition="(@(InvalidConfigs->Count()) > 0)" />
+  </Target>
+
+  <Target Name="tfs:checkout">
+    <Message Text="Tfs checkout: $(ItemsPath)" Importance="High" />
+    <MSBuild.ExtensionPack.VisualStudio.TfsSource
+      TaskAction="Checkout"
+      ItemPath="$(ItemsPath)"
+      Version="2017"
+      Recursive="true"
+      ContinueOnError="true" />
+  </Target>
+
+  <UsingTask
+    TaskName="Tokenize"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <XmlFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <JsonXPathFilePath ParameterType="System.String" Required="true" />
+      <AssemblyReferencesFilePath ParameterType="System.String" Required="true" />
+      <Profile ParameterType="System.String" Required="false" />
+      <ProcessedFiles ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      . $(TokenizePs1)
+
+      if ($null -ne $error) { $error.Clear() }
+      try {
+        $xpathJson = Get-Content -Raw -Path $JsonXPathFilePath | Out-String | ConvertFrom-Json
+
+        $assemblyFiles = @{}
+        [string[]]$referenceAssemblies = @()
+        if (Test-Path $AssemblyReferencesFilePath) {
+          $assemblyFiles = Get-Content -Raw -Path $AssemblyReferencesFilePath | Out-String | ConvertFrom-Json
+          if ($null -ne $assemblyFiles."ReferenceAssemblies") {
+            $referenceAssemblies = $assemblyFiles.ReferenceAssemblies
+          }
+        }
+
+        $ProcessedFiles = @()
+        $XmlFiles | % {
+          $xmlFilePath = $_.GetMetadata("Identity")
+
+          $ProcessedFiles += $xmlFilePath
+          $assemblyReferences = Tokenize -xmlFilePath $xmlFilePath -xpathJson $xpathJson -profile $Profile
+
+          if ($null -ne $assemblyReferences) {
+            $assemblyReferences | % {
+              if ((-not (Test-Path -Path $_ -PathType Container)) -and
+                  (-not $referenceAssemblies.Contains($_))) {
+                  $referenceAssemblies += $_
+              }
+            }
+          }
+        }
+
+        if ($referenceAssemblies.Count -gt 0) {
+          $assemblyFiles.ReferenceAssemblies = $referenceAssemblies
+          $assemblyFiles | ConvertTo-Json | Set-Content $AssemblyReferencesFilePath
+          $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Saved referenced assembly names to file: $AssemblyReferencesFilePath")
+        }
+      } catch {
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Error processing xml file: $xmlFilePath")
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", $error)
+      }
+    </Task>
+  </UsingTask>
+
+  <UsingTask
+    TaskName="ValidateXPathJsonConfig"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <JsonXPathFilePath ParameterType="System.String" Required="true" />
+      <InvalidConfigs ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      if ($null -ne $error) { $error.Clear() }
+
+      try {
+        $xpathJson = Get-Content -Raw -Path $JsonXPathFilePath | Out-String | ConvertFrom-Json
+        [string[]]$InvalidConfigs = @()
+        [string[]]$existValues = @()
+
+        $xpathJson = Get-Content -Raw -Path $JsonXPathFilePath | Out-String | ConvertFrom-Json
+        $xpathJson | % {
+          $config = $_
+          ("Name", "XPath") | % {
+            $field = $_
+            $value = $config.$field
+            if  (-not $existValues.Contains($value)) {
+              $existValues  += $value
+            } else {
+              $InvalidConfigs += ("{0}={1} " -f $field, $value)
+            }
+          }
+        }
+      } catch {
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Error processing xpath config file: $JsonXPathFilePath")
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", $error)
+      }
+    </Task>
+  </UsingTask>
+</Project>

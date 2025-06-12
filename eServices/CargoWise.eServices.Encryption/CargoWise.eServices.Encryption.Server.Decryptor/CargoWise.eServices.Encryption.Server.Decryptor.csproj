@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <TargetFrameworks>net40;net45;net46;netstandard2.0;</TargetFrameworks>
+    <AssemblyVersion>2.0.1</AssemblyVersion>
+    <FileVersion>$(AssemblyVersion)</FileVersion>
+    <PackageVersion>$(AssemblyVersion)</PackageVersion>
+    <RepositoryUrl>https://devops.wisetechglobal.com/wtg/eServices/_git/eServices</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>Server Decryptor</Description>
+    <PackageReleaseNotes>
+      Version 2.0.1
+      - WI00712593 - XH CS and etc. - Use BATNuGet for nuget package publish to replace Deploy.proj
+
+      Version 2.0.0
+      - WI00474575
+    </PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\server-private-key.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\server-private-key.xml" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
+    <PackageReference Include="System.Runtime">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cargowise.eServices.Encryption.Common\CargoWise.eServices.Encryption.Common.csproj" />
+  </ItemGroup>
+
+  <Target Name="bat:package" DependsOnTargets="PostBuild" />
+  <Target Name="PostBuild" AfterTargets="DispatchToInnerBuilds">
+    <Exec Command="dotnet pack &quot;$(MSBuildProjectFullPath)&quot; --no-build --configuration $(Configuration)" />
+  </Target>
+</Project>

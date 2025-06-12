@@ -1,0 +1,121 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>maven-environment-installation</artifactId>
+	<name>eServices Maven Environment installation</name>
+	<packaging>pom</packaging>
+	<parent>
+		<groupId>com.cargowise.eservices</groupId>
+		<artifactId>eservices-repo-pom</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../repo-pom.xml</relativePath>
+	</parent>
+	<properties>
+		<checkstyle.version>7.8.2</checkstyle.version>
+		<jdk.folder>jdk1.8.0_171</jdk.folder>
+		<maven.version>3.5.4</maven.version>
+		<vs.tfs>C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\Common7\\IDE\\CommonExtensions\\Microsoft</vs.tfs>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>VS-Code-settings</id>
+			<activation>
+				<file>
+					<missing>${env.APPDATA}\Code\User\settings.json</missing>
+				</file>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>ru.yaal.maven</groupId>
+						<artifactId>write-text-files-maven-plugin</artifactId>
+						<version>1.0</version>
+						<configuration>
+							<charset>UTF-8</charset>
+							<files>
+								<file>
+									<path>${env.APPDATA}/Code/User/settings.json</path>
+									<lines>
+										<line>
+{
+	"editor.suggestSelection": "first",
+	"vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+	"editor.insertSpaces": false,
+	"tfvc.location": "${vs.tfs}\\TeamFoundation\\Team Explorer\\TF.exe",
+	"java.home": "C:\\Program Files\\Java\\${jdk.folder}",
+	"java.configuration.checkProjectSettingsExclusions": false,
+	"java.checkstyle.configuration": ".\\quality-check\\checkstyle-checker.xml",
+	"java.checkstyle.version": "${checkstyle.version}",
+	"java.checkstyle.properties": {
+		"samedir": "./quality-check"
+	},
+	"maven.executable.path": "C:\\Program Files\\apache-maven-${maven.version}\\bin\\mvn",
+	"maven.terminal.useJavaHome": true,
+	"apexPMD.rulesets":  [
+		"quality-check\\pmd-ruleset.xml"
+	],
+	"apexPMD.runOnFileOpen": true
+}
+</line>
+									</lines>
+								</file>
+							</files>
+						</configuration>
+						<executions>
+							<execution>
+								<id>write-text-files</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>write-text-files</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>validate-settings-xml</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <echo>Checking %USERPROFILE%\.m2\settings.xml and updating if necessary</echo>
+                                <!-- Check if settings.xml exists and copy it if not -->
+                                <exec executable="cmd" osfamily="windows">
+                                    <arg value="/c"/>
+                                    <arg value="if not exist %USERPROFILE%\.m2\settings.xml copy settings.xml %USERPROFILE%\.m2\settings.xml"/>
+                                </exec>
+                                <!-- Check if settings.xml does not contain the URL and copy it if so -->
+                                <exec executable="cmd" osfamily="windows">
+                                    <arg value="/c"/>
+                                    <arg value='findstr /C:"https://proget.wtg.zone/maven2/WTG-Maven/" %USERPROFILE%\.m2\settings.xml || copy settings.xml %USERPROFILE%\.m2\settings.xml'/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+		</plugins>
+	</build>
+</project>

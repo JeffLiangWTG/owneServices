@@ -1,0 +1,688 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="info">
+
+    <PropertyGroup>
+        <BizTalkCommonImported>$true</BizTalkCommonImported>
+        <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(ProgramFiles)\MSBuild\ExtensionPack\4.0\</MSBuildExtensionsPackPath>
+        <MSBuildExtensionsPackPath Condition="!Exists('$(MSBuildExtensionsPackPath)')">$(ProgramFiles)\MSBuildExtensionPack\4.0\</MSBuildExtensionsPackPath>
+
+        <BizTalkAdminFilePath>$(MSBuildThisFileDirectory)BizTalkAdmin.ps1</BizTalkAdminFilePath>
+        <BtsTaskExe>$(BTSInstallPath)BTSTask.exe</BtsTaskExe>
+    </PropertyGroup>
+
+    <!-- MSBuild.ExtensionPack -->
+    <Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks" Condition="'$(BuildPath)'==''"/>
+
+    <PropertyGroup>
+        <!-- reference gac file -->
+        <ReferenceGACFilePath>$(MSBuildThisFileDirectory)Profiles\GAC.txt</ReferenceGACFilePath>
+        <ReferenceGACFilePath Condition="'$(Profile)'!=''">$(MSBuildThisFileDirectory)Profiles\$(Profile)\GAC.txt</ReferenceGACFilePath>
+    </PropertyGroup>
+
+    <PropertyGroup>
+      <CargoWiseeHubApplication>CargoWise.eHub</CargoWiseeHubApplication>
+    </PropertyGroup>
+
+    <!-- ProductApplicationAssemblies -->
+    <ItemGroup>
+        <ProductApplicationAssemblies Include="$(BinPath)\CargoWise.eHub.Products.Core.PipelineComponents.dll" />
+        <ProductApplicationAssemblies Include="$(BinPath)\CargoWise.eHub.Products.Core.Pipelines.dll" />
+        <ProductApplicationAssemblies Include="$(BinPath)\CargoWise.eHub.Products.Core.PropertySchemas.dll" />
+        <ProductApplicationAssemblies Include="$(BinPath)\CargoWise.eHub.Products.AUCustoms.Pipelines.dll" />
+        <ProductApplicationAssemblies Include="$(BinPath)\CargoWise.eHub.Products.AUCustoms.Schemas.dll" />
+        <ProductApplicationAssemblies Include="$(BinPath)\CargoWise.eHub.Products.NZCustoms.Common.dll" />
+        <ProductApplicationAssemblies Include="$(BinPath)\CargoWise.eHub.Products.NZCustoms.PipelineComponents.dll" />
+        <ProductApplicationAssemblies Include="$(BinPath)\CargoWise.eHub.Products.NZCustoms.Pipelines.dll" />
+        <ProductApplicationAssemblies Include="$(BinPath)\CargoWise.eHub.Products.NZCustoms.Schemas.dll" />
+        <ProductApplicationAssemblies Include="$(BinPath)\CargoWise.eHub.Products.NZCustoms.Transformations.dll" />
+    </ItemGroup>
+
+    <!-- Edi Application Assemblies -->
+    <ItemGroup>
+        <EdiApplicationAssemblies Include="$(BinPath)\Microsoft.BizTalk.Edi.*.dll" />
+        <EdiApplicationAssemblies Include="$(BinPath)\Microsoft.BizTalk.ReliableMessagingArtifacts.dll" />
+    </ItemGroup>
+
+    <!-- SystemAssemblies -->
+    <ItemGroup>
+        <SystemAssemblies Include="$(BinPath)\Microsoft.*.dll" />
+        <SystemAssemblies Include="$(BinPath)\Microsoft.XLANGs.*.dll" />
+        <SystemAssemblies Include="$(BinPath)\Microsoft.BizTalk.*.dll" />
+        <SystemAssemblies Include="$(BinPath)\PipelineObjects.dll" />
+        <SystemAssemblies Include="$(BinPath)\Blogical.Shared.Functoids.dll" />
+        <SystemAssemblies Include="$(BinPath)\System.dll" />
+        <SystemAssemblies Include="$(BinPath)\System.*.dll" />
+        <SystemAssemblies Include="$(BinPath)\Antlr3.Runtime.dll" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <UnitTestAssemblies Include="$(BinPath)\nunit.*.dll" />
+        <UnitTestAssemblies Include="$(BinPath)\NUnit*.*.dll" />
+        <UnitTestAssemblies Include="$(BinPath)\NDbUnit.*.dll" />
+        <UnitTestAssemblies Include="$(BinPath)\Rhino.Mocks.dll" />
+        <UnitTestAssemblies Include="$(BinPath)\Winterdom.*.dll" />
+        <UnitTestAssemblies Include="$(BinPath)\XmlDiffPatch.dll" />
+        <UnitTestAssemblies Include="$(BinPath)\XmlDiffPatch.*.dll" />
+        <UnitTestAssemblies Include="$(BinPath)\Moq.dll" />
+        <UnitTestAssemblies Include="$(BinPath)\CargoWise.BizTalk.UnitTestFX.dll" />
+        <UnitTestAssemblies Include="$(BinPath)\CargoWise.*.Tests.dll" />
+        <UnitTestAssemblies Include="$(BinPath)\eHubDeploymentTests.dll" />
+    </ItemGroup>
+
+    <!-- Assemblies cannot be computed by dependency walker -->
+    <ItemGroup>
+        <DependenciesInclude Include="$(BinPath)\Common.Logging.dll" />
+        <DependenciesInclude Include="$(BinPath)\Common.Logging.*.dll" />
+        <DependenciesInclude Include="$(BinPath)\Newtonsoft.Json.dll" />
+    </ItemGroup>
+
+    <!-- Assemblies to exclude -->
+    <ItemGroup>
+        <ServiceAssemblies Include="$(BinPath)\*WebService.dll" />
+        <ServiceAssemblies Include="$(BinPath)\*.Web.*.dll" />
+        <ServiceAssemblies Include="$(BinPath)\Mvc*.dll" />
+        <ServiceAssemblies Include="$(BinPath)\ServiceBroker.*.dll" />
+        <ServiceAssemblies Include="$(BinPath)\MvcContrib.dll" />
+        <ServiceAssemblies Include="$(BinPath)\MvcContrib.*.dll" />
+        <ServiceAssemblies Include="$(BinPath)\FluentFTP.dll" />
+        <ServiceAssemblies Include="$(BinPath)\WebGrease.dll" />
+        <ServiceAssemblies Include="$(BinPath)\CargoWise.ActiveDirectory.*.dll" />
+        <ServiceAssemblies Include="$(BinPath)\CargoWise.ApplicationManager.*.dll" />
+        <ServiceAssemblies Include="$(BinPath)\CargoWise.eHub.Nudge.*.dll" />
+        <ServiceAssemblies Include="$(BinPath)\*.Monitoring.*.dll" />
+
+        <PortalAssemblies Include="$(BinPath)\*.Portal*.dll" />
+        <PortalAssemblies Include="$(BinPath)\*.eHubAdmin.dll" />
+
+        <Billing Include="$(BinPath)\*.Billing.*.dll" />
+        <SqlAssemblies Include="$(BinPath)\*.Sql.*.dll" />
+        <UScustoms Include="$(BinPath)\CargoWise.eServices.USCustoms*.dll" />
+
+        <ExcludeAssemblies Include="@(SystemAssemblies);@(UnitTestAssemblies);@(ServiceAssemblies);@(PortalAssemblies);@(Billing);@(SqlAssemblies);@(UScustoms)" />
+    </ItemGroup>
+
+    <!-- Required Assembly Items -->
+    <ItemGroup>
+        <!-- assembly items required to be finalized by packer and installer tasks -->
+        <GacAssemblies Include="$(BinPath)\*.dll" Exclude="@(ExcludeAssemblies)" />
+        <BizTalkAssemblies Include="@(GacAssemblies)" />
+    </ItemGroup>
+
+    <!-- assemblies sorted on dependencies tree that the vertices with empty outer edges peeled off first -->
+    <!-- the caller project will feed this item up -->
+    <ItemGroup>
+        <Dependencies Include="[Dependencies]" />
+    </ItemGroup>
+
+    <Target Name="default">
+        <Error Text="Please specify a bin path to the assemblies" Condition="'$(BinPath)'==''" />
+
+        <DependencyBuildTask BinPath="$(BinPath)">
+            <Output TaskParameter="Dependencies" ItemName="Dependencies" />
+        </DependencyBuildTask>
+
+        <Message Text="%(Dependencies.Identity)" />
+    </Target>
+
+    <Target Name="StartHostInstances">
+        <BizTalkHostInstance TaskAction="Get">
+            <Output TaskParameter="HostInstances" ItemName="_HostInstances"/>
+        </BizTalkHostInstance>
+
+        <BizTalkHostInstance
+            TaskAction="Start"
+            Condition="'%(_HostInstances.Identity)' != '' and %(_HostInstances.HostType) == 1 and %(_HostInstances.ServiceState) == 1 and !%(_HostInstances.IsDisabled)"
+            HostName="%(_HostInstances.Identity)"/>
+    </Target>
+
+    <Target Name="StopHostInstances">
+        <BizTalkHostInstance TaskAction="Get" MachineName="$(Server)">
+            <Output TaskParameter="HostInstances" ItemName="_HostInstances"/>
+        </BizTalkHostInstance>
+
+        <BizTalkHostInstance
+            TaskAction="Stop"
+            MachineName="$(Server)"
+            Condition="'%(_HostInstances.Identity)' != '' and %(_HostInstances.HostType) == 1 and %(_HostInstances.ServiceState) == 4 and !%(_HostInstances.IsDisabled)"
+            HostName="%(_HostInstances.Identity)"/>
+    </Target>
+
+    <Target Name="StartApplications">
+      <MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="Get" MachineName="$(Server)" DatabaseServer="$(DatabaseServer)">
+        <Output TaskParameter="Applications" ItemName="_BizTalkApplications"/>
+      </MSBuild.ExtensionPack.BizTalk.BizTalkApplication>
+
+      <!-- 1, re-enable those receive locations that are disabled at the start -->
+      <BizTalkApplication
+        TaskAction="EnableAllReceiveLocations"
+        MachineName="$(Server)"
+        DatabaseServer="$(DatabaseServer)"
+        Applications="@(_BizTalkApplications)" />
+
+      <!-- 2, start the sendPorts that were stopped at the start -->
+      <StartSendPorts StartSendPorts="@(StoppedSendPorts)">
+        <Output TaskParameter="StartedSendPorts" ItemName="StartedSendPorts" />
+        <Output TaskParameter="FailedSendPorts" ItemName="FailedSendPorts" />
+      </StartSendPorts>
+      <Message Text="Started send port %(StartedSendPorts.Identity)." Importance="High" />
+      <!-- <Error Text="Failed to start send ports: %(FailedSendPorts.Identity)" Importance="High" Condition="@(FailedSendPorts->Count()) > 0" /> -->
+
+      <!-- 3, start the orchestrations that were stopped at the start -->
+      <StartOrchestrations StartOrchestrations="@(StoppedOrchestrations)">
+        <Output TaskParameter="StartedOrchestrations" ItemName="StartedOrchestrations" />
+        <Output TaskParameter="FailedOrchestrations" ItemName="FailedOrchestrations" />
+      </StartOrchestrations>
+      <Message Text="Started orchestration %(StartedOrchestrations.Identity)." Importance="High" />
+      <!-- <Error Text="Failed to start orchestrations: %(FailedOrchestrations.Identity)" Importance="High" Condition="@(FailedOrchestrations->Count()) > 0" /> -->
+
+      <!-- 4, start web site so that messages can be received -->
+      <MSBuild.ExtensionPack.Web.Iis7Website TaskAction="Start" Name="Default Web Site"/>
+    </Target>
+
+    <Target Name="StopApplications">
+      <Message Text="Server=$(Server); DatabaseServer=$(DatabaseServer); UserId=$(UserId); Password=$(Password)" Importance="High" />
+      <MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="Get" MachineName="$(Server)" DatabaseServer="$(DatabaseServer)">
+        <Output TaskParameter="Applications" ItemName="_BizTalkApplications"/>
+      </MSBuild.ExtensionPack.BizTalk.BizTalkApplication>
+
+      <!-- 1, stop web site so that messages can NOT be received -->
+      <MSBuild.ExtensionPack.Web.Iis7Website TaskAction="Stop" Name="Default Web Site"/>
+
+      <!-- 2, stop only those orchestrations that are currently started -->
+      <StopStartedOrchestrations>
+        <Output TaskParameter="StoppedOrchestrations" ItemName="StoppedOrchestrations" />
+      </StopStartedOrchestrations>
+      <Message Text="Stopped orchestration %(StoppedOrchestrations.Identity)." Importance="High" />
+
+      <!-- 3, disable all receive locations so that we don't get more messages -->
+      <BizTalkApplication
+        TaskAction="DisableAllReceiveLocations"
+        MachineName="$(Server)"
+        DatabaseServer="$(DatabaseServer)"
+        Applications="@(_BizTalkApplications)"/>
+
+      <!-- 4, stop only those sendPorts that are currently started -->
+      <StopStartedSendPorts>
+        <Output TaskParameter="StoppedSendPorts" ItemName="StoppedSendPorts" />
+      </StopStartedSendPorts>
+      <Message Text="Stopped send port %(StoppedSendPorts.Identity)." Importance="High" />
+
+      <!-- wait until all BizTalk message instances goes to a state lower than SuspendedResumable, i.e. either ReadyToRun or Active -->
+      <Message Text="Waiting for active BizTalk messages to complete..." Importance="high" />
+      <Exec Command='powershell.exe -executionpolicy remotesigned -Command "$job = Start-Job { while ((Get-WmiObject -class MSBTS_MessageInstance -Namespace root\MicrosoftBizTalkServer -Filter &apos;ServiceInstanceStatus &lt; 4&apos;).Count -gt 0) { sleep 1 } }"; Wait-Job $job -Timeout 120' />
+    </Target>
+
+    <!-- Hosts and HostInstances -->
+    <Target Name="CreateHostsAndInstances" Inputs="@(Hosts)" Outputs="%(Hosts.Identity)">
+        <BizTalkHost TaskAction="CheckExists" HostName="%(Hosts.HostName)" DatabaseServer="$(DatabaseServer)">
+            <Output TaskParameter="Exists" PropertyName="Exists" />
+        </BizTalkHost>
+
+        <Message Text="Host %(Hosts.Identity) already exists" Condition="'$(Exists)'=='True'" />
+
+        <BizTalkHost TaskAction="Create"
+             Condition="'$(Exists)'=='False'"
+             HostName="%(Hosts.HostName)"
+             Tracking="%(Hosts.Tracking)"
+             WindowsGroup="%(Hosts.WindowsGroup)"
+             HostType="%(Hosts.HostType)"
+             Use32BitHostOnly="%(Hosts.Use32BitHostOnly)"
+             Default="%(Hosts.Default)"
+             Trusted="%(Hosts.Trusted)"
+             DatabaseServer="$(DatabaseServer)"/>
+
+        <BizTalkHost TaskAction="Update"
+             Condition="'$(Exists)'=='True' AND '%(Hosts.TaskAction)'=='Update'"
+             HostName="%(Hosts.HostName)"
+             Tracking="%(Hosts.Tracking)"
+             WindowsGroup="%(Hosts.WindowsGroup)"
+             HostType="%(Hosts.HostType)"
+             Use32BitHostOnly="%(Hosts.Use32BitHostOnly)"
+             Default="%(Hosts.Default)"
+             Trusted="%(Hosts.Trusted)"
+             DatabaseServer="$(DatabaseServer)"/>
+
+        <BizTalkHostInstance TaskAction="CheckExists" HostName="%(Hosts.Identity)">
+            <Output TaskParameter="Exists" PropertyName="Exists" />
+        </BizTalkHostInstance>
+
+        <Message Text="HostInstances: '%(Hosts.Identity)' already exists." Condition="'$(Exists)'=='True'" />
+
+        <BizTalkHostInstance
+            TaskAction="Create"
+            Condition="'$(Exists)'=='False'"
+            HostName="%(Hosts.Identity)"
+            AccountName="$(AccountName)"
+            AccountPassword="$(AccountPassword)"
+            Force="true"/>
+    </Target>
+
+    <Target Name="DeleteHostsAndInstances" Inputs="@(Hosts)" Outputs="%(Hosts.Identity)">
+        <BizTalkHostInstance TaskAction="CheckExists" HostName="%(Hosts.Identity)">
+            <Output TaskParameter="Exists" PropertyName="Exists" />
+        </BizTalkHostInstance>
+        <BizTalkHostInstance TaskAction="Delete" HostName="%(Hosts.HostName)" Condition="'$(Exists)'=='True'" ContinueOnError="true" />
+
+        <BizTalkHost TaskAction="CheckExists" HostName="%(Hosts.HostName)" DatabaseServer="$(DatabaseServer)">
+            <Output TaskParameter="Exists" PropertyName="Exists" />
+        </BizTalkHost>
+        <BizTalkHost TaskAction="Delete" HostName="%(Hosts.HostName)" Condition="'$(Exists)'=='True'" ContinueOnError="true" />
+    </Target>
+
+    <!-- Handlers -->
+    <Target Name="CreateHandlers" Inputs="@(Handlers)" Outputs="%(Handlers.Identity)">
+
+        <BizTalkReceiveHandler TaskAction="CheckExists" HostName="%(Handlers.HostName)" AdapterName="%(Handlers.AdapterName)" Condition="'%(Handlers.Direction)'=='Receive'">
+            <Output TaskParameter="Exists" PropertyName="Exists"/>
+        </BizTalkReceiveHandler>
+
+        <BizTalkSendHandler TaskAction="CheckExists" HostName="%(Handlers.HostName)" AdapterName="%(Handlers.AdapterName)" Condition="'%(Handlers.Direction)'=='Send'">
+            <Output TaskParameter="Exists" PropertyName="Exists"/>
+        </BizTalkSendHandler>
+
+        <Message Text="Handler %(Handlers.HostName) already exists" Condition="'$(Exists)'=='True'" />
+
+        <BizTalkReceiveHandler
+            TaskAction="Create"
+            HostName="%(Handlers.HostName)"
+            AdapterName="%(Handlers.AdapterName)"
+            Condition="'$(Exists)'=='False' AND '%(Handlers.Direction)'=='Receive'"
+            Force="true"
+            DatabaseServer="$(DatabaseServer)"/>
+
+        <BizTalkSendHandler
+            TaskAction="Create"
+            HostName="%(Handlers.HostName)"
+            AdapterName="%(Handlers.AdapterName)"
+            Condition="'$(Exists)'=='False' AND '%(Handlers.Direction)'=='Send'"
+            Force="true"
+            DatabaseServer="$(DatabaseServer)"/>
+    </Target>
+
+    <!-- AddAssemblies target gac and then add the non-biztalk assemblies to the resources of BizTalk -->
+    <Target Name="GacAssemblies" Inputs="@(InstallingAssemblies)" Outputs="$(GacOutputPath)%(InstallingAssemblies.AssemblyFileName).gac">
+
+      <ItemGroup>
+        <AssemblyInfo  Remove="@(AssemblyInfo)" />
+
+        <AssemblyInfo Include="FullPath: %(InstallingAssemblies.FullPath)" />
+        <AssemblyInfo Include="AssemblyVersion: %(InstallingAssemblies.AssemblyVersion)" />
+        <AssemblyInfo Include="FullName: %(InstallingAssemblies.FullName)" />
+        <AssemblyInfo Include="SortOrder: %(InstallingAssemblies.SortOrder)" />
+      </ItemGroup>
+
+      <WriteLinesToFile
+        File="$(GacOutputPath)%(InstallingAssemblies.AssemblyFileName).gac"
+        Lines="@(AssemblyInfo)"
+        Overwrite="true"
+        Encoding="utf-8" />
+
+      <MSBuild.ExtensionPack.Framework.Gac
+        Condition="(%(InstallingAssemblies.Length)&lt;=$(GacAllowedMaxFileNameLength))"
+        TaskAction="AddAssembly"
+        AssemblyPath="%(InstallingAssemblies.FullPath)"
+        ContinueOnError="true" />
+
+    </Target>
+
+    <!-- remove all assemblies for the @(BizTalkApplications) -->
+    <Target Name="BizTalkAssemblies:RemoveAll">
+
+      <RemoveBizTalkAssembliesForApplication
+        ApplicationName="%(BizTalkApplications.Identity)"
+        BtsTaskExe="$(BtsTaskExe)">
+        <Output TaskParameter="ApplicationAssemblies" ItemName="ApplicationAssemblies" />
+      </RemoveBizTalkAssembliesForApplication>
+    </Target>
+
+    <!-- BizTalk assemblies -->
+    <Target Name="BizTalkAssemblies" Inputs="@(InstallingAssemblies)" Outputs="$(BizTalkOutputPath)%(InstallingAssemblies.AssemblyFileName).biztalk">
+
+      <ItemGroup>
+        <AssemblyInfo  Remove="@(AssemblyInfo)" />
+
+        <AssemblyInfo Include="FullPath: %(InstallingAssemblies.FullPath)" />
+        <AssemblyInfo Include="AssemblyVersion: %(InstallingAssemblies.AssemblyVersion)" />
+        <AssemblyInfo Include="FullName: %(InstallingAssemblies.FullName)" />
+        <AssemblyInfo Include="SortOrder: %(InstallingAssemblies.SortOrder)" />
+      </ItemGroup>
+
+      <WriteLinesToFile
+        File="$(BizTalkOutputPath)%(InstallingAssemblies.AssemblyFileName).biztalk"
+        Lines="@(AssemblyInfo)"
+        Overwrite="true"
+        Encoding="utf-8" />
+
+      <UnenlistOrchestration
+        AssemblyName="%(InstallingAssemblies.AssemblyFileName)"
+        AssemblyVersion="%(InstallingAssemblies.AssemblyVersion)">
+        <Output TaskParameter="UnenlistedOrchestrations" ItemName="UnenlistedOrchestrations"/>
+      </UnenlistOrchestration>
+
+      <MSBuild.ExtensionPack.BizTalk.BizTalkAssembly
+        Condition="%(InstallingAssemblies.Length)&lt;93"
+        TaskAction="Add"
+        Force="true"
+        Gac="false"
+        MachineName="$(Server)"
+        DatabaseServer="$(DatabaseServer)"
+        Application="%(InstallingAssemblies.Application)"
+        Assemblies="%(InstallingAssemblies.FullPath)"
+        GacOnAddResource="false"
+        GacOnMSIFileImport="false"
+        GacOnMSIFileInstall="true" />
+
+      <!-- <ResumeOrchestrations -->
+        <!-- AssemblyName="%(BizTalkAssemblies.FileName)" -->
+        <!-- AssemblyVersion="%(BizTalkAssemblies.AssemblyVersion)" -->
+        <!-- UnenlistedOrchestrations="@(UnenlistedOrchestrations)" /> -->
+    </Target>
+
+    <!-- Query if the provided @(BizTalkAssemblies) list exists on the machine and database server -->
+    <Target Name="BizTalkAssemblies:Exists" Outputs="$(Exists)">
+
+      <MSBuild.ExtensionPack.BizTalk.BizTalkAssembly
+        Condition="%(InstallingAssemblies.Length)&lt;93"
+        TaskAction="CheckExists"
+        MachineName="$(Server)"
+        DatabaseServer="$(DatabaseServer)"
+        Application="$(CargoWiseeHubApplication)"
+        Assemblies="@(InstallingAssemblies)">
+        <Output TaskParameter="Exists" PropertyName="Exists" />
+      </MSBuild.ExtensionPack.BizTalk.BizTalkAssembly>
+
+    </Target>
+
+    <!-- ImportBindings target expects the $(BindingFileName) file on the local directory -->
+    <Target Name="ImportBindings">
+        <Error Text="$(BindingInfoFilePath) file not found." Condition="!Exists('$(BindingInfoFilePath)')" />
+        <Message Text="Import bindings from $(BindingInfoFilePath)" Condition="Exists('$(BindingInfoFilePath)')" />
+
+        <BizTalkApplication
+            Condition="Exists('$(BindingInfoFilePath)')"
+            TaskAction="ImportBindings"
+            BindingFile="$(BindingInfoFilePath)"
+            MachineName="$(Server)"
+            DatabaseServer="$(DatabaseServer)"
+            Application="$(CargoWiseeHubApplication)" />
+    </Target>
+
+    <!-- deploy is scoped onto the unzipped package files only -->
+    <Target Name="start">
+        <CallTarget Targets="StartHostInstances;StartApplications" />
+    </Target>
+
+    <Target Name="restart">
+        <CallTarget Targets="StopApplications;StopHostInstances" />
+        <CallTarget Targets="StartHostInstances;StartApplications" />
+    </Target>
+
+    <Target Name="stop">
+        <CallTarget Targets="StopApplications;StopHostInstances" />
+    </Target>
+
+    <Target Name="ReferenceGAC">
+        <Message Text="Loading the reference GAC files list" Importance="High" />
+        <ReadLinesFromFile File="$(ReferenceGACFilePath)" Condition="Exists($(ReferenceGACFilePath))" >
+            <Output TaskParameter="Lines" ItemName="ReferenceGAC"/>
+        </ReadLinesFromFile>
+    </Target>
+
+    <Target Name="test" Inputs="@(ReferenceGAC)" Outputs="%(ReferenceGAC.Identity)" DependsOnTargets="ReferenceGAC">
+        <ItemContains ArrayItem="@(ReferenceGAC)" Element="%(ReferenceGAC.Identity)" Condition="(@(ReferenceGAC)!=nil) and (@(ReferenceGAC->Count())&gt;0)">
+            <Output TaskParameter="Exists" PropertyName="Exists"/>
+        </ItemContains>
+        <Message Text="ReferenceGAC contains %(ReferenceGAC.Identity): $(Exists)" />
+    </Target>
+
+    <Target Name="info" Outputs="@(_BizTalkApplications);@(_HostInstances);@(_ReceiveHandlers);@(_SendHandlers)">
+        <Message Text="DatabaseServer: $(DatabaseServer) on server: $(Server)" Importance="High" />
+
+        <MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="Get" DatabaseServer="$(DatabaseServer)">
+            <Output TaskParameter="Applications" ItemName="_BizTalkApplications"/>
+        </MSBuild.ExtensionPack.BizTalk.BizTalkApplication>
+        <Message Text="%(_BizTalkApplications.Identity)" Importance="High" />
+
+        <Message Text="BizTalkHostInstance" />
+        <MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Get" HostName="$(Server)">
+            <Output TaskParameter="HostInstances" ItemName="_HostInstances"/>
+        </MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance>
+        <Message Text="%(_HostInstances.Identity)" Importance="High" />
+
+        <MSBuild.ExtensionPack.BizTalk.BizTalkReceiveHandler TaskAction="Get" DatabaseServer="$(DatabaseServer)">
+            <Output TaskParameter="ReceiveHandlers" ItemName="_ReceiveHandlers"/>
+        </MSBuild.ExtensionPack.BizTalk.BizTalkReceiveHandler>
+        <Message Text="%(_ReceiveHandlers.Identity)" Importance="High" />
+
+        <MSBuild.ExtensionPack.BizTalk.BizTalkSendHandler TaskAction="Get" DatabaseServer="$(DatabaseServer)">
+            <Output TaskParameter="SendHandlers" ItemName="_SendHandlers"/>
+        </MSBuild.ExtensionPack.BizTalk.BizTalkSendHandler>
+        <Message Text="%(_SendHandlers.Identity)" Importance="High" />
+    </Target>
+
+    <Target Name="test:stop-start-application">
+      <CallTarget Targets="StopApplications;StartApplications" />
+    </Target>
+
+    <UsingTask
+      TaskName="RemoveBizTalkAssembliesForApplication"
+      TaskFactory="PowershellTaskFactory"
+      AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <ApplicationName ParameterType="System.String" Required="true" />
+            <BtsTaskExe ParameterType="System.String" Required="true" />
+            <ApplicationAssemblies ParameterType="System.String[]" Output="true" />
+        </ParameterGroup>
+
+        <Task>
+        <![CDATA[
+        Add-Type -AssemblyName "Microsoft.Build.Framework"
+
+        try{
+          $error.Clear()
+
+          [string[]]$ApplicationAssemblies = @()
+          [string[]]$Luids = @()
+          [regex]$rgx="^.*-Type=`"(System`.BizTalk:Assembly|System`.BizTalk:BizTalkAssembly)`"\s+-Luid=`"(?<luid>.*)`"$"
+
+          $results = & "$BtsTaskExe" ListApp -ApplicationName:$ApplicationName | Out-String
+          $results.Split([Environment]::NewLine) | ForEach-Object {
+            $match = $rgx.Match($_)
+
+            if ($match.Success) {
+              $ApplicationAssemblies += $match.Groups["luid"].Value
+            }
+          }
+
+          $ApplicationAssemblies | ForEach-Object {
+            & "$BtsTaskExe" RemoveResource -ApplicationName:$ApplicationName -Luid:"$_" | Out-Null
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Removed assembly: $_")
+          }
+        } catch {
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", $error[0])
+            throw $error
+        }
+        ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask
+      TaskName="ItemContains"
+      TaskFactory="PowershellTaskFactory"
+      AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <ArrayItem ParameterType="System.String[]" Required="true" />
+            <Element ParameterType="System.String" Required="true" />
+            <Exists ParameterType="System.Boolean" Output="true" />
+        </ParameterGroup>
+
+        <Task>
+            $Exists = ($ArrayItem -Contains $Element)
+        </Task>
+    </UsingTask>
+
+    <UsingTask
+      TaskName="StopStartedSendPorts"
+      TaskFactory="PowershellTaskFactory"
+      AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+      <ParameterGroup>
+        <StoppedSendPorts ParameterType="System.String[]" Output="true" />
+      </ParameterGroup>
+
+      <Task>
+      <![CDATA[
+        . $(BizTalkAdminFilePath)
+
+        [string[]]$StoppedSendPorts = @()
+        Stop-Started-SendPorts | ForEach-Object {
+          $StoppedSendPorts += $_.Name
+        } | Out-Null
+      ]]>
+      </Task>
+    </UsingTask>
+
+    <UsingTask
+      TaskName="StartSendPorts"
+      TaskFactory="PowershellTaskFactory"
+      AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+      <ParameterGroup>
+        <StartSendPorts ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+        <StartedSendPorts ParameterType="System.String[]" Output="true" />
+        <FailedSendPorts ParameterType="System.String[]" Output="true" />
+      </ParameterGroup>
+
+      <Task>
+      <![CDATA[
+        [string[]]$StartedSendPorts = @()
+        [string[]]$FailedSendPorts = @()
+
+        [string[]]$artifactNames = @()
+        $StartSendPorts | ForEach-Object {
+          $artifactNames += $_.GetMetadata("Identity")
+        } | Out-Null
+
+        . $(BizTalkAdminFilePath)
+
+        Start-SendPorts $artifactNames
+
+        Get-SendPorts "Started" | ForEach-Object {
+          $StartedSendPorts += $_.Name
+        } | Out-Null
+
+        $artifactNames | Where { $StartedSendPorts -NotContains $_ } | % {
+            $FailedSendPorts += $_
+        } | Out-Null
+      ]]>
+      </Task>
+    </UsingTask>
+
+    <UsingTask
+      TaskName="StopStartedOrchestrations"
+      TaskFactory="PowershellTaskFactory"
+      AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+      <ParameterGroup>
+        <StoppedOrchestrations ParameterType="System.String[]" Output="true" />
+      </ParameterGroup>
+
+      <Task>
+      <![CDATA[
+        [string[]] $StoppedOrchestrations = @()
+        . $(BizTalkAdminFilePath)
+
+        Stop-Started-Orchestrations | ForEach-Object {
+          $StoppedOrchestrations += $_.Name
+        } | Out-Null
+      ]]>
+      </Task>
+    </UsingTask>
+
+    <UsingTask
+      TaskName="StartOrchestrations"
+      TaskFactory="PowershellTaskFactory"
+      AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+      <ParameterGroup>
+        <StartOrchestrations ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+        <StartedOrchestrations ParameterType="System.String[]" Output="true" />
+        <FailedOrchestrations ParameterType="System.String[]" Output="true" />
+      </ParameterGroup>
+
+      <Task>
+      <![CDATA[
+        [string[]]$StartedOrchestrations = @()
+        [string[]]$FailedOrchestrations = @()
+
+        [string[]]$artifactNames = @()
+        $StartOrchestrations | ForEach-Object {
+          $artifactNames += $_.GetMetadata("Identity")
+        } | Out-Null
+
+        . $(BizTalkAdminFilePath)
+
+        Start-Orchestrations $artifactNames
+
+        Get-Orchestrations "Started" | ForEach-Object {
+          $StartedOrchestrations += $_.Name
+        } | Out-Null
+
+        $artifactNames | Where { $StartedOrchestrations -NotContains $_ } | % {
+            $FailedOrchestrations += $_
+        } | Out-Null
+      ]]>
+      </Task>
+    </UsingTask>
+
+    <UsingTask
+      TaskName="UnenlistOrchestration"
+      TaskFactory="PowershellTaskFactory"
+      AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+      <ParameterGroup>
+        <AssemblyName ParameterType="System.String" Required="true" />
+        <AssemblyVersion ParameterType="System.String" Required="true" />
+        <UnenlistedOrchestrations ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+      </ParameterGroup>
+
+      <Task>
+      <![CDATA[
+        Add-Type -AssemblyName "Microsoft.Build.Utilities, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL"
+
+        . $(BizTalkAdminFilePath)
+        $Unenlisted = Unenlist-Orchestrations-Match-Assembly -AssemblyName ${AssemblyName}  -AssemblyVersion ${AssemblyVersion}
+
+        [Microsoft.Build.Framework.ITaskItem[]] $UnenlistedOrchestrations = @()
+        ($Unenlisted) | ForEach-Object {
+          $item = New-Object -TypeName Microsoft.Build.Utilities.TaskItem -ArgumentList $_.Name
+          $item.SetMetadata("OriginalStatus", $_.OriginalStatus)
+          $UnenlistedOrchestrations += $item
+        } | Out-Null
+      ]]>
+      </Task>
+    </UsingTask>
+
+    <UsingTask
+      TaskName="ResumeOrchestrations"
+      TaskFactory="PowershellTaskFactory"
+      AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+      <ParameterGroup>
+        <AssemblyName ParameterType="System.String" Required="true" />
+        <AssemblyVersion ParameterType="System.String" Required="true" />
+        <UnenlistedOrchestrations ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      </ParameterGroup>
+
+      <Task>
+      <![CDATA[
+        . $(BizTalkAdminFilePath)
+
+        $Unenlisted = @()
+        $UnenlistedOrchestrations | ForEach-Object {
+          $Unenlisted += New-Object PSCustomObject -Property @{
+            Name = $_.GetMetadata("Identity")
+            OriginalStatus = $_.GetMetadata("OriginalStatus")
+          }
+        } | Out-Null
+
+        Resume-Orchestrations-Match-Assembly -AssemblyName ${AssemblyName}  -AssemblyVersion ${AssemblyVersion} -UnenlistedOrchestrations $(Unenlisted)
+      ]]>
+      </Task>
+    </UsingTask>
+</Project>

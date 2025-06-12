@@ -1,0 +1,41 @@
+﻿@page "/storage"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject IDbContextFactory<DmsStorageContext> DbFactory
+@inject DmsStorageContext Context
+
+<PageTitle>App Storage</PageTitle>
+
+<h1>App Storage</h1>
+
+<p>
+    <a href="storage/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="ownerDetails.OrderBy(o => o.Owner).AsQueryable()">
+    <PropertyColumn Property="owner => owner.Owner" />
+    <PropertyColumn Property="owner => owner.TableCount" Title="Table Count" />
+
+    <TemplateColumn Context="owner">
+        <a href="@($"storage/{owner.Owner}")">Details</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private List<OwnerDetails> ownerDetails = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        var owners = context.DmsStorageCatalog
+            .Where(c => !c.SC_DeleteTime.HasValue)
+            .GroupBy(c => c.SC_Schema)
+            .Select(g => new OwnerDetails(g.Key, g.Count()));
+
+        ownerDetails.AddRange(await owners.ToListAsync());
+    }
+
+    public record OwnerDetails(string Owner, int TableCount);
+}

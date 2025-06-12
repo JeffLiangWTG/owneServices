@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--EXTERNAL_PROPERTIES: Profile;UserName;Password;_Server;_DatabaseFilesPath;_ManifestFileName;TargetDatabase-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	
+	<PropertyGroup>
+		<MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(MSBuildExtensionsPath)\ExtensionPack\4.0</MSBuildExtensionsPackPath>
+	</PropertyGroup>
+
+	<Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks"/>
+
+	<Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props"/>
+	<Import Project="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Deployment.props" Condition="'$(Profile)' != ''"/>
+
+	<PropertyGroup>
+		<_ManifestFilePath>$(_DatabaseFilesPath)\$(_ManifestFileName)</_ManifestFilePath>
+	</PropertyGroup>
+	<Import Project="$(_ManifestFilePath)" Condition="Exists('$(_ManifestFilePath)')"/>
+
+	<Target Name="bat:deploy">
+		<PropertyGroup>
+			<_Credentials Condition="'$(UserName)' == '' Or '$(Password)' == ''">Integrated Security=True</_Credentials>
+			<_Credentials Condition="'$(UserName)' != '' And '$(Password)' != ''">User ID=$(UserName);Password='$(Password)'</_Credentials>
+			<ConnectionString Condition="'$(ConnectionString)' == ''">Data Source=$(_Server);$(_Credentials);Pooling=False</ConnectionString>
+			<VSDBCMDPath Condition="'$(VSDBCMDPath)' == ''">%programfiles(x86)%\Microsoft Visual Studio 10.0\VSTSDB\Deploy\vsdbcmd.exe</VSDBCMDPath>
+			<_SqlDeploymentConfigFilePath Condition="'$(_SqlDeploymentConfigFilePath)' == '' And '$(Profile)' != ''">$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\config.sqldeployment</_SqlDeploymentConfigFilePath>
+			<_SqlDeploymentConfigFilePath Condition="'$(_SqlDeploymentConfigFilePath)' == ''">$(MSBuildProjectDirectory)\Deployment\config.sqldeployment</_SqlDeploymentConfigFilePath>
+			<_DeploymentConfigurationFilePropertySetter Condition="Exists('$(_SqlDeploymentConfigFilePath)')">/p:DeploymentConfigurationFile=&quot;$(_SqlDeploymentConfigFilePath)&quot;</_DeploymentConfigurationFilePropertySetter>
+			<_SqlCmdVarsConfigFilePath Condition="'$(_SqlCmdVarsConfigFilePath)' == '' And '$(Profile)' != ''">$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\config.sqlcmdvars</_SqlCmdVarsConfigFilePath>
+			<_SqlCmdVarsConfigFilePath Condition="'$(_SqlCmdVarsConfigFilePath)' == ''">$(MSBuildProjectDirectory)\Deployment\config.sqlcmdvars</_SqlCmdVarsConfigFilePath>
+			<_SqlCommandVariablesFilePropertySetter Condition="Exists('$(_SqlCmdVarsConfigFilePath)')">/p:SqlCommandVariablesFile=&quot;$(_SqlCmdVarsConfigFilePath)&quot;</_SqlCommandVariablesFilePropertySetter>
+		</PropertyGroup>
+
+		<Exec Command="&quot;$(VSDBCMDPath)&quot; ^
+			/a:Deploy ^
+			/dd:+ ^
+			/cs:&quot;$(ConnectionString)&quot; ^
+			/manifest:&quot;$(_ManifestFilePath)&quot; ^
+			$(_DeploymentConfigurationFilePropertySetter) ^
+			$(_SqlCommandVariablesFilePropertySetter)" />
+	</Target>
+
+	<Target Name="bat:remove">
+		<Error Condition="'$(TargetDatabase)' == 'master'"
+					 Text="'master' database cannot be deleted."/>
+		<PropertyGroup>
+			<SqlCmdLogOn Condition="'$(UserName)' != '' And '$(Password)' != ''">$(UserName)</SqlCmdLogOn>
+			<SqlCmdPassword Condition="'$(UserName)' != '' And '$(Password)' != ''">$(Password)</SqlCmdPassword>
+		</PropertyGroup>
+		<SqlCmd TaskAction="Execute"
+						Server="$(_Server)"
+						LogOn="$(SqlCmdLogOn)"
+						Password="$(SqlCmdPassword)"
+						CommandLineQuery="
+						alter database [$(TargetDatabase)] set single_user with rollback immediate;
+						drop database [$(TargetDatabase)];"/>
+	</Target>
+
+</Project>

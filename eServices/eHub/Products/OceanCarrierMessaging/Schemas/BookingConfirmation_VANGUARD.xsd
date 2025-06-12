@@ -1,0 +1,1040 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 rel. 2 sp1 (http://www.altova.com) by NACA (NACA - dba Vanguard Logistics Services) -->
+<!-- SHORTCUT:XST -->
+<!-- LONGNAME:XML Booking Request-->
+<!-- USED_BY: Vanguard internal use only-->
+<!-- REVISION: 03.00 - 06/01/2010 jpatstone -->
+<!-- Standardized all VLS schemas. -->
+<!-- REVISION: 03.01 - 07/13/2010 jpatstone -->
+<!-- Added tags required for CargoSmart (Parties, CargoDetails, HazardousPage/Contact/Phone). -->
+<!-- REVISION: 03.02 - 09/20/2010 jpatstone -->
+<!-- Added RequestType. -->
+<!-- REVISION: 03.03 - 12/07/2010 vmungara -->
+<!-- Added PdfURL -->
+<!-- REVISION: 03.03 - 04/19/2011 vmungara -->
+<!-- Added  tags in Sailing Details like port of loding port of discharge....-->
+<!-- Moved tags CFSOrigin and CFSDestination to sailing schedule .-->
+<!--Added tag Transport Type-->
+<!-- REVISION: 03.04 - 10/30/2012 tluu -->
+<!-- Changed mandatory tags to optional VesselName, Voyage....-->
+<!-- REVISION: 03.05 - 02/26/2013 tluu -->
+<!-- Added "WH" PartyType and CutOffDate....-->
+<!-- REVISION: 03.06 - 05-MAY-2015 tluu -->
+<!-- Added Contact, Phone, Email tags....-->
+<!-- REVISION: 03.06 - 19-MAY-2015 tluu -->
+<!-- Updated version to "03.06" mentioned in below tag....-->
+
+<xsd:schema xmlns="http://www.cargowise.com/Schemas/VANGUARD" 
+            xmlns:b="http://schemas.microsoft.com/BizTalk/2003" 
+            attributeFormDefault="unqualified" 
+            elementFormDefault="qualified" 
+            targetNamespace="http://www.cargowise.com/Schemas/VANGUARD" 
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            version="03.06">
+  <xsd:element name="BookingConfirmation">
+    <xsd:annotation>
+      <xsd:documentation>Confirmation of a Vanguard Booking.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="Envelope">
+          <xsd:annotation>
+            <xsd:documentation>Delivery details of the message.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="SenderID">
+                <xsd:annotation>
+                  <xsd:documentation>Code identifying who is sending the message.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="20"/>
+                    <xsd:minLength value="1"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="ReceiverID">
+                <xsd:annotation>
+                  <xsd:documentation>Code identifying who will receive the message.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="20"/>
+                    <xsd:minLength value="1"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="MessageType">
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="40"/>
+                    <xsd:minLength value="1"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="MessageVersion" type="VersionType">
+                <xsd:annotation>
+                  <xsd:documentation>Version number of the schema.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="EnvelopeID">
+                <xsd:annotation>
+                  <xsd:documentation>Unique identification number of the message.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="20"/>
+                    <xsd:minLength value="1"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="TransmissionDate" type="xsd:date">
+                <xsd:annotation>
+                  <xsd:documentation>Date the message was created. (YYYY-MM-DD)</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="TransmissionTime" type="xsd:time">
+                <xsd:annotation>
+                  <xsd:documentation>Time the message was created. (HH:MM:SS)</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="BookingDetails">
+          <xsd:annotation>
+            <xsd:documentation>Details of the Booking.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="BookingType">
+                <xsd:annotation>
+                  <xsd:documentation>"F"=FCL, "L"=LCL</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1"/>
+                    <xsd:maxLength value="1"/>
+                    <xsd:enumeration value="F"/>
+                    <xsd:enumeration value="L"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="BookingDate" type="xsd:date">
+                <xsd:annotation>
+                  <xsd:documentation>Date the Booking was created. (YYYY-MM-DD)</xsd:documentation>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element name="RequestType" minOccurs="0">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    "N"=New
+                    "U"=Update
+                    "V"=Vessel Update
+                    "C"=Cancellation
+                  </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="1"/>
+                    <xsd:enumeration value="N"/>
+                    <xsd:enumeration value="U"/>
+                    <xsd:enumeration value="C"/>
+                    <xsd:enumeration value="V"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="BookingNumber">
+                <xsd:annotation>
+                  <xsd:documentation>Vanguard Booking Number.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="20"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="CustomerControlCode" minOccurs="0">
+                <xsd:annotation>
+                  <xsd:documentation>Code indicating the Booking Office to use.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="20"/>
+                    <xsd:minLength value="1"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="CommunicationReference" minOccurs="0">
+                <xsd:annotation>
+                  <xsd:documentation>Customer internal reference number.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="20"/>
+                    <xsd:minLength value="1"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="CustomerReference" minOccurs="0">
+                <xsd:annotation>
+                  <xsd:documentation>Customer Reference Number.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="20"/>
+                    <xsd:minLength value="1"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="Contact" minOccurs="0">
+                <xsd:annotation>
+                  <xsd:documentation>VLS Contact Name.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="20"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="Phone" minOccurs="0">
+                <xsd:annotation>
+                  <xsd:documentation>VLS Contact Phone Number.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="20"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="Email" minOccurs="0">
+                <xsd:annotation>
+                  <xsd:documentation>VLS Contact Email Address.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="50"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="ShipperReference" minOccurs="0">
+                <xsd:annotation>
+                  <xsd:documentation>Shipper Reference Number.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="30"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="ForwarderReference" minOccurs="0">
+                <xsd:annotation>
+                  <xsd:documentation>Forwarder Reference Number.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="30"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="OtherReference" minOccurs="0">
+                <xsd:annotation>
+                  <xsd:documentation>Other Reference Number.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="30"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="PdfURL" minOccurs="0">
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="200"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="Remarks" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                  <xsd:documentation>External Comments.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:maxLength value="40"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="TransportType">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    1 = Port / Port
+                    2 = Point / Port
+                    3 = Port / Point
+                    4 = Point / Point
+                  </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1"/>
+                    <xsd:maxLength value="1"/>
+                    <xsd:enumeration value="1"/>
+                    <xsd:enumeration value="2"/>
+                    <xsd:enumeration value="3"/>
+                    <xsd:enumeration value="4"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="PickupFlag">
+                <xsd:annotation>
+                  <xsd:documentation>"Y"=VLS will pick up freight, "N"=VLS will not.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:minLength value="1"/>
+                    <xsd:maxLength value="1"/>
+                    <xsd:enumeration value="N"/>
+                    <xsd:enumeration value="Y"/>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element name="PickupDetails" minOccurs="0">
+                <xsd:annotation>
+                  <xsd:documentation>If PickupFlag="Y" then PickupDetails is mandatory.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexType>
+                  <xsd:sequence>
+                    <xsd:annotation>
+                      <xsd:documentation>Use the individual fields for address information. If your application instead supports a globbed address, use the CombinedCompanyNameandAddress field.</xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:element name="CombinedCompanyNameandAddress" minOccurs="0" maxOccurs="5">
+                      <xsd:annotation>
+                        <xsd:documentation>Combined Company Name and Address.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="35"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="CompanyName" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Pickup Company Name.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="64"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="Address" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Pickup Company Address.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="192"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="City" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Pickup Company City.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="64"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="PostalCode" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Pickup Company Postal/Zip Code.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="64"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="StateProvince" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Pickup Company State/Province.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="64"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="Country" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Pickup Company Country.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="64"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="Contact" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Pickup Company Contact Name.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="64"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="Phone" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Pickup Company Contact Phone Number.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="64"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="Email" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Pickup Company Contact Email Address.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="50"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="Date" type="xsd:date" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Date freight will be available for pickup. (YYYY-MM-DD)</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="Time" type="xsd:time" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Time freight will be available for pickup. (HH:MM:SS)</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="LoadingReference" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Pickup Remarkls.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="254"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                  </xsd:sequence>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element name="SailingDetails" minOccurs="0">
+                <xsd:annotation>
+                  <xsd:documentation>If BookingType="L" then SailingDetails is mandatory.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexType>
+                  <xsd:sequence>
+                    <xsd:element name="VesselVoyageID" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Vanguard's unique ID for Vessel/Voyage/Origin/Destination set.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="20"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="VesselName" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Vessel Name.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="30"/>
+                          <xsd:minLength value="0"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="IMONumber" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Lloyd's Registration Number.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="7"/>
+                          <xsd:minLength value="0"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="Voyage" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Voyage Number.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="10"/>
+                          <xsd:minLength value="0"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="CarrierSCAC" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Carrier's Standard Carrier Alpha Code.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="4"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="ETD" type="xsd:date" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Estimated Date of Departure. (YYY-MM-DD)</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="ETA" type="xsd:date" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Estimated Date of Arrival. (YYYY-MM-DD)</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="CutOffDate" type="xsd:date" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Place of Receipt Cut Off Date. (YYYY-MM-DD)</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="PlaceOfReceipt" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Place of Receipt UN Location Code.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="5"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="PlaceOfReceiptName" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Place of Receipt City Name.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="35"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="CFSOrigin">
+                      <xsd:annotation>
+                        <xsd:documentation>CFS Place of Origin UN Location Code.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="5"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="CFSOriginName" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>CFS Place of Origin City Name.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="35"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="PortOfLoading" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Port of Loading UN Location Code.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="5"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="PortOfLoadingName" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Port of Loading City Name.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="35"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="PortOfTransshipment" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Port of Transshipment UN Location Code.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="5"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="PortOfTransshipmentName" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Port of Transshipment City Name.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="35"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="PortOfDischarge" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Port of Discharge UN Location Code.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="5"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="PortOfDischargeName" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Port of Discharge City Name.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="35"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="CFSDestination">
+                      <xsd:annotation>
+                        <xsd:documentation>CFS Place of Destination UN Location Code.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="5"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="CFSDestinationName" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>CFS Place of Destination  City Name.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="35"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="PlaceOfDelivery" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Place of Delivery UN Location Code.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="5"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="PlaceOfDeliveryName" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Place of Delivery City Name.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="35"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                  </xsd:sequence>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element name="CargoDetails" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                  <xsd:documentation>If BookingType="L" then CargoDetails is mandatory.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexType>
+                  <xsd:sequence>
+                    <xsd:element name="ShippingMarks" minOccurs="0" maxOccurs="unbounded">
+                      <xsd:annotation>
+                        <xsd:documentation>Marks and Numbers.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="35"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="Pieces" type="xsd:integer">
+                      <xsd:annotation>
+                        <xsd:documentation>Number of Pieces.</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="Packaging">
+                      <xsd:annotation>
+                        <xsd:documentation>Package Type.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="20"/>
+                          <xsd:minLength value="0"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="Commodity" maxOccurs="unbounded">
+                      <xsd:annotation>
+                        <xsd:documentation>Description of Goods.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="35"/>
+                          <xsd:minLength value="1"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="Weight" type="xsd:float" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Commodity Weight.</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="Volume" type="xsd:float" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Commodity Volume.</xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="UOM" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>
+                          "E"=English
+                          "M"=Metric
+                        </xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:minLength value="1"/>
+                          <xsd:maxLength value="1"/>
+                          <xsd:enumeration value="M"/>
+                          <xsd:enumeration value="E"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="HazardousFlag">
+                      <xsd:annotation>
+                        <xsd:documentation>
+                          "Y"=Commodity is hazardous
+                          "N"=Commodity is not.
+                        </xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:minLength value="1"/>
+                          <xsd:maxLength value="1"/>
+                          <xsd:enumeration value="N"/>
+                          <xsd:enumeration value="Y"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="HazardousDetails" minOccurs="0" maxOccurs="unbounded">
+                      <xsd:annotation>
+                        <xsd:documentation>If HazardousFlag="Y" then HazadousDetails is mandatory.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:complexType>
+                        <xsd:sequence>
+                          <xsd:element name="HazardousClass">
+                            <xsd:annotation>
+                              <xsd:documentation>Hazardous Classification Number.</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:simpleType>
+                              <xsd:restriction base="xsd:string">
+                                <xsd:maxLength value="10"/>
+                                <xsd:minLength value="1"/>
+                              </xsd:restriction>
+                            </xsd:simpleType>
+                          </xsd:element>
+                          <xsd:element name="Flashpoint" minOccurs="0">
+                            <xsd:annotation>
+                              <xsd:documentation>Flashpoint Termperature.</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:simpleType>
+                              <xsd:restriction base="xsd:string">
+                                <xsd:maxLength value="10"/>
+                              </xsd:restriction>
+                            </xsd:simpleType>
+                          </xsd:element>
+                          <xsd:element name="FlashpointUOM" minOccurs="0">
+                            <xsd:annotation>
+                              <xsd:documentation>"F"=Fahrenheit, "C"=Centigrade.</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:simpleType>
+                              <xsd:restriction base="xsd:string">
+                                <xsd:maxLength value="1"/>
+                                <xsd:enumeration value="F"/>
+                                <xsd:enumeration value="C"/>
+                              </xsd:restriction>
+                            </xsd:simpleType>
+                          </xsd:element>
+                          <xsd:element name="ShippingName">
+                            <xsd:annotation>
+                              <xsd:documentation>Technical Name of Hazardous Goods.</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:simpleType>
+                              <xsd:restriction base="xsd:string">
+                                <xsd:maxLength value="50"/>
+                                <xsd:minLength value="1"/>
+                              </xsd:restriction>
+                            </xsd:simpleType>
+                          </xsd:element>
+                          <xsd:element name="UNNumber">
+                            <xsd:annotation>
+                              <xsd:documentation>UN Number of Hazardous Goods.</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:simpleType>
+                              <xsd:restriction base="xsd:string">
+                                <xsd:maxLength value="10"/>
+                                <xsd:minLength value="1"/>
+                              </xsd:restriction>
+                            </xsd:simpleType>
+                          </xsd:element>
+                          <xsd:element name="PackingGroup" minOccurs="0">
+                            <xsd:annotation>
+                              <xsd:documentation>Hazardous Packing Group Code.</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:simpleType>
+                              <xsd:restriction base="xsd:string">
+                                <xsd:maxLength value="3"/>
+                                <xsd:minLength value="0"/>
+                              </xsd:restriction>
+                            </xsd:simpleType>
+                          </xsd:element>
+                          <xsd:element name="HazardousPage" minOccurs="0">
+                            <xsd:simpleType>
+                              <xsd:restriction base="xsd:string">
+                                <xsd:maxLength value="12"/>
+                              </xsd:restriction>
+                            </xsd:simpleType>
+                          </xsd:element>
+                          <xsd:element name="HazardousContact" minOccurs="0">
+                            <xsd:annotation>
+                              <xsd:documentation>Hazardous Contact Name.</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:simpleType>
+                              <xsd:restriction base="xsd:string">
+                                <xsd:maxLength value="24"/>
+                              </xsd:restriction>
+                            </xsd:simpleType>
+                          </xsd:element>
+                          <xsd:element name="HazardousPhone" minOccurs="0">
+                            <xsd:annotation>
+                              <xsd:documentation>Hazardous Contact Phone Number.</xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:simpleType>
+                              <xsd:restriction base="xsd:string">
+                                <xsd:maxLength value="24"/>
+                              </xsd:restriction>
+                            </xsd:simpleType>
+                          </xsd:element>
+                        </xsd:sequence>
+                      </xsd:complexType>
+                    </xsd:element>
+                  </xsd:sequence>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element name="ContainerDetails" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                  <xsd:documentation>If BookingType="F" then ContainerDetails is mandatory.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexType>
+                  <xsd:sequence>
+                    <xsd:element name="ContainerNumber">
+                      <xsd:annotation>
+                        <xsd:documentation>Container Number including SCAC, number and check digit (eg. SUDU123456-7).</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:minLength value="1"/>
+                          <xsd:maxLength value="12"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                    <xsd:element name="ContainerType" minOccurs="0">
+                      <xsd:annotation>
+                        <xsd:documentation>Container Type Code.</xsd:documentation>
+                      </xsd:annotation>
+                      <xsd:simpleType>
+                        <xsd:restriction base="xsd:string">
+                          <xsd:maxLength value="6"/>
+                          <xsd:enumeration value="20G0"/>
+                          <xsd:enumeration value="20G1"/>
+                          <xsd:enumeration value="20H1"/>
+                          <xsd:enumeration value="20T0"/>
+                          <xsd:enumeration value="22B0"/>
+                          <xsd:enumeration value="22G0"/>
+                          <xsd:enumeration value="22G1"/>
+                          <xsd:enumeration value="22H2"/>
+                          <xsd:enumeration value="22P1"/>
+                          <xsd:enumeration value="22P2"/>
+                          <xsd:enumeration value="22P3"/>
+                          <xsd:enumeration value="22P5"/>
+                          <xsd:enumeration value="22R0"/>
+                          <xsd:enumeration value="22R1"/>
+                          <xsd:enumeration value="22T0"/>
+                          <xsd:enumeration value="22T5"/>
+                          <xsd:enumeration value="22U0"/>
+                          <xsd:enumeration value="22U1"/>
+                          <xsd:enumeration value="22V0"/>
+                          <xsd:enumeration value="25G0"/>
+                          <xsd:enumeration value="25R1"/>
+                          <xsd:enumeration value="26T0"/>
+                          <xsd:enumeration value="28P0"/>
+                          <xsd:enumeration value="28U1"/>
+                          <xsd:enumeration value="42B0"/>
+                          <xsd:enumeration value="42G0"/>
+                          <xsd:enumeration value="42G1"/>
+                          <xsd:enumeration value="42P1"/>
+                          <xsd:enumeration value="42P2"/>
+                          <xsd:enumeration value="42P3"/>
+                          <xsd:enumeration value="42P5"/>
+                          <xsd:enumeration value="42R0"/>
+                          <xsd:enumeration value="42R1"/>
+                          <xsd:enumeration value="42U1"/>
+                          <xsd:enumeration value="45G0"/>
+                          <xsd:enumeration value="45P8"/>
+                          <xsd:enumeration value="45R1"/>
+                          <xsd:enumeration value="48P0"/>
+                          <xsd:enumeration value="48U1"/>
+                          <xsd:enumeration value="L5G1"/>
+                        </xsd:restriction>
+                      </xsd:simpleType>
+                    </xsd:element>
+                  </xsd:sequence>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element ref="Parties" maxOccurs="unbounded"/>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:simpleType name="VersionType">
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="5"/>
+      <xsd:pattern value="\d{2}.\d{2}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:element name="Parties">
+    <xsd:annotation>
+      <xsd:documentation>Party Addresses.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="PartyType" nillable="false">
+          <xsd:annotation>
+            <xsd:documentation>
+              "SH" = Shipper
+              "CN" = Consignee
+              "N1" = Notify Party 1
+              "N2" = Notify Party 2
+              "FW" = Forwarder
+              "SU"=Supplier
+              "WH"= Warehouse/Receiving CFS
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:minLength value="2"/>
+              <xsd:maxLength value="2"/>
+              <xsd:enumeration value="SH"/>
+              <xsd:enumeration value="CN"/>
+              <xsd:enumeration value="N1"/>
+              <xsd:enumeration value="N2"/>
+              <xsd:enumeration value="FW"/>
+              <xsd:enumeration value="SU"/>
+              <xsd:enumeration value="WH"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element name="PartyID" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>Code identifying the Party.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:maxLength value="20"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element name="PartyName">
+          <xsd:annotation>
+            <xsd:documentation>Name of the Party.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:minLength value="1"/>
+              <xsd:maxLength value="35"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element name="Address" minOccurs="0" maxOccurs="unbounded">
+          <xsd:annotation>
+            <xsd:documentation>Free-form address (recurring, as needed).</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:minLength value="0"/>
+              <xsd:maxLength value="35"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element name="City" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>City Name.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:maxLength value="35"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element name="StateProvince" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>State or Province.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:maxLength value="35"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element name="PostalCode" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>Postal or Zip Code.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:maxLength value="35"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element name="Country" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>Country.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:maxLength value="35"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+        <xsd:element name="UNLocCode" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>UN Location Code.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:maxLength value="5"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

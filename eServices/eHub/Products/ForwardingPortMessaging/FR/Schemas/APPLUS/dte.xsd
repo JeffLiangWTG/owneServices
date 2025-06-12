@@ -1,0 +1,1975 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xs:schema elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://www.cargowise.com/Schemas/FPM/APPLUS/DTE"
+           xmlns:std="http://www.cargowise.com/Schemas/FPM/APPLUS"
+           targetNamespace="http://www.cargowise.com/Schemas/FPM/APPLUS/DTE">
+
+  <xs:import namespace="http://www.cargowise.com/Schemas/FPM/APPLUS" schemaLocation="patterns.xsd"/>
+
+  <xs:complexType name="typeselection_sesy_type">
+    <xs:attribute name="indselection-scanner" type="std:Booleen_type">
+      <xs:annotation>
+        <xs:documentation>Selection causee par scanner</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="indselection-depotage" type="std:Booleen_type">
+      <xs:annotation>
+        <xs:documentation>Selection causee par depotage</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="indselection-ouverture" type="std:Booleen_type">
+      <xs:annotation>
+        <xs:documentation>Selection causee par ouverture</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="indselection-controle" type="std:Booleen_type">
+      <xs:annotation>
+        <xs:documentation>Selection causee par controle</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="user_type">
+    <xs:attribute name="user" use="required">
+      <xs:annotation>
+        <xs:documentation>Code utilisateur du tiers profession du message.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tiersProf" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant tiers profession du message.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="email" type="xs:string" use="optional"/>
+    <xs:attribute name="adresse" type="xs:string" use="optional"/>
+    <xs:attribute name="reseau" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="notification_type">
+    <xs:choice>
+      <xs:element ref="deplacement"/>
+      <!-- ** xs:element ref="liste-lpc"/ -->
+      <!-- ** xs:element ref="lpe"/ -->
+    </xs:choice>
+    <xs:attribute name="id" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant fonctionnel du document envoyé ou imprimé.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" use="required">
+      <xs:annotation>
+        <xs:documentation>Type du document notifié ou imprimé (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0"/>
+          <xs:maxLength value="7"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="action" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code fonction du document (Codification SIC)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="CREATE|UPDATE|DELETE|ADD|ERASE|PRINT|UKN"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="statut" type="xs:string" use="optional"/>
+    <xs:attribute name="ref" type="xs:string" use="optional"/>
+    <xs:attribute name="aerien" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="request_type">
+    <xs:choice>
+      <xs:element name="demande-depl" type="demande_depl_type">
+        <xs:annotation>
+          <xs:documentation>Request d'une demande de déplacement</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="action" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code fonction du document (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="CREATE|UPDATE|DELETE|ADD|ERASE|UKN"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="id" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant fonctionnel du message utilisé pour effectuer le suivi de l intégration.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" use="required">
+      <xs:annotation>
+        <xs:documentation>Type du document à intégrer (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0"/>
+          <xs:maxLength value="7"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="statut" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:element name="Request" type="request_type">
+    <xs:annotation>
+      <xs:documentation>Request précise la nature du document à intégrer.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Notification" type="notification_type">
+    <xs:annotation>
+      <xs:documentation>Notification précise la nature du document à notifier ou imprimer</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Interchanges">
+    <xs:annotation>
+      <xs:documentation>Interchanges décrit le contexte de la transmission des données entre le SIC et le système partenaire.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="MessageSet" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant interchange</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="from" use="required">
+        <xs:annotation>
+          <xs:documentation>Nom du système émetteur</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="75"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="to" use="required">
+        <xs:annotation>
+          <xs:documentation>Nom du système destinataire</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="75"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="servername" type="xs:string" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MessageSet">
+    <xs:annotation>
+      <xs:documentation>MessageSet identifie le message et permet d'assurer le suivi des échanges.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Destinataire"/>
+        <xs:element ref="Emetteur"/>
+        <xs:element name="Messages" type="messages_type">
+          <xs:annotation>
+            <xs:documentation>Messages contient le document à integrer, à notifier, à imprimer ou à acquitter</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant du message</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="icid" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant interchange de rattachement du message</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="date" type="std:DateLongue_type" use="required">
+        <xs:annotation>
+          <xs:documentation>"31/12/2004 23:59:59" Date d'envoi du message.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Destinataire" type="user_type">
+    <xs:annotation>
+      <xs:documentation>Identification du tiers destinataire du message</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Emetteur" type="user_type">
+    <xs:annotation>
+      <xs:documentation>Identification de l'émetteur du message</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="deplacement" type="deplacement_type">
+    <xs:annotation>
+      <xs:documentation>Déplacement décrit une demande de déplacement de marchandise.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="reference_dec_type">
+    <xs:annotation>
+      <xs:documentation>Reférences à laquelle est rattachée la demande de déplacement.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="sic" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de la demande de déplacement.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ori" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Origine de la demande de déplacement (Utilisateur ou généré par le système comme par exemple le changement de booking).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="date" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date à laquelle la demnade de transfert a été validée.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="statut" use="optional">
+      <xs:annotation>
+        <xs:documentation>Statut de la demande de déplacement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="6"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="sens" use="optional">
+      <xs:annotation>
+        <xs:documentation>Sens de la demande pour le transfert Interzone.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" type="xs:string" use="optional"/>
+    <xs:attribute name="num" type="xs:integer" use="optional"/>
+    <xs:attribute name="ref" type="xs:string" use="optional"/>
+    <xs:attribute name="efr" type="xs:string" use="optional"/>
+    <xs:attribute name="update-douane-dso" use="optional">
+      <xs:annotation>
+        <xs:documentation>Permet de savoir si c'est un update sur une DSO qui est fait par la douane.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="num-doss" type="xs:string" use="optional"/>
+    <xs:attribute name="extdoc" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence BL</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="doc" use="optional">
+      <xs:annotation>
+        <xs:documentation>Id. AP+ BL</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="11"/>
+          <xs:maxLength value="11"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="refotc" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence OTC</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="voyage_dec_type">
+    <xs:annotation>
+      <xs:documentation>Voyage à laquelle est rattachée la demande de déplacement</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="atp" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'Annonce de Transport Physique à laquelle est rattachée la demande de déplacement.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="atm" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'Annonce de Transport Massifiée dans le cas de transit Interzone.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ref-voyage-atm" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence voyage de l'ATM</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ref-interne-atm" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence interne de l'ATM</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="reptrans" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du représentant du transporteur de l'Annonce de Transport Physique.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="date" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date de passage du voyage.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="nav" type="xs:string" use="optional"/>
+    <xs:attribute name="reptrans-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="terrestre" type="std:Booleen_type" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="tiers_dec_type">
+    <xs:annotation>
+      <xs:documentation>Tiers concernés par la demande de déplacement.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="dem" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du demandeur du déplacement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="afret" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'agent fret.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="hors" type="xs:string" use="optional"/>
+    <xs:attribute name="dem-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="rec" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="rec-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fac" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fac-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="trport" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="trport-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dec" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dec-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="lieu_dec_type">
+    <xs:annotation>
+      <xs:documentation>Lieu de réception concerné par la demande de déplacement.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="zone" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de la zone à laquelle appartient le lieu de livraison.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu" use="required">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du lieu de réception livraison.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="manut" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du manutentionnaire du lieu de réception livraison.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="md" type="xs:string" use="optional"/>
+    <xs:attribute name="zone-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="lieu-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="manut-lib" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="bureau_dec_type">
+    <xs:annotation>
+      <xs:documentation>Bureau de douane auquel est rattaché le lieu de réception livraison.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="pays" use="required">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du pays du bureau de douane.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="2"/>
+          <xs:maxLength value="2"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code" use="required">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du bureau de douane.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="num" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur numéro de garantie.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="6"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Type de garantie.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="garantie" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code garantie du demandeur de la demande de déplacement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bpc-lib" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="detail_dec_type">
+    <xs:annotation>
+      <xs:documentation>Détails spécifiques de la demande de transfert.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="code" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du motif de la demande de déplacement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="motif" use="optional">
+      <xs:annotation>
+        <xs:documentation>Motif littéral de la demande de déplacement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="horodatage" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date d'exécution de la demande de déplacement.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="horo-depart" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date de départ de la demande de déplacement.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="masse" type="std:Poids_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Masse Nette à 15°.</xs:documentation>
+      </xs:annotation>
+      <!--<xs:simpleType>
+                <xs:restriction base="xs:integer">
+                    <xs:minInclusive value="1"/>
+                    <xs:maxInclusive value="999999"/>
+                </xs:restriction>
+            </xs:simpleType>-->
+    </xs:attribute>
+    <xs:attribute name="vol" use="optional">
+      <xs:annotation>
+        <xs:documentation>Volume Total à 15°.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="1"/>
+          <xs:maxInclusive value="999999"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Type d'enlèvement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="10"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu" use="optional">
+      <xs:annotation>
+        <xs:documentation>Lieu prenant.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dest" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du destinataire de la demande.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dest-lib" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="autorisation_dec_type">
+    <xs:annotation>
+      <xs:documentation>Autorisation spécifique à laquelle est soumise la demande de déplacement.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="code" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur autorisation administrative préalable.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="date" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Horodatage réponse administrative.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="reponse" use="optional">
+      <xs:annotation>
+        <xs:documentation>Réponse administrative.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="6"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="acheminement_dec_type">
+    <xs:annotation>
+      <xs:documentation>Description des modalités de déplacement.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="sic" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du moyen de transport par lequel l'avis de mise à quai va être déplacé.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="id" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant du moyen de transport par lequel l'avis de mise à quai va être déplacé.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ref-voyage-atm" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence voyage de l'ATM</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ref-interne-atm" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence interne de l'ATM</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du transporteur qui va déplacer la marchandise.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="nom" use="optional">
+      <xs:annotation>
+        <xs:documentation>Nom du transporteur qui va déplacer la marchandise.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="ind-sous-traitance" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="couv-douaniere" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="lmarchandise_dec_type">
+    <xs:annotation>
+      <xs:documentation>Identification des marchandses oblet de la demande de déplacement.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="descriptionLM-dec" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="lmarchandiseDecl-dec" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="lmarchandiseDecl-desc-decl" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="description-desc-decl" type="xs:string" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="nomenclature" type="xs:string" use="optional"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="type" use="required">
+            <xs:annotation>
+              <xs:documentation>Type de la déclaration</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="6"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="type-lib" type="xs:string" use="optional">
+            <xs:annotation>
+              <xs:documentation>Libellé du type de la déclaration</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="num" use="required">
+            <xs:annotation>
+              <xs:documentation>Numéro de la déclaration</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="22"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="num-doss" type="xs:string" use="optional">
+            <xs:annotation>
+              <xs:documentation xml:lang="fr">Référence dossier de la déclaration</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="sic" use="required">
+            <xs:annotation>
+              <xs:documentation>Identifiant SIC de la déclaration.</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="11"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="rat" use="optional">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="17"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="ind-sycoscan" use="optional">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="1"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="dec" use="optional">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="9"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="dec-lib" use="optional">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="75"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="statut-douanier" use="optional">
+            <xs:annotation>
+              <xs:documentation>Statut douanier de la déclaration.</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="11"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="date" type="std:DateLongue_type" use="optional"/>
+          <xs:attribute name="nb" use="optional">
+            <xs:annotation>
+              <xs:documentation>Nombre d'unitÃ©s de conditionnement dÃ©clarÃ©s.</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:integer">
+                <xs:minInclusive value="0"/>
+                <xs:maxInclusive value="999999"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="poids" type="std:Poids_type" use="optional">
+            <xs:annotation>
+              <xs:documentation>Poids brut dÃ©clarÃ© exprimÃ© en kilogramme.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="bdd" use="optional">
+            <xs:annotation>
+              <xs:documentation>Identifiant SIC du bureau de douane auprès duquel la déclaration a été effectuée. </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="8"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="bdd-lib" use="optional">
+            <xs:annotation>
+              <xs:documentation>Identifiant SIC du bureau de douane auprès duquel la déclaration a été effectuée. </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="75"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="bde" use="optional">
+            <xs:annotation>
+              <xs:documentation>Bureau d'emisison. </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="8"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="bde-lib" use="optional">
+            <xs:annotation>
+              <xs:documentation>Bureau d'emisison. </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="75"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="bds" use="optional">
+            <xs:annotation>
+              <xs:documentation>Bureau de sortie </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="8"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="bds-lib" use="optional">
+            <xs:annotation>
+              <xs:documentation>Bureau de sortie </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="75"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <!-- FBL 20719 2017 03 07 -->
+      <xs:element name="sycoscan-dec" type="typeselection_sesy_type" minOccurs="0"/>
+      <!-- FBL 20719 2017 03 07 -->
+      <xs:element name="scelle-dec" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="num" type="xs:string" use="required"/>
+          <xs:attribute name="ori" type="xs:string" use="optional"/>
+          <xs:attribute name="ori-lib" type="xs:string" use="optional"/>
+          <xs:attribute name="type" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="restit-dec" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="commentaires" type="xs:string" minOccurs="0"/>
+          </xs:sequence>
+          <xs:attribute name="sic" type="xs:string" use="optional"/>
+          <xs:attribute name="sic-lib" type="xs:string" use="optional"/>
+          <xs:attribute name="loc" type="xs:string" use="optional"/>
+          <xs:attribute name="date" type="std:DateLongue_type" use="optional"/>
+          <xs:attribute name="delai" type="xs:integer" use="optional"/>
+          <xs:attribute name="date-fin-stationnement" type="std:DateComplete_type" use="optional"/>
+          <xs:attribute name="date-fin-branchement" type="std:DateComplete_type" use="optional"/>
+          <xs:attribute name="random-bad" use="optional">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:maxLength value="35"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="lmarchandise-contenue-dec" type="lmarchandise_contenue_dec_type" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Ligne marchandise contenue décrit la marchandise contenue dans l'equipement</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="constat-enlevement-dec" type="constat_enlevement_dec_type" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Constat enlèvement Import et export</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="oldsic" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>identifiant de l'ancien amq</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="sic" type="std:IdSic_type" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant sic de l'avis de mise à quai objet de la demande de déplacement.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ref" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence de la ligne marchandise (Identifiant pour l'équipement ou référence pour la marchandise conventionnelle).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dos" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du dossier dont dépend l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="cbk" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de la confirmation de booking dont dépend l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="doc" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du document principal dont dépend l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="docRef" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence externe du document principal.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="docMrn" use="optional">
+      <xs:annotation>
+        <xs:documentation>Mrn du document principal.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="21"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dadt" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de la déclaration de transfert.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Type de la déclaration DADT</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="6"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type-lib" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Libellé du type de la déclaration DADT</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="num" use="optional">
+      <xs:annotation>
+        <xs:documentation>Numéro de la déclaration DADT</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="22"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="statut" use="optional">
+      <xs:annotation>
+        <xs:documentation>Statut attribué à la déclaration affectée à l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="afret" type="xs:string" use="optional"/>
+    <xs:attribute name="afret-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="old-ref" type="xs:string" use="optional"/>
+    <xs:attribute name="cond" type="xs:string" use="optional"/>
+    <xs:attribute name="old-cond" type="xs:string" use="optional"/>
+    <xs:attribute name="nb" type="xs:integer" use="optional"/>
+    <xs:attribute name="old-nb" type="xs:integer" use="optional"/>
+    <xs:attribute name="poids" type="std:Poids_type" use="optional"/>
+    <xs:attribute name="old-poids" type="std:Poids_type" use="optional"/>
+    <xs:attribute name="type-modif" type="xs:string" use="optional"/>
+    <xs:attribute name="cond-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="old-cond-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="extdoc" type="xs:string" use="optional"/>
+    <xs:attribute name="extcbk" type="xs:string" use="optional"/>
+    <xs:attribute name="atp" type="xs:string" use="optional"/>
+    <xs:attribute name="nav" type="xs:string" use="optional"/>
+    <xs:attribute name="dpc" type="xs:string" use="optional"/>
+    <xs:attribute name="dpc-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="vide" type="std:Booleen_type" use="optional"/>
+    <xs:attribute name="terrestre" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur terrestre</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ind-sycoscan" type="xs:string" use="optional"/>
+    <xs:attribute name="date-pvaq" type="std:DateComplete_type" use="optional"/>
+    <xs:attribute name="armement" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code 1/3 profession de l'armement</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="armement-lib" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="lmarchandise_contenue_dec_type">
+    <xs:annotation>
+      <xs:documentation>Identification de la marchandise contenue</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="designation" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Désignation de la nature de la marchandise contenue</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="marques" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Marques et numéros de la ligne marchandise contenue</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string"/>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="sic" type="xs:string" use="optional"/>
+    <xs:attribute name="ref" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="nb" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="6"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="poids" type="std:Poids_type" use="optional"/>
+    <xs:attribute name="poidsnet" type="std:Poids_type" use="optional"/>
+    <xs:attribute name="code" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="7"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="constat_enlevement_dec_type">
+    <xs:annotation>
+      <xs:documentation>Constat enlèvement Import et export (PIFPEC)</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="sic" type="std:IdSic_type" use="optional"/>
+    <xs:attribute name="numero" type="xs:string" use="optional"/>
+    <xs:attribute name="date" type="std:DateLongue_type" use="optional"/>
+    <xs:attribute name="lastdate" type="std:DateLongue_type" use="optional"/>
+    <xs:attribute name="inter" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="deplacement_type">
+    <xs:annotation>
+      <xs:documentation>Type Racine pour la Notif</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="reference_dec">
+        <xs:annotation>
+          <xs:documentation>Références de la demande de déplacement.</xs:documentation>
+          <xs:documentation>Références de la demande de déplacement.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="reference_dec_type">
+              <xs:attribute name="decl-version" type="xs:string" use="optional"/>
+              <xs:attribute name="decl-num" type="xs:string" use="optional"/>
+              <xs:attribute name="post-entry" type="xs:string" use="optional"/>
+              <xs:attribute name="report-number" type="xs:string" use="optional"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="inval-dec" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="inval_dec_type">
+              <xs:sequence>
+                <xs:element name="inval-decl-dec" type="inval_decl_dec_type" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="voyage-dec" type="voyage_dec_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Voyage décrit les informations à laquelle la demande de déplacement est rattachée.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="tiers-dec" type="tiers_dec_type">
+        <xs:annotation>
+          <xs:documentation>Tiers décrit les tiers concernés par la demande de déplacement.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lieu-dec" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Lieu de réception livraison concerné par la demande de déplacement.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="lieu_dec_type">
+              <xs:sequence>
+                <xs:element name="bureau-dec" type="bureau_dec_type" minOccurs="0">
+                  <xs:annotation>
+                    <xs:documentation>Bureau précise le bureau de douane dont dépend le lieu de réception livraison.</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="lieu-maritime-cbk" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Lieu RL maritime des CBK des AMQs.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="zone" use="required">
+            <xs:annotation>
+              <xs:documentation>Identifiant SIC de la zone à laquelle appartient le lieu de livraison.</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="4"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="lieu" use="required">
+            <xs:annotation>
+              <xs:documentation>Codification SIC du lieu de réception livraison.</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="8"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="manut" use="required">
+            <xs:annotation>
+              <xs:documentation>Identifiant SIC du manutentionnaire du lieu de réception livraison.</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="9"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="zone-lib" type="xs:string" use="optional"/>
+          <xs:attribute name="lieu-lib" type="xs:string" use="optional"/>
+          <xs:attribute name="manut-lib" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="detail-dec" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Détail décrit les détails spécifiques à la demande de déplacement prévue d'être réalisée.  </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="detail_dec_type">
+              <xs:sequence>
+                <xs:element name="commentaires" type="xs:string" minOccurs="0">
+                  <xs:annotation>
+                    <xs:documentation>Commentaires des détails de la demande de déplacement.</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="autorisation-dec" type="autorisation_dec_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Autorisation précise si la demande de déplacement est soumise à autorisation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="acheminement-dec" type="acheminement_dec_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Acheminement décrit les modalités de déplacement de la marchandise.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lmarchandise-dec" type="lmarchandise_dec_type" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Ligne marchandise décrit les avis de mise à quai objets de la demande de déplacement.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="droits-dec" type="droits_dec_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Droits de port</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="destFinale-dec" type="destFinale_dec_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Destination finale dans le cas de TIZI ou DTFF</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="droits_dec_type">
+    <xs:annotation>
+      <xs:documentation>Indique le montant des droits de port</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="montant-total" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="0"/>
+          <xs:maxInclusive value="999999999"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="unite" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="port" type="xs:string" use="optional"/>
+    <xs:attribute name="port-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="tiers-a-facturer" type="xs:string" use="optional"/>
+    <xs:attribute name="tiers-lib" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="demande_depl_type">
+    <xs:annotation>
+      <xs:documentation>Type Racine pour la Request</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="reference-req" type="reference_req_type">
+        <xs:annotation>
+          <xs:documentation>Informations générales: demandeur, lieu prenant, lieu cédant, référence, statut, Motif (Sic ou libre) de la demande + commentaires + masse et volume à 15°</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lmarchandise-req" type="lmarchandise_req_type" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Infos de l'amq à déplacer</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="droits-req" type="droits_req_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Droits de port</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="autorisation-req" type="autorisation_req_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Autorisation services Vétérinaires ou Phytosanitaires (si besoin)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="acheminement-req" type="acheminement_req_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Info d'acheminement: transporteur (Sic ou libre), identifiant du moyen de transport et type de moyen de transport</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="interzone-req" type="interzone_req_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Infos spécifiques pour les demandes interzone: sens, horodatage de départ prévu, lieu RL de départ et destinataire</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="reference_req_type">
+    <xs:annotation>
+      <xs:documentation>Reférence à laquelle est rattachée la demande de déplacement.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="sic" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant sic de la demande de déplacement.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ref" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence demandeur</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="dem" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du demandeur du déplacement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="afret" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant sic de l'agent fret</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="atp" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>identifiant ATP</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="nav" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>nom du navire</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="statut" use="optional">
+      <xs:annotation>
+        <xs:documentation>Statut de la demande de déplacement. (PRO ou VAL)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="6"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu-c" use="optional">
+      <xs:annotation>
+        <xs:documentation>code lieu du Lieu RL cédant</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="zone-c" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code zone du lieu RL cédant</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu-p" use="optional">
+      <xs:annotation>
+        <xs:documentation>code lieu du lieu RL prenant</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="zone-p" use="optional">
+      <xs:annotation>
+        <xs:documentation>code zone du lieu RL prenant</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code-motif" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du motif de la demande de déplacement. (Sur 2 caractères, ex: DE, CV, PH, ST, TR, CD, CS, IZ, CB, EM, DO, AM, FU)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="2"/>
+          <xs:maxLength value="2"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="motif" use="optional">
+      <xs:annotation>
+        <xs:documentation>Motif littéral de la demande de déplacement. (Motif Libre en IHM)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="comm-motif" use="optional">
+      <xs:annotation>
+        <xs:documentation>Commentaire Motif en IHM</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0"/>
+          <xs:maxLength value="210"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="masse" type="std:Poids_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Masse Nette à 15°.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="vol" use="optional">
+      <xs:annotation>
+        <xs:documentation>Volume Total à 15°.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="1"/>
+          <xs:maxInclusive value="999999"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="decl-num" use="optional">
+      <xs:annotation>
+        <xs:documentation>Numero de déclaration</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="decl-version" use="optional">
+      <xs:annotation>
+        <xs:documentation>Version de la déclaration</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="6"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="date-decl" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Horodatage de la déclaration.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="type-enlev" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Type d'enlévement: T (temporaire) ou D (définitif)
+          [DSO uniquement]
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu-p-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Intitulé du lieu prenant [DSO uniquement]</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="autorisation_req_type">
+    <xs:annotation>
+      <xs:documentation>Autorisation spécifique à laquelle est soumise la demande de déplacement.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="code" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur autorisation administrative préalable.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="date" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Horodatage réponse administrative.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="reponse" use="optional">
+      <xs:annotation>
+        <xs:documentation>Réponse administrative.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="6"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="acheminement_req_type">
+    <xs:annotation>
+      <xs:documentation>Description des modalités de déplacement.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="sic" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du moyen de transport par lequel l'avis de mise à quai va être déplacé.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="id" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant du moyen de transport par lequel l'avis de mise à quai va être déplacé.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du transporteur qui va déplacer la marchandise.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="nom" use="optional">
+      <xs:annotation>
+        <xs:documentation>Nom du transporteur qui va déplacer la marchandise.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ind-sous-traintance" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur de l'autorisation de la sous-traitance.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="lmarchandise_req_type">
+    <xs:annotation>
+      <xs:documentation>Identification des marchandises objet de la demande de déplacement.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="sic" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant sic de l'avis de mise à quai objet de la demande de déplacement.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ref" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence de la ligne marchandise (Identifiant pour l'équipement ou référence pour la marchandise conventionnelle).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="typeum" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="2"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="cbk" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de la confirmation de booking dont dépend l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="doc" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du document principal dont dépend l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="afret" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant sic de l'agent fret</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="cond" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>code conditionnement</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="extdoc" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>référence BL</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="extcbk" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence CBK</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="atp" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>identifiant ATP</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="nav" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>nom du navire</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="vide" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>indicateur vide</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="terrestre" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur terrestre</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="droits_req_type">
+    <xs:annotation>
+      <xs:documentation>Indique le montant des droits de port</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="montant-total" use="optional">
+      <xs:annotation>
+        <xs:documentation>montant des droits de port</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="0"/>
+          <xs:maxInclusive value="999999999"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="unite" use="optional">
+      <xs:annotation>
+        <xs:documentation>devise des droits de port</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="port" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>port de facturation</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="tiers-a-facturer" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>tiers à facturer</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="interzone_req_type">
+    <xs:annotation>
+      <xs:documentation>Informations spécifiques aux transferts interzone.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="dest" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du destinataire de la demande.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="date-prev" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Horodatage de départ prévu.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="sens" use="optional">
+      <xs:annotation>
+        <xs:documentation>Sens de la demande pour le transfert Interzone.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu-dep" use="optional">
+      <xs:annotation>
+        <xs:documentation>lieu de départ prévu</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="zone-dep" use="optional">
+      <xs:annotation>
+        <xs:documentation>zone du lieu RL de départ prévu</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="comm-tizz" use="optional">
+      <xs:annotation>
+        <xs:documentation>commentaires du transfert interzone</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0"/>
+          <xs:maxLength value="560"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="destinataire" use="optional">
+      <xs:annotation>
+        <xs:documentation>nom du destinataire final</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dpt" use="optional">
+      <xs:annotation>
+        <xs:documentation>département du destinataire final</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ville" use="optional">
+      <xs:annotation>
+        <xs:documentation>ville du destinataire final</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="destFinale_dec_type">
+    <xs:attribute name="destinataire" use="optional">
+      <xs:annotation>
+        <xs:documentation>destinataire finale d'un conteneur</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dest" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC de la destination finale d'un conteneur</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="5"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dest-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Libelle de la destination finale d'un conteneur</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dep" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du departement de la destination finale d'un conteneur</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dep-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Libelle du departement de la destination finale d'un conteneur</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="inval_dec_type">
+    <xs:annotation>
+      <xs:documentation>Information spécifique à la demande d'invalidation DTIZ</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="transit" type="std:IdSic_type" use="optional"/>
+    <xs:attribute name="motif" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="inval_decl_dec_type">
+    <xs:attribute name="id" type="std:IdSic_type" use="optional"/>
+    <xs:attribute name="type" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="messages_type">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element ref="Request"/>
+      <xs:element ref="Notification"/>
+    </xs:choice>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,111 @@
+<SendPort Name="Core_InsertFinalisedOutboxMessage_ACAS" IsStatic="true" IsTwoWay="false" BindingOption="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Description xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  <TransmitPipeline Name="CargoWise.eHub.Core.Pipelines.Snd_FormatRequestForOutbox" FullyQualifiedName="CargoWise.eHub.Core.Pipelines.Snd_FormatRequestForOutbox, CargoWise.eHub.Core.Pipelines, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350" Type="2" TrackingOption="ServiceStartEnd MessageSendReceive PipelineEvents" Description="" />
+  <SendPipelineData>
+    <Root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <Stages>
+        <Stage CategoryId="9d0e4101-4cce-4536-83fa-4a5040674ad6">
+          <Components>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.StreamWrapperComponent">
+              <Properties />
+            </Component>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.MultipleTransformationComponent">
+              <Properties />
+            </Component>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.SingleTransfomationComponent">
+              <Properties />
+            </Component>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.MessageAssembleComponent">
+              <Properties>
+                <Enabled vt="11">-1</Enabled>
+              </Properties>
+            </Component>
+          </Components>
+        </Stage>
+        <Stage CategoryId="9d0e4108-4cce-4536-83fa-4a5040674ad6">
+          <Components>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.SingleTransfomationComponent">
+              <Properties>
+                <TargetSchema vt="8">CargoWise.eHub.Core.Schemas.dbo_InsertOutboxMessage, CargoWise.eHub.Core.Schemas, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350</TargetSchema>
+                <TransformationType vt="8">CargoWise.eHub.Core.Transforms.OutboxInsert2dbo_InsertOutboxMessage, CargoWise.eHub.Core.Transforms, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350</TransformationType>
+              </Properties>
+            </Component>
+          </Components>
+        </Stage>
+      </Stages>
+    </Root>
+  </SendPipelineData>
+  <PrimaryTransport>
+    <Address>mssql://ehubtransactions.db.wisegrid.net//eHubTransactions?</Address>
+    <TransportType Name="WCF-SQL" Capabilities="779" ConfigurationClsid="59b35d03-6a06-4734-a249-ef561254ecf7" />
+    <TransportTypeData>
+      <CustomProps>
+        <BindingType vt="8">sqlBinding</BindingType>
+        <BindingConfiguration vt="8">
+          <binding name="sqlBinding" sendTimeout="00:10:00" useAmbientTransaction="false" />
+        </BindingConfiguration>
+        <InboundBodyPathExpression vt="8" />
+        <OutboundBodyLocation vt="8">UseBodyElement</OutboundBodyLocation>
+        <AffiliateApplicationName vt="8" />
+        <StaticAction vt="8">
+          <BtsActionMapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Operation Name="InsertOutboxMessage" Action="TypedProcedure/dbo/InsertOutboxMessage" />
+</BtsActionMapping>
+        </StaticAction>
+        <ProxyUserName vt="8" />
+        <ProxyAddress vt="8" />
+        <UserName vt="8">eHubBizTalk</UserName>
+        <InboundBodyLocation vt="8">UseBodyElement</InboundBodyLocation>
+        <EndpointBehaviorConfiguration vt="8">
+          <behavior name="EndpointBehavior" />
+        </EndpointBehaviorConfiguration>
+        <OutboundXmlTemplate vt="8">
+          <bts-msg-body xmlns="http://www.microsoft.com/schemas/bts2007" encoding="xml" />
+        </OutboundXmlTemplate>
+        <PropagateFaultMessage vt="11">-1</PropagateFaultMessage>
+        <InboundNodeEncoding vt="8">Xml</InboundNodeEncoding>
+        <Password vt="1" />
+        <IsolationLevel vt="8">Serializable</IsolationLevel>
+        <UseSSO vt="11">0</UseSSO>
+        <EnableTransaction vt="11">0</EnableTransaction>
+      </CustomProps>
+    </TransportTypeData>
+    <RetryCount>30</RetryCount>
+    <RetryInterval>1</RetryInterval>
+    <ServiceWindowEnabled>false</ServiceWindowEnabled>
+    <FromTime>2019-01-03T13:00:00</FromTime>
+    <ToTime>2019-01-04T12:59:59</ToTime>
+    <Primary>true</Primary>
+    <OrderedDelivery>true</OrderedDelivery>
+    <DeliveryNotification>1</DeliveryNotification>
+    <SendHandler Name="OutboxSend" HostTrusted="false">
+      <TransportType Name="WCF-SQL" Capabilities="779" ConfigurationClsid="59b35d03-6a06-4734-a249-ef561254ecf7" />
+    </SendHandler>
+  </PrimaryTransport>
+  <SecondaryTransport>
+    <Address />
+    <RetryCount>3</RetryCount>
+    <RetryInterval>5</RetryInterval>
+    <ServiceWindowEnabled>false</ServiceWindowEnabled>
+    <FromTime>2019-01-03T13:00:00</FromTime>
+    <ToTime>2019-01-04T12:59:59</ToTime>
+    <Primary>false</Primary>
+    <OrderedDelivery>false</OrderedDelivery>
+    <DeliveryNotification>1</DeliveryNotification>
+    <SendHandler xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  </SecondaryTransport>
+  <ReceivePipelineData xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  <Tracking>0</Tracking>
+  <Filter>&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;Filter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;Group&gt;
+    &lt;Statement Property="CargoWise.eHub.Core.PropertySchemas.NextStep" Operator="0" Value="DeliverToOutboxACAS" /&gt;
+  &lt;/Group&gt;
+&lt;/Filter&gt;</Filter>
+  <Transforms />
+  <OrderedDelivery>true</OrderedDelivery>
+  <Priority>5</Priority>
+  <StopSendingOnFailure>false</StopSendingOnFailure>
+  <RouteFailedMessage>true</RouteFailedMessage>
+  <ApplicationName>CargoWise.eHub</ApplicationName>
+</SendPort>

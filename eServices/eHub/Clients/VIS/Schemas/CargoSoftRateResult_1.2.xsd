@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Mit XMLSpy v2013 sp1 (x64) (http://www.altova.com) von Uwe Droste (CargoSoft GmbH) bearbeitet -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+	<xs:annotation>
+		<xs:documentation>Dieses Dokument beschreibt die Struktur der
+			Raten-Daten die von SCM an TMS ueber EDI uebertragen werden. Diese
+			Daten werden primaer durch das RMS nach einer Abfrage aus dem SCM
+			generiert.
+			Von: Christian Kenfack Tenevo
+		</xs:documentation>
+	</xs:annotation>
+	<xs:element name="rateResult">
+		<xs:complexType>
+			<xs:annotation>
+				<xs:documentation>Dieser Datentyp beschreib der "Behaelter" des
+					gesamten Suchergebnisses. Generell koennen die Suchergebisse in
+					maximal 3 geoben Abschnitte unterteilt werden.
+					PRE (Steht fuer Vorlauf), MAIN (Steht fuer Hauptlauf) und POST (Steht
+					fuer Nachlauf). Und jeder Abschnitt wird durch den DatenTyp
+					RateResultLeg abgebildet.
+					In dieser Definition hat RateResult maximal 3 RateResultLeg
+				</xs:documentation>
+			</xs:annotation>
+			<xs:sequence>
+				<xs:element name="rateMode" minOccurs="1" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>
+							Beschreibt was fuer Rate im Suchergebniss
+							enthalten sind. Valide Werte sind selling, bying und stehen fuer Verkauf- und Einkaufraten
+						</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="selling"/>
+							<xs:enumeration value="buying"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="legs" type="rateResultLeg" nillable="true" minOccurs="1" maxOccurs="3">
+					<xs:annotation>
+						<xs:documentation>
+							Gibt an welche Legs bei der Suche gefunden
+							wurden. Maximal kann man fuer den Moment nur 3
+							finden.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="rateResultLeg">
+		<xs:annotation>
+			<xs:documentation>Dieser Datentyp beschriebt die Raten Informationen
+				fuer einen bestimmten Leg.
+				Das Attribut legType mit den moeglichen Werte (PRE, MAIN, POST) soll die
+				Information darueber liefert, um welches Leg es sich handelt.
+				Neben diese Leg-Information gibt es weitere Attribute die Informationen
+				ueber gefundene Grundraten, Surcharges und Sideletters liefern. die
+				Attribute haben den gleich Strukturellen Aufbau
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="legType">
+				<xs:annotation>
+					<xs:documentation>Gibt an um welches Leg es sich handelt (pre,
+						main, post)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:annotation>
+						<xs:documentation>Moegliche Werte fuer legType</xs:documentation>
+					</xs:annotation>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="main"/>
+						<xs:enumeration value="post"/>
+						<xs:enumeration value="pre"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="rateResults" type="rateResultInfo" nillable="true" minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Gibt an welche Grundraten (generall BASIS) fuer
+						dieses Leg bei der Suche gefunden wurden. Generell findet man
+						hoechsten nur eine BASIS pro Leg.
+						Es gibt aber Faelle, wo das RMS mehr als nur eine BASIS bei der
+						Suche zurueckgibt jenachdem wie gesucht wurde und nach Mode of
+						Transportation.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sidelleterResults" type="rateResultInfo" nillable="true" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Gibt an welche Sideletters (z.B Demurage,
+						Detention, Rent Time usw. ) fuer dieses Leg bei der Suche gefunden
+						wurden.
+						Fuer ein Leg kann man mehrere Sideletter haben
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="surchargeResults" type="rateResultInfo" nillable="true" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Gibt an welche Surcharges (z.B BAF, CAF usw. )
+						fuer dieses Leg bei der Suche gefunden wurden
+						Fuer ein Leg kann man mehrere Surcharges haben
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="rateResultInfo">
+		<xs:annotation>
+			<xs:documentation>Dieser DatenType beschreibt die einzelne
+				Informationen (Grunddaten und berechnete Daten anhand der
+				Suchparameter) uber die einzelne Rate/Surcharge oder Sideletter
+			</xs:documentation>
+		</xs:annotation>
+		<xs:all>
+			<xs:element name="amount" type="xs:double" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Grundpreis der Rate/Surcharge/Sideletter
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="amountSum" type="xs:double" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Berechnete Preis dieser
+						Rate/Surcharge/Sideletter anhand der
+						Suchparameter. z.B der Grundpreis (amount) war
+						1000 USD pro Container. und man hat bei der
+						Suche 2 Container angegeben dann ist amountSum 2
+						* 1000 = 2000 USD
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="billingCatType" type="xs:string" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Hier wird der RMS Code der Abrechnungsart dieser
+						Rate/Surcharge/Sideletter angegeben. Fuer die
+						Grundrate ist dieser Code generell BASIS. Fuer
+						die Surcharges und Sideletter koennte man z.B
+						CAF, BAF, THC, DEM usw. als Wert haben
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="calculationBase" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Hier wird angeben auf welche Grunlage diese der
+						Preis dieser Rate/Surcharge/Sideletter berechnet
+						wird. Valide Werte sind momentan (shipment,
+						container, teu, freightTon, kilogramme, ton,
+						unit, min, cbm, loadingMeter,
+						chargeablekilogramme)
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:annotation>
+						<xs:documentation>
+							Moegliche Werte fur calculationBase
+						</xs:documentation>
+					</xs:annotation>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="shipment"/>
+						<xs:enumeration value="container"/>
+						<xs:enumeration value="teu"/>
+						<xs:enumeration value="freightTon"/>
+						<xs:enumeration value="kilogramme"/>
+						<xs:enumeration value="ton"/>
+						<xs:enumeration value="unit"/>
+						<xs:enumeration value="min"/>
+						<xs:enumeration value="cbm"/>
+						<xs:enumeration value="loadingMeter"/>
+						<xs:enumeration value="chargeablekilogramme"/>
+						<xs:enumeration value="relative"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="carrierAddressCode" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Hier wird der TMS-Code der Carrier (Verkaeufer
+						der Rate/Surcharge/Sideletter) Adresse
+						uebermittelt.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="carrierName" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Hier wird der Name des Carrier (Verkaeufer der
+						Rate/Surcharge/Sideletter) uebermittelt
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="commodityCode" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Hier wird der Commodity-Code dieser
+						Rate/Surcharge/Sideletter uebermitellt (falls
+						vorhanden)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="conditions" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Hier werden zusaetzliche
+						Nebenbdingungen-Informationen die, ein Grossteil
+						der Definition der Rate/Surcharge/Sideletter
+						ausmachen koennen. z.B min/max Weight, min/max
+						Volume, min Rent-Time, DG-Allowed, min/max
+						Distance
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="contractNumber" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Hier wird der Contract Number uebermittelt aus
+						dem diese Rate/Surcharge/Sideletter kommt.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="currencyIsoCode" type="xs:string" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Hier wird der Currency Iso Code uebermittelt mit
+						dem die Rate definiert wurde
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="destinationCode" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Hier wird der UN/ISO/IATA/Region code der
+						Destination angegeben fuer die diese
+						Rate/Surcharge/Sideletter gueltig ist
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="equipmentTypeCode" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Hier wird der Equipment-Code (generel
+						Container/Pallet Code) fuer den diese
+						Rate/Surcharge/Sideletter gueltig ist
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="originCode" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Hier wird der UN/ISO/IATA/Region code der Origin
+						angegeben fuer die diese
+						Rate/Surcharge/Sideletter gueltig ist
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="quantity" type="xs:double" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Hier wird die Quantity angeben mit der amountSum
+						(also der gesamte Betrag) berechnet wurde
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ranking" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Angabe ueber Ranking diese Rate
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="remark" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Moegliche Anmerkungen die fuer diese
+						Rate/Surcharge/Sideletter gelten
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="serviceName" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Gibt an welche Service fuer diese Rate gueltig
+						ist
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="transitTimeInDays" type="xs:double" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Gibt die Transitzeit in Tage fuer diese Rate
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="transportMode" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Gibt den Mode of transportation dieser Rate an.
+						Valide Werte sind hier (sea, road, air, barge,
+						rail)
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:annotation>
+						<xs:documentation>moegliche Werte fuer transportMode
+						</xs:documentation>
+					</xs:annotation>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="sea"/>
+						<xs:enumeration value="road"/>
+						<xs:enumeration value="air"/>
+						<xs:enumeration value="barge"/>
+						<xs:enumeration value="rail"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="rateType" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Gibt den RatenTyp an. Valide Werte sind hier
+						rate, surcharge, sideletter
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:annotation>
+						<xs:documentation>moegliche Werte fuer rateType</xs:documentation>
+					</xs:annotation>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="rate"/>
+						<xs:enumeration value="surcharge"/>
+						<xs:enumeration value="sideletter"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="exchangeRate" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>exhange rate und die Währung</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:double">
+							<xs:attribute name="currency" type="xs:string"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+</xs:schema>

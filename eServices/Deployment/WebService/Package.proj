@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--EXTERNAL_PROPERTIES: PackageFileName;_PackageTempDir-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(MSBuildThisFileDirectory)\..\package-common.tasks</PackageCommonTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+
+  <PropertyGroup>
+    <AutoParameterizationWebConfigConnectionStrings>False</AutoParameterizationWebConfigConnectionStrings>
+    <PackageDependsOn>
+      $(PackageDependsOn);
+      AddReplaceRuleForAppPath;
+    </PackageDependsOn>
+  </PropertyGroup>
+
+  <Target Name="AddReplaceRuleForAppPath">
+    <PropertyGroup>
+      <_PackageTempDirFullPath>$([System.IO.Path]::GetFullPath($(_PackageTempDir)))</_PackageTempDirFullPath>
+    </PropertyGroup>
+
+    <!-- escape the text into a regex -->
+    <EscapeTextForRegularExpressions Text="$(_PackageTempDirFullPath)">
+      <Output TaskParameter="Result" PropertyName="_PackageTempDirFullPathRegex" />
+    </EscapeTextForRegularExpressions>
+
+    <ItemGroup>
+      <MsDeployReplaceRules Include="replaceFullPath">
+        <Match>$(_PackageTempDirFullPathRegex)</Match>
+        <Replace>$(MSBuildProjectName)</Replace>
+      </MsDeployReplaceRules>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="ProvideCustomIisSettings" Condition="'$(ProvideCustomIisSettings)' == 'true'">
+
+  </Target>
+
+  <ItemGroup>
+    <ExcludeFromPackageFiles Include="$(MSBuildProjectDirectory)\Deployment\**\*">
+      <FromTarget>Project</FromTarget>
+    </ExcludeFromPackageFiles>
+  </ItemGroup>
+
+  <Target Name="bat:package">
+    <CallTarget Targets="bat:package:init"/>
+
+    <ItemGroup>
+      <_MSDeployPackage Include="$(PackageFileName)"/>
+      <_DeploymentFiles Include="$(MSBuildProjectDirectory)\Deployment\**\*"/>
+      <_DeploymentProject Include="$(DeploymentProjectPath)" />
+      <_DeploymentProject Include="$(MSBuildThisFileDirectory)\..\CommonScripts\**\*" />
+      <_DeploymentProject Include="$(MSBuildCommonTasks)" />
+      <_DATIntegration Include="$(MSBuildThisFileDirectory)\..\..\DAT\Dat.Integration.dll" />
+    </ItemGroup>
+
+    <!-- Create MSDeploy package -->
+    <CallTarget Targets="Package"/>
+
+    <!-- Copy MSDeploy Package -->
+    <Copy SourceFiles="@(_MSDeployPackage)"
+          DestinationFiles="$(_ZipContentsDirectory)\package.zip" />
+
+    <!-- Copy Deployment files -->
+    <Copy SourceFiles="@(_DeploymentFiles)"
+          DestinationFolder="$(_ZipContentsDirectory)\Deployment\%(RecursiveDir)"/>
+    <XmlPoke XmlInputPath="$(_ZipContentsDirectory)\Deployment\Deployment.props"
+             Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/msbuild/2003' /&gt;"
+             Query="//x:Project/x:PropertyGroup/x:_ServicePackagePath"
+             Value="package.zip" />
+
+    <!-- Copy Deployment project -->
+    <Copy SourceFiles="@(_DeploymentProject)"
+          DestinationFolder="$(_ZipContentsDirectory)"/>
+
+    <!-- Copy DAT assemblies -->
+    <Copy SourceFiles="@(_DATIntegration)"
+          DestinationFolder="$(_ZipContentsDirectory)"/>
+
+    <!-- Create package -->
+    <CallTarget Targets="bat:package:zip"/>
+  </Target>
+
+</Project>

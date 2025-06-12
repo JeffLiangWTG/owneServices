@@ -1,0 +1,211 @@
+version: '3'
+
+services:
+  base:
+    image: localhost:5000/ocmpoc-base
+    build:
+      context: .
+      dockerfile: Dockerfile-Build
+
+  orchestrator:
+    image: localhost:5000/orchestrator
+    build:
+      context: .
+      dockerfile: Dockerfile-Common
+      args:
+        PROJECT: Components/Orchestrator/OcmPoc.Components.Orchestrator.csproj
+        EXECUTABLE: OcmPoc.Components.Orchestrator.dll
+    depends_on:
+      - base
+    env_file:
+      - rabbitmq.env
+    environment:
+      Queue__001: ocm.poc.receive>
+      Queue__002: ocm.poc.main>
+      Queue__003: ocm.poc.correlated>
+      Exchange__Recipient: headers:ocm.poc.xch.recipient:ocm.poc.unroutable
+      Provider__001: Provider-A
+      Provider__002: Provider-B
+      Provider__003: CW1
+
+  api:
+    image: localhost:5000/api
+    build:
+      context: .
+      dockerfile: Dockerfile-Api
+    depends_on:
+      - base
+      - orchestrator
+    env_file:
+      - rabbitmq.env
+      - mongodb.env
+      - kafka.dev.env
+      - sqlserver.env
+    environment:
+      RabbitMq__Queue__Output: ocm.poc.receive
+      RabbitMq__Queue__Input: ocm.poc.cw1.send
+    ports:
+      - 8080:80
+
+  eventProcessor:
+    image: localhost:5000/event-processor
+    build:
+      context: .
+      dockerfile: Dockerfile-Common
+      args:
+        PROJECT: Components/EventProcessor/OcmPoc.Components.EventProcessor.csproj
+        EXECUTABLE: OcmPoc.Components.EventProcessor.dll
+    depends_on:
+      - base
+    env_file:
+      - kafka.dev.env
+      - sqlserver.env
+
+  correlator:
+    image: localhost:5000/corellator
+    build:
+      context: .
+      dockerfile: Dockerfile-Common
+      args:
+        PROJECT: Components/Correlator/OcmPoc.Components.Correlator.csproj
+        EXECUTABLE: OcmPoc.Components.Correlator.dll
+    depends_on:
+      - base
+      - orchestrator
+    env_file:
+      - rabbitmq.env
+      - kafka.dev.env
+      - sqlserver.env
+    environment:
+      RabbitMq__Queue__Input: ocm.poc.main
+      RabbitMq__Queue__Output: ocm.poc.correlated
+      RabbitMq__PreFetch: 0
+
+  receiveScaler:
+    image: localhost:5000/paralleliser
+    build:
+      context: .
+      dockerfile: Dockerfile-Common
+      args:
+        PROJECT: Components/Paralleliser/OcmPoc.Components.Paralleliser.csproj
+        EXECUTABLE: OcmPoc.Components.Paralleliser.dll
+    depends_on:
+      - base
+      - orchestrator
+    env_file:
+      - rabbitmq.env
+    environment:
+      RabbitMq__Queue__Input: ocm.poc.receive
+      RabbitMq__Queue__InternalPrefix: ocm.poc.receive.internal
+      RabbitMq__Queue__Deadletter: ocm.poc.receive.dl
+      PartitionHeaders: Sender
+      RabbitMq__Output__Queue: ocm.poc.main
+      RabbitMq__PreFetch: 0
+
+  sendScaler:
+    image: localhost:5000/paralleliser
+    build:
+      context: .
+      dockerfile: Dockerfile-Common
+      args:
+        PROJECT: Components/Paralleliser/OcmPoc.Components.Paralleliser.csproj
+        EXECUTABLE: OcmPoc.Components.Paralleliser.dll
+    depends_on:
+      - base
+      - orchestrator
+    env_file:
+      - rabbitmq.env
+    environment:
+      RabbitMq__Queue__Input: ocm.poc.correlated
+      RabbitMq__Queue__InternalPrefix: ocm.poc.send.internal
+      RabbitMq__Queue__Deadletter: ocm.poc.main.dl
+      PartitionHeaders: Sender:Recipient
+      RabbitMq__Output__Exchange: ocm.poc.xch.recipient
+      RabbitMq__PreFetch: 0
+
+  receiveMapper:
+    image: localhost:5000/mapper
+    build:
+      context: .
+      dockerfile: Dockerfile-Common
+      args:
+        PROJECT: Mapping/Mapper/Mapper.csproj
+        EXECUTABLE: Mapper.dll
+    deploy:
+      replicas: 3
+    depends_on:
+      - receiveScaler
+    env_file:
+      - rabbitmq.env
+      - mongodb.env
+      - kafka.dev.env
+    environment:
+      RabbitMq__Queue__Input: ocm.poc.receive.internal.ip
+      RabbitMq__Queue__Output: ocm.poc.receive.internal.op
+      MappingMode: Receive
+
+  sendMapper:
+    image: localhost:5000/mapper
+    build:
+      context: .
+      dockerfile: Dockerfile-Common
+      args:
+        PROJECT: Mapping/Mapper/Mapper.csproj
+        EXECUTABLE: Mapper.dll
+    deploy:
+      replicas: 3
+    depends_on:
+      - sendScaler
+    env_file:
+      - rabbitmq.env
+      - mongodb.env
+      - kafka.dev.env
+    environment:
+      RabbitMq__Queue__Input: ocm.poc.send.internal.ip
+      RabbitMq__Queue__Output: ocm.poc.send.internal.op
+      MappingMode: Send
+
+  transceiverProviderA:
+    image: localhost:5000/ftp-transceiver
+    build:
+      context: .
+      dockerfile: Dockerfile-Common
+      args:
+        PROJECT: Transceivers/Ftp/OcmPoc.Transceivers.Ftp.csproj
+        EXECUTABLE: OcmPoc.Transceivers.Ftp.dll
+    depends_on:
+      - base
+      - orchestrator
+    env_file:
+      - rabbitmq.env
+      - kafka.dev.env
+      - mongodb.env
+      - sqlserver.env
+      - ftp.local.env
+    environment:
+      Provider__Name: Provider-A
+      Connection__Port: 2021
+      RabbitMq__PreFetch: 0
+
+  transceiverProviderB:
+    image: localhost:5000/ftp-transceiver
+    build:
+      context: .
+      dockerfile: Dockerfile-Common
+      args:
+        PROJECT: Transceivers/Ftp/OcmPoc.Transceivers.Ftp.csproj
+        EXECUTABLE: OcmPoc.Transceivers.Ftp.dll
+    depends_on:
+      - base
+      - orchestrator
+    env_file:
+      - rabbitmq.env
+      - kafka.dev.env
+      - mongodb.env
+      - sqlserver.env
+      - ftp.local.env
+    environment:
+      Provider__Name: Provider-B
+      Connection__Port: 2121
+      RabbitMq__PreFetch: 0
+      

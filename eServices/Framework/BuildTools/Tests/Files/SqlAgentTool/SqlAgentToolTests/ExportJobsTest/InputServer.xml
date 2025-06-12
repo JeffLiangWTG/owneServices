@@ -1,0 +1,78 @@
+﻿<SqlJobs><sysjob><name>AlertBlockedProcess</name><enabled>1</enabled><description>No description available.</description><start_step_id>1</start_step_id><notify_level_eventlog>0</notify_level_eventlog><notify_level_email>2</notify_level_email><category_name>[Uncategorized (Local)]</category_name><owner_login_name>sa</owner_login_name><notify_email_operator_name>eServices</notify_email_operator_name><sysjobstep><step_id>1</step_id><step_name>Send Alert</step_name><subsystem>TSQL</subsystem><command>SET ANSI_NULLS, QUOTED_IDENTIFIER ON;
+
+DECLARE @errorPK uniqueidentifier = NEWID();
+DECLARE @source varchar(3) = 'SQL';
+DECLARE @errorType varchar(3) = 'Fai';
+DECLARE @inboxPK varchar(36) = NULL;
+DECLARE @currentDateTimeUTC varchar(32) = convert(varchar(32), getutcdate(), 127);
+DECLARE @issueMessageDelimiter nvarchar(50) = '
+----------BIZTALK PROPERTIES----------
+';
+
+DECLARE @description nvarchar(max);
+DECLARE @textData nvarchar(max);
+DECLARE @graphXml xml;
+DECLARE @issueManagerKey nvarchar(max);
+DECLARE @clientAppName nvarchar(max);
+DECLARE @hostname nvarchar(max);
+
+SET @textData = REPLACE('$(ESCAPE_NONE(WMI(TextData)))', '&amp;#x0A;', CHAR(10));
+SET @graphXml = @textData
+
+DECLARE @databaseName nvarchar(1000) = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/@currentdbname)[1]', 'nvarchar(1000)');
+DECLARE @logMessage nvarchar(max) = 'Blocked Process in database [' + @databaseName + ']: ' + @textData;
+DECLARE @pos int = 1, @len int = 1000;
+WHILE @pos &lt;= LEN(@logMessage) BEGIN PRINT SUBSTRING(@logMessage, @pos, @len); SET @pos += @len; END
+IF @databaseName NOT IN ('BAMArchive','BAMPrimaryImport','BizTalkDTADb','BizTalkMgmtDb','BizTalkMsgBoxDb','SSISDB','SSODB')
+  RETURN;
+
+SELECT @issueManagerKey = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/inputbuf)[string-length()&gt;0][1]', 'nvarchar(max)');
+
+IF @issueManagerKey IS NULL
+BEGIN
+	SET @clientAppName = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/@clientapp)[1]', 'nvarchar(max)');
+	SET @hostname = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/@hostname)[1]', 'nvarchar(max)');
+	SET @issueManagerKey = CONCAT(@clientAppName, '-', @hostname);
+END
+
+IF @issueManagerKey = '-'
+BEGIN
+	SET @issueManagerKey = @graphXml.value('(/TextData/blocked-process-report/blocking-process/process/inputbuf)[string-length()&gt;0][1]', 'nvarchar(max)');
+END
+
+IF @issueManagerKey IS NULL
+BEGIN
+	SET @clientAppName = @graphXml.value('(/TextData/blocked-process-report/blocking-process/process/@clientapp)[1]', 'nvarchar(max)');
+	SET @hostname = @graphXml.value('(/TextData/blocked-process-report/blocking-process/process/@hostname)[1]', 'nvarchar(max)');
+	SET @issueManagerKey = CONCAT(@clientAppName, '-', @hostname);
+END
+
+SET @issueManagerKey = REPLACE(CONCAT('Blocked process: ', @issueManagerKey), CHAR(10), ' ')
+WHILE CHARINDEX('  ', @issueManagerKey) &gt; 0 SET @issueManagerKey = REPLACE(@issueManagerKey, '  ', ' ')
+SET @description = CONCAT(@issueManagerKey, @issueMessageDelimiter, 'SERVERNAME: $(ESCAPE_NONE(A-SVR))', CHAR(10), 'REPORT:', CHAR(10),  @textData);
+
+EXECUTE [eHubTransactionsServer].[eHubTransactions].[dbo].[InsertError] 
+	 @ErrorPK = @errorPK
+	,@Source = @source
+	,@ErrorType = @errorType
+	,@Description = @description
+	,@InboxPK = @inboxPK
+	,@CurrentDateTimeUTC = @currentDateTimeUTC;
+
+PRINT 'Sent to issue manager.'</command><flags>4</flags><cmdexec_success_code>0</cmdexec_success_code><on_success_action>1</on_success_action><on_success_step_id>0</on_success_step_id><on_fail_action>2</on_fail_action><on_fail_step_id>0</on_fail_step_id><database_name>msdb</database_name><retry_attempts>0</retry_attempts><retry_interval>0</retry_interval><os_run_priority>0</os_run_priority></sysjobstep><sysalert><id>1</id><name>BlockedProcess</name><event_source>MSSQLSERVER</event_source><event_id>8</event_id><message_id>0</message_id><severity>0</severity><enabled>1</enabled><delay_between_responses>0</delay_between_responses><include_event_description>1</include_event_description><database_name>\\.\root\Microsoft\SqlServer\ServerEvents\INSTANCE1</database_name><has_notification>0</has_notification><flags>0</flags><performance_condition>SELECT * FROM BLOCKED_PROCESS_REPORT</performance_condition><category_id>98</category_id></sysalert></sysjob><sysjob><name>Backup BizTalk Server (BizTalkMgmtDb)</name><enabled>1</enabled><description>This job performs full database backups (step 1) and log backups (step 2) of BizTalk Server databases.</description><start_step_id>1</start_step_id><notify_level_eventlog>2</notify_level_eventlog><notify_level_email>0</notify_level_email><category_name>Database Maintenance</category_name><owner_login_name>CORP\Meng.Xue</owner_login_name><sysjobstep><step_id>1</step_id><step_name>Backup Bindings</step_name><subsystem>PowerShell</subsystem><command>$bkpDir = "c:\BizTalk\Backups\{0:yyyyMMdd}\" -f (get-date)
+if (Test-Path $bkpDir) { del $bkpDir\*.* -Force }
+md $bkpDir
+cd $bkpDir
+
+&amp;BTSTask.exe ExportBindings -Server:localhost -Database:BizTalkMgmtDb -ApplicationName:CargoWise.eHub -Destination:("CargoWise.eHub.BindingInfo.xml") -GlobalParties
+
+del ($env:TEMP + "\tmp*.cab")
+</command><flags>0</flags><cmdexec_success_code>0</cmdexec_success_code><on_success_action>3</on_success_action><on_success_step_id>0</on_success_step_id><on_fail_action>2</on_fail_action><on_fail_step_id>0</on_fail_step_id><database_name>master</database_name><retry_attempts>0</retry_attempts><retry_interval>0</retry_interval><os_run_priority>0</os_run_priority></sysjobstep><sysjobstep><step_id>2</step_id><step_name>Set Compression Option</step_name><subsystem>TSQL</subsystem><command>exec [dbo].[sp_SetBackupCompression] @bCompression = 0 /*0 - Do not use Compression, 1 - Use Compression */</command><flags>0</flags><cmdexec_success_code>0</cmdexec_success_code><on_success_action>3</on_success_action><on_success_step_id>0</on_success_step_id><on_fail_action>3</on_fail_action><on_fail_step_id>0</on_fail_step_id><database_name>BizTalkMgmtDb</database_name><retry_attempts>0</retry_attempts><retry_interval>1</retry_interval><os_run_priority>0</os_run_priority></sysjobstep><sysjobstep><step_id>3</step_id><step_name>BackupFull</step_name><subsystem>TSQL</subsystem><command>declare @path nvarchar(250) = 'C:\BizTalk\Backups\' + CONVERT(char(8), GETDATE(), 112)
+
+exec [dbo].[sp_ForceFullBackup]
+
+exec [dbo].[sp_BackupAllFull_Schedule] 
+'d' /* Frequency */, 
+'BTS' /* Name */, 
+@path /* location of backup files */</command><flags>0</flags><cmdexec_success_code>0</cmdexec_success_code><on_success_action>3</on_success_action><on_success_step_id>0</on_success_step_id><on_fail_action>2</on_fail_action><on_fail_step_id>0</on_fail_step_id><database_name>BizTalkMgmtDb</database_name><retry_attempts>0</retry_attempts><retry_interval>1</retry_interval><os_run_priority>0</os_run_priority></sysjobstep><sysjobstep><step_id>4</step_id><step_name>MarkAndBackupLog</step_name><subsystem>TSQL</subsystem><command>-- exec [dbo].[sp_MarkAll] 'BTS' /*  Log mark name */, '&lt;destination path&gt;' /* location of backup files */</command><flags>0</flags><cmdexec_success_code>0</cmdexec_success_code><on_success_action>3</on_success_action><on_success_step_id>0</on_success_step_id><on_fail_action>2</on_fail_action><on_fail_step_id>0</on_fail_step_id><database_name>BizTalkMgmtDb</database_name><retry_attempts>0</retry_attempts><retry_interval>1</retry_interval><os_run_priority>0</os_run_priority></sysjobstep><sysjobstep><step_id>5</step_id><step_name>Clear Backup History</step_name><subsystem>TSQL</subsystem><command>exec [dbo].[sp_DeleteBackupHistoryAndMarkLogsHistory] @DaysToKeep=14</command><flags>4</flags><cmdexec_success_code>0</cmdexec_success_code><on_success_action>3</on_success_action><on_success_step_id>0</on_success_step_id><on_fail_action>2</on_fail_action><on_fail_step_id>0</on_fail_step_id><database_name>BizTalkMgmtDb</database_name><retry_attempts>0</retry_attempts><retry_interval>1</retry_interval><os_run_priority>0</os_run_priority></sysjobstep><sysjobstep><step_id>6</step_id><step_name>Delete Old Backups</step_name><subsystem>PowerShell</subsystem><command>dir "C:\BizTalk\Backups" | where PSIsContainer | sort -descending | select -skip 7 | del -recurse
+</command><flags>0</flags><cmdexec_success_code>0</cmdexec_success_code><on_success_action>1</on_success_action><on_success_step_id>0</on_success_step_id><on_fail_action>2</on_fail_action><on_fail_step_id>0</on_fail_step_id><database_name>master</database_name><retry_attempts>0</retry_attempts><retry_interval>0</retry_interval><os_run_priority>0</os_run_priority></sysjobstep><sysjobschedule><name>MarkAndBackupLogSched</name><enabled>1</enabled><freq_type>4</freq_type><freq_interval>1</freq_interval><freq_subday_type>1</freq_subday_type><freq_subday_interval>15</freq_subday_interval><freq_relative_interval>0</freq_relative_interval><freq_recurrence_factor>0</freq_recurrence_factor><active_start_date>20031110</active_start_date><active_end_date>99991231</active_end_date><active_start_time>60000</active_start_time><active_end_time>235959</active_end_time><owner_login_name>CORP\Meng.Xue</owner_login_name></sysjobschedule></sysjob></SqlJobs>

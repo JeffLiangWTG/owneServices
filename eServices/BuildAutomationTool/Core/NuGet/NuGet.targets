@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(MSBuildExtensionsPath)\ExtensionPack\4.0</MSBuildExtensionsPackPath>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <_PackageSource Condition="$(_PackageSource) == ''">C:\Temp\NuGet</_PackageSource>
+    <_NugetExeFullPath Condition="$(_NugetExeFullPath) == ''">$(MSBuildProjectDirectory)\NuGet\NuGet.exe</_NugetExeFullPath>
+    <_PackageID Condition="$(_PackageID) == ''">$(MSBuildProjectName)</_PackageID>
+    <_PackageVersion Condition="$(_PackageVersion) == ''">1.0.0.0</_PackageVersion>
+    <_NuspecFullPath Condition="$(_NuspecFullPath) == ''">$(OutputPath)$(_PackageID).nuspec</_NuspecFullPath>
+    <_PackageFullPath Condition="$(_PackageFullPath) == ''">$(OutputPath)$(_PackageID).$(_PackageVersion).nupkg</_PackageFullPath>
+    <_PackagesConfigFullPath Condition="$(_PackagesConfigFullPath) == ''">$(MSBuildProjectDirectory)\packages.config</_PackagesConfigFullPath>
+  </PropertyGroup>
+
+
+  <Target Name="bat-nuget-pack">
+    <Exec Command="$(_NugetExeFullPath) pack $(_NuspecFullPath) -OutputDirectory $(OutputPath) -Exclude *.dll -Exclude *.pdb -NoPackageAnalysis -Version $(_PackageVersion)" />
+  </Target>
+  <Target Name="bat-nuget-push">
+    <Error Condition="!Exists('$(_PackageFullPath)')" Text="Couldn't locate package at: $(_PackageFullPath)" />
+    <Exec Command="$(_NugetExeFullPath) push $(_PackageFullPath) -Source $(_PackageSource)" />
+  </Target>
+
+</Project>

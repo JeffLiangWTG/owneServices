@@ -1,0 +1,88 @@
+﻿#if __DESIGNER_DATA
+#error Do not define __DESIGNER_DATA.
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<om:MetaModel MajorVersion="1" MinorVersion="3" Core="2b131234-7959-458d-834f-2dc0769ce683" ScheduleModel="66366196-361d-448d-976f-cab5e87496d2" xmlns:om="http://schemas.microsoft.com/BizTalk/2003/DesignerData">
+    <om:Element Type="Module" OID="2abbc2b6-1f2e-4463-9fdb-a132d970627b" LowerBound="1.1" HigherBound="17.1">
+        <om:Property Name="ReportToAnalyst" Value="True" />
+        <om:Property Name="Name" Value="CargoWise.eHub.Core.Orchestrations.Mutex" />
+        <om:Property Name="Signal" Value="False" />
+        <om:Element Type="ServiceDeclaration" OID="29fd8b4c-6b71-4010-93f1-67e3634a0890" ParentLink="Module_ServiceDeclaration" LowerBound="4.1" HigherBound="16.1">
+            <om:Property Name="InitializedTransactionType" Value="False" />
+            <om:Property Name="IsInvokable" Value="True" />
+            <om:Property Name="TypeModifier" Value="Internal" />
+            <om:Property Name="ReportToAnalyst" Value="True" />
+            <om:Property Name="Name" Value="MutexRequestResend" />
+            <om:Property Name="Signal" Value="True" />
+            <om:Element Type="CorrelationDeclaration" OID="8074ac09-6a65-4832-99b2-ffbc0d7058c9" ParentLink="ServiceDeclaration_CorrelationDeclaration" LowerBound="9.1" HigherBound="10.1">
+                <om:Property Name="Type" Value="CargoWise.eHub.Core.Orchestrations.Mutex.RequestCorrelationType" />
+                <om:Property Name="ParamDirection" Value="In" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="RequestCorrelation" />
+                <om:Property Name="Signal" Value="True" />
+                <om:Element Type="StatementRef" OID="e6341b56-b362-4dc1-a35a-ff151d8cf71b" ParentLink="CorrelationDeclaration_StatementRef" LowerBound="13.66" HigherBound="13.95">
+                    <om:Property Name="Initializes" Value="True" />
+                    <om:Property Name="Ref" Value="20b9d4bd-62ac-452c-84c6-f48d3aef0f2c" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="StatementRef_1" />
+                    <om:Property Name="Signal" Value="False" />
+                </om:Element>
+            </om:Element>
+            <om:Element Type="ServiceBody" OID="09a91df4-d985-4d2d-86d5-ca96df2457ba" ParentLink="ServiceDeclaration_ServiceBody">
+                <om:Property Name="Signal" Value="False" />
+                <om:Element Type="MessageDeclaration" OID="d12928d1-e02d-4739-a0bc-863fa7f14121" ParentLink="ServiceBody_Declaration" LowerBound="10.15" HigherBound="10.51">
+                    <om:Property Name="Type" Value="CargoWise.eHub.Core.Orchestrations.Mutex.MutexMessage" />
+                    <om:Property Name="ParamDirection" Value="In" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="MutexRequestMsg" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+                <om:Element Type="Send" OID="20b9d4bd-62ac-452c-84c6-f48d3aef0f2c" ParentLink="ServiceBody_Statement" LowerBound="12.1" HigherBound="14.1">
+                    <om:Property Name="PortName" Value="MutexResendRequest" />
+                    <om:Property Name="MessageName" Value="MutexRequestMsg" />
+                    <om:Property Name="OperationName" Value="Operation" />
+                    <om:Property Name="OperationMessageName" Value="Request" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="Resend Request" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+            </om:Element>
+            <om:Element Type="PortDeclaration" OID="ecb78521-a570-47f5-ab49-ca42f90dcd47" ParentLink="ServiceDeclaration_PortDeclaration" LowerBound="7.1" HigherBound="9.1">
+                <om:Property Name="PortModifier" Value="Uses" />
+                <om:Property Name="Orientation" Value="Right" />
+                <om:Property Name="PortIndex" Value="-1" />
+                <om:Property Name="IsWebPort" Value="False" />
+                <om:Property Name="OrderedDelivery" Value="False" />
+                <om:Property Name="DeliveryNotification" Value="None" />
+                <om:Property Name="Type" Value="CargoWise.eHub.Core.Orchestrations.Mutex.MutexRequestPort" />
+                <om:Property Name="ParamDirection" Value="In" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="MutexResendRequest" />
+                <om:Property Name="Signal" Value="False" />
+                <om:Element Type="DirectBindingAttribute" OID="5856f284-2f4e-4dc6-8267-dfa17d2daf55" ParentLink="PortDeclaration_CLRAttribute" LowerBound="7.1" HigherBound="8.1">
+                    <om:Property Name="PartnerPort" Value="MutexRequest" />
+                    <om:Property Name="PartnerService" Value="CargoWise.eHub.Core.Orchestrations.Mutex.MutexController" />
+                    <om:Property Name="DirectBindingType" Value="PartnerPort" />
+                    <om:Property Name="Signal" Value="False" />
+                </om:Element>
+            </om:Element>
+        </om:Element>
+    </om:Element>
+</om:MetaModel>
+#endif // __DESIGNER_DATA
+[Microsoft.XLANGs.BaseTypes.BPELExportable(false)]
+module CargoWise.eHub.Core.Orchestrations.Mutex
+{
+    [Microsoft.XLANGs.BaseTypes.BPELExportable(false)]
+    internal service MutexRequestResend
+    {
+        [Microsoft.XLANGs.BaseTypes.DirectBinding(typeof(CargoWise.eHub.Core.Orchestrations.Mutex.MutexController), "MutexRequest")]
+        port uses MutexRequestPort MutexResendRequest;
+        correlation RequestCorrelationType RequestCorrelation;
+        body (message MutexMessage MutexRequestMsg)
+        {
+            [Microsoft.XLANGs.BaseTypes.DesignerPosition("20b9d4bd-62ac-452c-84c6-f48d3aef0f2c")]
+            send (MutexResendRequest.Operation, MutexRequestMsg, initialize RequestCorrelation);
+        }
+    }
+}
+

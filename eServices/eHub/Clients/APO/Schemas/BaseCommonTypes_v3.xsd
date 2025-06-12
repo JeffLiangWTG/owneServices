@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--History-->
+<xs:schema xmlns="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<xs:complexType name="InterfaceHeader">
+		<xs:annotation>
+			<xs:documentation>Australia Post common interface header definition</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="InterfaceName">
+				<xs:annotation>
+					<xs:documentation>Mandatory unique name for interface being invoked</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="InterfaceVersion" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Mandatory version number of interface being invoked</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MessageType">
+				<xs:annotation>
+					<xs:documentation>Message interraction type (Request, Reply, Notification)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Request"/>
+						<xs:enumeration value="Reply"/>
+						<xs:enumeration value="Notification"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BusinessReferenceID">
+				<xs:annotation>
+					<xs:documentation>Mandatory business key identifying the interface payload</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SourceSystemID">
+				<xs:annotation>
+					<xs:documentation>Mandatory identifier of the system invoking the interface</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SourceInformation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Optional value identifying the source system user/process responsible for invoking the interface</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Timestamp" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Date/Time interface is invoked</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Exception">
+		<xs:sequence>
+			<xs:element name="ExceptionCategory">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+						<xs:enumeration value="Security"/>
+						<xs:enumeration value="DataTransformation"/>
+						<xs:enumeration value="Transaction"/>
+						<xs:enumeration value="Timeout"/>
+						<xs:enumeration value="Lookup"/>
+						<xs:enumeration value="Transport"/>
+						<xs:enumeration value="Duplicate"/>
+						<xs:enumeration value="Validation"/>
+						<xs:enumeration value="FileHandling"/>
+						<xs:enumeration value="ExternalException"/>
+						<xs:enumeration value="SystemException"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ExceptionType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+						<xs:enumeration value="SystemRetryable"/>
+						<xs:enumeration value="SystemTerminal"/>
+						<xs:enumeration value="Business"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ExceptionCode">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ExceptionDescription" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ExceptionOtherData" type="xs:anyType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="InterfaceHeader" type="InterfaceHeader">
+		<xs:annotation>
+			<xs:documentation>Element for Australia Post common interface header</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="SOAPException">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="InterfaceHeader"/>
+				<xs:element ref="Exception"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Exception" type="Exception"/>
+</xs:schema>

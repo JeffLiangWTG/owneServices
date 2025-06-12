@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <SqlCmdHelpersImported>True</SqlCmdHelpersImported>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+
+  <Target Name="bat:sql:get_files" Returns="@(LogicalNames)">
+    <Error Text="Please provide a path to the database backup file to restore the database from" Condition="'$(FromDisk)'==''" />
+    <Error Text="The path of database backup file '$(FromDisk)' cannot be found" Condition="!Exists('$(FromDisk)')" />
+
+    <PropertyGroup>
+      <OutputFile>$([System.IO.Path]::GetTempFileName())</OutputFile>
+      <Sql>
+<![CDATA[
+IF OBJECT_ID('tempdb.dbo.#FileListHeaders') IS NOT NULL
+BEGIN
+  DROP TABLE #FileListHeaders
+END
+GO
+
+CREATE TABLE #FileListHeaders (
+   LogicalName nvarchar(128)
+  ,PhysicalName nvarchar(260)
+  ,[Type] char(1)
+  ,FileGroupName nvarchar(128) NULL
+  ,Size numeric(20,0)
+  ,MaxSize numeric(20,0)
+  ,FileID bigint
+  ,CreateLSN  numeric(25,0)
+  ,DropLSN numeric(25,0) NULL
+  ,UniqueID uniqueidentifier
+  ,ReadOnlyLSN numeric(25,0) NULL
+  ,ReadWriteLSN numeric(25,0) NULL
+  ,BackupSizeInBytes bigint
+  ,SourceBlockSize int
+  ,FileGroupID int
+  ,LogGroupGUID uniqueidentifier NULL
+  ,DifferentialBaseLSN numeric(25,0) NULL
+  ,DifferentialBaseGUID uniqueidentifier NULL
+  ,IsReadOnly bit
+  ,IsPresent bit
+)
+
+IF cast(cast(SERVERPROPERTY('ProductVersion') as char(4)) as float) > 9 -- Greater than SQL 2005
+BEGIN
+  ALTER TABLE #FileListHeaders ADD TDEThumbprint varbinary(32) NULL
+END
+
+IF cast(cast(SERVERPROPERTY('ProductVersion') as char(2)) as float) > 12 -- Greater than 2014
+BEGIN
+  ALTER TABLE #FileListHeaders ADD SnapshotURL nvarchar(360) NULL
+END
+GO
+
+DECLARE @Path varchar(1000)='$(FromDisk)'
+INSERT INTO #FileListHeaders
+  EXEC('
+    RESTORE FILELISTONLY FROM DISK=''' + @Path + '''
+')
+
+SET NOCOUNT ON
+GO
+
+SELECT LogicalName + ',' + [Type] + ',' FROM #FileListHeaders
+GO
+]]>
+      </Sql>
+    </PropertyGroup>
+
+    <Message Text="Getting database files from backup file '$(FromDisk)' output to $(OutputFile), please wait..." />
+    <MSBuild Projects="$(MSBuildThisFileFullPath)" Targets="bat:sql:execute" Properties="Sql=$(Sql);OutputFile=$(OutputFile);SqlCmdLogOn=$(SqlCmdLogOn);SqlCmdPassword=$(SqlCmdPassword)" />
+    <ReadLinesFromFile File="$(OutputFile)" Condition="Exists('$(OutputFile)')">
+      <Output TaskParameter="Lines" ItemName="LogicalNames" />
+    </ReadLinesFromFile>
+
+    <Message Text="Logical Names:" Importance="High" />
+    <Message Text="%(LogicalNames.Identity)" />
+
+    <Delete Files="$(OutputFile)" Condition="Exists($(OutputFile))" />
+    <Delete Files="'$(TempFile)'" Condition="Exists('$(TempFile)')" />
+  </Target>
+
+  <Target Name="bat:sql:drop_db">
+    <Error Text="Please provide a name for the target database to restore the database" Condition="'$(DatabaseName)'==''" />
+
+    <PropertyGroup>
+      <Sql>
+<![CDATA[
+USE [master]
+
+IF EXISTS (SELECT 1 FROM sys.databases WHERE name = '$(DatabaseName)')
+BEGIN
+  ALTER DATABASE [$(DatabaseName)] SET SINGLE_USER WITH ROLLBACK IMMEDIATE
+  DROP DATABASE [$(DatabaseName)]
+END
+]]>
+      </Sql>
+    </PropertyGroup>
+
+    <Message Text="Dropping database '$(DatabaseName)'..." />
+    <MSBuild Projects="$(MSBuildThisFileFullPath)" Targets="bat:sql:execute" Properties="Sql=$(Sql);SqlCmdLogOn=$(SqlCmdLogOn);SqlCmdPassword=$(SqlCmdPassword)" />
+  </Target>
+
+  <Target Name="bat:sql:backup_db" Returns="$(BackupFilePath)">
+    <Error Text="Please provide a name for the database to backup" Condition="'$(DatabaseName)'==''" />
+
+    <PropertyGroup>
+      <ToDisk Condition="'$(ToDisk)'==''">$([System.IO.Path]::GetTempPath())</ToDisk>
+      <ToDisk Condition="$(ToDisk.EndsWith('\\'))">$(ToDisk.TrimEnd('\\'))</ToDisk>
+
+      <FileExtension>$([System.IO.Path]::GetExtension('$(ToDisk)'))</FileExtension>
+      <BackupFilePath Condition="'$(FileExtension)'==''">$([System.IO.Path]::Combine('$(ToDisk)', '$(DatabaseName).bak'))</BackupFilePath>
+      <BackupFilePath Condition="'$(FileExtension)'!=''">$(ToDisk)</BackupFilePath>
+      <Sql>
+<![CDATA[
+BACKUP DATABASE [$(DatabaseName)] TO DISK='$(BackupFilePath)'
+]]>
+</Sql>
+    </PropertyGroup>
+
+    <Message Text="Backup database '$(DatabaseName)' to '$(BackupFilePath)', please wait..." />
+    <MSBuild Projects="$(MSBuildThisFileFullPath)" Targets="bat:sql:execute" Properties="Sql=$(Sql);SqlCmdLogOn=$(SqlCmdLogOn);SqlCmdPassword=$(SqlCmdPassword)" />
+  </Target>
+
+  <Target Name="bat:sql:restore_db" Returns="$(SqlDataPath)">
+    <Error Text="Please provide a path to the database backup file to restore the database from" Condition="'$(FromDisk)'==''" />
+    <Error Text="Please provide a name for the target database to restore the database" Condition="'$(DatabaseName)'==''" />
+    <Error Text="The path of database backup file '$(FromDisk)' cannot be found" Condition="!Exists('$(FromDisk)')" />
+
+    <PropertyGroup>
+      <SqlDataPath Condition="'$(SqlDataPath)'==''">$(PROGRAMDATA)\WiseTech Global\CW1\Data\$(DatabaseName)</SqlDataPath>
+    </PropertyGroup>
+    <MakeDir Directories="$(SqlDataPath)" Condition="!Exists('$(SqlDataPath)')" />
+
+    <MSBuild Projects="$(MSBuildThisFileFullPath)" Targets="bat:sql:get_files" Properties="FromDisk=$(FromDisk);SqlCmdLogOn=$(SqlCmdLogOn);SqlCmdPassword=$(SqlCmdPassword)">
+      <Output TaskParameter="TargetOutputs" ItemName="LogicalNames" />
+    </MSBuild>
+
+    <FormatMoveDatabaseFiles LogicalNames="@(LogicalNames)" ToDirectory="$(SqlDataPath)" DatabaseName="$(DatabaseName)">
+        <Output TaskParameter="MoveFiles" PropertyName="MoveFilesStatement" />
+    </FormatMoveDatabaseFiles>
+
+    <PropertyGroup>
+      <Sql>
+<![CDATA[
+RESTORE DATABASE [$(DatabaseName)]
+FROM DISK='$(FromDisk)' WITH RECOVERY
+$(MoveFilesStatement)
+]]>
+</Sql>
+    </PropertyGroup>
+
+    <MSBuild Projects="$(MSBuildThisFileFullPath)" Targets="bat:sql:drop_db" Properties="DatabaseName=$(DatabaseName)" />
+    <MSBuild Projects="$(MSBuildThisFileFullPath)" Targets="bat:sql:execute" Properties="Sql=$(Sql);SqlCmdLogOn=$(SqlCmdLogOn);SqlCmdPassword=$(SqlCmdPassword)" />
+  </Target>
+
+  <Target Name="bat:sql:set_recovery_mode">
+    <Error Text="Please provide a name for the target database to restore the database" Condition="'$(DatabaseName)'==''" />
+    <PropertyGroup>
+      <RecoveryMode Condition="'$(RecoveryMode)'==''">SIMPLE</RecoveryMode>
+      <Sql>
+<![CDATA[
+ALTER DATABASE [$(DatabaseName)] SET RECOVERY $(RecoveryMode)
+]]>
+      </Sql>
+    </PropertyGroup>
+
+    <Message Text="Set recovery mode on database '$(DatabaseName)' to $(RecoveryMode)..." />
+    <MSBuild Projects="$(MSBuildThisFileFullPath)" Targets="bat:sql:execute" Properties="Sql=$(Sql);SqlCmdLogOn=$(SqlCmdLogOn);SqlCmdPassword=$(SqlCmdPassword)" />
+  </Target>
+
+  <Target Name="bat:sql:shrink_db">
+    <Error Text="Please provide a name for the target database to be shrinked" Condition="'$(DatabaseName)'==''" />
+
+    <PropertyGroup>
+      <Sql>
+<![CDATA[
+USE [master]
+
+IF EXISTS (SELECT 1 FROM sys.databases WHERE name = '$(DatabaseName)')
+BEGIN
+  DBCC SHRINKDATABASE([$(DatabaseName)])
+END
+
+IF EXISTS (SELECT 1 FROM sys.databases WHERE name = '$(DatabaseName)')
+BEGIN
+  USE [$(DatabaseName)]
+
+  DECLARE @logFileName VARCHAR(128)
+  SET @logFileName = (
+    SELECT name
+    FROM sys.master_files
+    WHERE database_id = db_id() AND type = 1
+  )
+
+  DBCC SHRINKFILE(@logFileName, 1)
+END
+]]>
+      </Sql>
+    </PropertyGroup>
+
+    <Message Text="Shrinking database '$(DatabaseName)'..." />
+    <MSBuild Projects="$(MSBuildThisFileFullPath)" Targets="bat:sql:execute" Properties="Sql=$(Sql);SqlCmdLogOn=$(SqlCmdLogOn);SqlCmdPassword=$(SqlCmdPassword)" />
+  </Target>
+
+  <Target Name="bat:sql:drop_login">
+    <Error Text="Please provide the login name to drop" Condition="'$(LoginName)'==''" />
+
+    <PropertyGroup>
+      <Sql>
+<![CDATA[
+IF EXISTS (SELECT 1 FROM sys.server_principals WHERE name = N'$(LoginName)')
+BEGIN
+  DROP LOGIN $(LoginName)
+END
+]]>
+      </Sql>
+    </PropertyGroup>
+
+    <Message Text="Dropping database login '$(LoginName)'..." />
+    <MSBuild Projects="$(MSBuildThisFileFullPath)" Targets="bat:sql:execute" Properties="Sql=$(Sql);SqlCmdLogOn=$(SqlCmdLogOn);SqlCmdPassword=$(SqlCmdPassword)" />
+  </Target>
+
+  <Target Name="bat:sql:execute" Returns="$(result)">
+    <Error Text="The required query statement cannot be empty" Condition="'$(Sql)'==''" />
+    <Message Text="$(sql)" Importance="high" />
+    <Message Text="User: $(SqlCmdLogOn) Server: $(_Server)" Importance="high" />
+
+    <SqlCmd
+      TaskAction="Execute"
+      Server="$(_Server)"
+      LogOn="$(SqlCmdLogOn)"
+      Password="$(SqlCmdPassword)"
+      OutputFile="$(OutputFile)"
+      CommandLineQuery="$(Sql)" />
+  </Target>
+
+  <Target Name="bat:sql:drop_databases_by_prefix">
+    <Error Text="Please provide a name for the target database to be shrinked" Condition="'$(DatabaseName)'==''" />
+
+    <PropertyGroup>
+      <Sql>
+<![CDATA[
+DECLARE @dbName VARCHAR(128) = '$(DatabaseName)'
+
+  USE [master]
+
+  DECLARE @databasesToDrop TABLE (NAME VARCHAR(128))
+  INSERT INTO @databasesToDrop SELECT NAME FROM SYS.DATABASES WHERE NAME = @dbName
+  INSERT INTO @databasesToDrop
+  SELECT NAME FROM SYS.DATABASES WHERE NAME LIKE @dbName + '_%'
+
+  DECLARE @query varchar(255)
+  DECLARE dbCursor CURSOR
+  FOR SELECT NAME FROM @databasesToDrop
+
+  OPEN dbCursor
+  FETCH NEXT FROM dbCursor INTO @dbName
+  WHILE @@FETCH_STATUS = 0
+  BEGIN
+    EXEC (N'
+      ALTER DATABASE ' + @dbName + ' SET SINGLE_USER WITH ROLLBACK IMMEDIATE
+      DROP DATABASE ' + @dbName
+    )
+
+    FETCH NEXT FROM dbCursor INTO @dbName
+  END
+
+  CLOSE dbCursor
+  DEALLOCATE dbCursor
+]]>
+      </Sql>
+    </PropertyGroup>
+
+    <Message Text="Dropping database and ref dbs prefixed by '$(DatabaseName)'..." />
+    <Message Text="$(Sql)" />
+    <MSBuild Projects="$(MSBuildThisFileFullPath)" Targets="bat:sql:execute" Properties="Sql=$(Sql);SqlCmdLogOn=$(SqlCmdLogOn);SqlCmdPassword=$(SqlCmdPassword)" />
+  </Target>
+
+  <UsingTask
+    TaskName="FormatMoveDatabaseFiles"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <LogicalNames ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <ToDirectory ParameterType="System.String" Required="true" />
+      <DatabaseName ParameterType="System.String" Required="true" />
+      <MoveFiles ParameterType="System.String" Output="true" />
+      <Delimiter ParameterType="System.String" Required="false" />
+    </ParameterGroup>
+
+    <Task>
+    <![CDATA[
+      Add-Type -AssemblyName "Microsoft.Build.Framework"
+      if ([string]::IsNullOrEmpty($Delimiter)) { $Delimiter = [String] "," }
+
+      [string] $MoveFiles = [string]::Empty
+      [string[]] $processedFiles = @()
+
+      $hadMaster = $false;
+      $LogicalNames | ForEach-Object {
+        [string]$item = $_.GetMetadata("Identity")
+
+        if ((-not [string]::IsNullOrEmpty($item)) -and (-not $item.StartsWith("(")) -and (-not $item.StartsWith("-"))) {
+          $x = $item.split($Delimiter);
+          $originalFileName = $x[0]
+          $nameParts = $originalFileName.split("_");
+          $newFileName = $DatabaseName + "_" + $nameParts[1];
+
+          if ($processedFiles -notcontains $newFileName) {
+            if ($x[1] -eq "D") {
+              $ext = '{0}' -f ('.mdf','.ndf')[$hadMaster];
+              $hadMaster = $true;
+            } else {
+              $ext = '.ldf';
+            }
+
+            $processedFiles += $newFileName;
+            $destinationFileName = $newFileName + $ext;
+            $MoveFiles +=  ", MOVE '{0}' TO '{1}'" -f $originalFileName, (Join-Path $ToDirectory $destinationFileName)
+          }
+        }
+      }
+    ]]>
+    </Task>
+  </UsingTask>
+</Project>

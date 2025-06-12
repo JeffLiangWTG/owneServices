@@ -1,0 +1,248 @@
+﻿@page "/identity/edit/{id}"
+@attribute [Authorize(Policy = "eServicesAdmins")]
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Cryptography
+
+@inject UserManager<AppUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject NavigationManager NavigationManager
+@inject AppAccessService AppAccessService
+
+<PageTitle>App Access Edit</PageTitle>
+
+<h2>App Access</h2>
+
+<h4>Edit</h4>
+<hr />
+@if (Input is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Input" OnValidSubmit="UpdateIdentity" FormName="create" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
+                <div class="mb-3">
+                    <label for="id" class="form-label">ID:</label>
+                    <InputText id="id" @bind-Value="Input.Id" class="form-control" />
+                    <ValidationMessage For="() => Input.Id" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="password">Password</label>
+                    <InputText id="password" type="password" @bind-Value="Input.Password" class="form-control" />
+                    <ValidationMessage For="() => Input.Password" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="confirm-password">Confirm Password</label>
+                    <InputText id="confirm-password" type="password" @bind-Value="Input.ConfirmPassword" class="form-control" />
+                    <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Contact Email:</label>
+                    <InputText id="email" @bind-Value="Input.Email" class="form-control" />
+                    <ValidationMessage For="() => Input.Email" class="text-danger" />
+                </div>
+                <h4>Claims</h4>
+                <div class="mb-3">
+                    <label>
+                        <InputCheckbox id="role-send-message" @bind-Value="Input.RoleSendMessage" />
+                        @AppRoles.SendMessage
+                    </label>
+                </div>
+                <div class="mb-3">
+                    <label>
+                        <InputCheckbox id="role-receive-message" @bind-Value="Input.RoleReceiveMessage" />
+                        @AppRoles.ReceiveMessage
+                    </label>
+                </div>
+                <div class="mb-3">
+                    <label>
+                        <InputCheckbox id="role-read-config" @bind-Value="Input.RoleReadConfig" />
+                        @AppRoles.ReadConfig
+                    </label>
+                </div>
+                <div class="mb-3">
+                    <label>
+                        <InputCheckbox id="role-write-storage" @bind-Value="Input.RoleWriteStorage" />
+                        @AppRoles.WriteStorage
+                    </label>
+                </div>
+                <button id="submit" type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+            <br/>
+            <div class="mb-3">
+                @if (Input.LockedOut)
+                {
+                    <button class="btn btn-danger" @onclick="UnlockAccount">Unlock</button>
+                }
+                else
+                {
+                    <button class="btn btn-success" @onclick="LockAccount">Lock</button>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/identity">Back to List</a>
+</div>
+
+@code {
+    [Parameter]
+    public required string Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private InputModel? Input { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await UserManager.FindByNameAsync(Id);
+        if (user is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+
+        if (Input is null)
+        {
+            Input = new InputModel
+                {
+                    Id = user.UserName!,
+                    Email = user.Email,
+                    RoleSendMessage = await UserManager.IsInRoleAsync(user, $"{AppRoles.SendMessage}:{user.UserName}"),
+                    RoleReceiveMessage = await UserManager.IsInRoleAsync(user, $"{AppRoles.ReceiveMessage}:{user.UserName}"),
+                    RoleReadConfig = await UserManager.IsInRoleAsync(user, $"{AppRoles.ReadConfig}:{user.UserName}"),
+                    RoleWriteStorage = await UserManager.IsInRoleAsync(user, $"{AppRoles.WriteStorage}:{user.UserName}"),
+                    LockedOut = user.LockoutEnd.GetValueOrDefault() > DateTimeOffset.UtcNow
+                };
+        }
+
+        await Task.CompletedTask;
+    }
+
+    private async Task UnlockAccount()
+    {
+        var user = await UserManager.FindByNameAsync(Id);
+        if ((await UserManager.SetLockoutEndDateAsync(user!, null)).Succeeded)
+        {
+            Input!.LockedOut = false;
+        }
+    }
+
+    private async Task LockAccount()
+    {
+        var user = await UserManager.FindByNameAsync(Id);
+        if ((await UserManager.SetLockoutEndDateAsync(user!, DateTimeOffset.MaxValue)).Succeeded)
+        {
+            Input!.LockedOut = true;
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateIdentity()
+    {
+        var user = await UserManager.FindByNameAsync(Id);
+        if (user is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+
+        if (Input!.Id != user.UserName)
+        {
+            if (!(await UserManager.SetUserNameAsync(user, Input.Id)).Succeeded)
+            {
+                throw new InvalidOperationException("Failed to update user name");
+            }
+        }
+
+        if (Input.Email != user.Email)
+        {
+            if (!(await UserManager.SetEmailAsync(user, Input.Email)).Succeeded)
+            {
+                throw new InvalidOperationException("Failed to update email");
+            }
+        }
+
+        if (!string.IsNullOrEmpty(Input.Password))
+        {
+            if (!(await UserManager.RemovePasswordAsync(user)).Succeeded)
+            {
+                throw new InvalidOperationException("Failed to remove password");
+            }
+
+            if (!(await UserManager.AddPasswordAsync(user, Input.Password)).Succeeded)
+            {
+                throw new InvalidOperationException("Failed to add password");
+            }
+
+            user.AccessKey = AppAccessService.GetAccessKey(Input.Password);
+
+            if (!(await UserManager.UpdateAsync(user)).Succeeded)
+            {
+                throw new InvalidOperationException("Failed to update user");
+            }
+        }
+
+        await UpdateRoleMembership(user, $"{AppRoles.SendMessage}:{user.UserName}", Input.RoleSendMessage);
+        await UpdateRoleMembership(user, $"{AppRoles.ReceiveMessage}:{user.UserName}", Input.RoleReceiveMessage);
+        await UpdateRoleMembership(user, $"{AppRoles.ReadConfig}:{user.UserName}", Input.RoleReadConfig);
+        await UpdateRoleMembership(user, $"{AppRoles.WriteStorage}:{user.UserName}", Input.RoleWriteStorage);
+        await UpdateRoleMembership(user, $"{AppRoles.ReadStorage}:{user.UserName}", Input.RoleWriteStorage);
+
+        NavigationManager.NavigateTo($"/identity/details/{Input.Id}");
+    }
+
+    private async Task UpdateRoleMembership(AppUser user, string role, bool add)
+    {
+        var isInRole = await UserManager.IsInRoleAsync(user, role);
+
+        switch (add, isInRole)
+        {
+            case (true, false):
+                if (!await RoleManager.RoleExistsAsync(role))
+                    await RoleManager.CreateAsync(new(role));
+                await UserManager.AddToRoleAsync(user, role);
+                break;
+            case (false, true):
+                if (!(await UserManager.RemoveFromRoleAsync(user, role)).Succeeded)
+                {
+                    throw new InvalidOperationException($"Failed to remove role '{role}'");
+                }
+                break;
+        }
+    }
+
+    private sealed class InputModel
+    {
+        [Required]
+        [Display(Name = "ID")]
+        public string Id { get; set; } = "";
+
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.")]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string? Password { get; set; } = "";
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string? ConfirmPassword { get; set; } = "";
+
+        [NullableValidation<EmailAddressAttribute>]
+        [Display(Name = "Email")]
+        public string? Email { get; set; } = "";
+
+        public bool RoleSendMessage { get; set; }
+        public bool RoleReceiveMessage { get; set; }
+        public bool RoleReadConfig { get; set; }
+        public bool RoleWriteStorage { get; set; }
+
+        public bool LockedOut { get; set; }
+    }
+}

@@ -1,0 +1,2255 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xs:schema elementFormDefault="qualified"
+           attributeFormDefault="unqualified" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:b="http://schemas.microsoft.com/BizTalk/2003"
+           xmlns="http://www.cargowise.com/Schemas/FPM/APPLUS/AMQ"
+           xmlns:std="http://www.cargowise.com/Schemas/FPM/APPLUS"
+           targetNamespace="http://www.cargowise.com/Schemas/FPM/APPLUS/AMQ">
+
+  <xs:import namespace="http://www.cargowise.com/Schemas/FPM/APPLUS" schemaLocation="patterns.xsd"/>
+  <xs:import namespace="http://www.cargowise.com/Schemas/FPM/APPLUS" schemaLocation="parties.xsd"/>
+
+  <xs:complexType name="amq_user_type">
+    <xs:attribute name="user" use="required">
+      <xs:annotation>
+        <xs:documentation>Code utilisateur du tiers profession du message.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tiersProf" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant tiers profession du message.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="email" type="xs:string" use="optional"/>
+    <xs:attribute name="adresse" type="xs:string" use="optional"/>
+    <xs:attribute name="reseau" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="amq_notification_type">
+    <xs:choice>
+      <xs:element name="amq" type="amq_type">
+        <xs:annotation>
+          <xs:documentation>Avis de mise a quai</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <!-- ** xs:element ref="liste-lpc"/ -->
+      <!-- ** xs:element ref="lpe"/ -->
+    </xs:choice>
+    <xs:attribute name="id" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant fonctionnel du document envoyé ou imprimé.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" use="required">
+      <xs:annotation>
+        <xs:documentation>Type du document notifié ou imprimé (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0"/>
+          <xs:maxLength value="7"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="action" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code fonction du document (Codification SIC)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="CREATE|UPDATE|DELETE|ADD|ERASE|PRINT|UKN"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="statut" type="xs:string" use="optional"/>
+    <xs:attribute name="ref" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="request_type">
+    <xs:choice>
+      <xs:element name="amq" type="amq_type">
+        <xs:annotation>
+          <xs:documentation>Avis de mise a quai</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="action" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code fonction du document (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="CREATE|UPDATE|DELETE|ADD|ERASE|UKN"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="id" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant fonctionnel du message utilisé pour effectuer le suivi de l intégration.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" use="required">
+      <xs:annotation>
+        <xs:documentation>Type du document à intégrer (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0"/>
+          <xs:maxLength value="7"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="statut" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:element name="Request" type="request_type">
+    <xs:annotation>
+      <xs:documentation>Request précise la nature du document à intégrer.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Notification" type="amq_notification_type">
+    <xs:annotation>
+      <xs:documentation>Notification précise la nature du document à notifier ou imprimer</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Interchanges">
+    <xs:annotation>
+      <xs:documentation>Interchanges décrit le contexte de la transmission des données entre le SIC et le système partenaire.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="MessageSet" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant interchange</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="from" use="required">
+        <xs:annotation>
+          <xs:documentation>Nom du système émetteur</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="75"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="to" use="required">
+        <xs:annotation>
+          <xs:documentation>Nom du système destinataire</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="75"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="servername" type="xs:string" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MessageSet">
+    <xs:annotation>
+      <xs:documentation>MessageSet identifie le message et permet d'assurer le suivi des échanges.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Destinataire"/>
+        <xs:element ref="Emetteur"/>
+        <xs:element name="Messages" type="amq_messages_type">
+          <xs:annotation>
+            <xs:documentation>Messages contient le document à integrer, à notifier, à imprimer ou à acquitter</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant du message</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="icid" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant interchange de rattachement du message</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="date" type="std:DateLongue_type" use="required">
+        <xs:annotation>
+          <xs:documentation>"31/12/2004 23:59:59" Date d'envoi du message.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Destinataire" type="amq_user_type">
+    <xs:annotation>
+      <xs:documentation>Identification du tiers destinataire du message</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Emetteur" type="amq_user_type">
+    <xs:annotation>
+      <xs:documentation>Identification de l'émetteur du message</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="amq_messages_type">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element ref="Request"/>
+      <xs:element ref="Notification"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="reference_amq_type">
+    <xs:annotation>
+      <xs:documentation>1..1</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="commentaires" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Commentaires littéraux relatifs à l'avis de mise à quai.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="commentaires-dgx" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Commentaires littéraux relatifs à la modification des dangereux de l'avis de mise à quai.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="depotage-amq" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Information liste de dépotage pour les marchandises dépotées</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="reference-lpd-amq" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="sic" type="xs:string" use="optional"/>
+                <xs:attribute name="ref-prop" type="xs:string" use="optional"/>
+                <xs:attribute name="ref-gest" type="xs:string" use="optional"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="enPlus" type="xs:string" use="optional">
+            <xs:annotation>
+              <xs:documentation>Notifcation LDD - Indicateur qui détermine si la marchandise n'est pas annoncée dans une LPD (en plus)</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="shipper-amq" type="std:party_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Party: Expediteur</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="consignee-amq" type="std:party_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Party: Destinataire</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="agent-amq" type="std:party_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Party: Agent</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="notifyOne-amq" type="std:party_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Party: A notifier 1</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="notifyTwo-amq" type="std:party_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Party: A notifier 2</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="notifyThree-amq" type="std:party_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Party: A notifier 3</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="sic" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="extliste" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="cbk" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de la confirmation de booking de rattachement de l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="rang" use="optional">
+      <xs:annotation>
+        <xs:documentation>Numéro de rang associé à la référence de confirmation de booking de l'agent fret à laquelle l'AMQ est rattaché.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="extcbk" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence externe de la confirmation de booking à laquelle est rattachée l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="extamq" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence externe de l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="extamqlpd" type="xs:string" use="optional"/>
+    <xs:attribute name="last" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur dernier AMQ d'un dossier (Uniquement Export).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="reco" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur de reconnaissance de l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="IMP|EXP|NDE"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="statut" use="required">
+      <xs:annotation>
+        <xs:documentation>Statut de l'avis de mise à quai (PRO= Provisoire, VAL=Validé, INV=Invalidé).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dos" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du dossier auquel est rattaché l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="extdos" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence externe du dossier auquel est rattaché le dossier.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="extdoslpd" type="xs:string" use="optional"/>
+    <xs:attribute name="hist" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur de la version de l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="2"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="baet" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur d'autorisation d'embarquement de l'avis de mise à quai par le transitaire (EXP= Explicite, IMP=Implicite).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="EXP|IMP|NDE"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="date" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date d'attibution du statut à l'avis de mise à quai par le SIC.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="dgx" type="xs:string" use="optional"/>
+    <xs:attribute name="doc" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du document principal.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="extdoc" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence du document principal de l'agent fret.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bad" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du bon à délivrer.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="extbad" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence externe du BAD attribué par l'agent fret.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="random" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence aléatoire au BAD fournie par le SIC.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="alotissement" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0"/>
+          <xs:maxLength value="20"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="numentree" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0"/>
+          <xs:maxLength value="20"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="datentree" type="std:DateLongue_type" use="optional"/>
+    <xs:attribute name="statutdouane" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="datebaed" type="std:DateLongue_type" use="optional"/>
+    <xs:attribute name="datearr" type="std:DateLongue_type" use="optional"/>
+    <xs:attribute name="numreception" type="xs:string" use="optional"/>
+    <xs:attribute name="inddel" type="xs:string" use="optional"/>
+    <xs:attribute name="qte-bae" type="xs:integer" use="optional"/>
+    <xs:attribute name="poids-bae" type="xs:integer" use="optional"/>
+    <xs:attribute name="bact" type="std:IdSic_type" use="optional"/>
+    <xs:attribute name="random-bact" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="voyage_amq_type">
+    <xs:annotation>
+      <xs:documentation>1..1</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="otc" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de lOffre de Transport Commerciale  auquel est rattaché l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="atp" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'Annonce de Transport Physique auquel est rattaché l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ser" type="std:IdSic_type" use="optional"/>
+    <xs:attribute name="nav" use="optional">
+      <xs:annotation>
+        <xs:documentation>Nom du navire de l'ATP.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="refotc" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence externe de l'OTC.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="45"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="refser" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence externe du service.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="armement" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="armement-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="sens" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="2"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="terrestre" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>indicateur terrestre - type du voyage</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="lieux_amq_type">
+    <xs:annotation>
+      <xs:documentation>1..1</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="ori" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code SIC du port d'origine de l'avis de mise à quai (AMQ import uniquement).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="5"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ori-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code SIC du port d'origine de l'avis de mise à quai (AMQ import uniquement).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dpc" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du dernier port de chargement de l'avis de mise à quai (Uniquement avis de mise à quai import).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="5"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dpc-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du dernier port de chargement de l'avis de mise à quai (Uniquement avis de mise à quai import).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lori" use="optional">
+      <xs:annotation>
+        <xs:documentation>Lieu d'origine de l'avis de mise à quai (Avis de mise à quai import uniquement).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="5"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lori-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Lieu d'origine de l'avis de mise à quai (Avis de mise à quai import uniquement).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fin" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification du lieu de destination finale de l'avis de mise à quai (Uniquement avis de mise à quai Export).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="5"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fin-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification du lieu de destination finale de l'avis de mise à quai (Uniquement avis de mise à quai Export).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="eta" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date estimée d'arrivée du navire.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="etd" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date de départ estimé du navire.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="tbt" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du premier port de déchargement de l'avis de mise à quai (Export uniquement).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="5"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tbt-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du premier port de déchargement de l'avis de mise à quai (Export uniquement).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dest" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du port de destination de l'avis de mise à quai (Uniquement Export).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="5"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dest-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du port de destination de l'avis de mise à quai (Uniquement Export).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="date" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date de passage de l'OTC à laquelle l'avis de mise à quai est rattachée.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="paq-lieu" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="paq-zone" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="lieu_amq_type">
+    <xs:annotation>
+      <xs:documentation>1..1</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="zone" use="required">
+      <xs:annotation>
+        <xs:documentation>Codification SIC de la zone du lieu de RL de l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="zone-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC de la zone du lieu de RL de l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu" use="required">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du lieu de RL de l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du lieu de RL de l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="manut" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du manutentionnaire responsable du lieu de RL.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="manut-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du manutentionnaire responsable du lieu de RL.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bpc" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bpc-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="loc" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Allotissement pour notification LDD</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="instruction_amq_type">
+    <xs:annotation>
+      <xs:documentation>0..1</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="commentaires-frigo" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Commentaires  Littéraux concernant la demande de branchement.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="commentaires-fum" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Commentaires littéraux concernant la de mande de fumigation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="frigo" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur de demande branchement.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="tiersfrigo" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du tiers responsable du branchement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tiersfrigo-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du tiers responsable du branchement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fum" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur de demande de fumigation.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="tiersfum" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du tiers responsable de la fumigation.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tiersfum-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du tiers responsable de la fumigation.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="lmarchandise_amq_type">
+    <xs:annotation>
+      <xs:documentation>0..1</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="designation" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Désignation de la nature de la marchandise.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="3500"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="mesurage-amq" type="mesurage_amq_type" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Mesurage des différentes unités de connditionnement de la ligne marchandise. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element ref="marques" minOccurs="0"/>
+      <xs:element name="dgx-amq" type="dgx_amq_type" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="nb" use="optional">
+      <xs:annotation>
+        <xs:documentation>Nombre d'unités de conditionnement de laligne marchandise.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="6"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC de l'unité de conditionnement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="7"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC de l'unité de conditionnement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="poids" use="required">
+      <xs:annotation>
+        <xs:documentation>Poids brut de la ligne marchandise exprimé en kilogrammes.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="frigo" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur frigo de la ligne marchandise.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="dgx" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur marchandise dangereuse. Précise le caractère dangereux de la marchandise.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="polluant" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur polluant précise le caractère polluant marin de la ligne marchandise.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="sic" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de la ligne marchandise.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ref" use="optional">
+      <xs:annotation>
+        <xs:documentation>Référence externe de la ligne marchandise.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="poidsnet" use="optional">
+      <xs:annotation>
+        <xs:documentation>Poids net de la ligne marchandise exprimé en kilogramme.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="haut" type="xs:integer" use="optional">
+      <xs:annotation>
+        <xs:documentation>A supprimer</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="larg" type="xs:integer" use="optional">
+      <xs:annotation>
+        <xs:documentation>A supprimer</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="long" type="xs:integer" use="optional">
+      <xs:annotation>
+        <xs:documentation>A supprimer</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="min" type="std:Temperature_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur minimale de la température de la ligne marchandise.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="consigne" type="std:Temperature_type" use="optional"/>
+    <xs:attribute name="max" type="std:Temperature_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur maximale de la température de la ligne marchandise.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="unite" use="optional">
+      <xs:annotation>
+        <xs:documentation>Unité dans laquelle sont exprimées les températures (CEL=Celsius ou FAH= Farhernheit).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="3"/>
+          <xs:maxLength value="3"/>
+          <xs:pattern value="CEL|FAH"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="vol" type="xs:integer" use="optional">
+      <xs:annotation>
+        <xs:documentation>A supprimer ???</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="qte-empot" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="eqd" type="xs:string" use="optional"/>
+    <xs:attribute name="ind-vab" type="xs:string" use="optional"/>
+    <xs:attribute name="hist" type="xs:integer" use="optional"/>
+    <xs:attribute name="qte-ann" type="xs:integer" use="optional"/>
+    <xs:attribute name="poids-ann" type="xs:integer" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="mesurage_amq_type">
+    <xs:annotation>
+      <xs:documentation>0..n</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element ref="marques" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="nb" use="required">
+      <xs:annotation>
+        <xs:documentation>Nombre d'unités de conditionnement de la ligne de mesurage.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="6"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code" use="required">
+      <xs:annotation>
+        <xs:documentation>Codifiacation SIC du conditionnement de la ligne de mesurage.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codifiacation SIC du conditionnement de la ligne de mesurage.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="long" use="optional">
+      <xs:annotation>
+        <xs:documentation>Longueur des unités de conditionnement de la ligne de mesurage exprimée en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="larg" use="optional">
+      <xs:annotation>
+        <xs:documentation>Largeur des unités conditionnements de la ligne de mesurage exprimées en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="haut" use="optional">
+      <xs:annotation>
+        <xs:documentation>Hauteur des unités de conditionnement de la ligne de mesurage exprimées en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="vol" use="optional">
+      <xs:annotation>
+        <xs:documentation>Volume des unités de conditionnement de la ligne de mesurage exprimé en mètre cube.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="0"/>
+          <xs:maxInclusive value="999999999"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ref" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="equipement_amq_type">
+    <xs:annotation>
+      <xs:documentation>0..1</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="scelle-amq" type="scelle_amq_type" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Scellé décrit les scellés et leur origine.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant de l'équipement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="vide" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur équipement vide.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="tare" use="optional">
+      <xs:annotation>
+        <xs:documentation>Tare de l'équipement exprimée en kilogrammes.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dim" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur de sur-dimension.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="code" use="required">
+      <xs:annotation>
+        <xs:documentation>Codification SIC de l'unité de conditionnement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC de l'unité de conditionnement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="frigo" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur marchandise frigorifique (Y=Oui, N=Non).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="poids" use="required">
+      <xs:annotation>
+        <xs:documentation>Poids brut de la marchandise exprimé en kilogrammes.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dgx" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur marchandises dangereuses (Y=Oui, N=Non).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="polluant" type="std:Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur marchandise polluante (Y=Oui, N=Non).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="sic" type="std:IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'équipement Notification LPD/LDD</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="oh" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur dépassement hauteur exprimée en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="owl" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur dépassement largeur gauche exprimée en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="owr" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur dépassement largeur droite exprimée en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="olf" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur dépassement longueur avant exprimée en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="olb" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur dépassement longueur arrière exprimée en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="min" type="std:Temperature_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur température minimale.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="consigne" type="std:Temperature_type" use="optional"/>
+    <xs:attribute name="max" type="std:Temperature_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur température maximale.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="unite" use="optional">
+      <xs:annotation>
+        <xs:documentation>Unité de température dans laquelle sont exprimées les températures.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="CEL|FAH"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="long" use="optional">
+      <xs:annotation>
+        <xs:documentation>Longueur de l'équipement exprimée en centimètre.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fcllcl" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur de groupage.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="FCL|LCL|FCL/LCL|LCL/FCL"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="haulage" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur gestion post-acheminement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="C|M"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="qte-emp" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="afd-dst" type="std:Booleen_type" use="optional"/>
+    <xs:attribute name="qte-ann" type="xs:integer" use="optional"/>
+    <xs:attribute name="poids-ann" type="xs:integer" use="optional"/>
+    <xs:attribute name="hist" type="xs:integer" use="optional">
+      <xs:annotation>
+        <xs:documentation>Version AMQ Contenant Notification LPD/LDD</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="larg" type="xs:integer" use="optional"/>
+    <xs:attribute name="haut" type="xs:integer" use="optional"/>
+    <xs:attribute name="vol" type="xs:integer" use="optional"/>
+    <xs:attribute name="non-operated-reefer" type="std:Booleen_type" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="scelle_amq_type">
+    <xs:annotation>
+      <xs:documentation>0..n</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="num" use="required">
+      <xs:annotation>
+        <xs:documentation>Numéro du scellé.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0"/>
+          <xs:maxLength value="35"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ori" use="optional">
+      <xs:annotation>
+        <xs:documentation>Origine des scellés.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ori-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Origine des scellés.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="support_amq_type">
+    <xs:annotation>
+      <xs:documentation>0..1</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" use="required">
+      <xs:annotation>
+        <xs:documentation>Identification du support de manutention.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code" use="required">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du type de support de manutention.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du type de support de manutention.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tare" use="optional">
+      <xs:annotation>
+        <xs:documentation>Tare du support de manutention exprimée en kilogrammes.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="dgx_amq_type">
+    <xs:annotation>
+      <xs:documentation>0..1</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="conditions" minOccurs="0">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="delai-stockage" type="xs:string" use="optional"/>
+              <xs:attribute name="ilot" type="xs:integer" use="optional"/>
+              <xs:attribute name="ilot-espace" type="xs:integer" use="optional"/>
+              <xs:attribute name="garde" type="xs:integer" use="optional"/>
+              <xs:attribute name="garde-type" type="xs:string" use="optional"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="commentaires-cmq" minOccurs="0" maxOccurs="unbounded">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="255"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="classe" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Classe de la matière dangereuse.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="un" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Numéro ONU de la marchandise dangereuse.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ge" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>A supprimer.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="date" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>A supprimer</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="etat" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>A suppprimer apres livraison 445 sur tous les env.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="iscond" type="xs:string" use="optional"/>
+    <xs:attribute name="qtelimitee" type="std:Booleen_type" use="optional"/>
+    <xs:attribute name="groupe-emb" use="optional">
+      <xs:annotation>
+        <xs:documentation>build 445 remplace ge</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="7"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="etat-matiere" use="optional">
+      <xs:annotation>
+        <xs:documentation>build 445 remplace etat</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="7"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="qteexceptee" type="std:Booleen_type" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="amq_type">
+    <xs:annotation>
+      <xs:documentation>Avis de mise a quai </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="reference-amq">
+        <xs:annotation>
+          <xs:documentation>Référence précise les références auxquelles se rattache l'avis de mise à quai annoncé à l'export, à l'import ou pour lequel les statuts BAS export, BAS import et BAD.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="reference_amq_type"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="voyage-amq" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Voyage précise les références SIC ou externes dont dépend l'avis de mise à quai.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="voyage_amq_type">
+              <xs:sequence>
+                <xs:element name="lieux-amq" type="lieux_amq_type" minOccurs="0">
+                  <xs:annotation>
+                    <xs:documentation>Lieux de provenance ou de destination de l'avis de mise à quai.</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="lieu-amq" type="lieu_amq_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Lieu précise le lieu de réception de livraison de l'avis de mise à quai.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="tiers-amq" type="tiers_amq_type">
+        <xs:annotation>
+          <xs:documentation>Tiers précise les tiers concernés par l'avis de mise à quai Export, Import, le BAS import, le BAS export ou le BAD.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="dgx-amq" type="dgx_amq_type" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Dangereux précise la nature des marchandises dangereuses contenues dans l'avis de mise à quai.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="equipement-amq" type="equipement_amq_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Equipement décrit les caractéristiques de l'équipement concerné par l'avis de mise à quai.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lmarchandise-amq" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Ligne marchandise décrit les marchandises conventionnelles ou les marchandises contenues dans un équipement. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="lmarchandise_amq_type"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="instruction-amq" type="instruction_amq_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Instruction précise si l'avis de mise à quai doit faire l'objet d'un branchement ou d'une fumigation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="support-amq" type="support_amq_type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Support précise le support de manutention de l'avis de mise à quai. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="reference-annexe" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Référence annexe indique des réferences complémentaires relatives à l'avis de mise à quai.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="0"/>
+            <xs:maxLength value="17"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="acheminement-amq" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Acheminement précise les conditions d'arrivée ou de sortie de l'avis de mise à quai.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="acheminement_amq_type"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="restit-amq" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Restit précise les conditions de restitution dans le cas d'un Bon à délivrer.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="restit_amq_type"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="declaration-amq" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Déclaration décrit la déclaration relative à l'avis de mise à quai import faisant l'objet d'un BAS import.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="declaration_amq_type"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="sycoscan-amq" type="xs:string" minOccurs="0"/>
+      <xs:element name="reserves-amq" type="reserves_amq_type" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="droits-amq" type="droit_amq_type" minOccurs="0"/>
+      <xs:element name="constat-amq" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Regroupe les informations renseignées lors du constat de l'AMQ</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="equipement-amq" type="equipement_amq_type" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>Equipement décrit les caractéristiques de l'équipement concerné par l'avis de mise à quai.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="lmarchandise-amq" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>Ligne marchandise décrit les marchandises conventionnelles ou les marchandises contenues dans un équipement. </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="lmarchandise_amq_type"/>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="reserves-amq" type="reserves_amq_type" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+          <xs:attribute name="type" type="xs:string" use="required"/>
+          <xs:attribute name="sic" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="totaux-amq" type="totaux_amq_type" minOccurs="0" maxOccurs="unbounded"/>
+      <!--xs:choice minOccurs="0">
+        <xs:element name="equipement-amq" type="equipement_amq_type" minOccurs="0"/>
+        <xs:element name="lmarchandise-amq" type="lmarchandise_amq_type" minOccurs="0"/>
+      </xs:choice-->
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="tiers_amq_type">
+    <xs:annotation>
+      <xs:documentation>1..1</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="amq" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du propriétaire de l'AMQ.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="amq-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du propriétaire de l'AMQ.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="afret" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'agent fret de l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="afret-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'agent fret de l'avis de mise à quai.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="pro" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du propriétaire des listes de dépotage.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="pro-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du propriétaire des listes de dépotage.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="rec" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du tiers réclamateur au BAD.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="rec-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du tiers réclamateur au BAD.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fac" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du tiers à facturer.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fac-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du tiers à facturer.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="nomrec" use="optional">
+      <xs:annotation>
+        <xs:documentation>Nom du tiers réclamateur hors SIC.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="trport" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du correspondant portuaire.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="trport-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du correspondant portuaire.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dec" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dec-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="trans" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="trans-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:element name="marques">
+    <xs:annotation>
+      <xs:documentation>Marques et numéros de la ligne marchandise.</xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="350"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:complexType name="acheminement_amq_type">
+    <xs:annotation>
+      <xs:documentation>Pre Post Acheminement 1..1</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="sic" use="optional">
+      <xs:annotation>
+        <xs:documentation>Type de moyen de transport.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="sic-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Type de moyen de transport.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="id" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant du moyen de transport.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="createur" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="createur-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="code" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du transporteur.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du transporteur.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="nom" use="optional">
+      <xs:annotation>
+        <xs:documentation>Nom du transporteur non codifié dans le SIC.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="date" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date prévue d'arrivée ou de sortie de l'avis de mise à quai (A supprimer???).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="loc" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du lieu de destination.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="5"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="loc-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du lieu de destination.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lochors" type="xs:string" use="optional"/>
+    <xs:attribute name="dateprevdep" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date de départ estimée du moyen de post-acheminement.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="declaration_amq_type">
+    <xs:sequence>
+      <xs:element name="description-amq" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="designation-amq" minOccurs="0">
+              <xs:simpleType>
+                <xs:restriction base="xs:string"/>
+              </xs:simpleType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="ndp" use="optional">
+            <xs:simpleType>
+              <xs:restriction base="xs:string"/>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="code-restit" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="document-associe-amq" type="document_associe_amq_type" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="sic" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de la déclaration.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="11"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" use="required">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du type de déclaration.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="6"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du type de déclaration.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bdd" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du bureau de douane auprès duquel la déclaration a été effectuée. </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bdd-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du bureau de douane auprès duquel la déclaration a été effectuée. </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="id" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant de la déclaration.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="22"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="nb" use="optional">
+      <xs:annotation>
+        <xs:documentation>Nombre de colis de la déclaration.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="0"/>
+          <xs:maxInclusive value="99999999"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="poids" use="optional">
+      <xs:annotation>
+        <xs:documentation>Poids des colis de la déclaration exprimé en kilogramme.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="statut" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="20"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dec" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dec-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="date" type="std:DateLongue_type" use="optional"/>
+    <xs:attribute name="afddst" type="std:Booleen_type" use="optional"/>
+    <xs:attribute name="accises" type="std:Booleen_type" use="optional"/>
+    <xs:attribute name="sensible" type="std:Booleen_type" use="optional"/>
+    <xs:attribute name="emp" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="rat" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="afd" type="std:Booleen_type" use="optional"/>
+    <xs:attribute name="dst" type="std:Booleen_type" use="optional"/>
+    <xs:attribute name="cred" type="xs:string" use="optional"/>
+    <xs:attribute name="qte-emp" type="xs:integer" use="optional"/>
+    <xs:attribute name="poids-emp" type="xs:integer" use="optional"/>
+    <xs:attribute name="qte-rest" type="xs:integer" use="optional"/>
+    <xs:attribute name="poids-rest" type="xs:integer" use="optional"/>
+    <xs:attribute name="ind-total" type="std:Booleen_type" use="optional"/>
+    <xs:attribute name="scelle" type="std:Booleen_type" use="optional"/>
+    <xs:attribute name="qte-con" use="optional">
+      <xs:annotation>
+        <xs:documentation>Notification BASI :  Quantité concernée renseignée au niveau du RGR</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="num-doss" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation xml:lang="fr">GRP 21/09/2007 - APR200012271 : Ajout de la référence dossier de la déclaration (BASI)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ind-qte-vab" type="xs:string" use="optional"/>
+    <xs:attribute name="decl-asso" use="optional">
+      <xs:annotation>
+        <xs:documentation>Declaration associee (LVAB)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu-prenant" type="xs:string" use="optional"/>
+    <xs:attribute name="lieu-prenant-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="zone-lieu-prenant" type="xs:string" use="optional"/>
+    <xs:attribute name="zone-lieu-prenant-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="siret-export" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="restit_amq_type">
+    <xs:sequence>
+      <xs:element name="commentaires" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Commentaires littéraux relatifs à la restitution. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="sic" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du lieu de restitution de l'équipement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="sic-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du lieu de restitution de l'équipement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="loc" use="optional">
+      <xs:annotation>
+        <xs:documentation>Lieu de restitution non codifié dans le SIC.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="date" type="std:DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date limite de restitution du vide, date à laquelle la restitution est prévue.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="delai" use="optional">
+      <xs:annotation>
+        <xs:documentation>Délai de restitution de l'équipement exprimé en jour.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="1"/>
+          <xs:maxInclusive value="999999"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="date-fin-stationnement" type="std:DateComplete_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date limite de stationnement (BASI)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="date-fin-branchement" type="std:DateComplete_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date limite de branchement (BASI)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="mode-transport" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Mode de Transport</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="mode-transport-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="email-transporteur" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="reserves_amq_type">
+    <xs:sequence>
+      <xs:element name="commentaires" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="code" type="xs:string" use="optional"/>
+    <xs:attribute name="code-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="ori" type="xs:string" use="optional"/>
+    <xs:attribute name="ori-lib" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="document_associe_amq_type">
+    <xs:attribute name="sic" type="xs:string" use="optional"/>
+    <xs:attribute name="nomenclature" type="xs:string" use="optional"/>
+    <xs:attribute name="type" type="xs:string" use="optional"/>
+    <xs:attribute name="createur" type="xs:string" use="optional"/>
+    <xs:attribute name="numero" type="xs:string" use="optional"/>
+    <xs:attribute name="bdd" type="xs:string" use="optional"/>
+    <xs:attribute name="nb" type="xs:integer" use="optional"/>
+    <xs:attribute name="poids" type="xs:integer" use="optional"/>
+    <xs:attribute name="type-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="bdd-lib" type="xs:string" use="optional"/>
+    <xs:attribute name="createur-lib" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="droit_amq_type">
+    <xs:annotation>
+      <xs:documentation>Indique le montant des droits de port</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="montant-total" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="0"/>
+          <xs:maxInclusive value="999999999"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="unite" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="port" type="xs:string" use="optional"/>
+    <xs:attribute name="port-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tiers-a-facturer" type="xs:string" use="optional"/>
+    <xs:attribute name="tiers-lib" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="totaux_amq_type">
+    <xs:annotation>
+      <xs:documentation>Va servir à totaliser le nombre de colis et le poids et nbicv pour une LPD</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="nbcolis" type="xs:integer" use="optional"/>
+    <xs:attribute name="poids" type="xs:integer" use="optional"/>
+    <xs:attribute name="nbicv" type="xs:integer" use="optional"/>
+  </xs:complexType>
+</xs:schema>

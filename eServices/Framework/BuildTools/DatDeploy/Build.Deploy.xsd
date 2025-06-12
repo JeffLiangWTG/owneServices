@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns="http://eservices.buildtools/datdeploy" targetNamespace="http://eservices.buildtools/datdeploy" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="DatDeploy">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Targets">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Target">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0">
+                    <xs:element name="Settings" type="NameValuePairList" />
+                    <xs:element name="Steps" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" name="Step">
+                            <xs:complexType>
+                              <xs:attribute name="Description" type="xs:string" use="required" />
+                              <xs:attribute name="Command" type="xs:string" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="Name" type="xs:string" use="required" />
+                  <xs:attribute name="Environment" type="xs:string" use="optional" />
+                  <xs:attribute name="Settings" type="xs:string" use="optional" />
+                  <xs:attribute name="Command" type="xs:string" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Settings" type="NameValuePairList" />
+        <xs:element name="Secrets" type="NameValuePairList" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="NameValuePairList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" name="Add">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="Name" type="xs:string" use="required" />
+              <xs:attribute name="Value" type="xs:string" use="optional" />
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

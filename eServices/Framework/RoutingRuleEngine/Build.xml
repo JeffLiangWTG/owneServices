@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Build xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" MSBuild="16.0" xmlns="http://wisetechglobal.com/DevTools/Build.xsd">
+  <Solutions>
+    <Solution Filename="eServices.RoutingRuleEngine.sln">
+    </Solution>
+  </Solutions>
+  <Dependencies>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/Shared/eHubDatabase" Name="eHubDatabase">
+      <Copy Target="Dependencies\eServices.eHubDatabase\Databases" Source="Databases" />
+      <Copy Target="Dependencies\eServices.eHubDatabase\Scripts" Source="Scripts" />
+    </Dependency>
+  </Dependencies>
+  <PreBuild>
+    <Command cacheable="false">cmd /c dotnet tool restore</Command>
+  </PreBuild>
+  <Tasks>
+    <Task Name="Initialize eServices.BuildTools.DatTool">
+      <Step>dotnet esv-dattool init --output Bin\DatTool</Step>
+    </Task>
+    <Task Name="Pack eServices.RoutingRuleEngine">
+      <Dependency Type="Solution">eServices.RoutingRuleEngine.sln</Dependency>
+      <Step>dotnet esv-pack --project RoutingRuleEngine\eServices.RoutingRuleEngine.csproj --package-source https://proget.wtg.zone/nuget/WTG-Internal/v3/index.json</Step>
+    </Task>
+  </Tasks>
+  <BuildConfigurations>
+    <Configuration BuildOnDat="true" TestOnDat="true" Publishable="false" GenerateMSBuildBinLogs="true">Release</Configuration>
+  </BuildConfigurations>
+  <DatSettings IntegrationAssembliesSubdir="DatTool\net48" BuildDeployerType="eServices.BuildTools.DatDeploy.Deployer, eServices.BuildTools.DatDeploy" DisableWorkspaceJobs="true">
+    <TestAdapter Type="Dat.Implementation.VSTest.VSTestAdapter, Dat.Implementation.VSTest">
+      <Options>
+        <Option Name="TestAssemblyFileFilter">*Tests.dll</Option>
+      </Options>
+    </TestAdapter>
+    <DeploymentTargets>
+      <DeploymentTarget Type="AutoDeployLatestBuild" BuildConfiguration="Release" DeploymentConfiguration="eServices.RoutingRuleEngine-Prerelease" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.RoutingRuleEngine-Prerelease" IsProduction="false" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.RoutingRuleEngine" />
+    </DeploymentTargets>
+  </DatSettings>
+</Build>

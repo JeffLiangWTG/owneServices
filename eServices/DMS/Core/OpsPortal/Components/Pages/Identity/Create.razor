@@ -1,0 +1,146 @@
+﻿@page "/identity/create"
+@attribute [Authorize(Policy = "eServicesAdmins")]
+
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Cryptography
+@inject UserManager<AppUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject NavigationManager NavigationManager
+@inject AppAccessService AppAccessService
+
+<PageTitle>App Access Create</PageTitle>
+
+<h2>App Access</h2>
+
+<h4>Create</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Input" OnValidSubmit="AddIdentityUser" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="id" class="form-label">ID:</label>
+                <InputText id="id" @bind-Value="Input.Id" class="form-control" />
+                <ValidationMessage For="() => Input.Id" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="password">Password</label>
+                <InputText id="password" type="password" @bind-Value="Input.Password" class="form-control" />
+                <ValidationMessage For="() => Input.Password" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="confirm-password">Confirm Password</label>
+                <InputText id="confirm-password" type="password" @bind-Value="Input.ConfirmPassword" class="form-control" />
+                <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Contact Email:</label>
+                <InputText id="email" @bind-Value="Input.Email" class="form-control" />
+                <ValidationMessage For="() => Input.Email" class="text-danger" />
+            </div>
+            <h4>Claims</h4>
+            <div class="mb-3">
+                <label>
+                    <InputCheckbox id="role-send-message" @bind-Value="Input.RoleSendMessage" />
+                    @AppRoles.SendMessage
+                </label>
+            </div>
+            <div class="mb-3">
+                <label>
+                    <InputCheckbox id="role-receive-message" @bind-Value="Input.RoleReceiveMessage" />
+                    @AppRoles.ReceiveMessage
+                </label>
+            </div>
+            <div class="mb-3">
+                <label>
+                    <InputCheckbox id="role-read-config" @bind-Value="Input.RoleReadConfig" />
+                    @AppRoles.ReadConfig
+                </label>
+            </div>
+            <div class="mb-3">
+                <label>
+                    <InputCheckbox id="role-write-storage" @bind-Value="Input.RoleWriteStorage" />
+                    @AppRoles.WriteStorage
+                </label>
+            </div>
+            <button id="submit" type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/identity">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public InputModel Input { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddIdentityUser()
+    {
+        var user = new AppUser()
+            {
+                UserName = Input.Id,
+                Email = Input.Email,
+                AccessKey = AppAccessService.GetAccessKey(Input.Password)
+            };
+
+        var result = await UserManager.CreateAsync(user, Input.Password);
+
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException(string.Join(';', result.Errors.Select(e => e.Description)));
+        }
+
+        if (Input.RoleSendMessage)
+            await AddUserToRole(user, $"{AppRoles.SendMessage}:{Input.Id}");
+        if (Input.RoleReceiveMessage)
+            await AddUserToRole(user, $"{AppRoles.ReceiveMessage}:{Input.Id}");
+        if (Input.RoleReadConfig)
+            await AddUserToRole(user, $"{AppRoles.ReadConfig}:{Input.Id}");
+        if (Input.RoleWriteStorage)
+        {
+            await AddUserToRole(user, $"{AppRoles.WriteStorage}:{Input.Id}");
+            await AddUserToRole(user, $"{AppRoles.ReadStorage}:{Input.Id}");
+        }
+
+        NavigationManager.NavigateTo($"/identity/details/{Input.Id}");
+    }
+
+    private async Task AddUserToRole(AppUser user, string role)
+    {
+        if (!await RoleManager.RoleExistsAsync(role))
+            await RoleManager.CreateAsync(new(role));
+        await UserManager.AddToRoleAsync(user, role);
+    }
+
+    public class InputModel
+    {
+        [Required]
+        [Display(Name = "ID")]
+        public string Id { get; set; } = "";
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; } = "";
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; } = "";
+
+        [NullableValidation<EmailAddressAttribute>]
+        [Display(Name = "Email")]
+        public string? Email { get; set; } = "";
+
+        public bool RoleSendMessage { get; set; }
+        public bool RoleReceiveMessage { get; set; }
+        public bool RoleReadConfig { get; set; }
+        public bool RoleWriteStorage { get; set; }
+    }
+}

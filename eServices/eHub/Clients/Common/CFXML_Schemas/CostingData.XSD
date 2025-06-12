@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!-- 
+    Title: "COSTING DATA"
+    
+    Purpose:
+    To send costing data from the CoreFreight application to
+    other external systems.
+    
+    Created by: Core Freight Systems
+    Version: 1.10
+    Last updated: 08 March 2012 (ES)
+    Last updated: 12 March 2012 (NRP)
+    Last updated: 25 February 2013 (NRP)
+    Last updated: 12 February 2014 (NRP)
+    Last updated: 13 February 2014 (WH)
+    Last updated: 16 February 2014 (WH)
+	Last updated: 18 February 2014 (WH)
+-->
+
+<xs:schema xmlns:xs           = "http://www.w3.org/2001/XMLSchema" 
+           elementFormDefault = "qualified">
+
+
+<!-- Define the root element: "CostingData" -->
+<xs:element name="CostingData">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="MessageHeader"  type="MessageHeaderType" />
+      <xs:element name="CostingFile"    type="CostingFileType" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>    <!-- "CostingData" -->
+
+
+<xs:complexType name="MessageHeaderType">
+  <xs:sequence>
+    <xs:element name="SenderID"    type="Str35" />
+    <xs:element name="RecipientID" type="Str35" />
+    <xs:element name="MessageID"   type="xs:positiveInteger" />
+    <xs:element name="MessageType" type="MsgTypeConstant" />
+    <xs:element name="Timestamp"   type="xs:dateTime" />
+    <xs:element name="Action"      type="MsgHdrActionType" />
+  </xs:sequence>
+</xs:complexType>    <!-- "MessageHeaderType" -->
+
+
+<xs:complexType name="CostingFileType">
+  <xs:sequence>
+    <xs:element name="CostingFileNo"   type="Str11" />
+    <xs:element name="BranchCode"      type="Str10" />
+    <xs:element name="ExcludeAllVAT"   type="xs:boolean" />
+    <xs:element name="TotalFreight"             type="xs:decimal" />
+    <xs:element name="TotalCustomsDuty"         type="xs:decimal" />
+    <xs:element name="TotalCustomsVAT"          type="xs:decimal" />
+    <xs:element name="TotalOtherCosts"          type="xs:decimal" />
+    <xs:element name="TotalInsurance"           type="xs:decimal" />
+    <xs:element name="TotalCartage"             type="xs:decimal" />
+    <xs:element name="TotalClearingCosts"       type="xs:decimal" />
+    <xs:element name="TotalCargoDues"           type="xs:decimal" />
+    <xs:element name="TotalLandingCost"         type="xs:decimal" />
+    <xs:element name="TotalStorageDemurrage"    type="xs:decimal" />
+    <xs:element name="TotalSuppInvCosts"        type="xs:decimal" />
+    <xs:element name="ClearingFile"    type="ClearingFileType" />
+    <xs:element name="CostingInvoice"  type="CostingInvoiceType"  maxOccurs="unbounded" />
+  </xs:sequence>
+</xs:complexType>    <!-- "CostingFileType" -->
+
+
+<xs:complexType name="ClearingFileType">
+  <xs:sequence>
+    <xs:element name="ClearingFileNo"     		type="Str11"  />
+    <xs:element name="ClientReference"    		type="Str20" minOccurs="0"/>
+    <xs:element name="TransportMethod"    		type="Str3"   />
+    <xs:element name="ImporterCode"       		type="Str10"  />
+    <xs:element name="ImporterName"       		type="Str100" />
+	<xs:element name="CustomerReference"  		type="Str20" minOccurs="0"/>
+	<xs:element name="PlaceOfClearance"   		type="Str10"  />
+    <xs:element name="TransportDocument"  		type="TransportDocumentType"  maxOccurs="unbounded" />
+  </xs:sequence>
+</xs:complexType>    <!-- "ClearingFileType" -->
+
+
+<xs:complexType name="TransportDocumentType">
+  <xs:sequence>
+    <xs:element name="MasterBillNo"       type="Str35" />
+    <xs:element name="ActualVoyageCode"   type="Str30" />
+    <xs:element name="ActualVesselName"   type="Str30" minOccurs="0"/>
+    <xs:element name="ActualAirlineCode"  type="Str10" minOccurs="0"/>
+    <xs:element name="OceanLineName"      type="Str100" minOccurs="0"/>
+    <xs:element name="ExecutionDate"      type="xs:dateTime" minOccurs="0"/>
+    <xs:element name="PortLoadingName"    type="Str50" minOccurs="0"/>
+    <xs:element name="ActualArrivalDate"  type="xs:dateTime" minOccurs="0"/>
+    <xs:element name="PortToName"         type="Str50" minOccurs="0"/>
+    <xs:element name="HouseBillNo"        type="Str35" minOccurs="0"/>
+    <xs:element name="ClientOrderNo"      type="Str20" minOccurs="0"/>
+    <xs:element name="GrossWeight"        type="xs:decimal" />
+    <xs:element name="PlaceOfEntry"       type="Str5"  minOccurs="0"/>
+	<xs:element name="PortOfDestination"  type="Str5"  minOccurs="0"/>
+    <xs:element name="ExternalReference"    type="Str50" minOccurs="0"/>
+    <xs:element name="ExternalReference1" type="Str50" minOccurs="0"/>
+    <xs:element name="ExternalReference2" type="Str50" minOccurs="0"/>
+    <xs:element name="ExternalReference3" type="Str50" minOccurs="0"/>
+    <xs:element name="ExternalReference4" type="Str50" minOccurs="0"/>
+    <xs:element name="ExternalReference5" type="Str50" minOccurs="0"/>
+    <xs:element name="ExternalReference6" type="Str50" minOccurs="0"/>
+    <xs:element name="ExternalReference7" type="Str50" minOccurs="0"/>
+    <xs:element name="ExternalReference8" type="Str50" minOccurs="0"/>
+    <xs:element name="ExternalReference9" type="Str50" minOccurs="0"/>
+    <xs:element name="ExternalReference10" type="Str50" minOccurs="0"/>
+    <xs:element name="Container"          type="ContainerType" minOccurs="0" maxOccurs="unbounded" />
+  </xs:sequence>
+</xs:complexType>    <!-- "TransportDocumentType" -->
+
+
+<xs:complexType name="ContainerType">
+  <xs:sequence>
+    <xs:element name="ContainerNo"        type="Str35" />
+    <xs:element name="ContainerTypeCode"        type="Str5"  minOccurs="0" />
+  </xs:sequence>
+</xs:complexType>    <!-- "ContainerType" -->
+
+
+<xs:complexType name="CostingInvoiceType">
+  <xs:sequence>
+    <xs:element name="InvoiceNo"                       type="Str15" />
+    <xs:element name="RevisedExchangeRateMultiplier"   type="xs:decimal" />
+    <xs:element name="RevisedExchangeRate"             type="xs:decimal" />
+    <xs:element name="AddInvForeignDiscount"           type="xs:decimal" />
+    <xs:element name="AddInvForeignDutiableAmount"     type="xs:decimal" />
+    <xs:element name="AddInvForeignNonDutiableAmount"  type="xs:decimal" />
+    <xs:element name="FOBCharges"  					   type="xs:decimal" minOccurs="0"/>
+    <xs:element name="TotalLinesExcluded"              type="xs:decimal" />
+    <xs:element name="ExporterName"                    type="Str100" />
+    <xs:element name="PurchTermCode"                   type="Str3" />
+    <xs:element name="InvoiceCurrency"                 type="Str3" />
+    <xs:element name="InvoiceTotal"                    type="xs:decimal" />
+	<xs:element name="SupplierInvoiceDate"             type="xs:dateTime" />
+	<xs:element name="SupplierCode"                    type="Str10" />
+	<xs:element name="SupplierName"                    type="Str100" />
+	<xs:element name="ExternalSupplierCode"            type="Str20" minOccurs="0"/>
+    <xs:element name="CostingInvoiceLine"       	   type="CostingInvoiceLineType"  maxOccurs="unbounded" />
+  </xs:sequence>
+</xs:complexType>    <!-- "CostingInvoiceType" -->
+
+
+<xs:complexType name="CostingInvoiceLineType">
+  <xs:sequence>
+    <xs:element name="CostingInvoiceLineNo"     type="xs:positiveInteger" />
+    <xs:element name="SuppliersInvoiceLineNo"   type="xs:integer" />
+    <xs:element name="PartNumber"               type="Str30" />
+    <xs:element name="CostingLineQuantity"      type="xs:decimal" />
+    <xs:element name="CostingLineLocalValue"    type="xs:decimal" />
+    <xs:element name="CostingLineValue"         type="xs:decimal" />
+    <xs:element name="ExchangeRate"             type="xs:decimal" />
+    <xs:element name="TotalInvoiceMarkUpValue"  type="xs:decimal" />
+    <xs:element name="CostingDuty"              type="xs:decimal" />
+    <xs:element name="CostingVAT"               type="xs:decimal" />
+    <xs:element name="CostLineDesc"             type="Str255" />
+    <xs:element name="CostLineRef"              type="Str50" />
+    <xs:element name="TotalLineCost"            type="xs:decimal" />
+    <xs:element name="CostingUnitQuantity"      type="xs:decimal" />
+    <xs:element name="Advalorem"                type="xs:decimal" />
+    <xs:element name="UnitPrice"                type="xs:decimal" />
+    <xs:element name="BOELineNo"                type="xs:integer" />
+    <xs:element name="TariffCode"               type="Str10" />
+    <xs:element name="TariffDescription"        type="Str255" />
+    <xs:element name="DateOfClearance"          type="xs:dateTime" minOccurs="0"/>
+    <xs:element name="BOENumber"                type="Str35" minOccurs="0"/>
+    <xs:element name="BOEDate"                  type="xs:dateTime" minOccurs="0"/>
+    <xs:element name="PurposeCode"              type="Str3" />
+    <xs:element name="BOELine"                  type="xs:positiveInteger" />
+    <xs:element name="NetWeight"                type="xs:decimal" />
+    <xs:element name="CountryCode"              type="Str3" />
+    <xs:element name="BOELineUnitQuantity"      type="BOELineUnitQuantityType" minOccurs="0" maxOccurs="unbounded" />
+    <xs:element name="TotalFreight"             type="xs:decimal" />
+    <xs:element name="TotalCustomsDuty"         type="xs:decimal" />
+    <xs:element name="TotalCustomsVAT"          type="xs:decimal" />
+    <xs:element name="TotalOtherCosts"          type="xs:decimal" />
+    <xs:element name="TotalInsurance"           type="xs:decimal" />
+    <xs:element name="TotalCartage"             type="xs:decimal" />
+    <xs:element name="TotalClearingCosts"       type="xs:decimal" />
+    <xs:element name="TotalCargoDues"           type="xs:decimal" />
+    <xs:element name="TotalLandingCost"         type="xs:decimal" />
+    <xs:element name="TotalStorageDemurrage"    type="xs:decimal" />
+    <xs:element name="TotalSuppInvCosts"        type="xs:decimal" />
+    <xs:element name="SuppInvoiceLineOrderNo"   type="Str30" />
+  </xs:sequence>
+</xs:complexType>    <!-- "CostingInvoiceLineType" -->
+
+
+<xs:complexType name="BOELineUnitQuantityType">
+  <xs:sequence>
+	<xs:element name="StatsCode"    type="Str20" />
+	<xs:element name="StatsQty"     type="xs:decimal" />
+	<xs:element name="StatsType"    type="Str3" />
+  </xs:sequence>
+</xs:complexType>    <!-- "BOELineUnitQuantityType" -->
+
+
+<xs:simpleType name="MsgHdrActionType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="Add" />
+    <xs:enumeration value="Update" />
+    <xs:enumeration value="Delete" />
+  </xs:restriction>
+</xs:simpleType>    <!-- "MsgHdrActionType" -->
+
+
+<xs:simpleType name="MsgTypeConstant">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="CFXML_COSTING_DETAILS" />
+  </xs:restriction>
+</xs:simpleType>    <!-- "MsgTypeConstant" -->
+
+
+<xs:simpleType name="Str255">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="255"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str255" -->
+
+<xs:simpleType name="Str100">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="100"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str100" -->
+
+<xs:simpleType name="Str50">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="50"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str50" -->
+
+<xs:simpleType name="Str35">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="35"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str35" -->
+
+<xs:simpleType name="Str30">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="30"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str30" -->
+
+<xs:simpleType name="Str20">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="20"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str20" -->
+
+<xs:simpleType name="Str15">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="15"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str15" -->
+
+<xs:simpleType name="Str11">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="11"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str11" -->
+
+<xs:simpleType name="Str10">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="10"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str10" -->
+
+<xs:simpleType name="Str5">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="5"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str5" -->
+
+<xs:simpleType name="Str3">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="3"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str3" -->
+
+</xs:schema>

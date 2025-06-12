@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="dat:package">
+
+  <PropertyGroup>
+    <BinPath Condition="'$(BinPath)'==''">$(MSBuildThisFileDirectory)..\..\..\..\Bin</BinPath>
+    <SourcePath Condition="'$(SourcePath)'==''">$(MSBuildThisFileDirectory)..\..\..\..</SourcePath>
+
+    <BinPath Condition="'$(BinPath)'==''">$([System.IO.Path]::GetFullPath('$(BinPath'))</BinPath>
+    <SourcePath Condition="'$(SourcePath)'==''">$([System.IO.Path]::GetFullPath('$(SourcePath'))</SourcePath>
+
+    <DeploymentPath>$(BinPath)\Deployment</DeploymentPath>
+    <InstallCommonPath Condition="'$(DeployCommonPath)' == ''">$(DeploymentPath)\Install\</InstallCommonPath>
+    <DeployCommonPath Condition="Exists('$(DeploymentPath)\Common\Deploy.tasks')">$(DeploymentPath)\Common\</DeployCommonPath>
+    <DeployCommonPath Condition="'$(DeployCommonPath)' == ''">$(MSBuildThisFileDirectory)Common\</DeployCommonPath>
+
+    <_ProjectId>eHubLatestBuild</_ProjectId>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(ProgramFiles)\MSBuild\ExtensionPack\4.0\</MSBuildExtensionsPackPath>
+    <MSBuildExtensionsPackPath Condition="!Exists('$(MSBuildExtensionsPackPath)')">$(ProgramFiles)\MSBuildExtensionPack\4.0\</MSBuildExtensionsPackPath>
+
+    <BizTalkAssembliesProjDirectory>$(SourcePath)\Deploy\BizTalk\BizTalkAssemblies</BizTalkAssembliesProjDirectory>
+    <BizTalkCommonDirectory>$(SourcePath)\Deploy\BizTalk\BizTalkCommon</BizTalkCommonDirectory>
+    <PackageCommonTasks>$(BizTalkCommonDirectory)\package-common.tasks</PackageCommonTasks>
+
+    <DeployCommonPath>$(SourcePath)\Deployment\Common\</DeployCommonPath>
+    <ProfilesPropsDirectory>$(MSBuildThisFileDirectory)..\..\Profiles</ProfilesPropsDirectory>
+  </PropertyGroup>
+
+  <!-- global properties -->
+  <Import Project="$(ProfilesPropsDirectory)\Profiles.tasks" Condition="'$(ProfilesIncluded)'==''" />
+
+  <Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks" Condition="'$(BuildPath)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)' == ''"/>
+  <Import Project="$(DeployCommonPath)Deploy.tasks" Condition="'$(DeployCommonImported)' == ''"/>
+
+  <!-- targeting BizTalkAssemblies -->
+  <Import Project="$(BizTalkAssembliesProjDirectory)\BizTalkAssemblies.proj" />
+
+  <Target Name="paket">
+    <Exec Command="$(SourcePath)\paket.exe restore" />
+  </Target>
+
+  <Target Name="dat:package" Returns="$(_TargetZipFilePath)" DependsOnTargets="bat:package:init;paket">
+    <ItemGroup>
+      <Profiles Include="$(MSBuildThisFileDirectory)\Profiles\**\*" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <MSBuildFrameworkAssemblyPath>$(SourcePath)\packages\Microsoft.Build.Framework\lib\net46\Microsoft.Build.Framework.dll</MSBuildFrameworkAssemblyPath>
+    </PropertyGroup>
+
+    <RemoveDir Directories="$(_ZipContentsDirectory)" Condition="Exists($(_ZipContentsDirectory))" />
+    <MakeDir Directories="$(_ZipContentsDirectory)" />
+
+    <Copy SourceFiles="$(MSBuildFrameworkAssemblyPath)" DestinationFolder="$(BinPath)" />
+    <Copy SourceFiles="@(Profiles)" DestinationFolder="$(_ZipContentsDirectory)\Profiles\%(RecursiveDir)" />
+
+    <CallTarget Targets="bat:package" />
+  </Target>
+
+  <Target Name="dat:deploy" DependsOnTargets="test:remote-session">
+    <Message Text="$(var-file)" />
+
+    <CallTarget Targets="dat:package">
+      <Output
+          TaskParameter="TargetOutputs"
+          PropertyName="_PackageFilePath" />
+    </CallTarget>
+
+    <PropertyGroup>
+      <PreDeployScript>
+        <![CDATA[
+{
+    $SiteName = "Default Web Site"
+
+    if ($null -ne $error) { $error.Clear() }
+
+    try {
+        Import-Module WebAdministration
+        Stop-Website -Name $SiteName
+        return Ge-WebsiteState $SiteName
+
+    } catch {
+        if ($null -ne $error[0])
+        {
+          return $error[0]
+        }
+    }
+}
+]]>
+      </PreDeployScript>
+      <PostDeployScript>
+        <![CDATA[
+{
+    if ($null -ne $error) { $error.Clear() }
+
+    try {
+        Import-Module WebAdministration
+        Start-Website -Name $SiteName
+        return Ge-WebsiteState $SiteName
+
+    } catch {
+        if ($null -ne $error[0])
+        {
+          return $error[0]
+        }
+    }
+}
+]]>
+      </PostDeployScript>
+    </PropertyGroup>
+
+    <Message Text="-p:SourcePath=$(SourcePath);BinPath=$(BinPath);Profile=$(Profile)" Importance="High" />
+    <Message Text="dat:deploy: $(_PackageFilePath) to server: $(Server), path: $(InstallPath)" />
+    <Deploy
+        ZipFile="$(_PackageFilePath)"
+        DeploymentFolder="$(InstallPath)"
+        MachineName="$(Server)"
+        UserId="$(UserId)"
+        UserPassword="$(Password)">
+
+      <Output TaskParameter="DeployResult" PropertyName="DeployResult" />
+    </Deploy>
+
+    <Delete Files="$(_PackageFilePath)" Condition="Exists('$(_PackageFilePath)')" />
+    <Message Text="$(_PackageFilePath) has been successfully deployed to $(Server), path: $(InstallPath)" Condition="'$(DeployResult)'=='True'" />
+    <Error Text="Failed to deploy $(_PackageFilePath) $(Server)" Condition="'$(DeployResult)'=='False'" />
+  </Target>
+
+  <Target Name="test:remote-session">
+    <Message Text="Test connection to $(Server) with credential from $(UserId)" Importance="High" />
+
+    <TestPsRemote Server="$(Server)" DatabaseServer="$(DatabaseServer)" UserId="$(UserId)" Password="$(Password)">
+      <Output TaskParameter="Result" PropertyName="Result" />
+    </TestPsRemote>
+
+    <Message Text="Successfully connected to $(Server)" Condition="'$(Result)'=='True'" Importance="High" />
+    <Error Text="Failed to connect to $(Server) with credential from $(UserId)" Condition="'$(Result)'!='True'" />
+  </Target>
+
+  <UsingTask
+    TaskName="TestPsRemote"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <Server ParameterType="System.String" Required="true" />
+      <DatabaseServer ParameterType="System.String" Required="true" />
+      <UserId ParameterType="System.String" Required="true" />
+      <Password ParameterType="System.String" Required="true" />
+      <Result ParameterType="System.Boolean" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        $securePw = ConvertTo-SecureString -AsPlainText -Force -String $Password
+        $UserCred = New-Object -TypeName System.Management.Automation.PSCredential($UserId, $securePw)
+        $Session = $null
+
+        try
+        {
+            $Session = New-PSSession -Computername $Server -Credential $UserCred
+
+            if ($null -ne $Session) {
+                $Result = $true
+
+                Invoke-Command -Session $Session -ScriptBlock { 
+                    param($command)
+                    Invoke-Expression -Command:"cmd.exe"
+                } -ArgumentList $installCommand
+           }
+        } catch {
+            $Result = $false
+        } finally {
+            if ($null -ne $Session) { 
+                Remove-PsSession -Session $Session
+            }
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+</Project>

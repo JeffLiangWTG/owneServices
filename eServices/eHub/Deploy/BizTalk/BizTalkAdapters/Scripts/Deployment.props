@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bat:props:init">
+  <PropertyGroup>
+    <_DeploymentPropsImported>$true</_DeploymentPropsImported>
+    <_BinPath>Bin</_BinPath>
+    <_AdaptersBinPath>$(_BinPath)\Adapters</_AdaptersBinPath>
+    <_GACBinPath>$(_BinPath)\GAC</_GACBinPath>
+    <_ProgramFilesJsonFile>$(MSBuildThisFileDirectory)Program-files.json</_ProgramFilesJsonFile>
+    <_GACFilesJsonFile>$(MSBuildThisFileDirectory)GAC-files.json</_GACFilesJsonFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(ProgramFiles)\MSBuild\ExtensionPack\4.0\</MSBuildExtensionsPackPath>
+    <MSBuildExtensionsPackPath Condition="!Exists('$(MSBuildExtensionsPackPath)')">$(ProgramFiles)\MSBuildExtensionPack\4.0\</MSBuildExtensionsPackPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks" Condition="'$(BuildPath)'==''"/>
+  
+  <Target Name="bat:props:init">
+    <ItemGroup>
+        <BinFileNames Remove="@(BinFileNames)" />
+        <GACFileNames Remove="@(GACFileNames)" />
+    </ItemGroup>
+
+    <LoadFilesListFromJsonFile JsonFilePath="$(_ProgramFilesJsonFile)">
+      <Output TaskParameter="FileNames" ItemName="BinFileNames" />
+    </LoadFilesListFromJsonFile>
+
+    <LoadFilesListFromJsonFile JsonFilePath="$(_GACFilesJsonFile)">
+      <Output TaskParameter="FileNames" ItemName="GACFileNames" />
+    </LoadFilesListFromJsonFile>
+  </Target>
+
+  <UsingTask
+    TaskName="LoadFilesListFromJsonFile"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <JsonFilePath ParameterType="System.String" Required="true" />
+      <FileNames ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        $FileNames = @()
+        $json = Get-Content -Raw -Path $JsonFilePath | Out-String | ConvertFrom-Json
+        $json | % {
+            $FileNames += [String] $_
+        }
+      ]]>
+    </Task>
+
+  </UsingTask>
+</Project>

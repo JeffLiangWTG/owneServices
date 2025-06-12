@@ -1,0 +1,108 @@
+﻿@implements IDisposable
+@inject NavigationManager NavigationManager
+@inject IWebHostEnvironment Env
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="d-flex align-items-center">
+        <img src="CW_Icon_RGB_BLUE_Logo.svg" alt="Logo" class="navbar-logo" />
+        <a class="navbar-brand px-3" href="">DMS Ops Portal</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+@if (Env.IsEnvironment("Test"))
+{
+    <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <i class="bi bi-house-door-fill" aria-hidden="true"></i> Home
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="messages">
+                    <i class="bi bi-list-nested" aria-hidden="true"></i> Messages
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="identity">
+                    <i class="bi bi-shield-shaded" aria-hidden="true"></i> App Access
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="storage">
+                    <i class="bi bi-database-gear" aria-hidden="true"></i> App Storage
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="about">
+                    <i class="bi bi-info-circle" aria-hidden="true"></i> About
+                </NavLink>
+            </div>
+        </nav>
+    </div>
+}
+else
+{
+    <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <i class="bi bi-house-door-fill" aria-hidden="true"></i> Home
+                </NavLink>
+            </div>
+
+            <AuthorizeView>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="messages">
+                        <i class="bi bi-list-nested" aria-hidden="true"></i> Messages
+                    </NavLink>
+                </div>
+
+                <AuthorizeView Policy="eServicesAdmins" Context="adminContext">
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="identity">
+                            <i class="bi bi-shield-shaded" aria-hidden="true"></i> App Access
+                        </NavLink>
+                    </div>
+
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="storage">
+                            <i class="bi bi-database-gear" aria-hidden="true"></i> App Storage
+                        </NavLink>
+                    </div>
+                </AuthorizeView>
+            </AuthorizeView>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="about">
+                    <i class="bi bi-info-circle" aria-hidden="true"></i> About
+                </NavLink>
+            </div>
+        </nav>
+    </div>
+}
+
+@code {
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

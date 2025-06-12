@@ -1,0 +1,76 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
+using System.Xml.Xsl;
+using System.Xml.XPath;
+using System.Resources;
+using System.IO;
+using System.Reflection;
+using Hawking.Xslt.Legacy;
+
+namespace $namespaceName$
+{
+    public class $className$ : IXsltLegacy
+    {
+        const string userCSharpNamespaceName = "$userCSharpNamespaceName$";
+        const string xslContentResourceFilePath = "$xslContentResourceFilePath$";
+        const string extxmlContentResourceFilePath = "$extxmlContentResourceFilePath$";
+
+        #region IXsltLegacy
+
+        Stream xslContentStream;
+        public Stream XslContent
+        {
+            get
+            {
+                if (xslContentStream == null)
+                {
+                    var assembly = Assembly.GetExecutingAssembly();
+                    xslContentStream = assembly.GetManifestResourceStream(assembly.GetName().Name + "." + xslContentResourceFilePath);
+                }
+
+                return xslContentStream;
+            }
+        }
+
+        string extxmlContent;
+        public string ExtxmlContent
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(extxmlContent) && !string.IsNullOrEmpty(extxmlContentResourceFilePath))
+                {
+                    var assembly = Assembly.GetExecutingAssembly();
+                    using (var stream = assembly.GetManifestResourceStream(assembly.GetName().Name + "." + extxmlContentResourceFilePath))
+                    {
+                        if (stream != null)
+                        {
+                            using (var reader = new StreamReader(stream))
+                            {
+                                extxmlContent = reader.ReadToEnd();
+                            }
+                        }
+                    }
+                }
+
+                return extxmlContent;
+            }
+        }
+
+        public string UserCSharpNamespaceName => userCSharpNamespaceName;
+        public bool HasUserCSharpScripts => !string.IsNullOrEmpty(UserCSharpNamespaceName);
+
+        public KeyValuePair<string, object> CreateUserCsharpExtensionObject()
+        {
+            var instance = new $className$();
+            return new KeyValuePair<string, object>(instance.UserCSharpNamespaceName, instance);
+        }
+
+        $userCSharpScripts$
+
+        #endregion
+    }
+}

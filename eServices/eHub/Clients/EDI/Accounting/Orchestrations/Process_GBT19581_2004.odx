@@ -1,0 +1,326 @@
+﻿#if __DESIGNER_DATA
+#error Do not define __DESIGNER_DATA.
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<om:MetaModel MajorVersion="1" MinorVersion="3" Core="2b131234-7959-458d-834f-2dc0769ce683" ScheduleModel="66366196-361d-448d-976f-cab5e87496d2" xmlns:om="http://schemas.microsoft.com/BizTalk/2003/DesignerData">
+    <om:Element Type="Module" OID="5a6f8173-96aa-453f-9949-b60b45596847" LowerBound="1.1" HigherBound="85.1">
+        <om:Property Name="ReportToAnalyst" Value="True" />
+        <om:Property Name="Name" Value="CargoWise.eHub.Clients.EDI.Accounting.Orchestrations" />
+        <om:Property Name="Signal" Value="False" />
+        <om:Element Type="ServiceDeclaration" OID="7af11d51-767b-4cd9-8979-ea4163faec81" ParentLink="Module_ServiceDeclaration" LowerBound="23.1" HigherBound="84.1">
+            <om:Property Name="InitializedTransactionType" Value="True" />
+            <om:Property Name="IsInvokable" Value="False" />
+            <om:Property Name="TypeModifier" Value="Internal" />
+            <om:Property Name="ReportToAnalyst" Value="True" />
+            <om:Property Name="Name" Value="Process_GBT19581" />
+            <om:Property Name="Signal" Value="True" />
+            <om:Element Type="VariableDeclaration" OID="8c3f3f9f-1b83-47ad-b982-f14dc310e1fc" ParentLink="ServiceDeclaration_VariableDeclaration" LowerBound="32.1" HigherBound="33.1">
+                <om:Property Name="UseDefaultConstructor" Value="True" />
+                <om:Property Name="Type" Value="System.Text.StringBuilder" />
+                <om:Property Name="ParamDirection" Value="In" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="msgBodyBuilder" />
+                <om:Property Name="Signal" Value="True" />
+            </om:Element>
+            <om:Element Type="VariableDeclaration" OID="4c955adb-e86d-4514-9e8e-fe807ff440a0" ParentLink="ServiceDeclaration_VariableDeclaration" LowerBound="33.1" HigherBound="34.1">
+                <om:Property Name="UseDefaultConstructor" Value="False" />
+                <om:Property Name="Type" Value="System.String" />
+                <om:Property Name="ParamDirection" Value="In" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="attachmentFileName" />
+                <om:Property Name="Signal" Value="True" />
+            </om:Element>
+            <om:Element Type="LongRunningTransaction" OID="01ea033f-b6d2-4175-97fb-fd0e4efb19a8" ParentLink="ServiceDeclaration_Transaction" LowerBound="24.21" HigherBound="24.62">
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="OrchestrationTransaction" />
+                <om:Property Name="Signal" Value="False" />
+            </om:Element>
+            <om:Element Type="MessageDeclaration" OID="02f4a186-e726-4b81-853e-fdfabdca7ac7" ParentLink="ServiceDeclaration_MessageDeclaration" LowerBound="30.1" HigherBound="31.1">
+                <om:Property Name="Type" Value="System.Xml.XmlDocument" />
+                <om:Property Name="ParamDirection" Value="In" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="CN_GBT19581_2004" />
+                <om:Property Name="Signal" Value="True" />
+            </om:Element>
+            <om:Element Type="MessageDeclaration" OID="311b6818-91e6-471d-9c0c-e009407c48e5" ParentLink="ServiceDeclaration_MessageDeclaration" LowerBound="31.1" HigherBound="32.1">
+                <om:Property Name="Type" Value="CargoWise.eHub.Clients.EDI.Accounting.Orchestrations.EmailType" />
+                <om:Property Name="ParamDirection" Value="In" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="Email" />
+                <om:Property Name="Signal" Value="True" />
+            </om:Element>
+            <om:Element Type="ServiceBody" OID="dcb427c4-bc4c-4e26-86eb-8853819bbc40" ParentLink="ServiceDeclaration_ServiceBody">
+                <om:Property Name="Signal" Value="False" />
+                <om:Element Type="Receive" OID="3ca67b42-0baa-457f-9458-d42adf9ced98" ParentLink="ServiceBody_Statement" LowerBound="36.1" HigherBound="40.1">
+                    <om:Property Name="Activate" Value="True" />
+                    <om:Property Name="PortName" Value="ReceivePort" />
+                    <om:Property Name="MessageName" Value="CN_GBT19581_2004" />
+                    <om:Property Name="OperationName" Value="Operation" />
+                    <om:Property Name="OperationMessageName" Value="Request" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="Receive" />
+                    <om:Property Name="Signal" Value="True" />
+                    <om:Element Type="DNFPredicate" OID="cebf97c3-ea27-42a0-9055-f507227adad1" ParentLink="Receive_DNFPredicate">
+                        <om:Property Name="LHS" Value="CargoWise.eHub.Core.PropertySchemas.NextStep" />
+                        <om:Property Name="RHS" Value="&quot;DistributeToRecipient&quot;" />
+                        <om:Property Name="Grouping" Value="AND" />
+                        <om:Property Name="Operator" Value="Equals" />
+                        <om:Property Name="Signal" Value="False" />
+                    </om:Element>
+                    <om:Element Type="DNFPredicate" OID="0d7ca0d1-0ba9-464c-b9f9-49fd0b40c528" ParentLink="Receive_DNFPredicate">
+                        <om:Property Name="LHS" Value="BTS.DestinationParty" />
+                        <om:Property Name="RHS" Value="&quot;ChinaAccounting&quot;" />
+                        <om:Property Name="Grouping" Value="AND" />
+                        <om:Property Name="Operator" Value="Equals" />
+                        <om:Property Name="Signal" Value="False" />
+                    </om:Element>
+                </om:Element>
+                <om:Element Type="Construct" OID="2ca4e977-25ed-449d-a507-0b76bfdff8e4" ParentLink="ServiceBody_Statement" LowerBound="40.1" HigherBound="63.1">
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="ConstructEmail" />
+                    <om:Property Name="Signal" Value="True" />
+                    <om:Element Type="MessageAssignment" OID="c150ac01-0748-465d-8654-6d9ef5a5d53d" ParentLink="ComplexStatement_Statement" LowerBound="43.1" HigherBound="62.1">
+                        <om:Property Name="Expression" Value="msgBodyBuilder = new System.Text.StringBuilder();&#xD;&#xA;msgBodyBuilder.AppendLine(&quot;&lt;html&gt;&lt;body&gt;&lt;span style=\&quot;font-family: calibri,arial,sans-serif\&quot;&gt;&quot;);&#xD;&#xA;msgBodyBuilder.AppendLine(&quot;&lt;pre&gt;&quot; + &quot;Enclosed please find the mapped GBT19581_2004 file. You can open it with Notepad or other text file editors.&quot; + &quot;&lt;/pre&gt;&quot;);&#xD;&#xA;msgBodyBuilder.AppendLine(&quot;&lt;/span&gt;&lt;/body&gt;&lt;/html&gt;&quot;);&#xD;&#xA;&#xD;&#xA;Email.EmailBody = new CargoWise.eHub.Core.PipelineComponents.Tools.RawString(msgBodyBuilder.ToString());&#xD;&#xA;Email.EmailBody(Microsoft.XLANGs.BaseTypes.ContentType) = &quot;text/html&quot;;&#xD;&#xA;Email.Attachment = CN_GBT19581_2004;&#xD;&#xA;attachmentFileName = CN_GBT19581_2004(CargoWise.eHub.Core.PropertySchemas.OverrideFilename);&#xD;&#xA;attachmentFileName = attachmentFileName.Replace(&quot;.xml&quot;, &quot;.txt&quot;);&#xD;&#xA;Email.Attachment(MIME.FileName) = attachmentFileName;&#xD;&#xA;&#xD;&#xA;Email(SMTP.Subject) = &quot;Mapped GBT19581_2004 File - &quot; + attachmentFileName;&#xD;&#xA;Email(SMTP.From) = &quot;eHubNoReply@cargowise.com&quot;;&#xD;&#xA;Email(SMTP.EmailBodyFileCharset) = &quot;UTF-8&quot;;&#xD;&#xA;&#xD;&#xA;Email(SMTP.MessagePartsAttachments) = 2;&#xD;&#xA;&#xD;&#xA;" />
+                        <om:Property Name="ReportToAnalyst" Value="False" />
+                        <om:Property Name="Name" Value="AssignEmail" />
+                        <om:Property Name="Signal" Value="False" />
+                    </om:Element>
+                    <om:Element Type="MessageRef" OID="8bf6c3bc-f4b5-43aa-97cc-446fea3d92db" ParentLink="Construct_MessageRef" LowerBound="41.23" HigherBound="41.28">
+                        <om:Property Name="Ref" Value="Email" />
+                        <om:Property Name="ReportToAnalyst" Value="True" />
+                        <om:Property Name="Signal" Value="False" />
+                    </om:Element>
+                </om:Element>
+                <om:Element Type="VariableAssignment" OID="68cf87ff-9a03-4375-976a-700dc0f9f80c" ParentLink="ServiceBody_Statement" LowerBound="63.1" HigherBound="65.1">
+                    <om:Property Name="Expression" Value="SendPort(Microsoft.XLANGs.BaseTypes.Address) = &quot;mailto:&quot; + CN_GBT19581_2004(CargoWise.eHub.Core.PropertySchemas.OverrideEmailSubject);" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="RecipientEmailAddress" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+                <om:Element Type="Scope" OID="593765cf-9d5f-4fbc-9dd3-91976952310e" ParentLink="ServiceBody_Statement" LowerBound="65.1" HigherBound="80.1">
+                    <om:Property Name="InitializedTransactionType" Value="True" />
+                    <om:Property Name="IsSynchronized" Value="False" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="UpdateStatus" />
+                    <om:Property Name="Signal" Value="True" />
+                    <om:Element Type="VariableDeclaration" OID="c156282a-3f69-4325-97d5-a4c01abe8043" ParentLink="Scope_VariableDeclaration" LowerBound="69.1" HigherBound="70.1">
+                        <om:Property Name="UseDefaultConstructor" Value="False" />
+                        <om:Property Name="Type" Value="CargoWise.eHub.DataAccess.Integration.IOutboxAccessor" />
+                        <om:Property Name="ParamDirection" Value="In" />
+                        <om:Property Name="ReportToAnalyst" Value="True" />
+                        <om:Property Name="Name" Value="OutboxAccessor" />
+                        <om:Property Name="Signal" Value="True" />
+                    </om:Element>
+                    <om:Element Type="AtomicTransaction" OID="8abfc881-7e86-4637-be29-c902778364ff" ParentLink="Scope_Transaction" LowerBound="67.18" HigherBound="67.61">
+                        <om:Property Name="ReportToAnalyst" Value="True" />
+                        <om:Property Name="Name" Value="UpdateStatusTransaction" />
+                        <om:Property Name="Signal" Value="False" />
+                    </om:Element>
+                    <om:Element Type="VariableAssignment" OID="a675ff8b-fb5f-4ece-8e93-27966242802c" ParentLink="ComplexStatement_Statement" LowerBound="72.1" HigherBound="78.1">
+                        <om:Property Name="Expression" Value="OutboxAccessor = CargoWise.eHub.DataAccess.Integration.DataAccessFactories.NewOutboxAccessorInstance();&#xD;&#xA;OutboxAccessor.UpdateMessageDistributionStatus(&#xD;&#xA;                            CN_GBT19581_2004(CargoWise.eHub.Core.PropertySchemas.MessageTrackingID), &#xD;&#xA;                            CN_GBT19581_2004(BTS.SourceParty), &#xD;&#xA;                            CN_GBT19581_2004(BTS.DestinationParty));" />
+                        <om:Property Name="ReportToAnalyst" Value="True" />
+                        <om:Property Name="Name" Value="UpdateStatus" />
+                        <om:Property Name="Signal" Value="False" />
+                    </om:Element>
+                    <om:Element Type="TransactionAttribute" OID="7f56bc83-20e9-4137-a9ae-69329946e4e3" ParentLink="Statement_CLRAttribute" LowerBound="66.1" HigherBound="67.1">
+                        <om:Property Name="Batch" Value="True" />
+                        <om:Property Name="Retry" Value="True" />
+                        <om:Property Name="Timeout" Value="60" />
+                        <om:Property Name="Isolation" Value="Serializable" />
+                        <om:Property Name="Signal" Value="False" />
+                    </om:Element>
+                </om:Element>
+                <om:Element Type="Send" OID="a068a5f5-5511-446f-bf81-76840bf130ba" ParentLink="ServiceBody_Statement" LowerBound="80.1" HigherBound="82.1">
+                    <om:Property Name="PortName" Value="SendPort" />
+                    <om:Property Name="MessageName" Value="Email" />
+                    <om:Property Name="OperationName" Value="Operation" />
+                    <om:Property Name="OperationMessageName" Value="Request" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="Send" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+            </om:Element>
+            <om:Element Type="PortDeclaration" OID="8081f67a-5081-4a09-ad40-1ae7f7160a5e" ParentLink="ServiceDeclaration_PortDeclaration" LowerBound="26.1" HigherBound="28.1">
+                <om:Property Name="PortModifier" Value="Implements" />
+                <om:Property Name="Orientation" Value="Left" />
+                <om:Property Name="PortIndex" Value="-1" />
+                <om:Property Name="IsWebPort" Value="False" />
+                <om:Property Name="OrderedDelivery" Value="False" />
+                <om:Property Name="DeliveryNotification" Value="None" />
+                <om:Property Name="Type" Value="CargoWise.eHub.Clients.EDI.Accounting.Orchestrations.ReceivePortType" />
+                <om:Property Name="ParamDirection" Value="In" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="ReceivePort" />
+                <om:Property Name="Signal" Value="True" />
+                <om:Element Type="DirectBindingAttribute" OID="4139abf3-4818-4a08-b8cf-34283f24493b" ParentLink="PortDeclaration_CLRAttribute" LowerBound="26.1" HigherBound="27.1">
+                    <om:Property Name="DirectBindingType" Value="MessageBox" />
+                    <om:Property Name="Signal" Value="False" />
+                </om:Element>
+            </om:Element>
+            <om:Element Type="PortDeclaration" OID="a3ab1fe8-851b-46af-b471-5f1072127210" ParentLink="ServiceDeclaration_PortDeclaration" LowerBound="28.1" HigherBound="30.1">
+                <om:Property Name="PortModifier" Value="Uses" />
+                <om:Property Name="Orientation" Value="Right" />
+                <om:Property Name="PortIndex" Value="-1" />
+                <om:Property Name="IsWebPort" Value="False" />
+                <om:Property Name="OrderedDelivery" Value="False" />
+                <om:Property Name="DeliveryNotification" Value="None" />
+                <om:Property Name="Type" Value="CargoWise.eHub.Clients.EDI.Accounting.Orchestrations.SendPortType" />
+                <om:Property Name="ParamDirection" Value="In" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="SendPort" />
+                <om:Property Name="Signal" Value="True" />
+                <om:Element Type="PhysicalBindingAttribute" OID="cbe4cd91-ba39-472c-aed1-bc5118f7e7e5" ParentLink="PortDeclaration_CLRAttribute" LowerBound="28.1" HigherBound="29.1">
+                    <om:Property Name="InPipeline" Value="Microsoft.BizTalk.DefaultPipelines.XMLReceive" />
+                    <om:Property Name="OutPipeline" Value="Microsoft.BizTalk.DefaultPipelines.PassThruTransmit" />
+                    <om:Property Name="TransportType" Value="HTTP" />
+                    <om:Property Name="URI" Value="http://tempURI" />
+                    <om:Property Name="IsDynamic" Value="True" />
+                    <om:Property Name="Signal" Value="False" />
+                </om:Element>
+            </om:Element>
+        </om:Element>
+        <om:Element Type="MultipartMessageType" OID="016e243b-7cba-4a7f-ad93-b5d63739a6be" ParentLink="Module_MessageType" LowerBound="4.1" HigherBound="9.1">
+            <om:Property Name="TypeModifier" Value="Internal" />
+            <om:Property Name="ReportToAnalyst" Value="True" />
+            <om:Property Name="Name" Value="EmailType" />
+            <om:Property Name="Signal" Value="True" />
+            <om:Element Type="PartDeclaration" OID="49adc929-02b4-4e01-9b41-36a2046b7fcd" ParentLink="MultipartMessageType_PartDeclaration" LowerBound="6.1" HigherBound="7.1">
+                <om:Property Name="ClassName" Value="CargoWise.eHub.Core.PipelineComponents.Tools.RawString" />
+                <om:Property Name="IsBodyPart" Value="True" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="EmailBody" />
+                <om:Property Name="Signal" Value="True" />
+            </om:Element>
+            <om:Element Type="PartDeclaration" OID="16a69ded-f8c5-4b0e-9ddd-df762be594f0" ParentLink="MultipartMessageType_PartDeclaration" LowerBound="7.1" HigherBound="8.1">
+                <om:Property Name="ClassName" Value="System.Xml.XmlDocument" />
+                <om:Property Name="IsBodyPart" Value="False" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="Attachment" />
+                <om:Property Name="Signal" Value="True" />
+            </om:Element>
+        </om:Element>
+        <om:Element Type="PortType" OID="b3c65670-6790-4bb8-adb4-2305622bea35" ParentLink="Module_PortType" LowerBound="9.1" HigherBound="16.1">
+            <om:Property Name="Synchronous" Value="False" />
+            <om:Property Name="TypeModifier" Value="Internal" />
+            <om:Property Name="ReportToAnalyst" Value="True" />
+            <om:Property Name="Name" Value="ReceivePortType" />
+            <om:Property Name="Signal" Value="False" />
+            <om:Element Type="OperationDeclaration" OID="bdedd055-2bfc-4594-a81e-c9e3a3bd2257" ParentLink="PortType_OperationDeclaration" LowerBound="11.1" HigherBound="15.1">
+                <om:Property Name="OperationType" Value="OneWay" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="Operation" />
+                <om:Property Name="Signal" Value="True" />
+                <om:Element Type="MessageRef" OID="235bee2a-08c0-436a-bb8d-7e3a443d6c34" ParentLink="OperationDeclaration_RequestMessageRef" LowerBound="13.13" HigherBound="13.35">
+                    <om:Property Name="Ref" Value="System.Xml.XmlDocument" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="Request" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+            </om:Element>
+        </om:Element>
+        <om:Element Type="PortType" OID="1e740b0a-3676-4c54-98b8-6c1e9626ad7d" ParentLink="Module_PortType" LowerBound="16.1" HigherBound="23.1">
+            <om:Property Name="Synchronous" Value="False" />
+            <om:Property Name="TypeModifier" Value="Internal" />
+            <om:Property Name="ReportToAnalyst" Value="True" />
+            <om:Property Name="Name" Value="SendPortType" />
+            <om:Property Name="Signal" Value="False" />
+            <om:Element Type="OperationDeclaration" OID="7ad41367-0fbb-4789-a3a0-a216b41a8932" ParentLink="PortType_OperationDeclaration" LowerBound="18.1" HigherBound="22.1">
+                <om:Property Name="OperationType" Value="OneWay" />
+                <om:Property Name="ReportToAnalyst" Value="True" />
+                <om:Property Name="Name" Value="Operation" />
+                <om:Property Name="Signal" Value="True" />
+                <om:Element Type="MessageRef" OID="16e80749-27eb-4a95-aefa-d30d73d5e9c9" ParentLink="OperationDeclaration_RequestMessageRef" LowerBound="20.13" HigherBound="20.22">
+                    <om:Property Name="Ref" Value="CargoWise.eHub.Clients.EDI.Accounting.Orchestrations.EmailType" />
+                    <om:Property Name="ReportToAnalyst" Value="True" />
+                    <om:Property Name="Name" Value="Request" />
+                    <om:Property Name="Signal" Value="True" />
+                </om:Element>
+            </om:Element>
+        </om:Element>
+    </om:Element>
+</om:MetaModel>
+#endif // __DESIGNER_DATA
+[Microsoft.XLANGs.BaseTypes.BPELExportable(false)]
+module CargoWise.eHub.Clients.EDI.Accounting.Orchestrations
+{
+    internal messagetype EmailType
+    {
+        body CargoWise.eHub.Core.PipelineComponents.Tools.RawString EmailBody;
+        System.Xml.XmlDocument Attachment;
+    };
+    internal porttype ReceivePortType
+    {
+        oneway Operation
+        {
+            System.Xml.XmlDocument
+        };
+    };
+    internal porttype SendPortType
+    {
+        oneway Operation
+        {
+            EmailType
+        };
+    };
+    [Microsoft.XLANGs.BaseTypes.BPELExportable(false)]
+    internal service longrunning transaction Process_GBT19581
+    {
+        [Microsoft.XLANGs.BaseTypes.DirectBinding()]
+        port implements ReceivePortType ReceivePort;
+        [Microsoft.XLANGs.BaseTypes.PhysicalBinding(typeof(Microsoft.BizTalk.DefaultPipelines.PassThruTransmit))]
+        port uses dynamic SendPortType SendPort;
+        message System.Xml.XmlDocument CN_GBT19581_2004;
+        message EmailType Email;
+        System.Text.StringBuilder msgBodyBuilder;
+        System.String attachmentFileName;
+        body ()
+        {
+            [Microsoft.XLANGs.BaseTypes.DesignerPosition("3ca67b42-0baa-457f-9458-d42adf9ced98")]
+            activate ((CargoWise.eHub.Core.PropertySchemas.NextStep == "DistributeToRecipient") && (BTS.DestinationParty == "ChinaAccounting"))receive (ReceivePort.Operation, CN_GBT19581_2004);
+            msgBodyBuilder = new System.Text.StringBuilder();
+            attachmentFileName = "";
+            [Microsoft.XLANGs.BaseTypes.DesignerPosition("2ca4e977-25ed-449d-a507-0b76bfdff8e4")]
+            construct Email
+            {
+                [Microsoft.XLANGs.BaseTypes.DesignerPosition("c150ac01-0748-465d-8654-6d9ef5a5d53d")]
+                msgBodyBuilder = new System.Text.StringBuilder();
+                msgBodyBuilder.AppendLine("<html><body><span style=\"font-family: calibri,arial,sans-serif\">");
+                msgBodyBuilder.AppendLine("<pre>" + "Enclosed please find the mapped GBT19581_2004 file. You can open it with Notepad or other text file editors." + "</pre>");
+                msgBodyBuilder.AppendLine("</span></body></html>");
+                
+                Email.EmailBody = new CargoWise.eHub.Core.PipelineComponents.Tools.RawString(msgBodyBuilder.ToString());
+                Email.EmailBody(Microsoft.XLANGs.BaseTypes.ContentType) = "text/html";
+                Email.Attachment = CN_GBT19581_2004;
+                attachmentFileName = CN_GBT19581_2004(CargoWise.eHub.Core.PropertySchemas.OverrideFilename);
+                attachmentFileName = attachmentFileName.Replace(".xml", ".txt");
+                Email.Attachment(MIME.FileName) = attachmentFileName;
+                
+                Email(SMTP.Subject) = "Mapped GBT19581_2004 File - " + attachmentFileName;
+                Email(SMTP.From) = "eHubNoReply@cargowise.com";
+                Email(SMTP.EmailBodyFileCharset) = "UTF-8";
+                
+                Email(SMTP.MessagePartsAttachments) = 2;
+                
+            }
+            [Microsoft.XLANGs.BaseTypes.DesignerPosition("68cf87ff-9a03-4375-976a-700dc0f9f80c")]
+            SendPort(Microsoft.XLANGs.BaseTypes.Address) = "mailto:" + CN_GBT19581_2004(CargoWise.eHub.Core.PropertySchemas.OverrideEmailSubject);
+            [Microsoft.XLANGs.BaseTypes.DesignerPosition("593765cf-9d5f-4fbc-9dd3-91976952310e")]
+            [Microsoft.XLANGs.BaseTypes.Transaction(Retry=true,Batch=true,Timeout=60,TranIsolationLevel=System.Data.IsolationLevel.Serializable)]
+            scope atomic transaction UpdateStatusTransaction
+            {
+                CargoWise.eHub.DataAccess.Integration.IOutboxAccessor OutboxAccessor;
+                body
+                {
+                    [Microsoft.XLANGs.BaseTypes.DesignerPosition("a675ff8b-fb5f-4ece-8e93-27966242802c")]
+                    OutboxAccessor = CargoWise.eHub.DataAccess.Integration.DataAccessFactories.NewOutboxAccessorInstance();
+                    OutboxAccessor.UpdateMessageDistributionStatus(
+                                                CN_GBT19581_2004(CargoWise.eHub.Core.PropertySchemas.MessageTrackingID), 
+                                                CN_GBT19581_2004(BTS.SourceParty), 
+                                                CN_GBT19581_2004(BTS.DestinationParty));
+                }
+            }
+            [Microsoft.XLANGs.BaseTypes.DesignerPosition("a068a5f5-5511-446f-bf81-76840bf130ba")]
+            send (SendPort.Operation, Email);
+        }
+    }
+}
+

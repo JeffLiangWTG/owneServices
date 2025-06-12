@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://portcommunity.haven.antwerpen.be/"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0"
+	targetNamespace="http://portcommunity.haven.antwerpen.be/">
+	<xs:element name="checkpointAndRetrieveMessages" type="tns:checkpointAndRetrieveMessages"/>
+	<xs:element name="checkpointAndRetrieveMessagesResponse" type="tns:checkpointAndRetrieveMessagesResponse"/>
+	<xs:element name="notifyAlive" type="tns:notifyAlive"/>
+	<xs:element name="notifyAliveResponse" type="tns:notifyAliveResponse"/>
+	<xs:element name="portCommunityFault" type="tns:portCommunityFault"/>
+	<xs:element name="sendMessages" type="tns:sendMessages"/>
+	<xs:element name="sendMessagesResponse" type="tns:sendMessagesResponse"/>
+	<xs:complexType name="sendMessages">
+		<xs:sequence>
+			<xs:element name="messages" type="tns:portCommunityMessage" minOccurs="0" maxOccurs="100"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="portCommunityMessage">
+		<xs:sequence>
+			<xs:element name="body" type="xs:string" minOccurs="1"/>
+			<xs:element name="checkpoint" type="tns:checkpoint" minOccurs="1"/>
+			<xs:element name="header" type="tns:header" minOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="header">
+		<xs:sequence>
+			<xs:element name="messageTypeCode" type="xs:string" minOccurs="1"/>
+			<xs:element name="messageTypeVersion" type="xs:string" minOccurs="1"/>
+			<xs:element name="mailbox" type="tns:mailbox" minOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="sendMessagesResponse">
+		<xs:sequence/>
+	</xs:complexType>
+	<xs:complexType name="portCommunityFault">
+		<xs:sequence>
+			<xs:element name="message" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="checkpointAndRetrieveMessages">
+		<xs:sequence>
+			<xs:element name="checkpoint" type="tns:checkpoint" minOccurs="1" nillable="true"/>
+			<xs:element name="criteria" type="tns:criteria" minOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="criteria">
+		<xs:sequence>
+			<xs:element name="maxNumberOfMessages" type="tns:maxNumberOfMessages"/>
+			<xs:element name="maxSize" type="tns:maxSize"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="checkpointAndRetrieveMessagesResponse">
+		<xs:sequence>
+			<xs:element name="batch" type="tns:batch" minOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="batch">
+		<xs:sequence>
+			<xs:element name="messages" type="tns:portCommunityMessage" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="moreMessages" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="notifyAlive">
+		<xs:sequence>
+			<xs:element name="callbackUrl" type="tns:callbackUrl" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="notifyAliveResponse">
+		<xs:sequence></xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="mailbox">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="32"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="checkpoint">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="40" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="callbackUrl">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="256" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="maxNumberOfMessages">
+		<xs:restriction base="xs:int">
+			<xs:minInclusive value="1"/>
+			<xs:maxInclusive value="100000"/>	
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="maxSize">
+		<xs:restriction base="xs:int">
+			<xs:minInclusive value="1000000"/> <!-- 1MB -->
+			<xs:maxInclusive value="100000000"/> <!-- 100MB -->	
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

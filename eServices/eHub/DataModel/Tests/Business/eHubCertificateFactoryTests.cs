@@ -1,0 +1,57 @@
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using CargoWise.eHub.DataModel.Business;
+
+namespace CargoWise.eHub.DataModel.Tests.Business
+{
+	[TestClass]
+	public class eHubCertificateFactoryTests
+	{
+		[TestMethod]
+		public void CreateNeweHubCertificate_Pkcs12binary()
+		{
+			var certificateBase64 = "MIIIGgIBAzCCB9QGCSqGSIb3DQEHAaCCB8UEggfBMIIHvTCCAxoGCSqGSIb3DQEHAaCCAwsEggMHMIIDAzCCAv8GCyqGSIb3DQEMCgECoIICsjCCAq4wKAYKKoZIhvcNAQwBAzAaBBSTakM2r1srEH1M6hkgGQeILBvOXwICBAAEggKABucw3C3vBHkXsOKLQuNvq3qXpxd27YFgVlY8boZqCO9bqGJ/JXQOmqZT5i2LAarRaRRDgwwmoFfY0D7vLiNjMNDg8unnnkmseqiMLiHnc9wRLxfErIrD0d0HcTuBSZzDUv3k2flD9hv+zMuCZgmOb0qEpOb67dkd5HkySpg2T49tiXM/iYQYjZvgdnql75QvQxowS6igS6hFPXIRivxMduc4hkjohZg38j7c0n8vCHeBdFe+1T2xngmE9foqOB6KOmnWnRL+ctAZjt24/5RqzJDgqj++rBjF/HeI+LKtL1XK5Vt8xtnzB/3ruOidAsIkkC6MUtRbA3TPQLVKWb+pHaJl/EyP+txPxIisUpM2Rx1gFgde/PsgYF2zL2PAr6thT+CdaUoz2r4/tAMnWA5TFawQY/iShF/hYfFjvMQPJyuJrd45BzO4C+mM6Ni6lgQnJUgeFFY6bxsxItK2r0lQcC0K9TlIHg8O5HrWYkDHKJ0YsVemiGWH6wiiZRcNwutVOfwEtD3xHe38Xd9t7s29ERPj4peg0uRpAr1ilmTKOy+RxP38S5PZbDvb7UiEWhASLeR5MH9d4t0mTJE17B/yEGaSvyut9xosqAE+0XtTQ65uHNsi92PruivKOVvScR0cwqPhfXY8/89UPxEm1N1BV4UpW0kzk+9pY6pzLePZUPyq6PUI7Sgq8wXo/LjqZS4LqsQ7yccYrEMQ/dNbeMn7alQZccdlhOP03axqakkmDqapfK6d1oR7rXzVI204+QXMGQHSbKfDMujUkJINaoiiGrAQiBJc2zPfpSK99DD1+9RfqvX7Y5S1jDkv7xicImwqENn/9D2AG+uhey4gnToTYDE6MBUGCSqGSIb3DQEJFDEIHgYAcwBzAGwwIQYJKoZIhvcNAQkVMRQEElRpbWUgMTQ5MDg2ODg3NDE1MDCCBJsGCSqGSIb3DQEHBqCCBIwwggSIAgEAMIIEgQYJKoZIhvcNAQcBMCgGCiqGSIb3DQEMAQYwGgQUXjj+JPOYpR7efBWJXT/ie/b6PJoCAgQAgIIESBFXWZT6sRHfAPltMdqatV5jvJHZP0PoZpBxfLfQ67nwAzdOLuL6AOMX9J8HZ0ua3KJLsvoeLGnWbgd7scwcdDCu9dr2FbfSugpI9wHIzdKFFQ5Ai1IA7d4GTL0w+lF7UnIfAnKK/tziBunIAUaYC2MCi76OqZxSnjWdc08Kwk/slkodTzKHgWS2uLuzNWsiBI6zq/mUf2p52b7wTS7ZrDYefpNizFviWK1Hxg23/kzTv3+T6ye+pL9y1beSKr0dqdG8pRb/sJVIoMUEY4r9pQoqRhTKvYhTvcM1I+mKaJz5DDeDDcMasN3ZLrLxD4F32XDhRQjx0/nk1YQQJu3NAGfy/UVyTzqamDJxZ+CgDZ6uF4RsEyzmBh2cHBGAvT8O/1RlGZlLGYcQ7jg5iFCd4d1MUnpQME1c932lG+ixE4kRiEhs7xV4mYy88hZywURPQFckp/yAbP87RxWvIe9/iawIlKZ6Uy2Br1+xzt66FM6E57Fw4pS5LF3QurJBq2jLvu+wkKm2XbkEwYdL/kjVnkoIKf9k3wykVMhOlU4k+j2wQnZD8lGuszo4J1eWeIZB+Rs59aQNY+5Tw1ddRQoVHFklPVQ+YXbmikgxhK+Gh12kTzmSUazCQASlVk/hGtXU1RB609hZhLLjElqTor4kdUouGWju+5Qkb/nAxkuHx+Joox8i1jxlG25Y/aAGZXNHxudVnB0/a3bLkfbYBoogUToc6J+3ix9iELsAk7vNG3OR6VTHluZMBg+2lK+V+COUCNwuFsaP/LpdjXZ5ThW+7UDCw1pbtJRuXP/n1DynTTp1Ekam24NjkiFCl+3yLaNwWeG+Tnt93sMaOVK11VyImhKzMAYVDpOjI7OUHuGOdqzUYWrkjdqPlHAvScEXp+MY66jrD7HozZEXZayo/COaeIgLeDYgv19R1AIXQhIijh6bBbo906pEe7uupTITAdBBD9TgKL+LZgDI47NfxAroRP4eDK2K/oGO6l5NM52WMOffWH4ccaoLM+OUnWzz2KrnNIr6Olx+sSMIc0TcUxnHcCbKOnZYRp5FO+FtLq6A/+1wSTqDOriOJmLgivkY3wmn5bZayZt9kcjXrQFGIsK5AlQrDQ2ilKZ1IDUkeQDBAnwcQOXQ9KaRMuqd7Uvy1NGd0cWtW1IPEKJlzrmhq9oWGbOXkhDP8zGvkol0et+v2eXNf/ODeBw2HKRNDvUXA410T7zMVFa3mQVB1raD8BbiXuWkNH7EYvDbOxSjMR+y1IwlKUoy/L6WIvXQ+Z2a8KqpP3xnJY1shOHNakdrXXji0afQk4XfaYPGwCR7W4AkCNaEWU5AmB5SdzaagbxrTYB6/L0Y+F8pddkpPUG8JLppXuzuwnoqdH+anF2laFsKZhUh2/hJVehBTcW7GxCleBvq/8nhecetL6wHFtUw6A9rc3j8tl9myp2ARxJBspVeoIMS2La+doFU4lEwPTAhMAkGBSsOAwIaBQAEFObQf9ttoa3cxzvJs8fxS6ACmIuxBBSW6iudfN/1W7nT0sS0PQudzsbhCgICBAA=";
+			var binaryContainer = Convert.FromBase64String(certificateBase64);
+			var cert = eHubCertificateFactory.CreateeHubCertificate("pkcs12-binary", binaryContainer, "AAA", "SY4F17N1", "cat", null);
+			Assert.AreEqual(new DateTime(2017, 03, 30, 10, 03, 49), cert.CE_ValidFromUTC);
+			Assert.AreEqual(new DateTime(2020, 03, 30, 10, 03, 49), cert.CE_ValidToUTC);
+			Assert.AreEqual("1BC17E85C50C89089FE9921A97133055F13D444A",cert.CE_Thumbprint);
+			Assert.AreEqual(ContainerType.PKCS12, cert.CE_ContainerType);
+			Assert.AreEqual("AAA",cert.CE_ID);
+			Assert.AreEqual("SY4F17N1", cert.CE_Password);
+			Assert.AreEqual("cat", cert.CE_Category);
+		}
+
+		[TestMethod]
+		public void UnexpectedContainerType_ThrowException()
+		{
+			try
+			{
+				var cert = eHubCertificateFactory.CreateeHubCertificate("dadada", new byte[0], "AAA", "pass", "cat", null);
+				Assert.Fail("Exception expected");
+			}
+			catch (Exception ex)
+			{
+				Assert.AreEqual("Unexpected Container Type: dadada", ex.Message);
+				Assert.AreEqual(typeof(ArgumentException), ex.GetType());
+			}
+		}
+
+		[TestMethod]
+		public void CreateNeweHubCertificate_Pkcs12binary_WrongPassword_ThrowException()
+		{
+			var certificateBase64 = "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";
+			var binaryContainer = Convert.FromBase64String(certificateBase64);
+			try
+			{
+				var cert = eHubCertificateFactory.CreateeHubCertificate("pkcs12-binary", binaryContainer, "AAA", "pass", "cat", null);
+				Assert.Fail("Exception expected");
+			}
+			catch (Exception ex)
+			{
+				Assert.IsTrue(ex.Message.Contains("The specified network password is not correct."));
+				Assert.AreEqual(typeof(System.Security.Cryptography.CryptographicException), ex.GetType());
+			}
+		}
+	}
+}

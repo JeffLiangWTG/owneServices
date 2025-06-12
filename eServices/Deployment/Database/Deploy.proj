@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+
+    <MSBuildTaksToolsFilePath>$(MSBuildBinPath)\Microsoft.Build.Tasks.Core.dll</MSBuildTaksToolsFilePath>
+    <MSBuildTasksToolsFilePath Condition="!Exists('$(MSBuildTasksToolsFilePath)')">$(MSBuildProgramFiles32)\MSBuild\$(MSBuildToolsVersion)\Bin\Microsoft.Build.Tasks.v$(MSBuildUseVersion).dll</MSBuildTasksToolsFilePath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props" Condition="'$(_DeploymentPropsImported)'==''"/>
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Deployment.props" Condition="'$(Profile)' != '' and '$(_ProfilePropsImported)'==''"/>
+
+  <PropertyGroup>
+    <SQLServer2008R2>$(MSBuildProgramFiles32)\Microsoft SQL Server\105\DAC\bin</SQLServer2008R2>
+    <SQLServer2012>$(MSBuildProgramFiles32)\Microsoft SQL Server\110\DAC\bin</SQLServer2012>
+    <SQLServer2014>$(MSBuildProgramFiles32)\Microsoft SQL Server\120\DAC\bin</SQLServer2014>
+    <SQLServer2016>$(MSBuildProgramFiles32)\Microsoft SQL Server\130\DAC\bin</SQLServer2016>
+    <VisualStudio2013>$(MSBuildProgramFiles32)\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\Microsoft\SQLDB\DAC\</VisualStudio2013>
+    <VisualStudio2019>$(MSBuildProgramFiles32)\Microsoft Visual Studio\2019\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\DAC\</VisualStudio2019>
+
+    <SqlPackageExe>sqlpackage.exe</SqlPackageExe>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <_DatabaseFilesPath>$(OutputPath)</_DatabaseFilesPath>
+    <_DatabaseFilesPath Condition="'$(_DatabaseFilesPath)'==''">$(MSBuildThisFileDirectory)Bin</_DatabaseFilesPath>
+    <_SourceFilePath>$(_DatabaseFilesPath)\$(_DacpacFileName)</_SourceFilePath>
+
+    <SqlCmdVariablesFile Condition="'$(SqlCmdVariablesFile)' == '' And '$(Profile)' != ''">$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\SqlCmdVariables.xml</SqlCmdVariablesFile>
+    <SqlCmdVariablesFile Condition="'$(SqlCmdVariablesFile)' == ''">$(MSBuildProjectDirectory)\Deployment\SqlCmdVariables.xml</SqlCmdVariablesFile>
+  </PropertyGroup>
+
+  <Import Project="$(SqlCmdVariablesFile)" Condition="'$(SqlCmdVariablesImported)'=='' and '$(SqlCmdVariablesFile)'!='' and Exists('$(SqlCmdVariablesFile)') and '$(SqlCmdVariableImported)'==''" />
+
+  <PropertyGroup>
+    <_Credentials Condition="'$(UserName)' == '' Or '$(Password)' == ''">Integrated Security=True</_Credentials>
+    <_Credentials Condition="'$(UserName)' != '' And '$(Password)' != ''">User ID=$(UserName);Password='$(Password)'</_Credentials>
+    <ConnectionString Condition="'$(ConnectionString)' == ''">Data Source=$(_Server);Database=$(_TargetDatabaseName);$(_Credentials);Pooling=False</ConnectionString>
+    <VersionCheckConnectionString>Data Source=localhost;Integrated Security=True;Pooling=False</VersionCheckConnectionString>
+  </PropertyGroup>
+
+  <Target Name="bat:deploy">
+    <ItemGroup>
+      <SqlPackageExeFiles Include="$(SQLServer2008R2)/**/$(SqlPackageExe)" />
+      <SqlPackageExeFiles Include="$(SQLServer2012)/**/$(SqlPackageExe)" />
+      <SqlPackageExeFiles Include="$(SQLServer2014)/**/$(SqlPackageExe)" />
+      <SqlPackageExeFiles Include="$(SQLServer2016)/**/$(SqlPackageExe)" />
+      <SqlPackageExeFiles Include="$(VisualStudio2013)/**/$(SqlPackageExe)" />
+      <SqlPackageExeFiles Include="$(VisualStudio2019)/**/$(SqlPackageExe)" />
+    </ItemGroup>
+
+    <Error Text="Cannot find $(SqlPackageExe). Please install SSDT for Visual Studio." Condition="@(SqlPackageExeFiles->Count()) &lt; 1" />
+    <GetLastItem Items="@(SqlPackageExeFiles)">
+      <Output TaskParameter="LastItem" PropertyName="SQLPackagePath"/>
+    </GetLastItem>
+
+    <Exec Command="&quot;$(SQLPackagePath)&quot; /Action:Publish /SourceFile:&quot;$(_SourceFilePath)&quot; /TargetConnectionString:&quot;$(ConnectionString)&quot; /Profile:&quot;$(SqlCmdVariablesFile)&quot;"/>
+  </Target>
+
+  <Target Name="bat:remove">
+    <Error
+      Condition="'$(_TargetDatabaseName)' == 'master'"
+      Text="'master' database cannot be deleted."/>
+
+    <PropertyGroup>
+      <SqlCmdLogOn Condition="'$(UserName)' != '' And '$(Password)' != ''">$(UserName)</SqlCmdLogOn>
+      <SqlCmdPassword Condition="'$(UserName)' != '' And '$(Password)' != ''">$(Password)</SqlCmdPassword>
+    </PropertyGroup>
+
+    <SqlCmd
+      TaskAction="Execute"
+      Server="$(_Server)"
+      LogOn="$(SqlCmdLogOn)"
+      Password="$(SqlCmdPassword)"
+      CommandLineQuery="
+      alter database [$(_TargetDatabaseName)] set single_user with rollback immediate;
+      drop database [$(_TargetDatabaseName)];"/>
+
+  </Target>
+
+  <UsingTask
+    TaskName="GetLastItem"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="$(MSBuildTasksToolsFilePath)">
+    <ParameterGroup>
+      <Items ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <LastItem ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <Using Namespace="System.Linq"/>
+      <Code Type="Fragment" Language="cs">LastItem = Items.Last().ItemSpec;</Code>
+    </Task>
+  </UsingTask>
+
+</Project>

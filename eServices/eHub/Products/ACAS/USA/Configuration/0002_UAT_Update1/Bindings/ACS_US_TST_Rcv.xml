@@ -1,0 +1,109 @@
+<ReceivePort Name="ACS_US_TST_Rcv" IsTwoWay="false" BindingOption="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Description xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  <ReceiveLocations>
+    <ReceiveLocation Name="ACS_US_TST_Rcv">
+      <Description xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+      <Address>C:\Temp\Inbound\ACS_US_TST_Rcv\*copy*</Address>
+      <PublicAddress />
+      <Primary>true</Primary>
+      <ReceiveLocationServiceWindowEnabled>false</ReceiveLocationServiceWindowEnabled>
+      <ReceiveLocationFromTime>2019-03-18T13:00:00</ReceiveLocationFromTime>
+      <ReceiveLocationToTime>2019-03-19T12:59:59</ReceiveLocationToTime>
+      <ReceiveLocationStartDateEnabled>false</ReceiveLocationStartDateEnabled>
+      <ReceiveLocationStartDate>2019-03-19T00:00:00</ReceiveLocationStartDate>
+      <ReceiveLocationEndDateEnabled>false</ReceiveLocationEndDateEnabled>
+      <ReceiveLocationEndDate>2019-03-20T00:00:00</ReceiveLocationEndDate>
+      <ReceiveLocationTransportType Name="FILE" Capabilities="11" ConfigurationClsid="5e49e3a6-b4fc-4077-b44c-22f34a242fdb" />
+      <ReceiveLocationTransportTypeData>
+        <CustomProps>
+          <RenameReceivedFiles vt="11">-1</RenameReceivedFiles>
+          <RemoveReceivedFileDelay vt="19">10</RemoveReceivedFileDelay>
+          <RemoveReceivedFileMaxInterval vt="19">300000</RemoveReceivedFileMaxInterval>
+          <FileMask vt="8">*copy*</FileMask>
+          <FileNetFailRetryInt vt="19">5</FileNetFailRetryInt>
+          <RemoveReceivedFileRetryCount vt="19">5</RemoveReceivedFileRetryCount>
+          <BatchSizeInBytes vt="19">102400</BatchSizeInBytes>
+          <PollingInterval vt="19">60000</PollingInterval>
+          <FileNetFailRetryCount vt="19">5</FileNetFailRetryCount>
+          <BatchSize vt="19">1</BatchSize>
+        </CustomProps>
+      </ReceiveLocationTransportTypeData>
+      <ReceivePipeline Name="CargoWise.eHub.Core.Pipelines.Rcv_ResolveInboundMessage" FullyQualifiedName="CargoWise.eHub.Core.Pipelines.Rcv_ResolveInboundMessage, CargoWise.eHub.Core.Pipelines, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350" Type="1" TrackingOption="ServiceStartEnd MessageSendReceive PipelineEvents" />
+      <ReceivePipelineData>
+        <Root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <Stages>
+            <Stage CategoryId="9d0e4103-4cce-4536-83fa-4a5040674ad6">
+              <Components>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.StreamWrapperComponent">
+                  <Properties />
+                </Component>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.AS2Decoder">
+                  <Properties />
+                </Component>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.TrackingIDAssignmentComponent">
+                  <Properties>
+                    <AssignSenderTrackingID vt="11">-1</AssignSenderTrackingID>
+                  </Properties>
+                </Component>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.CompositeValuePromotionComponent">
+                  <Properties />
+                </Component>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.BodyPropertyReader">
+                  <Properties />
+                </Component>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.AddNamespaceComponent">
+                  <Properties />
+                </Component>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.PartyResolutionComponent">
+                  <Properties>
+                    <RecipientID vt="8"></RecipientID>
+                    <ResolveRecipient vt="11">0</ResolveRecipient>
+                    <ResolveSender vt="11">0</ResolveSender>
+                    <SenderID vt="8">ACAS_US</SenderID>
+                  </Properties>
+                </Component>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.IncomingMessageLogger">
+                  <Properties>
+                    <Enabled vt="11">-1</Enabled>
+                  </Properties>
+                </Component>
+              </Components>
+            </Stage>
+            <Stage CategoryId="9d0e4105-4cce-4536-83fa-4a5040674ad6">
+              <Components>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.SchemaResolveDisassembleComponent">
+                  <Properties>
+                    <DisassembleType vt="8">FlatFile</DisassembleType>
+                    <MessageSchema vt="8">CargoWise.eHub.Products.ACAS.Schemas.ACAS_US_Envelope, CargoWise.eHub.Products.ACAS.Schemas, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350</MessageSchema>
+                    <ProcessSubscriptions vt="11">-1</ProcessSubscriptions>
+                  </Properties>
+                </Component>
+              </Components>
+            </Stage>
+            <Stage CategoryId="9d0e410e-4cce-4536-83fa-4a5040674ad6">
+              <Components>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.StaticValuePromotionComponent">
+                  <Properties>
+                    <Value vt="8">DeliverToOutbox</Value>
+                  </Properties>
+                </Component>
+              </Components>
+            </Stage>
+          </Stages>
+        </Root>
+      </ReceivePipelineData>
+      <SendPipeline xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+      <SendPipelineData xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+      <Enable>false</Enable>
+      <ReceiveHandler Name="BizTalkServerApplication" HostTrusted="false">
+        <TransportType Name="FILE" Capabilities="11" ConfigurationClsid="5e49e3a6-b4fc-4077-b44c-22f34a242fdb" />
+      </ReceiveHandler>
+    </ReceiveLocation>
+  </ReceiveLocations>
+  <SendPipelineData xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  <Authentication>0</Authentication>
+  <Tracking>0</Tracking>
+  <Transforms />
+  <RouteFailedMessage>true</RouteFailedMessage>
+  <ApplicationName>CargoWise.eHub</ApplicationName>
+</ReceivePort>

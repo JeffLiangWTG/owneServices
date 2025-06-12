@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration strict="true" xmlns="http://logging.apache.org/log4j/2.0/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://logging.apache.org/log4j/2.0/config
+		log4j2.xsd">
+	<Properties>
+		<Property name="directory">logs/mhaccess</Property>
+	</Properties>
+	<Appenders>
+		<RollingFile name="RollingFile" fileName="${directory}/mhaccess.log" filePattern="${directory}/mhaccess-%d{yyyyMMdd}-%i.log">
+			<PatternLayout pattern="%d [%-5p] [%t] %c{2}%x - %m%n" />
+			<Policies>
+				<!-- Trigger a new log file by pattern: http://docs.embarcadero.com/products/er_studio_portal/erstudioPortal2.0/HTMLHelp/Admin/erstudioportal/erstudioportaladministratorsguide/cron_expression_examplescron_expression_examplecreates_trigger.htm-->
+				<CronTriggeringPolicy schedule="0 0 0 * * ?" />
+				<SizeBasedTriggeringPolicy size="5 MB" />
+			</Policies>
+			<DefaultRolloverStrategy>
+				<Delete basePath="${directory}">
+					<IfFileName glob="mhaccess-*.log">
+						<IfLastModified age="60d" />
+					</IfFileName>
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingFile>
+		<RollingFile name="ApiSevereError" fileName="${directory}/api-severe-error.log" filePattern="${directory}/api-severe-error-%d{yyyyMMdd}-%i.log">
+			<PatternLayout pattern="%d - %m%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="1 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="5" />
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Logger name="ApiSevereError" level="error" additivity="false">
+			<AppenderRef ref="ApiSevereError" />
+		</Logger>
+		<Root level="info">
+			<AppenderRef ref="RollingFile" />
+		</Root>
+	</Loggers>
+</Configuration>

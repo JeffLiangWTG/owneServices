@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bat:update-deployment-targets">
+
+  <PropertyGroup>
+    <SourcePath Condition="'$(SourcePath)'==''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), 'Build.xml'))</SourcePath>
+    <BinPath Condition="'$(BinPath)'==''">$(SourcePath)\Bin</BinPath>
+    <RelativeBATPath>$([MSBUILD]::MakeRelative("$(BinPath)", "$(MSBuildProjectDirectory)"))</RelativeBATPath>
+
+    <DeploymentRoot Condition="'$(DeploymentRoot)'==''">$(MSBuildThisFileDirectory)..\</DeploymentRoot>
+    <DeploymentRoot>$([System.IO.Path]::GetFullPath('$(DeploymentRoot)'))</DeploymentRoot>
+    <CommonScriptsPath>$(DeploymentRoot)Common\</CommonScriptsPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(CommonScriptsPath)MSBuildCommon.tasks</MSBuildCommonTasks>
+    <BuildXmlFilePath>$([MSBuild]::GetPathOfFileAbove('Build.xml', $(MSBuildProjectDirectory)))</BuildXmlFilePath>
+    <PackageCommonTasks>$(DeploymentRoot)package-common.tasks</PackageCommonTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+
+  <!-- =============================================================================== -->
+  <!-- Execution -->
+  <!-- execute the Deploy.proj msbuild project file from within a given zip file -->
+  <Target Name="bat:deploy" DependsOnTargets="bat:package:init">
+    <Error Text="The PackageFilePath $(PackageFilePath) is not found" Condition="!Exists('$(PackageFilePath)')" />
+    <Message Text="Executing package: '$(PackageFilePath)' on profile: $(Profile)" />
+
+    <!-- Unpack package to a temp folder -->
+    <Zip TaskAction="Extract"
+         ExtractPath="$(_ZipContentsDirectory)"
+         ZipFileName="$(PackageFilePath)" />
+
+    <PropertyGroup>
+      <DeployProjFile>$(_ZipContentsDirectory)\Deploy.proj</DeployProjFile>
+    </PropertyGroup>
+
+    <Message Text="'$(DeployProjFile)' not found" Condition="!Exists('$(DeployProjFile)')" />
+    <MSBuild Projects="$(DeployProjFile)" Targets="bat:deploy" Properties="Profile=$(Profile)" Condition="Exists('$(DeployProjFile)')" />
+  </Target>
+
+  <!-- =============================================================================== -->
+  <!-- bat:package:Discover -->
+  <Target Name="bat:package:discover">
+    <PropertyGroup>
+      <RelativePackageOutputPath Condition="'$(RelativePackageOutputPath)'==''">BAT</RelativePackageOutputPath>
+      <PackageOutputPath Condition="'$(PackageOutputPath)'==''">$([System.IO.Path]::Combine('$(BinPath)', '$(RelativePackageOutputPath)'))</PackageOutputPath>
+    </PropertyGroup>
+    <ItemGroup>
+      <ProductProjectFiles Include="$(SourcePath)\**\*.csproj" Condition="'$(DATOperator)'=='true'" />
+      <ProductProjectFiles Include="$(SourcePath)\**\*.sqlproj" Condition="'$(DATOperator)'=='true'" />
+      <ProductProjectFiles Include="$(SourcePath)\**\*.mbproj" Condition="'$(DATOperator)'=='true'" />
+      <ProductProjectFiles Include="$(SourcePath)\**\*.uiproj" Condition="'$(DATOperator)'=='true'" />
+      <TestProjectFiles Include="$(SourcePath)\**\*.Tests.csproj" Condition="'$(DATOperator)'=='true'" />
+      <TestProjectFiles Include="$(SourcePath)\**\*.Tests.sqlproj" Condition="'$(DATOperator)'=='true'" />
+
+      <ProjectFiles Include="@(ProductProjectFiles)" Exclude="@(TestProjectFiles)" Condition="'$(DATOperator)'=='true'" />
+    </ItemGroup>
+
+    <ListBatPackageProjectFiles ProjectFiles="@(ProjectFiles)" Condition="'$(DATOperator)'=='true'">
+      <Output TaskParameter="BatPackageProjectFiles" ItemName="BatPackageProjectFiles" />
+    </ListBatPackageProjectFiles>
+
+    <!-- call msbuild targeting "bat:package" on every project listed above, so the package files will be generated in the end of this process -->
+    <Msbuild
+      Projects="@(BatPackageProjectFiles)"
+      Targets="bat:package"
+      Properties="PackageOutputPath=$(PackageOutputPath);DeploymentRoot=$(DeploymentRoot);Configuration=$(Configuration)"
+      Condition="'$(DATOperator)'=='true'" />
+    <Message Text="%(BatPackageProjectFiles.Identity)'" Condition="'$(DATOperator)'=='true'" />
+
+  </Target>
+
+  <!-- =============================================================================== -->
+  <!-- bat:deploy:Discover -->
+  <Target Name="bat:deploy:discover" Returns="@(PackagaeFiles)">
+
+    <CallTarget Targets="bat:package:discover" />
+
+    <PropertyGroup>
+      <PackageDir Condition="'$(PackageDir)'==''">$(BinPath)\BAT</PackageDir>
+    </PropertyGroup>
+
+    <Error Text="The specified packages directory '$(PackageDir)' is not found" Condition="!Exists('$(PackageDir)')" />
+
+    <Message Text="Discovering deployment packages under '$(PackageDir)'" Importance="High" />
+    <ItemGroup>
+      <ZipFiles Include="$(PackageDir)\*.zip" />
+    </ItemGroup>
+
+    <Message Text="Zip Files found from under '$(PackageDir)' are as follows:" Importance="High" />
+    <Message Text="%(ZipFiles.Identity)" Condition="'@(ZipFiles)'!=''" />
+
+    <ListPackageFiles ZipFiles="@(ZipFiles)">
+      <Output TaskParameter="PackagaeFiles" ItemName="PackagaeFiles" />
+    </ListPackageFiles>
+
+    <Message Text="Candidate deployment package files are as follows:"  Importance="High" Condition="'@(PackagaeFiles)'!=''" />
+    <Message Text="%(PackagaeFiles.Identity)" Condition="'@(PackagaeFiles)'!=''" />
+    <Message Text="Oops!! No package files discovered." Condition="'@(PackagaeFiles)'==''" Importance="High" />
+  </Target>
+
+  <Target Name="bat:update-deployment-targets">
+    <Message Text="Build.xml path is: '$(BuildXmlFilePath)'" />
+    <Message Text="BinPath is: '$(BinPath)'" />
+
+    <CallTarget Targets="bat:deploy:discover">
+      <Output TaskParameter="TargetOutputs" ItemName="PackagaeFiles" />
+    </CallTarget>
+
+    <MSBuild.ExtensionPack.VisualStudio.TfsSource
+      TaskAction="Checkout"
+      ItemCol="$(BuildXmlFilePath)"
+      Recursive="false"
+      WorkingDirectory="$(SourcePath)"
+      Condition="Exists('$(BuildXmlFilePath)')" />
+
+    <!-- every auto deployment uses this BAT.proj with their own given package file path -->
+    <AddDeploymentTargetsToBuildXml
+      PackagaeFiles="@(PackagaeFiles)"
+      ProjectFilePath="$(MSBuildProjectFile)"
+      BinPath="$(BinPath)"
+      BATRelativePath="$(RelativeBATPath)"
+      BuildXmlFilePath="$(BuildXmlFilePath)"
+      Condition="'@(PackagaeFiles)'!='' and Exists('$(BuildXmlFilePath)')">
+
+      <Output TaskParameter="ExistDeploymentConfigurations" ItemName="ExistDeploymentConfigurations" />
+      <Output TaskParameter="AddedDeploymentConfigurations" ItemName="AddedDeploymentConfigurations" />
+      <Output TaskParameter="RemovedDeploymentConfigurations" ItemName="RemovedDeploymentConfigurations" />
+
+    </AddDeploymentTargetsToBuildXml>
+
+    <Message Text="ExistDeploymentConfigurations" Importance="High" Condition="'@(ExistDeploymentConfigurations)'!=''" />
+    <Message Text="%(ExistDeploymentConfigurations.Identity)" />
+
+    <Message Text="AddedDeploymentConfigurations" Importance="High" Condition="'@(AddedDeploymentConfigurations)'!=''" />
+    <Message Text="%(AddedDeploymentConfigurations.Identity)" />
+
+    <Message Text="RemovedDeploymentConfigurations" Importance="High" Condition="'@(RemovedDeploymentConfigurations)'!=''" />
+    <Message Text="%(RemovedDeploymentConfigurations.Identity)" />
+
+    <MSBuild.ExtensionPack.VisualStudio.TfsSource
+      TaskAction="GetPendingChanges"
+      ItemPath="$(BuildXmlFilePath)"
+      WorkingDirectory="$(SourcePath)">
+      <Output TaskParameter="PendingChanges" PropertyName="PendingChanges" />
+      <Output TaskParameter="PendingChangesExist" PropertyName="PendingChangesExist" />
+    </MSBuild.ExtensionPack.VisualStudio.TfsSource>
+
+    <Message Text="No changes to the deployment packages have been found" Importance="High" Condition="'$(PendingChangesExist)'!='true'" />
+    <MSBuild.ExtensionPack.VisualStudio.TfsSource
+      TaskAction="UndoCheckout"
+      ItemCol="$(BuildXmlFilePath)"
+      WorkingDirectory="$(SourcePath)"
+      Condition="'$(PendingChangesExist)'!='true'" />
+
+    <Message Text="DeploymentTargets in the build.xml have been updated with BAT discover" Importance="High" Condition="'$(PendingChangesExist)'=='true'" />
+    <Message Text="Please review changes made to the build.xml before check in" Importance="High" Condition="'$(PendingChangesExist)'=='true'" />
+
+  </Target>
+
+  <UsingTask
+    TaskName="ListBatPackageProjectFiles"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <ProjectFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <BatPackageProjectFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+      Add-Type -AssemblyName "Microsoft.Build.Framework"
+
+      [Microsoft.Build.Framework.ITaskItem[]] $BatPackageProjectFiles = @()
+
+      $msbuild = Join-Path "$(MSBuildBinPath)" "MSBuild.exe"
+
+      $ProjectFiles | ForEach-Object {
+
+        $error.Clear()
+
+        $item = $_
+        $projectFullPath = (Get-Item $item.GetMetadata("Identity")).FullName
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", $projectFullPath)
+
+        if ( (& $msbuild $_ /targets) -Contains 'bat:package' ) {
+          $BatPackageProjectFiles += $item
+          $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "[+] " + $projectFullPath)
+        } else {
+          $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[-] " + $projectFullPath)
+        }
+
+      }
+    ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask
+    TaskName="ListPackageFiles"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <ZipFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <PackagaeFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+      Add-Type -AssemblyName "Microsoft.Build.Framework"
+      Add-Type -AssemblyName "Microsoft.Build.Utilities, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL"
+      Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+      $timeStamp = [System.DateTime]::Now.ToString("yyyyMMdd_HHmmss_fff")
+      $tempPath = [System.IO.Path]::GetTempPath()
+      $tempFolder = [string](Join-Path $tempPath $timeStamp)
+      New-Item -ItemType directory -Path $tempFolder
+
+      function GetDeploymentProps {
+        Param([System.String]$xmlPropsFilePath)
+
+        Process {
+          $deploymentProps = New-Object psCustomObject -property @{
+            IsProduction = $false
+            ExcludeFromDat = $false
+          }
+
+          $xpathExcludeFromDat = "/ns:Project/ns:PropertyGroup/ns:ExcludeFromDat"
+          $xpathIsProduction = "/ns:Project/ns:PropertyGroup/ns:IsProduction"
+
+          $xmlFile = Get-Item $xmlPropsFilePath
+          [xml]$xml = Get-Content $xmlFile
+          $ns = @{ ns = "http://schemas.microsoft.com/developer/msbuild/2003" }
+
+          $excludeFromDat = Select-Xml $xml -XPath $xpathExcludeFromDat -Namespace $ns
+          $isProduction = Select-Xml $xml -XPath $xpathIsProduction -Namespace $ns
+
+          if ($isProduction -ne $null) {
+            $nodeText = $isProduction.Node."#text"
+            if ( ($nodeText -ne $null ) -and ($nodeText.ToLower() -eq "true" ) ) {
+              $deploymentProps.IsProduction = $true
+            }
+          }
+
+          if ($excludeFromDat -ne $null) {
+            $nodeText = $excludeFromDat.Node."#text"
+            if ( ($nodeText -ne $null ) -and ($nodeText.ToLower() -eq "true" ) ) {
+              $deploymentProps.ExcludeFromDat = $true
+            }
+          }
+
+          return $deploymentProps
+        }
+      }
+
+      [Microsoft.Build.Framework.ITaskItem[]]$PackagaeFiles = @()
+      $ZipFiles | ForEach-Object {
+        $zipFile = Get-Item $_.GetMetadata("Identity")
+        $destDir = Join-Path $tempFolder $zipFile.BaseName
+
+        [io.compression.zipfile]::ExtractToDirectory($zipFile.FullName, $destDir)
+
+        $deployProjFile = Join-Path $destDir "Deploy.proj"
+        if (Test-Path $deployProjFile) {
+          # $PackagaeFiles += $zipFile.FullName
+
+          $profiles = Get-ChildItem -Directory (Join-Path $destDir "Deployment\Profiles")
+
+          if ( ($null -ne $profiles) -and ($profiles.Count -gt 0) ) {
+            $profiles | ForEach-Object {
+              $item = New-Object -TypeName Microsoft.Build.Utilities.TaskItem -ArgumentList ("{0};p:Profile={1}" -f $zipFile.FullName, $_.BaseName)
+              $item.SetMetadata("FullName", $zipFile.FullName)
+              $item.SetMetadata("Profile", $_.BaseName)
+
+              $deploymentPropsFileName = "Deployment.props"
+              $deploymentPropsFilePath = Join-Path $_.FullName $deploymentPropsFileName
+
+              if (Test-Path $deploymentPropsFilePath) {
+                $deploymentProps = GetDeploymentProps -xmlPropsFilePath $deploymentPropsFilePath
+
+                if (-not $deploymentProps.ExcludeFromDat) {
+                  $item.SetMetadata("IsProduction", $deploymentProps.IsProduction.ToString().ToLower())
+                  $PackagaeFiles += $item
+                }
+              }
+
+            }
+          } else {
+            $item = New-Object -TypeName Microsoft.Build.Utilities.TaskItem -ArgumentList $zipFile.FullName
+            $item.SetMetadata("FullName", $zipFile.FullName)
+            $item.SetMetadata("Profile", "")
+            $PackagaeFiles += $item
+          }
+        }
+      }
+
+      Remove-Item -LiteralPath $tempFolder -Force -Recurse
+    ]]>
+    </Task>
+  </UsingTask>
+
+  <!-- <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="Project=$(BinPath)\Deployment\BAT\BAT.proj;t:bat:deploy;p:PackageFilePath=$(BinPath)\BAT\foo.zip" IsProduction="false" TimeOutInMinutes="120" /> -->
+  <UsingTask
+    TaskName="AddDeploymentTargetsToBuildXml"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <PackagaeFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <ProjectFilePath ParameterType="System.String" Required="true" />
+      <BinPath ParameterType="System.String" Required="true" />
+      <BATRelativePath ParameterType="System.String" Required="true" />
+      <BuildXmlFilePath ParameterType="System.String" Required="true" />
+      <ExistDeploymentConfigurations ParameterType="System.String[]" Output="true" />
+      <AddedDeploymentConfigurations ParameterType="System.String[]" Output="true" />
+      <RemovedDeploymentConfigurations ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+      Add-Type -AssemblyName "Microsoft.Build.Framework"
+      [string[]]$ExistDeploymentConfigurations = @()
+      [string[]]$AddedDeploymentConfigurations = @()
+      [string[]]$RemovedDeploymentConfigurations = @()
+
+      function AddAttribute {
+        Param(
+            [System.String]$attributeName,
+            [System.String]$attributeValue,
+            [System.String]$namespace,
+            [System.Xml.XmlElement]$xmlElement)
+
+        Process {
+            $includeAttribute = $xmlElement.OwnerDocument.CreateAttribute($attributeName)
+            $includeAttribute.Value = $attributeValue
+            $xmlElement.Attributes.Append($includeAttribute)
+        }
+      }
+
+      $type = "DeployOnDemand"
+      $buildConfig = "RELEASE"
+      $targetElementName = "DeploymentTarget"
+
+      $attributeType = "Type"
+      $attributeBuildConfiguration = "BuildConfiguration"
+      $attributeDeploymentConfiguration = "DeploymentConfiguration"
+      $attributeIsProduction = "IsProduction"
+
+      $xpathDeploymentTargets = "/ns:Build/ns:DatSettings/ns:DeploymentTargets"
+      $xpathDeploymentConfigurations = "/ns:Build/ns:DatSettings/ns:DeploymentTargets/ns:DeploymentTarget"
+      $xmlNamespace = "http://wisetechglobal.com/DevTools/Build.xsd"
+
+      $buildXmlFile = Get-Item $BuildXmlFilePath
+      [xml]$xml = Get-Content $buildXmlFile
+
+      $ns = New-Object System.Xml.XmlNamespaceManager($xml.Psbase.NameTable)
+      $ns.AddNamespace("ns",$xml.Build.xmlns)
+      $targetsElement = $xml.SelectSingleNode($xpathDeploymentTargets, $ns)
+
+      # find from in the DeploymentConfiguration for the same project
+      # ===============================================================================
+      [regex]$rgx="BAT=(.*?);"
+      $targetElementDictionary = New-Object 'system.collections.generic.sorteddictionary[string,object]'
+      Select-Xml $xml -XPath $xpathDeploymentConfigurations -Namespace @{ ns = $xmlNamespace } | ForEach-Object {
+        $deploymentConfig = $_.Node.Attributes[$attributeDeploymentConfiguration].'#text'
+        $targetElementDictionary.Add($deploymentConfig, $_.Node)
+
+        $match = $rgx.Match($deploymentConfig)
+        if ( $match.Success ) {
+          $ExistDeploymentConfigurations += $deploymentConfig
+        }
+      }
+
+      [string[]]$targetDeploymentConfigurations = @()
+      $PackagaeFiles | ForEach-Object {
+        $packageFile = $_.GetMetadata("Identity")
+        $isProduction = $_.GetMetadata("IsProduction")
+        $package = $packageFile -replace [regex]::escape($BinPath), "`$`(BinPath`)"
+        $deploymentConfig = 'BAT={0};t:{1}' -f $package, "bat:deploy"
+        $targetDeploymentConfigurations += $deploymentConfig
+
+        if ($ExistDeploymentConfigurations -notcontains $deploymentConfig) {
+          $AddedDeploymentConfigurations += $deploymentConfig
+          $newTargetElement = $xml.CreateElement($targetElementName, $xmlNamespace)
+
+          AddAttribute -attributeName $attributeType -attributeValue $type -namespace $xmlNamespace -xmlElement $newTargetElement
+          AddAttribute -attributeName $attributeBuildConfiguration -attributeValue $buildConfig -namespace $xmlNamespace -xmlElement $newTargetElement
+          AddAttribute -attributeName $attributeDeploymentConfiguration -attributeValue $deploymentConfig -namespace $xmlNamespace -xmlElement $newTargetElement
+          AddAttribute -attributeName $attributeIsProduction -attributeValue $isProduction -namespace $xmlNamespace -xmlElement $newTargetElement
+
+          $targetsElement.AppendChild($newTargetElement)
+
+        } else {
+          $existTargetElement = $targetElementDictionary[$deploymentConfig]
+
+          if ($existTargetElement.Attributes[$attributeDeploymentConfiguration].'#text' -ne $isProduction) {
+            $existTargetElement.SetAttribute($attributeIsProduction, $isProduction)
+          }
+        }
+      }
+
+      $ExistDeploymentConfigurations | Where-Object { $targetDeploymentConfigurations -notcontains $_ } | ForEach-Object {
+        $RemovedDeploymentConfigurations += $_
+      }
+
+      # save the xml to file utf-8 encoding
+      $utf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
+      $streamWriter = New-Object System.IO.StreamWriter($BuildXmlFilePath, $false, $utf8WithoutBom)
+
+      $xml.Save( $streamWriter )
+      $streamWriter.Close()
+    ]]>
+    </Task>
+  </UsingTask>
+
+</Project>

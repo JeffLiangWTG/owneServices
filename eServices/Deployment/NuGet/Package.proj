@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+        <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+        <MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+		<_OutputDirectory Condition="$(_OutputDirectory) == ''">bin</_OutputDirectory>
+		<_NuGetExe>$(MSBuildThisFileDirectory)Nuget.exe</_NuGetExe>
+		<_DeployProjFile>$(MSBuildThisFileDirectory)Deploy.proj</_DeployProjFile>
+	</PropertyGroup>
+
+    <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+	
+	<Target Name="bat:package">
+
+		<GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      		<Output TaskParameter="Assemblies" ItemName="AssemblyIdentities"/>
+    	</GetAssemblyIdentity>
+
+    	<PropertyGroup Condition="$(_DefaultNuGetVersionFromAssemblyVersion) == 'true'">
+      		<_NuGetVersion Condition="%(AssemblyIdentities.Version) != ''">%(AssemblyIdentities.Version)</_NuGetVersion>
+    	</PropertyGroup>
+
+		<PropertyGroup>
+			<_NuGetExePath>$(MSBuildThisFileDirectory)NuGet.exe</_NuGetExePath>
+			
+			<Configuration Condition="$(Configuration) ==''">Debug</Configuration>
+
+			<_UseProject Condition="$(_UseProject) ==''">true</_UseProject>
+			<_PackCommand Condition="$(_UseProject) == 'false'">pack $(MSBuildProjectName).nuspec</_PackCommand>
+			<_PackCommand Condition="$(_UseProject) != 'false'">pack $(MSBuildProjectName).csproj</_PackCommand>
+			
+			<_TempPackageFolder>$(MSBuildProjectDirectory)\bin\temp</_TempPackageFolder>
+			<_PackageZipFilePath>$(_OutputDirectory)\$(MSBuildProjectName).zip</_PackageZipFilePath>
+			
+			<_NuGetVersion Condition="$(_NuGetVersion) ==''"></_NuGetVersion>
+			<_VersionCommand Condition="$(_NuGetVersion) != ''">-Version $(_NuGetVersion)</_VersionCommand>
+			<_IncludeReferencedProjects Condition="$(_UseProject) == 'true'">-IncludeReferencedProjects</_IncludeReferencedProjects>
+		</PropertyGroup>
+		
+		<RemoveDir Directories="$(_TempPackageFolder)" />
+		<MakeDir Directories="$(_TempPackageFolder)" Condition="!Exists('$(_TempPackageFolder)')" />
+
+		<!-- create the nuget package -->
+		<Exec Command="$(_NuGetExePath) $(_PackCommand) -OutputDirectory $(_OutputDirectory) -Properties Configuration=$(Configuration) $(_IncludeReferencedProjects) $(NugetExecArguments) $(_VersionCommand)" ContinueOnError="true"/>
+
+		<ItemGroup>
+			<!--include nuget packages -->
+			<_NuPackages Include="$(_OutputDirectory)\*.nupkg"/>
+			
+			<!-- include all Deployment configuration files -->
+			<_DeploymentFiles Include="$(MSBuildProjectDirectory)\Deployment\**\*"/>
+		</ItemGroup>
+
+		<!-- Copy Deployment configuration files -->
+		<Copy
+			SourceFiles="@(_DeploymentFiles)"
+			DestinationFolder="$(_TempPackageFolder)\Deployment\%(RecursiveDir)"/>
+
+		<!-- copy Nuget package files -->
+		<Copy
+			SourceFiles="@(_NuPackages)"
+			DestinationFolder="$(_TempPackageFolder)\"/>
+			
+		<!-- copy Nuget exe -->
+		<Copy
+			SourceFiles="$(_NuGetExe)"
+			DestinationFolder="$(_TempPackageFolder)\"/>
+
+		<!-- Copy Deploy.proj for deployment -->
+		<Copy
+			SourceFiles="$(_DeployProjFile)"
+			DestinationFolder="$(_TempPackageFolder)\"/>
+        
+        <!-- Copy CommonTasks for deployment -->
+        <Copy
+			SourceFiles="$(MSBuildCommonTasks)"
+			DestinationFolder="$(_TempPackageFolder)\"/>
+        
+		<!-- Create zip file package -->
+		<Zip
+			TaskAction="Create"
+			ZipFileName="$(_PackageZipFilePath)"
+			CompressPath="$(_TempPackageFolder)"
+			RemoveRoot="$(_TempPackageFolder)" />
+
+		<RemoveDir Directories="$(_TempPackageFolder)" />
+	</Target>
+</Project>

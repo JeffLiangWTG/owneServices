@@ -1,0 +1,9 @@
+﻿use eHubTransactions;
+GO
+SET XACT_ABORT ON;
+GO
+BEGIN TRANSACTION;
+
+
+ROLLBACK
+--COMMIT

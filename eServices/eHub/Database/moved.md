@@ -1,0 +1,1 @@
+CargoWise.eHub.Database.sln has been moved/renamed to $/Shared/eHubDatabase/eServices.eHubDatabase.sln (https://devops.wisetechglobal.com/wtg/eServices/_git/eServices?path=%2FShared%2FeHubDatabase&version=GBmaster&_a=preview).

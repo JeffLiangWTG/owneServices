@@ -1,0 +1,111 @@
+version: '3'
+services:
+
+  tracking:
+    build: 
+      context: ../Tracking
+    deploy:
+      replicas: 2
+    image: sydco-wbln-2.wtg.zone:5000/tracking:1.0.6
+    env_file: ${ENVIRONMENT}.env
+    ports:
+      - "7001:80"
+
+  content-store:
+    build: 
+      context: ../ContentStore
+    deploy:
+      replicas: 3
+    image: sydco-wbln-2.wtg.zone:5000/content-store:1.0.6
+    env_file: ${ENVIRONMENT}.env
+    ports:
+      - "7002:80"
+
+  forward:
+    build: 
+      context: ../Forward
+    deploy:
+      replicas: 3
+    image: sydco-wbln-2.wtg.zone:5000/forward:1.0.6
+    env_file: ${ENVIRONMENT}.env
+    depends_on:
+      - tracking
+      - redis
+    ports:
+      - "7003:80"
+
+  exchange:
+    build: 
+      context: ../Exchange
+    deploy:
+      replicas: 2
+    image: sydco-wbln-2.wtg.zone:5000/exchange:1.0.6
+    env_file: ${ENVIRONMENT}.env
+    depends_on: 
+      - content-store
+      - tracking
+    ports:
+      - "7004:80"
+
+  yyyyyy-outbound:
+    build: 
+      context: ../Apps/YYYYYY.Outbound
+    deploy:
+      replicas: 2
+    image: sydco-wbln-2.wtg.zone:5000/yyyyyy-outbound:1.0.6
+    env_file: ${ENVIRONMENT}.env
+    depends_on: 
+      - content-store
+      - tracking
+    ports:
+      - "7005:80"
+
+  yyyyyy-send:
+    build: 
+      context: ../Apps/YYYYYY.Send
+    deploy:
+      replicas: 2
+    image: sydco-wbln-2.wtg.zone:5000/yyyyyy-send:1.0.6
+    env_file: ${ENVIRONMENT}.env
+    depends_on: 
+      - content-store
+      - tracking
+    ports:
+      - "7006:80"
+
+  xxxxxx-outbound:
+    build: 
+      context: ../Apps/XXXXXX.Outbound
+    deploy:
+      replicas: 2
+    image: sydco-wbln-2.wtg.zone:5000/xxxxxx-outbound:1.0.6
+    env_file: ${ENVIRONMENT}.env
+    depends_on: 
+      - content-store
+      - tracking
+    ports:
+      - "7007:80"
+
+  xxxxxx-send:
+    build: 
+      context: ../Apps/XXXXXX.Send
+    deploy:
+      replicas: 2
+    image: sydco-wbln-2.wtg.zone:5000/xxxxxx-send:1.0.6
+    env_file: ${ENVIRONMENT}.env
+    depends_on: 
+      - content-store
+      - tracking
+    ports:
+      - "7008:80"
+
+  monitoring:
+    build: 
+      context: ../Monitoring
+    image: sydco-wbln-2.wtg.zone:5000/monitoring:1.0.6
+    env_file: ${ENVIRONMENT}.env
+
+  redis:
+    image: "redis"
+    ports:
+      - "6379:6379"

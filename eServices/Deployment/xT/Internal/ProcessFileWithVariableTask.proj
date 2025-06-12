@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup>
+		<RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>
+		<CommonPowershellFunctionsFilePath>$(RootDirectory)Common.ps1</CommonPowershellFunctionsFilePath>
+		<MSBuildExtensionsPackPath>C:\Program Files (x86)\MSBuildExtensionPack\4.0</MSBuildExtensionsPackPath>
+	</PropertyGroup>
+
+	<UsingTask
+		TaskName="ProcessFileWithVariables"
+		TaskFactory="CodeTaskFactory"
+		AssemblyFile="$(MSBuildTasksToolsFilePath)" >
+		<ParameterGroup>
+			<FilePath ParameterType="System.String" />
+			<Variables ParameterType="Microsoft.Build.Framework.ITaskItem[]"/>
+			<VariableIdentity ParameterType="System.String" />
+		</ParameterGroup>
+		<Task>
+			<Using Namespace="System.Text.RegularExpressions"/>
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+				File.WriteAllText(FilePath, Regex.Replace(File.ReadAllText(FilePath), @"(?<VariableName>\$\(.*?\))", new MatchEvaluator(match =>
+                {
+                    var variableName = match.Groups["VariableName"].Value;
+					variableName = variableName.Substring(2, variableName.Length - 3);
+                    var item = Variables.SingleOrDefault(x => x.GetMetadata("Identity") == VariableIdentity && x.MetadataNames.OfType<string>().Contains(variableName));
+                    return item != null 
+						? item.GetMetadata(variableName)
+						: match.Value;
+                })));
+                ]]>
+			</Code>
+		</Task>
+	</UsingTask>
+
+	<UsingTask
+		TaskName="OverrideItem"
+		TaskFactory="CodeTaskFactory"
+		AssemblyFile="$(MSBuildTasksToolsFilePath)" >
+		<ParameterGroup>
+			<Items ParameterType="Microsoft.Build.Framework.ITaskItem[]"/>
+			<OutputItems Output="true" ParameterType="Microsoft.Build.Framework.ITaskItem[]"/>
+		</ParameterGroup>
+		<Task>
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+                OutputItems = Items.Where(item => !(item.GetMetadata("Identity").Contains("_Override") || item.GetMetadata("Identity").Contains("_Remove"))).ToArray();
+                Items = Items.Except(OutputItems).ToArray();
+                OutputItems = OutputItems.Except(OutputItems.Where(item => Items.Where(x => x.GetMetadata("Identity") == item.GetMetadata("Identity") + "_Remove").Any()).ToArray()).ToArray();
+                foreach (var item in OutputItems)
+                {
+                    foreach (var overwriteItem in Items)
+                    {
+                        if (overwriteItem.GetMetadata("Identity") == item.GetMetadata("Identity") + "_Override")
+                        {
+                            foreach (string metadata in overwriteItem.MetadataNames)
+                            {
+                                if (metadata != "Identity")
+                                {
+                                    item.SetMetadata(metadata, overwriteItem.GetMetadata(metadata));
+                                }
+                            }
+                        }
+                    }
+                }
+                ]]>
+			</Code>
+		</Task>
+	</UsingTask>
+</Project>

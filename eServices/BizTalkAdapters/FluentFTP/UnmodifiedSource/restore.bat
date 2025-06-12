@@ -1,0 +1,2 @@
+dotnet restore FluentFTP_Core.csproj
+pause

@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Canada Border Services Agency-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xop="http://www.w3.org/2004/08/xop/include" elementFormDefault="qualified">
+	<xsd:import namespace="http://www.w3.org/2004/08/xop/include" schemaLocation="xop-include.xsd"/>
+	<xsd:element name="LPCOImages">
+		<xsd:annotation>
+			<xsd:documentation>This XSD describes the image message that will be trasmitted by the Importer/Broker to CBSA by calling the B2B LPCO Image Web Service</xsd:documentation>
+			<xsd:documentation> When The Image is shared with the PGAs , The Image Header and the xop include are the only elements to be sent, no need for the B2BInfo</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="B2BInfo" type="B2BInfo"/>
+				<xsd:element name="BN" type="Business_Number"/>
+				<xsd:element name="MessageType" type="Message_Type"/>
+				<xsd:element name="Image" type="Image" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="B2BInfo">
+		<xsd:sequence>
+			<xsd:element name="VanID" type="Van_ID"/>
+			<xsd:element name="PartnerID" type="Partner_ID"/>
+			<xsd:element name="PartnerQualifier" type="Partner_Qualifier"/>
+			<xsd:element name="DocID" type="Doc_ID"/>
+		</xsd:sequence>
+		<xsd:attribute name="Type" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:token"/>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="Image">
+		<xsd:annotation>
+			<xsd:documentation>This tag contains the metadata for each picture being sent to the CBSA.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ImageHeader" type="Image_Header"/>
+			<xsd:element ref="xop:Include">
+				<!--cid:  A reference to the mime body part in which this document is embedded -->
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="Image_Header">
+		<xsd:sequence>
+			<xsd:element name="Identifier" type="Image_Identifier"/>
+			<xsd:element name="FunctionCode" type="Image_Function"/>
+			<xsd:element name="LPCOImageTypeCode" type="LPCO_Type"/>
+			<xsd:element name="LPCOReferenceNumber" type="LPCO_Reference"/>
+			<xsd:element name="LPCOImageEffectiveDate" type="xsd:date"/>
+			<xsd:element name="LPCOImageExpiryDate" type="xsd:date"/>
+			<xsd:element name="LPCOImageFormat" type="Image_Format"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="Message_Type">
+		<xsd:annotation>
+			<xsd:documentation>Static Value “LPCO”</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="LPCO"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- BN Type-->
+	<xsd:simpleType name="Business_Number">
+		<xsd:restriction base="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation>Importer Business Number </xsd:documentation>
+			</xsd:annotation>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- Types for the message Header-->
+	<xsd:simpleType name="Image_Identifier">
+		<xsd:annotation>
+			<xsd:documentation>This is the Unique Reference Number (URN) identifying this image as described in SG9/SG121.DOC.1366 of the IID.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:integer">
+			<xsd:totalDigits value="14"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Image_Function">
+		<xsd:annotation>
+			<xsd:documentation>This is the "message function" of this image</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:length value="2"/>
+			<xsd:enumeration value="01"/>
+			<xsd:enumeration value="04"/>
+			<xsd:enumeration value="09"/>
+			<xsd:enumeration value="05"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="LPCO_Type">
+		<xsd:annotation>
+			<xsd:documentation>This is the LPCO Document Type Qualifier that corresponds to data element ‘SG9/SG121.DOC.1131’ on the IID map </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:integer"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="LPCO_Reference">
+		<xsd:annotation>
+			<xsd:documentation>This is the unique identification number on this LPCO that distinguishes it from others of the same type should be provided here.  This is often the “permit number” of the document, but may be referred to by different names depending upon the document and PGA requirements.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="70"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Image_Format">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="doc"/>
+			<xsd:enumeration value="docx"/>
+			<xsd:enumeration value="gif"/>
+			<xsd:enumeration value="jpg"/>
+			<xsd:enumeration value="pdf"/>
+			<xsd:enumeration value="ps"/>
+			<xsd:enumeration value="tif"/>
+			<xsd:enumeration value="wp"/>
+			<xsd:enumeration value="png"/>
+			<xsd:enumeration value="rtf"/>
+			<xsd:enumeration value="bmp"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--	Types for B2BInfo -->
+	<xsd:simpleType name="Van_ID">
+		<xsd:annotation>
+			<xsd:documentation>Mutually Agreed code list, provided by ECU/CECP</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="20"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Partner_ID">
+		<xsd:annotation>
+			<xsd:documentation>UNB or ISA Sender Identifier</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="35"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Partner_Qualifier">
+		<xsd:annotation>
+			<xsd:documentation>UNB or ISA Sender Qualifier</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="12"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Doc_ID">
+		<xsd:annotation>
+			<xsd:documentation>UNG or GS Application Receiver</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="35"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Partner_Alias">
+		<xsd:annotation>
+			<xsd:documentation>Parter Regstration Identifier from ECU/CECP</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="35"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Doc_Alias">
+		<xsd:annotation>
+			<xsd:documentation>Incoming Document Identifier from ECU/CECP</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="35"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Ack_Alias">
+		<xsd:annotation>
+			<xsd:documentation>Outgoing Notice Document Identifier from ECU/CECP</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+</xsd:schema>

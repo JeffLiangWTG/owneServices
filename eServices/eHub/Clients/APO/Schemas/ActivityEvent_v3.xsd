@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 rel. 2 sp1 (http://www.altova.com) by Silvio Zarb (Australia Post) -->
+<xs:schema xmlns="http://www.auspost.com.au/Schema/CommonDataModel/Event:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns0="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" xmlns:ns2="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" xmlns:ns3="http://www.auspost.com.au/Schema/CommonDataModel/Product:v1" xmlns:ns4="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty/Customer:v1" xmlns:ns1="http://www.auspost.com.au/Schema/CommonDataModel/Mail_Product:v1" targetNamespace="http://www.auspost.com.au/Schema/CommonDataModel/Event:v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.3">
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" schemaLocation="Address_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" schemaLocation="CommonTypes_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Product:v1" schemaLocation="Service_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Mail_Product:v1" schemaLocation="Mail_Product_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty/Customer:v1" schemaLocation="Customer_v3.xsd"/>
+	<xs:include schemaLocation="Event_v3.xsd"/>
+	<xs:complexType name="MailEvent">
+		<xs:complexContent>
+			<xs:extension base="Event">
+				<xs:sequence>
+					<xs:element name="TrackingIdentification" type="ns2:TrackingIdentification"/>
+					<xs:element name="ArticleEventDetails" type="ArticleEventDetails" minOccurs="0"/>
+					<xs:element name="ConsignmentEventDetails" type="ConsignmentEventDetails" minOccurs="0"/>
+					<xs:element name="LocationIdentifications" type="LocationIdentifications" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="Comments" minOccurs="0">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="1024"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="ProofOfDelivery" type="ns2:ProofOfDelivery" minOccurs="0"/>
+					<xs:element name="ServiceActions" type="ns2:ServiceAction" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="DriverContractID" type="ns2:string20" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Number for the contract the contractor is delivering under.  </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="RoundNumber" type="ns2:string20" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Number for the round that the track event has been assigned to</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DeliveryPostcode" type="ns0:InternationalPostCode" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Postcode the parcel is delivered to.  Includes postcodes for international parcels for delivery, postcode for missorts and postcodes for RTS </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DriverName" type="ns2:DriverName" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Name of the driver for acceptance</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AddresseeOnly" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Indicates that the parcel has been delivered to the addressee. Will also be used if "sight id and verify" attribute is used for future products</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Communications" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="CommunicationAvailable" type="xs:boolean">
+									<xs:annotation>
+										<xs:documentation>Indicates if communication was available</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="CommunicationErrorReasonCode" type="ns2:string2" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Reason code for the communication error</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="CommincationDuration" type="xs:int" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Communication duration in seconds</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<!-- change the type of EstimatedDeliveryTimeSlot from xs:long to xs:string with pattern for numerics only 
+					<xs:element name="EstimatedDeliveryTimeSlot" type="xs:long" minOccurs="0">  -->
+					<xs:element name="EstimatedDeliveryTimeSlot" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Utilises bitwise arithmetic to identify timeslot combinations</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:pattern value="\d+"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="EstimatedDeliverySequence" type="xs:int" minOccurs="0"/>
+					<xs:element name="Survey" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="SurveyId" type="ns2:string50" minOccurs="0"/>
+								<xs:element name="SurveyCompleted" type="xs:boolean" minOccurs="0"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="LocationIdentifications">
+		<xs:sequence>
+			<xs:element name="LocationCodeSet" type="ns2:string20">
+				<xs:annotation>
+					<xs:documentation>Type of the location id. WorkCentre is a possible vaule</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="LocationCodeID" type="ns2:string50">
+				<xs:annotation>
+					<xs:documentation>Location ID. WorkCentreCode is a possible value.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="LocationCodeName" type="ns2:string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Location name. Work Centre Name is a possible value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Address" type="ns0:DetailedInternationalAddress" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Address details</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Comments">
+		<xs:sequence>
+			<xs:element name="Textsapplicationobject" type="xs:string" minOccurs="0"/>
+			<xs:element name="Name" type="xs:string"/>
+			<xs:element name="TextID" type="xs:string"/>
+			<xs:element name="TextSegment" type="ns2:GeneralTextSegment"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ConsignmentEventDetails">
+		<xs:annotation>
+			<xs:documentation>Consignment Details</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MultiParcelConsignment" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Flag to indicate mulitple parcel consignment</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MultiParcelConsignmentCount" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Total number of items for the multi parcel consignment</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PartialConsignment" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Flag indicating if the the track event is for part of a consignment</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DeliverPartGoodsIndicator" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Flag to indicate in a multiparcel consignement whether partial deliveries are allowable</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DangerousGoodsIndicator" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Flag to indicate consignment contains dangerous goods</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ArticleEventDetails">
+		<xs:annotation>
+			<xs:documentation>Event details</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="DeliveryConfirmation" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Delivery Confirmation flag.  Denotes that the delivery has been confirmed</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TotalArticlesCount" type="xs:integer" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Number of articles in covered by event</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ReturnAuthorityNumber" type="ns2:string20" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Merchant provided number which driver checks on the parcel to authorise pick up</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TransitCoverCharge" type="ns2:string20" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Amount charged for insurance</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PaymentCategories" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="PaymentCategoryType">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="0"/>
+									<xs:maxLength value="10"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="Quantity" type="xs:int"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="MailEvent" type="MailEvent"/>
+	<xs:complexType name="DeviceEvent">
+		<xs:complexContent>
+			<xs:extension base="Event">
+				<xs:sequence>
+					<xs:element name="TrackingIdentification" type="ns2:TrackingIdentification"/>
+					<xs:element name="ActiveStatus" type="ns2:string10">
+						<xs:annotation>
+							<xs:documentation>Handheld device status</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="WorkCenter" type="ns2:WorkCentreCode" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Work centre code</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ContractAssigneTo" type="ns2:string10" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Contract ID whom the device assigned to</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="DeviceEvent" type="DeviceEvent"/>
+	<xs:complexType name="TrackingRegistration">
+		<xs:sequence>
+			<xs:element name="BusinessPartnerNumber" type="ns2:string10"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CommunicationEvent">
+		<xs:complexContent>
+			<xs:extension base="Event">
+				<xs:sequence>
+					<xs:element name="TrackingIdentification" type="ns2:TrackingIdentification" minOccurs="0"/>
+					<xs:element name="DeliveryNotification" minOccurs="0" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="NotificationService" type="ns2:string10"/>
+								<xs:element name="NotificationIntervalCode" type="ns2:string20" minOccurs="0"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="TrackingNotification" type="ns2:TrackingNotification" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="RequestedServices" type="ns3:Services" minOccurs="0"/>
+					<xs:element name="DeliveryContacts" type="ns1:DeliveryContact" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="TrackingRegistration" type="TrackingRegistration" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="CommunicationEvent" type="CommunicationEvent"/>
+</xs:schema>

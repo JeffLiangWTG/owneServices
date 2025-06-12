@@ -1,0 +1,950 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService" xmlns:s1="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService">
+      <s:import namespace="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM" />
+      <s:element name="AddSubscription">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="viewName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="alertName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="subscriptions" type="tns:ArrayOfSubscription" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfSubscription">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Subscription" nillable="true" type="s1:Subscription" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="AddSubscriptionResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="CreateAlert">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Alert" type="tns:Alert" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="Alert">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ViewName" type="s:token" />
+          <s:element minOccurs="0" maxOccurs="1" name="ActivityName" type="s:token" />
+          <s:element minOccurs="0" maxOccurs="1" name="CubeName" type="s:token" />
+          <s:element minOccurs="0" maxOccurs="1" name="RtaName" type="s:token" />
+          <s:element minOccurs="0" maxOccurs="1" ref="s1:PollingInterval" />
+          <s:element minOccurs="0" maxOccurs="1" ref="s1:MaxAlertsPerTimeUnit" />
+          <s:element minOccurs="0" maxOccurs="1" ref="s1:AlertInstance" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="CreateAlertResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="DeleteAlert">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="viewName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="alertName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DeleteAlertResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="GenerateEventForArtifact">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="viewName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="title" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="description" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="References" type="tns:ReferenceList" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ReferenceList">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Reference" type="tns:Reference" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Reference">
+        <s:attribute name="Type" type="s:string" />
+        <s:attribute name="Name" type="s:string" />
+        <s:attribute name="Data" type="s:string" />
+        <s:attribute name="LongReferenceData" type="s:string" />
+      </s:complexType>
+      <s:element name="GenerateEventForArtifactResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetAlert">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="viewName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="alertName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAlertResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetAlertResult" type="tns:Alert" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAlertsSummary">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="viewName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetAlertsSummaryResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Alerts" type="tns:AlertSummaryList" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="AlertSummaryList">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="AlertInstance" type="tns:AlertSummary" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="AlertSummary">
+        <s:attribute name="Name" type="s:token" />
+        <s:attribute name="Type" type="tns:AlertType" use="required" />
+        <s:attribute name="Priority" type="s:positiveInteger" />
+        <s:attribute name="Enabled" type="s:boolean" use="required" />
+        <s:attribute name="Security" type="s:NCName" />
+        <s:attribute name="IsOwner" type="s:boolean" use="required" />
+        <s:attribute name="CreatedBy" type="s:token" />
+        <s:attribute name="CreationDate" type="s:dateTime" />
+        <s:attribute name="LastModifiedDate" type="s:dateTime" />
+      </s:complexType>
+      <s:simpleType name="AlertType">
+        <s:restriction base="s:string">
+          <s:enumeration value="Instance" />
+          <s:enumeration value="OLAP" />
+          <s:enumeration value="RTA" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="GetCapabilities">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetCapabilitiesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetCapabilitiesResult" type="tns:Configuration" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="Configuration">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="DatabaseVersion" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="OlapAggregations" type="tns:OlapAggregations" />
+          <s:element minOccurs="0" maxOccurs="1" name="Alerts" type="tns:Alerts" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="OlapAggregations">
+        <s:attribute default="false" name="Configured" type="s:boolean" />
+      </s:complexType>
+      <s:complexType name="Alerts">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Transports" type="tns:ArrayOfTransport" />
+        </s:sequence>
+        <s:attribute default="false" name="Configured" type="s:boolean" />
+      </s:complexType>
+      <s:complexType name="ArrayOfTransport">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Transport" type="tns:Transport" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Transport">
+        <s:attribute name="Name" type="tns:AlertTransport" use="required" />
+      </s:complexType>
+      <s:simpleType name="AlertTransport">
+        <s:restriction base="s:string">
+          <s:enumeration value="File" />
+          <s:enumeration value="Email" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="GetPivotViewXml">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="viewName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pivotViewName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="cubeName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetPivotViewXmlResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetPivotViewXmlResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetRelatedActivityInstances">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="viewName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="activityName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="activityInstanceId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetRelatedActivityInstancesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetRelatedActivityInstancesResult" type="tns:RelatedActivities" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="RelatedActivities">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ActivityInstances" type="tns:ActivityInstances" />
+        </s:sequence>
+        <s:attribute default="false" name="PartialResults" type="s:boolean" />
+      </s:complexType>
+      <s:complexType name="ActivityInstances">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Instance" type="s:string" />
+        </s:sequence>
+        <s:attribute name="ActivityName" type="s:string" />
+        <s:attribute name="Server" type="s:string" />
+        <s:attribute name="Database" type="s:string" />
+        <s:attribute name="PortalUrl" type="s:string" />
+        <s:attribute default="false" name="IsRemote" type="s:boolean" />
+      </s:complexType>
+      <s:element name="GetReferences">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="viewName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="activityName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="activityInstanceId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="referenceType" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetReferencesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="References" type="tns:ReferenceList" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetViewDetailsAsXml">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="viewName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetViewDetailsAsXmlResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetViewDetailsAsXmlResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetViewSummaryForCurrentUser">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetViewSummaryForCurrentUserResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Views" type="tns:ViewSummaryList" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ViewSummaryList">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="View" type="tns:ViewSummary" />
+        </s:sequence>
+        <s:attribute default="false" name="PartialResults" type="s:boolean" />
+      </s:complexType>
+      <s:complexType name="ViewSummary">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Activity" type="tns:ActivitySummary" />
+        </s:sequence>
+        <s:attribute name="Name" type="s:string" />
+      </s:complexType>
+      <s:complexType name="ActivitySummary">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Aggregation" type="tns:Aggregation" />
+        </s:sequence>
+        <s:attribute name="Name" type="s:string" />
+        <s:attribute name="Server" type="s:string" />
+        <s:attribute name="Database" type="s:string" />
+        <s:attribute name="PortalUrl" type="s:string" />
+        <s:attribute default="false" name="IsRemote" type="s:boolean" />
+      </s:complexType>
+      <s:complexType name="Aggregation">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="PivotView" type="tns:PivotView" />
+        </s:sequence>
+        <s:attribute name="Type" type="tns:AggregationType" use="required" />
+        <s:attribute name="Name" type="s:string" />
+        <s:attribute name="CubeName" type="s:string" />
+        <s:attribute name="RtaWindow" type="s:integer" />
+      </s:complexType>
+      <s:complexType name="PivotView">
+        <s:attribute name="Name" type="s:string" />
+      </s:complexType>
+      <s:simpleType name="AggregationType">
+        <s:restriction base="s:string">
+          <s:enumeration value="OLAP" />
+          <s:enumeration value="RTA" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="RemoveSubscription">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="viewName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="alertName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="subscriptions" type="tns:ArrayOfSubscription" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RemoveSubscriptionResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="UpdateAlert">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Alert" type="tns:Alert" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateAlertResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="UpdateSubscription">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="viewName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="alertName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="subscriptions" type="tns:ArrayOfSubscription" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateSubscriptionResponse">
+        <s:complexType />
+      </s:element>
+    </s:schema>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM">
+      <s:complexType name="Subscription">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:token" />
+          <s:element minOccurs="0" maxOccurs="1" name="Address" type="s:string" />
+        </s:sequence>
+        <s:attribute name="Type" type="s1:SubscriptionType" use="required" />
+        <s:attribute name="ID" type="s:string" />
+      </s:complexType>
+      <s:simpleType name="SubscriptionType">
+        <s:restriction base="s:string">
+          <s:enumeration value="email" />
+          <s:enumeration value="file" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="PollingInterval" type="s1:TimeDuration" />
+      <s:complexType name="TimeDuration">
+        <s:simpleContent>
+          <s:extension base="s:integer">
+            <s:attribute name="Unit" type="s1:TimePart" use="required" />
+          </s:extension>
+        </s:simpleContent>
+      </s:complexType>
+      <s:simpleType name="TimePart">
+        <s:restriction base="s:string">
+          <s:enumeration value="Year" />
+          <s:enumeration value="Quarter" />
+          <s:enumeration value="Month" />
+          <s:enumeration value="Week" />
+          <s:enumeration value="Day" />
+          <s:enumeration value="Hour" />
+          <s:enumeration value="Minute" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="MaxAlertsPerTimeUnit" type="s1:MaxAlertsPerTimeUnit" />
+      <s:complexType name="MaxAlertsPerTimeUnit">
+        <s:simpleContent>
+          <s:extension base="s:positiveInteger">
+            <s:attribute name="TimeUnit" type="s1:TimePartSimple" use="required" />
+          </s:extension>
+        </s:simpleContent>
+      </s:complexType>
+      <s:simpleType name="TimePartSimple">
+        <s:restriction base="s:string">
+          <s:enumeration value="Week" />
+          <s:enumeration value="Day" />
+          <s:enumeration value="Hour" />
+          <s:enumeration value="Minute" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="AlertInstance" type="s1:AlertInstance" />
+      <s:complexType name="AlertInstance">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Message" type="s:string" />
+          <s:choice minOccurs="1" maxOccurs="1">
+            <s:element minOccurs="0" maxOccurs="1" name="InstanceQuery" type="s1:InstanceQuery" />
+            <s:element minOccurs="0" maxOccurs="1" name="AggregationQuery" type="s1:AggregationQuery" />
+          </s:choice>
+          <s:element minOccurs="0" maxOccurs="1" name="Owners" type="s1:ArrayOfToken" />
+          <s:element minOccurs="0" maxOccurs="1" name="Subscriptions" type="s1:ArrayOfSubscription" />
+        </s:sequence>
+        <s:attribute name="Name" type="s:string" />
+        <s:attribute name="Priority" type="s:positiveInteger" />
+        <s:attribute name="Enabled" type="s:boolean" use="required" />
+        <s:attribute name="Security" type="s:NCName" />
+        <s:attribute name="CreatedBy" type="s:token" />
+        <s:attribute name="CreationDate" type="s:dateTime" />
+        <s:attribute name="LastModifiedDate" type="s:dateTime" />
+        <s:attribute name="ExtensionRef" type="s:NCName" />
+      </s:complexType>
+      <s:complexType name="InstanceQuery">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="SelectClauses" type="s1:ArrayOfString" />
+          <s:element minOccurs="0" maxOccurs="1" name="WhereClauses" type="s1:ArrayOfWhereClausesFilter" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Column" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfWhereClausesFilter">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Filter">
+            <s:complexType>
+              <s:attribute name="Field" type="s:string" />
+              <s:attribute name="Condition" type="s:string" />
+              <s:attribute name="Value" type="s:string" />
+              <s:attribute name="Logic" type="s:string" />
+              <s:attribute name="TimeUnit" type="s1:DurationTimeResolution" />
+            </s:complexType>
+          </s:element>
+        </s:sequence>
+      </s:complexType>
+      <s:simpleType name="DurationTimeResolution">
+        <s:restriction base="s:string">
+          <s:enumeration value="Day" />
+          <s:enumeration value="Hour" />
+          <s:enumeration value="Minute" />
+          <s:enumeration value="Second" />
+        </s:restriction>
+      </s:simpleType>
+      <s:complexType name="AggregationQuery">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Threshold" type="s1:Threshold" />
+          <s:element minOccurs="0" maxOccurs="1" name="SlicerDimensions" type="s1:ArrayOfSlicerDimension" />
+          <s:element minOccurs="0" maxOccurs="1" name="TimeWindow" type="s1:TimeWindow" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Threshold">
+        <s:attribute name="Name" type="s:string" />
+        <s:attribute name="Condition" type="s:string" />
+        <s:attribute name="Value" type="s:double" use="required" />
+      </s:complexType>
+      <s:complexType name="ArrayOfSlicerDimension">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="SlicerDimension" type="s1:SlicerDimension" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="SlicerDimension">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Level" type="s1:Level" />
+        </s:sequence>
+        <s:attribute name="Name" type="s:string" />
+      </s:complexType>
+      <s:complexType name="Level">
+        <s:simpleContent>
+          <s:extension base="s:string">
+            <s:attribute name="Name" type="s:string" />
+          </s:extension>
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="TimeWindow">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="TimeWindowDuration" type="s1:TimeDurationSimple" />
+          <s:element minOccurs="0" maxOccurs="1" name="Increment" type="s1:TimeDurationNoQuarter" />
+        </s:sequence>
+        <s:attribute name="Enabled" type="s:boolean" use="required" />
+        <s:attribute name="TimeDimension" type="s:string" />
+      </s:complexType>
+      <s:complexType name="TimeDurationSimple">
+        <s:simpleContent>
+          <s:extension base="s:integer">
+            <s:attribute name="Unit" type="s1:TimePartSimple" use="required" />
+          </s:extension>
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="TimeDurationNoQuarter">
+        <s:simpleContent>
+          <s:extension base="s:integer">
+            <s:attribute name="Unit" type="s1:TimePartNoQuarter" use="required" />
+          </s:extension>
+        </s:simpleContent>
+      </s:complexType>
+      <s:simpleType name="TimePartNoQuarter">
+        <s:restriction base="s:string">
+          <s:enumeration value="Year" />
+          <s:enumeration value="Month" />
+          <s:enumeration value="Week" />
+          <s:enumeration value="Day" />
+          <s:enumeration value="Hour" />
+          <s:enumeration value="Minute" />
+        </s:restriction>
+      </s:simpleType>
+      <s:complexType name="ArrayOfToken">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Owner" type="s:token" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfSubscription">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Subscription" type="s1:Subscription" />
+        </s:sequence>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="AddSubscriptionSoapIn">
+    <wsdl:part name="parameters" element="tns:AddSubscription" />
+  </wsdl:message>
+  <wsdl:message name="AddSubscriptionSoapOut">
+    <wsdl:part name="parameters" element="tns:AddSubscriptionResponse" />
+  </wsdl:message>
+  <wsdl:message name="CreateAlertSoapIn">
+    <wsdl:part name="parameters" element="tns:CreateAlert" />
+  </wsdl:message>
+  <wsdl:message name="CreateAlertSoapOut">
+    <wsdl:part name="parameters" element="tns:CreateAlertResponse" />
+  </wsdl:message>
+  <wsdl:message name="DeleteAlertSoapIn">
+    <wsdl:part name="parameters" element="tns:DeleteAlert" />
+  </wsdl:message>
+  <wsdl:message name="DeleteAlertSoapOut">
+    <wsdl:part name="parameters" element="tns:DeleteAlertResponse" />
+  </wsdl:message>
+  <wsdl:message name="GenerateEventForArtifactSoapIn">
+    <wsdl:part name="parameters" element="tns:GenerateEventForArtifact" />
+  </wsdl:message>
+  <wsdl:message name="GenerateEventForArtifactSoapOut">
+    <wsdl:part name="parameters" element="tns:GenerateEventForArtifactResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAlertSoapIn">
+    <wsdl:part name="parameters" element="tns:GetAlert" />
+  </wsdl:message>
+  <wsdl:message name="GetAlertSoapOut">
+    <wsdl:part name="parameters" element="tns:GetAlertResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetAlertsSummarySoapIn">
+    <wsdl:part name="parameters" element="tns:GetAlertsSummary" />
+  </wsdl:message>
+  <wsdl:message name="GetAlertsSummarySoapOut">
+    <wsdl:part name="parameters" element="tns:GetAlertsSummaryResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetCapabilitiesSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCapabilities" />
+  </wsdl:message>
+  <wsdl:message name="GetCapabilitiesSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCapabilitiesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetPivotViewXmlSoapIn">
+    <wsdl:part name="parameters" element="tns:GetPivotViewXml" />
+  </wsdl:message>
+  <wsdl:message name="GetPivotViewXmlSoapOut">
+    <wsdl:part name="parameters" element="tns:GetPivotViewXmlResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetRelatedActivityInstancesSoapIn">
+    <wsdl:part name="parameters" element="tns:GetRelatedActivityInstances" />
+  </wsdl:message>
+  <wsdl:message name="GetRelatedActivityInstancesSoapOut">
+    <wsdl:part name="parameters" element="tns:GetRelatedActivityInstancesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetReferencesSoapIn">
+    <wsdl:part name="parameters" element="tns:GetReferences" />
+  </wsdl:message>
+  <wsdl:message name="GetReferencesSoapOut">
+    <wsdl:part name="parameters" element="tns:GetReferencesResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetViewDetailsAsXmlSoapIn">
+    <wsdl:part name="parameters" element="tns:GetViewDetailsAsXml" />
+  </wsdl:message>
+  <wsdl:message name="GetViewDetailsAsXmlSoapOut">
+    <wsdl:part name="parameters" element="tns:GetViewDetailsAsXmlResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetViewSummaryForCurrentUserSoapIn">
+    <wsdl:part name="parameters" element="tns:GetViewSummaryForCurrentUser" />
+  </wsdl:message>
+  <wsdl:message name="GetViewSummaryForCurrentUserSoapOut">
+    <wsdl:part name="parameters" element="tns:GetViewSummaryForCurrentUserResponse" />
+  </wsdl:message>
+  <wsdl:message name="RemoveSubscriptionSoapIn">
+    <wsdl:part name="parameters" element="tns:RemoveSubscription" />
+  </wsdl:message>
+  <wsdl:message name="RemoveSubscriptionSoapOut">
+    <wsdl:part name="parameters" element="tns:RemoveSubscriptionResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdateAlertSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateAlert" />
+  </wsdl:message>
+  <wsdl:message name="UpdateAlertSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateAlertResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdateSubscriptionSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateSubscription" />
+  </wsdl:message>
+  <wsdl:message name="UpdateSubscriptionSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateSubscriptionResponse" />
+  </wsdl:message>
+  <wsdl:portType name="BamManagementServiceSoap">
+    <wsdl:operation name="AddSubscription">
+      <wsdl:input message="tns:AddSubscriptionSoapIn" />
+      <wsdl:output message="tns:AddSubscriptionSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CreateAlert">
+      <wsdl:input message="tns:CreateAlertSoapIn" />
+      <wsdl:output message="tns:CreateAlertSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="DeleteAlert">
+      <wsdl:input message="tns:DeleteAlertSoapIn" />
+      <wsdl:output message="tns:DeleteAlertSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GenerateEventForArtifact">
+      <wsdl:input message="tns:GenerateEventForArtifactSoapIn" />
+      <wsdl:output message="tns:GenerateEventForArtifactSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAlert">
+      <wsdl:input message="tns:GetAlertSoapIn" />
+      <wsdl:output message="tns:GetAlertSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAlertsSummary">
+      <wsdl:input message="tns:GetAlertsSummarySoapIn" />
+      <wsdl:output message="tns:GetAlertsSummarySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCapabilities">
+      <wsdl:input message="tns:GetCapabilitiesSoapIn" />
+      <wsdl:output message="tns:GetCapabilitiesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPivotViewXml">
+      <wsdl:input message="tns:GetPivotViewXmlSoapIn" />
+      <wsdl:output message="tns:GetPivotViewXmlSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetRelatedActivityInstances">
+      <wsdl:input message="tns:GetRelatedActivityInstancesSoapIn" />
+      <wsdl:output message="tns:GetRelatedActivityInstancesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetReferences">
+      <wsdl:input message="tns:GetReferencesSoapIn" />
+      <wsdl:output message="tns:GetReferencesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetViewDetailsAsXml">
+      <wsdl:input message="tns:GetViewDetailsAsXmlSoapIn" />
+      <wsdl:output message="tns:GetViewDetailsAsXmlSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetViewSummaryForCurrentUser">
+      <wsdl:input message="tns:GetViewSummaryForCurrentUserSoapIn" />
+      <wsdl:output message="tns:GetViewSummaryForCurrentUserSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveSubscription">
+      <wsdl:input message="tns:RemoveSubscriptionSoapIn" />
+      <wsdl:output message="tns:RemoveSubscriptionSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAlert">
+      <wsdl:input message="tns:UpdateAlertSoapIn" />
+      <wsdl:output message="tns:UpdateAlertSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSubscription">
+      <wsdl:input message="tns:UpdateSubscriptionSoapIn" />
+      <wsdl:output message="tns:UpdateSubscriptionSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BamManagementServiceSoap" type="tns:BamManagementServiceSoap">
+    <wsdl:documentation>
+      <wsi:Claim conformsTo="http://ws-i.org/profiles/basic/1.1" xmlns:wsi="http://ws-i.org/schemas/conformanceClaim/" />
+    </wsdl:documentation>
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="AddSubscription">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/AddSubscription" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateAlert">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/CreateAlert" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteAlert">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/DeleteAlert" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GenerateEventForArtifact">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GenerateEventForArtifact" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAlert">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetAlert" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAlertsSummary">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetAlertsSummary" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCapabilities">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetCapabilities" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPivotViewXml">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetPivotViewXml" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetRelatedActivityInstances">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetRelatedActivityInstances" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetReferences">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetReferences" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetViewDetailsAsXml">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetViewDetailsAsXml" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetViewSummaryForCurrentUser">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetViewSummaryForCurrentUser" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveSubscription">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/RemoveSubscription" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAlert">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/UpdateAlert" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSubscription">
+      <soap:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/UpdateSubscription" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="BamManagementServiceSoap12" type="tns:BamManagementServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="AddSubscription">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/AddSubscription" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateAlert">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/CreateAlert" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteAlert">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/DeleteAlert" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GenerateEventForArtifact">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GenerateEventForArtifact" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAlert">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetAlert" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAlertsSummary">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetAlertsSummary" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCapabilities">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetCapabilities" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPivotViewXml">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetPivotViewXml" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetRelatedActivityInstances">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetRelatedActivityInstances" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetReferences">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetReferences" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetViewDetailsAsXml">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetViewDetailsAsXml" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetViewSummaryForCurrentUser">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/GetViewSummaryForCurrentUser" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveSubscription">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/RemoveSubscription" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAlert">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/UpdateAlert" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSubscription">
+      <soap12:operation soapAction="http://schemas.microsoft.com/BizTalkServer/2004/10/BAM/ManagementWebService/UpdateSubscription" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="BamManagementService">
+    <wsdl:port name="BamManagementServiceSoap" binding="tns:BamManagementServiceSoap">
+      <soap:address location="http://localhost/BAM/bammanagementservice/bammanagementservice.asmx" />
+    </wsdl:port>
+    <wsdl:port name="BamManagementServiceSoap12" binding="tns:BamManagementServiceSoap12">
+      <soap12:address location="http://localhost/BAM/bammanagementservice/bammanagementservice.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

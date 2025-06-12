@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props"/>
+	
+	<PropertyGroup>
+		<MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+		<MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+		<_OutputDirectory Condition="$(_OutputDirectory) == ''">bin</_OutputDirectory>
+		<_DeployProjFile>$(MSBuildThisFileDirectory)Deploy.proj</_DeployProjFile>
+		<_Deploy64ProjFile>$(MSBuildThisFileDirectory)Deploy64.proj</_Deploy64ProjFile>
+		<_NuGetExePath>$(MSBuildThisFileDirectory)NuGet.exe</_NuGetExePath>
+		<_TempPackageFolder>$(MSBuildProjectDirectory)\bin\temp</_TempPackageFolder>
+		<_PackageZipFilePath>$(_OutputDirectory)\$(MSBuildProjectName).zip</_PackageZipFilePath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<_DeploymentFiles Include="$(MSBuildProjectDirectory)\Deployment\**\*"/>
+	</ItemGroup>
+
+	<Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+	
+	<Target Name="bat:package">
+		<RemoveDir Directories="$(_TempPackageFolder)" />
+		<MakeDir Directories="$(_TempPackageFolder)" Condition="!Exists('$(_TempPackageFolder)')" />
+		<Exec Command="$(_NuGetExePath) install $(InterfaceID) -Version $(InterfaceVersion) -NoCache -DirectDownload -NonInteractive -OutputDirectory $(_TempPackageFolder)\Packages\Interface"/>
+		<ItemGroup>
+			<_CommonScripts Include="$(RootLevelBin)\Deployment\CommonScripts\**\*" />
+			<_InterfaceFiles Include="$(_TempPackageFolder)\Packages\Interface\$(InterfaceID).$(InterfaceVersion)\content\Interface\**\*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(_CommonScripts)" DestinationFolder="$(_TempPackageFolder)\%(RecursiveDir)"/>
+		<Copy SourceFiles="$(RootLevelBin)\Deployment\Bin\XT.Internal.API.dll" DestinationFolder="$(_TempPackageFolder)\XT.Internal.API"/>
+		<Copy SourceFiles="$(RootLevelBin)\Deployment\Bin\XT.Internal.API.Tasks.dll" DestinationFolder="$(_TempPackageFolder)\XT.Internal.API"/>
+		<Copy SourceFiles="$(RootLevelBin)\Deployment\Bin\XT.Internal.API.tasks" DestinationFolder="$(_TempPackageFolder)\XT.Internal.API"/>		
+		<Copy SourceFiles="@(_DeploymentFiles)" DestinationFolder="$(_TempPackageFolder)\Deployment\%(RecursiveDir)"/>
+		<Copy SourceFiles="$(_DeployProjFile)" DestinationFolder="$(_TempPackageFolder)\"/>
+		<Copy SourceFiles="$(_Deploy64ProjFile)" DestinationFolder="$(_TempPackageFolder)\"/>
+		<Copy SourceFiles="@(_InterfaceFiles)" DestinationFolder="$(_TempPackageFolder)\Interface\%(RecursiveDir)"/>
+		<Copy SourceFiles="$(MSBuildCommonTasks)" DestinationFolder="$(_TempPackageFolder)\"/>
+		<Copy SourceFiles="$(_NuGetExePath)" DestinationFolder="$(_TempPackageFolder)\"/>
+		<Copy SourceFiles="$(RootLevelBin)\..\NuGet.config" DestinationFolder="$(_TempPackageFolder)\" Condition="Exists('$(RootLevelBin)\..\NuGet.config')"/>
+		<RemoveDir Directories="$(_TempPackageFolder)\Packages" />
+		<Zip
+			TaskAction="Create"
+			ZipFileName="$(_PackageZipFilePath)"
+			CompressPath="$(_TempPackageFolder)"
+			RemoveRoot="$(_TempPackageFolder)" />
+		<RemoveDir Directories="$(_TempPackageFolder)" />
+	</Target>
+
+</Project>

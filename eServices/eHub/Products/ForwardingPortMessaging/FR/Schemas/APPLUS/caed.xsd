@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Christian Allemand (Marseille Gyptis International) -->
+<xs:schema elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://www.cargowise.com/Schemas/FPM/APPLUS/CAED"
+           xmlns:std="http://www.cargowise.com/Schemas/FPM/APPLUS"
+           targetNamespace="http://www.cargowise.com/Schemas/FPM/APPLUS/CAED">
+
+  <xs:import namespace="http://www.cargowise.com/Schemas/FPM/APPLUS" schemaLocation="patterns.xsd"/>
+
+  <xs:complexType name="tiers_ctrl_type">
+    <xs:attribute name="code" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="lieux_ctrl_type">
+    <xs:attribute name="md" type="xs:string" use="optional"/>
+    <xs:attribute name="bdd" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="lmarchandise_ctrl_type">
+    <xs:attribute name="nb" type="xs:integer" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="equipement_ctrl_type">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="controle_prealable_type">
+    <xs:sequence>
+      <xs:element name="references-ctrl" type="references_ctrl_type"/>
+      <xs:element name="tiers-ctrl" type="tiers_ctrl_type" minOccurs="0"/>
+      <xs:element name="lieux-ctrl" type="lieux_ctrl_type" minOccurs="0"/>
+      <xs:element name="lmarchandise-ctrl" type="lmarchandise_ctrl_type" minOccurs="0"/>
+      <xs:element name="equipement-ctrl" type="equipement_ctrl_type" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="droits-ctrl" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="droits_sofi_type"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="references_ctrl_type">
+    <xs:attribute name="rca" type="xs:string" use="required"/>
+    <xs:attribute name="globale" type="std:Booleen_type" use="optional"/>
+    <xs:attribute name="type" type="xs:string" use="optional"/>
+    <xs:attribute name="dos" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="droits_sofi_type">
+    <xs:annotation>
+      <xs:documentation>Droits indique le montant des droits de port dont font l_objet les marchandises faisant l_objet d_une avis d_enregistrement.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="montant" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur du montant des droits de port.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:minInclusive value="0"/>
+          <xs:maxInclusive value="999999999"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="unite" use="optional">
+      <xs:annotation>
+        <xs:documentation>Unité monétaire dans laquelle sont exprimés les droits de port.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="port" type="xs:string" use="optional"/>
+    <xs:attribute name="port-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="caed_user_type">
+    <xs:attribute name="user" use="required">
+      <xs:annotation>
+        <xs:documentation>Code utilisateur du tiers profession du message.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tiersProf" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant tiers profession du message.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="email" type="xs:string" use="optional"/>
+    <xs:attribute name="adresse" type="xs:string" use="optional"/>
+    <xs:attribute name="reseau" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="caed_request_type">
+    <xs:choice>
+      <xs:element name="controle-prealable" type="controle_prealable_type"/>
+    </xs:choice>
+    <xs:attribute name="action" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code fonction du document (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="CREATE|UPDATE|DELETE|ADD|ERASE|UKN"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="id" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant fonctionnel du message utilisé pour effectuer le suivi de l intégration.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" use="required">
+      <xs:annotation>
+        <xs:documentation>Type du document à intégrer (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0"/>
+          <xs:maxLength value="7"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="statut" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:element name="Request" type="caed_request_type">
+    <xs:annotation>
+      <xs:documentation>Request précise la nature du document à intégrer.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Interchanges">
+    <xs:annotation>
+      <xs:documentation>Interchanges décrit le contexte de la transmission des données entre le SIC et le système partenaire.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="MessageSet" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant interchange</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="from" use="required">
+        <xs:annotation>
+          <xs:documentation>Nom du système émetteur</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="75"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="to" use="required">
+        <xs:annotation>
+          <xs:documentation>Nom du système destinataire</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="75"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="servername" type="xs:string" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MessageSet">
+    <xs:annotation>
+      <xs:documentation>MessageSet identifie le message et permet d'assurer le suivi des échanges.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Destinataire"/>
+        <xs:element ref="Emetteur"/>
+        <xs:element name="Messages" type="caed_messages_type">
+          <xs:annotation>
+            <xs:documentation>Messages contient le document à integrer, à notifier, à imprimer ou à acquitter</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant du message</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="icid" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant interchange de rattachement du message</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="date" type="std:DateLongue_type" use="required">
+        <xs:annotation>
+          <xs:documentation>"31/12/2004 23:59:59" Date d'envoi du message.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Destinataire" type="caed_user_type">
+    <xs:annotation>
+      <xs:documentation>Identification du tiers destinataire du message</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Emetteur" type="caed_user_type">
+    <xs:annotation>
+      <xs:documentation>Identification de l'émetteur du message</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="caed_messages_type">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element ref="Request"/>
+    </xs:choice>
+  </xs:complexType>
+</xs:schema>

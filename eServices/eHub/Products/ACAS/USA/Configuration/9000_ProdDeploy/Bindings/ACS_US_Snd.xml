@@ -1,0 +1,111 @@
+<SendPort Name="ACS_US_Snd" IsStatic="true" IsTwoWay="false" BindingOption="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Description xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  <TransmitPipeline Name="CargoWise.eHub.Core.Pipelines.Snd_PassThruTransmitWithDeliveryNotification" FullyQualifiedName="CargoWise.eHub.Core.Pipelines.Snd_PassThruTransmitWithDeliveryNotification, CargoWise.eHub.Core.Pipelines, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350" Type="2" TrackingOption="None" Description="" />
+  <SendPipelineData>
+    <Root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <Stages>
+        <Stage CategoryId="9d0e4101-4cce-4536-83fa-4a5040674ad6">
+          <Components>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.StreamWrapperComponent">
+              <Properties />
+            </Component>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.DynamicValuePromotionComponent">
+              <Properties />
+            </Component>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.StaticValuePromotionComponent">
+              <Properties />
+            </Component>
+          </Components>
+        </Stage>
+        <Stage CategoryId="9d0e4108-4cce-4536-83fa-4a5040674ad6">
+          <Components>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.AddXmlDeclarationComponent">
+              <Properties />
+            </Component>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.BodyPropertyWriter">
+              <Properties />
+            </Component>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.WrapMessageComponent">
+              <Properties />
+            </Component>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.AS2Encoder">
+              <Properties />
+            </Component>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.ResetMessageContentTypeComponent">
+              <Properties />
+            </Component>
+          </Components>
+        </Stage>
+      </Stages>
+    </Root>
+  </SendPipelineData>
+  <PrimaryTransport>
+    <Address>mqsc://EHUBP.SVRCONN/tcp/WG3-SCMQ-1.wg.cargowise.com(1414)/QM_CRGWP/AMSP.AIR.OUTBOUND.TO.CBP</Address>
+    <TransportType Name="MQSC" Capabilities="15627" ConfigurationClsid="cf8b4d15-5d2b-4c62-90db-16804d2454b9" />
+    <TransportTypeData>
+      <CustomProps>
+        <AdapterConfig vt="8">
+          <Config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <uri>mqsc://EHUBP.SVRCONN/tcp/WG3-SCMQ-1.wg.cargowise.com(1414)/QM_CRGWP/AMSP.AIR.OUTBOUND.TO.CBP</uri>
+            <queueManager>QM_CRGWP</queueManager>
+            <queue>AMSP.AIR.OUTBOUND.TO.CBP</queue>
+            <heartBeat>300</heartBeat>
+            <channelName>EHUBP.SVRCONN</channelName>
+            <transportType>tcp</transportType>
+            <connectionName>WG3-SCMQ-1.wg.cargowise.com(1414)</connectionName>
+            <maximumMessageLength>4</maximumMessageLength>
+            <connectionTimeout>120</connectionTimeout>
+            <transactionSupported>yes</transactionSupported>
+            <segmentationAllowed>no</segmentationAllowed>
+          </Config>
+        </AdapterConfig>
+      </CustomProps>
+    </TransportTypeData>
+    <RetryCount>3</RetryCount>
+    <RetryInterval>5</RetryInterval>
+    <ServiceWindowEnabled>false</ServiceWindowEnabled>
+    <FromTime>2000-01-01T13:00:00</FromTime>
+    <ToTime>2000-01-01T12:59:59</ToTime>
+    <Primary>true</Primary>
+    <OrderedDelivery>false</OrderedDelivery>
+    <DeliveryNotification>1</DeliveryNotification>
+    <SendHandler Name="SendHost_MQ" HostTrusted="false">
+      <TransportType Name="MQSC" Capabilities="15627" ConfigurationClsid="cf8b4d15-5d2b-4c62-90db-16804d2454b9" />
+    </SendHandler>
+  </PrimaryTransport>
+  <SecondaryTransport>
+    <Address />
+    <RetryCount>3</RetryCount>
+    <RetryInterval>5</RetryInterval>
+    <ServiceWindowEnabled>false</ServiceWindowEnabled>
+    <FromTime>2000-01-01T13:00:00</FromTime>
+    <ToTime>2000-01-01T12:59:59</ToTime>
+    <Primary>false</Primary>
+    <OrderedDelivery>false</OrderedDelivery>
+    <DeliveryNotification>1</DeliveryNotification>
+    <SendHandler xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  </SecondaryTransport>
+  <ReceivePipelineData xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  <Tracking>204</Tracking>
+  <Filter>&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;Filter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;Group&gt;
+    &lt;Statement Property="CargoWise.eHub.Core.PropertySchemas.NextStep" Operator="0" Value="DistributeToRecipient" /&gt;
+    &lt;Statement Property="BTS.DestinationParty" Operator="0" Value="ACAS_US_FRI" /&gt;
+  &lt;/Group&gt;
+  &lt;Group&gt;
+    &lt;Statement Property="CargoWise.eHub.Core.PropertySchemas.NextStep" Operator="0" Value="DistributeToRecipient" /&gt;
+    &lt;Statement Property="BTS.DestinationParty" Operator="0" Value="ACAS_US_FHL" /&gt;
+  &lt;/Group&gt;
+  &lt;Group&gt;
+    &lt;Statement Property="CargoWise.eHub.Core.PropertySchemas.NextStep" Operator="0" Value="DistributeToRecipient" /&gt;
+    &lt;Statement Property="BTS.DestinationParty" Operator="0" Value="ACAS_US_ASN" /&gt;
+  &lt;/Group&gt;
+&lt;/Filter&gt;</Filter>
+  <Transforms />
+  <OrderedDelivery>false</OrderedDelivery>
+  <Priority>5</Priority>
+  <StopSendingOnFailure>false</StopSendingOnFailure>
+  <RouteFailedMessage>true</RouteFailedMessage>
+  <ApplicationName>CargoWise.eHub</ApplicationName>
+</SendPort>

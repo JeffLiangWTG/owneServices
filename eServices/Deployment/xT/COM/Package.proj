@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+
+  <PropertyGroup>
+    <ProgramFiles>C:\Program Files (x86)</ProgramFiles>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)..\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(MSBuildThisFileDirectory)..\..\package-common.tasks</PackageCommonTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+
+  <PropertyGroup>
+    <RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>
+    <_OutputDirectory Condition="$(_OutputDirectory) == ''">bin</_OutputDirectory>
+    <_DeployProjFile>$(MSBuildThisFileDirectory)Deploy.proj</_DeployProjFile>
+    <_NuGetExePath>$(MSBuildThisFileDirectory)NuGet.exe</_NuGetExePath>
+    <_TempPackageFolder>$(MSBuildProjectDirectory)\bin\temp</_TempPackageFolder>
+    <_PackageZipFilePath>$(_OutputDirectory)\$(MSBuildProjectName).zip</_PackageZipFilePath>
+  </PropertyGroup>
+
+  <Target Name="Test" BeforeTargets="Bat:Package">
+    <Message Text="================================================"></Message>
+    <Message Text="$(PackageCommonTasks)"></Message>
+    <Message Text="================================================"></Message>
+  </Target>
+
+  <Target Name="bat:package">
+    <RemoveDir Directories="$(_TempPackageFolder)" />
+    <MakeDir Directories="$(_TempPackageFolder)" Condition="!Exists('$(_TempPackageFolder)')" />
+    <ItemGroup>
+      <_DeploymentFiles Include="$(MSBuildProjectDirectory)\Deployment\**\*"/>
+      <_RegAsmExecutable Include="$(MSBuildThisFileDirectory)\RegAsm.exe" />
+      <_OutputFiles Include="$(_OutputDirectory)\**\*"/>
+      <_DeployProjFile Include="$(MSBuildThisFileDirectory)Deploy.proj"/>
+      <_CommonScripts Include="$(MSBuildThisFileDirectory)..\..\CommonScripts\**\*" />
+    </ItemGroup>
+    <Copy	SourceFiles="@(_DeploymentFiles)"	DestinationFolder="$(_TempPackageFolder)\Deployment\%(RecursiveDir)"/>
+    <Copy SourceFiles="@(_RegAsmExecutable)" DestinationFolder="$(_TempPackageFolder)\%(RecursiveDir)"/>
+    <Copy SourceFiles="@(_OutputFiles)" DestinationFolder="$(_TempPackageFolder)\bin\%(RecursiveDir)"/>
+    <Copy SourceFiles="@(_DeployProjFile)" DestinationFolder="$(_TempPackageFolder)\"/>
+    <Copy SourceFiles="@(_CommonScripts)" DestinationFolder="$(_TempPackageFolder)\"/>
+
+    <Message Text="=============================================="/>
+    <Message Text="$(_CommonScripts)"/>
+    <Message Text="$(MSBuildThisFileDirectory)DeployComObjects.proj"/>
+    <Message Text="$(MSBuildProjectDirectory)\Deployment\**\*"/>
+    <Message Text="=============================================="/>
+    <Zip
+			TaskAction="Create"
+			ZipFileName="$(_PackageZipFilePath)"
+			CompressPath="$(_TempPackageFolder)"
+			RemoveRoot="$(_TempPackageFolder)" />
+    <RemoveDir Directories="$(_TempPackageFolder)" />
+  </Target>
+
+</Project>

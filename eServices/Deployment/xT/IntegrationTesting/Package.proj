@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!--Import Default deployment properties-->
+	<Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props"/>
+	
+	<PropertyGroup>
+		<MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+		<MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+		<_OutputDirectory Condition="$(_OutputDirectory) == ''">bin</_OutputDirectory>
+		<_TempPackageFolder>$(MSBuildProjectDirectory)\bin\temp</_TempPackageFolder>
+		<_PackageZipFilePath>$(_OutputDirectory)\$(MSBuildProjectName).zip</_PackageZipFilePath>
+		<_XtDeployment>$(MSBuildThisFileDirectory)\..\..\Bin\XT.IntegrationTesting\</_XtDeployment>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<_DeploymentFiles Include="$(MSBuildProjectDirectory)\Deployment\**\*"/>
+	</ItemGroup>
+
+	<Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+	
+	<!--Import XT Deployment Tasks-->
+	<Import Project="$(_XtDeployment)XT.IntegrationTesting.tasks" Condition="'$(_XtDeployment)'!=''" />
+
+	<Target Name="bat:package">
+		<!--Remove existing temp folder-->
+		<RemoveDir Directories="$(_TempPackageFolder)" />
+
+		<!--Create temp folder-->
+		<MakeDir Directories="$(_TempPackageFolder)" Condition="!Exists('$(_TempPackageFolder)')" />
+
+		<ItemGroup>
+			<_CommonScripts Include="$(RootLevelBin)\Deployment\CommonScripts\**\*" />
+			<_XtDeploymentFiles Include="$(_XtDeployment)\*" />
+		</ItemGroup>
+
+		<!--Copy all common deployment scripts-->
+		<Copy SourceFiles="@(_CommonScripts)" DestinationFolder="$(_TempPackageFolder)\%(RecursiveDir)"/>
+
+		<!--Copy XT.IntegrationTesting assemblies-->
+		<Copy SourceFiles="@(_XtDeploymentFiles)" DestinationFolder="$(_TempPackageFolder)\xT.IntegrationTesting"/>
+		
+		<!--Copy all files from Deployment directory (incl. Profiles)-->
+		<Copy SourceFiles="@(_DeploymentFiles)" DestinationFolder="$(_TempPackageFolder)\Deployment\%(RecursiveDir)"/>
+
+		<!--Copy MsBuildCommonTasks-->
+		<Copy SourceFiles="$(MSBuildCommonTasks)" DestinationFolder="$(_TempPackageFolder)\"/>
+
+		<LoadProfiles
+			DefaultProfileFile="$(_TempPackageFolder)\Deployment\Deployment.json"
+			ProfileFile="$(_TempPackageFolder)\Deployment\Profiles\$(Profile)\Deployment.json">
+			<Output TaskParameter="InterfaceName" PropertyName="InterfaceName" />
+		</LoadProfiles>
+		<Build WorkingDirectory="$(_TempPackageFolder)" />
+
+		<!--Remove downloaded packages-->
+		<RemoveDir Directories="$(_TempPackageFolder)\Packages" />
+
+		<!--Remove build directory-->
+		<RemoveDir Directories="$(_TempPackageFolder)\build" />
+		
+		<!--Create the zip file-->
+		<Zip
+			TaskAction="Create"
+			ZipFileName="$(_PackageZipFilePath)"
+			CompressPath="$(_TempPackageFolder)"
+			RemoveRoot="$(_TempPackageFolder)" />
+
+		<!--Remove temp folder-->
+		<RemoveDir Directories="$(_TempPackageFolder)" />
+	</Target>
+
+</Project>

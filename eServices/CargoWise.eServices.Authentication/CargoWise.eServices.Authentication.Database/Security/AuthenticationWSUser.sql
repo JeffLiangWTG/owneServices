@@ -1,0 +1,1 @@
+﻿CREATE USER [AuthenticationWS] FOR LOGIN [AuthenticationWS];

@@ -1,0 +1,304 @@
+<#@ template language="C#" hostspecific="True" #>
+<#@ output extension="sql" encoding="utf-16" #>
+<#@ assembly name="EnvDTE"#>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="System.Xml.Schema" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="System.Xml.XPath" #>
+<#@ include file="..\..\..\..\..\DeveloperTools\T4Templates\FileManager.ttinclude" #>
+
+<#
+
+var manager = Manager.Create(Host, GenerationEnvironment);
+GenerationEnvironment.Clear();
+
+EnvDTE.DTE dte = (Host as IServiceProvider).GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+EnvDTE.ProjectItems transformItems =  dte.Solution.FindProjectItem(Host.TemplateFile).Collection;
+EnvDTE.ProjectItems schemaItems =  (transformItems.Parent as EnvDTE.ProjectItem).Collection.Item("Schemas").Collection;
+string assemblyName =  dte.Solution.FindProjectItem(Host.TemplateFile).ContainingProject.Properties.Item("AssemblyName").Value.ToString();
+string defaultCustomisationsXslt = "<!-- Imported during auto-generation of maps.\r\n     {0} -->";
+
+DirectoryInfo schemaDir = new DirectoryInfo(Path.GetDirectoryName(Host.TemplateFile) + @"\..\Schemas");
+string nsPrefix = "CargoWise.eHub.Clients.EDI." + schemaDir.Parent.Name + ".Schemas.";
+string interchangeSchemaName = "UniversalInterchange";
+string interchangeSchemaPath = schemaDir.FullName + @"\" + interchangeSchemaName + ".xsd";
+string interchangeNamespace = (schemaDir.GetFiles("*.xsd").Length > 0)
+                              ? XmlSchema.Read(File.OpenText(interchangeSchemaPath), null).TargetNamespace
+                              : string.Empty;
+
+XNamespace xs = "http://www.w3.org/2001/XMLSchema";
+XNamespace b = "http://schemas.microsoft.com/BizTalk/2003";
+XDocument xdoc = XDocument.Load(interchangeSchemaPath);
+xdoc.Root.Add(new XAttribute("elementFormDefault", "qualified"));
+xdoc.Root.AddFirst(new XElement(xs + "annotation", new XElement(xs + "appinfo", new XElement(b + "schemaInfo", new XAttribute("root_reference", interchangeSchemaName + "Include")))));
+xdoc.XPathSelectElement("//*[local-name()='element' and @name='" + interchangeSchemaName + "']").SetAttributeValue("name", interchangeSchemaName + "Include");
+var choice = new XElement(xs + "choice", new XAttribute("minOccurs", "0"), new XAttribute("maxOccurs", "unbounded"));
+
+StringBuilder sql = new StringBuilder();
+sql.AppendLine("USE [eHubTransactions];");
+sql.AppendLine("SET XACT_ABORT ON;");
+sql.AppendLine("BEGIN TRAN;");
+sql.AppendFormat("DECLARE @{0}DT UNIQUEIDENTIFIER = '{2}'; " +
+                 "INSERT INTO [dbo].[eHubMessageType] ([DT_PK],[DT_Code],[DT_IsFlatFile],[DT_IsEDI]) " +
+                 "VALUES (@{0}DT,'{1}#{0}',0,0);",
+                 interchangeSchemaName, interchangeNamespace, Guid.NewGuid()).AppendLine();
+
+var excludedFiles = new List<string>() { interchangeSchemaName + ".xsd", interchangeSchemaName + "Include.xsd", "UniversalCommon.xsd" };
+foreach(var file in schemaDir.GetFiles("*.xsd").Where(f => !excludedFiles.Contains(f.Name)))
+{
+    string msgType = Path.GetFileNameWithoutExtension(file.Name);
+    string msgNamespace = XmlSchema.Read(file.OpenText(), null).TargetNamespace;
+
+    sql.AppendFormat("DECLARE @{0}DT UNIQUEIDENTIFIER = '{2}'; " +
+                     "INSERT INTO [dbo].[eHubMessageType] ([DT_PK],[DT_Code],[DT_IsFlatFile],[DT_IsEDI]) " +
+                     "VALUES (@{0}DT,'{1}#{0}',0,0);",
+                     msgType, msgNamespace, Guid.NewGuid()).AppendLine();
+    sql.AppendFormat("DECLARE @{0}2{3}TT UNIQUEIDENTIFIER = '{2}'; " +
+                     "INSERT INTO [dbo].[eHubTransformationType] ([TT_PK],[TT_DT_Source],[TT_DT_Target],[TT_TransformationType]) " +
+                     "VALUES (@{0}2{3}TT,@{0}DT,@{3}DT,'{1}.Transforms.{0}2{3}, {1}, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350');",
+                     msgType, assemblyName, Guid.NewGuid(), interchangeSchemaName).AppendLine();
+    sql.AppendFormat("DECLARE @{3}2{0}TT UNIQUEIDENTIFIER = '{2}'; " +
+                     "INSERT INTO [dbo].[eHubTransformationType] ([TT_PK],[TT_DT_Source],[TT_DT_Target],[TT_TransformationType]) " +
+                     "VALUES (@{3}2{0}TT,@{3}DT,@{0}DT,'{1}.Transforms.{3}2{0}, {1}, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350');",
+                     msgType, assemblyName, Guid.NewGuid(), interchangeSchemaName).AppendLine();
+
+    xdoc.Root.AddFirst(new XElement(xs + "include", new XAttribute("schemaLocation", @"..\Schemas\" + file.Name)));
+    choice.Add(
+        new XElement(xs + "element", new XAttribute("name", msgType),
+            new XElement(xs + "complexType",
+                new XElement(xs + "complexContent", new XAttribute("mixed", "false"),
+                    new XElement(xs + "extension", new XAttribute("base", msgType + "Data"))
+                )
+            )
+        )
+    );
+
+    string mapName = interchangeSchemaName + "2" + msgType;
+
+    string custPath = Path.GetDirectoryName(Host.TemplateFile) + "\\" + mapName + "Customisations.xsl";
+    string custText;
+    if (dte.Solution.FindProjectItem(custPath) == null)
+    {
+        File.WriteAllText(custPath, string.Format(defaultCustomisationsXslt, mapName + "Customisations.xsl"), Encoding.Unicode);
+        transformItems.AddFromFile(custPath);
+        custText = defaultCustomisationsXslt;
+    }
+    else
+    {
+        custText = File.ReadAllText(custPath);
+    }
+
+    manager.StartNewFile(mapName + ".btm", Encoding.Unicode);
+#>
+<?xml version="1.0" encoding="utf-16"?>
+<mapsource Name="BizTalk Map" Version="2" BizTalkServerMapperTool_Version="3.0" XRange="100" YRange="420" OmitXmlDeclaration="Yes" TreatElementsAsRecords="No" OptimizeValueMapping="Yes" GenerateDefaultFixedNodes="Yes" PreserveSequenceOrder="No" IgnoreNamespacesForLinks="Yes" method="xml" CopyPIs="No" xmlVersion="1.0">
+  <SrcTree RootNode_Name="<#= interchangeSchemaName #>">
+    <Reference Location="..\Schemas\\<#= interchangeSchemaName #>.xsd" />
+  </SrcTree>
+  <TrgTree RootNode_Name="<#= msgType #>">
+    <Reference Location="..\Schemas\\<#= file.Name #>" />
+  </TrgTree>
+  <CustomXSLT XsltPath=".\\<#= mapName #>.xsl" ExtObjXmlPath="" />
+  <Pages><Page Name="Page 1"><Links /><Functoids /></Page></Pages>
+</mapsource>
+<# 
+    manager.EndBlock();
+    manager.StartNewFile(mapName + ".xsl", Encoding.Unicode);
+#>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output omit-xml-declaration="yes" method="xml" version="1.0" indent="yes" />
+  <xsl:template match="/">
+    <xsl:apply-templates select="*[local-name()='UniversalInterchange']/*[local-name()='Body']/*" />
+    <xsl:apply-templates select="*[local-name()='UniversalInterchange']/*[local-name()='Body']/@*" />
+  </xsl:template>
+  <xsl:template match="*">
+    <xsl:element name="{local-name(.)}" namespace="<#= msgNamespace #>" >
+      <xsl:apply-templates/>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="@*">
+    <xsl:copy/>
+  </xsl:template>
+  <#= custText #>
+</xsl:stylesheet>
+<# 
+    manager.EndBlock();
+
+    mapName = msgType + "2" + interchangeSchemaName;
+    
+    custPath = Path.GetDirectoryName(Host.TemplateFile) + "\\" + mapName + "Customisations.xsl";
+    if (dte.Solution.FindProjectItem(custPath) == null)
+    {
+        File.WriteAllText(custPath, string.Format(defaultCustomisationsXslt, mapName + "Customisations.xsl"), Encoding.Unicode);
+        transformItems.AddFromFile(custPath);
+        custText = defaultCustomisationsXslt;
+    }
+    else
+    {
+        custText = File.ReadAllText(custPath);
+    }
+
+    manager.StartNewFile(mapName + ".btm", Encoding.Unicode);
+#>
+<?xml version="1.0" encoding="utf-16"?>
+<mapsource Name="BizTalk Map" Version="2" BizTalkServerMapperTool_Version="3.0" XRange="100" YRange="420" OmitXmlDeclaration="Yes" TreatElementsAsRecords="No" OptimizeValueMapping="Yes" GenerateDefaultFixedNodes="Yes" PreserveSequenceOrder="No" IgnoreNamespacesForLinks="Yes" method="xml" CopyPIs="No" xmlVersion="1.0">
+  <SrcTree RootNode_Name="<#= msgType #>">
+    <Reference Location="..\Schemas\\<#= file.Name #>" />
+  </SrcTree>
+  <TrgTree RootNode_Name="<#= interchangeSchemaName #>">
+    <Reference Location="..\Schemas\\<#= interchangeSchemaName #>.xsd" />
+  </TrgTree>
+  <CustomXSLT XsltPath=".\\<#= mapName #>.xsl" ExtObjXmlPath="" />
+  <Pages><Page Name="Page 1"><Links /><Functoids /></Page></Pages>
+</mapsource>
+<# 
+    manager.EndBlock();
+    manager.StartNewFile(mapName + ".xsl", Encoding.Unicode);
+#>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output omit-xml-declaration="yes" method="xml" version="1.0" indent="yes" />
+  <xsl:template match="/">
+    <xsl:element name="UniversalInterchange" xmlns="<#= interchangeNamespace #>">
+      <xsl:element name="Header">
+        <xsl:element name="SenderID" />
+        <xsl:element name="RecipientID" />
+      </xsl:element>
+      <xsl:element name="Body">
+        <xsl:apply-templates select="@*" />
+        <xsl:apply-templates select="*" />
+      </xsl:element>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="*">
+    <xsl:element name="{local-name(.)}" namespace="<#= msgNamespace #>" >
+      <xsl:apply-templates/>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="@*">
+    <xsl:copy/>
+  </xsl:template>
+  <#= custText #>
+</xsl:stylesheet>
+<# 
+    manager.EndBlock();
+
+}
+
+xdoc.XPathSelectElement("//*[local-name()='element' and @name='Body']/*[local-name()='complexType']").ReplaceNodes(choice);
+string includeschemaPath = schemaDir.FullName + @"\" + interchangeSchemaName + "Include.xsd";
+if (dte.SourceControl.IsItemUnderSCC(includeschemaPath) && !dte.SourceControl.IsItemCheckedOut(includeschemaPath))
+{
+    dte.SourceControl.CheckOutItem(includeschemaPath);
+}
+var includeschema = File.Open(includeschemaPath, FileMode.OpenOrCreate);
+var xmlwriter = XmlWriter.Create(includeschema, new XmlWriterSettings() { Indent = true });
+xdoc.WriteTo(xmlwriter);
+xmlwriter.Flush();
+xmlwriter.Close();
+if (dte.Solution.FindProjectItem(includeschemaPath) == null)
+{
+    (transformItems.Parent as EnvDTE.ProjectItem).Collection.Item("Schemas").Collection.AddFromFile(includeschemaPath);
+}
+
+manager.StartNewFile("UniversalInterchange2UniversalInterchangeInclude.btm", Encoding.Unicode);
+#>
+<?xml version="1.0" encoding="utf-16"?>
+<mapsource Name="BizTalk Map" Version="2" BizTalkServerMapperTool_Version="3.0" XRange="100" YRange="420" OmitXmlDeclaration="Yes" TreatElementsAsRecords="No" OptimizeValueMapping="Yes" GenerateDefaultFixedNodes="Yes" PreserveSequenceOrder="No" IgnoreNamespacesForLinks="Yes" method="xml" CopyPIs="No" xmlVersion="1.0">
+  <SrcTree RootNode_Name="UniversalInterchange">
+    <Reference Location="..\Schemas\UniversalInterchange.xsd" />
+  </SrcTree>
+  <TrgTree RootNode_Name="UniversalInterchangeInclude">
+    <Reference Location="..\Schemas\UniversalInterchangeInclude.xsd" />
+  </TrgTree>
+  <CustomXSLT XsltPath=".\UniversalInterchange2UniversalInterchangeInclude.xsl" ExtObjXmlPath="" />
+  <Pages><Page Name="Page 1"><Links /><Functoids /></Page></Pages>
+</mapsource>
+<# 
+manager.EndBlock();
+
+manager.StartNewFile("UniversalInterchangeInclude2UniversalInterchange.btm", Encoding.Unicode);
+#>
+<?xml version="1.0" encoding="utf-16"?>
+<mapsource Name="BizTalk Map" Version="2" BizTalkServerMapperTool_Version="3.0" XRange="100" YRange="420" OmitXmlDeclaration="Yes" TreatElementsAsRecords="No" OptimizeValueMapping="Yes" GenerateDefaultFixedNodes="Yes" PreserveSequenceOrder="No" IgnoreNamespacesForLinks="Yes" method="xml" CopyPIs="No" xmlVersion="1.0">
+  <SrcTree RootNode_Name="UniversalInterchange">
+    <Reference Location="..\Schemas\UniversalInterchangeInclude.xsd" />
+  </SrcTree>
+  <TrgTree RootNode_Name="UniversalInterchange">
+    <Reference Location="..\Schemas\UniversalInterchange.xsd" />
+  </TrgTree>
+  <CustomXSLT XsltPath=".\UniversalInterchangeInclude2UniversalInterchange.xsl" ExtObjXmlPath="" />
+  <Pages><Page Name="Page 1"><Links /><Functoids /></Page></Pages>
+</mapsource>
+<# 
+manager.EndBlock();
+
+manager.StartNewFile("UniversalInterchange2UniversalInterchangeInclude.xsl", Encoding.Unicode);
+#>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output omit-xml-declaration="yes" method="xml" version="1.0" indent="yes" />
+  <xsl:template match="/">
+    <xsl:element name="UniversalInterchangeInclude" xmlns="<#= interchangeNamespace #>">
+      <xsl:apply-templates select="*[1]/*" />
+      <xsl:apply-templates select="*[1]/@*" />
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="*">
+    <xsl:element name="{local-name(.)}" namespace="<#= interchangeNamespace #>" >
+      <xsl:apply-templates/>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="@*">
+    <xsl:copy/>
+  </xsl:template>
+</xsl:stylesheet>
+<# 
+manager.EndBlock();
+
+manager.StartNewFile("UniversalInterchangeInclude2UniversalInterchange.xsl", Encoding.Unicode);
+#>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output omit-xml-declaration="yes" method="xml" version="1.0" indent="yes" />
+  <xsl:template match="/">
+    <xsl:element name="UniversalInterchange" xmlns="<#= interchangeNamespace #>">
+      <xsl:apply-templates select="*[1]/*" />
+      <xsl:apply-templates select="*[1]/@*" />
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="*">
+    <xsl:element name="{local-name(.)}" namespace="<#= interchangeNamespace #>" >
+      <xsl:apply-templates/>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="@*">
+    <xsl:copy/>
+  </xsl:template>
+</xsl:stylesheet>
+<# 
+manager.EndBlock();
+
+sql.AppendFormat("DECLARE @{0}DT UNIQUEIDENTIFIER = '{2}'; " +
+                    "INSERT INTO [dbo].[eHubMessageType] ([DT_PK],[DT_Code],[DT_IsFlatFile],[DT_IsEDI]) " +
+                    "VALUES (@{0}DT,'{1}#{0}',0,0);",
+                    "UniversalInterchangeInclude", interchangeNamespace, Guid.NewGuid()).AppendLine();
+sql.AppendFormat("DECLARE @{0}2{3}TT UNIQUEIDENTIFIER = '{2}'; " +
+                    "INSERT INTO [dbo].[eHubTransformationType] ([TT_PK],[TT_DT_Source],[TT_DT_Target],[TT_TransformationType]) " +
+                    "VALUES (@{0}2{3}TT,@{0}DT,@{3}DT,'{1}.Transforms.{0}2{3}, {1}, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350');",
+                    "UniversalInterchangeInclude", assemblyName, Guid.NewGuid(), interchangeSchemaName).AppendLine();
+sql.AppendFormat("DECLARE @{3}2{0}TT UNIQUEIDENTIFIER = '{2}'; " +
+                    "INSERT INTO [dbo].[eHubTransformationType] ([TT_PK],[TT_DT_Source],[TT_DT_Target],[TT_TransformationType]) " +
+                    "VALUES (@{3}2{0}TT,@{3}DT,@{0}DT,'{1}.Transforms.{3}2{0}, {1}, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350');",
+                    "UniversalInterchangeInclude", assemblyName, Guid.NewGuid(), interchangeSchemaName).AppendLine();
+
+sql.AppendLine("COMMIT;");
+string sqlPath = schemaDir.FullName.Replace("\\Schemas", "\\EDIUniversalTransforms.sql");
+if (dte.Solution.FindProjectItem(sqlPath) == null)
+{
+    File.WriteAllText(sqlPath, sql.ToString(), Encoding.Unicode);
+    transformItems.AddFromFile(sqlPath);
+}
+#><#= sql.ToString() #><#
+
+manager.Process(true);
+#>

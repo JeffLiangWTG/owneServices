@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <BizTalkBindingsBuilderTasksImported>true</BizTalkBindingsBuilderTasksImported>
+
+    <DeploymentRootPath>$(MSBuildThisFileDirectory)..\</DeploymentRootPath>
+    <CommonScriptsPath>$(DeploymentRootPath)Common\</CommonScriptsPath>
+    <MSBuildCommonTasks>$(CommonScriptsPath)MSBuildCommon.tasks</MSBuildCommonTasks>
+
+    <ScriptsDir>$(MSBuildThisFileDirectory)Scripts</ScriptsDir>
+    <ReplaceTokensWithValuesPs1>$(ScriptsDir)\ReplaceTokensWithValues.ps1</ReplaceTokensWithValuesPs1>
+    <BuildBindingInfoPs1>$(ScriptsDir)\BuildBindingInfo.ps1</BuildBindingInfoPs1>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+
+  <!-- using the provided bindinginfo items to build a single BuildingInfo.xml that can be used to import to the target BizTalk server -->
+  <Target Name="bindinginfo:build" Returns="$(OutputBindingInfoFilePath)">
+    <Error Text="BuildBindingInfo script '$(BuildBindingInfoPs1)' does not exist" Condition="!Exists('$(BuildBindingInfoPs1)')" />
+    <Error Text="Please provide the path to the binding items, e.g. /p:BindingItemsDir=(path-to-a-directory-containing-binding-items)" Condition="'$(BindingItemsDir)'==''" />
+    <Error Text="The specified path '$(BindingItemsDir)' to the binding items does not exist" Condition="!Exists('$(BindingItemsDir)')" />
+
+    <!-- replace the tokens with values provided in the Production json files -->
+    <MSBuild Projects="$(MSBuildProjectFile)" Targets="bindinginfo:detokenize" Properties="BindingItemsDir=$(BindingItemsDir);Profile=$(Profile)" Condition="'$(Profile)'!=''">
+      <Output TaskParameter="TargetOutputs" PropertyName="DetokenizedDir" />
+    </MSBuild>
+
+    <!-- build the final binding info xml file -->
+    <PropertyGroup>
+      <OutputBindingInfoFilePath
+        Condition="'$(OutputBindingInfoFilePath)'=='' or !Exists('$(OutputBindingInfoFilePath)')">binding-info-$([System.DateTime]::Now.ToString(`yyyyMMdd_HHmmss`)).xml</OutputBindingInfoFilePath>
+    </PropertyGroup>
+
+    <BuildBindingInfo
+      BuildBindingInfoPs1="$(BuildBindingInfoPs1)"
+      InputBindingItemsDir="$(DetokenizedDir)"
+      OutputBindingInfoFilePath="$(OutputBindingInfoFilePath)" />
+
+    <Message Text="$(OutputBindingInfoFilePath) has been successfully created:" Condition="Exists('$(OutputBindingInfoFilePath)')" />
+    <Message Text="$(OutputBindingInfoFilePath)" Condition="Exists('$(OutputBindingInfoFilePath)')" Importance="High" />
+    <Error Text="Failed to create the $(OutputBindingInfoFilePath) file" Condition="!Exists('$(OutputBindingInfoFilePath)')" />
+  </Target>
+
+  <!-- replace the tokens embedded in the xml files with values provided in the *.json files and values provided from local key stores -->
+  <Target Name="bindinginfo:detokenize" Returns="$(DetokenizedDir)">
+
+    <Error Text="Please provide the path to the binding items, e.g. /p:BindingItemsDir=(path-to-a-directory-containing-binding-items)" Condition="'$(BindingItemsDir)'==''" />
+    <Error Text="The specified path '$(BindingItemsDir)' to the binding items does not exist" Condition="!Exists('$(BindingItemsDir)')" />
+    <Error Text="Please specify a profile to use so that the process can find the token values from the companying *.json files in the sub-folder" Condition="'$(Profile)'==''" />
+
+    <!-- copy the token files to the $(DetokenizedDir) -->
+    <ItemGroup>
+      <SourceFiles Include="$(BindingItemsDir)\**\*" />
+    </ItemGroup>
+
+    <!-- create a new temp folder to store the de-tokenized results -->
+    <CreateNewTempFolder>
+      <Output TaskParameter="NewTempFolder" PropertyName="DetokenizedDir" />
+    </CreateNewTempFolder>
+
+    <!-- copy all binding items over to the temp folder to work with -->
+    <Copy SourceFiles="@(SourceFiles)" DestinationFolder="$(DetokenizedDir)\%(RecursiveDir)" />
+
+    <!-- replace the token files -->
+    <ReplaceTokensWithValues BindingsDir="$(DetokenizedDir)" Profile="$(Profile)">
+      <Output TaskParameter="ProcessedFiles" ItemName="ProcessedFiles" />
+      <Output TaskParameter="NotProcessedFiles" ItemName="NotProcessedFiles" />
+    </ReplaceTokensWithValues>
+    <PropertyGroup>
+      <Yields Condition="'@(ProcessedFiles)'!=''">@(ProcessedFiles->Count())</Yields>
+    </PropertyGroup>
+
+    <Message Text="Tokens from $(Yields) files under the $(BindingItemsDir) has been de-tokenized by using the $(Profile) json files" Condition="'$(Yields)'!=''" />
+    <Message Text="Check out files the folder below for the de-tokenized results:" Importance="High"  Condition="'$(Yields)'!=''" />
+    <Message Text="$(DetokenizedDir)"  Condition="'$(Yields)'!=''" />
+
+    <!-- remove input files if told to do so -->
+    <RemoveDir Directories="$(BindingItemsDir)" Condition="Exists('$(BindingItemsDir)') and '$(DeleteInputFiles)'=='true'" />
+
+    <!-- open the result zip file -->
+    <Exec Command="start $(DetokenizedDir)" Condition="'$(ShowResult)'=='true'" />
+  </Target>
+
+  <!-- get values for keys from local key store -->
+  <!-- key store could be a provider that is capable to decrypt encrypted passwords by using a pre-installed private key in the container -->
+  <!-- key store could also be from a SSO database -->
+  <!-- key store could also be from a local file based key-value dictionary -->
+  <Target Name="keystore:get-values">
+  </Target>
+
+  <UsingTask
+    TaskName="BuildBindingInfo"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <BuildBindingInfoPs1 ParameterType="System.String" Required="true" />
+      <InputBindingItemsDir ParameterType="System.String" Required="true" />
+      <OutputBindingInfoFilePath ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+
+    <Task>
+    <![CDATA[
+      Add-Type -AssemblyName "Microsoft.Build.Framework"
+      . $(BuildBindingInfoPs1)
+
+      $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "BuildBindingInfo `"$InputBindingItemsDir`" `"$OutputBindingInfoFilePath`"")
+      BuildBindingInfo "$InputBindingItemsDir" "$OutputBindingInfoFilePath"
+    ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask
+    TaskName="CreateNewTempFolder"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <NewTempFolder ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+    <![CDATA[
+      $timeStamp = [System.DateTime]::Now.ToString("yyyyMMdd_HHmmss_fff")
+      $tempPath = [System.IO.Path]::GetTempPath()
+      $NewTempFolder = [string](Join-Path $tempPath $timeStamp)
+    ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask
+    TaskName="ReplaceTokensWithValues"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <BindingsDir ParameterType="System.String" Required="true" />
+      <Profile ParameterType="System.String" Required="true" />
+      <ProcessedFiles ParameterType="System.String[]" Output="true" />
+      <NotProcessedFiles ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+    <![CDATA[
+      Add-Type -AssemblyName "Microsoft.Build.Framework"
+      . $(ReplaceTokensWithValuesPs1)
+
+      [string[]]$ProcessedFiles = @()
+      [string[]]$NotProcessedFiles = @()
+
+      if ($null -ne $error) { $error.Clear() }
+      $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Replace tokens with values to the binding items directory: $BindingsDir")
+
+      try {
+
+        (Get-ChildItem -Recurse -Path $BindingsDir -Include *.xml) | % {
+          $xmlFile = $_
+          $xmlFilePath = $xmlFile.FullName
+          $xmlFileName = split-path $xmlFilePath -Leaf
+          $folderName = split-path $xmlFilePath -Parent
+
+          $jsonFileName = [IO.Path]::ChangeExtension($xmlFileName, ".json")
+          $jsonFilePath = Join-Path $folderName -ChildPath $Profile | Join-Path -ChildPath $jsonFileName
+
+          if (Test-Path $jsonFilePath) {
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "De-tokenizing '$xmlFilePath'")
+            $ProcessedFiles += $xmlFilePath
+
+            ReplaceTokensWithValues $xmlFilePath $jsonFilePath
+
+          } else {
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "$jsonFilePath is not found to de-tokenize the '$xmlFilePath'")
+            $NotProcessedFiles += $xmlFilePath
+          }
+        }
+      } catch {
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Error processing xml file: $xmlFilePath")
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", $error)
+      }
+    ]]>
+    </Task>
+  </UsingTask>
+
+  </Project>

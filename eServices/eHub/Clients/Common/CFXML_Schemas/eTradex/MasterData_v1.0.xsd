@@ -1,0 +1,385 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+GTS Master Data Schema:
+Defines a list master data defined on international standards used over a number of GTS integration messages.
+
+(C) eTradex (Pty) Ltd
+Last Updated: 22 March 2012
+Last Updated By: Anton Eccles
+-->
+
+<xs:schema targetNamespace="http://schemas.exrilov3.com/MasterData_v1.0.xsd"
+    elementFormDefault="qualified"
+    xmlns:masterData="http://schemas.exrilov3.com/MasterData_v1.0.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+
+  <xs:complexType name="EntityHierarchy">
+    <xs:annotation>
+      <xs:documentation>
+        The owner entity code defines the entity which "owns" the master data element. Uniqueness of codes will be tested against this entity's immediate master data entity.
+        The entity codes is a list of entities which also have rights to view and edit the master data element.
+        By default the owner entity will always have rights to view the master data element.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element type="xs:token" name="OwnerEntityCode" minOccurs="1" maxOccurs="1"/>
+      <xs:element type="xs:token" name="EntityCode" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="CountryCode">
+    <xs:annotation>
+      <xs:documentation>Must conform to ISO 3166-1 Representation of Countries.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[A-Z][A-Z]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CurrencyCode">
+    <xs:annotation>
+      <xs:documentation>Must conform to ISO 4217 - Representation of Currency and Funds</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z][A-Z][A-Z]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="LocaleCode">
+    <xs:annotation>
+      <xs:documentation>
+        Must conform to RFC 4646 Tags for Identifying Languages.
+        GTS will not support dialects and the advanced features of RFC 4646. Only locale codes in the format en-ZA will be accepted.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[a-zA-Z][a-zA-Z]-[a-zA-Z][a-zA-Z]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="UNLOCODE">
+    <xs:annotation>
+      <xs:documentation>
+        The United Nations Code for Trade and Transport Locations. Managed and maintained by the UNECE
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[A-Z][A-Z][A-Z][A-Z][A-Z]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Email">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Za-z0-9_]+([-+.'][A-Za-z0-9_]+)*@[A-Za-z0-9_]+([-.][A-Za-z0-9_]+)*\.[A-Za-z0-9_]+([-.][A-Za-z0-9_]+)*;{0,1})+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="TypeOfPackages">
+    <xs:annotation>
+      <xs:documentation>This is the Type of Package Code based on UN Recommendation 21.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="UNDGCode">
+    <xs:annotation>
+      <xs:documentation>This is the UN Dangerous Good Code.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[0-9][0-9][0-9][0-9]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PackingGroup">
+    <xs:restriction base="xs:integer">
+      <xs:enumeration id="GreatDanger" value="1"/>
+      <xs:enumeration id="MediumDanger" value="2"/>
+      <xs:enumeration id="MinorDanger" value="3"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TransportMode">
+    <xs:annotation>
+      <xs:documentation>
+        This conforms to the UNECE recommendation 19 for Transport Mode Code
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:int">
+      <xs:enumeration id="Sea" value="1" >
+        <xs:annotation>
+          <xs:documentation >
+            Sea (Maritime Transport). Provision is made for separate reporting of inland water transport under code
+            8, assuming that appropriate definitions and rules of application will be given,
+            particularly when transport covers sea as well as inland waterways.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="Rail" value="2" >
+        <xs:annotation>
+          <xs:documentation>
+            Rail Transport
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="Road" value="3" >
+        <xs:annotation>
+          <xs:documentation>
+            Road Transport
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="Air" value="4" >
+        <xs:annotation>
+          <xs:documentation>
+            Air Transport
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="Mail" value="5" >
+        <xs:annotation>
+          <xs:documentation>
+            Post / Mail. (Active mode of transport unknown) – This code is provided for practical
+            reasons, despite the fact that mail is not a genuine mode of transport. In many
+            countries, the value of merchandise exported and imported by mail is considerable,
+            but the exporter or importer concerned would be unable to state by which
+            mode postal items had passed the national border.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="Multimodal" value="6" >
+        <xs:annotation>
+          <xs:documentation>
+            Multi Modal Transport. (Active mode of transport unknown) – This code is provided for practical
+            reasons, despite the fact that multimodal transport is not a genuine mode of
+            transport. It can be used when goods are carried by at least two different modes
+            from a place at which the goods are taken in charge by a transport operator to
+            a place designated for delivery, on the basis of one transport contract. (Operations
+            of pick-up and delivery of goods carried out in the performance of a
+            unimodal transport, as defined in such a contract, shall not be considered as
+            multimodal transport.)
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="Fixed" value="7" >
+        <xs:annotation>
+          <xs:documentation>
+            Fixed Transport Installation. This code applies to installations for continuous transport such as pipelines,
+            ropeways and electric power lines.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="InlandWater" value="8" >
+        <xs:annotation>
+          <xs:documentation>
+            Inland Water Transport. This code is used only in such cases where the application of waterborne
+            transport is reported separately within the framework of a one-digit code.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="Unknown" value="9" >
+        <xs:annotation>
+          <xs:documentation>
+            Mode Unknown. This code can be used when the mode is not known or when information on it
+            is not available at the time of issuing the document concerned.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Incoterm">
+    <xs:annotation>
+      <xs:documentation>
+        This data element conforms to the Incoterms 2010 specification
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:enumeration id="EXW" value="EXW" >
+        <xs:annotation>
+          <xs:documentation >
+            Ex Works (named place of delivery)
+            The seller makes the goods available at its premises. This term places the maximum obligation on the buyer and minimum obligations on the seller. The Ex Works term 
+            is often used when making an initial quotation for the sale of goods without any costs included. EXW means that a seller has the goods ready for collection at his 
+            premises (works, factory, warehouse, plant) on the date agreed upon. The buyer pays all transportation costs and also bears the risks for bringing the goods to 
+            their final destination. The seller doesn't load the goods on collecting vehicles and doesn't clear them for export. If the seller does load the good, he does so 
+            at buyer's risk and cost. If parties wish seller to be responsible for the loading of the goods on departure and to bear the risk and all costs of such loading, 
+            this must be made clear by adding explicit wording to this effect in the contract of sale.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="FCA" value="FCA" >
+        <xs:annotation>
+          <xs:documentation>
+            Free Carrier (named place of delivery)
+            The seller hands over the goods, cleared for export, into the disposal of the first carrier (named by the buyer) at the named place. The seller pays for carriage 
+            to the named point of delivery, and risk passes when the goods are handed over to the first carrier.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="FAS" value="FAS" >
+        <xs:annotation>
+          <xs:documentation>
+            Free Alongside Ship (named port of shipment)
+            The seller must place the goods alongside the ship at the named port. The seller must clear the goods for export. Suitable only for maritime transport but NOT 
+            for multimodal sea transport in containers (see Incoterms 2010, ICC publication 715). This term is typically used for heavy-lift or bulk cargo.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="FOB" value="FOB" >
+        <xs:annotation>
+          <xs:documentation>
+            Free on Board (named port of shipment)
+            The seller must load themselves the goods on board the vessel nominated by the buyer. Cost and risk are divided when the goods are actually on board of the 
+            vessel (this rule is new!). The seller must clear the goods for export. The term is applicable for maritime and inland waterway transport only but NOT for 
+            multimodal sea transport in containers (see Incoterms 2010, ICC publication 715). The buyer must instruct the seller the details of the vessel and the port where 
+            the goods are to be loaded, and there is no reference to, or provision for, the use of a carrier or forwarder. This term has been greatly misused over the last 
+            three decades ever since Incoterms 1980 explained that FCA should be used for container shipments.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="CFR" value="CFR" >
+        <xs:annotation>
+          <xs:documentation>
+            Cost and Freight (named port of destination)
+            Seller must pay the costs and freight to bring the goods to the port of destination. However, risk is transferred to the buyer once the goods are loaded on the 
+            vessel (this rule is new!). Maritime transport only and Insurance for the goods is NOT included. This term is formerly known as CNF (C&amp;F).
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="CIF" value="CIF" >
+        <xs:annotation>
+          <xs:documentation>
+            Cost, Insurance and Freight (named port of destination)
+            Exactly the same as CFR except that the seller must in addition procure and pay for the insurance. Maritime transport only.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="CPT" value="CPT" >
+        <xs:annotation>
+          <xs:documentation>
+            Carriage Paid To (named place of destination)
+            The seller pays for carriage. Risk transfers to buyer upon handing goods over to the first carrier.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="CIP" value="CIP" >
+        <xs:annotation>
+          <xs:documentation>
+            Carriage and Insurance Paid to (named place of destination)
+            The containerized transport/multimodal equivalent of CIF. Seller pays for carriage and insurance to the named destination point, but risk passes when the goods 
+            are handed over to the first carrier.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="DAT" value="DAT" >
+        <xs:annotation>
+          <xs:documentation>
+            Delivered at Terminal (named terminal at port or place of destination)
+            Seller pays for carriage to the terminal, except for costs related to import clearance, and assumes all risks up to the point that the goods are unloaded at the 
+            terminal.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="DAP" value="DAP" >
+        <xs:annotation>
+          <xs:documentation>
+            Delivered at Place (named place of destination)
+            Seller pays for carriage to the named place, except for costs related to import clearance, and assumes all risks prior to the point that the goods are ready 
+            for unloading by the buyer.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="DDU" value="DDU" >
+        <xs:annotation>
+          <xs:documentation>
+            Delivered Duty Unpaid (named place of destination)
+            Seller is responsible for delivering the goods to the named place in the country of the buyer, and pays all costs in bringing the goods to the destination
+            excluding import duties and taxes.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="DDP" value="DDP" >
+        <xs:annotation>
+          <xs:documentation>
+            Delivered Duty Paid (named place of destination)
+            Seller is responsible for delivering the goods to the named place in the country of the buyer, and pays all costs in bringing the goods to the destination 
+            including import duties and taxes. This term places the maximum obligations on the seller and minimum obligations on the buyer.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration id="DEL" value="DEL" >
+        <xs:annotation>
+          <xs:documentation>
+            Delivered (named place of destination)
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TermsOfDelivery">
+    <xs:annotation>
+      <xs:documentation>This is the full terms of delivey. The first 3 characters are the Incoterm and the last 5 are normally a UNLOCODE.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z][A-Z]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ContainerSizeISOCode">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[0-9][0-9][A-Z][0-9]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="LSPClientReferenceList">
+    <xs:sequence>
+      <xs:element type="masterData:LSPClientReference" name="LSPClientReference" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="LSPClientReference">
+    <xs:annotation>
+      <xs:documentation>Standard Client Reference Information used on LSP Integration Messages</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element type="masterData:EntityHierarchy" name="EntityHierarchy" minOccurs="0"/>
+      <xs:element type="xs:token" name="PONumber"/>
+      <xs:element type="xs:token" name="DeliveryInstructionCode" minOccurs="0"/>
+      <xs:element type="xs:token" name="SupplierCode" minOccurs="0"/>
+      <xs:element type="xs:string" name="SupplierName" minOccurs="0"/>
+      <xs:element type="xs:token" name="SupplierInvoiceNumber" minOccurs="0"/>
+      <xs:element type="xs:token" name="DeliveryLocationCode" minOccurs="0"/>
+      <xs:element type="masterData:ProductCodeList" name="ProductCodeList" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ProductCodeList">
+    <xs:sequence>
+      <xs:element type="xs:token" name="ProductCode" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DocumentList">
+    <xs:sequence>
+      <xs:element type="masterData:Document" name="Document" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Document">
+    <xs:sequence>
+      <xs:element type="xs:string" name="ReferenceNumber"/>
+      <xs:element type="xs:date" name="ReferenceDate"/>
+      <xs:element type="xs:string" name="Description" minOccurs="0"/>
+      <xs:element type="xs:string" name="DocumentTypeCode"/>
+      <xs:element type="xs:string" name="DocumentTypeDescription"/>
+      <xs:element type="xs:string" name="DocumentFileType"/>
+      <xs:element type="xs:base64Binary" name="Document"/>
+      <xs:element type="xs:string" name="FileName"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+</xs:schema>

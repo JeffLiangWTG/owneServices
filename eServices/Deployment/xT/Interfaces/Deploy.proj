@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>
+    <CommonPowershellFunctionsFile>$(RootDirectory)..\..\CommonScripts\Common.ps1</CommonPowershellFunctionsFile>
+    <CommonPowershellFunctionsFile Condition="Exists('$(RootDirectory)Common.ps1')">$(RootDirectory)Common.ps1</CommonPowershellFunctionsFile>
+    <MSBuildExtensionsPackPath>C:\Program Files (x86)\MSBuildExtensionPack\4.0</MSBuildExtensionsPackPath>
+    <MSBuildTasksToolsFilePath Condition="'$(MSBuildTasksToolsFilePath)'==''">$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll</MSBuildTasksToolsFilePath>
+    <ProcessFileScripts>$(MSBuildThisFileDirectory)..\Internal\ProcessFileWithVariableTask.proj</ProcessFileScripts>
+    <ProcessFileScripts Condition="!Exists('$(ProcessFileScripts)')">$(MSBuildThisFileDirectory)ProcessFileWithVariableTask.proj</ProcessFileScripts>
+    <UnprocessedContents>$(TargetDir)Contents\</UnprocessedContents>
+    <UnprocessedContents Condition="!Exists('$(UnprocessedContents)')">$(MSBuildProjectDirectory)\UnprocessedContents\</UnprocessedContents>
+    <ProcessedContents>$(UnprocessedContents)..\Interfaces</ProcessedContents>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props" Condition="'$(_DeploymentPropsImported)'==''"/>
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Deployment.props" Condition="'$(Profile)' != '' and '$(_ProfilePropsImported)'==''"/>
+  <Import Project="$(ProcessFileScripts)"/>
+
+  <UsingTask TaskName="CopyFile" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <LocalPath ParameterType="System.String" />
+      <TargetPath ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+            . $(CommonPowershellFunctionsFile)
+			      $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword).Session
+			      Try
+			      {
+              $TargetPath = $TargetPath.TrimEnd('\') + '\'
+              $LocalPath = $LocalPath.TrimEnd('\')
+              Invoke-Command -Session $session -ScriptBlock {New-Item -ItemType Directory -Force -Path "$args"} -ArgumentList "$TargetPath"
+              Copy-Item -ToSession $session $LocalPath -Destination $TargetPath -Recurse -Force
+			      }
+			      Finally
+			      {
+				      #$session | Remove-PSSession
+			      }
+            ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="RemoteServiceController" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <ServiceName ParameterType="System.String" />
+      <Action ParameterType="System.String" />
+      <ExitCode Output="true"/>
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+            . $(CommonPowershellFunctionsFile)
+			      $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword).Session
+			      Try
+			      {
+              switch($Action) {
+                'Start' {
+                    $r = Invoke-Command -Session $session -ScriptBlock {
+                        $service = Get-Service "$args"
+                        $service | Start-Service
+                        if ($service.Status -like "Running") {return 0} else {return 1}
+                    } -ArgumentList "$ServiceName"
+                    $ExitCode = "$r"
+                    break
+                } 
+                'Stop' {
+                    
+                    $r = Invoke-Command -Session $session -ScriptBlock {
+                        $service = Get-Service "$args"
+                        $service | Stop-Service
+                        if ($service.Status -like "Stopped") {return 0} else {return 0}
+                    } -ArgumentList "$ServiceName"
+                    $ExitCode = "$r"
+                    break
+                } 
+                default {
+                    Write-Error "Invalid Action!"
+                    $ExitCode = 1;
+                    break
+                } 
+              }
+			      }
+			      Finally
+			      {
+				      $session | Remove-PSSession
+			      }
+            ]]>
+    </Task>
+  </UsingTask>
+
+  <PropertyGroup>
+    <_OutputDirectory Condition="'$(_OutputDirectory)'==''">$(MSBuildProjectDirectory)\bin</_OutputDirectory>
+    <TargetFileName Condition="'$(TargetFileName)'==''">XH.Framework.Mapping.dll</TargetFileName>
+  </PropertyGroup>
+  
+  <Target Name="ProcessInterfacesFolder">
+    <Message Text="====================================================="></Message>
+    <Message Text="Processing Files : $(UnprocessedContents)"></Message>
+    <Message Text="====================================================="></Message>
+    <RemoveDir Directories="$(ProcessedContents)" />
+    <MakeDir Directories="$(ProcessedContents)" Condition="!Exists('$(ProcessedContents)')" />
+    <ItemGroup>
+      <_UnprocessedContentFiles Include="$(UnprocessedContents)\**\*"/>
+    </ItemGroup>
+    <Copy	SourceFiles="@(_UnprocessedContentFiles)"	DestinationFolder="$(ProcessedContents)\%(RecursiveDir)"/>
+    <OverrideItem Items="@(Variables)">
+      <Output TaskParameter="OutputItems" ItemName="OverridenVariables" />
+    </OverrideItem>
+
+    <ProcessFileWithVariables	FilePath="$(ProcessedContents)\XH.Framework.Logging.dll.Config"	Variables="@(OverridenVariables)"	VariableIdentity="XH.Framework.Logging.dll.Config"/>
+  </Target>
+  
+  <Target Name="bat:deploy">
+    <Message Text="====================================================="></Message>
+    <Message Text="$(ProcessFileScripts)"></Message>
+    <Message Text="====================================================="></Message>
+    <CallTarget Targets="ProcessInterfacesFolder"/>
+    <RemoteServiceController
+        MachineName="$(ServerName)"
+        UserName="$(UserName)"
+        UserPassword="$(Password)"
+        ServiceName="xtservice"
+        Action="Stop">
+      <Output TaskParameter="ExitCode" PropertyName="StopServiceExitCode"/>
+    </RemoteServiceController>
+    <Error Condition="'$(StopServiceExitCode)' != 0" Text="Failed to stop service."/>
+    
+    <Message Text="====================================================="></Message>
+    <Message Text="Copying Files to Destination Folder : $(DestinationDirectory)"></Message>
+    <Message Text="====================================================="></Message>
+    
+    <CopyFile
+        MachineName="$(ServerName)"
+        UserName="$(UserName)"
+        UserPassword="$(Password)"
+        LocalPath="$(ProcessedContents)\*"
+        TargetPath="$(DestinationDirectory)" />
+
+    <RemoteServiceController
+      MachineName="$(ServerName)"
+      UserName="$(UserName)"
+      UserPassword="$(Password)"
+      ServiceName="xtservice"
+      Action="Start">
+      <Output TaskParameter="ExitCode" PropertyName="StartServiceExitCode"/>
+    </RemoteServiceController>
+    <Error Condition="'$(StartServiceExitCode)' != 0" Text="Failed to start service. ServiceName:xtservice, MachineName=$(ServerName)"/>
+    <RemoveDir Directories="$(_TempPackageFolder)" />
+  </Target>
+</Project>

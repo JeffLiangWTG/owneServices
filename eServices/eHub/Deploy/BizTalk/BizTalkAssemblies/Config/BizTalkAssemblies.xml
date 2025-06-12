@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- static files picked from bin folder -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <BizTalkAssembliesXmlImported>true</BizTalkAssembliesXmlImported>
+    <RelativeBinPath>..\..\..\..\Bin\</RelativeBinPath>
+    <BinPathDefined Condition="'$(BinPath)'!=''">true</BinPathDefined>
+    <BinPath Condition="'$(BinPath)'==''">$(MSBuildThisFileDirectory)$(RelativeBinPath)</BinPath>
+
+    <BinPath>$([System.IO.Path]::GetFullPath('$(BinPath)'))</BinPath>
+    <BinPath Condition="$(BinPath.EndsWith('\\'))">$(BinPath.TrimEnd('\\'))</BinPath>
+  </PropertyGroup>
+
+  <!-- ATTENTION: -->
+  <!-- please put any specific assemblies to be included in this list -->
+  <ItemGroup>
+    <SpecificIncludedBizTalkAssemblies Include="$(BinPath)CargoWise.eHub.Products.*.dll" />
+    <SpecificIncludedBizTalkAssemblies Include="$(BinPath)CargoWise.eHub.BizTalkAdapters.Common.UI.dll" />
+    <SpecificIncludedBizTalkAssemblies Include="$(BinPath)CargoWise.eHub.BizTalkAdapters.PollingAdapterSchemas.dll" />
+    <SpecificIncludedBizTalkAssemblies Include="$(BinPath)CargoWise.eHub.BizTalkAdapters.PropertySchemas.dll" />
+    <SpecificIncludedBizTalkAssemblies Include="$(BinPath)CargoWise.eHub.BizTalkAdapters.WSHttpEx.dll" />
+    <SpecificIncludedBizTalkAssemblies Include="$(BinPath)EntityFramework.SqlServer.dll" />
+  </ItemGroup>
+
+  <!-- Edi Application Assemblies -->
+  <ItemGroup>
+    <EdiApplicationAssemblies Include="$(BinPath)\Microsoft.BizTalk.Edi.*.dll" />
+    <EdiApplicationAssemblies Include="$(BinPath)\Microsoft.BizTalk.ReliableMessagingArtifacts.dll" />
+  </ItemGroup>
+
+  <!-- SystemAssemblies -->
+  <ItemGroup>
+    <SystemAssemblies Include="$(BinPath)\Microsoft.*.dll" />
+    <SystemAssemblies Include="$(BinPath)\Microsoft.XLANGs.*.dll" />
+    <SystemAssemblies Include="$(BinPath)\Microsoft.BizTalk.*.dll" />
+    <SystemAssemblies Include="$(BinPath)\PipelineObjects.dll" />
+    <SystemAssemblies Include="$(BinPath)\Blogical.Shared.Functoids.dll" />
+    <SystemAssemblies Include="$(BinPath)\System.dll" />
+    <SystemAssemblies Include="$(BinPath)\System.*.dll" />
+    <SystemAssemblies Include="$(BinPath)\Antlr3.Runtime.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UnitTestAssemblies Include="$(BinPath)\nunit.*.dll" />
+    <UnitTestAssemblies Include="$(BinPath)\NUnit*.*.dll" />
+    <UnitTestAssemblies Include="$(BinPath)\NDbUnit.*.dll" />
+    <UnitTestAssemblies Include="$(BinPath)\Rhino.Mocks.dll" />
+    <UnitTestAssemblies Include="$(BinPath)\Winterdom.*.dll" />
+    <UnitTestAssemblies Include="$(BinPath)\XmlDiffPatch.dll" />
+    <UnitTestAssemblies Include="$(BinPath)\XmlDiffPatch.*.dll" />
+    <UnitTestAssemblies Include="$(BinPath)\Moq.dll" />
+    <UnitTestAssemblies Include="$(BinPath)\CargoWise.BizTalk.UnitTestFX.dll" />
+    <UnitTestAssemblies Include="$(BinPath)\CargoWise.*.Tests.dll" />
+    <UnitTestAssemblies Include="$(BinPath)\eHubDeploymentTests.dll" />
+  </ItemGroup>
+
+  <!-- Assemblies cannot be computed by dependency walker -->
+  <ItemGroup>
+    <DependenciesInclude Include="$(BinPath)\Common.Logging.dll" />
+    <DependenciesInclude Include="$(BinPath)\Common.Logging.*.dll" />
+    <DependenciesInclude Include="$(BinPath)\Newtonsoft.Json.dll" />
+  </ItemGroup>
+
+  <!-- Assemblies to exclude -->
+  <ItemGroup>
+    <ServiceAssemblies Include="$(BinPath)\*WebService.dll" />
+    <ServiceAssemblies Include="$(BinPath)\*.Web.*.dll" />
+    <ServiceAssemblies Include="$(BinPath)\Mvc*.dll" />
+    <ServiceAssemblies Include="$(BinPath)\ServiceBroker.*.dll" />
+    <ServiceAssemblies Include="$(BinPath)\MvcContrib.dll" />
+    <ServiceAssemblies Include="$(BinPath)\MvcContrib.*.dll" />
+    <ServiceAssemblies Include="$(BinPath)\FluentFTP.dll" />
+    <ServiceAssemblies Include="$(BinPath)\WebGrease.dll" />
+    <ServiceAssemblies Include="$(BinPath)\CargoWise.ActiveDirectory.*.dll" />
+    <ServiceAssemblies Include="$(BinPath)\CargoWise.ApplicationManager.*.dll" />
+    <ServiceAssemblies Include="$(BinPath)\CargoWise.eHub.Nudge.*.dll" />
+    <ServiceAssemblies Include="$(BinPath)\*.Monitoring.*.dll" />
+
+    <PortalAssemblies Include="$(BinPath)\*.Portal*.dll" />
+    <PortalAssemblies Include="$(BinPath)\*.eHubAdmin.dll" />
+
+    <WTGUtilities Include="$(BinPath)\**\WTG.*.dll" />
+    <WTGUtilities Include="$(BinPath)\**\*.BizTalkFakes.dll" />
+
+    <Billing Include="$(BinPath)\*.Billing.*.dll" />
+    <SqlAssemblies Include="$(BinPath)\*.Sql.*.dll" />
+    <UScustoms Include="$(BinPath)\CargoWise.eServices.USCustoms*.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ExcludeAssemblies Include="@(SystemAssemblies);@(UnitTestAssemblies);@(ServiceAssemblies);@(PortalAssemblies);@(Billing);@(SqlAssemblies);@(UScustoms);@(WTGUtilities)" />
+  </ItemGroup>
+
+  <!-- Required Assembly Items -->
+  <ItemGroup>
+    <!-- assembly items required to be finalized by packer and installer tasks -->
+    <GacAssemblies Include="$(BinPath)\*.dll" Exclude="@(ExcludeAssemblies)" />
+    <BizTalkAssemblies Include="@(GacAssemblies)" />
+  </ItemGroup>
+
+  <Target Name="this">
+    <Message Text="%(BizTalkAssemblies.Identity)" />
+  </Target>
+
+</Project>

@@ -1,0 +1,44 @@
+
+namespace BizTalk.Utilities.GroupAdmin.Options
+{
+    internal enum CommandType
+    {
+        Help,
+        CreateHost,
+        CreateHostInstance,
+        CreateReceiveHandler,
+        CreateSendHandler,
+        DeleteHost,
+        DeleteHostInstance,
+        DeleteReceiveHandler,
+        DeleteSendHandler,
+        GetAppStatus,
+        GetHostProperty,
+        GetOrchHost,
+        GetOrchStatus,
+        GetOrchTracking,
+        GetPipelineTracking,
+        GetReceivePortTracking, 
+        GetReceiveLocationHost,
+        GetReceiveLocationStatus,
+        GetRegistryKeyValue,
+        GetSendPortHost,
+        GetSendPortStatus,
+        GetSendPortTracking,
+        SetAppStatus,
+        SetApplHostsAndHandlers,
+        SetHostInstanceState,
+        SetHostProperty,
+        SetOrchHost,
+        SetOrchStatus,
+        SetOrchTracking,
+        SetPipelineTracking,
+        SetReceiveLocationHost,
+        SetReceiveLocationStatus,
+        SetReceivePortTracking,
+        SetRegistryKeyValue,
+        SetSendPortHost,
+        SetSendPortStatus,
+        SetSendPortTracking
+    }
+}

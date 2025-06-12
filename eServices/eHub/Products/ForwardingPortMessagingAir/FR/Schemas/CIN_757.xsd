@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://www.cargowise.com/Schemas/FPMA/CIN/757"
+           targetNamespace="http://www.cargowise.com/Schemas/FPMA/CIN/757">
+  <xs:element name="Xml757" type="xml757Type"/>
+  <!-- XML757 -->
+  <xs:complexType name="xml757Type">
+    <xs:sequence>
+      <xs:element type="customsType" name="Customs"/>
+      <xs:element type="shipmentsType" name="Shipments"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Customs -->
+  <xs:complexType name="customsType">
+    <xs:sequence>
+      <xs:element type="dateTimeType" name="DateTime"/>
+      <xs:element type="xs:string" name="Sender"/>
+      <xs:element type="xs:string" name="ReportingParty"/>
+      <xs:element type="xs:string" name="ShiptoParty" minOccurs="0"/>
+      <xs:element type="xs:string" name="AWBNumber"/>
+      <xs:element type="xs:string" name="CarrierCode" minOccurs="0"/>
+      <xs:element type="xs:string" name="FlightNumber" minOccurs="0"/>
+      <xs:element type="xs:string" name="FlightDate" minOccurs="0"/>
+      <xs:element type="xs:string" name="FlightDeparture" minOccurs="0"/>
+      <xs:element type="xs:string" name="FlightDestination" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Shipments -->
+  <xs:complexType name="shipmentsType">
+    <xs:sequence>
+      <xs:element type="shipmentType" name="Shipment"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Error -->
+  <xs:complexType name="shipmentType">
+    <xs:sequence>
+      <xs:element type="mrnType" name="MRN"/>
+      <xs:element type="statusType" name="Status"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Status -->
+  <xs:complexType name="statusType">
+    <xs:sequence>
+      <xs:element type="statusCodeType" name="Last"/>
+      <xs:element type="xs:string" name="Description" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- SIMPLE TYPES -->
+  <xs:simpleType name="dateTimeType">
+    <xs:restriction base="xs:token">
+      <!-- Format : YYYYMMDDhhmm -->
+      <xs:pattern value="(2[0-9]{3})(0[0-9]|1[0-2])([0-2][0-9]|3[0-1])([0-1][0-9]|2[0-3])([0-5][0-9])"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="mrnType">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[0-9]{2}\w{16}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- ENUMERATION -->
+  <xs:simpleType name="statusCodeType" final="restriction">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="755_INT"/>
+      <xs:enumeration value="331_S"/>
+      <xs:enumeration value="331_AER"/>
+      <xs:enumeration value="331_ARR"/>
+      <xs:enumeration value="331_A"/>
+      <xs:enumeration value="331_STO"/>
+      <xs:enumeration value="331_MRN"/>
+      <xs:enumeration value="331_SOU"/>
+      <xs:enumeration value="331_BLO"/>
+      <xs:enumeration value="331_R"/>
+      <xs:enumeration value="331_DAD"/>
+      <xs:enumeration value="331_SEM"/>
+      <xs:enumeration value="331_LAT"/>
+      <xs:enumeration value="331_AEA"/>
+      <xs:enumeration value="331_SRA"/>
+      <xs:enumeration value="331_ANN"/>
+      <xs:enumeration value="331_UNK"/>
+      <xs:enumeration value="MAN_REC"/>
+      <xs:enumeration value="332_A"/>
+      <xs:enumeration value="332_S"/>
+      <xs:enumeration value="332_STO"/>
+      <xs:enumeration value="332_COE"/>
+      <xs:enumeration value="332_R"/>
+      <xs:enumeration value="332_DAD"/>
+      <xs:enumeration value="332_SOR"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

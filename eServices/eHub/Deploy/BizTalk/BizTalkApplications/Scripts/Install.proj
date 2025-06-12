@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="install">
+
+  <PropertyGroup>
+    <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(ProgramFiles)\MSBuild\ExtensionPack\4.0\</MSBuildExtensionsPackPath>
+    <MSBuildExtensionsPackPath Condition="!Exists('$(MSBuildExtensionsPackPath)')">$(ProgramFiles)\MSBuildExtensionPack\4.0\</MSBuildExtensionsPackPath>
+
+    <DeployCommonPath Condition="'$(DeployCommonPath)' == ''">$(MSBuildThisFileDirectory)Common\</DeployCommonPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks" Condition="'$(BuildPath)'==''"/>
+  <Import Project="$(DeployCommonPath)Deploy.tasks" Condition="'$(DeployCommonImported)' == ''"/>
+  <Import Project="$(MSBuildThisFileDirectory)\BizTalkCommon\BizTalkCommon.tasks" Condition="'$(BizTalkCommonImported)' == ''"/>
+
+  <Import Project="$(MSBuildThisFileDirectory)Profiles\Profiles.tasks" Condition="'$(ProfilesIncluded)' == ''"/>
+
+  <Target Name="install" Inputs="@(BizTalkApplications)" Outputs="%(Identity)">
+
+    <Message Text="BizTalkApplication: %(BizTalkApplications.Identity)" Importance="high" />
+
+    <BizTalkApplication TaskAction="CheckExists" Application="%(BizTalkApplications.Identity)" DatabaseServer="$(DatabaseServer)">
+      <Output TaskParameter="Exists" PropertyName="Exists" />
+    </BizTalkApplication>
+
+    <BizTalkApplication
+        TaskAction="Create"
+        Condition="'$(Exists)'=='False'"
+        Applications="%(BizTalkApplications.Identity)"
+        Default="%(BizTalkApplications.Default)"
+        DatabaseServer="$(DatabaseServer)"
+        Force="true" />
+
+    <BizTalkApplication
+        TaskAction="AddReference"
+        DatabaseServer="$(DatabaseServer)"
+        Application="%(BizTalkApplications.Identity)"
+        References="%(BizTalkApplications.Reference)"
+        Condition="'%(BizTalkApplications.Reference)'!=''"/>
+
+  </Target>
+
+</Project>

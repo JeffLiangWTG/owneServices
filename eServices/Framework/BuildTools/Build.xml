@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Build MSBuild="17" xmlns="http://wisetechglobal.com/DevTools/Build.xsd">
+  <Solutions>
+    <Solution Filename="eServices.BuildTools.sln" SignWithAuthenticode="false" />
+  </Solutions>
+  <Tasks>
+    <Task Name="Pack eServices.BuildTools.DatTool">
+      <Dependency Type="Solution">eServices.BuildTools.sln</Dependency>
+      <Step>dotnet Bin\Build\eServices.BuildTools.PackTool\Release\net8.0\eServices.BuildTools.PackTool.dll --project DatTool\eServices.BuildTools.DatTool.csproj --package-source https://proget.wtg.zone/nuget/WTG-Internal/v3/index.json</Step>
+    </Task>
+    <Task Name="Pack eServices.BuildTools.SqlAgentTool">
+      <Dependency Type="Solution">eServices.BuildTools.sln</Dependency>
+      <Step>dotnet Bin\Build\eServices.BuildTools.PackTool\Release\net8.0\eServices.BuildTools.PackTool.dll --project SqlAgentTool\eServices.BuildTools.SqlAgentTool.csproj --package-source https://proget.wtg.zone/nuget/WTG-Internal/v3/index.json</Step>
+    </Task>
+    <Task Name="Pack eServices.BuildTools.PackTool">
+      <Dependency Type="Solution">eServices.BuildTools.sln</Dependency>
+      <Step>dotnet Bin\Build\eServices.BuildTools.PackTool\Release\net8.0\eServices.BuildTools.PackTool.dll --project PackTool\eServices.BuildTools.PackTool.csproj --package-source https://proget.wtg.zone/nuget/WTG-Internal/v3/index.json</Step>
+    </Task>
+    <Task Name="Pack eServices.BuildTools.SqlDeploy">
+      <Dependency Type="Solution">eServices.BuildTools.sln</Dependency>
+      <Step>dotnet Bin\Build\eServices.BuildTools.PackTool\Release\net8.0\eServices.BuildTools.PackTool.dll --project SqlDeploy\eServices.BuildTools.SqlDeploy.csproj --package-source https://proget.wtg.zone/nuget/WTG-Internal/v3/index.json</Step>
+    </Task>
+  </Tasks>
+  <BuildConfigurations>
+    <Configuration BuildOnDat="true" TestOnDat="true" Publishable="false" GenerateMSBuildBinLogs="true">Release</Configuration>
+  </BuildConfigurations>
+  <DatSettings IntegrationAssembliesSubdir="Publish\eServices.BuildTools.DatDeploy\net48" BuildDeployerType="eServices.BuildTools.DatDeploy.Deployer, eServices.BuildTools.DatDeploy" DisableWorkspaceJobs="true">
+    <TestAdapter Type="Dat.Implementation.VSTest.VSTestAdapter, Dat.Implementation.VSTest">
+      <Options>
+        <Option Name="TestAssemblyAnyItemFilter">Microsoft.NET.Test.Sdk</Option>
+      </Options>
+    </TestAdapter>
+    <DeploymentTargets>
+      <DeploymentTarget Type="AutoDeployLatestBuild" BuildConfiguration="Release" DeploymentConfiguration="eServices.BuildTools.DatTool-Prerelease" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.BuildTools.DatTool-Prerelease" IsProduction="false" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.BuildTools.DatTool" />
+      <DeploymentTarget Type="AutoDeployLatestBuild" BuildConfiguration="Release" DeploymentConfiguration="eServices.BuildTools.SqlAgentTool-Prerelease" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.BuildTools.SqlAgentTool-Prerelease" IsProduction="false" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.BuildTools.SqlAgentTool" />
+      <DeploymentTarget Type="AutoDeployLatestBuild" BuildConfiguration="Release" DeploymentConfiguration="eServices.BuildTools.PackTool-Prerelease" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.BuildTools.PackTool-Prerelease" IsProduction="false" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.BuildTools.PackTool" />
+      <DeploymentTarget Type="AutoDeployLatestBuild" BuildConfiguration="Release" DeploymentConfiguration="eServices.BuildTools.SqlDeploy-Prerelease" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.BuildTools.SqlDeploy-Prerelease" IsProduction="false" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.BuildTools.SqlDeploy" />
+    </DeploymentTargets>
+  </DatSettings>
+</Build>

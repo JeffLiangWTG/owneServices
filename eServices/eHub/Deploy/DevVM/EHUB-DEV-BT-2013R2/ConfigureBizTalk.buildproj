@@ -1,0 +1,195 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="Default" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<Import Project="$(MSBuildExtensionsPath)\ExtensionPack\4.0\MSBuild.ExtensionPack.tasks"/>
+
+	<PropertyGroup>
+		<AccountName Condition="'$(AccountName)'==''">DevAdmin</AccountName>
+		<AccountPassword Condition="'$(AccountPassword)'==''">3hubRock$</AccountPassword>
+	</PropertyGroup>
+
+	<Target Name="Default">
+ 		<CallTarget Targets="Adapters" ContinueOnError="true" />
+		<CallTarget Targets="Hosts" ContinueOnError="true" />
+		<CallTarget Targets="HostInstances" ContinueOnError="true" />
+		<CallTarget Targets="Handlers" ContinueOnError="true" />
+		<CallTarget Targets="Application" ContinueOnError="true" />
+		<CallTarget Targets="NuGet" ContinueOnError="true" />
+		<CallTarget Targets="Assemblies" ContinueOnError="true" />
+ 		<CallTarget Targets="Bindings" ContinueOnError="true" />
+		<CallTarget Targets="Database" ContinueOnError="true" />
+		<CallTarget Targets="Configs" ContinueOnError="true" />
+	</Target>
+
+	<Target Name="Adapters">
+		<MSBuild.ExtensionPack.BizTalk.BizTalkAdaptor TaskAction="CheckExists" AdaptorName="WCF-SQL" DatabaseServer=".\BT2013R2">
+			<Output TaskParameter="Exists" PropertyName="Exists" />
+		</MSBuild.ExtensionPack.BizTalk.BizTalkAdaptor>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkAdaptor Condition="'$(Exists)'=='False'" TaskAction="Create" AdaptorName="WCF-SQL" MgmtCLSID="{59b35d03-6a06-4734-a249-ef561254ecf7}" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkAdaptor TaskAction="CheckExists" AdaptorName="FTPEx" DatabaseServer=".\BT2013R2">
+			<Output TaskParameter="Exists" PropertyName="Exists" />
+		</MSBuild.ExtensionPack.BizTalk.BizTalkAdaptor>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkAdaptor Condition="'$(Exists)'=='False'" TaskAction="Create" AdaptorName="FTPEx" MgmtCLSID="{a164bee6-4eec-4a72-bff0-221a75c18ef0}" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkAdaptor TaskAction="CheckExists" AdaptorName="SFTPEx" DatabaseServer=".\BT2013R2">
+			<Output TaskParameter="Exists" PropertyName="Exists" />
+		</MSBuild.ExtensionPack.BizTalk.BizTalkAdaptor>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkAdaptor Condition="'$(Exists)'=='False'" TaskAction="Create" AdaptorName="SFTPEx" MgmtCLSID="{b28837dd-cb92-4357-9ae6-c34f3932b7e1}" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkAdaptor TaskAction="CheckExists" AdaptorName="NULL" DatabaseServer=".\BT2013R2">
+			<Output TaskParameter="Exists" PropertyName="Exists" />
+		</MSBuild.ExtensionPack.BizTalk.BizTalkAdaptor>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkAdaptor Condition="'$(Exists)'=='False'" TaskAction="Create" AdaptorName="NULL" MgmtCLSID="{d6f3a77c-b641-45dc-8aa5-3ee3503f59fc}" DatabaseServer=".\BT2013R2"/>
+	</Target>
+
+	<Target Name="Hosts">
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="TrackingHost" Tracking="true" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="AlertSend" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="ErrorReceive" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="InboxReceive" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="InboxSend" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="OutboxReceive" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="OutboxSend" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="ReceiveHost_FILE" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="ReceiveHost_FTP" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="ReceiveHost_POP3" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="ReceiveHost_WCFBasicHttp" Tracking="false" WindowsGroup="BizTalk Isolated Host Users" HostType="Isolated" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="ReceiveHost_WCFSQL" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="ReceiveHost_FTPEx" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="ReceiveHost_SFTPEx" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="SendHost_FTP" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="SendHost_SMTP" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="SendHost_WCF" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="SendHost_WCFSQL" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="SendHost_FTPEx" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="SendHost_SFTPEx" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Create" HostName="SendHost_SFTPEx" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="false" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHost TaskAction="Update" HostName="BizTalkServerApplication" Tracking="false" WindowsGroup="BizTalk Application Users" HostType="InProcess" Use32BitHostOnly="true" Default="true" DatabaseServer=".\BT2013R2"/>
+	</Target>
+
+	<Target Name="HostInstances">
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="TrackingHost" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="AlertSend" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="ErrorReceive" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="InboxReceive" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="InboxSend" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="OutboxReceive" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="OutboxSend" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="ReceiveHost_FILE" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="ReceiveHost_FTP" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="ReceiveHost_POP3" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="ReceiveHost_WCFBasicHttp" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="ReceiveHost_WCFSQL" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="ReceiveHost_FTPEx" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="ReceiveHost_SFTPEx" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="SendHost_FTP" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="SendHost_SMTP" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="SendHost_WCF" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="SendHost_WCFSQL" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="SendHost_FTPEx" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Create" HostName="SendHost_SFTPEx" AccountName="$(AccountName)" AccountPassword="$(AccountPassword)" Force="true"/>
+	</Target>
+
+	<Target Name="Handlers">
+		<MSBuild.ExtensionPack.BizTalk.BizTalkReceiveHandler TaskAction="Create" HostName="AlertSend" AdapterName="WCF-SQL" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkReceiveHandler TaskAction="Create" HostName="InboxReceive" AdapterName="WCF-SQL" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkReceiveHandler TaskAction="Create" HostName="OutboxReceive" AdapterName="WCF-SQL" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkSendHandler TaskAction="Create" HostName="ErrorReceive" AdapterName="WCF-SQL" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkSendHandler TaskAction="Create" HostName="InboxSend" AdapterName="WCF-SQL" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkSendHandler TaskAction="Create" HostName="OutboxSend" AdapterName="WCF-SQL" Force="true" DatabaseServer=".\BT2013R2"/>
+
+		<MSBuild.ExtensionPack.BizTalk.BizTalkReceiveHandler TaskAction="Create" HostName="ReceiveHost_FILE" AdapterName="FILE" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkReceiveHandler TaskAction="Create" HostName="ReceiveHost_FTP" AdapterName="FTP" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkReceiveHandler TaskAction="Create" HostName="ReceiveHost_POP3" AdapterName="POP3" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkReceiveHandler TaskAction="Create" HostName="ReceiveHost_WCFSQL" AdapterName="WCF-SQL" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkReceiveHandler TaskAction="Create" HostName="ReceiveHost_FTPEx" AdapterName="FTPEx" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkReceiveHandler TaskAction="Create" HostName="ReceiveHost_SFTPEx" AdapterName="SFTPEx" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkSendHandler TaskAction="Create" HostName="SendHost_FTP" AdapterName="FTP" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkSendHandler TaskAction="Create" HostName="SendHost_SMTP" AdapterName="SMTP" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkSendHandler TaskAction="Create" HostName="SendHost_WCFSQL" AdapterName="WCF-SQL" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkSendHandler TaskAction="Create" HostName="SendHost_WCF" AdapterName="WCF-BasicHttp" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkSendHandler TaskAction="Create" HostName="SendHost_FTPEx" AdapterName="FTPEx" Force="true" DatabaseServer=".\BT2013R2"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkSendHandler TaskAction="Create" HostName="SendHost_SFTPEx" AdapterName="SFTPEx" Force="true" DatabaseServer=".\BT2013R2"/>
+	</Target>
+
+	<Target Name="Application">
+		<Exec Command="&quot;%BTSINSTALLPATH%\BTSTask.exe&quot; AddApp -ApplicationName:CargoWise.eHub -Default" IgnoreExitCode="true" />
+		<MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="AddReference" Application="CargoWise.eHub" References="BizTalk EDI Application" DatabaseServer=".\BT2013R2"/>
+		<Exec Command="&quot;%BTSINSTALLPATH%\BTSTask.exe&quot; RemoveApp -ApplicationName:&quot;BizTalk Application 1&quot;" IgnoreExitCode="true" />
+	</Target>
+
+	<Target Name="NuGet">
+		<Exec Command="powershell -ExecutionPolicy RemoteSigned -Command &quot;[IO.File]::WriteAllBytes('nuget.exe', (Invoke-WebRequest -Uri https://www.nuget.org/nuget.exe -Method Get -Proxy http://sydco-spxy-1.wtg.zone:8080 -ProxyUseDefaultCredentials).Content)&quot;" />
+		<Exec Command="nuget.exe install" />
+		<ItemGroup>
+			<NuGetAssemblies Include="Common.Logging.2.2.0\lib\net40\Common.Logging.dll" />
+			<NuGetAssemblies Include="Common.Logging.Core.2.2.0\lib\net40\Common.Logging.Core.dll" />
+			<NuGetAssemblies Include="Common.Logging.Log4Net1211.2.2.0\lib\net40\Common.Logging.Log4Net1211.dll" />
+			<NuGetAssemblies Include="EntityFramework.6.1.1\lib\net40\EntityFramework.dll" />
+			<NuGetAssemblies Include="EntityFramework.6.1.1\lib\net40\EntityFramework.SqlServer.dll" />
+			<NuGetAssemblies Include="log4net.2.0.0\lib\net40-full\log4net.dll" />
+			<NuGetAssemblies Include="Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll" />
+		</ItemGroup>
+		<MSBuild.ExtensionPack.Framework.Gac TaskAction="AddAssembly" AssemblyPath="%(NuGetAssemblies.FullPath)"/>
+	</Target>
+
+	<Target Name="Assemblies">
+		<ItemGroup>
+			<BizTalkAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.AlertService.Orchestrations.dll" />
+			<BizTalkAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.AlertService.Pipelines.dll" />
+			<BizTalkAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.AlertService.Schemas.dll" />
+			<BizTalkAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.AlertService.Transformations.dll" />
+			<BizTalkAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Core.Pipelines.dll" />
+			<BizTalkAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Core.PropertySchemas.dll" />
+			<BizTalkAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Core.Schemas.dll" />
+			<BizTalkAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Core.Transforms.dll" />
+			<BizTalkAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Gateway.Pipelines.dll" />
+			<BizTalkAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Gateway.Schemas.dll" />
+			<BizTalkAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Gateway.Transforms.dbo_SelectInboxMessagesByStatus2SendRequestStream.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.AlertService.PipelineComponents.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Common.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Core.Logging.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Core.Orchestrations.Helper.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Core.PipelineComponents.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Core.Transforms.Helper.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.DataAccess.Cache.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.DataAccess.Integration.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.DataAccess.Models.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.DataAccess.Sql.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.DataModel.Common.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.DataModel.eHubTransactions.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Integration.dll" />
+			<GacAssemblies Include="\\sydco-stfb-1.wtg.zone\eHubBuilds\eHubLatestRelease\CargoWise.eHub.Shared.RoutingRuleEngine.dll" />
+		</ItemGroup>
+		<MakeDir Directories="BizTalkAssemblies;GacAssemblies" />
+		<Copy SourceFiles="@(BizTalkAssemblies)" DestinationFolder="BizTalkAssemblies" />
+		<Copy SourceFiles="@(GacAssemblies)" DestinationFolder="GacAssemblies" />
+		<ItemGroup>
+			<LocalBizTalkAssemblies Include="BizTalkAssemblies\*.*" />
+			<LocalGacAssemblies Include="GacAssemblies\*.*" />
+			<AllLocalAssemblies Include="@(LocalBizTalkAssemblies);@(LocalGacAssemblies)" />
+		</ItemGroup>
+		<MakeDir Directories="..\..\..\bin" />
+		<Copy SourceFiles="@(AllLocalAssemblies)" DestinationFolder="..\..\..\bin" />
+		<MSBuild.ExtensionPack.Framework.Gac TaskAction="AddAssembly" AssemblyPath="%(AllLocalAssemblies.FullPath)"/>
+		<MSBuild.ExtensionPack.BizTalk.BizTalkAssembly TaskAction="Add" Application="CargoWise.eHub" Assemblies="@(LocalBizTalkAssemblies)" Force="true" Gac="true" GacOnAddResource="true" GacOnMSIFileImport="true" GacOnMSIFileInstall="true" DatabaseServer=".\BT2013R2"/>
+	</Target>
+
+	<Target Name="Bindings">
+		<MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="ImportBindings" Application="CargoWise.eHub" BindingFile="CargoWise.eHub.BindingInfo.xml" DatabaseServer=".\BT2013R2"/> 
+	</Target>
+
+	<Target Name="Database">
+		<MSBuild.ExtensionPack.SqlServer.SqlExecute TaskAction="Execute" Sql="sp_dropserver [EHUB-DEV-BT];" ConnectionString="Data Source=localhost;Integrated Security=SSPI" ContinueOnError="True" />
+		<MSBuild.ExtensionPack.SqlServer.SqlExecute TaskAction="Execute" Sql="declare @host nvarchar(250) = (select HOST_NAME()); exec sp_addserver @host, local;" ConnectionString="Data Source=localhost;Integrated Security=SSPI" ContinueOnError="True" />
+		<MSBuild.ExtensionPack.SqlServer.SqlExecute TaskAction="Execute" Sql="declare @host nvarchar(250) = (select HOST_NAME()); exec sp_serveroption @host, 'data access', 'true';" ConnectionString="Data Source=localhost;Integrated Security=SSPI" ContinueOnError="True" />
+		<MSBuild.ExtensionPack.SqlServer.SqlExecute TaskAction="Execute" Sql="sp_dropserver [EHUB-DEV-BT\EHUBTEST];" ConnectionString="Data Source=localhost\EHUBTEST;Integrated Security=SSPI" ContinueOnError="True" />
+		<MSBuild.ExtensionPack.SqlServer.SqlExecute TaskAction="Execute" Sql="declare @host nvarchar(250) = (select HOST_NAME()) + '\EHUBTEST'; exec sp_addserver @host, local;" ConnectionString="Data Source=localhost\EHUBTEST;Integrated Security=SSPI" ContinueOnError="True" />
+		<MSBuild.ExtensionPack.SqlServer.SqlExecute TaskAction="Execute" Sql="declare @host nvarchar(250) = (select HOST_NAME()) + '\EHUBTEST'; exec sp_serveroption @host, 'data access', 'true';" ConnectionString="Data Source=localhost\EHUBTEST;Integrated Security=SSPI" ContinueOnError="True" />
+		<MSBuild.ExtensionPack.SqlServer.SqlExecute TaskAction="Execute" Sql="sp_dropserver [EHUB-DEV-BT\BT2013R2];" ConnectionString="Data Source=localhost\BT2013R2;Integrated Security=SSPI" ContinueOnError="True" />
+		<MSBuild.ExtensionPack.SqlServer.SqlExecute TaskAction="Execute" Sql="declare @host nvarchar(250) = (select HOST_NAME()) + '\BT2013R2'; exec sp_addserver @host, local;" ConnectionString="Data Source=localhost\BT2013R2;Integrated Security=SSPI" ContinueOnError="True" />
+		<MSBuild.ExtensionPack.SqlServer.SqlExecute TaskAction="Execute" Sql="declare @host nvarchar(250) = (select HOST_NAME()) + '\BT2013R2'; exec sp_serveroption @host, 'data access', 'true';" ConnectionString="Data Source=localhost\BT2013R2;Integrated Security=SSPI" ContinueOnError="True" />
+	</Target>
+
+	<Target Name="Configs">
+		<Exec Command="powershell -ExecutionPolicy RemoteSigned -File Config.Dev.UpdateScript.ps1" />
+	</Target>
+
+</Project>

@@ -1,0 +1,295 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.cargowise.eservices.canadian.encryption.client</groupId>
+	<artifactId>canadian-encryption-client</artifactId>
+	<name>Canadian Encryption Client</name>
+	<packaging>jar</packaging>
+	<description>CACustoms encrypting and decrypting SOAP Web Service</description>
+	<parent>
+		<groupId>com.cargowise.eservices.canadian.encryption</groupId>
+		<artifactId>canadian-encryption-code-quality-check</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../CanadianEncryption/code-quality-check-pom.xml</relativePath>
+	</parent>
+
+	<properties>
+		<tomcat_windows_service_name>Tomcat8</tomcat_windows_service_name>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.5</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.cargowise.eservices.canadian.encryption.service</groupId>
+			<artifactId>canadian-encryption-service</artifactId>
+			<version>1.0.0</version>
+			<type>war</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.cargo</groupId>
+			<artifactId>cargo-maven2-plugin</artifactId>
+			<version>1.6.3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>jaxws-rt</artifactId>
+			<version>2.2.10</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<testResources>
+			<testResource>
+				<directory>src/integrationtest/resources</directory>
+				<excludes>
+					<exclude>maven/**</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.6.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<!-- run mvn clean jaxws:wsimport to regenerate Web Service Client from 
+				given Web Service -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxws-maven-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<wsdlUrls>
+						<wsdlUrl>${tomcat_protocol}://${tomcat_hostname}:${tomcat_port}/${tomcat_deployment_path}/CanadianEncryptionService?wsdl</wsdlUrl>
+					</wsdlUrls>
+					<genWsdl>true</genWsdl>
+					<keep>true</keep>
+					<packageName>com.cargowise.eservices.canadian.encryption.client</packageName>
+					<sourceDestDir>${basedir}/src/main/java</sourceDestDir>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<propertyfile file="${basedir}/src/integrationtest/resources/maven(auto-generated).properties" comment="Version information">
+									<entry key="tomcat_hostname" value="${tomcat_hostname}" />
+									<entry key="tomcat_port" value="${tomcat_port}" />
+									<entry key="tomcat_protocol" value="${tomcat_protocol}" />
+									<entry key="tomcat_deployment_path" value="${tomcat_deployment_path}" />
+								</propertyfile>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Tests definition -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>add-test-source</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/integrationtest/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- run mvn clean jaxws:wsimport to -->
+			<plugin>
+				<!-- Separates the unit tests from the integration tests. -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19.1</version>
+				<configuration>
+					<!-- Skip the default running of this plug-in (or everything is run 
+						twice...see below) -->
+					<skip>true</skip>
+					<!-- Show 100% of the lines from the stack trace (doesn't work) -->
+					<trimStackTrace>false</trimStackTrace>
+				</configuration>
+				<executions>
+					<execution>
+						<id>unit-tests</id>
+						<phase>test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<!-- Never skip running the tests when the test phase is invoked -->
+							<skip>false</skip>
+							<excludes>
+								<!-- Exclude integration tests within (unit) test phase. -->
+								<exclude>**/*IntegrationTests.java</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+					<execution>
+						<id>integration-tests</id>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<!-- Never skip running the tests when the integration-test phase 
+								is invoked -->
+							<skip>false</skip>
+							<includes>
+								<!-- Include integration tests within integration-test phase. -->
+								<include>**/*IntegrationTests.java</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+					<execution>
+						<id>restart-tomcat</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>safeServiceRestart.bat</executable>
+							<!-- optional -->
+							<workingDirectory>${basedir}\..\CanadianEncryption</workingDirectory>
+							<arguments>
+								<argument>${tomcat_hostname}</argument>
+								<argument>${tomcat_windows_service_name}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>restart-tomcat-after-integration</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>safeServiceRestart.bat</executable>
+							<!-- optional -->
+							<workingDirectory>${basedir}/src/integrationtest/resources/maven</workingDirectory>
+							<arguments>
+								<argument>${tomcat_hostname}</argument>
+								<argument>${tomcat_windows_service_name}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- https://codehaus-cargo.github.io/cargo/Deployable.html -->
+			<plugin>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>cargo-maven2-plugin</artifactId>
+				<version>1.4.19</version>
+				<configuration>
+					<container>
+						<containerId>tomcat8x</containerId>
+						<type>remote</type>
+					</container>
+					<configuration>
+						<type>runtime</type>
+						<properties>
+							<cargo.hostname>${tomcat_hostname}</cargo.hostname>
+							<cargo.servlet.port>${tomcat_port}</cargo.servlet.port>
+							<cargo.protocol>${tomcat_protocol}</cargo.protocol>
+							<cargo.remote.username>${tomcat_username}</cargo.remote.username>
+							<cargo.remote.password>${tomcat_password}</cargo.remote.password>
+						</properties>
+					</configuration>
+					<deployer>
+						<type>remote</type>
+					</deployer>
+					<deployables>
+						<deployable>
+							<groupId>com.cargowise.eservices.canadian.encryption.service</groupId>
+							<artifactId>canadian-encryption-service</artifactId>
+							<type>war</type>
+							<properties>
+								<context>/${tomcat_deployment_path}</context>
+							</properties>
+						</deployable>
+					</deployables>
+				</configuration>
+				<executions>
+					<execution>
+						<id>pre-integration-test-deploy</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>redeploy</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>post-integration-test-undeploy</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>undeploy</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--Solve plugin execution not covered by lifecycle configuration -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-antrun-plugin</artifactId>
+										<versionRange>[1.4,)</versionRange>
+										<goals>
+											<goal>run</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

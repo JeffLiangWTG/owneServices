@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!-- Title: "SUPPLIER INVOICE DATA"                                  -->
+<!--                                                                 -->
+<!-- Purpose:                                                        -->
+<!-- To send supplier invoice data to the CoreFreight system.        -->
+<!-- Multiple supplier invoices may be batched together into one     -->
+<!-- XML document.                                                   -->
+<!--                                                                 -->
+<!-- Created by: Ettiene Stander                                     -->
+<!-- Version: 1.08                                                   -->
+<!--                                                                 -->
+<!-- Updated: 08 May 2012  NRP   (Added min and max Occurs)          -->
+<!-- Updated: 07 May 2013  NRP   Added new fields		             -->
+<!-- Updated: 10 Jul 2013  ES    DA63Req made mandatory              -->
+<!--          as its a boolean that is required by the processor.    -->
+<!-- Updated: 03 Feb 2015  RP    Added Sundry Charges.               -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           elementFormDefault="qualified">
+
+<!-- Upfront declarations: -->
+
+    <xs:simpleType name="Str255">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="255"/>
+        </xs:restriction>
+    </xs:simpleType>    <!-- "Str255" -->
+
+    <xs:simpleType name="Str50">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="50"/>
+        </xs:restriction>
+    </xs:simpleType>    <!-- "Str50" -->
+
+    <xs:simpleType name="Str40">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="40"/>
+        </xs:restriction>
+    </xs:simpleType>    <!-- "Str40" -->
+
+    <xs:simpleType name="Str35">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="35"/>
+        </xs:restriction>
+    </xs:simpleType>    <!-- "Str35" -->
+
+    <xs:simpleType name="Str30">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="30"/>
+        </xs:restriction>
+    </xs:simpleType>    <!-- "Str30" -->
+
+    <xs:simpleType name="Str20">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="20"/>
+        </xs:restriction>
+    </xs:simpleType>    <!-- "Str20" -->
+
+    <xs:simpleType name="Str15">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="15"/>
+        </xs:restriction>
+    </xs:simpleType>    <!-- "Str15" -->
+
+    <xs:simpleType name="Str11">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="11"/>
+        </xs:restriction>
+    </xs:simpleType>    <!-- "Str11" -->
+
+    <xs:simpleType name="Str10">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="10"/>
+        </xs:restriction>
+    </xs:simpleType>    <!-- "Str10" -->
+
+	<xs:simpleType name="Str5">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="5"/>
+        </xs:restriction>
+    </xs:simpleType>    <!-- "Str5" -->
+
+    <xs:simpleType name="Str4">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="4"/>
+        </xs:restriction>
+    </xs:simpleType>    <!-- "Str4" -->
+
+    <xs:simpleType name="Str3">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="3"/>
+        </xs:restriction>
+    </xs:simpleType>    <!-- "Str3" -->
+
+    <xs:simpleType name="MsgTypeConstant">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="SupplierInvoiceData" />
+        </xs:restriction>
+    </xs:simpleType>    <!-- "MsgTypeConstant" -->
+
+    <xs:simpleType name="MsgHdrActionType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Add" />
+            <xs:enumeration value="Update" />
+            <xs:enumeration value="Delete" />
+        </xs:restriction>
+    </xs:simpleType>    <!-- "MsgHdrActionType" -->
+
+    <xs:complexType name="MessageHeaderType">
+        <xs:sequence>
+            <xs:element name="SenderID"    type="Str35" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="RecipientID" type="Str35" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="MessageID"   type="xs:positiveInteger" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="MessageType" type="MsgTypeConstant" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="Timestamp"   type="xs:dateTime" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="Action"      type="MsgHdrActionType" minOccurs="1"	maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>    <!-- "MessageHeaderType" -->
+
+    <xs:simpleType name="NewOrUsedType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NEW" />
+            <xs:enumeration value="USED" />
+            <xs:enumeration value="SECOND HAND" />
+        </xs:restriction>
+    </xs:simpleType>    <!-- "NewOrUsedType" -->
+
+    <xs:complexType name="MotorVehicleInfoType">
+        <xs:sequence>
+            <xs:element name="DescriptionFormat"      type="xs:nonNegativeInteger" />
+            <xs:element name="VinNo"                  type="Str35" />
+            <xs:element name="ModelNo"                type="Str40" />
+            <xs:element name="Colour"                 type="Str35" />
+            <xs:element name="ManufactureYear"        type="Str4" />
+            <xs:element name="EngineNo"               type="Str20" />
+            <xs:element name="EngineCapacity"         type="Str10" />
+            <xs:element name="CommissionNo"           type="Str15" />
+        </xs:sequence>
+    </xs:complexType>    <!-- "MotorVehicleInfoType" -->
+
+    <xs:simpleType id="TRDAGRMNT" name="TradeAgreementType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[A-Z]{2,10}"/>
+            <xs:enumeration value="EFTA">
+                <xs:annotation>
+                    <xs:documentation>European Free Trade Agreement</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="EUTRADE">
+                <xs:annotation>
+                    <xs:documentation>EU Trade Agreement Jan 2000</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SADC">
+                <xs:annotation>
+                    <xs:documentation>SADC Trade Agreement 2000</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="STANDARD">
+                <xs:annotation>
+                    <xs:documentation>No Trade Agreement - Standard Tariffs</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType> <!-- "TradeAgreementType" -->
+
+    <xs:complexType name="InvoiceLineType">
+        <xs:sequence>
+            <xs:element name="InvoiceLineNo"          type="xs:positiveInteger" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="PartNumber"             type="Str50" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="LineDescription"        type="Str255" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="LineValue"              type="xs:decimal" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="LineQuantity"           type="xs:decimal" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="LineUOM"                type="Str50" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="LineCurrency"           type="Str50" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="LineCountryOfOrigin"    type="Str50" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="LineDiscountPercentage" type="xs:decimal" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="LineDiscountAmount"     type="xs:decimal" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="LineTariffCode"         type="Str20" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="LineFOBValue"           type="xs:decimal" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="LineWeightKG"           type="xs:decimal"  minOccurs="0" />
+            <xs:element name="IndentNo"               type="Str30"  	 minOccurs="0" />
+            <xs:element name="WarehousePackCaseNo"    type="Str30"  	 minOccurs="0" />
+            <xs:element name="CostingUOM"             type="Str50"  	 minOccurs="0" />
+            <xs:element name="CountableUOM"           type="Str50"  	 minOccurs="0" />
+            <xs:element name="RebateCode"             type="Str11"   	 minOccurs="0" />
+            <xs:element name="AdditionalDuty"         type="Str11"  	 minOccurs="0" />
+            <xs:element name="Quantity1"              type="xs:decimal"  minOccurs="0" />
+            <xs:element name="UOM1"                   type="Str50"       minOccurs="0" />
+            <xs:element name="Quantity2"              type="xs:decimal"  minOccurs="0" />
+            <xs:element name="UOM2"                   type="Str50"       minOccurs="0" />
+            <xs:element name="Quantity3"              type="xs:decimal"  minOccurs="0" />
+            <xs:element name="UOM3"                   type="Str50"       minOccurs="0" />
+            <xs:element name="Quantity4"              type="xs:decimal"  minOccurs="0" />
+            <xs:element name="UOM4"                   type="Str50"       minOccurs="0" />
+            <xs:element name="Quantity5"              type="xs:decimal"  minOccurs="0" />
+            <xs:element name="UOM5"                   type="Str50"       minOccurs="0" />
+            <xs:element name="PermitNo1"              type="Str10" 	 	 minOccurs="0" />
+            <xs:element name="PermitNo2"              type="Str10" 		 minOccurs="0" />
+            <xs:element name="PermitNo3"              type="Str10" 		 minOccurs="0" />
+            <xs:element name="ContainerNo"            type="Str35"  	 minOccurs="0" />
+            <xs:element name="ToBeCoded"              type="xs:positiveInteger"  minOccurs="0" />
+            <xs:element name="InsuranceCost"          type="xs:decimal"  default="0" />
+            <xs:element name="FreightCost"            type="xs:decimal"  default="0" />
+            <xs:element name="DutyPaidIndicator"      type="xs:boolean" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="CustomsPurposeCode"     type="Str3" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="ROONumber"              type="Str50"  				minOccurs="0" />
+            <xs:element name="LineTradeAgreement"     type="TradeAgreementType" 	minOccurs="0" />
+            <xs:element name="LineUCR"                type="Str35"  				minOccurs="0" />
+            <xs:element name="LineUCRDate"            type="xs:date"  				minOccurs="0" />
+            <xs:element name="CO2Emissions"           type="xs:decimal"  			minOccurs="0" />
+            <xs:element name="PreviousMRN"            type="Str35"  				minOccurs="0" />
+            <xs:element name="PreviousLineNo"         type="xs:positiveInteger"  	minOccurs="0" />
+            <xs:element name="PreviousCPC"            type="Str3"  					minOccurs="0" />
+            <xs:element name="CountableQty"           type="xs:decimal"  			minOccurs="0" />
+            <xs:element name="ExtLineRef"             type="Str35"  			    minOccurs="0" />
+            <xs:element name="CostingQty"             type="xs:decimal"  			minOccurs="0" />
+            <xs:element name="Da63Req"  	          type="xs:boolean" />
+            <xs:element name="ExpDA63CustomsDuty"     type="xs:decimal"  			minOccurs="0" />
+            <xs:element name="ExpDa63CustomsValue"    type="xs:decimal"  			minOccurs="0" />
+            <xs:element name="ExpDA63Sched1P2B"       type="xs:decimal"  			minOccurs="0" />
+            <xs:element name="NewOrUsed"              type="NewOrUsedType" minOccurs="1" maxOccurs="1" />
+            <xs:element name="MotorVehicleInfo"       type="MotorVehicleInfoType"   minOccurs="0"	maxOccurs="1" />
+			<xs:element name="ClientRefNo"            type="Str30"  	 minOccurs="0" />
+			<xs:element name="AddClientRef"           type="Str35"  	 minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>    <!-- "InvoiceLineType" -->
+    
+    <xs:simpleType name="PrepaidCollectType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="P" />
+        <xs:enumeration value="C" />
+      </xs:restriction>
+    </xs:simpleType>    <!-- "PrepaidCollectType" -->
+    
+    <xs:simpleType name="YesNoType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="Y" />
+        <xs:enumeration value="N" />
+      </xs:restriction>
+    </xs:simpleType>    <!-- "YesNoType" -->
+    
+    <xs:complexType name="SundryChargeType">
+      <xs:sequence>
+        <xs:element name="SundryChargeCode"     type="Str35" />
+        <xs:element name="SundryChargeCurrency" type="Str35" />
+        <xs:element name="SundryChargeAmount"   type="xs:decimal" />
+        <xs:element name="PrepaidCollect"       type="PrepaidCollectType" />
+      </xs:sequence>
+    </xs:complexType>    <!-- "SundryChargeType" -->
+    
+    <xs:complexType name="InvoiceDetailsType">
+        <xs:sequence>
+            <xs:element name="ExporterName"     type="Str50" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="ImporterName"     type="Str50" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="InvoiceNo"        type="Str50" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="InvoiceDate"      type="xs:date" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="InvoiceTotal"     type="xs:decimal" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="InvoiceCurrency"  type="Str50" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="PurchaseTerm"     type="Str50" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="CountryOfOrigin"  type="Str50" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="TotalFOBValue"    type="xs:decimal" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="TotalWeightKG"    type="xs:decimal" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="InsuranceCost"    type="xs:decimal" minOccurs="0" />
+            <xs:element name="FreightCost"      type="xs:decimal" minOccurs="0" />
+            <xs:element name="ShipmentRefNo"    type="Str50" 	  minOccurs="0" />
+            <xs:element name="AddProcessingReq" type="YesNoType"  minOccurs="0" />
+            <xs:element name="InvoiceLine"      type="InvoiceLineType"   minOccurs="0"  maxOccurs="unbounded" />
+            <xs:element name="SundryCharge"     type="SundryChargeType"  minOccurs="0"  maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>    <!-- "InvoiceDetailsType" -->
+	
+	
+   <xs:complexType name="DocumentListType">
+        <xs:sequence>
+            <xs:element name="ReferenceNumber"  		type="Str50" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="ReferenceDate"    		type="xs:date" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="DocumentTypeCode" 		type="Str50" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="DocumentTypeDescription"  type="Str255" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="DocumentFileType"     	type="Str5" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="Document"  				type="xs:base64Binary" minOccurs="1"	maxOccurs="1" />
+            <xs:element name="FileName"     			type="Str50" minOccurs="1"	maxOccurs="1" />     
+        </xs:sequence>
+    </xs:complexType>    <!-- "DocumentListType" -->
+	
+    
+    <!-- Define the root node: "InvoiceBatch" -->
+    <xs:element name="InvoiceBatch">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="MessageHeader"   type="MessageHeaderType" />
+                <xs:element name="InvoiceDetails"  type="InvoiceDetailsType"  maxOccurs="unbounded" />
+				<xs:element name="DocumentList"  type="DocumentListType"  minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>    <!-- "InvoiceBatch" -->
+</xs:schema>

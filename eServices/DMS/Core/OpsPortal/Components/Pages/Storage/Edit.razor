@@ -1,0 +1,101 @@
+﻿@page "/storage/{owner}/edit/{tablename}"
+
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<DmsStorageContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>@Owner.@TableName Edit</PageTitle>
+
+<h1>@Owner.@TableName</h1>
+
+<h4>Edit</h4>
+<hr />
+@if (DmsStorageCatalog is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="DmsStorageCatalog" OnValidSubmit="UpdateDmsStorageCatalog" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
+                <input type="hidden" name="DmsStorageCatalog.SC_Schema" value="@DmsStorageCatalog.SC_Schema" />
+                <input type="hidden" name="DmsStorageCatalog.SC_Name" value="@DmsStorageCatalog.SC_Name" />
+                <input type="hidden" name="DmsStorageCatalog.SC_Type" value="@DmsStorageCatalog.SC_Type" />
+                <input type="hidden" name="DmsStorageCatalog.SC_Version" value="@DmsStorageCatalog.SC_Version" />
+                <input type="hidden" name="DmsStorageCatalog.SC_CreateTime" value="@DmsStorageCatalog.SC_CreateTime" />
+                <input type="hidden" name="DmsStorageCatalog.SC_CreateUser" value="@DmsStorageCatalog.SC_CreateUser" />
+                <input type="hidden" name="DmsStorageCatalog.SC_DeleteTime" value="@DmsStorageCatalog.SC_DeleteTime" />
+                <input type="hidden" name="DmsStorageCatalog.SC_DeleteUser" value="@DmsStorageCatalog.SC_DeleteUser" />
+                <input type="hidden" name="DmsStorageCatalog.SC_Name" value="@DmsStorageCatalog.SC_Name" />
+                <div class="mb-3">
+                    <label for="sc_expirationdays" class="form-label">Expiration Days:</label>
+                    <InputNumber id="sc_expirationdays" @bind-Value="DmsStorageCatalog.SC_ExpirationDays" class="form-control" />
+                    <ValidationMessage For="() => DmsStorageCatalog.SC_ExpirationDays" class="text-danger" />
+                </div>
+                <button id="submit" type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/storage/@Owner">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    public DmsStorageCatalog? DmsStorageCatalog { get; set; }
+
+    [Parameter]
+    public required string Owner { get; set; }
+
+    [Parameter]
+    public required string TableName { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        DmsStorageCatalog ??= await context.DmsStorageCatalog
+            .FirstOrDefaultAsync(m => m.SC_Schema == Owner && m.SC_Name == TableName);
+
+        if (DmsStorageCatalog is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateDmsStorageCatalog()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(DmsStorageCatalog!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!DmsStorageCatalogExists(DmsStorageCatalog!.SC_Schema, DmsStorageCatalog!.SC_Name))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo($"/storage/{Owner}");
+    }
+
+    bool DmsStorageCatalogExists(string sc_schema, string sc_name)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.DmsStorageCatalog.Any(e => e.SC_Schema == sc_schema && e.SC_Name == sc_name);
+    }
+}

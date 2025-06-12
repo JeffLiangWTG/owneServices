@@ -1,0 +1,805 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--EXTERNAL_PROPERTIES: Profile;UserName;Password;_Server;_ServiceName;_ServiceDisplayName;_ServiceDescription;_ServiceFilesPath;_ServiceExeFileName;_StartupType;_AppConfigTransformPath;_DeploymentFolder;_BackupFolder;_LogsFolder-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+
+    <DatIntegrationAssemblyFilePath>$(MSBuildThisFileDirectory)\..\..\DAT\Dat.Integration.dll</DatIntegrationAssemblyFilePath>
+    <DatIntegrationAssemblyFilePath Condition="!Exists('$(DatIntegrationAssemblyFilePath)')">$(MSBuildThisFileDirectory)\Dat.Integration.dll</DatIntegrationAssemblyFilePath>
+
+    <MicrosoftWebPublishingPath Condition="'$(MicrosoftWebPublishingPath)' == ''">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\</MicrosoftWebPublishingPath>
+    <MicrosoftWebPublishingTasksDllPath Condition="'$(MicrosoftWebPublishingTasksDllPath)' == ''">$(MicrosoftWebPublishingPath)Microsoft.Web.Publishing.Tasks.dll</MicrosoftWebPublishingTasksDllPath>
+
+    <CommonPowershellFunctionsFilePath>.\Common.ps1</CommonPowershellFunctionsFilePath>
+    <CommonPowershellFunctionsFilePath Condition="!Exists('$(CommonPowershellFunctionsFilePath)')">$(MSBuildThisFileDirectory)\..\CommonScripts\Common.ps1</CommonPowershellFunctionsFilePath>
+
+    <MSDeployPath Condition="'$(MSDeployPath)' == ''">$(ProgramFiles)\IIS\Microsoft Web Deploy V3</MSDeployPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props" Condition="'$(_DeploymentPropsImported)'==''"/>
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Deployment.props" Condition="'$(Profile)' != '' and '$(_ProfilePropsImported)'==''"/>
+
+  <UsingTask TaskName="TransformXml"
+             AssemblyFile="$(MicrosoftWebPublishingTasksDllPath)"/>
+
+  <UsingTask TaskName="CreateService"
+             TaskFactory="PowershellTaskFactory"
+             AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <ServiceName Required="true" ParameterType="System.String"/>
+      <BinaryPath Required="true" ParameterType="System.String"/>
+      <CommandArguments ParameterType="System.String"/>
+      <DisplayName Required="true" ParameterType="System.String"/>
+      <Description Required="true" ParameterType="System.String"/>
+      <PortNumber ParameterType="System.Int32"/>
+      <StartupType ParameterType="System.String"/>
+      <EnvironmentVariableRequired ParameterType="System.Boolean" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+      . $(CommonPowershellFunctionsFilePath)
+      $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+      $cred = $null;
+      if ($EnvironmentVariableRequired) 
+      {
+        if (!$UserPassword) 
+        {
+          Throw "UserPassword is required for EnvironmentVariableRequired"
+        }
+
+        $securedPassword = ConvertTo-SecureString -AsPlainText -Force $UserPassword
+        $cred = New-Object System.Management.Automation.PSCredential -ArgumentList $username,$securedPassword
+      }
+
+      $sb = { param($ServiceName,$BinaryPath,$CommandArguments,$DisplayName,$Description,$StartupType,$EnvironmentVariableRequired,$Cred)
+        $BinaryPathWithArguments = $BinaryPath
+        if ($null -ne $CommandArguments)
+        {
+          $BinaryPathWithArguments = "$BinaryPath $CommandArguments"
+        }
+
+        $args = @{}
+        if ($EnvironmentVariableRequired) 
+        {
+          $args.Add('Credential', $Cred)
+        }
+
+        New-Service @args -Name $ServiceName -BinaryPathName $BinaryPathWithArguments -Description $Description -DisplayName $DisplayName -StartupType $StartupType
+        if ($null -ne $error[0])
+        {
+          Throw $error[0]
+        }
+
+        Set-ItemProperty -Path "Registry::HKLM\System\CurrentControlSet\Services\$ServiceName" -Name "DelayedAutostart" -Value 1 -Type DWORD
+        if ($null -ne $error[0])
+        {
+          Throw $error[0]
+        }
+      }
+
+      if ($null -eq $MachineName)
+      {
+        $MachineName = $env:COMPUTERNAME
+      }
+
+      $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Creating service [$ServiceName] on [$MachineName]")
+
+      Try
+      {
+        Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $ServiceName,$BinaryPath,$CommandArguments,$DisplayName,$Description,$StartupType,$EnvironmentVariableRequired,$cred
+      }
+      Finally
+      {
+        remove-pssession -session $s
+      }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="EncryptAppConfig"
+       TaskFactory="PowershellTaskFactory"
+       AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <ApplicationBinPath Required="true" ParameterType="System.String" />
+      <EncryptedSection Required="true" ParameterType="System.String" />
+      <ConfigFilename Required="true" ParameterType="System.String" />
+      <PortNumber ParameterType="System.Int32"/>
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+            $sb = { param($EncryptedSection,$ApplicationBinPath)
+                $regiis = (Join-Path $env:windir Microsoft.NET\Framework\v4.0.30319\aspnet_regiis.exe)
+                $EncryptedSection.Split(",") | ForEach {
+                    . $regiis -pef $_ $ApplicationBinPath -prov "RsaProtectedConfigurationProvider"
+                }
+            }
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "[$MachineName]: Encrypted section(s) [$EncryptedSection] of web.config on [$ApplicationBinPath]")
+            Try
+            {
+        Invoke-Command -Session $s -ScriptBlock { param($ApplicationBinPath,$ConfigFilename) Rename-Item -Path "$ApplicationBinPath\$ConfigFilename" -NewName "Web.config" } -ArgumentList $ApplicationBinPath,$ConfigFilename
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $EncryptedSection,$ApplicationBinPath
+        Invoke-Command -Session $s -ScriptBlock { param($ApplicationBinPath,$ConfigFilename) Rename-Item -Path "$ApplicationBinPath\Web.config" -NewName $ConfigFilename } -ArgumentList $ApplicationBinPath,$ConfigFilename
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="DeleteService"
+             TaskFactory="PowershellTaskFactory"
+             AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <ServiceName Required="true" ParameterType="System.String"/>
+      <PortNumber ParameterType="System.Int32"/>
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+      . $(CommonPowershellFunctionsFilePath)
+      $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+      $sb = { param($ServiceName)
+        $service = Get-WmiObject -Class Win32_Service -Filter "Name='$ServiceName'"
+        if ($null -ne $service)
+        {
+          $service.delete()
+        }
+        if ($null -ne $error[0])
+        {
+          Throw $error[0]
+        }
+      }
+
+      if ($null -eq $MachineName)
+      {
+        $MachineName = $env:COMPUTERNAME
+      }
+
+      $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Deleting service [$ServiceName] on [$MachineName]")
+
+      Try
+      {
+        Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $ServiceName
+      }
+      Finally
+      {
+        remove-pssession -session $s
+      }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="StartService"
+             TaskFactory="PowershellTaskFactory"
+             AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <ServiceName Required="true" ParameterType="System.String"/>
+      <PortNumber ParameterType="System.Int32"/>
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+      . $(CommonPowershellFunctionsFilePath)
+      $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+      $sb = { param($ServiceName)
+        Start-Service $ServiceName
+        if ($null -ne $error[0])
+        {
+          Throw $error[0]
+        }
+      }
+
+      if ($null -eq $MachineName)
+      {
+        $MachineName = $env:COMPUTERNAME
+      }
+
+      $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Starting service [$ServiceName] on [$MachineName]")
+
+      Try
+      {
+        Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $ServiceName
+      }
+      Finally
+      {
+        remove-pssession -session $s
+      }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="StopService"
+             TaskFactory="PowershellTaskFactory"
+             AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <ServiceName Required="true" ParameterType="System.String"/>
+      <PortNumber ParameterType="System.Int32"/>
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+      . $(CommonPowershellFunctionsFilePath)
+        $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+        $sb = { param($ServiceName)
+          $timeoutSecond = 5 
+
+          if ($waitToKillServiceTimeout = Get-ItemProperty -Path "Registry::HKLM\System\CurrentControlSet\Control" -Name "WaitToKillServiceTimeout")
+          {
+            $timeoutMillisecond = $waitToKillServiceTimeout.WaitToKillServiceTimeout
+            $timeoutSecond = $timeoutMillisecond / 1000
+            Write-Output " Set stopping service timeout $timeoutSecond second(s) from Registry HKLM\System\CurrentControlSet\Control\WaitToKillServiceTimeout`n"
+          }
+          elseif ($null -ne $error[0])
+          {
+            $errorMessage = $error[0].Exception.Message
+
+            if ($errorMessage.Contains("Cannot find path") -or $errorMessage.Contains("Property WaitToKillServiceTimeout does not exist"))
+            {
+              Write-Output  " $errorMessage`n"
+              Write-Output "Use default stopping service timeout: $timeoutSecond`n"
+            }
+          }
+
+          if ($service = Get-Service -Name $ServiceName)
+          {
+            $serviceStatus = $service.Status
+
+            if ($serviceStatus -eq 'Running')
+            {
+              $error.Clear()
+
+              $service.Stop()
+
+              if ($null -ne $error[0])
+              {
+                Throw $error[0]
+              }
+
+              $waitCount = 1
+              $waitInternalSecond = 1
+              $timeout = New-Object -TypeName System.Timespan -ArgumentList 0,0,$waitInternalSecond
+
+              while ($true)
+              {
+                try 
+                {
+                  $service.WaitForStatus([ServiceProcess.ServiceControllerStatus]::Stopped, $timeout)
+                  Write-Output "Stopped service '$ServiceName'"
+                  break
+                }
+                catch [ServiceProcess.TimeoutException]
+                {
+                  Write-Output "Waited for $waitInternalSecond second(s). Total number of waits: $waitCount`n"
+                  $waitCount++
+                }
+
+                $totalWaitedTimeSecond = $waitCount * $waitInternalSecond
+                    
+                if ($totalWaitedTimeSecond -ge $timeoutSecond) 
+                {
+                  Write-Output "Total waited time $totalWaitedTimeSecond second(s) has reached stopping service timeout $timeoutSecond second(s). Killing service process...`n"
+                      
+                  $error.Clear()
+
+                  if ($serviceProcess = Get-WmiObject -Class Win32_Service -Filter "Name LIKE '$ServiceName'")
+                  {
+                    $serviceProcessID = $serviceProcess.ProcessId
+                    Stop-Process -Id $serviceProcessID -Force
+
+                    if ($null -ne $error[0])
+                    {
+                      Throw $error[0]
+                    }
+                    
+                    $serviceProcessName = $serviceProcess.Name
+                    Write-Output "Killed process (SPID: $serviceProcessID; Name: $serviceProcessName)`n"
+                  }
+                  elseif ($null -ne $error[0])
+                  {
+                    Throw $error[0]
+                  }
+                  else 
+                  {
+                    Throw "Cannot find a process whose name is like '$ServiceName'"
+                  }
+                }
+              }
+            }
+            else
+            {
+              Write-Output "Skipped stopping service '$ServiceName'. Its status is '$serviceStatus'"
+            }
+          }
+          elseif ($null -ne $error[0])
+          {
+            $errorMessage = $error[0].Exception.Message
+            if ($errorMessage.Contains("Cannot find any service with service name"))
+            {
+              Write-Output $errorMessage
+            }
+            else
+            {
+              Throw $error[0]
+            }
+          }
+        }
+
+        if ($null -eq $MachineName)
+        {
+          $MachineName = $env:COMPUTERNAME
+        }
+
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Stopping service [$ServiceName] on [$MachineName]")
+
+        Try
+        {
+          $Result = Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $ServiceName
+          $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", $Result)
+        }
+        Finally
+        {
+          remove-pssession -session $s
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="InstallCertificates" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <MetadataFile ParameterType="System.String" />
+      <PortNumber ParameterType="System.Int32"/>
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+        . $(CommonPowershellFunctionsFilePath)
+        InstallCertificate -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -MetadataFile $MetadataFile -DatIntegrationAssemblyFilePath $(DatIntegrationAssemblyFilePath) -Logger $log -PortNumber $PortNumber
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="UninstallCertificates" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <MetadataFile ParameterType="System.String" />
+      <PortNumber ParameterType="System.Int32"/>
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+        . $(CommonPowershellFunctionsFilePath)
+        UninstallCertificate -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -MetadataFile $MetadataFile -DatIntegrationAssemblyFilePath $(DatIntegrationAssemblyFilePath) -Logger $log -PortNumber $PortNumber
+        ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="DecryptPasswordInConfigFile" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <Key ParameterType="System.String" />
+      <EncryptedPassword ParameterType="System.String" />
+      <ConfigFile ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+      . $(CommonPowershellFunctionsFilePath)
+      $Password = Decrypt -EncryptedPassword $EncryptedPassword -DatIntegrationAssemblyFilePath $(DatIntegrationAssemblyFilePath) -Logger $log
+      $content = Get-Content -Path $ConfigFile
+      $newContent = $content.replace($Key, $Password)
+      Set-Content -Path $ConfigFile -Value $newContent
+        ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="DecryptAndSetEnvironmentVariable" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <PortNumber ParameterType="System.Int32"/>
+      <Key ParameterType="System.String" />
+      <EncryptedValue ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+      . $(CommonPowershellFunctionsFilePath)
+
+      $decryptedValue = Decrypt -EncryptedPassword $EncryptedValue -DatIntegrationAssemblyFilePath $(DatIntegrationAssemblyFilePath) -Logger $log
+
+      $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+      $sb = { param($key,$value)
+        [Environment]::SetEnvironmentVariable($key, $value, "User")
+        if ($null -ne $error[0])
+        {
+          Throw $error[0]
+        }
+      }
+
+      if ($null -eq $MachineName)
+      {
+        $MachineName = $env:COMPUTERNAME
+      }
+
+      $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Setting environment variable [$Key] for [$UserName] on [$MachineName]")
+
+      Try
+      {
+        Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Key,$decryptedValue
+      }
+      Finally
+      {
+        remove-pssession -session $s
+      }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <Target Name="bat:deploy">
+
+    <Error Condition="'$(_ServiceName)' == ''"
+           Text="Service name was not specified" />
+    <Error Condition="'$(_ServiceDisplayName)' == ''"
+          Text="Service display name was not specified" />
+    <Error Condition="'$(_ServiceDescription)' == ''"
+          Text="Service description was not specified" />
+    <Error Condition="'$(_DeploymentFolder)' == ''"
+           Text="Deployment folder was not specified."/>
+    <Error Condition="'$(_BackupFolder)' == ''"
+           Text="Backup folder was not specified."/>
+
+    <PropertyGroup>
+      <DeploymentReason Condition="'$(DeploymentReason)' == ''">4:5:4</DeploymentReason>
+      <_EnvironmentVariableRequired Condition="'$(_EnvironmentVariableRequired)' == ''">false</_EnvironmentVariableRequired>
+      <_StartupType Condition="'$(_StartupType)' == ''">Automatic</_StartupType>
+
+      <_DeploymentDrive Condition="'$(_DeploymentFolder)' != ''">$(_DeploymentFolder.Substring(0, $(_DeploymentFolder.IndexOf(':'))))</_DeploymentDrive>
+      <_LocalDeploymentPath>$([System.IO.Path]::Combine('$(_DeploymentFolder)', '$(_ServiceName)'))</_LocalDeploymentPath>
+      <_DeploymentPath Condition="'$(_Server)' == ''">$(_LocalDeploymentPath)</_DeploymentPath>
+      <_DeploymentPath Condition="'$(_Server)' != ''">\\$(_Server)\$(_LocalDeploymentPath.Replace(':', '$'))</_DeploymentPath>
+
+      <_TempFolder>$(MSBuildProjectDirectory)\bin\temp</_TempFolder>
+      <_BackupDrive>$(_BackupFolder.Substring(0, $(_BackupFolder.IndexOf(':'))))</_BackupDrive>
+      <_BackupPath>$([System.IO.Path]::Combine('$(_BackupFolder)', '$(_ServiceName)\$([System.DateTime]::Now.ToString(yyyyMMdd - HHmmss))'))</_BackupPath>
+      <_BackupPath Condition="'$(_Server)' != ''">\\$(_Server)\$(_BackupPath.Replace(':', '$'))</_BackupPath>
+
+      <BinFilesPath Condition="'$(Outputpath)'==''">Bin</BinFilesPath>
+      <BinFilesPath Condition="'$(Outputpath)'!=''">$(Outputpath)</BinFilesPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_ServiceFiles Include=".\$(BinFilesPath)\**\*"></_ServiceFiles>
+    </ItemGroup>
+
+    <!-- Clean temp folder -->
+    <RemoveDir Directories="$(_TempFolder)"/>
+
+    <!-- Copy service files to temp folder -->
+    <Copy SourceFiles="@(_ServiceFiles)"
+          DestinationFolder="$(_TempFolder)\%(RecursiveDir)"/>
+
+    <!-- Apply config transform to App.config and Log4net.config -->
+    <ItemGroup>
+      <Log4NetConfigFile Include="$(_TempFolder)\*.log4net.config" />
+    </ItemGroup>
+    <PropertyGroup>
+      <_AppConfigTransformPath>$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\App.config</_AppConfigTransformPath>
+      <_Log4NetConfigTransformPath>$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\%(Log4NetConfigFile.Filename).config</_Log4NetConfigTransformPath>
+	  <SelectedAppConfigFile Condition="!Exists('$(_TempFolder)\$(_ServiceDllFileName).config')">$(_TempFolder)\$(_ServiceExeFileName).config</SelectedAppConfigFile>
+	  <SelectedAppConfigFile Condition="Exists('$(_TempFolder)\$(_ServiceDllFileName).config')">$(_TempFolder)\$(_ServiceDllFileName).config</SelectedAppConfigFile>
+	</PropertyGroup>
+    <TransformXml Condition="Exists('$(_AppConfigTransformPath)')"
+                  Source="$(SelectedAppConfigFile)"
+                  Transform="$(_AppConfigTransformPath)"
+                  Destination="$(SelectedAppConfigFile)" />
+    <TransformXml Condition="Exists('$(_Log4NetConfigTransformPath)')"
+                  Source="@(Log4NetConfigFile)"
+                  Transform="$(_Log4NetConfigTransformPath)"
+                  Destination="@(Log4NetConfigFile)" />
+
+    <DecryptPasswordInConfigFile
+        Key="%(EncryptedPassword.Identity)"
+        EncryptedPassword="%(EncryptedPassword.Value)"
+        ConfigFile="$(SelectedAppConfigFile)"
+        Condition="'@(EncryptedPassword->Count())' &gt; 0"/>
+
+    <DecryptAndSetEnvironmentVariable
+        Condition="'$(_EnvironmentVariableRequired)' And '@(EnvironmentVariable->Count())' &gt; 0"
+        MachineName="$(_Server)"
+        UserName="$(UserName)"
+        UserPassword="$(Password)"
+        PortNumber="$(_PortNumber)"
+        Key="%(EnvironmentVariable.Identity)"
+        EncryptedValue="%(EnvironmentVariable.Value)"/>
+
+    <!-- Get access to deployment and backup drives -->
+    <Exec Condition="'$(_Server)' != '' And '$(UserName)' != '' And '$(Password)' != ''"
+          Command="net use &quot;\\$(_Server)\$(_BackupDrive)$&quot; &quot;/user:$(UserName)&quot; &quot;$(Password)&quot; /persistent:no"/>
+    <Exec Condition="'$(_DeploymentDrive)' != '$(_BackupDrive)' And '$(_Server)' != '' And '$(UserName)' != '' And '$(Password)' != ''"
+          Command="net use &quot;\\$(_Server)\$(_DeploymentDrive)$&quot; &quot;/user:$(UserName)&quot; &quot;$(Password)&quot; /persistent:no"/>
+
+    <!-- Stop & Delete service -->
+    <StopService MachineName="$(_Server)"
+                 UserName="$(UserName)"
+                 UserPassword="$(Password)"
+                 ServiceName="$(_ServiceName)"
+                 PortNumber="$(_PortNumber)"/>
+    <DeleteService MachineName="$(_Server)"
+                   UserName="$(UserName)"
+                   UserPassword="$(Password)"
+                   ServiceName="$(_ServiceName)"
+                   PortNumber="$(_PortNumber)"/>
+
+    <!-- Backup service -->
+    <ItemGroup>
+      <_CurrentServiceFiles Condition="'$(_LogsFolder)'!=''"
+                            Include="$(_DeploymentPath)\**\*"
+                            Exclude="$(_DeploymentPath)\$(_LogsFolder)\*"/>
+      <_CurrentServiceFiles Condition="'$(_LogsFolder)'==''"
+                            Include="$(_DeploymentPath)\**\*"/>
+    </ItemGroup>
+    <Copy Condition="'@(_CurrentServiceFiles->Count())' &gt; 0"
+          SourceFiles="@(_CurrentServiceFiles)"
+          DestinationFolder="$(_BackupPath)\%(RecursiveDir)"/>
+
+    <!-- Copy package to the server -->
+    <ItemGroup>
+      <_PackageContents Include="$(_TempFolder)\**\*" />
+      <_PackageContents Include="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Files\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_PackageContents)"
+          DestinationFolder="$(_DeploymentPath)\%(RecursiveDir)"
+          SkipUnchangedFiles="true"
+          OverwriteReadOnlyFiles="true" />
+
+    <!-- Remove access to deployment and backup drives -->
+    <Exec Condition="'$(_Server)' != '' And '$(UserName)' != '' And '$(Password)' != ''"
+          Command="net use &quot;\\$(_Server)\$(_BackupDrive)$&quot; /delete"/>
+    <Exec Condition="'$(_DeploymentDrive)' != '$(_BackupDrive)' And '$(_Server)' != '' And '$(UserName)' != '' And '$(Password)' != ''"
+          Command="net use &quot;\\$(_Server)\$(_DeploymentDrive)$&quot; /delete"/>
+
+    <!-- Clean temp folder -->
+    <RemoveDir Directories="$(_TempFolder)" />
+
+    <ItemGroup>
+      <_MetadataFiles Condition="$(Profile)==''" Include="$(MSBuildProjectDirectory)\Deployment\Certificates\*.ps1" />
+      <_MetadataFiles Condition="$(Profile)!=''" Include="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Certificates\*.ps1" />
+    </ItemGroup>
+    <InstallCertificates Condition="'@(_MetadataFiles)' != ''"
+                         MachineName="$(_Server)"
+                         UserName="$(UserName)"
+                         UserPassword="$(Password)"
+                         MetadataFile="%(_MetadataFiles.Identity)"
+                         PortNumber="$(_PortNumber)"/>
+
+    <!-- Create and Start service -->
+    <CreateService MachineName="$(_Server)"
+                   UserName="$(UserName)"
+                   UserPassword="$(Password)"
+                   ServiceName="$(_ServiceName)"
+                   BinaryPath="$(_LocalDeploymentPath)\$(_ServiceExeFileName)"
+                   CommandArguments="$(CommandArguments)"
+                   DisplayName="$(_ServiceDisplayName)"
+                   Description="$(_ServiceDescription)"
+                   PortNumber="$(_PortNumber)"
+                   StartupType="$(_StartupType)"
+                   EnvironmentVariableRequired="$(_EnvironmentVariableRequired)"/>
+
+    <EncryptAppConfig MachineName="$(_Server)"
+                      UserName="$(UserName)"
+                      UserPassword="$(Password)"
+                      EncryptedSection="$(_EncryptedSection)"
+                      ApplicationBinPath="$(_LocalDeploymentPath)"
+                      ConfigFilename="$(_ServiceExeFileName).config"
+                      Condition="$(_EncryptConfigRequired) == 'true'"
+                      PortNumber="$(_PortNumber)"/>
+
+    <StartService Condition="'$(_StartupType)' == 'Automatic'"
+                  MachineName="$(_Server)"
+                  UserName="$(UserName)"
+                  UserPassword="$(Password)"
+                  ServiceName="$(_ServiceName)"
+                  PortNumber="$(_PortNumber)"/>
+
+  </Target>
+
+  <Target Name="bat:remove">
+
+    <Error Condition="'$(_ServiceName)' == ''"
+        Text="Service name was not specified" />
+    <Error Condition="'$(_DeploymentFolder)' == ''"
+           Text="Deployment folder was not specified."/>
+
+    <PropertyGroup>
+      <_DeploymentDrive Condition="'$(_DeploymentFolder)' != ''">$(_DeploymentFolder.Substring(0, $(_DeploymentFolder.IndexOf(':'))))</_DeploymentDrive>
+      <_LocalDeploymentPath>$([System.IO.Path]::Combine('$(_DeploymentFolder)', '$(_ServiceName)'))</_LocalDeploymentPath>
+      <_DeploymentPath Condition="'$(_Server)' == ''">$(_LocalDeploymentPath)</_DeploymentPath>
+      <_DeploymentPath Condition="'$(_Server)' != ''">\\$(_Server)\$(_LocalDeploymentPath.Replace(':', '$'))</_DeploymentPath>
+    </PropertyGroup>
+
+    <StopService MachineName="$(_Server)"
+                 UserName="$(UserName)"
+                 UserPassword="$(Password)"
+                 ServiceName="$(_ServiceName)"
+                 PortNumber="$(_PortNumber)"/>
+    <DeleteService MachineName="$(_Server)"
+                   UserName="$(UserName)"
+                   UserPassword="$(Password)"
+                   ServiceName="$(_ServiceName)"
+                   PortNumber="$(_PortNumber)"/>
+
+    <ItemGroup>
+      <_MetadataFiles Condition="$(Profile)==''" Include="$(MSBuildProjectDirectory)\Deployment\Certificates\*.ps1" />
+      <_MetadataFiles Condition="$(Profile)!=''" Include="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Certificates\*.ps1" />
+    </ItemGroup>
+    <UninstallCertificates Condition="'@(_MetadataFiles)' != ''"
+                           MachineName="$(_Server)"
+                           UserName="$(UserName)"
+                           UserPassword="$(Password)"
+                           MetadataFile="%(_MetadataFiles.Identity)"
+                           PortNumber="$(_PortNumber)"/>
+
+    <Exec Condition="'$(_Server)' != '' And '$(UserName)' != '' And '$(Password)' != ''"
+          Command="net use &quot;\\$(_Server)\$(_DeploymentDrive)$&quot; &quot;/user:$(UserName)&quot; &quot;$(Password)&quot; /persistent:no"/>
+    <RemoveDir Directories="$(_DeploymentPath)"/>
+    <Exec Condition="'$(_Server)' != '' And '$(UserName)' != '' And '$(Password)' != ''"
+          Command="net use &quot;\\$(_Server)\$(_DeploymentDrive)$&quot; /delete"/>
+
+  </Target>
+  <Target Name="bat:deploy_only">
+    <!-- Checking mandatory fields -->
+    <Error Condition="'$(_SiteName)' == ''" Text="Site name was not specified" />
+    <Error Condition="'$(_ServiceName)' == ''" Text="Service name was not specified" />
+    <Error Condition="'$(_ServiceDisplayName)' == ''" Text="Service display name was not specified" />
+    <Error Condition="'$(_DeploymentFolder)' == ''" Text="Deployment folder was not specified."/>
+
+    <!-- Define properties -->
+    <PropertyGroup>
+      <_StartupType Condition="'$(_StartupType)' == ''">auto</_StartupType>
+
+      <BinFilesPath Condition="'$(Outputpath)'==''">Bin</BinFilesPath>
+      <BinFilesPath Condition="'$(Outputpath)'!=''">$(Outputpath)</BinFilesPath>
+
+      <_BackupRequired Condition="'$(_BackupRequired)' == ''">True</_BackupRequired>
+      <_TempFolder Condition="$(_TempFolder) == ''">$(MSBuildProjectDirectory)\temp</_TempFolder>
+      <_TempPackageFolder>$(_TempFolder)</_TempPackageFolder>
+      <_TempPackagePath>$(_TempFolder)\package.zip</_TempPackagePath>
+
+      <_ComputerName Condition="'$(_Server)' != ''">$(_Server.Split('.')[0])</_ComputerName>
+      <_DestPassword Condition="'$(Password)' != ''">,password=&quot;$(Password)&quot;</_DestPassword>
+      <_DestLocalUserName Condition="'$(UserName)' != '' And '$(_ComputerName)' != ''">,userName=&quot;$(_ComputerName)\$(UserName)&quot;</_DestLocalUserName>
+      <_PortNumber Condition="'$(_PortNumber)' == ''">8172</_PortNumber>
+      <_Destwmsvc Condition="'$(_Server)' != ''">,wmsvc=&quot;https://$(_Server):$(_PortNumber)/msdeploy.axd?Site=$(_SiteName)&quot;</_Destwmsvc>
+
+      <_IISWebApplicationName Condition="'$(_ServiceName)' == ''">$(_SiteName)</_IISWebApplicationName>
+      <_IISWebApplicationName Condition="'$(_IISWebApplicationName)' == ''">$(_SiteName)/$(_ServiceName)</_IISWebApplicationName>
+
+      <_ExeFullPath>$(_DeploymentFolder)\$(_ServiceExeFileName)</_ExeFullPath>
+      <_BinPath Condition="'$(CommandArguments)' != ''">$(_ExeFullPath) $(CommandArguments)</_BinPath>
+      <_BinPath Condition="'$(CommandArguments)' == ''">$(_ExeFullPath)</_BinPath>
+      <_SkipRule Condition="'$(_LogsFolder)' != ''">-skip:objectName=dirPath,absolutePath=&quot;$([System.Text.RegularExpressions.Regex]::Escape($(_LogsFolder)))&quot;</_SkipRule>
+    </PropertyGroup>
+
+    <!-- Prepare service package -->
+    <ItemGroup>
+      <_ServiceFiles Include=".\$(BinFilesPath)\**\*"></_ServiceFiles>
+    </ItemGroup>
+    <RemoveDir Directories="$(_TempFolder)"/>
+    <Copy SourceFiles="@(_ServiceFiles)" DestinationFolder="$(_TempFolder)\%(RecursiveDir)"/>
+
+    <!-- Apply config transform to App.config and Log4net.config -->
+    <ItemGroup>
+      <Log4NetConfigFile Include="$(_TempFolder)\*.log4net.config" />
+    </ItemGroup>
+    <PropertyGroup>
+      <_AppConfigTransformPath>$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\App.config</_AppConfigTransformPath>
+      <_Log4NetConfigTransformPath>$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\%(Log4NetConfigFile.Filename).config</_Log4NetConfigTransformPath>
+	  <SelectedAppConfigFile Condition="!Exists('$(_TempFolder)\$(_ServiceDllFileName).config')">$(_TempFolder)\$(_ServiceExeFileName).config</SelectedAppConfigFile>
+	  <SelectedAppConfigFile Condition="Exists('$(_TempFolder)\$(_ServiceDllFileName).config')">$(_TempFolder)\$(_ServiceDllFileName).config</SelectedAppConfigFile>
+	</PropertyGroup>
+    <TransformXml Condition="Exists('$(_AppConfigTransformPath)')"
+                  Source="$(SelectedAppConfigFile)"
+                  Transform="$(_AppConfigTransformPath)"
+                  Destination="$(SelectedAppConfigFile)" />
+    <TransformXml Condition="Exists('$(_Log4NetConfigTransformPath)')"
+                  Source="@(Log4NetConfigFile)"
+                  Transform="$(_Log4NetConfigTransformPath)"
+                  Destination="@(Log4NetConfigFile)" />
+
+    <DecryptPasswordInConfigFile
+        Key="%(EncryptedPassword.Identity)"
+        EncryptedPassword="%(EncryptedPassword.Value)"
+        ConfigFile="$(SelectedAppConfigFile)"
+        Condition="'@(EncryptedPassword->Count())' &gt; 0"/>
+
+    <!-- Repack -->
+    <Zip TaskAction="Create"
+        CompressPath="$(_TempPackageFolder)"
+        ZipFileName="$(_TempPackagePath)"
+        RemoveRoot="$(_TempPackageFolder)"/>
+
+    <!-- Stop service -->
+    <Exec IgnoreExitCode="true" IgnoreStandardErrorWarningFormat="true" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runCommand=' &quot;%WINDIR%\System32\sc.exe&quot; stop &quot;$(_ServiceName)&quot;',successReturnCodes=0,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(_DestLocalUserName)$(_DestPassword) ^
+        -verbose" />
+
+    <!-- Delete service -->
+    <Exec IgnoreExitCode="true" IgnoreStandardErrorWarningFormat="true" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runCommand=' &quot;%WINDIR%\System32\sc.exe&quot; delete &quot;$(_ServiceName)&quot;',successReturnCodes=0,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(_DestLocalUserName)$(_DestPassword) ^		
+        -verbose" />
+
+    <!-- Backup service -->
+    <Exec Condition="'$(_BackupRequired)' == 'True'" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:backupManager  ^
+        -dest:backupManager=&quot;$(_IISWebApplicationName)&quot;$(_Destwmsvc)$(_DestLocalUserName)$(_DestPassword) ^
+        $(_SkipRule) ^
+        -verbose" />
+
+	<!-- Deploy service -->
+    <Exec Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:package=$(_TempPackagePath) ^
+        -dest:auto$(_Destwmsvc)$(_DestLocalUserName)$(_DestPassword) ^
+        -retryAttempts:10 ^
+        -retryInterval:6000 ^
+        -verbose ^
+        -enableRule:DoNotDeleteRule ^
+        -setParam:kind=ProviderPath,scope=contentPath,value=&quot;$(_IISWebApplicationName)&quot;" />
+
+    <!-- TODO: Install/Uninstall certificate -->
+
+    <!-- Create service -->
+    <Exec Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runCommand=' &quot;%WINDIR%\System32\sc.exe&quot; create &quot;$(_ServiceName)&quot; binPath=&quot;$(_BinPath)&quot; DisplayName=&quot;$(_ServiceDisplayName)&quot; Start=&quot;$(_StartupType)&quot;',successReturnCodes=0,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(_DestLocalUserName)$(_DestPassword) ^
+        -verbose" />
+
+    <!-- Start service -->
+    <Exec Condition="'$(_StartupType)' != 'demand' And '$(_StartupType)' != 'disabled'"
+        Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runCommand=' &quot;%WINDIR%\System32\sc.exe&quot; start &quot;$(_ServiceName)&quot;',successReturnCodes=0,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(_DestLocalUserName)$(_DestPassword) ^
+        -verbose" />
+  </Target>
+</Project>

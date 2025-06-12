@@ -1,0 +1,18 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="add" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ExtensionPack>$(MSBuildExtensionsPath)\ExtensionPack\4.0\MSBuild.ExtensionPack.tasks</ExtensionPack>
+    <Dir>Bin\1.0.0.0</Dir>
+  </PropertyGroup>
+  <Import Condition="Exists('$(ExtensionPack)')" Project="$(ExtensionPack)"/>
+  <ItemGroup>
+    <Assemblies Include="$(Dir)\*.dll" Exclude="$(Dir)\*Test*.dll;$(Dir)\Microsoft*.dll" />
+  </ItemGroup>
+  <Target Name="add">
+    <Error Condition="!Exists('$(ExtensionPack)')" Text="*** Please install MSBuild Extension Pack from http://msbuildextensionpack.codeplex.com/ ***" />
+    <MSBuild.ExtensionPack.Framework.Gac Condition="'%(Assemblies.FullPath)'!=''" TaskAction="AddAssembly" AssemblyPath="%(Assemblies.FullPath)"/>
+  </Target>
+  <Target Name="remove">
+    <Error Condition="!Exists('$(ExtensionPack)')" Text="*** Please install MSBuild Extension Pack from http://msbuildextensionpack.codeplex.com/ ***" />
+	<MSBuild.ExtensionPack.Framework.Gac Condition="'%(Assemblies.Filename)'!=''" TaskAction="RemoveAssembly" AssemblyName="%(Assemblies.Filename)"/>
+  </Target>
+</Project>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <BizTalkBindingsPackageProjImported>true</BizTalkBindingsPackageProjImported>
+
+    <DeploymentRootPath>$(MSBuildThisFileDirectory)..\</DeploymentRootPath>
+    <CommonScriptsPath>$(DeploymentRootPath)Common\</CommonScriptsPath>
+    <InstallScriptsPath>$(DeploymentRootPath)Install\</InstallScriptsPath>
+
+    <MSBuildCommonTasks>$(CommonScriptsPath)MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(DeploymentRootPath)package-common.tasks</PackageCommonTasks>
+    <BindingBuilderTasks>$(MSBuildThisFileDirectory)Builder.tasks</BindingBuilderTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+  <Import Project="$(BindingBuilderTasks)" Condition="'$(BizTalkBindingsBuilderTasksImported)'==''"/>
+
+  <!-- pack project outputs, deployment files and scripts to a zip file -->
+  <!-- it's the package project responsibility to include what to be packed as the deployment project is only responsible to deploy the contents packed in the zip file -->
+  <Target Name="bat:package">
+
+    <PropertyGroup>
+      <ProductionProfile>Production</ProductionProfile>
+      <IsProduction Condition="'$(Profile)'=='' or '$(Profile)'=='$(ProductionProfile)'">true</IsProduction>
+      <HasProfile Condition="'$(Profile)'!='' and '$(Profile)'!='$(ProductionProfile)'">true</HasProfile>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <InstallScripts Include="$(MSBuildThisFileDirectory)Install.proj" />
+      <ProjectScripts Include="$(MSBuildThisFileDirectory)Scripts\**\*" />
+      <InstallCommonFiles Include="$(InstallScriptsPath)**\*" />
+      <CommonScriptsFiles Include="$(CommonScriptsPath)**\*" />
+    </ItemGroup>
+
+    <!-- initialize temp folder to copy contents over for packaging -->
+    <!-- all files are expected to be copied over to the temporary $(_ZipContentsDirectory) folder -->
+    <!-- that will be zipped up, and then the result zip file will be copied over to the $(Outputpath)-->
+    <!-- the MSBuildProject file defined to output, relative to the MSBuildProjectDirectory -->
+    <CallTarget Targets="bat:package:init"/>
+
+    <PropertyGroup>
+      <PackageDir>$(_ZipContentsDirectory)</PackageDir>
+      <PackageBinDir>$(PackageDir)\Bin</PackageBinDir>
+      <PackageScriptsDir>$(PackageDir)\Scripts</PackageScriptsDir>
+      <PackageProfilesDir>$(PackageDir)\Profiles</PackageProfilesDir>
+      <PackageCommonDir>$(PackageDir)\Common</PackageCommonDir>
+      <PackageBindingsDir>$(PackageDir)\Bindings</PackageBindingsDir>
+      <PackageBizTalkCommonDir>$(PackageDir)\BizTalkCommon</PackageBizTalkCommonDir>
+    </PropertyGroup>
+
+    <!-- Start package files -->
+
+    <!-- expected ItemsGroup: BindingItems -->
+    <!-- Orchestrations, ReceivePorts, SendPorts, Parties -->
+    <MSBuild Projects="$(PackageCommonTasks)" Targets="dir:create-temp-path">
+      <Output TaskParameter="TargetOutputs" PropertyName="newTempDir" />
+    </MSBuild>
+    <Copy
+      SourceFiles="%(BindingItems.Identity)"
+      DestinationFolder="$(newTempDir)\%(BindingItems.DestinationFolder)%(RecursiveDir)" />
+
+    <!-- 1st/3 round build bindings at package time using hard-coded "Production" profile -->
+    <MSBuild Projects="$(BindingBuilderTasks)" Targets="bindinginfo:detokenize" Properties="BindingItemsDir=$(newTempDir);Profile=$(ProductionProfile);DeleteInputFiles=true">
+      <Output TaskParameter="TargetOutputs" PropertyName="ProductionDetokenizedDir" />
+    </MSBuild>
+
+    <!-- 2nd/3 round build bindings at package time using script runner provided profile if different from production -->
+    <MSBuild Projects="$(BindingBuilderTasks)" Targets="bindinginfo:detokenize" Properties="BindingItemsDir=$(ProductionDetokenizedDir);Profile=$(Profile);DeleteInputFiles=true" Condition="'$(HasProfile)'=='true'">
+      <Output TaskParameter="TargetOutputs" PropertyName="ProfileDetokenizedDir" />
+    </MSBuild>
+
+    <!-- the result de-tokenized files -->
+    <PropertyGroup>
+      <DetokenizedDir Condition="'$(HasProfile)'!='true'">$(ProductionDetokenizedDir)</DetokenizedDir>
+      <DetokenizedDir Condition="'$(HasProfile)'=='true'">$(ProfileDetokenizedDir)</DetokenizedDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <DetokenizedFiles Include="$(DetokenizedDir)\**\*.*" />
+    </ItemGroup>
+
+    <!-- copy the de-tokenized binding info files to the package dir -->
+    <Copy SourceFiles="@(DetokenizedFiles)" DestinationFolder="$(PackageBindingsDir)\%(RecursiveDir)" />
+    <RemoveDir Directories="$(DetokenizedDir)" Condition="Exists('$(DetokenizedDir)')" />
+
+    <!-- call the client msbuild project copy project specific files to the target $(_ZipContentsDirectory) -->
+    <MSBuild Projects="$(MSBuildProjectFile)" Targets="on:bat:package" />
+
+    <!-- project specific script files -->
+    <Copy SourceFiles="@(InstallScripts)" DestinationFolder="$(PackageDir)" />
+    <Copy SourceFiles="@(ProjectScripts)" DestinationFolder="$(PackageScriptsDir)\%(RecursiveDir)" />
+
+    <!-- profiles will be used by installer to set the connection strings and environment specific properties onsite -->
+    <Copy SourceFiles="@(Profiles)" DestinationFolder="$(PackageProfilesDir)\%(RecursiveDir)" />
+
+    <!-- common library files -->
+    <Copy SourceFiles="@(CommonScriptsFiles)" DestinationFolder="$(PackageCommonDir)\%(RecursiveDir)" />
+    <Copy SourceFiles="@(InstallCommonFiles)" DestinationFolder="$(PackageDir)\%(RecursiveDir)" />
+    <!-- End package files -->
+
+    <!-- Create package zip file and copy over to target destination -->
+    <!-- $(Outputpath) relative to the $(MSBuildProjectDirectory) -->
+    <CallTarget Targets="bat:package:zip"/>
+  </Target>
+</Project>

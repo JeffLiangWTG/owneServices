@@ -1,0 +1,15 @@
+To deploy client project on a server you need to create MSI first. If you already have MSI, just copy it to BizTalk server machine, import application and 
+install it (tick "Run Installation Application Wizard..." check-box at the end of importing wizard). During the import on "Application Target Envioronment" stage in drop-down box
+you may find 3 options in addition to <default> - "DEV", "LOCAL", "PROD". It will automaticly configure binding settings for development server, local server
+or production server.
+
+To create new client MSI you need to:
+
+1. Build client project in RELEASE mode, deploy it to local BizTalk server with application name = "CargoWise.eHub.Client.xxx" (xxx - client Code).
+2. In BizTalk Administration add reference to CargoWise.eHub.Core and to other client application if needed (your application might use artifacts from 
+different client applications, in most cases refrence to CargoWise.eHub.Client.EDI needs to be added).
+3. Add non-BizTalk binaries to resources of your new client application, if client solution contains any (tick "Add to the lobalh assambly cache on MSI file import"
+check box).
+4. Some of the client projects might contain client specific bindings, in this case in Solution Items should be 3 xml files end with "BindingImfo.DEV.xml",
+"BindingImfo.LOCAL.xml", "BindingImfo.PROD.xml". Add all 3 files to resources and specify "Destionation location" in "Add Resources" window as "DEV", "LOCAL"
+and "PROD" accordingly.

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 rel. 2 sp1 (http://www.altova.com) by Silvio Zarb (Australia Post) -->
+<xs:schema xmlns="http://www.auspost.com.au/Schema/CommonDataModel/Event:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns0="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" xmlns:ns2="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" targetNamespace="http://www.auspost.com.au/Schema/CommonDataModel/Event:v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1">
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" schemaLocation="Address_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" schemaLocation="CommonTypes_v3.xsd"/>
+	<xs:complexType name="Event">
+		<xs:annotation>
+			<xs:documentation>An event occurs at a discrete point in time or over a period of time. An event occurs in relation to business processes. It may also be a future event. Could occur at any time during the lifecycle of a product</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="EventType" type="ns2:string50">
+				<xs:annotation>
+					<xs:documentation>Event Type for the message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EventDescription" type="ns2:string80" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Event detail description</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EventDateTime" type="ns2:DateTime">
+				<xs:annotation>
+					<xs:documentation>DateTime the event was created</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EventMessageTransmissionDateTime" type="ns2:DateTime">
+				<xs:annotation>
+					<xs:documentation>Date time of the first transmission of the event</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EventReasonID" type="ns2:string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Reason id of the event message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EventReasonText" type="ns2:string80" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Reason description of the event message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DataEntryType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Methods by which the date has been entered: A - Created by Autom. Scanning Based on Real Sighting/Event; B - Created Artificially (w/o Real World Event); C - Created from Internet / Webpage; D - Created Manually in Event Manager; E - Created Manually or Online</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+						<xs:enumeration value="A"/>
+						<xs:enumeration value="B"/>
+						<xs:enumeration value="C"/>
+						<xs:enumeration value="D"/>
+						<xs:enumeration value="E"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SenderEventMessageNumber" type="ns2:string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Event message identifer from the sender</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FurtherReference" type="FurtherReferences" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="EventIDName" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="EventID" type="ns2:string50" minOccurs="0"/>
+						<xs:element name="EventName" type="ns2:string50" minOccurs="0"/>
+						<xs:element name="EventIDNameType">
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="Sender"/>
+									<xs:enumeration value="Recipient"/>
+									<xs:enumeration value="ReportingPartner"/>
+									<xs:enumeration value="Device"/>
+									<xs:enumeration value="User"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Geocode" type="Geocode" minOccurs="0"/>
+			<xs:element name="GeocodeDateTime" type="ns2:DateTime" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FurtherReferences">
+		<xs:sequence>
+			<xs:element name="ReferenceCodeSet" type="ns2:string20">
+				<xs:annotation>
+					<xs:documentation>Additional type of reference the event message. Possible values are MANIFEST_ID, CONSIGNMENT_ID or ARTICLE_ID etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ReferenceID" type="ns2:string50">
+				<xs:annotation>
+					<xs:documentation>Additional ID of the event message. Possible values are ids of manifest, consignment or article etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProviderID" type="ns2:string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Provider id of the additional reference</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProviderName" type="ns2:string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Provider name of the additional reference</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Geocode">
+		<xs:sequence>
+			<xs:element name="Feature" type="ns2:string30" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> The physical or virtual reference of the geocode</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GeographicDatum" type="ns2:string10" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> The reference model of the earth's surface used inthe measurement of the geocide position of the address point</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="VerticalDatum" type="ns2:string10" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The reference datum of the height (AHD71 for Australia)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Latitude" type="xs:decimal">
+				<xs:annotation>
+					<xs:documentation>Measurement in degrees</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Longitude" type="xs:decimal">
+				<xs:annotation>
+					<xs:documentation>Measurement in degrees</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Height" type="xs:decimal" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Height of a point measured in meters above or below a specified reference vertical datum</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PositionalUncertainty" type="xs:decimal" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Horizontal uncrtainty of the coordinateds in metres at the 95% confidence level</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Containment" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Refers to an area of volume object or a point within an area or volume object or feature</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Event" type="Event"/>
+</xs:schema>

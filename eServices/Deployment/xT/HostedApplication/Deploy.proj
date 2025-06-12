@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--EXTERNAL_PROPERTIES: Profile;UserName;Password;_Server;_HostedApplicationName;_HostedApplicationFilesPath;_HostedApplicationExeFileName;_AppConfigTransformPath;_DeploymentFolder;_BackupFolder;_LogsFolder-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)..\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+
+    <DatIntegrationAssemblyFilePath>$(MSBuildThisFileDirectory)..\..\..\DAT\Dat.Integration.dll</DatIntegrationAssemblyFilePath>
+    <DatIntegrationAssemblyFilePath Condition="!Exists('$(DatIntegrationAssemblyFilePath)')">$(MSBuildThisFileDirectory)\Dat.Integration.dll</DatIntegrationAssemblyFilePath>
+
+    <MicrosoftWebPublishingPath Condition="'$(MicrosoftWebPublishingPath)' == ''">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\</MicrosoftWebPublishingPath>
+    <MicrosoftWebPublishingTasksDllPath Condition="'$(MicrosoftWebPublishingTasksDllPath)' == ''">$(MicrosoftWebPublishingPath)Microsoft.Web.Publishing.Tasks.dll</MicrosoftWebPublishingTasksDllPath>
+
+    <CommonPowershellFunctionsFilePath>.\Common.ps1</CommonPowershellFunctionsFilePath>
+    <CommonPowershellFunctionsFilePath Condition="!Exists('$(CommonPowershellFunctionsFilePath)')">$(MSBuildThisFileDirectory)..\..\CommonScripts\Common.ps1</CommonPowershellFunctionsFilePath>
+
+    <MSDeployPath Condition="'$(MSDeployPath)' == ''">$(ProgramFiles)\IIS\Microsoft Web Deploy V3</MSDeployPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props" Condition="'$(_DeploymentPropsImported)'==''"/>
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Deployment.props" Condition="'$(Profile)' != '' and '$(_ProfilePropsImported)'==''"/>
+
+  <Target Name="bat:deploy">
+
+    <Error Condition="'$(_HostedApplicationName)' == ''"
+           Text="Hosted Application name was not specified" />
+    <Error Condition="'$(_DeploymentFolder)' == ''"
+           Text="Deployment folder was not specified."/>
+    <Error Condition="'$(_BackupFolder)' == ''"
+           Text="Backup folder was not specified."/>
+
+    <PropertyGroup>
+      <DeploymentReason Condition="'$(DeploymentReason)' == ''">4:5:4</DeploymentReason>
+      <_EnvironmentVariableRequired Condition="'$(_EnvironmentVariableRequired)' == ''">false</_EnvironmentVariableRequired>
+
+      <_DeploymentDrive Condition="'$(_DeploymentFolder)' != ''">$(_DeploymentFolder.Substring(0, $(_DeploymentFolder.IndexOf(':'))))</_DeploymentDrive>
+      <_LocalDeploymentPath>$([System.IO.Path]::Combine('$(_DeploymentFolder)', '$(_HostedApplicationName)'))</_LocalDeploymentPath>
+      <_DeploymentPath Condition="'$(_Server)' == ''">$(_LocalDeploymentPath)</_DeploymentPath>
+      <_DeploymentPath Condition="'$(_Server)' != ''">\\$(_Server)\$(_LocalDeploymentPath.Replace(':', '$'))</_DeploymentPath>
+
+      <_TempFolder>$(MSBuildProjectDirectory)\bin\temp</_TempFolder>
+      <_BackupDrive>$(_BackupFolder.Substring(0, $(_BackupFolder.IndexOf(':'))))</_BackupDrive>
+      <_BackupPath>$([System.IO.Path]::Combine('$(_BackupFolder)', '$(_HostedApplicationName)\$([System.DateTime]::Now.ToString(yyyyMMdd - HHmmss))'))</_BackupPath>
+      <_BackupPath Condition="'$(_Server)' != ''">\\$(_Server)\$(_BackupPath.Replace(':', '$'))</_BackupPath>
+
+      <BinFilesPath Condition="'$(Outputpath)'==''">Bin</BinFilesPath>
+      <BinFilesPath Condition="'$(Outputpath)'!=''">$(Outputpath)</BinFilesPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_HostedApplicationFiles Include=".\$(BinFilesPath)\**\*"></_HostedApplicationFiles>
+    </ItemGroup>
+
+    <!-- Clean temp folder -->
+    <RemoveDir Directories="$(_TempFolder)"/>
+
+    <!-- Copy service files to temp folder -->
+    <Copy SourceFiles="@(_HostedApplicationFiles)"
+          DestinationFolder="$(_TempFolder)\%(RecursiveDir)"/>
+
+    <!-- Get access to deployment and backup drives -->
+    <Exec Condition="'$(_Server)' != '' And '$(UserName)' != '' And '$(Password)' != ''"
+          Command="net use &quot;\\$(_Server)\$(_BackupDrive)$&quot; &quot;/user:$(UserName)&quot; &quot;$(Password)&quot; /persistent:no"/>
+    <Exec Condition="'$(_DeploymentDrive)' != '$(_BackupDrive)' And '$(_Server)' != '' And '$(UserName)' != '' And '$(Password)' != ''"
+          Command="net use &quot;\\$(_Server)\$(_DeploymentDrive)$&quot; &quot;/user:$(UserName)&quot; &quot;$(Password)&quot; /persistent:no"/>
+
+    <!-- Backup service -->
+    <ItemGroup>
+      <_CurrentServiceFiles Condition="'$(_LogsFolder)'!=''"
+                            Include="$(_DeploymentPath)\**\*"
+                            Exclude="$(_DeploymentPath)\$(_LogsFolder)\*"/>
+      <_CurrentServiceFiles Condition="'$(_LogsFolder)'==''"
+                            Include="$(_DeploymentPath)\**\*"/>
+    </ItemGroup>
+    <Copy Condition="'@(_CurrentServiceFiles->Count())' &gt; 1"
+          SourceFiles="@(_CurrentServiceFiles)"
+          DestinationFolder="$(_BackupPath)\%(RecursiveDir)"/>
+
+    <!-- Copy package to the server -->
+    <ItemGroup>
+      <_PackageContents Include="$(_TempFolder)\**\*" />
+      <_PackageContents Include="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Files\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_PackageContents)"
+          DestinationFolder="$(_DeploymentPath)\%(RecursiveDir)"
+          SkipUnchangedFiles="true"
+          OverwriteReadOnlyFiles="true" />
+
+    <!-- Remove access to deployment and backup drives -->
+    <Exec Condition="'$(_Server)' != '' And '$(UserName)' != '' And '$(Password)' != ''"
+          Command="net use &quot;\\$(_Server)\$(_BackupDrive)$&quot; /delete"/>
+    <Exec Condition="'$(_DeploymentDrive)' != '$(_BackupDrive)' And '$(_Server)' != '' And '$(UserName)' != '' And '$(Password)' != ''"
+          Command="net use &quot;\\$(_Server)\$(_DeploymentDrive)$&quot; /delete"/>
+
+    <!-- Clean temp folder -->
+    <RemoveDir Directories="$(_TempFolder)" />
+
+  </Target>
+
+  <Target Name="bat:remove">
+
+    <Error Condition="'$(_HostedApplicationName)' == ''"
+        Text="Service name was not specified" />
+    <Error Condition="'$(_DeploymentFolder)' == ''"
+           Text="Deployment folder was not specified."/>
+
+    <PropertyGroup>
+      <_DeploymentDrive Condition="'$(_DeploymentFolder)' != ''">$(_DeploymentFolder.Substring(0, $(_DeploymentFolder.IndexOf(':'))))</_DeploymentDrive>
+      <_LocalDeploymentPath>$([System.IO.Path]::Combine('$(_DeploymentFolder)', '$(_HostedApplicationName)'))</_LocalDeploymentPath>
+      <_DeploymentPath Condition="'$(_Server)' == ''">$(_LocalDeploymentPath)</_DeploymentPath>
+      <_DeploymentPath Condition="'$(_Server)' != ''">\\$(_Server)\$(_LocalDeploymentPath.Replace(':', '$'))</_DeploymentPath>
+    </PropertyGroup>
+
+    <Exec Condition="'$(_Server)' != '' And '$(UserName)' != '' And '$(Password)' != ''"
+          Command="net use &quot;\\$(_Server)\$(_DeploymentDrive)$&quot; &quot;/user:$(UserName)&quot; &quot;$(Password)&quot; /persistent:no"/>
+    
+	<RemoveDir Directories="$(_DeploymentPath)"/>
+	
+    <Exec Condition="'$(_Server)' != '' And '$(UserName)' != '' And '$(Password)' != ''"
+          Command="net use &quot;\\$(_Server)\$(_DeploymentDrive)$&quot; /delete"/>
+
+  </Target>
+  
+</Project>

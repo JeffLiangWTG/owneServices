@@ -1,0 +1,53 @@
+﻿@page "/identity"
+@attribute [Authorize(Policy = "eServicesAdmins")]
+
+@inject UserManager<AppUser> UserManager
+
+<PageTitle>App Access</PageTitle>
+
+<h2>App Access</h2>
+
+<p>
+    <a href="identity/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="Users.OrderBy(u => u.AppUser.UserName).AsQueryable()">
+    <PropertyColumn Property="user => user.AppUser.UserName" Title="ID" />
+    <TemplateColumn Context="user" Title="Claims">
+        @foreach (var role in user.Roles.Order())
+        {
+            @role<br/>
+        }
+    </TemplateColumn>
+    <PropertyColumn Property="user => user.AppUser.LockoutEnd.GetValueOrDefault() > DateTimeOffset.UtcNow" Title="Locked Out?" />
+
+    <TemplateColumn Context="user">
+        <a href="@($"identity/edit/{user.AppUser.UserName}")">Edit</a> |
+        <a href="@($"identity/details/{user.AppUser.UserName}")">Details</a> |
+        <a href="@($"identity/delete/{user.AppUser.UserName}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+
+    private List<User> Users { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var users = UserManager.Users.ToList();
+        foreach (var appUser in users)
+        {
+            var roles = await UserManager.GetRolesAsync(appUser);
+            var user = new User(appUser, roles);
+            Users.Add(user);
+        }
+    }
+
+    private static string GetRoles(AppUser user, UserManager<AppUser> userManager)
+    {
+        var roles = userManager.GetRolesAsync(user).Result;
+        return string.Join(", ", roles);
+    }
+
+    public record User(AppUser AppUser, IList<string> Roles);
+}

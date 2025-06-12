@@ -1,0 +1,98 @@
+﻿@page "/storage/{owner}/delete/{tablename}"
+
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<DmsStorageContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject IHttpContextAccessor HttpContextAccessor;
+
+<PageTitle>@Owner.@TableName Delete</PageTitle>
+
+<h1>Delete @Owner.@TableName</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <hr />
+    @if (dmsstoragecatalog is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Owner</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_Schema</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Table Name</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_Name</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Type</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_Type</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Version</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_Version</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Expiration Days</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_ExpirationDays</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Create Time</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_CreateTime</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Create User</dt>
+            <dd class="col-sm-10">@dmsstoragecatalog.SC_CreateUser</dd>
+        </dl>
+        <EditForm method="post" Model="dmsstoragecatalog" OnValidSubmit="DeleteDmsStorageCatalog" FormName="delete" Enhance>
+            <button id="delete" type="submit" class="btn btn-danger" disabled="@(dmsstoragecatalog is null)">Delete</button> |
+            <a href="/storage">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    DmsStorageCatalog? dmsstoragecatalog;
+
+    [Parameter]
+    public required string Owner { get; set; }
+
+    [Parameter]
+    public required string TableName { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        dmsstoragecatalog = await context.DmsStorageCatalog
+            .FirstOrDefaultAsync(m => m.SC_Schema == Owner && m.SC_Name == TableName && m.SC_DeleteTime == null);
+
+        if (dmsstoragecatalog is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+
+    }
+
+    public async Task DeleteDmsStorageCatalog()
+    {
+        using var context = DbFactory.CreateDbContext();
+        dmsstoragecatalog!.SC_DeleteTime = DateTime.UtcNow;
+        dmsstoragecatalog.SC_DeleteUser = HttpContextAccessor.HttpContext?.User.Identity?.Name;
+        var dmsstoragecatalogEntry = context.Entry(dmsstoragecatalog);
+        dmsstoragecatalogEntry.State = EntityState.Modified;
+
+        if (context.Database.IsSqlServer())
+        {
+            var connection = context.Database.GetDbConnection();
+            await connection.OpenAsync();
+            using var command = context.Database.GetDbConnection().CreateCommand();
+            command.CommandText =
+            $"DROP TABLE IF EXISTS [{dmsstoragecatalog.SC_Schema}].[{dmsstoragecatalog.SC_Name}]";
+            await command.ExecuteNonQueryAsync();
+        }
+
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo($"/storage/{Owner}");
+    }
+}

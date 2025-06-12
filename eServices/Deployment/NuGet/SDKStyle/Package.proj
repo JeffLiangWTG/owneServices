@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+        <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+		<_OutputDirectory Condition="$(_OutputDirectory) == ''">bin</_OutputDirectory>
+		<_NuGetExe>$(MSBuildThisFileDirectory)nuget.exe</_NuGetExe>
+		<_DeployProjFile>$(MSBuildThisFileDirectory)Deploy.proj</_DeployProjFile>
+		<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+	</PropertyGroup>
+
+    <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+	
+	<Target Name="bat:prepack">
+		<PropertyGroup>
+			<Configuration Condition="$(Configuration) ==''">Debug</Configuration>
+			<PackageVersion>$(FileVersion)$(VersionSuffix)</PackageVersion>
+			<Authors>WiseTech Global</Authors>
+			<Company>WiseTech Global</Company>
+			<Copyright>Copyright ©2021 WiseTech Global</Copyright>
+			<PackageOutputPath>$(_OutputDirectory)</PackageOutputPath>
+		</PropertyGroup>
+	</Target>
+	
+	<Target Name="bat:pack" DependsOnTargets="bat:prepack">
+		<CallTarget Targets="pack" />
+	</Target>
+		
+	<Target Name="bat:package">
+
+		<PropertyGroup>
+			<_TempPackageFolder>$(MSBuildProjectDirectory)\bin\temp</_TempPackageFolder>
+			<_PackageZipFilePath>$(_OutputDirectory)\$(MSBuildProjectName).zip</_PackageZipFilePath>
+		</PropertyGroup>
+		
+		<RemoveDir Directories="$(_TempPackageFolder)" />
+		<MakeDir Directories="$(_TempPackageFolder)" Condition="!Exists('$(_TempPackageFolder)')" />
+
+		<CallTarget Targets="bat:pack" />
+
+		<ItemGroup>
+			<!--include nuget packages -->
+			<_NuPackages Include="$(_OutputDirectory)\*.nupkg"/>
+			
+			<!-- include all Deployment configuration files -->
+			<_DeploymentFiles Include="$(MSBuildProjectDirectory)\Deployment\**\*"/>
+		</ItemGroup>
+
+		<!-- Copy Deployment configuration files -->
+		<Copy
+			SourceFiles="@(_DeploymentFiles)"
+			DestinationFolder="$(_TempPackageFolder)\Deployment\%(RecursiveDir)"/>
+
+		<!-- copy Nuget package files -->
+		<Copy
+			SourceFiles="@(_NuPackages)"
+			DestinationFolder="$(_TempPackageFolder)\"/>
+			
+		<!-- copy Nuget exe -->
+		<Copy
+			SourceFiles="$(_NuGetExe)"
+			DestinationFolder="$(_TempPackageFolder)\"/>
+
+		<!-- Copy Deploy.proj for deployment -->
+		<Copy
+			SourceFiles="$(_DeployProjFile)"
+			DestinationFolder="$(_TempPackageFolder)\"/>
+        
+        <!-- Copy CommonTasks for deployment -->
+        <Copy
+			SourceFiles="$(MSBuildCommonTasks)"
+			DestinationFolder="$(_TempPackageFolder)\"/>
+        
+		<!-- Create zip file package -->
+		<Zip
+			TaskAction="Create"
+			ZipFileName="$(_PackageZipFilePath)"
+			CompressPath="$(_TempPackageFolder)"
+			RemoveRoot="$(_TempPackageFolder)" />
+
+		<RemoveDir Directories="$(_TempPackageFolder)" />
+	</Target>
+
+	<Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
+		<ItemGroup>
+			<_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')-&gt;WithMetadataValue('PrivateAssets', 'All'))"/>
+		</ItemGroup>
+
+		<Message Text="Batch for .nupkg: ReferenceCopyLocalPaths = @(_ReferenceCopyLocalPaths), ReferenceCopyLocalPaths.DestinationSubDirectory = %(_ReferenceCopyLocalPaths.DestinationSubDirectory) Filename = %(_ReferenceCopyLocalPaths.Filename) Extension = %(_ReferenceCopyLocalPaths.Extension)" Importance="High" Condition="'@(_ReferenceCopyLocalPaths)' != ''" />
+
+		<ItemGroup>
+			<BuildOutputInPackage Include="@(_ReferenceCopyLocalPaths)" TargetPath="%(_ReferenceCopyLocalPaths.DestinationSubDirectory)"/>
+		</ItemGroup>
+	</Target>
+</Project>

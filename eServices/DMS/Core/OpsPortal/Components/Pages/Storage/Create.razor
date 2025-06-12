@@ -1,0 +1,117 @@
+﻿@page "/storage/create/{Owner?}"
+
+@using Microsoft.Data.SqlClient
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<DmsStorageContext> DbFactory
+@inject UserManager<AppUser> UserManager
+@inject AppAccessService AppAccessService
+@inject NavigationManager NavigationManager
+@inject IHttpContextAccessor HttpContextAccessor;
+@inject IDmsStorageRepository DmsStorageRepository_V0_1
+
+<PageTitle>Storage Create</PageTitle>
+
+<h1 />
+<h1>Storage</h1>
+
+<h4>Create</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="DmsStorageCatalog" OnValidSubmit="AddDmsStorageCatalog" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="sc_schema" class="form-label">Owner:</label>
+                @if (string.IsNullOrWhiteSpace(Owner))
+                {
+                    <InputSelect id="sc_schema" @bind-Value="DmsStorageCatalog.SC_Schema" class="form-control">
+                        <option value=""></option>
+                        @foreach (var appOwner in appOwners ?? [])
+                        {
+                            <option value="@appOwner">@appOwner</option>
+                        }
+                    </InputSelect>
+                }
+                else
+                {
+                    <label class="form-control">@Owner</label>
+                }
+                <ValidationMessage For="() => DmsStorageCatalog.SC_Schema" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="sc_name" class="form-label">Name:</label>
+                <InputText id="sc_name" @bind-Value="DmsStorageCatalog.SC_Name" class="form-control" />
+                <ValidationMessage For="() => DmsStorageCatalog.SC_Name" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="sc_type" class="form-label">Type:</label>
+                <InputSelect id="sc_type" @bind-Value="DmsStorageCatalog.SC_Type" class="form-control">
+                    <option value="Document">Document</option>
+                    <option value="Object">Object</option>
+                </InputSelect>
+                <ValidationMessage For="() => DmsStorageCatalog.SC_Type" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="sc_version" class="form-label">Version:</label>
+                <InputSelect id="sc_version" @bind-Value="DmsStorageCatalog.SC_Version" class="form-control">
+                    <option value="@DmsDefaults.ApiVersion_0_1.ToString()">
+                        @DmsDefaults.ApiVersion_0_1.ToString()
+                    </option>
+                </InputSelect>
+                <ValidationMessage For="() => DmsStorageCatalog.SC_Version" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="sc_expirationdays" class="form-label">Expiration Days:</label>
+                <InputNumber id="sc_expirationdays" @bind-Value="DmsStorageCatalog.SC_ExpirationDays" class="form-control" />
+                <ValidationMessage For="() => DmsStorageCatalog.SC_ExpirationDays" class="text-danger" />
+            </div>
+            <button id="submit" type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/storage">Back to List</a>
+</div>
+
+@code {
+
+    [Parameter]
+    public string? Owner { get; set; }
+
+    [SupplyParameterFromForm]
+    public DmsStorageCatalog DmsStorageCatalog { get; set; } = new();
+
+    private List<string>? appOwners;
+
+    protected override void OnInitialized()
+    {
+        DmsStorageCatalog.SC_Schema = Owner ?? "";
+        DmsStorageCatalog.SC_Type = "Document";
+        DmsStorageCatalog.SC_Version = DmsDefaults.DefaultApiVersion.ToString();
+        DmsStorageCatalog.SC_ExpirationDays = 180;
+        DmsStorageCatalog.SC_CreateUser = HttpContextAccessor.HttpContext?.User.Identity?.Name!;
+
+        appOwners = UserManager.Users.Select(u => u.UserName).OfType<string>().ToList();
+        appOwners.Sort();
+    }
+
+    public async Task AddDmsStorageCatalog()
+    {
+        using var context = DbFactory.CreateDbContext();
+        var existing = await context.DmsStorageCatalog.FirstOrDefaultAsync(c 
+            => c.SC_Schema == DmsStorageCatalog.SC_Schema && c.SC_Name == DmsStorageCatalog.SC_Name);
+        if (existing is not null)
+        {
+            if (existing.SC_DeleteTime is null)
+                throw new InvalidOperationException("Storage already exists.");
+            else
+                context.DmsStorageCatalog.Remove(existing);
+        }
+        await DmsStorageRepository_V0_1.RegisterOwnerAsync(DmsStorageCatalog.SC_Schema);
+        await DmsStorageRepository_V0_1.CreateTableAsync(DmsStorageCatalog);
+
+        NavigationManager.NavigateTo($"/storage/{DmsStorageCatalog.SC_Schema}");
+    }
+}

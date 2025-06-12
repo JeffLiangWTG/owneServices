@@ -1,0 +1,620 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xmlns="http://exworks.com/schema"
+           targetNamespace="http://exworks.com/schema">
+
+    <!-- Basic Data Types -->
+    <xs:simpleType name="ReferenceNumberValueType">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="30"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="ReferenceNumberType">
+        <xs:annotation>
+            <xs:documentation>
+                A generic user-supplied alphanumeric reference #
+            </xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="ReferenceNumberValueType">
+                <xs:attribute name="label" use="required">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="alternateReferenceNumber"/>
+                            <xs:enumeration value="containerNumber"/>
+                            <xs:enumeration value="houseBillNumber"/>
+                            <xs:enumeration value="inbondTransitNumber"/>
+                            <xs:enumeration value="masterBillNumber"/>
+                            <xs:enumeration value="sapReferenceNumber"/>
+                            <xs:enumeration value="truckerProNumber"/>
+                            <xs:enumeration value="dhlMFileNumber"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="ReferenceNumbersType">
+        <xs:annotation>
+            <xs:documentation>
+                A list of reference numbers
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="ReferenceNumber" type="ReferenceNumberType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="AccountNumberType">
+        <xs:annotation>
+            <xs:documentation>
+                Identifies an external customer for the purposes of billing and/or determining physical location.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="30"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AddressLineType">
+        <xs:annotation>
+            <xs:documentation>
+                Line of a street address, e.g. 123 Main St.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="32"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="BranchType">
+        <xs:annotation>
+            <xs:documentation>
+                Branch name or code
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="16"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CargoTypeType">
+        <xs:annotation>
+            <xs:documentation>
+                Determines how cargo is to be delivered.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="LOOSE"/>
+            <xs:enumeration value="FTL"/>
+            <xs:enumeration value="FCL"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CarrierNameType">
+        <xs:annotation>
+            <xs:documentation>
+                Name of carrier company, e.g. Swift Express, Inc.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="32"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="ChargeType">
+        <xs:annotation>
+            <xs:documentation>
+                Describes an accounting charge. Includes amount, currency, and type of charge.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="MonetaryAmountType">
+                <xs:attribute name="chargeType" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="CityType">
+        <xs:annotation>
+            <xs:documentation>
+                City name.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="20"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="ContactType">
+        <xs:annotation>
+            <xs:documentation>
+                Encapsulates contact information. May specify name, phone, and/or email, as appropriate.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Name" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="Phone" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="Email" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="ContainerNumberType">
+        <xs:annotation>
+            <xs:documentation>
+                Standard ISO-6346 container number. (Note: Actual format is not validated.)
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="11"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CountryCodeType">
+        <xs:annotation>
+            <xs:documentation>
+                Standard 2-letter ISO country code.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:length value="2"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DepartmentType">
+        <xs:annotation>
+            <xs:documentation>
+                Department name or code
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="16"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="EventDateTimeType">
+        <xs:annotation>
+            <xs:documentation>
+                Encapsulates a date and time corresponding to an event. Includes the Olson timezone designator (e.e.g
+                America/New_York) as a mandatory attribute, to ensure the time can be localized appropriately.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="xs:dateTime">
+                <xs:attribute name="timezone" use="required">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:minLength value="1"/>
+                            <xs:maxLength value="30"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="FileNumberType">
+        <xs:annotation>
+            <xs:documentation>
+                Forwarder-defined file # identifying a shipment.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="30"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="FreightClassType">
+        <xs:annotation>
+            <xs:documentation>
+                NMFC Freight Class
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="50"/>
+            <xs:enumeration value="55"/>
+            <xs:enumeration value="60"/>
+            <xs:enumeration value="65"/>
+            <xs:enumeration value="70"/>
+            <xs:enumeration value="77.5"/>
+            <xs:enumeration value="85"/>
+            <xs:enumeration value="92.5"/>
+            <xs:enumeration value="100"/>
+            <xs:enumeration value="110"/>
+            <xs:enumeration value="125"/>
+            <xs:enumeration value="150"/>
+            <xs:enumeration value="175"/>
+            <xs:enumeration value="200"/>
+            <xs:enumeration value="250"/>
+            <xs:enumeration value="300"/>
+            <xs:enumeration value="400"/>
+            <xs:enumeration value="500"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="QuoteNumberType">
+        <xs:annotation>
+            <xs:documentation>
+                Unique quote number obtained via ExWorks Rate API
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="64"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="MonetaryAmountType">
+        <xs:annotation>
+            <xs:documentation>
+                Encapsulates a monetary amount, including currency.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="xs:decimal">
+                <xs:attribute name="currency" use="required">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:length value="3"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="NameType">
+        <xs:annotation>
+            <xs:documentation>
+                Generic name type. Usually used for business name, etc.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="32"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PackagingType">
+        <xs:annotation>
+            <xs:documentation>
+                Describes the packaging used. e.g. CARTONS, SKIDS, BOXES, etc.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="10"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PieceCountType">
+        <xs:annotation>
+            <xs:documentation>
+                Number of pieces being transported.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="1"/>
+            <xs:maxInclusive value="999999"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PortCodeType">
+        <xs:annotation>
+            <xs:documentation>
+                Airport or seaport code. e.g., LAX, USNYC02, etc.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="10"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PostalCodeType">
+        <xs:annotation>
+            <xs:documentation>
+                US or international postal code, as appropriate. e.g. 07432, H7W , etc.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="10"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ScacType">
+        <xs:annotation>
+            <xs:documentation>
+                Standard 4-letter SCAC code.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:length value="4"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ShipmentTypeType">
+        <xs:annotation>
+            <xs:documentation>
+                Determines the type of shipment. e.g. PU=Pickup, DE=Delivery, LH=Linehaul, OT=Other.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="PU"/>
+            <xs:enumeration value="DE"/>
+            <xs:enumeration value="LH"/>
+            <xs:enumeration value="OT"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="StateOrProvinceType">
+        <xs:annotation>
+            <xs:documentation>
+                State abbreviation or province name for addressing.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="16"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="WeightType">
+        <xs:annotation>
+            <xs:documentation>
+                Encapsulates a weight measure, including mandatory units attribute (kgs or lbs)
+            </xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="xs:int">
+                <xs:attribute name="units" use="required">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="lbs"/>
+                            <xs:enumeration value="kgs"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="XtagType">
+        <xs:annotation>
+            <xs:documentation>
+                An X-Tag is a unique 5-letter identifier generated by ExWorks to identify shipments. Typically used for
+                consolidations, but
+                in the future may be extended to other types.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:length value="5"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+    <!-- Commonly Used Composite Data Types -->
+
+    <xs:complexType name="AddressType">
+        <xs:annotation>
+            <xs:documentation>
+                Composite address type, encapsulating all the usual addressing info. Note that city/state are optional,
+                as they can be determined by postal code.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="AddressLine1" type="AddressLineType"/>
+            <xs:element name="AddressLine2" type="AddressLineType" minOccurs="0"/>
+            <xs:element name="City" type="CityType" minOccurs="0"/>
+            <xs:element name="StateOrProvince" type="StateOrProvinceType" minOccurs="0"/>
+            <xs:element name="PostalCode" type="PostalCodeType"/>
+            <xs:element name="CountryCode" type="CountryCodeType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DimensionType">
+        <xs:annotation>
+            <xs:documentation>
+                Encapsulates dimension measurements and piece counts.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="pieces" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:int">
+                    <xs:minExclusive value="0"/>
+                    <xs:maxExclusive value="999999"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="units" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="in"/>
+                    <xs:enumeration value="cm"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="length" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:int">
+                    <xs:minExclusive value="0"/>
+                    <xs:maxExclusive value="99999"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="width" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:int">
+                    <xs:minExclusive value="0"/>
+                    <xs:maxExclusive value="99999"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="height" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:int">
+                    <xs:minExclusive value="0"/>
+                    <xs:maxExclusive value="99999"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="DimensionListType">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element name="Dimension" type="DimensionType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SpecialHandlingType">
+        <xs:annotation>
+            <xs:documentation>
+                Identifies special handling situations. e.g. HazMat, etc.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="handlingCode" use="required">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="hazmat"/>
+                            <xs:enumeration value="tempctl"/>
+                            <xs:enumeration value="oversized"/>
+                            <xs:enumeration value="perishable"/>
+                            <xs:enumeration value="triaxle"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="SpecialHandlingListType">
+        <xs:sequence maxOccurs="unbounded">
+            <xs:element name="SpecialHandling" type="SpecialHandlingType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CargoType">
+        <xs:sequence>
+            <xs:element name="Pieces" type="PieceCountType"/>
+            <xs:element name="Packaging" type="PackagingType"/>
+            <xs:element name="ActualWeight" type="WeightType"/>
+            <xs:element name="Description" type="xs:string"/>
+            <xs:element name="Dimensions" type="DimensionListType" minOccurs="0"/>
+            <xs:element name="FreightClass" type="FreightClassType" minOccurs="0"/>
+            <xs:element name="SpecialHandlings" type="SpecialHandlingListType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="TransactionHeaderType">
+        <xs:annotation>
+            <xs:documentation>
+                Common transaction header uniquely identifying a message transmission.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="transactionId" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string"/>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="transactionDateTime" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:dateTime"/>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="purpose" use="optional">
+            <xs:simpleType>
+                <xs:restriction base="xs:string"/>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="messageRoutingCode" use="optional">
+            <xs:annotation>
+                <xs:documentation>
+                    Partner-specific code to support message routing in multi-homed infrastructures.
+                </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+                <xs:restriction base="xs:string"/>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="ResponseTransactionHeaderType">
+        <xs:complexContent>
+            <xs:extension base="TransactionHeaderType">
+                <xs:attribute name="requestFilename" use="required">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string"/>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="requestTransactionId" use="optional">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string"/>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="UserDefinedValueType">
+        <xs:annotation>
+            <xs:documentation>
+                Optional user-defined tag sent with a shipment. These tags will be echoed back in response messages.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="label" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="UserDefinedValuesType">
+        <xs:annotation>
+            <xs:documentation>
+                A list of user-defined tags.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="UserDefinedValue" type="UserDefinedValueType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ForwarderType">
+        <xs:sequence>
+            <xs:element name="Scac" type="ScacType"/>
+            <xs:element name="Name" type="NameType"/>
+            <xs:element name="Branch" type="BranchType"/>
+            <xs:element name="Department" type="DepartmentType"/>
+            <xs:element name="ContactInfo" type="ContactType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="OriginType">
+        <xs:sequence>
+            <xs:element name="Name" type="NameType"/>
+            <xs:element name="Address" type="AddressType"/>
+            <xs:element name="RatingPortCode" type="PortCodeType" minOccurs="0"/>
+            <xs:element name="AccountNumber" type="AccountNumberType" minOccurs="0"/>
+            <xs:element name="Contact" type="ContactType" minOccurs="0"/>
+            <xs:element name="EstimatedReadyDateTime" type="EventDateTimeType"/>
+            <xs:element name="EstimatedCloseDateTime" type="EventDateTimeType"/>
+            <xs:element name="TruckerPickupNotes" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DestinationType">
+        <xs:sequence>
+            <xs:element name="Name" type="NameType"/>
+            <xs:element name="Address" type="AddressType"/>
+            <xs:element name="RatingPortCode" type="PortCodeType" minOccurs="0"/>
+            <xs:element name="AccountNumber" type="AccountNumberType" minOccurs="0"/>
+            <xs:element name="Contact" type="ContactType" minOccurs="0"/>
+            <xs:element name="RequestedDeliveryDateTime" type="EventDateTimeType" minOccurs="0"/>
+            <xs:element name="TruckerDeliveryNotes" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

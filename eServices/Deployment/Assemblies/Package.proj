@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <PackageProjectImported>true</PackageProjectImported>
+
+    <PackageCommonTasks>$(MSBuildThisFileDirectory)..\package-common.tasks</PackageCommonTasks>
+    <CommonScriptsPath>$(MSBuildThisFileDirectory)..\Common\</CommonScriptsPath>
+    <MSBuildCommonTasks>$(CommonScriptsPath)MSBuildCommon.tasks</MSBuildCommonTasks>
+    <InstallCommonPath>$(MSBuildThisFileDirectory)Install\</InstallCommonPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+
+  <Target Name="bat:package" Returns="$(_TargetZipFilePath)" DependsOnTargets="bat:package:init">
+    <!-- pack common files -->
+    <CallTarget Targets="bat:base-content" />
+
+    <!-- call $(MSBuildProjectFullPath) target to copy content -->
+    <!-- copy-content target expects to be aware of $(_ZipContentsDirectory) variable -->
+    <MSBuild Targets="bat:copy-content" Projects="$(MSBuildProjectFullPath)" Properties="ZipContentsDirectory=$(_ZipContentsDirectory)" />
+
+    <!-- create a zip file and deploy the temporary $(_ZipContentsDirectory) -->
+    <CallTarget Targets="bat:package:zip"/>
+  </Target>
+
+  <Target Name="bat:base-content">
+    <ItemGroup>
+      <CommonFiles Include="$(CommonScriptsPath)**\*" />
+      <InstallCommonFiles Include="$(InstallCommonPath)**\*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(InstallCommonFiles)" DestinationFolder="$(_ZipContentsDirectory)\%(RecursiveDir)" />
+    <Copy SourceFiles="@(CommonFiles)" DestinationFolder="$(_ZipContentsDirectory)\Common\%(RecursiveDir)" />
+  </Target>
+
+</Project>

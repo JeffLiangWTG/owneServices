@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2014 rel. 2 sp1 (x64) (http://www.altova.com) by Katherine Priore (private) -->
+<!--Authored by Celeste Catano (KEWILL) XML SCHEMA version 1.0-->
+<!--Edited by John Greco (SHEA) XML SCHEMA version 1.1-->
+<!--Edited by John Greco (SHEA) XML SCHEMA version 1.2-->
+<!--Edited by Nathan Baylor (AVALON) XML SCHEMA version 1.4-->
+<!--Edited by Nathan Baylor (AVALON) XML SCHEMA version 1.5-->
+<!--Edited by Nathan Baylor (AVALON) XML SCHEMA version 1.8-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="SuretyToBrokerMessage">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="MessageLevelResult" type="MessageLevelResultT"/>
+				<xs:element name="LineLevelResults" type="LineLevelResultT" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="MessageLevelResultT">
+		<xs:sequence>
+			<xs:element name="TransactionIDTypeCode">
+				<xs:annotation>
+					<xs:documentation>1 = Entry Number, 2 = ISF Reference Number </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TransactionID">
+				<xs:annotation>
+					<xs:documentation>Unique Transaction ID based on the Transaction ID Type Code. Do not include spaces, hyphens, slashes or other special characters.
+			
+Valid formats are:
+
+Entry Number: XXXNNNNNNNC
+ISF Transaction Number: Filed by a broker:FFFNNNNNNNNNNN or Filed by an Carrier or Service Center: FFFFNNNNNNNNNNN where FFFF = Filer code / SCAC and NNNNNNNNNNN = Numeric sequence number</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BrokerReferenceNumber">
+				<xs:annotation>
+					<xs:documentation>A reference number provided by the broker/filer that will be returned with the response messages.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="25"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="DispositionCode">
+				<xs:annotation>
+					<xs:documentation>A = Accepted by CBP
+
+E = Data Errors - see attached errors
+
+R = Data Accepted by Surety - Pending Review
+
+X = Bond Rejected by CBP - see attached errors</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SuretyResponseCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Code representing the error or response:
+
+B01 = Surety Rejection – Data Correction Required
+
+B02 = Data Accepted – Pending Underwriting Review
+
+B03 = Data Accepted – Bond Data Sent to CBP
+
+B04 = Review Complete – Bond Data Sent to CBP
+
+B05 = Review Complete – Bond Not Authorized
+
+B06 = Bond Accepted by CBP
+
+B07 = CBP Rejection – Correction Required</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3"/>
+						<xs:minLength value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SuretyResponseDescription" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Description corresponding to SuretyResponseCode.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+						<xs:minLength value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BondDesignationCode">
+				<xs:annotation>
+					<xs:documentation>Echo back what was sent by the broker. A code representing the general purpose of the bond and the action to be taken.  Valid codes are:
+
+B = Add a new basic bond.
+
+A = An additional bond; the bond that secures an AD/CVD, PGA or any other aspect not covered by the basic bond requirement. Applies to a Single Transaction Bond only.
+
+V = Void the Single Transaction Bond on file. 
+
+C = Adjust the bond amount of the Single Transaction Bond on file.
+
+U = Substitute for the bond presented at time of entry. Applies to a Single Transaction Bond only.
+
+E = Supersede the bond presented at time of entry. Applies to a Single Transaction Bond only.
+
+R = Bond Rider to take the following actions: (1) Add Reconciliation Flag, (2) US Virgin Islands.
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SuretyCode">
+				<xs:annotation>
+					<xs:documentation>Surety code as sent on the entry/entry summary/ISF transactions.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3"/>
+						<xs:minLength value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BondAmount">
+				<xs:annotation>
+					<xs:documentation>Bond Amount in whole US dollars. Must be greater than zero.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SuretyReferenceNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This is an option field provided for the Surety/Surety Agent’s internal use. A 9-character self-generated surety reference number that a surety may opt to submit to CBP and have returned, unmodified in the response from CBP.		</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CBPBondNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The CBP number assigned to the bond. </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+						<xs:minLength value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ImporterNumber">
+				<xs:annotation>
+					<xs:documentation>Valid formats for the Principal ID Number are:
+NNNNNNNNNXX Internal Revenue Service (IRS) Number
+YYDDPP NNNNN CBP Assigned Number
+NNN NN NNNN Social Security Number
+In these codes, N = number, X = alphanumeric,
+YY = the last two digits of the calendar year when the number is assigned,
+DDPP = the district/port code where the number is assigned.			</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ImporterName">
+				<xs:annotation>
+					<xs:documentation>Importer name returned from CBP.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SuretyContactName" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The name of a contact at the surety/surety agent who can be contacted if there are issues/questions with processing the bond.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SuretyContactEmail" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The email address of a contact at the surety/surety agent who can be contacted if there are issues/questions with processing the bond.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SuretyContactPhone" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The phone number of a contact at the surety/surety agent who can be contacted if there are issues/questions with processing the bond.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="MessageLevelReasonCodes" type="ProcessingResultT" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LineLevelResultT">
+		<xs:sequence>
+			<xs:element name="LineNo" type="xs:int"/>
+			<xs:element name="HTSNumber" type="xs:string" minOccurs="0"/>
+			<xs:element name="LineLevelReasonCodes" type="ProcessingResultT" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProcessingResultT">
+		<xs:sequence>
+			<xs:element name="ReasonCode" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Reason why corresponding SuretyResponseCode was generated.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ReasonDescription" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Description of the corresponding ReasonCode.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bat:package">
+
+  <PropertyGroup>
+    <_ProjectId>BindingInfos</_ProjectId>
+    <OutputPath>..\..\Bin\</OutputPath>
+    <BinPath>$(MSBuildThisFileDirectory)$(OutputPath)</BinPath>
+    <DeploymentRootPath>$(BinPath)Deployment\</DeploymentRootPath>
+    <CommonScriptsPath>$(DeploymentRootPath)Common\</CommonScriptsPath>
+    <OperationBindingsPath>$(MSBuildThisFileDirectory)..\..\..\Operation\Bindings\</OperationBindingsPath>
+    <TargetBindingsPath>$(MSBuildThisFileDirectory)..\..\Deploy\BizTalk\Bindings\</TargetBindingsPath>
+    <Profile>Production</Profile>
+
+    <TokenizeTasksPath>$(MSBuildThisFileDirectory)..\Tokenize\</TokenizeTasksPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(CommonScriptsPath)MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(DeploymentRootPath)package-common.tasks</PackageCommonTasks>
+    <TokenizeTasks>$(TokenizeTasksPath)Tokenize.tasks</TokenizeTasks>
+    <BuilderConfigProps>$(MSBuildThisFileDirectory)BuilderConfig.props</BuilderConfigProps>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+  <Import Project="$(TokenizeTasks)" Condition="'$(TokenizeTasksImported)'==''" />
+  <Import Project="$(BuilderConfigProps)" Condition="'$(BuilderConfigPropsImported)'==''" />
+
+  <Target Name="bat:package" Returns="$(_TargetZipFilePath)">
+    <CallTarget Targets="bat:package:init" />
+
+    <ItemGroup>
+      <BindingFiles Include="$(OperationBindingsPath)**\*.xml" />
+    </ItemGroup>
+
+    <!-- Copy and process binding files -->
+    <Copy SourceFiles="@(BindingFiles)" DestinationFolder="$(_ZipContentsDirectory)\%(RecursiveDir)" />
+
+    <!-- a dozen of file names are too long exceeded max windows allowed 260 characters when combined with folder path -->
+    <!-- they have to be shortened to avoid build errors -->
+    <!-- the file names are not important because the contents will be merged all together to a final bindingInfo.xml file -->
+    <CallTarget Targets="files:shorten-names" />
+
+    <!-- tokenize the work in process xml files -->
+    <CallTarget Targets="this:tokenize" />
+
+    <!-- Create package -->
+    <CallTarget Targets="bat:package:zip"/>
+
+    <!-- open the result zip file -->
+    <Exec Command="start $(_TargetZipFilePath)" />
+  </Target>
+  
+  <Target Name="files:shorten-names">
+    <ItemGroup>
+      <BindingFiles Include="$(_ZipContentsDirectory)\**\*.xml" />
+    </ItemGroup>
+
+    <Message Text="Shorten file names, please wait..." Importance="High" />
+    <ShortenFileNames Files="@(BindingFiles)" />
+  </Target>
+
+  <Target Name="this:tokenize" Returns="@(ProcessedFiles)">
+    <PropertyGroup>
+      <AssemblyReferencesFilePath>$(_ZipContentsDirectory)\AssemblyFiles.json</AssemblyReferencesFilePath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <TokenFiles Include="$(_ZipContentsDirectory)\**\*.xml" />
+    </ItemGroup>
+
+    <Message Text="Tokenizing xml files under $(_ZipContentsDirectory), please wait..." Importance="High" />
+    <Tokenize XmlFiles="@(TokenFiles)" JsonXPathFilePath="$(JsonXPathFilePath)" AssemblyReferencesFilePath="$(AssemblyReferencesFilePath)" Profile="$(Profile)">
+      <Output TaskParameter="ProcessedFiles" ItemName="ProcessedFiles" />
+    </Tokenize>
+  </Target>
+
+  <Target Name="tfs:update">
+
+    <!-- validate the json xpath config -->
+    <CallTarget Targets="validate:xpath-json-config" />
+
+    <!-- make sure no pending changes if no flag $(IgnorePendingChanges) specified-->
+    <MSBuild.ExtensionPack.VisualStudio.TfsSource
+      TaskAction="GetPendingChanges"
+      ItemPath="$(TargetBindingsPath)">
+      <Output TaskParameter="PendingChangesExistItem" ItemName="PendingChanges" />
+    </MSBuild.ExtensionPack.VisualStudio.TfsSource>
+    <Error Text="You have uncommitted pending changes. You may choose to undo your pending changes or set flag /p:IgnorePendingChanges=true to continue" Condition="(@(PendingChanges->Count()) > 0) and ('$(IgnorePendingChanges)'=='')" />
+
+    <Message Text="Checking out $(TargetBindingsPath) for update" Importance="High" />
+    <MSBuild.ExtensionPack.VisualStudio.TfsSource
+      TaskAction="Checkout"
+      ItemPath="$(PendingChanges)"
+      Version="2017"
+      Recursive="true"
+      ContinueOnError="true" />
+
+    <!-- pack the operational binding files -->
+    <CallTarget Targets="bat:package">
+      <Output
+          TaskParameter="TargetOutputs"
+          PropertyName="BindingsZipFilePath" />
+    </CallTarget>
+
+    <!-- delete all files under for unzip to succeed -->
+    <MSBuild.ExtensionPack.FileSystem.Folder TaskAction="RemoveContent" Path="$(TargetBindingsPath)"/>
+
+    <Message Text="Updating $(TargetBindingsPath) with processed files from OperationBindingsPath" Importance="High" />
+
+    <!--
+      msbuild unzip has an issue to produce warning when unable to create a new folder at the destination if not exist,
+      but actually created if file under has been copied over successfully -->
+    <Unzip
+      SourceFiles="$(BindingsZipFilePath)"
+      DestinationFolder="$(TargetBindingsPath)"
+      SkipUnchangedFiles="true"
+      OverwriteReadOnlyFiles="true"
+      ContinueOnError="true" />
+
+    <Message Text="Get list of updated files" Importance="High" />
+    <ItemGroup>
+      <PendingChanges Remove="@(PendingChanges)" />
+    </ItemGroup>
+    <MSBuild.ExtensionPack.VisualStudio.TfsSource
+      TaskAction="GetPendingChanges"
+      ItemPath="$(TargetBindingsPath)">
+      <Output TaskParameter="PendingChangesExistItem" ItemName="PendingChanges" />
+    </MSBuild.ExtensionPack.VisualStudio.TfsSource>
+
+    <Message Text="Please review the following updated files:" Importance="High" Condition="@(PendingChanges->Count()) > 0" />
+    <Message Text="%(PendingChanges.Identity)" Condition="@(PendingChanges->Count()) > 0" />
+  </Target>
+
+  <Target Name="tfs:checkout">
+    <Message Text="Tfs checkout: $(TargetBindingsPath)" Importance="High" />
+
+    <MSBuild.ExtensionPack.VisualStudio.TfsSource
+      TaskAction="Checkout"
+      ItemPath="$(TargetBindingsPath)"
+      Version="2017"
+      Recursive="true"
+      ContinueOnError="true" />
+
+  </Target>
+
+  <UsingTask
+    TaskName="ShortenFileNames"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+
+    <Task>
+    <![CDATA[
+      Add-Type -AssemblyName "Microsoft.Build.Framework"
+      [regex]$rgx="^(.*)((\d+\.){3}\d+)(.*)$"
+
+      $Files | % {
+        $filePath = $_.GetMetadata("Identity")
+        $file = Get-Item $filePath
+
+        $baseName = $file.BaseName
+        $fullName = $file.FullName
+
+        if ($baseName.Length -gt 128) {
+          $match = $rgx.Match($baseName)
+          if ($match.Success) {
+            $shortName = ("{0}{1}{2}" -f $match.Groups[2].Value, $match.Groups[4].Value, $file.Extension)
+            $dir = $file.Directory.FullName
+            $destFilePath = Join-Path $dir $shortName
+
+            Move-Item -Path $fullName -Destination $destFilePath
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "$dir")
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", ">> $baseName")
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", ">> $shortName")
+
+            if (-not (Test-Path $destFilePath)) { throw "failed to copy file: $fullName" }
+          }
+        }
+      }
+    ]]>
+    </Task>
+
+  </UsingTask>
+
+  <UsingTask
+    TaskName="ExtractZipFile"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <ZipFilePath ParameterType="System.String" Required="true" />
+      <DestinationFolder ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        [string] $destDir = $DestinationFolder
+        if (([string]::IsNullOrEmpty($destDir)) -or (-not [System.IO.File]::Exists($destDir))) {
+          $destDir = (Get-Item $ZipFilePath).Directory.FullName
+        }
+
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        [System.IO.Compression.ZipFile]::ExtractToDirectory($ZipFilePath, $destDir)
+      ]]>
+    </Task>
+
+  </UsingTask>
+</Project>

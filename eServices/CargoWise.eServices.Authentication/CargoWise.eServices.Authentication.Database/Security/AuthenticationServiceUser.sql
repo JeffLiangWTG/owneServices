@@ -1,0 +1,1 @@
+﻿CREATE USER [AuthenticationService] FOR LOGIN [AuthenticationService];

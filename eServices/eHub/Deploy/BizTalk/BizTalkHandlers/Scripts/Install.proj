@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="install">
+
+  <PropertyGroup>
+    <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(ProgramFiles)\MSBuild\ExtensionPack\4.0\</MSBuildExtensionsPackPath>
+    <MSBuildExtensionsPackPath Condition="!Exists('$(MSBuildExtensionsPackPath)')">$(ProgramFiles)\MSBuildExtensionPack\4.0\</MSBuildExtensionsPackPath>
+    <DeployCommonPath Condition="'$(DeployCommonPath)' == ''">$(MSBuildThisFileDirectory)Common\</DeployCommonPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks" Condition="'$(BuildPath)'==''"/>
+
+  <Import Project="$(MSBuildThisFileDirectory)Profiles\Profiles.tasks" Condition="'$(ProfilesIncluded)' == ''"/>
+  <Import Project="$(DeployCommonPath)Deploy.tasks" Condition="'$(DeployCommonImported)'==''"/>
+  <Import Project="$(MSBuildThisFileDirectory)\BizTalkCommon\BizTalkCommon.tasks" Condition="'$(BizTalkCommonImported)' == ''"/>
+
+  <Target Name="install">
+    <CallTarget Targets="CreateHostsAndInstances;CreateHandlers" />
+  </Target>
+
+</Project>

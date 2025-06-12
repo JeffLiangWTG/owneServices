@@ -1,0 +1,44 @@
+﻿@page "/storage/{owner}"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject IDbContextFactory<DmsStorageContext> DbFactory
+@implements IAsyncDisposable
+
+<PageTitle>@Owner Storage</PageTitle>
+
+<h1/>
+<h1>@Owner Storage</h1>
+
+<p>
+    <a href="storage/create/@Owner">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.DmsStorageCatalog.Where(c => c.SC_Schema == Owner && !c.SC_DeleteTime.HasValue).OrderBy(c => c.SC_Name)">
+    <PropertyColumn Property="table => table.SC_Name" Title="Table Name" Sortable="true" />
+    <PropertyColumn Property="table => table.SC_Type" Title="Type" />
+    <PropertyColumn Property="table => table.SC_Version" Title="Version" />
+    <PropertyColumn Property="table => table.SC_ExpirationDays" Title="Expiration Days" />
+    <PropertyColumn Property="table => table.SC_CreateTime" Format="u" Title="Create Time" />
+    <PropertyColumn Property="table => table.SC_CreateUser" Title="Create User"/>
+
+    <TemplateColumn Context="table">
+        <a href="@($"storage/{Owner}/edit/{table.SC_Name}")" >Edit</a> |
+        <a href="@($"storage/{Owner}/details/{table.SC_Name}")">Details</a> |
+        <a href="@($"storage/{Owner}/delete/{table.SC_Name}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    [Parameter]
+    public required string Owner { get; set; }
+
+    DmsStorageContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

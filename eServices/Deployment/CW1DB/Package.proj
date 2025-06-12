@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <CW1DBPackageProjImported>True</CW1DBPackageProjImported>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(MSBuildThisFileDirectory)..\package-common.tasks</PackageCommonTasks>
+    <SqlHelpersProject>$(MSBuildThisFileDirectory)..\Helpers\SqlCmdHelpers.proj</SqlHelpersProject>
+    <SqlHelpersProject Condition="!Exists('$(SqlHelpersProject)')">$(MSBuildThisFileDirectory)\SqlCmdHelpers.proj</SqlHelpersProject>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+
+  <!-- package latest CW1 database backup, file info together with Deploy.proj and deployment prop files -->
+  <Target Name="bat:package" Returns="$(_TargetZipFilePath)" DependsOnTargets="Build">
+    <Error Text="Please specify a value for FromBackupFilePath so as to pack up for deployment" Condition="'$(FromBackupFilePath)'==''" />
+    <Error Text="Please specify a value for TargetDatabaseName" Condition="'$(TargetDatabaseName)'==''" />
+    <CallTarget Targets="bat:package:init"/>
+
+    <PropertyGroup>
+      <TargetBackupFileName Condition="'$(TargetBackupFileName)'==''">$(TargetDatabaseName).bak</TargetBackupFileName>
+
+      <OutputDirectory>$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(OutputPath)'))</OutputDirectory>
+      <OutputDirectory>$([System.IO.Path]::GetFullPath('$(OutputDirectory)'))</OutputDirectory>
+
+      <CW1ExeFileInfoPath>$([System.IO.Path]::Combine('$(OutputDirectory)', 'CW1ExeFileInfo.txt'))</CW1ExeFileInfoPath>
+      <BackupFilePath>$([System.IO.Path]::Combine('$(OutputDirectory)', '$(BackupFileName)'))</BackupFilePath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_DeploymentFiles Include="$(MSBuildProjectDirectory)\Deployment\**\*"/>
+      <_DeploymentProject Include="$(DeploymentProjectPath)" />
+      <_DeploymentProject Include="$(MSBuildCommonTasks)" />
+    </ItemGroup>
+
+    <RemoveDir Directories="$(_ZipContentsDirectory)" />
+
+    <!-- Copy Deployment files -->
+    <Copy SourceFiles="@(_DeploymentFiles)"
+          DestinationFolder="$(_ZipContentsDirectory)\Deployment\%(RecursiveDir)"/>
+
+    <!-- Copy Deployment project -->
+    <Copy SourceFiles="@(_DeploymentProject)"
+          DestinationFolder="$(_ZipContentsDirectory)"/>
+
+    <!-- artifacts -->
+    <Copy SourceFiles="$(BackupFilePath)"
+          DestinationFiles="$(_ZipContentsDirectory)\$(TargetBackupFileName)"/>
+    <Copy SourceFiles="$(CW1ExeFileInfoPath)"
+          DestinationFolder="$(_ZipContentsDirectory)"/>
+
+    <!-- Copy the SqlHelpersProject project to use as utility-->
+    <Copy SourceFiles="$(SqlHelpersProject)"
+          DestinationFolder="$(_ZipContentsDirectory)"/>
+
+    <!-- Create package -->
+    <CallTarget Targets="bat:package:zip"/>
+  </Target>
+</Project>

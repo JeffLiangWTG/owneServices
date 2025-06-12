@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="test">
+
+  <PropertyGroup>
+    <DeploymentRoot Condition="'$(DeploymentRoot)'==''">$(MSBuildThisFileDirectory)</DeploymentRoot>
+    <SourcePath Condition="'$(SourcePath)'==''">$(MSBuildThisFileDirectory)</SourcePath>
+    <SourcePath Condition="$(SourcePath.EndsWith('\\'))">$(SourcePath.TrimEnd('\\'))</SourcePath>
+    <BinDir Condition="'$(BinDir)'==''">$(SourcePath)\Bin</BinDir>
+  </PropertyGroup>
+
+  <!-- test main -->
+  <Target Name="test">
+    <CallTarget Targets="test:all-fixtures" Condition="'$(TestProject)'==''" />
+    <CallTarget Targets="test:single-test" Condition="'$(TestProject)'!=''" />
+  </Target>
+
+  <!-- without /p:TestProject specified from command line, discover all *-Fixtures.proj to execute -->
+  <Target Name="test:all-fixtures">
+    <ItemGroup>
+      <ExcludeProjects Include="$(BinDir)\**\*-Fixtures.proj" />
+      <TestProjects Include="$(SourcePath)**\*-Fixtures.proj" Exclude="@(ExcludeProjects)" />
+    </ItemGroup>
+
+    <Warning Text="No test projects found under source path: '$(SourcePath)'" Condition="@(TestProjects->Count()) == 0" />
+    <Message Text="%(TestProjects.Identity)" Condition="@(TestProjects->Count()) &gt; 0" />
+    <MSBuild Targets="test" Projects="@(TestProjects)" Properties="DeploymentRoot=$(DeploymentRoot)" Condition="@(TestProjects->Count()) &gt; 0" />
+  </Target>
+
+  <!-- from command line, provide /p:TestProject=~some-Fixture.proj to test on single test project -->
+  <Target Name="test:single-test">
+    <Message Text="Testing $(TestProject)" Importance="high" />
+    <Error Text="Test project '$(TestProject)' not found" Condition="!Exists('$(TestProject)')" />
+    <MSBuild Targets="test" Projects="$(TestProject)" Properties="DeploymentRoot=$(DeploymentRoot);TestProject=$(TestProject)" Condition="'$(TestProject)' != '' and Exists('$(TestProject)')" />
+  </Target>
+
+</Project>

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>
+    <CommonPowershellFunctionsFilePath>$(RootDirectory)..\..\CommonScripts\Common.ps1</CommonPowershellFunctionsFilePath>
+    <CommonPowershellFunctionsFilePath Condition="Exists('$(RootDirectory)Common.ps1')">$(RootDirectory)Common.ps1</CommonPowershellFunctionsFilePath>
+    <MSBuildExtensionsPackPath>C:\Program Files (x86)\MSBuildExtensionPack\4.0</MSBuildExtensionsPackPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props" Condition="'$(_DeploymentPropsImported)'==''"/>
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Deployment.props" Condition="'$(Profile)' != '' and '$(_ProfilePropsImported)'==''"/>
+
+  <UsingTask TaskName="CopyFile" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <LocalPath ParameterType="System.String" />
+      <TargetPath ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+			      $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword).Session
+			      Try
+			      {
+              $TargetPath = $TargetPath.TrimEnd('\') + '\'
+              $LocalPath = $LocalPath.TrimEnd('\')
+              Invoke-Command -Session $session -ScriptBlock {New-Item -ItemType Directory -Force -Path "$args"} -ArgumentList "$TargetPath"
+              Copy-Item -ToSession $session $LocalPath -Destination $TargetPath -Recurse -Force
+			      }
+			      Finally
+			      {
+				      #$session | Remove-PSSession
+			      }
+            ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="RemoteServiceController" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <ServiceName ParameterType="System.String" />
+      <Action ParameterType="System.String" />
+      <ExitCode Output="true"/>
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+			      $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword).Session
+			      Try
+			      {
+              switch($Action) {
+                'Start' {
+                    $r = Invoke-Command -Session $session -ScriptBlock {
+                        $service = Get-Service "$args"
+                        $service | Start-Service
+                        if ($service.Status -like "Running") {return 0} else {return 1}
+                    } -ArgumentList "$ServiceName"
+                    $ExitCode = "$r"
+                    break
+                } 
+                'Stop' {
+                    
+                    $r = Invoke-Command -Session $session -ScriptBlock {
+                        $service = Get-Service "$args"
+                        $service | Stop-Service
+                        if ($service.Status -like "Stopped") {return 0} else {return 0}
+                    } -ArgumentList "$ServiceName"
+                    $ExitCode = "$r"
+                    break
+                } 
+                default {
+                    Write-Error "Invalid Action!"
+                    $ExitCode = 1;
+                    break
+                } 
+              }
+			      }
+			      Finally
+			      {
+				      $session | Remove-PSSession
+			      }
+            ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="RemoteRegisterAssembly" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <TargetDirectory ParameterType="System.String" />
+      <AssemblyName ParameterType="System.String" />
+      <Unregister ParameterType="System.String" />
+      <ExitCode Output="true"/>
+      <Output Output="true"/>
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+      $ExitCode = 1
+      $Output = "0"
+      try
+      {
+        . $(CommonPowershellFunctionsFilePath)
+        $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword).Session
+        try
+        {
+            $invokeparameter = @{
+                Session = $session
+                ArgumentList = $TargetDirectory, $AssemblyName, $Unregister
+                ScriptBlock = { 
+                    Param ($TargetDirectory , $AssemblyName, $Unregister)
+                    $Command = "&`"$TargetDirectory\RegAsm.exe`" `"$TargetDirectory\$AssemblyName`" /codebase /tlb /verbose"
+                    if ([boolean]$Unregister) {
+                      $Command = $Command + " /Unregister"
+                    }
+                    Invoke-Expression $Command -OutVariable output -ErrorVariable errors
+                    return @($Command) + $output + $errors
+                }
+            }
+            $r = Invoke-Command @invokeparameter
+
+            $errors = $r | ?{$_ -like "*error*"} 
+
+            $ExitCode = $errors.Count
+            $t = $r | ForEach-Object  { "$_`r`n" } 
+            $Output = "$t"
+        }
+        catch
+        {
+          $ExitCode = 1
+          $Output = "$_!"
+        }
+			  Finally
+			  {
+				  $session | Remove-PSSession
+			  }
+      }
+      catch
+      {
+        $ExitCode=1
+        $Output = "$_!"
+      }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <Target Name="pre:deploy" BeforeTargets="bat:deploy">
+
+    <Copy SourceFiles="%(Component.Assemblies)" DestinationFolder="$(RootDirectory)\$(InterfaceName)\%(Component.Identity)"/>
+    <RemoteServiceController
+        MachineName="$(ServerName)"
+        UserName="$(UserName)"
+        UserPassword="$(Password)"
+        ServiceName="xtservice"
+        Action="Stop">
+      <Output TaskParameter="ExitCode" PropertyName="StopServiceExitCode"/>
+    </RemoteServiceController>
+    <Error Condition="'$(StopServiceExitCode)' != 0" Text="Failed to stop service."/>
+
+  </Target>
+
+  <PropertyGroup>
+    <_OutputDirectory Condition="'$(_OutputDirectory)'==''">$(MSBuildProjectDirectory)\bin</_OutputDirectory>
+    <TargetFileName Condition="'$(TargetFileName)'==''">XH.Framework.Mapping.dll"</TargetFileName>
+  </PropertyGroup>
+  
+  <Target Name="bat:deploy">
+    <Message text="Unregistering Com Component : ServerName:$(ServerName) UserName:$(UserName) DestinationDirectory:$(DestinationDirectory) AssemblyName:$(TargetFileName) "></Message>
+    <RemoteRegisterAssembly
+        MachineName="$(ServerName)"
+        UserName="$(UserName)"
+        UserPassword="$(Password)"
+        TargetDirectory="$(DestinationDirectory)"
+        AssemblyName="$(TargetFileName)"
+        Unregister="$True">
+      <Output TaskParameter="ExitCode" PropertyName="UnregisterExitCode"/>
+    </RemoteRegisterAssembly>
+    <Message text="==========================================="></Message>
+    <Message text="$(_OutputDirectory)\"></Message>
+    <Message text="==========================================="></Message>
+    <CopyFile
+        MachineName="$(ServerName)"
+        UserName="$(UserName)"
+        UserPassword="$(Password)"
+        LocalPath="$(_OutputDirectory)\*"
+        TargetPath="$(DestinationDirectory)" />
+    <CopyFile
+        MachineName="$(ServerName)"
+        UserName="$(UserName)"
+        UserPassword="$(Password)"
+        LocalPath="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Files\*"
+        TargetPath="$(DestinationDirectory)" />
+    <CopyFile
+        MachineName="$(ServerName)"
+        UserName="$(UserName)"
+        UserPassword="$(Password)"
+        LocalPath="$(MSBuildThisFileDirectory)RegAsm.exe"
+        TargetPath="$(DestinationDirectory)" />
+
+    <Message text="Registering Com Component : ServerName:$(ServerName) UserName:$(UserName) RootDirectory:$(RootDirectory) DestinationDirectory:$(DestinationDirectory) "></Message>
+    <RemoteRegisterAssembly
+        MachineName="$(ServerName)"
+        UserName="$(UserName)"
+        UserPassword="$(Password)"
+        TargetDirectory="$(DestinationDirectory)"
+        AssemblyName="$(TargetFileName)">
+      <Output TaskParameter="ExitCode" PropertyName="RegisterExitCode"/>
+      <Output TaskParameter="Output" PropertyName="RegisterOutput"/>
+    </RemoteRegisterAssembly>
+
+    <Error Condition="'$(RegisterExitCode)' != 0" Text="$(RegisterOutput)"/>
+    <Message Condition="'$(RegisterExitCode)' == 0" Text="$(RegisterOutput)"/>
+
+  </Target>
+
+  <Target Name="post:deploy" AfterTargets="bat:deploy">
+    <RemoteServiceController
+        MachineName="$(ServerName)"
+        UserName="$(UserName)"
+        UserPassword="$(Password)"
+        ServiceName="xtservice"
+        Action="Start">
+      <Output TaskParameter="ExitCode" PropertyName="StartServiceExitCode"/>
+    </RemoteServiceController>
+    <Error Condition="'$(StartServiceExitCode)' != 0" Text="Failed to start service. ServiceName:xtservice, MachineName=$(ServerName)"/>
+  </Target>
+
+</Project>

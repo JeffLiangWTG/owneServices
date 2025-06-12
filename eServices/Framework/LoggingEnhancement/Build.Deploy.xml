@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DatDeploy xmlns="http://eservices.buildtools/datdeploy">
+  <Targets>
+    <Target Name="eServices.LoggingEnhancement.Log4netImpl"
+            Command="%CMD_PUBLISH_PACKAGE%"
+            Settings="API_KEY=$(Secrets:PROGET_API_KEY);PKG_PATH=%DAT_BIN_PATH%\*.nupkg" />
+    <Target Name="eServices.LoggingEnhancement.Log4netImpl-Prerelease"
+            Command="%CMD_PUBLISH_PACKAGE_PRERELEASE%"
+            Settings="API_KEY=$(Secrets:PROGET_API_KEY);PKG_PATH=%DAT_BIN_PATH%\*.nupkg" />
+  </Targets>
+  <Settings>
+    <Add Name="CMD_PUBLISH_PACKAGE">
+      <![CDATA[powershell "dir $env:PKG_PATH -Exclude *-rc[.0-9]*.nupkg | sort | select -last 1 | %% { dotnet nuget push $_.FullName --source https://proget.wtg.zone/nuget/WTG-Internal/ --api-key $env:API_KEY --skip-duplicate }"]]>
+    </Add>
+    <Add Name="CMD_PUBLISH_PACKAGE_PRERELEASE">
+      <![CDATA[powershell "dir $env:PKG_PATH -Include *-rc[.0-9]*.nupkg | sort | select -last 1 | %% { dotnet nuget push $_.FullName --source https://proget.wtg.zone/nuget/WTG-Internal/ --api-key $env:API_KEY --skip-duplicate }"]]>
+    </Add>
+  </Settings>
+  <Secrets>
+    <Add Name="PROGET_API_KEY" Value="nk+r5IbnfDgXKpdZC3lP2lxtAjM3Mk+Unj4zb3tirQ5oQx272c1wp/Tr9tVRgInATkz40SIEi+CsECp5PhZncsfUxcfUzFJ7yDTvGbSMeUSWbC8Dd5UjY6XN41qF4I1ptaK6fBgaQvl1Z0BFjj50iZtroLvM0PWjHWf/hzYzRmk=" />
+  </Secrets>
+</DatDeploy>

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<Build xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" MSBuild="17.0"
+  xmlns="http://wisetechglobal.com/DevTools/Build.xsd">
+  <Cleanup>
+    <Item>packages\NUnit3TestAdapter</Item>
+  </Cleanup>
+  <Solutions>
+    <Solution Filename="eHub.DatImplementation.sln" />
+  </Solutions>
+  <PreBuild>
+    <Command>setup.cmd</Command>
+  </PreBuild>
+  <BuildConfigurations>
+    <Configuration BuildOnDat="true" TestOnDat="true">DEBUG</Configuration>
+    <Configuration BuildOnDat="true" Publishable="true">RELEASE</Configuration>
+  </BuildConfigurations>
+  <Dependencies>
+	<Dependency Repository="https://devops.wisetechglobal.com/wtg/Shared/_git/WTG.DeploymentUtils">
+		<Copy Source="WTG.DeploymentUtils.dll" Target="Dependencies"/>   
+	</Dependency>
+  </Dependencies>
+  <DatSettings BuildDeployerType="eHub.DatImplementation.Deployment.BuildDeployer, eHub.DatImplementation.Deployment" IntegrationAssembliesSubdir="DAT">
+    <TestAdapters>
+      <TestAdapter Key="NUnit" Type="Dat.Implementation.NUnit3.NUnit3TestAdapter, Dat.Implementation.NUnit3">
+        <Options>
+          <Option Name="TestAssemblyAnyItemFilter">nunit</Option>
+        </Options>
+      </TestAdapter>
+    </TestAdapters>
+  </DatSettings>
+</Build>

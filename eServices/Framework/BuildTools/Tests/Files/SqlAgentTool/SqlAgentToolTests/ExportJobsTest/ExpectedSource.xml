@@ -1,0 +1,217 @@
+﻿<Source>
+  <Folder Name="AlertBlockedProcess">
+    <File Name="SendAlert.sql"><![CDATA[SET ANSI_NULLS, QUOTED_IDENTIFIER ON;
+
+DECLARE @errorPK uniqueidentifier = NEWID();
+DECLARE @source varchar(3) = 'SQL';
+DECLARE @errorType varchar(3) = 'Fai';
+DECLARE @inboxPK varchar(36) = NULL;
+DECLARE @currentDateTimeUTC varchar(32) = convert(varchar(32), getutcdate(), 127);
+DECLARE @issueMessageDelimiter nvarchar(50) = '
+----------BIZTALK PROPERTIES----------
+';
+
+DECLARE @description nvarchar(max);
+DECLARE @textData nvarchar(max);
+DECLARE @graphXml xml;
+DECLARE @issueManagerKey nvarchar(max);
+DECLARE @clientAppName nvarchar(max);
+DECLARE @hostname nvarchar(max);
+
+SET @textData = REPLACE('$(ESCAPE_NONE(WMI(TextData)))', '&#x0A;', CHAR(10));
+SET @graphXml = @textData
+
+DECLARE @databaseName nvarchar(1000) = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/@currentdbname)[1]', 'nvarchar(1000)');
+DECLARE @logMessage nvarchar(max) = 'Blocked Process in database [' + @databaseName + ']: ' + @textData;
+DECLARE @pos int = 1, @len int = 1000;
+WHILE @pos <= LEN(@logMessage) BEGIN PRINT SUBSTRING(@logMessage, @pos, @len); SET @pos += @len; END
+IF @databaseName NOT IN ('BAMArchive','BAMPrimaryImport','BizTalkDTADb','BizTalkMgmtDb','BizTalkMsgBoxDb','SSISDB','SSODB')
+  RETURN;
+
+SELECT @issueManagerKey = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/inputbuf)[string-length()>0][1]', 'nvarchar(max)');
+
+IF @issueManagerKey IS NULL
+BEGIN
+	SET @clientAppName = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/@clientapp)[1]', 'nvarchar(max)');
+	SET @hostname = @graphXml.value('(/TextData/blocked-process-report/blocked-process/process/@hostname)[1]', 'nvarchar(max)');
+	SET @issueManagerKey = CONCAT(@clientAppName, '-', @hostname);
+END
+
+IF @issueManagerKey = '-'
+BEGIN
+	SET @issueManagerKey = @graphXml.value('(/TextData/blocked-process-report/blocking-process/process/inputbuf)[string-length()>0][1]', 'nvarchar(max)');
+END
+
+IF @issueManagerKey IS NULL
+BEGIN
+	SET @clientAppName = @graphXml.value('(/TextData/blocked-process-report/blocking-process/process/@clientapp)[1]', 'nvarchar(max)');
+	SET @hostname = @graphXml.value('(/TextData/blocked-process-report/blocking-process/process/@hostname)[1]', 'nvarchar(max)');
+	SET @issueManagerKey = CONCAT(@clientAppName, '-', @hostname);
+END
+
+SET @issueManagerKey = REPLACE(CONCAT('Blocked process: ', @issueManagerKey), CHAR(10), ' ')
+WHILE CHARINDEX('  ', @issueManagerKey) > 0 SET @issueManagerKey = REPLACE(@issueManagerKey, '  ', ' ')
+SET @description = CONCAT(@issueManagerKey, @issueMessageDelimiter, 'SERVERNAME: $(ESCAPE_NONE(A-SVR))', CHAR(10), 'REPORT:', CHAR(10),  @textData);
+
+EXECUTE [eHubTransactionsServer].[eHubTransactions].[dbo].[InsertError] 
+	 @ErrorPK = @errorPK
+	,@Source = @source
+	,@ErrorType = @errorType
+	,@Description = @description
+	,@InboxPK = @inboxPK
+	,@CurrentDateTimeUTC = @currentDateTimeUTC;
+
+PRINT 'Sent to issue manager.'
+]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>AlertBlockedProcess</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>No description available.</Description>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="SendAlert" Command="SendAlert.sql" Type="SQL" Database="msdb" />
+  </Steps>
+  <Schedules />
+  <Alerts>
+    <Alert Name="BlockedProcess" Enabled="true" WmiNamespace="\\.\root\Microsoft\SqlServer\ServerEvents\INSTANCE1" WmiQuery="SELECT * FROM BLOCKED_PROCESS_REPORT" />
+  </Alerts>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="BackupBizTalkServerBizTalkMgmtDb">
+    <File Name="BackupBindings.ps1"><![CDATA[$bkpDir = "c:\BizTalk\Backups\{0:yyyyMMdd}\" -f (get-date)
+if (Test-Path $bkpDir) { del $bkpDir\*.* -Force }
+md $bkpDir
+cd $bkpDir
+
+&BTSTask.exe ExportBindings -Server:localhost -Database:BizTalkMgmtDb -ApplicationName:CargoWise.eHub -Destination:("CargoWise.eHub.BindingInfo.xml") -GlobalParties
+
+del ($env:TEMP + "\tmp*.cab")
+]]></File>
+    <File Name="BackupFull.sql"><![CDATA[exec [dbo].[sp_BackupAllFull_Schedule] 
+	'd' /* Frequency */, 
+	'BTS' /* Name */, 
+	'\\sydwp-sbak-2.wisecloud.zone\Other\Non_DPM_ToTape\WormHole\BIZTLK' /* location of backup files */, 
+	0 /* Force full backup after partial failure */,
+	21 /* backup hour */,
+	1 /* use local time */
+]]></File>
+    <File Name="BackupFull.Staging.sql"><![CDATA[declare @path nvarchar(250) = 'C:\BizTalk\Backups\' + CONVERT(char(8), GETDATE(), 112)
+
+exec [dbo].[sp_ForceFullBackup]
+
+exec [dbo].[sp_BackupAllFull_Schedule] 
+'d' /* Frequency */, 
+'BTS' /* Name */, 
+@path /* location of backup files */
+]]></File>
+    <File Name="CheckIsPrimary.sql"><![CDATA[IF sys.fn_hadr_is_primary_replica('BizTalkMgmtDb') = 0
+	RAISERROR('Instance is secondary replica',11,0)
+]]></File>
+    <File Name="ClearBackupHistory.sql"><![CDATA[exec [dbo].[sp_DeleteBackupHistoryAndMarkLogsHistory] @DaysToKeep=14
+]]></File>
+    <File Name="DeleteOldBackups.ps1"><![CDATA[dir "C:\BizTalk\Backups" | where PSIsContainer | sort -descending | select -skip 7 | del -recurse
+]]></File>
+    <File Name="MarkAndBackupLog.sql"><![CDATA[exec [dbo].[sp_MarkAll] 'BTS' /*  Log mark name */, 
+		      '\\sydwp-sbak-2.wisecloud.zone\Other\Non_DPM_ToTape\WormHole\BIZTLK' /* location of backup files */
+]]></File>
+    <File Name="MarkAndBackupLog.Staging.sql"><![CDATA[-- exec [dbo].[sp_MarkAll] 'BTS' /*  Log mark name */, '<destination path>' /* location of backup files */
+]]></File>
+    <File Name="SetCompressionOption.sql"><![CDATA[exec [dbo].[sp_SetBackupCompression] @bCompression = 1 /*0 - Do not use Compression, 1 - Use Compression */
+]]></File>
+    <File Name="SetCompressionOption.Staging.sql"><![CDATA[exec [dbo].[sp_SetBackupCompression] @bCompression = 0 /*0 - Do not use Compression, 1 - Use Compression */
+]]></File>
+    <File Name="SqlJob.Staging.xml"><![CDATA[<SqlJob>
+  <DisplayName>Backup BizTalk Server (BizTalkMgmtDb)</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>CORP\Meng.Xue</OwnerLoginName>
+  <Description>This job performs full database backups (step 1) and log backups (step 2) of BizTalk Server databases.</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyLevelEmail>Never</NotifyLevelEmail>
+  <Steps>
+    <Step Name="BackupBindings" Command="BackupBindings.ps1" Type="Powershell" Database="master" />
+    <Step Name="SetCompressionOption" Command="SetCompressionOption.Staging.sql" Type="SQL" Database="BizTalkMgmtDb" OnFail="GoToNextStep" />
+    <Step Name="BackupFull" Command="BackupFull.Staging.sql" Type="SQL" Database="BizTalkMgmtDb" />
+    <Step Name="MarkAndBackupLog" Command="MarkAndBackupLog.Staging.sql" Type="SQL" Database="BizTalkMgmtDb" />
+    <Step Name="ClearBackupHistory" Command="ClearBackupHistory.sql" Type="SQL" Database="BizTalkMgmtDb" />
+    <Step Name="DeleteOldBackups" Command="DeleteOldBackups.ps1" Type="Powershell" Database="master" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="MarkAndBackupLogSched" Enabled="true" Type="Daily" Interval="1" SubDayType="AtSpecifiedTime" StartTime="060000" />
+  </Schedules>
+</SqlJob>]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>Backup BizTalk Server (BizTalkMgmtDb)</DisplayName>
+  <Enabled>false</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>This job performs full database backups (step 1) and log backups (step 2) of BizTalk Server databases.</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CheckIsPrimary" Command="CheckIsPrimary.sql" Type="SQL" Database="master" OnFail="QuitReportingSuccess" />
+    <Step Name="SetCompressionOption" Command="SetCompressionOption.sql" Type="SQL" Database="BizTalkMgmtDb" OnFail="GoToNextStep" />
+    <Step Name="BackupFull" Command="BackupFull.sql" Type="SQL" Database="BizTalkMgmtDb" />
+    <Step Name="MarkAndBackupLog" Command="MarkAndBackupLog.sql" Type="SQL" Database="BizTalkMgmtDb" />
+    <Step Name="ClearBackupHistory" Command="ClearBackupHistory.sql" Type="SQL" Database="BizTalkMgmtDb" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="MarkAndBackupLogSched" Enabled="true" Type="Daily" Interval="1" SubDayType="Minutes" SubDayInterval="15" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="CommandLogCleanup">
+    <File Name="CommandLogCleanup.sql"><![CDATA[DELETE FROM [dbo].[CommandLog]
+WHERE StartTime < DATEADD(dd,-30,GETDATE())]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>CommandLog Cleanup</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>Source: https://ola.hallengren.com</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="CommandLogCleanup" Command="CommandLogCleanup.sql" Type="SQL" Database="master" OutputFile="$(ESCAPE_SQUOTE(SQLLOGDIR))\$(ESCAPE_SQUOTE(JOBNAME))_$(ESCAPE_SQUOTE(STEPID))_$(ESCAPE_SQUOTE(DATE))_$(ESCAPE_SQUOTE(TIME)).txt" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="Cleanup" Enabled="true" Type="Weekly" Interval="1" SubDayType="AtSpecifiedTime" RecurrenceFactor="1" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="DatabaseIntegrityCheckSYSTEM_DATABASES">
+    <File Name="DatabaseIntegrityCheckSYSTEM_DATABASES.sql"><![CDATA[EXECUTE [dbo].[DatabaseIntegrityCheck]
+@Databases = 'SYSTEM_DATABASES',
+@LogToTable = 'Y']]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>DatabaseIntegrityCheck - SYSTEM_DATABASES</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>Source: https://ola.hallengren.com</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="DatabaseIntegrityCheckSYSTEM_DATABASES" Command="DatabaseIntegrityCheckSYSTEM_DATABASES.sql" Type="SQL" Database="master" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="IntegrityCheck_System" Enabled="true" Type="Weekly" Interval="1" SubDayType="AtSpecifiedTime" RecurrenceFactor="1" StartTime="013000" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+  <Folder Name="OutputFileCleanup">
+    <File Name="OutputFileCleanup.cmd"><![CDATA[cmd /q /c "For /F "tokens=1 delims=" %v In ('ForFiles /P "$(ESCAPE_SQUOTE(SQLLOGDIR))" /m *_*_*_*.txt /d -30 2^>^&1') do if EXIST "$(ESCAPE_SQUOTE(SQLLOGDIR))"\%v echo del "$(ESCAPE_SQUOTE(SQLLOGDIR))"\%v& del "$(ESCAPE_SQUOTE(SQLLOGDIR))"\%v"]]></File>
+    <File Name="SqlJob.Staging.xml"><![CDATA[<SqlJob/>]]></File>
+    <File Name="SqlJob.xml"><![CDATA[<SqlJob>
+  <DisplayName>Output File Cleanup</DisplayName>
+  <Enabled>true</Enabled>
+  <OwnerLoginName>sa</OwnerLoginName>
+  <Description>Source: https://ola.hallengren.com</Description>
+  <CategoryName>Database Maintenance</CategoryName>
+  <NotifyEmailOperatorName>eServices</NotifyEmailOperatorName>
+  <Steps>
+    <Step Name="OutputFileCleanup" Command="OutputFileCleanup.cmd" Type="CmdExec" OutputFile="$(ESCAPE_SQUOTE(SQLLOGDIR))\$(ESCAPE_SQUOTE(JOBNAME))_$(ESCAPE_SQUOTE(STEPID))_$(ESCAPE_SQUOTE(DATE))_$(ESCAPE_SQUOTE(TIME)).txt" />
+  </Steps>
+  <Schedules>
+    <Schedule Name="Output File Cleanup" Enabled="true" Type="Weekly" Interval="1" SubDayType="AtSpecifiedTime" RecurrenceFactor="1" StartTime="020000" />
+  </Schedules>
+</SqlJob>]]></File>
+  </Folder>
+</Source>

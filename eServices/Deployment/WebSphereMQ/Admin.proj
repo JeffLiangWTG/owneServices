@@ -1,0 +1,4025 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <CommonPowershellFunctionsFilePath>.\Common.ps1</CommonPowershellFunctionsFilePath>
+    <CommonPowershellFunctionsFilePath Condition="!Exists('$(CommonPowershellFunctionsFilePath)')">$(MSBuildThisFileDirectory)\..\CommonScripts\Common.ps1</CommonPowershellFunctionsFilePath>
+  </PropertyGroup>
+
+  <UsingTask TaskName="Certificate-AddPersonalType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <KeyDatabaseFilePath ParameterType="System.String" />
+      <KeyDatabasePassword ParameterType="System.String" />
+      <CertificateLabel ParameterType="System.String" />
+      <CertificateFilePath ParameterType="System.String" />
+      <CertificatePassword ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Certificate-AddPersonalType() on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($KeyDatabaseFilePath,$KeyDatabasePassword,$CertificateLabel,$CertificateFilePath,$CertificatePassword)
+    try
+    {
+        $errorMessage = runmqckm -cert -import -file $CertificateFilePath -pw $CertificatePassword -type pkcs12 -target $KeyDatabaseFilePath -target_pw $KeyDatabasePassword -target_type cms -label $CertificateLabel
+        if ($LASTEXITCODE -ne 0) { throw "Could not add certificate '$CertificateLabelName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+        $errorMessage = runmqckm -cert -setdefault -db $KeyDatabaseFilePath -pw $KeyDatabasePassword -label $CertificateLabel
+        if ($LASTEXITCODE -ne 0) { throw "Could not set certificate '$CertificateLabelName' as default. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $KeyDatabaseFilePath,$KeyDatabasePassword,$CertificateLabel,$CertificateFilePath,$CertificatePassword
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Certificate-AddPersonalType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Certificate-AddSignerType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <KeyDatabaseFilePath ParameterType="System.String" />
+      <KeyDatabasePassword ParameterType="System.String" />
+      <CertificateLabel ParameterType="System.String" />
+      <CertificateFilePath ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Certificate-AddSignerType() on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($KeyDatabaseFilePath,$KeyDatabasePassword,$CertificateLabel,$CertificateFilePath)
+    try
+    {
+        $errorMessage = runmqckm -cert -add -db $KeyDatabaseFilePath -pw $KeyDatabasePassword -label $CertificateLabel -file $CertificateFilePath
+        if ($LASTEXITCODE -ne 0) { throw "Could not add certificate '$CertificateLabel'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $KeyDatabaseFilePath,$KeyDatabasePassword,$CertificateLabel,$CertificateFilePath
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Certificate-AddSignerType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Certificate-Rename"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <KeyDatabaseFilePath ParameterType="System.String" />
+      <KeyDatabasePassword ParameterType="System.String" />
+      <CertificateLabel ParameterType="System.String" />
+      <NewCertificateLabel ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Certificate-Rename() on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($KeyDatabaseFilePath,$KeyDatabasePassword,$CertificateLabel,$NewCertificateLabel)
+    try
+    {
+        $errorMessage = runmqckm -cert -rename -db $KeyDatabaseFilePath -pw $KeyDatabasePassword -label $CertificateLabel -new_label $NewCertificateLabel
+        if ($LASTEXITCODE -ne 0) { throw "Could not rename certificate '$CertificateLabel'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $KeyDatabaseFilePath,$KeyDatabasePassword,$CertificateLabel,$NewCertificateLabel
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Certificate-Rename. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Channel-DefineCLNTCONNType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ChannelName Required="true" ParameterType="System.String" />
+      <MQSC_CONNAME ParameterType="System.String" />
+      <MQSC_AFFINITY ParameterType="System.String" />
+      <MQSC_CLNTWGHT ParameterType="System.String" />
+      <MQSC_COMPHDR ParameterType="System.String" />
+      <MQSC_COMPMSG ParameterType="System.String" />
+      <MQSC_DEFRECON ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_HBINT ParameterType="System.String" />
+      <MQSC_KAINT ParameterType="System.String" />
+      <MQSC_LOCLADDR ParameterType="System.String" />
+      <MQSC_MAXMSGL ParameterType="System.String" />
+      <MQSC_MODENAME ParameterType="System.String" />
+      <MQSC_PASSWORD ParameterType="System.String" />
+      <MQSC_QMNAME ParameterType="System.String" />
+      <MQSC_RCVDATA ParameterType="System.String" />
+      <MQSC_RCVEXIT ParameterType="System.String" />
+      <MQSC_SCYDATA ParameterType="System.String" />
+      <MQSC_SCYEXIT ParameterType="System.String" />
+      <MQSC_SENDDATA ParameterType="System.String" />
+      <MQSC_SENDEXIT ParameterType="System.String" />
+      <MQSC_SHARECNV ParameterType="System.String" />
+      <MQSC_SSLCIPH ParameterType="System.String" />
+      <MQSC_SSLPEER ParameterType="System.String" />
+      <MQSC_TPNAME ParameterType="System.String" />
+      <MQSC_TRPTYPE ParameterType="System.String" />
+      <MQSC_USERID ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Channel-DefineCLNTCONNType(QueueManagerName:$QueueManagerName,ChannelName:$ChannelName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ChannelName,$MQSC_CONNAME,$MQSC_AFFINITY,$MQSC_CLNTWGHT,$MQSC_COMPHDR,
+$MQSC_COMPMSG,$MQSC_DEFRECON,$MQSC_DESCR,$MQSC_HBINT,$MQSC_KAINT,$MQSC_LOCLADDR,
+$MQSC_MAXMSGL,$MQSC_MODENAME,$MQSC_PASSWORD,$MQSC_QMNAME,$MQSC_RCVDATA,$MQSC_RCVEXIT,
+$MQSC_SCYDATA,$MQSC_SCYEXIT,$MQSC_SENDDATA,$MQSC_SENDEXIT,$MQSC_SHARECNV,$MQSC_SSLCIPH,
+$MQSC_SSLPEER,$MQSC_TPNAME,$MQSC_TRPTYPE,$MQSC_USERID,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE CHANNEL($ChannelName) CHLTYPE(CLNTCONN) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not define channel '$ChannelName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ChannelName,$MQSC_CONNAME,$MQSC_AFFINITY,$MQSC_CLNTWGHT,$MQSC_COMPHDR,
+$MQSC_COMPMSG,$MQSC_DEFRECON,$MQSC_DESCR,$MQSC_HBINT,$MQSC_KAINT,$MQSC_LOCLADDR,
+$MQSC_MAXMSGL,$MQSC_MODENAME,$MQSC_PASSWORD,$MQSC_QMNAME,$MQSC_RCVDATA,$MQSC_RCVEXIT,
+$MQSC_SCYDATA,$MQSC_SCYEXIT,$MQSC_SENDDATA,$MQSC_SENDEXIT,$MQSC_SHARECNV,$MQSC_SSLCIPH,
+$MQSC_SSLPEER,$MQSC_TPNAME,$MQSC_TRPTYPE,$MQSC_USERID,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Channel-DefineCLNTCONNType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Channel-DefineCLUSRCVRType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ChannelName Required="true" ParameterType="System.String" />
+      <MQSC_CONNAME ParameterType="System.String" />
+      <MQSC_BATCHHB ParameterType="System.String" />
+      <MQSC_BATCHINT ParameterType="System.String" />
+      <MQSC_BATCHLIM ParameterType="System.String" />
+      <MQSC_BATCHSZ ParameterType="System.String" />
+      <MQSC_CLUSNL ParameterType="System.String" />
+      <MQSC_CLUSTER ParameterType="System.String" />
+      <MQSC_CLWLPRTY ParameterType="System.String" />
+      <MQSC_CLWLRANK ParameterType="System.String" />
+      <MQSC_CLWLWGHT ParameterType="System.String" />
+      <MQSC_COMPHDR ParameterType="System.String" />
+      <MQSC_COMPMSG ParameterType="System.String" />
+      <MQSC_CONVERT ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_DISCINT ParameterType="System.String" />
+      <MQSC_HBINT ParameterType="System.String" />
+      <MQSC_KAINT ParameterType="System.String" />
+      <MQSC_LOCLADDR ParameterType="System.String" />
+      <MQSC_LONGRTY ParameterType="System.String" />
+      <MQSC_LONGTMR ParameterType="System.String" />
+      <MQSC_MAXMSGL ParameterType="System.String" />
+      <MQSC_MCANAME ParameterType="System.String" />
+      <MQSC_MCATYPE ParameterType="System.String" />
+      <MQSC_MCAUSER ParameterType="System.String" />
+      <MQSC_MODENAME ParameterType="System.String" />
+      <MQSC_MONCHL ParameterType="System.String" />
+      <MQSC_MRDATA ParameterType="System.String" />
+      <MQSC_MREXIT ParameterType="System.String" />
+      <MQSC_MRRTY ParameterType="System.String" />
+      <MQSC_MRTMR ParameterType="System.String" />
+      <MQSC_MSGDATA ParameterType="System.String" />
+      <MQSC_MSGEXIT ParameterType="System.String" />
+      <MQSC_NETPRTY ParameterType="System.String" />
+      <MQSC_NPMSPEED ParameterType="System.String" />
+      <MQSC_PROPCTL ParameterType="System.String" />
+      <MQSC_PUTAUT ParameterType="System.String" />
+      <MQSC_RCVDATA ParameterType="System.String" />
+      <MQSC_RCVEXIT ParameterType="System.String" />
+      <MQSC_SCYDATA ParameterType="System.String" />
+      <MQSC_SCYEXIT ParameterType="System.String" />
+      <MQSC_SENDDATA ParameterType="System.String" />
+      <MQSC_SENDEXIT ParameterType="System.String" />
+      <MQSC_SEQWRAP ParameterType="System.String" />
+      <MQSC_SHORTRTY ParameterType="System.String" />
+      <MQSC_SHORTTMR ParameterType="System.String" />
+      <MQSC_SSLCAUTH ParameterType="System.String" />
+      <MQSC_SSLCIPH ParameterType="System.String" />
+      <MQSC_SSLPEER ParameterType="System.String" />
+      <MQSC_STATCHL ParameterType="System.String" />
+      <MQSC_TPNAME ParameterType="System.String" />
+      <MQSC_TRPTYPE ParameterType="System.String" />
+      <MQSC_USEDLQ ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Channel-DefineCLUSRCVRType(QueueManagerName:$QueueManagerName,ChannelName:$ChannelName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ChannelName,$MQSC_CONNAME,$MQSC_BATCHHB,$MQSC_BATCHINT,$MQSC_BATCHLIM,
+$MQSC_BATCHSZ,$MQSC_CLUSNL,$MQSC_CLUSTER,$MQSC_CLWLPRTY,$MQSC_CLWLRANK,$MQSC_CLWLWGHT,
+$MQSC_COMPHDR,$MQSC_COMPMSG,$MQSC_CONVERT,$MQSC_DESCR,$MQSC_DISCINT,$MQSC_HBINT,
+$MQSC_KAINT,$MQSC_LOCLADDR,$MQSC_LONGRTY,$MQSC_LONGTMR,$MQSC_MAXMSGL,$MQSC_MCANAME,
+$MQSC_MCATYPE,$MQSC_MCAUSER,$MQSC_MODENAME,$MQSC_MONCHL,$MQSC_MRDATA,$MQSC_MREXIT,
+$MQSC_MRRTY,$MQSC_MRTMR,$MQSC_MSGDATA,$MQSC_MSGEXIT,$MQSC_NETPRTY,$MQSC_NPMSPEED,
+$MQSC_PROPCTL,$MQSC_PUTAUT,$MQSC_RCVDATA,$MQSC_RCVEXIT,$MQSC_SCYDATA,$MQSC_SCYEXIT,
+$MQSC_SENDDATA,$MQSC_SENDEXIT,$MQSC_SEQWRAP,$MQSC_SHORTRTY,$MQSC_SHORTTMR,$MQSC_SSLCAUTH,
+$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_STATCHL,$MQSC_TPNAME,$MQSC_TRPTYPE,$MQSC_USEDLQ,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE CHANNEL($ChannelName) CHLTYPE(CLUSRCVR) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not define channel '$ChannelName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ChannelName,$MQSC_CONNAME,$MQSC_BATCHHB,$MQSC_BATCHINT,$MQSC_BATCHLIM,
+$MQSC_BATCHSZ,$MQSC_CLUSNL,$MQSC_CLUSTER,$MQSC_CLWLPRTY,$MQSC_CLWLRANK,$MQSC_CLWLWGHT,
+$MQSC_COMPHDR,$MQSC_COMPMSG,$MQSC_CONVERT,$MQSC_DESCR,$MQSC_DISCINT,$MQSC_HBINT,
+$MQSC_KAINT,$MQSC_LOCLADDR,$MQSC_LONGRTY,$MQSC_LONGTMR,$MQSC_MAXMSGL,$MQSC_MCANAME,
+$MQSC_MCATYPE,$MQSC_MCAUSER,$MQSC_MODENAME,$MQSC_MONCHL,$MQSC_MRDATA,$MQSC_MREXIT,
+$MQSC_MRRTY,$MQSC_MRTMR,$MQSC_MSGDATA,$MQSC_MSGEXIT,$MQSC_NETPRTY,$MQSC_NPMSPEED,
+$MQSC_PROPCTL,$MQSC_PUTAUT,$MQSC_RCVDATA,$MQSC_RCVEXIT,$MQSC_SCYDATA,$MQSC_SCYEXIT,
+$MQSC_SENDDATA,$MQSC_SENDEXIT,$MQSC_SEQWRAP,$MQSC_SHORTRTY,$MQSC_SHORTTMR,$MQSC_SSLCAUTH,
+$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_STATCHL,$MQSC_TPNAME,$MQSC_TRPTYPE,$MQSC_USEDLQ,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Channel-DefineCLUSRCVRType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Channel-DefineCLUSSDRType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ChannelName Required="true" ParameterType="System.String" />
+      <MQSC_CONNAME ParameterType="System.String" />
+      <MQSC_BATCHHB ParameterType="System.String" />
+      <MQSC_BATCHINT ParameterType="System.String" />
+      <MQSC_BATCHLIM ParameterType="System.String" />
+      <MQSC_BATCHSZ ParameterType="System.String" />
+      <MQSC_CLUSNL ParameterType="System.String" />
+      <MQSC_CLUSTER ParameterType="System.String" />
+      <MQSC_CLWLPRTY ParameterType="System.String" />
+      <MQSC_CLWLRANK ParameterType="System.String" />
+      <MQSC_CLWLWGHT ParameterType="System.String" />
+      <MQSC_COMPHDR ParameterType="System.String" />
+      <MQSC_COMPMSG ParameterType="System.String" />
+      <MQSC_CONVERT ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_DISCINT ParameterType="System.String" />
+      <MQSC_HBINT ParameterType="System.String" />
+      <MQSC_KAINT ParameterType="System.String" />
+      <MQSC_LOCLADDR ParameterType="System.String" />
+      <MQSC_LONGRTY ParameterType="System.String" />
+      <MQSC_LONGTMR ParameterType="System.String" />
+      <MQSC_MAXMSGL ParameterType="System.String" />
+      <MQSC_MCANAME ParameterType="System.String" />
+      <MQSC_MCATYPE ParameterType="System.String" />
+      <MQSC_MCAUSER ParameterType="System.String" />
+      <MQSC_MODENAME ParameterType="System.String" />
+      <MQSC_MONCHL ParameterType="System.String" />
+      <MQSC_MSGDATA ParameterType="System.String" />
+      <MQSC_MSGEXIT ParameterType="System.String" />
+      <MQSC_NPMSPEED ParameterType="System.String" />
+      <MQSC_PASSWORD ParameterType="System.String" />
+      <MQSC_PROPCTL ParameterType="System.String" />
+      <MQSC_RCVDATA ParameterType="System.String" />
+      <MQSC_RCVEXIT ParameterType="System.String" />
+      <MQSC_SCYDATA ParameterType="System.String" />
+      <MQSC_SCYEXIT ParameterType="System.String" />
+      <MQSC_SENDDATA ParameterType="System.String" />
+      <MQSC_SENDEXIT ParameterType="System.String" />
+      <MQSC_SEQWRAP ParameterType="System.String" />
+      <MQSC_SHORTRTY ParameterType="System.String" />
+      <MQSC_SHORTTMR ParameterType="System.String" />
+      <MQSC_SSLCIPH ParameterType="System.String" />
+      <MQSC_SSLPEER ParameterType="System.String" />
+      <MQSC_STATCHL ParameterType="System.String" />
+      <MQSC_TPNAME ParameterType="System.String" />
+      <MQSC_TRPTYPE ParameterType="System.String" />
+      <MQSC_USEDLQ ParameterType="System.String" />
+      <MQSC_USERID ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Channel-DefineCLUSSDRType(QueueManagerName:$QueueManagerName,ChannelName:$ChannelName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ChannelName,$MQSC_CONNAME,$MQSC_BATCHHB,$MQSC_BATCHINT,$MQSC_BATCHLIM,
+$MQSC_BATCHSZ,$MQSC_CLUSNL,$MQSC_CLUSTER,$MQSC_CLWLPRTY,$MQSC_CLWLRANK,$MQSC_CLWLWGHT,
+$MQSC_COMPHDR,$MQSC_COMPMSG,$MQSC_CONVERT,$MQSC_DESCR,$MQSC_DISCINT,$MQSC_HBINT,
+$MQSC_KAINT,$MQSC_LOCLADDR,$MQSC_LONGRTY,$MQSC_LONGTMR,$MQSC_MAXMSGL,$MQSC_MCANAME,
+$MQSC_MCATYPE,$MQSC_MCAUSER,$MQSC_MODENAME,$MQSC_MONCHL,$MQSC_MSGDATA,$MQSC_MSGEXIT,
+$MQSC_NPMSPEED,$MQSC_PASSWORD,$MQSC_PROPCTL,$MQSC_RCVDATA,$MQSC_RCVEXIT,$MQSC_SCYDATA,
+$MQSC_SCYEXIT,$MQSC_SENDDATA,$MQSC_SENDEXIT,$MQSC_SEQWRAP,$MQSC_SHORTRTY,$MQSC_SHORTTMR,
+$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_STATCHL,$MQSC_TPNAME,$MQSC_TRPTYPE,$MQSC_USEDLQ,
+$MQSC_USERID,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE CHANNEL($ChannelName) CHLTYPE(CLUSSDR) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not define channel '$ChannelName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ChannelName,$MQSC_CONNAME,$MQSC_BATCHHB,$MQSC_BATCHINT,$MQSC_BATCHLIM,
+$MQSC_BATCHSZ,$MQSC_CLUSNL,$MQSC_CLUSTER,$MQSC_CLWLPRTY,$MQSC_CLWLRANK,$MQSC_CLWLWGHT,
+$MQSC_COMPHDR,$MQSC_COMPMSG,$MQSC_CONVERT,$MQSC_DESCR,$MQSC_DISCINT,$MQSC_HBINT,
+$MQSC_KAINT,$MQSC_LOCLADDR,$MQSC_LONGRTY,$MQSC_LONGTMR,$MQSC_MAXMSGL,$MQSC_MCANAME,
+$MQSC_MCATYPE,$MQSC_MCAUSER,$MQSC_MODENAME,$MQSC_MONCHL,$MQSC_MSGDATA,$MQSC_MSGEXIT,
+$MQSC_NPMSPEED,$MQSC_PASSWORD,$MQSC_PROPCTL,$MQSC_RCVDATA,$MQSC_RCVEXIT,$MQSC_SCYDATA,
+$MQSC_SCYEXIT,$MQSC_SENDDATA,$MQSC_SENDEXIT,$MQSC_SEQWRAP,$MQSC_SHORTRTY,$MQSC_SHORTTMR,
+$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_STATCHL,$MQSC_TPNAME,$MQSC_TRPTYPE,$MQSC_USEDLQ,
+$MQSC_USERID,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Channel-DefineCLUSSDRType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Channel-DefineRCVRType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ChannelName Required="true" ParameterType="System.String" />
+      <MQSC_BATCHSZ ParameterType="System.String" />
+      <MQSC_COMPHDR ParameterType="System.String" />
+      <MQSC_COMPMSG ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_HBINT ParameterType="System.String" />
+      <MQSC_KAINT ParameterType="System.String" />
+      <MQSC_MAXMSGL ParameterType="System.String" />
+      <MQSC_MCAUSER ParameterType="System.String" />
+      <MQSC_MONCHL ParameterType="System.String" />
+      <MQSC_MRDATA ParameterType="System.String" />
+      <MQSC_MREXIT ParameterType="System.String" />
+      <MQSC_MRRTY ParameterType="System.String" />
+      <MQSC_MRTMR ParameterType="System.String" />
+      <MQSC_MSGDATA ParameterType="System.String" />
+      <MQSC_MSGEXIT ParameterType="System.String" />
+      <MQSC_NPMSPEED ParameterType="System.String" />
+      <MQSC_PUTAUT ParameterType="System.String" />
+      <MQSC_RCVDATA ParameterType="System.String" />
+      <MQSC_RCVEXIT ParameterType="System.String" />
+      <MQSC_SCYDATA ParameterType="System.String" />
+      <MQSC_SCYEXIT ParameterType="System.String" />
+      <MQSC_SENDDATA ParameterType="System.String" />
+      <MQSC_SENDEXIT ParameterType="System.String" />
+      <MQSC_SEQWRAP ParameterType="System.String" />
+      <MQSC_SSLCAUTH ParameterType="System.String" />
+      <MQSC_SSLCIPH ParameterType="System.String" />
+      <MQSC_SSLPEER ParameterType="System.String" />
+      <MQSC_STATCHL ParameterType="System.String" />
+      <MQSC_TRPTYPE ParameterType="System.String" />
+      <MQSC_USEDLQ ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Channel-DefineRCVRType(QueueManagerName:$QueueManagerName,ChannelName:$ChannelName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ChannelName,$MQSC_BATCHSZ,$MQSC_COMPHDR,$MQSC_COMPMSG,$MQSC_DESCR,
+$MQSC_HBINT,$MQSC_KAINT,$MQSC_MAXMSGL,$MQSC_MCAUSER,$MQSC_MONCHL,$MQSC_MRDATA,
+$MQSC_MREXIT,$MQSC_MRRTY,$MQSC_MRTMR,$MQSC_MSGDATA,$MQSC_MSGEXIT,$MQSC_NPMSPEED,
+$MQSC_PUTAUT,$MQSC_RCVDATA,$MQSC_RCVEXIT,$MQSC_SCYDATA,$MQSC_SCYEXIT,$MQSC_SENDDATA,
+$MQSC_SENDEXIT,$MQSC_SEQWRAP,$MQSC_SSLCAUTH,$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_STATCHL,
+$MQSC_TRPTYPE,$MQSC_USEDLQ,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE CHANNEL($ChannelName) CHLTYPE(RCVR) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not define channel '$ChannelName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ChannelName,$MQSC_BATCHSZ,$MQSC_COMPHDR,$MQSC_COMPMSG,$MQSC_DESCR,
+$MQSC_HBINT,$MQSC_KAINT,$MQSC_MAXMSGL,$MQSC_MCAUSER,$MQSC_MONCHL,$MQSC_MRDATA,
+$MQSC_MREXIT,$MQSC_MRRTY,$MQSC_MRTMR,$MQSC_MSGDATA,$MQSC_MSGEXIT,$MQSC_NPMSPEED,
+$MQSC_PUTAUT,$MQSC_RCVDATA,$MQSC_RCVEXIT,$MQSC_SCYDATA,$MQSC_SCYEXIT,$MQSC_SENDDATA,
+$MQSC_SENDEXIT,$MQSC_SEQWRAP,$MQSC_SSLCAUTH,$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_STATCHL,
+$MQSC_TRPTYPE,$MQSC_USEDLQ,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Channel-DefineRCVRType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Channel-DefineRQSTRType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ChannelName Required="true" ParameterType="System.String" />
+      <MQSC_CONNAME ParameterType="System.String" />
+      <MQSC_BATCHSZ ParameterType="System.String" />
+      <MQSC_COMPHDR ParameterType="System.String" />
+      <MQSC_COMPMSG ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_HBINT ParameterType="System.String" />
+      <MQSC_KAINT ParameterType="System.String" />
+      <MQSC_LOCLADDR ParameterType="System.String" />
+      <MQSC_MAXMSGL ParameterType="System.String" />
+      <MQSC_MCANAME ParameterType="System.String" />
+      <MQSC_MCATYPE ParameterType="System.String" />
+      <MQSC_MCAUSER ParameterType="System.String" />
+      <MQSC_MODENAME ParameterType="System.String" />
+      <MQSC_MONCHL ParameterType="System.String" />
+      <MQSC_MRDATA ParameterType="System.String" />
+      <MQSC_MREXIT ParameterType="System.String" />
+      <MQSC_MRRTY ParameterType="System.String" />
+      <MQSC_MRTMR ParameterType="System.String" />
+      <MQSC_MSGDATA ParameterType="System.String" />
+      <MQSC_MSGEXIT ParameterType="System.String" />
+      <MQSC_NPMSPEED ParameterType="System.String" />
+      <MQSC_PASSWORD ParameterType="System.String" />
+      <MQSC_PUTAUT ParameterType="System.String" />
+      <MQSC_RCVDATA ParameterType="System.String" />
+      <MQSC_RCVEXIT ParameterType="System.String" />
+      <MQSC_SCYDATA ParameterType="System.String" />
+      <MQSC_SCYEXIT ParameterType="System.String" />
+      <MQSC_SENDDATA ParameterType="System.String" />
+      <MQSC_SENDEXIT ParameterType="System.String" />
+      <MQSC_SEQWRAP ParameterType="System.String" />
+      <MQSC_SSLCAUTH ParameterType="System.String" />
+      <MQSC_SSLCIPH ParameterType="System.String" />
+      <MQSC_SSLPEER ParameterType="System.String" />
+      <MQSC_STATCHL ParameterType="System.String" />
+      <MQSC_TPNAME ParameterType="System.String" />
+      <MQSC_TRPTYPE ParameterType="System.String" />
+      <MQSC_USEDLQ ParameterType="System.String" />
+      <MQSC_USERID ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Channel-DefineRQSTRType(QueueManagerName:$QueueManagerName,ChannelName:$ChannelName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ChannelName,$MQSC_CONNAME,$MQSC_BATCHSZ,$MQSC_COMPHDR,$MQSC_COMPMSG,
+$MQSC_DESCR,$MQSC_HBINT,$MQSC_KAINT,$MQSC_LOCLADDR,$MQSC_MAXMSGL,$MQSC_MCANAME,
+$MQSC_MCATYPE,$MQSC_MCAUSER,$MQSC_MODENAME,$MQSC_MONCHL,$MQSC_MRDATA,$MQSC_MREXIT,
+$MQSC_MRRTY,$MQSC_MRTMR,$MQSC_MSGDATA,$MQSC_MSGEXIT,$MQSC_NPMSPEED,$MQSC_PASSWORD,
+$MQSC_PUTAUT,$MQSC_RCVDATA,$MQSC_RCVEXIT,$MQSC_SCYDATA,$MQSC_SCYEXIT,$MQSC_SENDDATA,
+$MQSC_SENDEXIT,$MQSC_SEQWRAP,$MQSC_SSLCAUTH,$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_STATCHL,
+$MQSC_TPNAME,$MQSC_TRPTYPE,$MQSC_USEDLQ,$MQSC_USERID,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE CHANNEL($ChannelName) CHLTYPE(RQSTR) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not define channel '$ChannelName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ChannelName,$MQSC_CONNAME,$MQSC_BATCHSZ,$MQSC_COMPHDR,$MQSC_COMPMSG,
+$MQSC_DESCR,$MQSC_HBINT,$MQSC_KAINT,$MQSC_LOCLADDR,$MQSC_MAXMSGL,$MQSC_MCANAME,
+$MQSC_MCATYPE,$MQSC_MCAUSER,$MQSC_MODENAME,$MQSC_MONCHL,$MQSC_MRDATA,$MQSC_MREXIT,
+$MQSC_MRRTY,$MQSC_MRTMR,$MQSC_MSGDATA,$MQSC_MSGEXIT,$MQSC_NPMSPEED,$MQSC_PASSWORD,
+$MQSC_PUTAUT,$MQSC_RCVDATA,$MQSC_RCVEXIT,$MQSC_SCYDATA,$MQSC_SCYEXIT,$MQSC_SENDDATA,
+$MQSC_SENDEXIT,$MQSC_SEQWRAP,$MQSC_SSLCAUTH,$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_STATCHL,
+$MQSC_TPNAME,$MQSC_TRPTYPE,$MQSC_USEDLQ,$MQSC_USERID,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Channel-DefineRQSTRType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Channel-DefineSDRType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ChannelName Required="true" ParameterType="System.String" />
+      <MQSC_CONNAME ParameterType="System.String" />
+      <MQSC_XMITQ ParameterType="System.String" />
+      <MQSC_BATCHHB ParameterType="System.String" />
+      <MQSC_BATCHINT ParameterType="System.String" />
+      <MQSC_BATCHLIM ParameterType="System.String" />
+      <MQSC_BATCHSZ ParameterType="System.String" />
+      <MQSC_COMPHDR ParameterType="System.String" />
+      <MQSC_COMPMSG ParameterType="System.String" />
+      <MQSC_CONVERT ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_DISCINT ParameterType="System.String" />
+      <MQSC_HBINT ParameterType="System.String" />
+      <MQSC_KAINT ParameterType="System.String" />
+      <MQSC_LOCLADDR ParameterType="System.String" />
+      <MQSC_LONGRTY ParameterType="System.String" />
+      <MQSC_LONGTMR ParameterType="System.String" />
+      <MQSC_MAXMSGL ParameterType="System.String" />
+      <MQSC_MCANAME ParameterType="System.String" />
+      <MQSC_MCATYPE ParameterType="System.String" />
+      <MQSC_MCAUSER ParameterType="System.String" />
+      <MQSC_MODENAME ParameterType="System.String" />
+      <MQSC_MONCHL ParameterType="System.String" />
+      <MQSC_MSGDATA ParameterType="System.String" />
+      <MQSC_MSGEXIT ParameterType="System.String" />
+      <MQSC_NPMSPEED ParameterType="System.String" />
+      <MQSC_PASSWORD ParameterType="System.String" />
+      <MQSC_PROPCTL ParameterType="System.String" />
+      <MQSC_RCVDATA ParameterType="System.String" />
+      <MQSC_RCVEXIT ParameterType="System.String" />
+      <MQSC_SCYDATA ParameterType="System.String" />
+      <MQSC_SCYEXIT ParameterType="System.String" />
+      <MQSC_SENDDATA ParameterType="System.String" />
+      <MQSC_SENDEXIT ParameterType="System.String" />
+      <MQSC_SEQWRAP ParameterType="System.String" />
+      <MQSC_SHORTRTY ParameterType="System.String" />
+      <MQSC_SHORTTMR ParameterType="System.String" />
+      <MQSC_SSLCIPH ParameterType="System.String" />
+      <MQSC_SSLPEER ParameterType="System.String" />
+      <MQSC_STATCHL ParameterType="System.String" />
+      <MQSC_TPNAME ParameterType="System.String" />
+      <MQSC_TRPTYPE ParameterType="System.String" />
+      <MQSC_USEDLQ ParameterType="System.String" />
+      <MQSC_USERID ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Channel-DefineSDRType(QueueManagerName:$QueueManagerName,ChannelName:$ChannelName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ChannelName,$MQSC_CONNAME,$MQSC_XMITQ,$MQSC_BATCHHB,$MQSC_BATCHINT,
+$MQSC_BATCHLIM,$MQSC_BATCHSZ,$MQSC_COMPHDR,$MQSC_COMPMSG,$MQSC_CONVERT,$MQSC_DESCR,
+$MQSC_DISCINT,$MQSC_HBINT,$MQSC_KAINT,$MQSC_LOCLADDR,$MQSC_LONGRTY,$MQSC_LONGTMR,
+$MQSC_MAXMSGL,$MQSC_MCANAME,$MQSC_MCATYPE,$MQSC_MCAUSER,$MQSC_MODENAME,$MQSC_MONCHL,
+$MQSC_MSGDATA,$MQSC_MSGEXIT,$MQSC_NPMSPEED,$MQSC_PASSWORD,$MQSC_PROPCTL,$MQSC_RCVDATA,
+$MQSC_RCVEXIT,$MQSC_SCYDATA,$MQSC_SCYEXIT,$MQSC_SENDDATA,$MQSC_SENDEXIT,$MQSC_SEQWRAP,
+$MQSC_SHORTRTY,$MQSC_SHORTTMR,$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_STATCHL,$MQSC_TPNAME,
+$MQSC_TRPTYPE,$MQSC_USEDLQ,$MQSC_USERID,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE CHANNEL($ChannelName) CHLTYPE(SDR) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not define channel '$ChannelName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ChannelName,$MQSC_CONNAME,$MQSC_XMITQ,$MQSC_BATCHHB,$MQSC_BATCHINT,
+$MQSC_BATCHLIM,$MQSC_BATCHSZ,$MQSC_COMPHDR,$MQSC_COMPMSG,$MQSC_CONVERT,$MQSC_DESCR,
+$MQSC_DISCINT,$MQSC_HBINT,$MQSC_KAINT,$MQSC_LOCLADDR,$MQSC_LONGRTY,$MQSC_LONGTMR,
+$MQSC_MAXMSGL,$MQSC_MCANAME,$MQSC_MCATYPE,$MQSC_MCAUSER,$MQSC_MODENAME,$MQSC_MONCHL,
+$MQSC_MSGDATA,$MQSC_MSGEXIT,$MQSC_NPMSPEED,$MQSC_PASSWORD,$MQSC_PROPCTL,$MQSC_RCVDATA,
+$MQSC_RCVEXIT,$MQSC_SCYDATA,$MQSC_SCYEXIT,$MQSC_SENDDATA,$MQSC_SENDEXIT,$MQSC_SEQWRAP,
+$MQSC_SHORTRTY,$MQSC_SHORTTMR,$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_STATCHL,$MQSC_TPNAME,
+$MQSC_TRPTYPE,$MQSC_USEDLQ,$MQSC_USERID,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Channel-DefineSDRType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Channel-DefineSVRCONNType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ChannelName Required="true" ParameterType="System.String" />
+      <MQSC_COMPHDR ParameterType="System.String" />
+      <MQSC_COMPMSG ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_DISCINT ParameterType="System.String" />
+      <MQSC_HBINT ParameterType="System.String" />
+      <MQSC_KAINT ParameterType="System.String" />
+      <MQSC_MAXINST ParameterType="System.String" />
+      <MQSC_MAXINSTC ParameterType="System.String" />
+      <MQSC_MAXMSGL ParameterType="System.String" />
+      <MQSC_MCAUSER ParameterType="System.String" />
+      <MQSC_MONCHL ParameterType="System.String" />
+      <MQSC_RCVDATA ParameterType="System.String" />
+      <MQSC_RCVEXIT ParameterType="System.String" />
+      <MQSC_SCYDATA ParameterType="System.String" />
+      <MQSC_SCYEXIT ParameterType="System.String" />
+      <MQSC_SENDDATA ParameterType="System.String" />
+      <MQSC_SENDEXIT ParameterType="System.String" />
+      <MQSC_SHARECNV ParameterType="System.String" />
+      <MQSC_SSLCAUTH ParameterType="System.String" />
+      <MQSC_SSLCIPH ParameterType="System.String" />
+      <MQSC_SSLPEER ParameterType="System.String" />
+      <MQSC_TRPTYPE ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Channel-DefineSVRCONNType(QueueManagerName:$QueueManagerName,ChannelName:$ChannelName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ChannelName,$MQSC_COMPHDR,$MQSC_COMPMSG,$MQSC_DESCR,$MQSC_DISCINT,
+$MQSC_HBINT,$MQSC_KAINT,$MQSC_MAXINST,$MQSC_MAXINSTC,$MQSC_MAXMSGL,$MQSC_MCAUSER,
+$MQSC_MONCHL,$MQSC_RCVDATA,$MQSC_RCVEXIT,$MQSC_SCYDATA,$MQSC_SCYEXIT,$MQSC_SENDDATA,
+$MQSC_SENDEXIT,$MQSC_SHARECNV,$MQSC_SSLCAUTH,$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_TRPTYPE,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE CHANNEL($ChannelName) CHLTYPE(SVRCONN) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not define channel '$ChannelName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ChannelName,$MQSC_COMPHDR,$MQSC_COMPMSG,$MQSC_DESCR,$MQSC_DISCINT,
+$MQSC_HBINT,$MQSC_KAINT,$MQSC_MAXINST,$MQSC_MAXINSTC,$MQSC_MAXMSGL,$MQSC_MCAUSER,
+$MQSC_MONCHL,$MQSC_RCVDATA,$MQSC_RCVEXIT,$MQSC_SCYDATA,$MQSC_SCYEXIT,$MQSC_SENDDATA,
+$MQSC_SENDEXIT,$MQSC_SHARECNV,$MQSC_SSLCAUTH,$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_TRPTYPE,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Channel-DefineSVRCONNType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Channel-DefineSVRType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ChannelName Required="true" ParameterType="System.String" />
+      <MQSC_XMITQ ParameterType="System.String" />
+      <MQSC_BATCHHB ParameterType="System.String" />
+      <MQSC_BATCHINT ParameterType="System.String" />
+      <MQSC_BATCHLIM ParameterType="System.String" />
+      <MQSC_BATCHSZ ParameterType="System.String" />
+      <MQSC_COMPHDR ParameterType="System.String" />
+      <MQSC_COMPMSG ParameterType="System.String" />
+      <MQSC_CONNAME ParameterType="System.String" />
+      <MQSC_CONVERT ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_DISCINT ParameterType="System.String" />
+      <MQSC_HBINT ParameterType="System.String" />
+      <MQSC_KAINT ParameterType="System.String" />
+      <MQSC_LOCLADDR ParameterType="System.String" />
+      <MQSC_LONGRTY ParameterType="System.String" />
+      <MQSC_LONGTMR ParameterType="System.String" />
+      <MQSC_MAXMSGL ParameterType="System.String" />
+      <MQSC_MCANAME ParameterType="System.String" />
+      <MQSC_MCATYPE ParameterType="System.String" />
+      <MQSC_MCAUSER ParameterType="System.String" />
+      <MQSC_MODENAME ParameterType="System.String" />
+      <MQSC_MONCHL ParameterType="System.String" />
+      <MQSC_MSGDATA ParameterType="System.String" />
+      <MQSC_MSGEXIT ParameterType="System.String" />
+      <MQSC_NPMSPEED ParameterType="System.String" />
+      <MQSC_PASSWORD ParameterType="System.String" />
+      <MQSC_PROPCTL ParameterType="System.String" />
+      <MQSC_RCVDATA ParameterType="System.String" />
+      <MQSC_RCVEXIT ParameterType="System.String" />
+      <MQSC_SCYDATA ParameterType="System.String" />
+      <MQSC_SCYEXIT ParameterType="System.String" />
+      <MQSC_SENDDATA ParameterType="System.String" />
+      <MQSC_SENDEXIT ParameterType="System.String" />
+      <MQSC_SEQWRAP ParameterType="System.String" />
+      <MQSC_SHORTRTY ParameterType="System.String" />
+      <MQSC_SHORTTMR ParameterType="System.String" />
+      <MQSC_SSLCAUTH ParameterType="System.String" />
+      <MQSC_SSLCIPH ParameterType="System.String" />
+      <MQSC_SSLPEER ParameterType="System.String" />
+      <MQSC_STATCHL ParameterType="System.String" />
+      <MQSC_TPNAME ParameterType="System.String" />
+      <MQSC_TRPTYPE ParameterType="System.String" />
+      <MQSC_USEDLQ ParameterType="System.String" />
+      <MQSC_USERID ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Channel-DefineSVRType(QueueManagerName:$QueueManagerName,ChannelName:$ChannelName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ChannelName,$MQSC_XMITQ,$MQSC_BATCHHB,$MQSC_BATCHINT,$MQSC_BATCHLIM,
+$MQSC_BATCHSZ,$MQSC_COMPHDR,$MQSC_COMPMSG,$MQSC_CONNAME,$MQSC_CONVERT,$MQSC_DESCR,
+$MQSC_DISCINT,$MQSC_HBINT,$MQSC_KAINT,$MQSC_LOCLADDR,$MQSC_LONGRTY,$MQSC_LONGTMR,
+$MQSC_MAXMSGL,$MQSC_MCANAME,$MQSC_MCATYPE,$MQSC_MCAUSER,$MQSC_MODENAME,$MQSC_MONCHL,
+$MQSC_MSGDATA,$MQSC_MSGEXIT,$MQSC_NPMSPEED,$MQSC_PASSWORD,$MQSC_PROPCTL,$MQSC_RCVDATA,
+$MQSC_RCVEXIT,$MQSC_SCYDATA,$MQSC_SCYEXIT,$MQSC_SENDDATA,$MQSC_SENDEXIT,$MQSC_SEQWRAP,
+$MQSC_SHORTRTY,$MQSC_SHORTTMR,$MQSC_SSLCAUTH,$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_STATCHL,
+$MQSC_TPNAME,$MQSC_TRPTYPE,$MQSC_USEDLQ,$MQSC_USERID,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE CHANNEL($ChannelName) CHLTYPE(SVR) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not define channel '$ChannelName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ChannelName,$MQSC_XMITQ,$MQSC_BATCHHB,$MQSC_BATCHINT,$MQSC_BATCHLIM,
+$MQSC_BATCHSZ,$MQSC_COMPHDR,$MQSC_COMPMSG,$MQSC_CONNAME,$MQSC_CONVERT,$MQSC_DESCR,
+$MQSC_DISCINT,$MQSC_HBINT,$MQSC_KAINT,$MQSC_LOCLADDR,$MQSC_LONGRTY,$MQSC_LONGTMR,
+$MQSC_MAXMSGL,$MQSC_MCANAME,$MQSC_MCATYPE,$MQSC_MCAUSER,$MQSC_MODENAME,$MQSC_MONCHL,
+$MQSC_MSGDATA,$MQSC_MSGEXIT,$MQSC_NPMSPEED,$MQSC_PASSWORD,$MQSC_PROPCTL,$MQSC_RCVDATA,
+$MQSC_RCVEXIT,$MQSC_SCYDATA,$MQSC_SCYEXIT,$MQSC_SENDDATA,$MQSC_SENDEXIT,$MQSC_SEQWRAP,
+$MQSC_SHORTRTY,$MQSC_SHORTTMR,$MQSC_SSLCAUTH,$MQSC_SSLCIPH,$MQSC_SSLPEER,$MQSC_STATCHL,
+$MQSC_TPNAME,$MQSC_TRPTYPE,$MQSC_USEDLQ,$MQSC_USERID,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Channel-DefineSVRType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Channel-Delete"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ChannelName Required="true" ParameterType="System.String" />
+      <MQSC_CHLTABLE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Channel-Delete(QueueManagerName:$QueueManagerName,ChannelName:$ChannelName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ChannelName,$MQSC_CHLTABLE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DELETE CHANNEL($ChannelName) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not delete channel '$ChannelName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ChannelName,$MQSC_CHLTABLE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Channel-Delete. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Channel-Start"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ChannelName Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Channel-Start(QueueManagerName:$QueueManagerName,ChannelName:$ChannelName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ChannelName)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "START CHANNEL($ChannelName) IGNSTATE(YES) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not start channel '$ChannelName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ChannelName
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Channel-Start. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Channel-Stop"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ChannelName Required="true" ParameterType="System.String" />
+      <MQSC_MODE ParameterType="System.String" />
+      <MQSC_STATUS ParameterType="System.String" />
+      <MQSC_QMNAME ParameterType="System.String" />
+      <MQSC_CONNAME ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Channel-Stop(QueueManagerName:$QueueManagerName,ChannelName:$ChannelName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ChannelName,$MQSC_MODE,$MQSC_STATUS,$MQSC_QMNAME,$MQSC_CONNAME)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "STOP CHANNEL($ChannelName) IGNSTATE(YES) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not stop channel '$ChannelName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ChannelName,$MQSC_MODE,$MQSC_STATUS,$MQSC_QMNAME,$MQSC_CONNAME
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Channel-Stop. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="KeyDatabase-Create"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <KeyDatabaseFilePath ParameterType="System.String" />
+      <KeyDatabasePassword ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start KeyDatabase-Create() on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($KeyDatabaseFilePath,$KeyDatabasePassword)
+    try
+    {
+        $errorMessage = runmqckm -keydb -create -db $KeyDatabaseFilePath -pw $KeyDatabasePassword -type cms
+        if ($LASTEXITCODE -ne 0) { throw "Could not add certificate '$CertificateLabel'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $KeyDatabaseFilePath,$KeyDatabasePassword
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed KeyDatabase-Create. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Listener-DefineLU62Type"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ListenerName Required="true" ParameterType="System.String" />
+      <MQSC_CONTROL ParameterType="System.String" />
+      <MQSC_TPNAME ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_LIKE ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Listener-DefineLU62Type(QueueManagerName:$QueueManagerName,ListenerName:$ListenerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ListenerName,$MQSC_CONTROL,$MQSC_TPNAME,$MQSC_DESCR,$MQSC_LIKE,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE LISTENER($ListenerName) TRPTYPE(LU62) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not define listener '$ListenerName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ListenerName,$MQSC_CONTROL,$MQSC_TPNAME,$MQSC_DESCR,$MQSC_LIKE,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Listener-DefineLU62Type. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Listener-DefineNETBIOSType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ListenerName Required="true" ParameterType="System.String" />
+      <MQSC_CONTROL ParameterType="System.String" />
+      <MQSC_ADAPTER ParameterType="System.String" />
+      <MQSC_LOCLNAME ParameterType="System.String" />
+      <MQSC_NTBNAMES ParameterType="System.String" />
+      <MQSC_SESSIONS ParameterType="System.String" />
+      <MQSC_COMMANDS ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_LIKE ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Listener-DefineNETBIOSType(QueueManagerName:$QueueManagerName,ListenerName:$ListenerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ListenerName,$MQSC_CONTROL,$MQSC_ADAPTER,$MQSC_LOCLNAME,$MQSC_NTBNAMES,
+$MQSC_SESSIONS,$MQSC_COMMANDS,$MQSC_DESCR,$MQSC_LIKE,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE LISTENER($ListenerName) TRPTYPE(NETBIOS) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not define listener '$ListenerName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ListenerName,$MQSC_CONTROL,$MQSC_ADAPTER,$MQSC_LOCLNAME,$MQSC_NTBNAMES,
+$MQSC_SESSIONS,$MQSC_COMMANDS,$MQSC_DESCR,$MQSC_LIKE,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Listener-DefineNETBIOSType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Listener-DefineSPXType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ListenerName Required="true" ParameterType="System.String" />
+      <MQSC_CONTROL ParameterType="System.String" />
+      <MQSC_SOCKET ParameterType="System.String" />
+      <MQSC_BACKLOG ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_LIKE ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Listener-DefineSPXType(QueueManagerName:$QueueManagerName,ListenerName:$ListenerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ListenerName,$MQSC_CONTROL,$MQSC_SOCKET,$MQSC_BACKLOG,$MQSC_DESCR,
+$MQSC_LIKE,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE LISTENER($ListenerName) TRPTYPE(SPX) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not define listener '$ListenerName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ListenerName,$MQSC_CONTROL,$MQSC_SOCKET,$MQSC_BACKLOG,$MQSC_DESCR,
+$MQSC_LIKE,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Listener-DefineSPXType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Listener-DefineTCPType"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ListenerName Required="true" ParameterType="System.String" />
+      <MQSC_CONTROL Required="true" ParameterType="System.String" />
+      <MQSC_PORT Required="true" ParameterType="System.String" />
+      <MQSC_IPADDR ParameterType="System.String" />
+      <MQSC_BACKLOG ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_LIKE ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Listener-DefineTCPType(QueueManagerName:$QueueManagerName,ListenerName:$ListenerName,MQSC_CONTROL:$MQSC_CONTROL,MQSC_PORT:$MQSC_PORT) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ListenerName,$MQSC_CONTROL,$MQSC_PORT,$MQSC_IPADDR,$MQSC_BACKLOG,
+$MQSC_DESCR,$MQSC_LIKE,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE LISTENER($ListenerName) TRPTYPE(TCP) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not define listener '$ListenerName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ListenerName,$MQSC_CONTROL,$MQSC_PORT,$MQSC_IPADDR,$MQSC_BACKLOG,
+$MQSC_DESCR,$MQSC_LIKE,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Listener-DefineTCPType. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Listener-Delete"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ListenerName Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Listener-Delete(QueueManagerName:$QueueManagerName,ListenerName:$ListenerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ListenerName)
+    try
+    {
+        $errorMessage = "DELETE LISTENER($ListenerName)" | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not delete listener '$ListenerName' for queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ListenerName
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Listener-Delete. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Listener-IsPortNumberInUse"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <PortNumber Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+      <IsInUse Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Listener-IsPortNumberInUse(PortNumber:$PortNumber) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($PortNumber)
+    try
+    {
+        $allQueueManagerNames = dspmq.exe | Out-String | Select-String -Pattern 'QMNAME\((?<Name>.+)\)\s+STATUS\((?<Status>.+)\)' -AllMatches | ForEach-Object { $_.Matches } | Where-Object {$_.Groups["Status"].Value -eq  "Running"} | ForEach-Object { $_.Groups["Name"].Value }
+        if ($LASTEXITCODE -ne 0)
+        {
+            $errorMessage = if ($Error[0]) { $Error[0] | Out-String } else {""}
+            throw "Could not display all queue managers. Error code: $LASTEXITCODE. Error Message: $errorMessage"
+        }
+
+        foreach ($queueManagerName in $allQueueManagerNames)
+        {
+            $result = "DISPLAY LISTENER(*)" | runmqsc.exe $queueManagerName
+            if ($LASTEXITCODE -ne 0) { throw "Could not display all listeners in queue manager '$queueManagerName'. Error code: $LASTEXITCODE. Error Message: $result" }
+
+            $allListenerNames = $result | Out-String | Select-String -Pattern 'LISTENER\((?<Name>.+)\)' -AllMatches | ForEach-Object { $_.Matches } | ForEach-Object { $_.Groups["Name"].Value }
+            foreach ($listenerName in $allListenerNames)
+            {
+                $result = "DISPLAY LISTENER($listenerName) PORT" | runmqsc.exe $queueManagerName
+                if ($LASTEXITCODE -ne 0) { throw "Could not display listener '$listenerName' in queue manager '$queueManagerName'. Error code: $LASTEXITCODE. Error Message: $result" }
+                $match = $result | Out-String | Select-String -Pattern "LISTENER\($listenerName\)\s+PORT\($PortNumber\)" | ForEach-Object { $_.Matches }
+                if ($match -ne $null)
+                {
+                    RETURN $true
+                }
+            }
+        }
+
+        $False
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $PortNumber
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -is [Boolean]
+if ($Succeeded) { $IsInUse = $Result.ToString() }
+else { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Listener-IsPortNumberInUse. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Listener-Start"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ListenerName Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Listener-Start(QueueManagerName:$QueueManagerName,ListenerName:$ListenerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ListenerName)
+    try
+    {
+        $errorMessage = "START LISTENER($ListenerName) IGNSTATE(YES)" | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not start listener '$ListenerName' for queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ListenerName
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Listener-Start. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Listener-Stop"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ListenerName Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Listener-Stop(QueueManagerName:$QueueManagerName,ListenerName:$ListenerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$ListenerName)
+    try
+    {
+        $errorMessage = "STOP LISTENER($ListenerName) IGNSTATE(YES)" | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not stop listener '$ListenerName' for queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$ListenerName
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Listener-Stop. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Queue-CreateLocal"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <QueueName Required="true" ParameterType="System.String" />
+      <MQSC_ACCTQ ParameterType="System.String" />
+      <MQSC_BOQNAME ParameterType="System.String" />
+      <MQSC_BOTHRESH ParameterType="System.String" />
+      <MQSC_CLCHNAME ParameterType="System.String" />
+      <MQSC_CLUSNL ParameterType="System.String" />
+      <MQSC_CLUSTER ParameterType="System.String" />
+      <MQSC_CLWLPRTY ParameterType="System.String" />
+      <MQSC_CLWLRANK ParameterType="System.String" />
+      <MQSC_CLWLUSEQ ParameterType="System.String" />
+      <MQSC_CUSTOM ParameterType="System.String" />
+      <MQSC_DEFBIND ParameterType="System.String" />
+      <MQSC_DEFPRESP ParameterType="System.String" />
+      <MQSC_DEFPRTY ParameterType="System.String" />
+      <MQSC_DEFPSIST ParameterType="System.String" />
+      <MQSC_DEFREADA ParameterType="System.String" />
+      <MQSC_DEFSOPT ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_DISTL ParameterType="System.String" />
+      <MQSC_GET ParameterType="System.String" />
+      <MQSC_INITQ ParameterType="System.String" />
+      <MQSC_LIKE ParameterType="System.String" />
+      <MQSC_MAXDEPTH ParameterType="System.String" />
+      <MQSC_MAXMSGL ParameterType="System.String" />
+      <MQSC_MONQ ParameterType="System.String" />
+      <MQSC_MSGDLVSQ ParameterType="System.String" />
+      <MQSC_NPMCLASS ParameterType="System.String" />
+      <MQSC_PROCESS ParameterType="System.String" />
+      <MQSC_PROPCTL ParameterType="System.String" />
+      <MQSC_PUT ParameterType="System.String" />
+      <MQSC_QDEPTHHI ParameterType="System.String" />
+      <MQSC_QDEPTHLO ParameterType="System.String" />
+      <MQSC_QDPHIEV ParameterType="System.String" />
+      <MQSC_QDPLOEV ParameterType="System.String" />
+      <MQSC_QDPMAXEV ParameterType="System.String" />
+      <MQSC_QSVCIEV ParameterType="System.String" />
+      <MQSC_QSVCINT ParameterType="System.String" />
+      <MQSC_RETINTVL ParameterType="System.String" />
+      <MQSC_SCOPE ParameterType="System.String" />
+      <MQSC_STATQ ParameterType="System.String" />
+      <MQSC_TRIGDATA ParameterType="System.String" />
+      <MQSC_TRIGDPTH ParameterType="System.String" />
+      <MQSC_TRIGMPRI ParameterType="System.String" />
+      <MQSC_TRIGTYPE ParameterType="System.String" />
+      <MQSC_USAGE ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Queue-CreateLocal(QueueManagerName:$QueueManagerName,QueueName:$QueueName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$QueueName,$MQSC_ACCTQ,$MQSC_BOQNAME,$MQSC_BOTHRESH,$MQSC_CLCHNAME,
+$MQSC_CLUSNL,$MQSC_CLUSTER,$MQSC_CLWLPRTY,$MQSC_CLWLRANK,$MQSC_CLWLUSEQ,$MQSC_CUSTOM,
+$MQSC_DEFBIND,$MQSC_DEFPRESP,$MQSC_DEFPRTY,$MQSC_DEFPSIST,$MQSC_DEFREADA,$MQSC_DEFSOPT,
+$MQSC_DESCR,$MQSC_DISTL,$MQSC_GET,$MQSC_INITQ,$MQSC_LIKE,$MQSC_MAXDEPTH,
+$MQSC_MAXMSGL,$MQSC_MONQ,$MQSC_MSGDLVSQ,$MQSC_NPMCLASS,$MQSC_PROCESS,$MQSC_PROPCTL,
+$MQSC_PUT,$MQSC_QDEPTHHI,$MQSC_QDEPTHLO,$MQSC_QDPHIEV,$MQSC_QDPLOEV,$MQSC_QDPMAXEV,
+$MQSC_QSVCIEV,$MQSC_QSVCINT,$MQSC_RETINTVL,$MQSC_SCOPE,$MQSC_STATQ,$MQSC_TRIGDATA,
+$MQSC_TRIGDPTH,$MQSC_TRIGMPRI,$MQSC_TRIGTYPE,$MQSC_USAGE,$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE QLOCAL($QueueName) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not create queue '$QueueName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$QueueName,$MQSC_ACCTQ,$MQSC_BOQNAME,$MQSC_BOTHRESH,$MQSC_CLCHNAME,
+$MQSC_CLUSNL,$MQSC_CLUSTER,$MQSC_CLWLPRTY,$MQSC_CLWLRANK,$MQSC_CLWLUSEQ,$MQSC_CUSTOM,
+$MQSC_DEFBIND,$MQSC_DEFPRESP,$MQSC_DEFPRTY,$MQSC_DEFPSIST,$MQSC_DEFREADA,$MQSC_DEFSOPT,
+$MQSC_DESCR,$MQSC_DISTL,$MQSC_GET,$MQSC_INITQ,$MQSC_LIKE,$MQSC_MAXDEPTH,
+$MQSC_MAXMSGL,$MQSC_MONQ,$MQSC_MSGDLVSQ,$MQSC_NPMCLASS,$MQSC_PROCESS,$MQSC_PROPCTL,
+$MQSC_PUT,$MQSC_QDEPTHHI,$MQSC_QDEPTHLO,$MQSC_QDPHIEV,$MQSC_QDPLOEV,$MQSC_QDPMAXEV,
+$MQSC_QSVCIEV,$MQSC_QSVCINT,$MQSC_RETINTVL,$MQSC_SCOPE,$MQSC_STATQ,$MQSC_TRIGDATA,
+$MQSC_TRIGDPTH,$MQSC_TRIGMPRI,$MQSC_TRIGTYPE,$MQSC_USAGE,$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Queue-CreateLocal. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Queue-CreateRemote"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <QueueName Required="true" ParameterType="System.String" />
+      <MQSC_CLUSNL ParameterType="System.String" />
+      <MQSC_CLUSTER ParameterType="System.String" />
+      <MQSC_CLWLPRTY ParameterType="System.String" />
+      <MQSC_CLWLRANK ParameterType="System.String" />
+      <MQSC_CUSTOM ParameterType="System.String" />
+      <MQSC_DEFBIND ParameterType="System.String" />
+      <MQSC_DEFPRESP ParameterType="System.String" />
+      <MQSC_DEFPRTY ParameterType="System.String" />
+      <MQSC_DEFPSIST ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_LIKE ParameterType="System.String" />
+      <MQSC_PUT ParameterType="System.String" />
+      <MQSC_RNAME ParameterType="System.String" />
+      <MQSC_RQMNAME ParameterType="System.String" />
+      <MQSC_SCOPE ParameterType="System.String" />
+      <MQSC_XMITQ ParameterType="System.String" />
+      <MQSCOPT_REPLACE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Queue-CreateRemote(QueueManagerName:$QueueManagerName,QueueName:$QueueName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$QueueName,$MQSC_CLUSNL,$MQSC_CLUSTER,$MQSC_CLWLPRTY,$MQSC_CLWLRANK,
+$MQSC_CUSTOM,$MQSC_DEFBIND,$MQSC_DEFPRESP,$MQSC_DEFPRTY,$MQSC_DEFPSIST,$MQSC_DESCR,
+$MQSC_LIKE,$MQSC_PUT,$MQSC_RNAME,$MQSC_RQMNAME,$MQSC_SCOPE,$MQSC_XMITQ,
+$MQSCOPT_REPLACE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "DEFINE QREMOTE($QueueName) " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not create queue '$QueueName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$QueueName,$MQSC_CLUSNL,$MQSC_CLUSTER,$MQSC_CLWLPRTY,$MQSC_CLWLRANK,
+$MQSC_CUSTOM,$MQSC_DEFBIND,$MQSC_DEFPRESP,$MQSC_DEFPRTY,$MQSC_DEFPSIST,$MQSC_DESCR,
+$MQSC_LIKE,$MQSC_PUT,$MQSC_RNAME,$MQSC_RQMNAME,$MQSC_SCOPE,$MQSC_XMITQ,
+$MQSCOPT_REPLACE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Queue-CreateRemote. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Queue-DeleteLocal"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <QueueName Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Queue-DeleteLocal(QueueManagerName:$QueueManagerName,QueueName:$QueueName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$QueueName)
+    try
+    {
+        $errorMessage = "DELETE QLOCAL($QueueName) PURGE" | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not delete queue '$QueueName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$QueueName
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Queue-DeleteLocal. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Queue-DeleteRemote"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <QueueName Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Queue-DeleteRemote(QueueManagerName:$QueueManagerName,QueueName:$QueueName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$QueueName)
+    try
+    {
+        $errorMessage = "DELETE QREMOTE($QueueName)" | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not delete queue '$QueueName' in queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$QueueName
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Queue-DeleteRemote. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="Queue-IsExisting"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <QueueName Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+      <IsExisting Output="true" ParameterType="System.Boolean" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start Queue-IsExisting(QueueManagerName:$QueueManagerName,QueueName:$QueueName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$QueueName)
+    try
+    {
+        $result = "DISPLAY QUEUE(*)" | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not display queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $result" }
+        $match = $result | Out-String | Select-String -Pattern "QUEUE\($QueueName\)\s+TYPE\((?<Type>.+)\)" | ForEach-Object { $_.Matches }
+        $match -ne $null
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$QueueName
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -is [Boolean]
+if ($Succeeded) { $IsExisting = $Result.ToString() }
+else { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed Queue-IsExisting. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="QueueManager-Alter"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <MQSC_ACCTINT ParameterType="System.String" />
+      <MQSC_ACCTCONO ParameterType="System.String" />
+      <MQSC_ACCTMQI ParameterType="System.String" />
+      <MQSC_ACCTQ ParameterType="System.String" />
+      <MQSC_ACTIVREC ParameterType="System.String" />
+      <MQSC_ACTVCONO ParameterType="System.String" />
+      <MQSC_ACTVTRC ParameterType="System.String" />
+      <MQSC_AUTHOREV ParameterType="System.String" />
+      <MQSC_CCSID ParameterType="System.String" />
+      <MQSC_CERTVPOL ParameterType="System.String" />
+      <MQSC_CHAD ParameterType="System.String" />
+      <MQSC_CHADEV ParameterType="System.String" />
+      <MQSC_CHADEXIT ParameterType="System.String" />
+      <MQSC_CHLAUTH ParameterType="System.String" />
+      <MQSC_CHLEV ParameterType="System.String" />
+      <MQSC_CLWLDATA ParameterType="System.String" />
+      <MQSC_CLWLEXIT ParameterType="System.String" />
+      <MQSC_CLWLLEN ParameterType="System.String" />
+      <MQSC_CLWLMRUC ParameterType="System.String" />
+      <MQSC_CLWLUSEQ ParameterType="System.String" />
+      <MQSC_CMDEV ParameterType="System.String" />
+      <MQSC_CONFIGEV ParameterType="System.String" />
+      <MQSC_CUSTOM ParameterType="System.String" />
+      <MQSC_DEADQ ParameterType="System.String" />
+      <MQSC_DEFCLXQ ParameterType="System.String" />
+      <MQSC_DEFXMITQ ParameterType="System.String" />
+      <MQSC_DESCR ParameterType="System.String" />
+      <MQSC_INHIBTEV ParameterType="System.String" />
+      <MQSC_IPADDRV ParameterType="System.String" />
+      <MQSC_LOCALEV ParameterType="System.String" />
+      <MQSC_LOGGEREV ParameterType="System.String" />
+      <MQSC_MARKINT ParameterType="System.String" />
+      <MQSC_MAXHANDS ParameterType="System.String" />
+      <MQSC_MAXMSGL ParameterType="System.String" />
+      <MQSC_MAXUMSGS ParameterType="System.String" />
+      <MQSC_MAXPROPL ParameterType="System.String" />
+      <MQSC_MONACLS ParameterType="System.String" />
+      <MQSC_MONCHL ParameterType="System.String" />
+      <MQSC_MONQ ParameterType="System.String" />
+      <MQSC_PARENT ParameterType="System.String" />
+      <MQSC_PERFMEV ParameterType="System.String" />
+      <MQSC_PSCLUS ParameterType="System.String" />
+      <MQSC_PSMODE ParameterType="System.String" />
+      <MQSC_PSNPRES ParameterType="System.String" />
+      <MQSC_PSNPMSG ParameterType="System.String" />
+      <MQSC_PSRTYCNT ParameterType="System.String" />
+      <MQSC_PSSYNCPT ParameterType="System.String" />
+      <MQSC_REMOTEEV ParameterType="System.String" />
+      <MQSC_REPOS ParameterType="System.String" />
+      <MQSC_REPOSNL ParameterType="System.String" />
+      <MQSC_ROUTEREC ParameterType="System.String" />
+      <MQSC_SCHINIT ParameterType="System.String" />
+      <MQSC_SCMDSERV ParameterType="System.String" />
+      <MQSC_SSLCRLNL ParameterType="System.String" />
+      <MQSC_SSLCRYP ParameterType="System.String" />
+      <MQSC_SSLFIPS ParameterType="System.String" />
+      <MQSC_SSLKEYR ParameterType="System.String" />
+      <MQSC_SSLRKEYC ParameterType="System.String" />
+      <MQSC_SSLEV ParameterType="System.String" />
+      <MQSC_STATACLS ParameterType="System.String" />
+      <MQSC_STATCHL ParameterType="System.String" />
+      <MQSC_STATINT ParameterType="System.String" />
+      <MQSC_STATMQI ParameterType="System.String" />
+      <MQSC_STATQ ParameterType="System.String" />
+      <MQSC_STRSTPEV ParameterType="System.String" />
+      <MQSC_SUITEB ParameterType="System.String" />
+      <MQSC_TREELIFE ParameterType="System.String" />
+      <MQSC_TRIGINT ParameterType="System.String" />
+      <MQSCOPT_FORCE ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start QueueManager-Alter(QueueManagerName:$QueueManagerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$MQSC_ACCTINT,$MQSC_ACCTCONO,$MQSC_ACCTMQI,$MQSC_ACCTQ,$MQSC_ACTIVREC,
+$MQSC_ACTVCONO,$MQSC_ACTVTRC,$MQSC_AUTHOREV,$MQSC_CCSID,$MQSC_CERTVPOL,$MQSC_CHAD,
+$MQSC_CHADEV,$MQSC_CHADEXIT,$MQSC_CHLAUTH,$MQSC_CHLEV,$MQSC_CLWLDATA,$MQSC_CLWLEXIT,
+$MQSC_CLWLLEN,$MQSC_CLWLMRUC,$MQSC_CLWLUSEQ,$MQSC_CMDEV,$MQSC_CONFIGEV,$MQSC_CUSTOM,
+$MQSC_DEADQ,$MQSC_DEFCLXQ,$MQSC_DEFXMITQ,$MQSC_DESCR,$MQSC_INHIBTEV,$MQSC_IPADDRV,
+$MQSC_LOCALEV,$MQSC_LOGGEREV,$MQSC_MARKINT,$MQSC_MAXHANDS,$MQSC_MAXMSGL,$MQSC_MAXUMSGS,
+$MQSC_MAXPROPL,$MQSC_MONACLS,$MQSC_MONCHL,$MQSC_MONQ,$MQSC_PARENT,$MQSC_PERFMEV,
+$MQSC_PSCLUS,$MQSC_PSMODE,$MQSC_PSNPRES,$MQSC_PSNPMSG,$MQSC_PSRTYCNT,$MQSC_PSSYNCPT,
+$MQSC_REMOTEEV,$MQSC_REPOS,$MQSC_REPOSNL,$MQSC_ROUTEREC,$MQSC_SCHINIT,$MQSC_SCMDSERV,
+$MQSC_SSLCRLNL,$MQSC_SSLCRYP,$MQSC_SSLFIPS,$MQSC_SSLKEYR,$MQSC_SSLRKEYC,$MQSC_SSLEV,
+$MQSC_STATACLS,$MQSC_STATCHL,$MQSC_STATINT,$MQSC_STATMQI,$MQSC_STATQ,$MQSC_STRSTPEV,
+$MQSC_SUITEB,$MQSC_TREELIFE,$MQSC_TRIGINT,$MQSCOPT_FORCE)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " " + $mqscParameterVariable.Name.Replace("MQSC_", '') + "(" + $mqscParameterVariable.Value +")"
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " " + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscCommand = "ALTER QMGR " + $mqscArguments
+        $errorMessage = $mqscCommand | runmqsc.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0) { throw "Could not alter queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage" }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$MQSC_ACCTINT,$MQSC_ACCTCONO,$MQSC_ACCTMQI,$MQSC_ACCTQ,$MQSC_ACTIVREC,
+$MQSC_ACTVCONO,$MQSC_ACTVTRC,$MQSC_AUTHOREV,$MQSC_CCSID,$MQSC_CERTVPOL,$MQSC_CHAD,
+$MQSC_CHADEV,$MQSC_CHADEXIT,$MQSC_CHLAUTH,$MQSC_CHLEV,$MQSC_CLWLDATA,$MQSC_CLWLEXIT,
+$MQSC_CLWLLEN,$MQSC_CLWLMRUC,$MQSC_CLWLUSEQ,$MQSC_CMDEV,$MQSC_CONFIGEV,$MQSC_CUSTOM,
+$MQSC_DEADQ,$MQSC_DEFCLXQ,$MQSC_DEFXMITQ,$MQSC_DESCR,$MQSC_INHIBTEV,$MQSC_IPADDRV,
+$MQSC_LOCALEV,$MQSC_LOGGEREV,$MQSC_MARKINT,$MQSC_MAXHANDS,$MQSC_MAXMSGL,$MQSC_MAXUMSGS,
+$MQSC_MAXPROPL,$MQSC_MONACLS,$MQSC_MONCHL,$MQSC_MONQ,$MQSC_PARENT,$MQSC_PERFMEV,
+$MQSC_PSCLUS,$MQSC_PSMODE,$MQSC_PSNPRES,$MQSC_PSNPMSG,$MQSC_PSRTYCNT,$MQSC_PSSYNCPT,
+$MQSC_REMOTEEV,$MQSC_REPOS,$MQSC_REPOSNL,$MQSC_ROUTEREC,$MQSC_SCHINIT,$MQSC_SCMDSERV,
+$MQSC_SSLCRLNL,$MQSC_SSLCRYP,$MQSC_SSLFIPS,$MQSC_SSLKEYR,$MQSC_SSLRKEYC,$MQSC_SSLEV,
+$MQSC_STATACLS,$MQSC_STATCHL,$MQSC_STATINT,$MQSC_STATMQI,$MQSC_STATQ,$MQSC_STRSTPEV,
+$MQSC_SUITEB,$MQSC_TREELIFE,$MQSC_TRIGINT,$MQSCOPT_FORCE
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed QueueManager-Alter. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="QueueManager-Create"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <MQSC_c ParameterType="System.String" />
+      <MQSC_d ParameterType="System.String" />
+      <MQSC_h ParameterType="System.String" />
+      <MQSC_md ParameterType="System.String" />
+      <MQSC_g ParameterType="System.String" />
+      <MQSC_t ParameterType="System.String" />
+      <MQSC_u ParameterType="System.String" />
+      <MQSC_x ParameterType="System.String" />
+      <MQSC_lp ParameterType="System.String" />
+      <MQSC_ls ParameterType="System.String" />
+      <MQSC_lf ParameterType="System.String" />
+      <MQSC_ld ParameterType="System.String" />
+      <MQSCOPT_z ParameterType="System.String" />
+      <MQSCOPT_q ParameterType="System.String" />
+      <MQSCOPT_ss ParameterType="System.String" />
+      <MQSCOPT_sa ParameterType="System.String" />
+      <MQSCOPT_sax ParameterType="System.String" />
+      <MQSCOPT_si ParameterType="System.String" />
+      <MQSCOPT_lc ParameterType="System.String" />
+      <MQSCOPT_ll ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start QueueManager-Create(QueueManagerName:$QueueManagerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName,$MQSC_c,$MQSC_d,$MQSC_h,$MQSC_md,$MQSC_g,
+$MQSC_t,$MQSC_u,$MQSC_x,$MQSC_lp,$MQSC_ls,$MQSC_lf,
+$MQSC_ld,$MQSCOPT_z,$MQSCOPT_q,$MQSCOPT_ss,$MQSCOPT_sa,$MQSCOPT_sax,
+$MQSCOPT_si,$MQSCOPT_lc,$MQSCOPT_ll)
+    try
+    {
+        $mqscParameterVariables = Get-Variable -name "MQSC_*" -scope "SCRIPT"
+        $mqscArguments = ""
+        foreach ($mqscParameterVariable in $mqscParameterVariables)
+        {
+            if($mqscParameterVariable.Value)
+            {
+                $mqscArguments += " -" + $mqscParameterVariable.Name.Replace("MQSC_", '') + " " + $mqscParameterVariable.Value
+            }
+        }
+
+        $mqscOptionVariables = Get-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+        foreach ($mqscOptionVariable in $mqscOptionVariables)
+        {
+            if($mqscOptionVariable.Value)
+            {
+                $mqscArguments += " -" + $mqscOptionVariable.Value
+            }
+        }
+
+        $mqscArguments += " $QueueManagerName"
+        $mqscCommand = "crtmqm.exe $mqscArguments"
+
+        Invoke-Expression $mqscCommand
+
+        if ($LASTEXITCODE -ne 0)
+        {
+            $errorMessage = if ($Error[0]) { $Error[0] | Out-String } else {""}
+            throw "Could not create queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage"
+        }
+    }
+    catch { $_ }
+    finally
+    {
+        Remove-Variable -name "MQSC_*" -scope "SCRIPT"
+        Remove-Variable -name "MQSCOPT_*" -scope "SCRIPT"
+    }
+}
+
+$serverCredSSPConfiguration = Invoke-Command -Session $session -ScriptBlock { Get-WSManCredSSP } | Out-String
+$wasServerCredSSPEnabled = -not($serverCredSSPConfiguration.Contains("This computer is not configured to receive credentials from a remote client computer."));
+
+$clientCredSSPConfiguration = Get-WSManCredSSP | Out-String
+$wasCredSSPClientEnabled = -not($clientCredSSPConfiguration.Contains("The machine is not configured to allow delegating fresh credentials."));
+
+try
+{
+    if (-not($wasCredSSPClientEnabled)) { Enable-WSManCredSSP -Role Client -DelegateComputer $ComputerName -Force }
+    if (-not($wasServerCredSSPEnabled)) { Invoke-Command -Session $session -ScriptBlock { Enable-WSManCredSSP -Role Server –Force } }
+}
+finally
+{
+    remove-pssession -session $session
+}
+
+$credSSPSession = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword -CredSSP).Session
+
+try
+{
+	$Result = Invoke-Command -Session $credSSPSession -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName,$MQSC_c,$MQSC_d,$MQSC_h,$MQSC_md,$MQSC_g,
+			$MQSC_t,$MQSC_u,$MQSC_x,$MQSC_lp,$MQSC_ls,$MQSC_lf,
+			$MQSC_ld,$MQSCOPT_z,$MQSCOPT_q,$MQSCOPT_ss,$MQSCOPT_sa,$MQSCOPT_sax,
+			$MQSCOPT_si,$MQSCOPT_lc,$MQSCOPT_ll
+}
+finally
+{
+    if (-not($wasServerCredSSPEnabled)) { Invoke-Command -Session $credSSPSession -ScriptBlock { Disable-WSManCredSSP -Role Server } }
+    if (-not($wasCredSSPClientEnabled)) { Disable-WSManCredSSP -Role Client }
+    remove-pssession -session $credSSPSession
+}
+
+$Succeeded = -not(($Result | Out-String).StartsWith("Could not create queue manager"));
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed QueueManager-Create. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="QueueManager-Delete"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start QueueManager-Delete(QueueManagerName:$QueueManagerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName)
+    try
+    {
+        dltmqm.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0)
+        {
+            $errorMessage = if ($Error[0]) { $Error[0] | Out-String } else {""}
+            throw "Could not delete queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage"
+        }
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed QueueManager-Delete. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="QueueManager-End"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start QueueManager-End(QueueManagerName:$QueueManagerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName)
+    try
+    {
+        endmqm.exe -w $QueueManagerName
+        if ($LASTEXITCODE -ne 0)
+        {
+            $errorMessage = if ($Error[0]) { $Error[0] | Out-String } else {""}
+            throw "Could not end queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage"
+        }
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed QueueManager-End. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="QueueManager-IsExisting"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+      <IsExisting Output="true" ParameterType="System.Boolean" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start QueueManager-IsExisting(QueueManagerName:$QueueManagerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName)
+    try
+    {
+        $match = dspmq.exe | Out-String | Select-String -Pattern "QMNAME\($QueueManagerName\)\s+STATUS\((?<Status>.+)\)" | ForEach-Object { $_.Matches }
+        if ($LASTEXITCODE -ne 0)
+        {
+            $errorMessage = if ($Error[0]) { $Error[0] | Out-String } else {""}
+            throw "Could not display queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage"
+        }
+
+        $match -ne $null
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -is [Boolean]
+if ($Succeeded) { $IsExisting = $Result.ToString() }
+else { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed QueueManager-IsExisting. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="QueueManager-IsRunning"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+      <IsRunning Output="true" ParameterType="System.Boolean" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start QueueManager-IsRunning(QueueManagerName:$QueueManagerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName)
+    try
+    {
+        $match = dspmq.exe | Out-String | Select-String -Pattern "QMName\($QueueManagerName\)\s+STATUS\((?<Status>.+)\)" | ForEach-Object { $_.Matches }
+        if ($LASTEXITCODE -ne 0)
+        {
+            $errorMessage = if ($Error[0]) { $Error[0] | Out-String } else {""}
+            throw "Could not display queue manager. Error code: $LASTEXITCODE. Error Message: $errorMessage"
+        }
+
+        if ($match)
+        {
+            $match.Groups["Status"].Value -eq 'Running'
+        }
+        else { throw "Could not find queue manager '$QueueManagerName'."}
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -is [Boolean]
+if ($Succeeded) { $IsRunning = $Result.ToString() }
+else { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed QueueManager-IsRunning. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="QueueManager-Start"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start QueueManager-Start(QueueManagerName:$QueueManagerName) on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+	param($QueueManagerName)
+    try
+    {
+        strmqm.exe $QueueManagerName
+        if ($LASTEXITCODE -ne 0)
+        {
+            $errorMessage = if ($Error[0]) { $Error[0] | Out-String } else {""}
+            throw "Could not start queue manager '$QueueManagerName'. Error code: $LASTEXITCODE. Error Message: $errorMessage"
+        }
+    }
+    catch { $_ }
+}
+
+Try
+{
+	$Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock -ArgumentList $QueueManagerName
+}
+Finally
+{
+	remove-pssession -session $session
+}
+
+$Succeeded = $Result -eq $null
+if (-not($Succeeded)) { $FailureMessage = ($Result | Out-String).ToString() }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed QueueManager-Start. $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="PreCheck"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <Succeeded Output="true" ParameterType="System.Boolean" />
+      <FailureMessage Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start PreCheck on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$ScriptBlock = {
+  Get-Item Env:MQ_FILE_PATH
+}
+
+Try
+{
+  $Result = Invoke-Command -Session $session -ScriptBlock $ScriptBlock
+  
+  if ($null -ne $error[0])
+  {
+    Throw $error[0]
+  }
+}
+Finally
+{
+  remove-pssession -session $session
+}
+
+$Succeeded = $null -ne $Result
+if (-not($Succeeded)) { $FailureMessage = "Environment variable MQ_FILE_PATH not found" }
+
+if ($FailureMessage)
+{
+	$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Failed PreCheck, $FailureMessage")
+}
+]]>
+    </Task>
+  </UsingTask>
+  <UsingTask TaskName="ImportMQConfig"
+      TaskFactory = "PowershellTaskFactory"
+      AssemblyFile = "$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" >
+    <ParameterGroup>
+      <ComputerName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <QueueManagerName Required="true" ParameterType="System.String" />
+      <ConfigFilePath ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+$log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Start importing MQ config on Computer($ComputerName)")
+
+. $(CommonPowershellFunctionsFilePath)
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+
+$createFolderBlock = {
+  New-TemporaryFile
+
+  if ($null -ne $error[0])
+  {
+    Throw $error[0]
+  }
+}
+
+$importBlock = {
+  param($ConfigFile, $QueueManager)
+
+  $command = "runmqsc $QueueManager < $ConfigFile"
+  cmd /c $command
+
+  if ($null -ne $error[0])
+  {
+    Throw $error[0]
+  }
+}
+
+Try
+{
+  $remoteTempFile = Invoke-Command -Session $session -ScriptBlock $createFolderBlock
+  $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Created temp file [$remoteTempFile] on Computer($ComputerName)")
+
+  Copy-Item $ConfigFilePath -ToSession $session -Destination $remoteTempFile
+  $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Copied config file [$ConfigFilePath] to Computer($ComputerName):$remoteTempFile")
+}
+Finally
+{
+  Remove-PSSession -Session $session
+}
+
+$session = (Connect -MachineName $ComputerName -UserName $UserName -UserPassword $UserPassword).Session
+Try
+{
+  $Result = Invoke-Command -Session $session -ScriptBlock $importBlock -ArgumentList $remoteTempFile,$QueueManagerName
+
+  if ($null -eq $Result) 
+  {
+    Throw "Unexpected empty output";
+  }
+
+  $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Finished importing MQ config on Computer($ComputerName)")
+  foreach ($line in $Result)
+  {
+    $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", $line)
+  }
+
+  if (-not($Result[$Result.Count - 2].Contains("No commands have a syntax error")))
+  {
+    Throw "Configure file contains syntax error";
+  }
+}
+Finally
+{
+  Remove-PSSession -Session $session
+}
+
+if ($null -ne $error[0])
+{
+  Throw $error[0]
+}
+]]>
+    </Task>
+  </UsingTask>
+  <Target Name="bat:mq-certificate-addPersonalType">
+    <Certificate-AddPersonalType Condition="'%(_CertificateLabel._Type)' == 'Personal'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        KeyDatabaseFilePath="%(_CertificateLabel._KeyDatabaseFilePath)"
+        KeyDatabasePassword="%(_CertificateLabel._KeyDatabasePassword)"
+        CertificateLabel="%(_CertificateLabel.Identity)"
+        CertificateFilePath="%(_CertificateLabel._CertificateFilePath)"
+        CertificatePassword="%(_CertificateLabel._CertificatePassword)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Certificate-AddPersonalType>
+  </Target>
+  <Target Name="bat:mq-certificate-addSignerType">
+    <Certificate-AddSignerType Condition="'%(_CertificateLabel._Type)' == 'Signer'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        KeyDatabaseFilePath="%(_CertificateLabel._KeyDatabaseFilePath)"
+        KeyDatabasePassword="%(_CertificateLabel._KeyDatabasePassword)"
+        CertificateLabel="%(_CertificateLabel.Identity)"
+        CertificateFilePath="%(_CertificateLabel._CertificateFilePath)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Certificate-AddSignerType>
+  </Target>
+  <Target Name="bat:mq-certificate-rename">
+    <Certificate-Rename
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        KeyDatabaseFilePath="%(_NewCertificateLabel._KeyDatabaseFilePath)"
+        KeyDatabasePassword="%(_NewCertificateLabel._KeyDatabasePassword)"
+        CertificateLabel="%(_NewCertificateLabel._CertificateLabel)"
+        NewCertificateLabel="%(_NewCertificateLabel.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Certificate-Rename>
+  </Target>
+  <Target Name="bat:mq-channel-defineCLNTCONNType">
+    <Channel-DefineCLNTCONNType Condition="'%(_ChannelName._Type)' == 'CLNTCONN'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ChannelName._QueueManagerName)"
+        ChannelName="%(_ChannelName.Identity)"
+        MQSC_CONNAME="%(_ChannelName._MQSC_CONNAME)"
+        MQSC_AFFINITY="%(_ChannelName._MQSC_AFFINITY)"
+        MQSC_CLNTWGHT="%(_ChannelName._MQSC_CLNTWGHT)"
+        MQSC_COMPHDR="%(_ChannelName._MQSC_COMPHDR)"
+        MQSC_COMPMSG="%(_ChannelName._MQSC_COMPMSG)"
+        MQSC_DEFRECON="%(_ChannelName._MQSC_DEFRECON)"
+        MQSC_DESCR="%(_ChannelName._MQSC_DESCR)"
+        MQSC_HBINT="%(_ChannelName._MQSC_HBINT)"
+        MQSC_KAINT="%(_ChannelName._MQSC_KAINT)"
+        MQSC_LOCLADDR="%(_ChannelName._MQSC_LOCLADDR)"
+        MQSC_MAXMSGL="%(_ChannelName._MQSC_MAXMSGL)"
+        MQSC_MODENAME="%(_ChannelName._MQSC_MODENAME)"
+        MQSC_PASSWORD="%(_ChannelName._MQSC_PASSWORD)"
+        MQSC_QMNAME="%(_ChannelName._MQSC_QMNAME)"
+        MQSC_RCVDATA="%(_ChannelName._MQSC_RCVDATA)"
+        MQSC_RCVEXIT="%(_ChannelName._MQSC_RCVEXIT)"
+        MQSC_SCYDATA="%(_ChannelName._MQSC_SCYDATA)"
+        MQSC_SCYEXIT="%(_ChannelName._MQSC_SCYEXIT)"
+        MQSC_SENDDATA="%(_ChannelName._MQSC_SENDDATA)"
+        MQSC_SENDEXIT="%(_ChannelName._MQSC_SENDEXIT)"
+        MQSC_SHARECNV="%(_ChannelName._MQSC_SHARECNV)"
+        MQSC_SSLCIPH="%(_ChannelName._MQSC_SSLCIPH)"
+        MQSC_SSLPEER="%(_ChannelName._MQSC_SSLPEER)"
+        MQSC_TPNAME="%(_ChannelName._MQSC_TPNAME)"
+        MQSC_TRPTYPE="%(_ChannelName._MQSC_TRPTYPE)"
+        MQSC_USERID="%(_ChannelName._MQSC_USERID)"
+        MQSCOPT_REPLACE="%(_ChannelName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Channel-DefineCLNTCONNType>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-channel-defineCLUSRCVRType">
+    <Channel-DefineCLUSRCVRType Condition="'%(_ChannelName._Type)' == 'CLUSRCVR'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ChannelName._QueueManagerName)"
+        ChannelName="%(_ChannelName.Identity)"
+        MQSC_CONNAME="%(_ChannelName._MQSC_CONNAME)"
+        MQSC_BATCHHB="%(_ChannelName._MQSC_BATCHHB)"
+        MQSC_BATCHINT="%(_ChannelName._MQSC_BATCHINT)"
+        MQSC_BATCHLIM="%(_ChannelName._MQSC_BATCHLIM)"
+        MQSC_BATCHSZ="%(_ChannelName._MQSC_BATCHSZ)"
+        MQSC_CLUSNL="%(_ChannelName._MQSC_CLUSNL)"
+        MQSC_CLUSTER="%(_ChannelName._MQSC_CLUSTER)"
+        MQSC_CLWLPRTY="%(_ChannelName._MQSC_CLWLPRTY)"
+        MQSC_CLWLRANK="%(_ChannelName._MQSC_CLWLRANK)"
+        MQSC_CLWLWGHT="%(_ChannelName._MQSC_CLWLWGHT)"
+        MQSC_COMPHDR="%(_ChannelName._MQSC_COMPHDR)"
+        MQSC_COMPMSG="%(_ChannelName._MQSC_COMPMSG)"
+        MQSC_CONVERT="%(_ChannelName._MQSC_CONVERT)"
+        MQSC_DESCR="%(_ChannelName._MQSC_DESCR)"
+        MQSC_DISCINT="%(_ChannelName._MQSC_DISCINT)"
+        MQSC_HBINT="%(_ChannelName._MQSC_HBINT)"
+        MQSC_KAINT="%(_ChannelName._MQSC_KAINT)"
+        MQSC_LOCLADDR="%(_ChannelName._MQSC_LOCLADDR)"
+        MQSC_LONGRTY="%(_ChannelName._MQSC_LONGRTY)"
+        MQSC_LONGTMR="%(_ChannelName._MQSC_LONGTMR)"
+        MQSC_MAXMSGL="%(_ChannelName._MQSC_MAXMSGL)"
+        MQSC_MCANAME="%(_ChannelName._MQSC_MCANAME)"
+        MQSC_MCATYPE="%(_ChannelName._MQSC_MCATYPE)"
+        MQSC_MCAUSER="%(_ChannelName._MQSC_MCAUSER)"
+        MQSC_MODENAME="%(_ChannelName._MQSC_MODENAME)"
+        MQSC_MONCHL="%(_ChannelName._MQSC_MONCHL)"
+        MQSC_MRDATA="%(_ChannelName._MQSC_MRDATA)"
+        MQSC_MREXIT="%(_ChannelName._MQSC_MREXIT)"
+        MQSC_MRRTY="%(_ChannelName._MQSC_MRRTY)"
+        MQSC_MRTMR="%(_ChannelName._MQSC_MRTMR)"
+        MQSC_MSGDATA="%(_ChannelName._MQSC_MSGDATA)"
+        MQSC_MSGEXIT="%(_ChannelName._MQSC_MSGEXIT)"
+        MQSC_NETPRTY="%(_ChannelName._MQSC_NETPRTY)"
+        MQSC_NPMSPEED="%(_ChannelName._MQSC_NPMSPEED)"
+        MQSC_PROPCTL="%(_ChannelName._MQSC_PROPCTL)"
+        MQSC_PUTAUT="%(_ChannelName._MQSC_PUTAUT)"
+        MQSC_RCVDATA="%(_ChannelName._MQSC_RCVDATA)"
+        MQSC_RCVEXIT="%(_ChannelName._MQSC_RCVEXIT)"
+        MQSC_SCYDATA="%(_ChannelName._MQSC_SCYDATA)"
+        MQSC_SCYEXIT="%(_ChannelName._MQSC_SCYEXIT)"
+        MQSC_SENDDATA="%(_ChannelName._MQSC_SENDDATA)"
+        MQSC_SENDEXIT="%(_ChannelName._MQSC_SENDEXIT)"
+        MQSC_SEQWRAP="%(_ChannelName._MQSC_SEQWRAP)"
+        MQSC_SHORTRTY="%(_ChannelName._MQSC_SHORTRTY)"
+        MQSC_SHORTTMR="%(_ChannelName._MQSC_SHORTTMR)"
+        MQSC_SSLCAUTH="%(_ChannelName._MQSC_SSLCAUTH)"
+        MQSC_SSLCIPH="%(_ChannelName._MQSC_SSLCIPH)"
+        MQSC_SSLPEER="%(_ChannelName._MQSC_SSLPEER)"
+        MQSC_STATCHL="%(_ChannelName._MQSC_STATCHL)"
+        MQSC_TPNAME="%(_ChannelName._MQSC_TPNAME)"
+        MQSC_TRPTYPE="%(_ChannelName._MQSC_TRPTYPE)"
+        MQSC_USEDLQ="%(_ChannelName._MQSC_USEDLQ)"
+        MQSCOPT_REPLACE="%(_ChannelName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Channel-DefineCLUSRCVRType>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-channel-defineCLUSSDRType">
+    <Channel-DefineCLUSSDRType Condition="'%(_ChannelName._Type)' == 'CLUSSDR'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ChannelName._QueueManagerName)"
+        ChannelName="%(_ChannelName.Identity)"
+        MQSC_CONNAME="%(_ChannelName._MQSC_CONNAME)"
+        MQSC_BATCHHB="%(_ChannelName._MQSC_BATCHHB)"
+        MQSC_BATCHINT="%(_ChannelName._MQSC_BATCHINT)"
+        MQSC_BATCHLIM="%(_ChannelName._MQSC_BATCHLIM)"
+        MQSC_BATCHSZ="%(_ChannelName._MQSC_BATCHSZ)"
+        MQSC_CLUSNL="%(_ChannelName._MQSC_CLUSNL)"
+        MQSC_CLUSTER="%(_ChannelName._MQSC_CLUSTER)"
+        MQSC_CLWLPRTY="%(_ChannelName._MQSC_CLWLPRTY)"
+        MQSC_CLWLRANK="%(_ChannelName._MQSC_CLWLRANK)"
+        MQSC_CLWLWGHT="%(_ChannelName._MQSC_CLWLWGHT)"
+        MQSC_COMPHDR="%(_ChannelName._MQSC_COMPHDR)"
+        MQSC_COMPMSG="%(_ChannelName._MQSC_COMPMSG)"
+        MQSC_CONVERT="%(_ChannelName._MQSC_CONVERT)"
+        MQSC_DESCR="%(_ChannelName._MQSC_DESCR)"
+        MQSC_DISCINT="%(_ChannelName._MQSC_DISCINT)"
+        MQSC_HBINT="%(_ChannelName._MQSC_HBINT)"
+        MQSC_KAINT="%(_ChannelName._MQSC_KAINT)"
+        MQSC_LOCLADDR="%(_ChannelName._MQSC_LOCLADDR)"
+        MQSC_LONGRTY="%(_ChannelName._MQSC_LONGRTY)"
+        MQSC_LONGTMR="%(_ChannelName._MQSC_LONGTMR)"
+        MQSC_MAXMSGL="%(_ChannelName._MQSC_MAXMSGL)"
+        MQSC_MCANAME="%(_ChannelName._MQSC_MCANAME)"
+        MQSC_MCATYPE="%(_ChannelName._MQSC_MCATYPE)"
+        MQSC_MCAUSER="%(_ChannelName._MQSC_MCAUSER)"
+        MQSC_MODENAME="%(_ChannelName._MQSC_MODENAME)"
+        MQSC_MONCHL="%(_ChannelName._MQSC_MONCHL)"
+        MQSC_MSGDATA="%(_ChannelName._MQSC_MSGDATA)"
+        MQSC_MSGEXIT="%(_ChannelName._MQSC_MSGEXIT)"
+        MQSC_NPMSPEED="%(_ChannelName._MQSC_NPMSPEED)"
+        MQSC_PASSWORD="%(_ChannelName._MQSC_PASSWORD)"
+        MQSC_PROPCTL="%(_ChannelName._MQSC_PROPCTL)"
+        MQSC_RCVDATA="%(_ChannelName._MQSC_RCVDATA)"
+        MQSC_RCVEXIT="%(_ChannelName._MQSC_RCVEXIT)"
+        MQSC_SCYDATA="%(_ChannelName._MQSC_SCYDATA)"
+        MQSC_SCYEXIT="%(_ChannelName._MQSC_SCYEXIT)"
+        MQSC_SENDDATA="%(_ChannelName._MQSC_SENDDATA)"
+        MQSC_SENDEXIT="%(_ChannelName._MQSC_SENDEXIT)"
+        MQSC_SEQWRAP="%(_ChannelName._MQSC_SEQWRAP)"
+        MQSC_SHORTRTY="%(_ChannelName._MQSC_SHORTRTY)"
+        MQSC_SHORTTMR="%(_ChannelName._MQSC_SHORTTMR)"
+        MQSC_SSLCIPH="%(_ChannelName._MQSC_SSLCIPH)"
+        MQSC_SSLPEER="%(_ChannelName._MQSC_SSLPEER)"
+        MQSC_STATCHL="%(_ChannelName._MQSC_STATCHL)"
+        MQSC_TPNAME="%(_ChannelName._MQSC_TPNAME)"
+        MQSC_TRPTYPE="%(_ChannelName._MQSC_TRPTYPE)"
+        MQSC_USEDLQ="%(_ChannelName._MQSC_USEDLQ)"
+        MQSC_USERID="%(_ChannelName._MQSC_USERID)"
+        MQSCOPT_REPLACE="%(_ChannelName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Channel-DefineCLUSSDRType>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-channel-defineRCVRType">
+    <Channel-DefineRCVRType Condition="'%(_ChannelName._Type)' == 'RCVR'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ChannelName._QueueManagerName)"
+        ChannelName="%(_ChannelName.Identity)"
+        MQSC_BATCHSZ="%(_ChannelName._MQSC_BATCHSZ)"
+        MQSC_COMPHDR="%(_ChannelName._MQSC_COMPHDR)"
+        MQSC_COMPMSG="%(_ChannelName._MQSC_COMPMSG)"
+        MQSC_DESCR="%(_ChannelName._MQSC_DESCR)"
+        MQSC_HBINT="%(_ChannelName._MQSC_HBINT)"
+        MQSC_KAINT="%(_ChannelName._MQSC_KAINT)"
+        MQSC_MAXMSGL="%(_ChannelName._MQSC_MAXMSGL)"
+        MQSC_MCAUSER="%(_ChannelName._MQSC_MCAUSER)"
+        MQSC_MONCHL="%(_ChannelName._MQSC_MONCHL)"
+        MQSC_MRDATA="%(_ChannelName._MQSC_MRDATA)"
+        MQSC_MREXIT="%(_ChannelName._MQSC_MREXIT)"
+        MQSC_MRRTY="%(_ChannelName._MQSC_MRRTY)"
+        MQSC_MRTMR="%(_ChannelName._MQSC_MRTMR)"
+        MQSC_MSGDATA="%(_ChannelName._MQSC_MSGDATA)"
+        MQSC_MSGEXIT="%(_ChannelName._MQSC_MSGEXIT)"
+        MQSC_NPMSPEED="%(_ChannelName._MQSC_NPMSPEED)"
+        MQSC_PUTAUT="%(_ChannelName._MQSC_PUTAUT)"
+        MQSC_RCVDATA="%(_ChannelName._MQSC_RCVDATA)"
+        MQSC_RCVEXIT="%(_ChannelName._MQSC_RCVEXIT)"
+        MQSC_SCYDATA="%(_ChannelName._MQSC_SCYDATA)"
+        MQSC_SCYEXIT="%(_ChannelName._MQSC_SCYEXIT)"
+        MQSC_SENDDATA="%(_ChannelName._MQSC_SENDDATA)"
+        MQSC_SENDEXIT="%(_ChannelName._MQSC_SENDEXIT)"
+        MQSC_SEQWRAP="%(_ChannelName._MQSC_SEQWRAP)"
+        MQSC_SSLCAUTH="%(_ChannelName._MQSC_SSLCAUTH)"
+        MQSC_SSLCIPH="%(_ChannelName._MQSC_SSLCIPH)"
+        MQSC_SSLPEER="%(_ChannelName._MQSC_SSLPEER)"
+        MQSC_STATCHL="%(_ChannelName._MQSC_STATCHL)"
+        MQSC_TRPTYPE="%(_ChannelName._MQSC_TRPTYPE)"
+        MQSC_USEDLQ="%(_ChannelName._MQSC_USEDLQ)"
+        MQSCOPT_REPLACE="%(_ChannelName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Channel-DefineRCVRType>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-channel-defineRQSTRType">
+    <Channel-DefineRQSTRType Condition="'%(_ChannelName._Type)' == 'RQSTR'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ChannelName._QueueManagerName)"
+        ChannelName="%(_ChannelName.Identity)"
+        MQSC_CONNAME="%(_ChannelName._MQSC_CONNAME)"
+        MQSC_BATCHSZ="%(_ChannelName._MQSC_BATCHSZ)"
+        MQSC_COMPHDR="%(_ChannelName._MQSC_COMPHDR)"
+        MQSC_COMPMSG="%(_ChannelName._MQSC_COMPMSG)"
+        MQSC_DESCR="%(_ChannelName._MQSC_DESCR)"
+        MQSC_HBINT="%(_ChannelName._MQSC_HBINT)"
+        MQSC_KAINT="%(_ChannelName._MQSC_KAINT)"
+        MQSC_LOCLADDR="%(_ChannelName._MQSC_LOCLADDR)"
+        MQSC_MAXMSGL="%(_ChannelName._MQSC_MAXMSGL)"
+        MQSC_MCANAME="%(_ChannelName._MQSC_MCANAME)"
+        MQSC_MCATYPE="%(_ChannelName._MQSC_MCATYPE)"
+        MQSC_MCAUSER="%(_ChannelName._MQSC_MCAUSER)"
+        MQSC_MODENAME="%(_ChannelName._MQSC_MODENAME)"
+        MQSC_MONCHL="%(_ChannelName._MQSC_MONCHL)"
+        MQSC_MRDATA="%(_ChannelName._MQSC_MRDATA)"
+        MQSC_MREXIT="%(_ChannelName._MQSC_MREXIT)"
+        MQSC_MRRTY="%(_ChannelName._MQSC_MRRTY)"
+        MQSC_MRTMR="%(_ChannelName._MQSC_MRTMR)"
+        MQSC_MSGDATA="%(_ChannelName._MQSC_MSGDATA)"
+        MQSC_MSGEXIT="%(_ChannelName._MQSC_MSGEXIT)"
+        MQSC_NPMSPEED="%(_ChannelName._MQSC_NPMSPEED)"
+        MQSC_PASSWORD="%(_ChannelName._MQSC_PASSWORD)"
+        MQSC_PUTAUT="%(_ChannelName._MQSC_PUTAUT)"
+        MQSC_RCVDATA="%(_ChannelName._MQSC_RCVDATA)"
+        MQSC_RCVEXIT="%(_ChannelName._MQSC_RCVEXIT)"
+        MQSC_SCYDATA="%(_ChannelName._MQSC_SCYDATA)"
+        MQSC_SCYEXIT="%(_ChannelName._MQSC_SCYEXIT)"
+        MQSC_SENDDATA="%(_ChannelName._MQSC_SENDDATA)"
+        MQSC_SENDEXIT="%(_ChannelName._MQSC_SENDEXIT)"
+        MQSC_SEQWRAP="%(_ChannelName._MQSC_SEQWRAP)"
+        MQSC_SSLCAUTH="%(_ChannelName._MQSC_SSLCAUTH)"
+        MQSC_SSLCIPH="%(_ChannelName._MQSC_SSLCIPH)"
+        MQSC_SSLPEER="%(_ChannelName._MQSC_SSLPEER)"
+        MQSC_STATCHL="%(_ChannelName._MQSC_STATCHL)"
+        MQSC_TPNAME="%(_ChannelName._MQSC_TPNAME)"
+        MQSC_TRPTYPE="%(_ChannelName._MQSC_TRPTYPE)"
+        MQSC_USEDLQ="%(_ChannelName._MQSC_USEDLQ)"
+        MQSC_USERID="%(_ChannelName._MQSC_USERID)"
+        MQSCOPT_REPLACE="%(_ChannelName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Channel-DefineRQSTRType>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-channel-defineSDRType">
+    <Channel-DefineSDRType Condition="'%(_ChannelName._Type)' == 'SDR'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ChannelName._QueueManagerName)"
+        ChannelName="%(_ChannelName.Identity)"
+        MQSC_CONNAME="%(_ChannelName._MQSC_CONNAME)"
+        MQSC_XMITQ="%(_ChannelName._MQSC_XMITQ)"
+        MQSC_BATCHHB="%(_ChannelName._MQSC_BATCHHB)"
+        MQSC_BATCHINT="%(_ChannelName._MQSC_BATCHINT)"
+        MQSC_BATCHLIM="%(_ChannelName._MQSC_BATCHLIM)"
+        MQSC_BATCHSZ="%(_ChannelName._MQSC_BATCHSZ)"
+        MQSC_COMPHDR="%(_ChannelName._MQSC_COMPHDR)"
+        MQSC_COMPMSG="%(_ChannelName._MQSC_COMPMSG)"
+        MQSC_CONVERT="%(_ChannelName._MQSC_CONVERT)"
+        MQSC_DESCR="%(_ChannelName._MQSC_DESCR)"
+        MQSC_DISCINT="%(_ChannelName._MQSC_DISCINT)"
+        MQSC_HBINT="%(_ChannelName._MQSC_HBINT)"
+        MQSC_KAINT="%(_ChannelName._MQSC_KAINT)"
+        MQSC_LOCLADDR="%(_ChannelName._MQSC_LOCLADDR)"
+        MQSC_LONGRTY="%(_ChannelName._MQSC_LONGRTY)"
+        MQSC_LONGTMR="%(_ChannelName._MQSC_LONGTMR)"
+        MQSC_MAXMSGL="%(_ChannelName._MQSC_MAXMSGL)"
+        MQSC_MCANAME="%(_ChannelName._MQSC_MCANAME)"
+        MQSC_MCATYPE="%(_ChannelName._MQSC_MCATYPE)"
+        MQSC_MCAUSER="%(_ChannelName._MQSC_MCAUSER)"
+        MQSC_MODENAME="%(_ChannelName._MQSC_MODENAME)"
+        MQSC_MONCHL="%(_ChannelName._MQSC_MONCHL)"
+        MQSC_MSGDATA="%(_ChannelName._MQSC_MSGDATA)"
+        MQSC_MSGEXIT="%(_ChannelName._MQSC_MSGEXIT)"
+        MQSC_NPMSPEED="%(_ChannelName._MQSC_NPMSPEED)"
+        MQSC_PASSWORD="%(_ChannelName._MQSC_PASSWORD)"
+        MQSC_PROPCTL="%(_ChannelName._MQSC_PROPCTL)"
+        MQSC_RCVDATA="%(_ChannelName._MQSC_RCVDATA)"
+        MQSC_RCVEXIT="%(_ChannelName._MQSC_RCVEXIT)"
+        MQSC_SCYDATA="%(_ChannelName._MQSC_SCYDATA)"
+        MQSC_SCYEXIT="%(_ChannelName._MQSC_SCYEXIT)"
+        MQSC_SENDDATA="%(_ChannelName._MQSC_SENDDATA)"
+        MQSC_SENDEXIT="%(_ChannelName._MQSC_SENDEXIT)"
+        MQSC_SEQWRAP="%(_ChannelName._MQSC_SEQWRAP)"
+        MQSC_SHORTRTY="%(_ChannelName._MQSC_SHORTRTY)"
+        MQSC_SHORTTMR="%(_ChannelName._MQSC_SHORTTMR)"
+        MQSC_SSLCIPH="%(_ChannelName._MQSC_SSLCIPH)"
+        MQSC_SSLPEER="%(_ChannelName._MQSC_SSLPEER)"
+        MQSC_STATCHL="%(_ChannelName._MQSC_STATCHL)"
+        MQSC_TPNAME="%(_ChannelName._MQSC_TPNAME)"
+        MQSC_TRPTYPE="%(_ChannelName._MQSC_TRPTYPE)"
+        MQSC_USEDLQ="%(_ChannelName._MQSC_USEDLQ)"
+        MQSC_USERID="%(_ChannelName._MQSC_USERID)"
+        MQSCOPT_REPLACE="%(_ChannelName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Channel-DefineSDRType>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-channel-defineSVRCONNType">
+    <Channel-DefineSVRCONNType Condition="'%(_ChannelName._Type)' == 'SVRCONN'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ChannelName._QueueManagerName)"
+        ChannelName="%(_ChannelName.Identity)"
+        MQSC_COMPHDR="%(_ChannelName._MQSC_COMPHDR)"
+        MQSC_COMPMSG="%(_ChannelName._MQSC_COMPMSG)"
+        MQSC_DESCR="%(_ChannelName._MQSC_DESCR)"
+        MQSC_DISCINT="%(_ChannelName._MQSC_DISCINT)"
+        MQSC_HBINT="%(_ChannelName._MQSC_HBINT)"
+        MQSC_KAINT="%(_ChannelName._MQSC_KAINT)"
+        MQSC_MAXINST="%(_ChannelName._MQSC_MAXINST)"
+        MQSC_MAXINSTC="%(_ChannelName._MQSC_MAXINSTC)"
+        MQSC_MAXMSGL="%(_ChannelName._MQSC_MAXMSGL)"
+        MQSC_MCAUSER="%(_ChannelName._MQSC_MCAUSER)"
+        MQSC_MONCHL="%(_ChannelName._MQSC_MONCHL)"
+        MQSC_RCVDATA="%(_ChannelName._MQSC_RCVDATA)"
+        MQSC_RCVEXIT="%(_ChannelName._MQSC_RCVEXIT)"
+        MQSC_SCYDATA="%(_ChannelName._MQSC_SCYDATA)"
+        MQSC_SCYEXIT="%(_ChannelName._MQSC_SCYEXIT)"
+        MQSC_SENDDATA="%(_ChannelName._MQSC_SENDDATA)"
+        MQSC_SENDEXIT="%(_ChannelName._MQSC_SENDEXIT)"
+        MQSC_SHARECNV="%(_ChannelName._MQSC_SHARECNV)"
+        MQSC_SSLCAUTH="%(_ChannelName._MQSC_SSLCAUTH)"
+        MQSC_SSLCIPH="%(_ChannelName._MQSC_SSLCIPH)"
+        MQSC_SSLPEER="%(_ChannelName._MQSC_SSLPEER)"
+        MQSC_TRPTYPE="%(_ChannelName._MQSC_TRPTYPE)"
+        MQSCOPT_REPLACE="%(_ChannelName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Channel-DefineSVRCONNType>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-channel-defineSVRType">
+    <Channel-DefineSVRType Condition="'%(_ChannelName._Type)' == 'SVR'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ChannelName._QueueManagerName)"
+        ChannelName="%(_ChannelName.Identity)"
+        MQSC_XMITQ="%(_ChannelName._MQSC_XMITQ)"
+        MQSC_BATCHHB="%(_ChannelName._MQSC_BATCHHB)"
+        MQSC_BATCHINT="%(_ChannelName._MQSC_BATCHINT)"
+        MQSC_BATCHLIM="%(_ChannelName._MQSC_BATCHLIM)"
+        MQSC_BATCHSZ="%(_ChannelName._MQSC_BATCHSZ)"
+        MQSC_COMPHDR="%(_ChannelName._MQSC_COMPHDR)"
+        MQSC_COMPMSG="%(_ChannelName._MQSC_COMPMSG)"
+        MQSC_CONNAME="%(_ChannelName._MQSC_CONNAME)"
+        MQSC_CONVERT="%(_ChannelName._MQSC_CONVERT)"
+        MQSC_DESCR="%(_ChannelName._MQSC_DESCR)"
+        MQSC_DISCINT="%(_ChannelName._MQSC_DISCINT)"
+        MQSC_HBINT="%(_ChannelName._MQSC_HBINT)"
+        MQSC_KAINT="%(_ChannelName._MQSC_KAINT)"
+        MQSC_LOCLADDR="%(_ChannelName._MQSC_LOCLADDR)"
+        MQSC_LONGRTY="%(_ChannelName._MQSC_LONGRTY)"
+        MQSC_LONGTMR="%(_ChannelName._MQSC_LONGTMR)"
+        MQSC_MAXMSGL="%(_ChannelName._MQSC_MAXMSGL)"
+        MQSC_MCANAME="%(_ChannelName._MQSC_MCANAME)"
+        MQSC_MCATYPE="%(_ChannelName._MQSC_MCATYPE)"
+        MQSC_MCAUSER="%(_ChannelName._MQSC_MCAUSER)"
+        MQSC_MODENAME="%(_ChannelName._MQSC_MODENAME)"
+        MQSC_MONCHL="%(_ChannelName._MQSC_MONCHL)"
+        MQSC_MSGDATA="%(_ChannelName._MQSC_MSGDATA)"
+        MQSC_MSGEXIT="%(_ChannelName._MQSC_MSGEXIT)"
+        MQSC_NPMSPEED="%(_ChannelName._MQSC_NPMSPEED)"
+        MQSC_PASSWORD="%(_ChannelName._MQSC_PASSWORD)"
+        MQSC_PROPCTL="%(_ChannelName._MQSC_PROPCTL)"
+        MQSC_RCVDATA="%(_ChannelName._MQSC_RCVDATA)"
+        MQSC_RCVEXIT="%(_ChannelName._MQSC_RCVEXIT)"
+        MQSC_SCYDATA="%(_ChannelName._MQSC_SCYDATA)"
+        MQSC_SCYEXIT="%(_ChannelName._MQSC_SCYEXIT)"
+        MQSC_SENDDATA="%(_ChannelName._MQSC_SENDDATA)"
+        MQSC_SENDEXIT="%(_ChannelName._MQSC_SENDEXIT)"
+        MQSC_SEQWRAP="%(_ChannelName._MQSC_SEQWRAP)"
+        MQSC_SHORTRTY="%(_ChannelName._MQSC_SHORTRTY)"
+        MQSC_SHORTTMR="%(_ChannelName._MQSC_SHORTTMR)"
+        MQSC_SSLCAUTH="%(_ChannelName._MQSC_SSLCAUTH)"
+        MQSC_SSLCIPH="%(_ChannelName._MQSC_SSLCIPH)"
+        MQSC_SSLPEER="%(_ChannelName._MQSC_SSLPEER)"
+        MQSC_STATCHL="%(_ChannelName._MQSC_STATCHL)"
+        MQSC_TPNAME="%(_ChannelName._MQSC_TPNAME)"
+        MQSC_TRPTYPE="%(_ChannelName._MQSC_TRPTYPE)"
+        MQSC_USEDLQ="%(_ChannelName._MQSC_USEDLQ)"
+        MQSC_USERID="%(_ChannelName._MQSC_USERID)"
+        MQSCOPT_REPLACE="%(_ChannelName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Channel-DefineSVRType>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-channel-delete">
+    <Channel-Delete
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ChannelName._QueueManagerName)"
+        ChannelName="%(_ChannelName.Identity)"
+        MQSC_CHLTABLE="%(_ChannelName._MQSC_CHLTABLE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Channel-Delete>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-channel-start">
+    <Channel-Start
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ChannelName._QueueManagerName)"
+        ChannelName="%(_ChannelName.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Channel-Start>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-channel-stop">
+    <Channel-Stop
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ChannelName._QueueManagerName)"
+        ChannelName="%(_ChannelName.Identity)"
+        MQSC_MODE="%(_ChannelName._MQSC_MODE)"
+        MQSC_STATUS="%(_ChannelName._MQSC_STATUS)"
+        MQSC_QMNAME="%(_ChannelName._MQSC_QMNAME)"
+        MQSC_CONNAME="%(_ChannelName._MQSC_CONNAME)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Channel-Stop>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-keyDatabase-create">
+    <KeyDatabase-Create
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        KeyDatabaseFilePath="%(_KeyDatabaseFilePath.Identity)"
+        KeyDatabasePassword="%(_KeyDatabaseFilePath._KeyDatabasePassword)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </KeyDatabase-Create>
+  </Target>
+  <Target Name="bat:mq-listener-defineLU62Type">
+    <Listener-DefineLU62Type
+        Condition="'%(_ListenerName._Type)' == 'LU62'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ListenerName._QueueManagerName)"
+        ListenerName="%(_ListenerName.Identity)"
+        MQSC_CONTROL="%(_ListenerName._MQSC_CONTROL)"
+        MQSC_TPNAME="%(_ListenerName._MQSC_TPNAME)"
+        MQSC_DESCR="%(_ListenerName._MQSC_DESCR)"
+        MQSC_LIKE="%(_ListenerName._MQSC_LIKE)"
+        MQSCOPT_REPLACE="%(_ListenerName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Listener-DefineLU62Type>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-listener-defineNETBIOSType">
+    <Listener-DefineNETBIOSType
+        Condition="'%(_ListenerName._Type)' == 'NETBIOS'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ListenerName._QueueManagerName)"
+        ListenerName="%(_ListenerName.Identity)"
+        MQSC_CONTROL="%(_ListenerName._MQSC_CONTROL)"
+        MQSC_ADAPTER="%(_ListenerName._MQSC_ADAPTER)"
+        MQSC_LOCLNAME="%(_ListenerName._MQSC_LOCLNAME)"
+        MQSC_NTBNAMES="%(_ListenerName._MQSC_NTBNAMES)"
+        MQSC_SESSIONS="%(_ListenerName._MQSC_SESSIONS)"
+        MQSC_COMMANDS="%(_ListenerName._MQSC_COMMANDS)"
+        MQSC_DESCR="%(_ListenerName._MQSC_DESCR)"
+        MQSC_LIKE="%(_ListenerName._MQSC_LIKE)"
+        MQSCOPT_REPLACE="%(_ListenerName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Listener-DefineNETBIOSType>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-listener-defineSPXType">
+    <Listener-DefineSPXType
+        Condition="'%(_ListenerName._Type)' == 'SPX'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ListenerName._QueueManagerName)"
+        ListenerName="%(_ListenerName.Identity)"
+        MQSC_CONTROL="%(_ListenerName._MQSC_CONTROL)"
+        MQSC_SOCKET="%(_ListenerName._MQSC_SOCKET)"
+        MQSC_BACKLOG="%(_ListenerName._MQSC_BACKLOG)"
+        MQSC_DESCR="%(_ListenerName._MQSC_DESCR)"
+        MQSC_LIKE="%(_ListenerName._MQSC_LIKE)"
+        MQSCOPT_REPLACE="%(_ListenerName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Listener-DefineSPXType>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-listener-defineTCPType">
+    <Listener-DefineTCPType
+        Condition="'%(_ListenerName._Type)' == 'TCP'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ListenerName._QueueManagerName)"
+        ListenerName="%(_ListenerName.Identity)"
+        MQSC_CONTROL="%(_ListenerName._MQSC_CONTROL)"
+        MQSC_PORT="%(_ListenerName._MQSC_PORT)"
+        MQSC_IPADDR="%(_ListenerName._MQSC_IPADDR)"
+        MQSC_BACKLOG="%(_ListenerName._MQSC_BACKLOG)"
+        MQSC_DESCR="%(_ListenerName._MQSC_DESCR)"
+        MQSC_LIKE="%(_ListenerName._MQSC_LIKE)"
+        MQSCOPT_REPLACE="%(_ListenerName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Listener-DefineTCPType>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-listener-delete">
+    <Listener-Delete
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ListenerName._QueueManagerName)"
+        ListenerName="%(_ListenerName.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Listener-Delete>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-listener-isPortNumberInUse">
+    <Listener-IsPortNumberInUse
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        PortNumber="%(_PortNumber.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+      <Output TaskParameter="IsInUse" PropertyName="_IsInUse"/>
+    </Listener-IsPortNumberInUse>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-listener-start">
+    <Listener-Start
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ListenerName._QueueManagerName)"
+        ListenerName="%(_ListenerName.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Listener-Start>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-listener-stop" DependsOnTargets="bat:mq-queueManager-isRunning">
+    <Listener-Stop
+        Condition="$(_IsRunning)"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_ListenerName._QueueManagerName)"
+        ListenerName="%(_ListenerName.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Listener-Stop>
+    <Message Condition="!$(_IsRunning)" Importance="normal" Text="%(_QueueManagerName.Identity) is not exist or not running, skip stopping" />
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-queue-createLocal">
+    <Queue-CreateLocal Condition="'%(_QueueName._Type)' == 'Local'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_QueueName._QueueManagerName)"
+        QueueName="%(_QueueName.Identity)"
+        MQSC_ACCTQ="%(_QueueName._MQSC_ACCTQ)"
+        MQSC_BOQNAME="%(_QueueName._MQSC_BOQNAME)"
+        MQSC_BOTHRESH="%(_QueueName._MQSC_BOTHRESH)"
+        MQSC_CLCHNAME="%(_QueueName._MQSC_CLCHNAME)"
+        MQSC_CLUSNL="%(_QueueName._MQSC_CLUSNL)"
+        MQSC_CLUSTER="%(_QueueName._MQSC_CLUSTER)"
+        MQSC_CLWLPRTY="%(_QueueName._MQSC_CLWLPRTY)"
+        MQSC_CLWLRANK="%(_QueueName._MQSC_CLWLRANK)"
+        MQSC_CLWLUSEQ="%(_QueueName._MQSC_CLWLUSEQ)"
+        MQSC_CUSTOM="%(_QueueName._MQSC_CUSTOM)"
+        MQSC_DEFBIND="%(_QueueName._MQSC_DEFBIND)"
+        MQSC_DEFPRESP="%(_QueueName._MQSC_DEFPRESP)"
+        MQSC_DEFPRTY="%(_QueueName._MQSC_DEFPRTY)"
+        MQSC_DEFPSIST="%(_QueueName._MQSC_DEFPSIST)"
+        MQSC_DEFREADA="%(_QueueName._MQSC_DEFREADA)"
+        MQSC_DEFSOPT="%(_QueueName._MQSC_DEFSOPT)"
+        MQSC_DESCR="%(_QueueName._MQSC_DESCR)"
+        MQSC_DISTL="%(_QueueName._MQSC_DISTL)"
+        MQSC_GET="%(_QueueName._MQSC_GET)"
+        MQSC_INITQ="%(_QueueName._MQSC_INITQ)"
+        MQSC_LIKE="%(_QueueName._MQSC_LIKE)"
+        MQSC_MAXDEPTH="%(_QueueName._MQSC_MAXDEPTH)"
+        MQSC_MAXMSGL="%(_QueueName._MQSC_MAXMSGL)"
+        MQSC_MONQ="%(_QueueName._MQSC_MONQ)"
+        MQSC_MSGDLVSQ="%(_QueueName._MQSC_MSGDLVSQ)"
+        MQSC_NPMCLASS="%(_QueueName._MQSC_NPMCLASS)"
+        MQSC_PROCESS="%(_QueueName._MQSC_PROCESS)"
+        MQSC_PROPCTL="%(_QueueName._MQSC_PROPCTL)"
+        MQSC_PUT="%(_QueueName._MQSC_PUT)"
+        MQSC_QDEPTHHI="%(_QueueName._MQSC_QDEPTHHI)"
+        MQSC_QDEPTHLO="%(_QueueName._MQSC_QDEPTHLO)"
+        MQSC_QDPHIEV="%(_QueueName._MQSC_QDPHIEV)"
+        MQSC_QDPLOEV="%(_QueueName._MQSC_QDPLOEV)"
+        MQSC_QDPMAXEV="%(_QueueName._MQSC_QDPMAXEV)"
+        MQSC_QSVCIEV="%(_QueueName._MQSC_QSVCIEV)"
+        MQSC_QSVCINT="%(_QueueName._MQSC_QSVCINT)"
+        MQSC_RETINTVL="%(_QueueName._MQSC_RETINTVL)"
+        MQSC_SCOPE="%(_QueueName._MQSC_SCOPE)"
+        MQSC_STATQ="%(_QueueName._MQSC_STATQ)"
+        MQSC_TRIGDATA="%(_QueueName._MQSC_TRIGDATA)"
+        MQSC_TRIGDPTH="%(_QueueName._MQSC_TRIGDPTH)"
+        MQSC_TRIGMPRI="%(_QueueName._MQSC_TRIGMPRI)"
+        MQSC_TRIGTYPE="%(_QueueName._MQSC_TRIGTYPE)"
+        MQSC_USAGE="%(_QueueName._MQSC_USAGE)"
+        MQSCOPT_REPLACE="%(_QueueName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Queue-CreateLocal>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-queue-createRemote">
+    <Queue-CreateRemote Condition="'%(_QueueName._Type)' == 'Remote'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_QueueName._QueueManagerName)"
+        QueueName="%(_QueueName.Identity)"
+        MQSC_CLUSNL="%(_QueueName._MQSC_CLUSNL)"
+        MQSC_CLUSTER="%(_QueueName._MQSC_CLUSTER)"
+        MQSC_CLWLPRTY="%(_QueueName._MQSC_CLWLPRTY)"
+        MQSC_CLWLRANK="%(_QueueName._MQSC_CLWLRANK)"
+        MQSC_CUSTOM="%(_QueueName._MQSC_CUSTOM)"
+        MQSC_DEFBIND="%(_QueueName._MQSC_DEFBIND)"
+        MQSC_DEFPRESP="%(_QueueName._MQSC_DEFPRESP)"
+        MQSC_DEFPRTY="%(_QueueName._MQSC_DEFPRTY)"
+        MQSC_DEFPSIST="%(_QueueName._MQSC_DEFPSIST)"
+        MQSC_DESCR="%(_QueueName._MQSC_DESCR)"
+        MQSC_LIKE="%(_QueueName._MQSC_LIKE)"
+        MQSC_PUT="%(_QueueName._MQSC_PUT)"
+        MQSC_RNAME="%(_QueueName._MQSC_RNAME)"
+        MQSC_RQMNAME="%(_QueueName._MQSC_RQMNAME)"
+        MQSC_SCOPE="%(_QueueName._MQSC_SCOPE)"
+        MQSC_XMITQ="%(_QueueName._MQSC_XMITQ)"
+        MQSCOPT_REPLACE="%(_QueueName._MQSCOPT_REPLACE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Queue-CreateRemote>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-queue-deleteLocal">
+    <Queue-DeleteLocal
+        Condition="'%(_QueueName._Type)' == 'Local'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_QueueName._QueueManagerName)"
+        QueueName="%(_QueueName.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Queue-DeleteLocal>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-queue-deleteRemote">
+    <Queue-DeleteRemote
+        Condition="'%(_QueueName._Type)' == 'Remote'"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_QueueName._QueueManagerName)"
+        QueueName="%(_QueueName.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </Queue-DeleteRemote>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-queue-isExisting">
+    <Queue-IsExisting
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_QueueName._QueueManagerName)"
+        QueueName="%(_QueueName.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+      <Output TaskParameter="IsExisting" PropertyName="_IsExisting"/>
+      <!-- IsExisting will overlaps with QueueManager._IsExisting -->
+    </Queue-IsExisting>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-queueManager-alter">
+    <QueueManager-Alter
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_QueueManagerName.Identity)"
+        MQSC_ACCTINT="%(_QueueManagerName._MQSC_ACCTINT)"
+        MQSC_ACCTCONO="%(_QueueManagerName._MQSC_ACCTCONO)"
+        MQSC_ACCTMQI="%(_QueueManagerName._MQSC_ACCTMQI)"
+        MQSC_ACCTQ="%(_QueueManagerName._MQSC_ACCTQ)"
+        MQSC_ACTIVREC="%(_QueueManagerName._MQSC_ACTIVREC)"
+        MQSC_ACTVCONO="%(_QueueManagerName._MQSC_ACTVCONO)"
+        MQSC_ACTVTRC="%(_QueueManagerName._MQSC_ACTVTRC)"
+        MQSC_AUTHOREV="%(_QueueManagerName._MQSC_AUTHOREV)"
+        MQSC_CCSID="%(_QueueManagerName._MQSC_CCSID)"
+        MQSC_CERTVPOL="%(_QueueManagerName._MQSC_CERTVPOL)"
+        MQSC_CHAD="%(_QueueManagerName._MQSC_CHAD)"
+        MQSC_CHADEV="%(_QueueManagerName._MQSC_CHADEV)"
+        MQSC_CHADEXIT="%(_QueueManagerName._MQSC_CHADEXIT)"
+        MQSC_CHLAUTH="%(_QueueManagerName._MQSC_CHLAUTH)"
+        MQSC_CHLEV="%(_QueueManagerName._MQSC_CHLEV)"
+        MQSC_CLWLDATA="%(_QueueManagerName._MQSC_CLWLDATA)"
+        MQSC_CLWLEXIT="%(_QueueManagerName._MQSC_CLWLEXIT)"
+        MQSC_CLWLLEN="%(_QueueManagerName._MQSC_CLWLLEN)"
+        MQSC_CLWLMRUC="%(_QueueManagerName._MQSC_CLWLMRUC)"
+        MQSC_CLWLUSEQ="%(_QueueManagerName._MQSC_CLWLUSEQ)"
+        MQSC_CMDEV="%(_QueueManagerName._MQSC_CMDEV)"
+        MQSC_CONFIGEV="%(_QueueManagerName._MQSC_CONFIGEV)"
+        MQSC_CUSTOM="%(_QueueManagerName._MQSC_CUSTOM)"
+        MQSC_DEADQ="%(_QueueManagerName._MQSC_DEADQ)"
+        MQSC_DEFCLXQ="%(_QueueManagerName._MQSC_DEFCLXQ)"
+        MQSC_DEFXMITQ="%(_QueueManagerName._MQSC_DEFXMITQ)"
+        MQSC_DESCR="%(_QueueManagerName._MQSC_DESCR)"
+        MQSC_INHIBTEV="%(_QueueManagerName._MQSC_INHIBTEV)"
+        MQSC_IPADDRV="%(_QueueManagerName._MQSC_IPADDRV)"
+        MQSC_LOCALEV="%(_QueueManagerName._MQSC_LOCALEV)"
+        MQSC_LOGGEREV="%(_QueueManagerName._MQSC_LOGGEREV)"
+        MQSC_MARKINT="%(_QueueManagerName._MQSC_MARKINT)"
+        MQSC_MAXHANDS="%(_QueueManagerName._MQSC_MAXHANDS)"
+        MQSC_MAXMSGL="%(_QueueManagerName._MQSC_MAXMSGL)"
+        MQSC_MAXUMSGS="%(_QueueManagerName._MQSC_MAXUMSGS)"
+        MQSC_MAXPROPL="%(_QueueManagerName._MQSC_MAXPROPL)"
+        MQSC_MONACLS="%(_QueueManagerName._MQSC_MONACLS)"
+        MQSC_MONCHL="%(_QueueManagerName._MQSC_MONCHL)"
+        MQSC_MONQ="%(_QueueManagerName._MQSC_MONQ)"
+        MQSC_PARENT="%(_QueueManagerName._MQSC_PARENT)"
+        MQSC_PERFMEV="%(_QueueManagerName._MQSC_PERFMEV)"
+        MQSC_PSCLUS="%(_QueueManagerName._MQSC_PSCLUS)"
+        MQSC_PSMODE="%(_QueueManagerName._MQSC_PSMODE)"
+        MQSC_PSNPRES="%(_QueueManagerName._MQSC_PSNPRES)"
+        MQSC_PSNPMSG="%(_QueueManagerName._MQSC_PSNPMSG)"
+        MQSC_PSRTYCNT="%(_QueueManagerName._MQSC_PSRTYCNT)"
+        MQSC_PSSYNCPT="%(_QueueManagerName._MQSC_PSSYNCPT)"
+        MQSC_REMOTEEV="%(_QueueManagerName._MQSC_REMOTEEV)"
+        MQSC_REPOS="%(_QueueManagerName._MQSC_REPOS)"
+        MQSC_REPOSNL="%(_QueueManagerName._MQSC_REPOSNL)"
+        MQSC_ROUTEREC="%(_QueueManagerName._MQSC_ROUTEREC)"
+        MQSC_SCHINIT="%(_QueueManagerName._MQSC_SCHINIT)"
+        MQSC_SCMDSERV="%(_QueueManagerName._MQSC_SCMDSERV)"
+        MQSC_SSLCRLNL="%(_QueueManagerName._MQSC_SSLCRLNL)"
+        MQSC_SSLCRYP="%(_QueueManagerName._MQSC_SSLCRYP)"
+        MQSC_SSLFIPS="%(_QueueManagerName._MQSC_SSLFIPS)"
+        MQSC_SSLKEYR="%(_QueueManagerName._MQSC_SSLKEYR)"
+        MQSC_SSLRKEYC="%(_QueueManagerName._MQSC_SSLRKEYC)"
+        MQSC_SSLEV="%(_QueueManagerName._MQSC_SSLEV)"
+        MQSC_STATACLS="%(_QueueManagerName._MQSC_STATACLS)"
+        MQSC_STATCHL="%(_QueueManagerName._MQSC_STATCHL)"
+        MQSC_STATINT="%(_QueueManagerName._MQSC_STATINT)"
+        MQSC_STATMQI="%(_QueueManagerName._MQSC_STATMQI)"
+        MQSC_STATQ="%(_QueueManagerName._MQSC_STATQ)"
+        MQSC_STRSTPEV="%(_QueueManagerName._MQSC_STRSTPEV)"
+        MQSC_SUITEB="%(_QueueManagerName._MQSC_SUITEB)"
+        MQSC_TREELIFE="%(_QueueManagerName._MQSC_TREELIFE)"
+        MQSC_TRIGINT="%(_QueueManagerName._MQSC_TRIGINT)"
+        MQSCOPT_FORCE="%(_QueueManagerName._MQSCOPT_FORCE)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </QueueManager-Alter>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-queueManager-create" DependsOnTargets="bat:mq-queueManager-isExisting">
+    <QueueManager-Create
+        Condition="!$(_IsExisting)"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_QueueManagerName.Identity)"
+        MQSC_c="%(_QueueManagerName._MQSC_c)"
+        MQSC_d="%(_QueueManagerName._MQSC_d)"
+        MQSC_h="%(_QueueManagerName._MQSC_h)"
+        MQSC_md="%(_QueueManagerName._MQSC_md)"
+        MQSC_g="%(_QueueManagerName._MQSC_g)"
+        MQSC_t="%(_QueueManagerName._MQSC_t)"
+        MQSC_u="%(_QueueManagerName._MQSC_u)"
+        MQSC_x="%(_QueueManagerName._MQSC_x)"
+        MQSC_lp="%(_QueueManagerName._MQSC_lp)"
+        MQSC_ls="%(_QueueManagerName._MQSC_ls)"
+        MQSC_lf="%(_QueueManagerName._MQSC_lf)"
+        MQSC_ld="%(_QueueManagerName._MQSC_ld)"
+        MQSCOPT_z="%(_QueueManagerName._MQSCOPT_z)"
+        MQSCOPT_q="%(_QueueManagerName._MQSCOPT_q)"
+        MQSCOPT_ss="%(_QueueManagerName._MQSCOPT_ss)"
+        MQSCOPT_sa="%(_QueueManagerName._MQSCOPT_sa)"
+        MQSCOPT_sax="%(_QueueManagerName._MQSCOPT_sax)"
+        MQSCOPT_si="%(_QueueManagerName._MQSCOPT_si)"
+        MQSCOPT_lc="%(_QueueManagerName._MQSCOPT_lc)"
+        MQSCOPT_ll="%(_QueueManagerName._MQSCOPT_ll)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </QueueManager-Create>
+    <Message Condition="$(_IsExisting)" Importance="normal" Text="%(_QueueManagerName.Identity) exists, skip creating" />
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-queueManager-delete" DependsOnTargets="bat:mq-queueManager-end">
+    <QueueManager-Delete
+        Condition="$(_IsExisting)"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_QueueManagerName.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </QueueManager-Delete>
+    <Message Condition="!$(_IsExisting)" Importance="normal" Text="%(_QueueManagerName.Identity) is not exists, skip deleting" />
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-queueManager-end" DependsOnTargets="bat:mq-queueManager-isRunning">
+    <QueueManager-End
+        Condition="$(_IsRunning)"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_QueueManagerName.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </QueueManager-End>
+    <Message Condition="!$(_IsRunning)" Importance="normal" Text="%(_QueueManagerName.Identity) is not exists or stopped, skip ending" />
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-queueManager-isExisting" DependsOnTargets="bat:mq-preCheck">
+    <QueueManager-IsExisting
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_QueueManagerName.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+      <Output TaskParameter="IsExisting" PropertyName="_IsExisting"/>
+    </QueueManager-IsExisting>
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-queueManager-isRunning" DependsOnTargets="bat:mq-queueManager-isExisting">
+    <QueueManager-IsRunning
+        Condition="$(_IsExisting)"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_QueueManagerName.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+      <Output TaskParameter="IsRunning" PropertyName="_IsRunning"/>
+    </QueueManager-IsRunning>
+    <Message Condition="!$(_IsExisting)" Importance="normal" Text="%(_QueueManagerName.Identity) is not exist, skip checking" />
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-queueManager-start" DependsOnTargets="bat:mq-queueManager-isRunning">
+    <QueueManager-Start
+        Condition="!$(_IsRunning)"
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)"
+        QueueManagerName="%(_QueueManagerName.Identity)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </QueueManager-Start>
+    <Message Condition="$(_IsRunning)" Importance="normal" Text="%(_QueueManagerName.Identity) is running, skip starting" />
+    <Error Condition="!$(_Succeeded)" Text="$(_FailureMessage)" />
+  </Target>
+  <Target Name="bat:mq-preCheck">
+    <PreCheck
+        ComputerName="$(_ComputerName)"
+        UserName="$(_UserName)"
+        UserPassword="$(_Password)">
+      <Output TaskParameter="Succeeded" PropertyName="_Succeeded"/>
+      <Output TaskParameter="FailureMessage" PropertyName="_FailureMessage"/>
+    </PreCheck>
+    <PropertyGroup>
+      <_IsRunning>false</_IsRunning>
+      <_IsExisting>false</_IsExisting>
+    </PropertyGroup>
+  </Target>
+
+  <!--
+msbuild /t:bat:mq-certificate-addPersonalType
+msbuild /t:bat:mq-certificate-addSignerType
+msbuild /t:bat:mq-certificate-rename
+msbuild /t:bat:mq-channel-defineCLNTCONNType
+msbuild /t:bat:mq-channel-defineCLUSRCVRType
+msbuild /t:bat:mq-channel-defineCLUSSDRType
+msbuild /t:bat:mq-channel-defineRCVRType
+msbuild /t:bat:mq-channel-defineRQSTRType
+msbuild /t:bat:mq-channel-defineSDRType
+msbuild /t:bat:mq-channel-defineSVRCONNType
+msbuild /t:bat:mq-channel-defineSVRType
+msbuild /t:bat:mq-channel-delete
+msbuild /t:bat:mq-channel-start
+msbuild /t:bat:mq-channel-stop
+msbuild /t:bat:mq-keyDatabase-create
+msbuild /t:bat:mq-listener-defineLU62Type
+msbuild /t:bat:mq-listener-defineNETBIOSType
+msbuild /t:bat:mq-listener-defineSPXType
+msbuild /t:bat:mq-listener-defineTCPType
+msbuild /t:bat:mq-listener-delete
+msbuild /t:bat:mq-listener-isPortNumberInUse
+msbuild /t:bat:mq-listener-start
+msbuild /t:bat:mq-listener-stop
+msbuild /t:bat:mq-queue-createLocal
+msbuild /t:bat:mq-queue-createRemote
+msbuild /t:bat:mq-queue-deleteLocal
+msbuild /t:bat:mq-queue-deleteRemote
+msbuild /t:bat:mq-queue-isExisting
+msbuild /t:bat:mq-queueManager-alter
+msbuild /t:bat:mq-queueManager-create
+msbuild /t:bat:mq-queueManager-delete
+msbuild /t:bat:mq-queueManager-end
+msbuild /t:bat:mq-queueManager-isExisting
+msbuild /t:bat:mq-queueManager-isRunning
+msbuild /t:bat:mq-queueManager-start
+msbuild /t:bat:mq-preCheck
+-->
+
+</Project>

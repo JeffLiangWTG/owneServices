@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="1.0">
+    <xsd:include schemaLocation="ZCOMMON.xsd" />
+    <xsd:element name="ZDNOTICE" type="ZDNOTICE" />
+    <xsd:complexType name="ZDNOTICE">
+        <xsd:annotation>
+            <xsd:documentation>ARL Daily Notice</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="item" minOccurs="1" maxOccurs="1" type="DNItem" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="DNItem">
+        <xsd:annotation>
+            <xsd:documentation>ARL Daily Notice Item</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="HEADER" minOccurs="1" maxOccurs="1" type="ZDNHEAD" />
+            <xsd:element name="DETAILS" minOccurs="0" maxOccurs="1" type="ZDNTAB" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ZDNHEAD">
+        <xsd:annotation>
+            <xsd:documentation>Daily Notice Header</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="DN_DATE" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>XSD Date: yyyy-mm-dd [ext.]</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:pattern value="....-..-.." />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="TRANS_DATE" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>XSD Date: yyyy-mm-dd [ext.]</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:pattern value="....-..-.." />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="PARTY" minOccurs="1" maxOccurs="1" type="ZPARTY" />
+            <xsd:element name="TRANS_SITE" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Transmission site for CADEX transmission</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:maxLength value="8" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="PAYMENTS" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Payments made at the BN9 level</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:decimal">
+                        <xsd:totalDigits value="13" />
+                        <xsd:fractionDigits value="2" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="REFUNDS" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Amount of refund issued to this client</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:decimal">
+                        <xsd:totalDigits value="13" />
+                        <xsd:fractionDigits value="2" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ZDNTAB">
+        <xsd:annotation>
+            <xsd:documentation>Details Tab on Daily Notice</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="item" type="ZDNDETAILS" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ZDNDETAILS">
+        <xsd:annotation>
+            <xsd:documentation>Detail Records on Daily Notice</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="IMPORTER" minOccurs="0" maxOccurs="1" type="ZIMPORTER" />
+            <xsd:element name="PAYMENTS" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Payments made at the BN15 level</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:decimal">
+                        <xsd:totalDigits value="13" />
+                        <xsd:fractionDigits value="2" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="REFUNDS" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Amount of refund issued to this client</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:decimal">
+                        <xsd:totalDigits value="13" />
+                        <xsd:fractionDigits value="2" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="LINEITEMS" minOccurs="0" maxOccurs="1" type="ZLINESTAB" />
+            <xsd:element name="TOTALS" minOccurs="0" maxOccurs="1" type="ZTOTALS" />
+            <xsd:element name="OTHERS" minOccurs="0" maxOccurs="1" type="ZOTHTAB" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ZLINESTAB">
+        <xsd:annotation>
+            <xsd:documentation>Line items table</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="item" type="ZLINES" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ZLINES">
+        <xsd:annotation>
+            <xsd:documentation>Detailed transactions</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="LINE" minOccurs="1" maxOccurs="1" type="xsd:int">
+                <xsd:annotation>
+                    <xsd:documentation>Number of line items</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="DOC_TYPE" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Document Type Description</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:maxLength value="20" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="REL_DATE" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Release Date</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:pattern value="....-..-.." />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="ACC_DATE" minOccurs="0" maxOccurs="1">
+              <xsd:annotation>
+                <xsd:documentation>Accounting Date</xsd:documentation>
+              </xsd:annotation>
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                  <xsd:pattern value="....-..-.." />
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="FIELD6" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Field 6 Indicator</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:maxLength value="1" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="PORT" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Port on the B3</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:maxLength value="4" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="DOC_NUMBER" minOccurs="1" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Document Number</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:maxLength value="32" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="REL_DOC_NUMBER" minOccurs="0" maxOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Reference document number</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:maxLength value="16" />
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="AMOUNTS" minOccurs="1" maxOccurs="1" type="ZAMOUNTS" />
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>
+

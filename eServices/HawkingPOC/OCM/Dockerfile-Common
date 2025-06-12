@@ -1,0 +1,14 @@
+FROM microsoft/dotnet:2.1.301-sdk AS build
+ARG PROJECT
+ARG EXECUTABLE
+ENV HTTPS_PROXY=http://sydco-spxy-1.wtg.zone:8080
+WORKDIR /src
+COPY . .
+RUN dotnet publish -c Release -o /out $PROJECT
+
+FROM microsoft/dotnet:2.1.1-runtime AS final
+ARG EXECUTABLE
+ENV EXECUTABLE=$EXECUTABLE
+WORKDIR /app
+COPY --from=build /out .
+ENTRYPOINT dotnet /app/$EXECUTABLE

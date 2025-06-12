@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Build xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" MSBuild="16.0" xmlns="http://wisetechglobal.com/DevTools/Build.xsd">
+  <Solutions>
+    <Solution Filename="CargoWise.eHub.BizTalkAdapters.sln" />
+  </Solutions>
+  <PreBuild>
+    <Command>setup.cmd</Command>
+  </PreBuild>
+  <PostBuild>
+    <Command cacheable="false">post-build.cmd</Command>
+  </PostBuild>
+  <Dependencies>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/Deployment">
+      <Copy Source="Deployment" Target="Deployment" />
+    </Dependency>
+  </Dependencies>
+  <BuildConfigurations>
+    <Configuration BuildOnDat="true" TestOnDat="true">DEBUG</Configuration>
+    <Configuration BuildOnDat="true" Publishable="true">RELEASE</Configuration>
+  </BuildConfigurations>
+  <DatSettings BuildDeployerType="eHub.DatImplementation.Deployment.BuildDeployer, eHub.DatImplementation.Deployment" IntegrationAssembliesSubdir="DAT">
+    <TestAdapters>
+      <TestAdapter Key="VSTest" Type="Dat.Implementation.VSTest.VSTestAdapter, Dat.Implementation.VSTest">
+        <Options>
+          <Option Name="TestAssemblyReferenceFilter">Microsoft.VisualStudio.QualityTools.UnitTestFramework</Option>
+        </Options>
+      </TestAdapter>
+      <TestAdapter Key="NUnit" Type="Dat.Implementation.NUnit3.NUnit3TestAdapter, Dat.Implementation.NUnit3">
+        <Options>
+          <Option Name="TestAssemblyReferenceFilter">nunit.framework</Option>
+        </Options>
+      </TestAdapter>
+    </TestAdapters>
+  </DatSettings>
+</Build>

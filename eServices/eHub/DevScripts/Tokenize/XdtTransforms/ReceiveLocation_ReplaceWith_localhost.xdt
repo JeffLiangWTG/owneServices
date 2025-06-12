@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <ReceiveLocationReplaceWithFILEImported>true</ReceiveLocationReplaceWithFILEImported>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <MSBuildNamespaces Include="MSBuildNamespace">
+      <Prefix>x</Prefix>
+      <Uri>http://schemas.microsoft.com/developer/msbuild/2003</Uri>
+    </MSBuildNamespaces>
+  </ItemGroup>
+
+  <!-- validation rules on the target xml file this xdt transformation can be applied -->
+  <ItemGroup>
+    <Validations Remove="@(Validations)" />
+
+    <Validations Include="WCF-SQL-Only">
+      <XPath><![CDATA[/ReceivePort/ReceiveLocations/ReceiveLocation/ReceiveLocationTransportType[@Name="WCF-SQL" or @Name="WCF-Custom"]/@Name]]></XPath>
+    </Validations>
+  </ItemGroup>
+
+  <ItemGroup>
+
+    <Xdt Include="ReceiveHandler.HostTrusted.RegexReplace">
+      <XPath>/ReceivePort/ReceiveLocations/ReceiveLocation/Address</XPath>
+      <Namespaces>@(MSBuildNamespaces)</Namespaces>
+      <TaskAction>RegexReplace</TaskAction>
+      <Pattern><![CDATA[(.*)://([^/]*)(.*)]]></Pattern>
+      <Replace><![CDATA[$1://localhost$3]]></Replace>
+    </Xdt>
+
+  </ItemGroup>
+
+  <!-- import the xdt transform tasks -->
+  <PropertyGroup>
+    <XdtTransformsTasksPath Condition="'$(XdtTransformsTasksPath)'==''">$(MSBuildThisFileDirectory)</XdtTransformsTasksPath>
+    <XdtTransformsTasks Condition="'$(XdtTransformsTasks)'==''">$(XdtTransformsTasksPath)XdtTransforms.tasks</XdtTransformsTasks>
+  </PropertyGroup>
+
+  <Import Project="$(XdtTransformsTasks)" Condition="'$(XdtTransformsTasksImported)'==''" />
+
+</Project>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="test">
+
+  <PropertyGroup>
+    <SourceProject>$(MSBuildThisFileDirectory)..\Package.proj</SourceProject>
+    <HelperTasks>$(DeploymentRoot)\Helpers\Helpers.tasks</HelperTasks>
+    <OutputPath>..\..\Bin</OutputPath>
+  </PropertyGroup>
+
+  <Import Project="$(SourceProject)" Condition="'$(PackageProjectImported)'==''" />
+  <Import Project="$(HelperTasks)" Condition="'$(HelperTasksImported)'==''" />
+
+  <Target Name="test">
+    <CallTarget Targets="copy-content:test" />
+    <CallTarget Targets="helper:TargetItems:Exist" />
+    <CallTarget Targets="helper:ItemsToRemove:Remove" />
+  </Target>
+
+  <Target Name="copy-content:test">
+     <!--execute--> 
+    <CallTarget Targets="bat:package">
+      <Output
+        TaskParameter="TargetOutputs"
+        PropertyName="ZipFilePath" />
+    </CallTarget>
+
+     <!--verify package zip file created--> 
+    <Error Text="ZipFilePath is not generated" Condition="'$(ZipFilePath)'==''" />
+    <Error Text="$(ZipFilePath) is not found" Condition="!Exists('$(ZipFilePath)')" />
+
+     <!--unzip and assert--> 
+    <CallTarget Targets="helper:CreateTempGuidDir">
+      <Output
+        TaskParameter="TargetOutputs"
+        PropertyName="UnzipDir" />
+    </CallTarget>
+
+    <Message Text="UnzipDir: $(UnzipDir)" />
+    <Zip
+      TaskAction="Extract"
+      ExtractPath="$(UnzipDir)"
+      ZipFileName="$(ZipFilePath)" />
+
+    <ItemGroup>
+      <TargetItems Remove="@(TargetItems)" />
+      <TargetItems Include="$(UnzipDir)\$(MSBuildThisFile)" />
+      <TargetItems Include="$(UnzipDir)\Common\Deploy.ps1" />
+      <TargetItems Include="$(UnzipDir)\Common\Deploy.tasks" />
+      <TargetItems Include="$(UnzipDir)\Common\MSBuildCommon.tasks" />
+    </ItemGroup>
+
+    <Message Text="[Expected Items]" Importance="High" />
+    <Message Text="%(TargetItems.Identity)" />
+
+     <!--clean up--> 
+    <Message Text="[Clean Up]" Importance="High" />
+    <ItemGroup>
+      <ItemsToRemove Include="$(ZipFilePath)" />
+      <ItemsToRemove Include="$(UnzipDir)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="bat:copy-content">
+    <Warning Text="ZipContentsDirectory shall contains '$(MSBuildThisFileName)'" Condition="!$(ZipContentsDirectory.Contains('$(MSBuildThisFileName)'))" />
+    <Message Text="Copying: $(MSBuildThisFileFullPath)" Importance="High" />
+    <Copy SourceFiles="$(MSBuildThisFileFullPath)" DestinationFolder="$(ZipContentsDirectory)" />
+  </Target>
+
+</Project>

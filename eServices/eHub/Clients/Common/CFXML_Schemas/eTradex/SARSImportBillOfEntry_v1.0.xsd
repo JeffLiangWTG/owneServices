@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+GTS Import Bill of Entry Schema:
+Import Bill of Entry for integration from LSP into GTS. This message is SARS specific
+
+(C) eTradex (Pty) Ltd
+Last Updated: 11 September 2012
+Last Updated By: Quinton Pretorious
+-->
+
+<xs:schema targetNamespace="http://schemas.exrilov3.com/SARSImportBillOfEntry_v1.0.xsd"
+    elementFormDefault="qualified"
+    xmlns:SARSImportBOE="http://schemas.exrilov3.com/SARSImportBillOfEntry_v1.0.xsd"
+	  xmlns:masterData="http://schemas.exrilov3.com/MasterData_v1.0.xsd"
+	  xmlns:interface="http://schemas.exrilov3.com/Interface_v1.0.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:import namespace="http://schemas.exrilov3.com/MasterData_v1.0.xsd" schemaLocation="MasterData_v1.0.xsd"/>
+  <xs:import namespace="http://schemas.exrilov3.com/Interface_v1.0.xsd" schemaLocation="Interface_v1.0.xsd"/>
+
+  <xs:simpleType name="TransactionType">
+    <xs:restriction base="xs:int">
+      <xs:enumeration value="9" id="Original"/>
+      <xs:enumeration value="4" id="Change"/>
+      <xs:enumeration value="1" id="Cancellation"/>
+      <xs:enumeration value="5" id="Replace"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:complexType name="ImportBillOfEntry">
+    <xs:sequence>
+      <xs:element type="xs:token" name="HWBNumber"/>
+      <xs:element type="xs:string" name="TransportDocumentNumber"/>
+      <xs:element type="xs:string" name="ClearingFileNumber" minOccurs="0"/>
+      <xs:element type="xs:token" name="MRNNumber"/>
+      <xs:element type="xs:date" name="BillOfEntryDate"/>
+      <xs:element type="SARSImportBOE:TransactionType" name="TransactionType"/>
+      <xs:element type="xs:token" name="ProcedureCategoryCode"/>
+      <xs:element type="xs:token" name="CustomsOfficeOfEntry"/>
+      <xs:element type="xs:token" name="CustomsOfficeOfDestination" minOccurs="0"/>
+      <xs:element type="xs:string" name="DeclarantsReferenceNumber" minOccurs="0"/>
+      <xs:element type="xs:token" name="OriginalMRNNumber" minOccurs="0"/>
+      <xs:element type="masterData:TransportMode" name="TransportMode"/>
+      <xs:element type="xs:string" name="VoyageFlightNumber" minOccurs="0"/>
+      <xs:element type="xs:string" name="TransportName" minOccurs="0"/>
+      <xs:element type="xs:token" name="AgentCustomsCode"/>
+      <xs:element type="xs:token" name="ImporterCustomsCode" minOccurs="0"/>
+      <xs:element type="xs:token" name="ExporterCustomsCode" minOccurs="0"/>
+      <xs:element type="xs:date" name="ShippedOnBoardDate" minOccurs="0"/>
+      <xs:element type="SARSImportBOE:InvoiceList" name="InvoiceList" minOccurs="0"/>
+      <xs:element type="SARSImportBOE:BOELineList" name="BOELineList" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="InvoiceList">
+    <xs:sequence>
+      <xs:element type="SARSImportBOE:Invoice" name="Invoice" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Invoice">
+    <xs:sequence>
+      <xs:element type="xs:string" name="InvoiceNumber"/>
+      <xs:element type="masterData:CurrencyCode" name="CurrencyCode"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="BOELine">
+    <xs:sequence>
+      <xs:element type="xs:positiveInteger" name="LineNumber"/>
+      <xs:element type="xs:token" name="CPCCode"/>
+      <xs:element type="xs:token" name="PreviousCPCCode"/>
+      <xs:element type="xs:token" name="TariffCode"/>
+      <xs:element type="xs:token" name="ProcedureMeasure" minOccurs="0"/>
+      <xs:element type="masterData:CountryCode" name="CountryOfOrigin"/>
+      <xs:element type="xs:decimal" name="CustomsValue"/>
+      <xs:element type="xs:decimal" name="ActualPrice" minOccurs="0"/>
+      <xs:element type="SARSImportBOE:UnitOfMeasureList" name="UnitOfMeasureList"/>
+      <xs:element type="SARSImportBOE:CustomsDutyList" name="CustomsDutyList" minOccurs="0"/>
+      <xs:element type="masterData:LSPClientReferenceList" name="LSPClientReferenceList" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UnitOfMeasure">
+    <xs:sequence>
+      <xs:element type="xs:token" name="Type"/>
+      <xs:element type="xs:token" name="Code"/>
+      <xs:element type="xs:decimal" name="Quantity"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CustomsDuty">
+    <xs:sequence>
+      <xs:element type="xs:token" name="DutyTypeCode"/>
+      <xs:element type="xs:decimal" name="DutyValue"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ImportBillOfEntryList">
+    <xs:sequence>
+      <xs:element type="SARSImportBOE:ImportBillOfEntry" name="ImportBillOfEntry" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="BOELineList">
+    <xs:sequence>
+      <xs:element type="SARSImportBOE:BOELine" name="BOELine" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UnitOfMeasureList">
+    <xs:sequence>
+      <xs:element type="SARSImportBOE:UnitOfMeasure" name="UnitOfMeasure" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="CustomsDutyList">
+    <xs:sequence>
+      <xs:element type="SARSImportBOE:CustomsDuty" name="CustomsDuty" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  
+  
+  <xs:element name="EV3Interface">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element type="interface:InterfaceHeader" name="InterfaceHeader"/>
+        <xs:element type="SARSImportBOE:ImportBillOfEntryList" name="ImportBillOfEntryList" minOccurs="0"/>
+        <xs:element type="interface:IntefaceFooter" name="InterfaceFooter"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified"
+           targetNamespace="http://exworks.com/schema" xmlns="http://exworks.com/schema">
+
+    <xs:annotation>
+        <xs:appinfo>
+            <schemaInfo root_reference="TruckingOrder" displayroot_reference="TruckingOrder" xmlns="http://schemas.microsoft.com/BizTalk/2003" />
+        </xs:appinfo>
+    </xs:annotation>
+
+    <xs:include schemaLocation=".\ExWorksTypes.xsd"/>
+
+    <xs:complexType name="ContainerInfoType">
+        <xs:sequence>
+            <xs:element name="ContainerNumber" type="ContainerNumberType" minOccurs="0"/>
+            <xs:element name="LastFreeDate" type="xs:date" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DispatchMethodType">
+        <xs:sequence>
+            <xs:choice minOccurs="1" maxOccurs="1">
+                <xs:element name="PreBooked">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="BookedScac" type="ScacType"/>
+                            <xs:element name="BookedPrice" type="MonetaryAmountType"/>
+                            <xs:element name="IntermediateBrokerScac" type="ScacType" minOccurs="0" maxOccurs="1"/>
+                            <xs:element name="QuoteNumber" type="QuoteNumberType" minOccurs="0" maxOccurs="1"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="OpenOffer">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="SuggestedScac" type="ScacType" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="FixedOffer">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="OfferScac" type="ScacType"/>
+                            <xs:element name="OfferPrice" type="MonetaryAmountType"/>
+                            <xs:element name="IntermediateBrokerScac" type="ScacType" minOccurs="0" maxOccurs="1"/>
+                            <xs:element name="QuoteNumber" type="QuoteNumberType" minOccurs="0" maxOccurs="1"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="ShipmentIdentifiers">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="FileNumber" type="FileNumberType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Dispatch">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="DispatchMethod" type="DispatchMethodType"/>
+                <xs:element name="DispatcherInstructions" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Transport">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ShipmentType" type="ShipmentTypeType"/>
+                <xs:element name="CargoType" type="CargoTypeType"/>
+                <xs:element name="Container" type="ContainerInfoType" minOccurs="0"/>
+                <xs:element name="VehicleDescription" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="OrderService">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute name="type" use="required">
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:enumeration value="bookingConfirmation"/>
+                                <xs:enumeration value="podData"/>
+                                <xs:enumeration value="podImage"/>
+                                <xs:enumeration value="invoice"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="OrderServices">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="OrderService"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Shipment">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="ShipmentIdentifiers"/>
+                <xs:element name="AdditionalReferenceNumbers" type="ReferenceNumbersType" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="Forwarder" type="ForwarderType"/>
+                <xs:element ref="Dispatch"/>
+                <xs:element ref="Transport"/>
+                <xs:element name="Cargo" type="CargoType"/>
+                <xs:element ref="OrderServices" minOccurs="0"/>
+                <xs:element name="Origin" type="OriginType"/>
+                <xs:element name="Destination" type="DestinationType"/>
+                <xs:element name="UserDefinedValues" type="UserDefinedValuesType" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="TruckingOrder">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="TransactionHeader" type="TransactionHeaderType"/>
+                <xs:element ref="Shipment"/>
+            </xs:sequence>
+            <xs:attribute name="exworksVersion" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string"/>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
+	

@@ -1,0 +1,785 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Enterprise.ZArchitecture.Business</name>
+    </assembly>
+    <members>
+        <member name="T:Enterprise.ZArchitecture.Business.ActionFieldAttribute">
+            <summary>
+            Used by the operational actions system to identify how a property should be presented to the user when
+            running an action that updates the field.
+            </summary>
+            <remarks>
+            See: http://intranet/development/Development%20Wiki/CorrectingTheFieldDetection.aspx
+            </remarks>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ActionFieldAttribute.MaxLength">
+            <summary>
+            Specifies the maximum length for a ZString property or the Precision of a numeric property.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ActionFieldAttribute.LookUpEditType">
+            <summary>
+            Specifies the CodeDescriptionPairList to use for a ZString property.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ActionFieldAttribute.DateTimeFormat">
+            <summary>
+            Specifies the ZDateTimePickerFormat to use for a ZDateTime property.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ActionFieldAttribute.CollectionType">
+            <summary>
+            Specifies the BusinessObjectCollection to use for a ZString or ZGuid property.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ActionFieldAttribute.DefaultAddressType">
+            <summary>
+            Specifies the default AddressType to use for a ZGuid property.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ActionFieldAttribute.FieldType">
+            <summary>
+            Specifies the type of control to present to the user. Defaults to Auto.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ActionFieldAttribute.MinValue">
+            <summary>
+            The minimum acceptable value for numeric properties.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ActionFieldAttribute.MaxValue">
+            <summary>
+            The maximum acceptable value for numeric properties.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ActionFieldAttribute.Scale">
+            <summary>
+            The scale for numeric properties.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ActionFieldAttribute.ReadOnly">
+            <summary>
+            Read-only properties cannot be set but may still be used in filters.
+            </summary>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.Business.ActionFieldFollowAttribute">
+            <summary>
+            Used by the operational actions system to determine if it can follow a property when looking for fields that can be bulk updated.
+            </summary>
+            <remarks>
+            See: http://intranet/development/Development%20Wiki/CorrectingTheFieldDetection.aspx
+            </remarks>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.ActionFieldFollowAttribute.ShouldFollow(System.Reflection.PropertyInfo)">
+            <summary>
+            Determine if a property can be followed by looking for the relivant ActionFieldFollowAttribute's and taking into account any fallbacks.
+            </summary>
+            <param name="info">The property to check</param>
+            <returns>True if the property can be followed, false otherwise.</returns>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.Business.ActionFieldType.Auto">
+            <summary>
+            Automaticly determine how the property should be presented based on the property type and
+            what other information is available. (default)
+            </summary>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.Business.ActionFieldType.Hidden">
+            <summary>
+            Do not allow the property to be bulk updated or used in filters by operational actions.
+            </summary>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.Business.ActionFieldType.DateTime">
+            <summary>
+            The property should be edited using a ZDateEdit control.
+            </summary>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.Business.ActionFieldType.Text">
+            <summary>
+            The property should be edited using a ZTextBox control.
+            </summary>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.Business.ActionFieldType.Code">
+            <summary>
+            The property should be edited using a ZDropEdit control.
+            </summary>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.Business.ActionFieldType.NKModule">
+            <summary>
+            The property should be edited using a ZCodeFindBox control.
+            </summary>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.Business.ActionFieldType.PKModule">
+            <summary>
+            The property should be edited using a ZFindBox control.
+            </summary>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.Business.ActionFieldType.Address">
+            <summary>
+            The property should be edited using a ZAddressControl control.
+            </summary>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.Business.ActionFieldType.Boolean">
+            <summary>
+            The property should be edited using a check box or 2 value drop edit.
+            </summary>
+            <remarks>
+            If the value is mandatory then a check box should be used. If the value is optional then a drop edit should be used.
+            </remarks>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.Business.ActionFieldType.Numeric">
+            <summary>
+            The property should be edited using a calc edit.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.BackgroundAppDomainWorker.QueueWorkItem(System.String,System.Delegate,System.Object[])">
+            <summary>
+            Run a unit of work on a separate thread in a separate application domain asynchronously.
+            An anonymous delegate that references local or member variables cannot be used.
+            The delegate arguments, and the delegate instance (if the method is not static) must be serializable.
+            </summary>
+            <param name="workItemDescription">
+            The human-readable description of the work item. Used as the key in ReportOnce,
+            and shown to the user when attempting to close Enterprise with pending background jobs.
+            </param>
+            <param name="method">The delegate to run. If the delegate points to an instance method, the instance must be serializable.</param>
+            <param name="args">The arguments to the delegate. Each argument must be serializable.</param>
+            <returns>The return value of the delegate, which must be serializable.</returns>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.EnterpriseBusinessObject.SupportsNotes">
+            <summary>
+            Indicates whether or not notes are accessible for the business object (by default, all business objects support notes).
+            Objects that do not support notes, such as those objects that do not reside
+            in a database containing StmNote should override and return false.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.EnterpriseBusinessObject.BusinessObjectsWithRelatedNotes">
+            <summary>
+            Override this method and return each related Business Object for which you want to see Notes (on the Notes tab).
+            For example, return new BusinessObject[] { Consol, PackLine }
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.EnterpriseBusinessObject.NoteContextsForRelatedNotes">
+            <summary>
+            Override this method and return the StmNoteContexts for which you want to see Related Notes (on the Notes tab).
+            You can combine these enums using a Bitwise OR, for example, return StmNoteContexts.Module.S | StmNoteContexts.Module.F | StmNoteContexts.Module.D.
+            Note that you do not need to include StmNoteContexts.Module.A, StmNoteContexts.Direction.A and StmNoteContexts.FreightMode.A as it is included by default.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.EnterpriseBusinessObject.NoteTypes">
+            <summary>
+            Determines which predefinted notes are available to this business object. When bound to the Notes tab the grid drop list for "Description" will contain these.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.EnterpriseBusinessObject.BusinessObjectsWithRelatedEvents">
+            <summary>
+            Override this method and return each related Business Object for which you want to see Logs (on the Events tab).
+            For example, return new BusinessObject[] { Shipment, Container, PackLine[0], PackLine[1] }
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Internal.BusinessObjectLoggerOptions.#ctor(System.String,System.Boolean,Enterprise.ZArchitecture.Business.Event)">
+            <param name="PrefixToReference">StmALog.SL_Reference will be prefixed with this value</param>
+            <param name="ChangeMainAuditFieldsOnBusinessObject">If true, XX_LastAuditedDate/XX_LastAuditedUser on the main BusinessObject will be updated</param>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.Business.CountrySpecificTypeDecider.CountrySpecificType">
+            <remarks>
+            It should be a class, not a struct. As if it is a struct then this assignement:
+            fBusinessObjectType = BusinessObjectTypeGetter();
+            will initialize only local copy of the field in stack, but global copy in an array will remain null.
+            </remarks>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Testing.CountrySpecificTestCase.SetCountryCode(CargoWise.Types.ZString)">
+            <summary>
+            Sets the static GlbCompany.CurrentCompany.Country to the specified code.
+            When the test is completed, the Country is returned to its initial value
+            </summary>
+            <param name="CountryCode">The 2 character code of the country to be set</param>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.NotificationBuffer.#ctor(CargoWise.ComponentModel.INotifications)">
+            <summary>
+            Make sure you pass the parent level INotifications in if there is one or it will not get any events posted after this buffer is instantiated.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.NotificationBuffer.#ctor">
+            <summary>
+            DO NOT USE THIS unless there is no parent level INotifications already instantiated. Use the other constructor instead.
+            </summary>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.VerboseInfoNotification">
+            <summary>
+            This event is not reported to the user in the batch processor.
+            </summary>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.Business.EventDatePropertyAttribute">
+            <summary>
+            Apply this attribute to a property to ensure an StmALog record exists with SL_EventTime containing the
+            property's value.
+            WARNING: Use of this property means an INSERT into StmALog when a date is first populated or changed.
+                     When the property value is changed, an additional SELECT is performed to see if the StmALog
+                     already exists, so that the existing event log can be cancelled.
+            </summary>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.Business.JoinConditionItemList">
+            <summary>
+            A Code Description pair list that provides all Join Conditions.
+            Also provides the ability to get the actual JoinCondition from a code.
+            </summary>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.Business.ROT13">
+            <summary>
+            Simple encryption and decryption with ROT13
+            </summary>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.Business.ROT13QueryString">
+            <summary>
+            Query string encoded with ROT13
+            </summary>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.Business.SQLComparisonOperatorItemList">
+            <summary>
+            A Code Description pair list that provides all user-sensible SQL Comparison Operators.
+            Also provides the ability to get the actual SQLComparisonOperator from a 3 char code.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.AutoStmActivityLogValidation.Add(Enterprise.ZArchitecture.Business.AutoStmActivityLogValidation)">
+            <summary>
+            Add more validation to the StmActivityLog's base validation. This will not replace existing validation 
+            (to replace existing validation you should override the 'Validation' property in the business object).
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.AutoStmActivityLogValidation.Remove(Enterprise.ZArchitecture.Business.AutoStmActivityLogValidation)">
+            <summary>
+            Remove validation. The StmActivityLog's base validation object cannot be removed.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.AutoStmActivityLogValidation.AutoValidationType">
+            <summary>
+            The auto validation type.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.AutoStmALogValidation.Add(Enterprise.ZArchitecture.Business.AutoStmALogValidation)">
+            <summary>
+            Add more validation to the StmALog's base validation. This will not replace existing validation 
+            (to replace existing validation you should override the 'Validation' property in the business object).
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.AutoStmALogValidation.Remove(Enterprise.ZArchitecture.Business.AutoStmALogValidation)">
+            <summary>
+            Remove validation. The StmALog's base validation object cannot be removed.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.AutoStmALogValidation.AutoValidationType">
+            <summary>
+            The auto validation type.
+            </summary>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.Business.ZLogsOrNotes">
+            TODO :
+             Rename this class (to what?),
+             Implement IEnumerator + IEnumerable
+             Ensure the 'AllElements' implements IBusinessObjectCollectionWithRelatedElements
+             Ensure 'GetElementsCollectionFromRelatedBizObject()' implements IBusinessObjectCollectionWithRelatedElements
+             Report error if attempting to add incorrect BizObj type in AddWithoutLoading()
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ZLogsOrNotes.DatabaseCount">
+            <summary>
+            Gets the record count from the DATABASE (this may not be the same as the count in the FACTORY!).
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ZLogsOrNotes.NewElements">
+            <summary>
+            For performance we store all new elements in this hash until such time that ElementsInternal is accessed.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ZLogsOrNotes.RelatedBusinessObjectsHaveChanged">
+            <summary>
+            Has the module developer assigned a new business object to an item in their 'RelatedBusinessObjects' array?
+            (eg. BizO.RelatedBusinessEntitiesWithLogs or BizO.RelatedBusinessEntitiesWithNotes)
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Logs.CancelAll">
+            <summary>
+            Sets SL_IsCancelled to true for all Logs. Note that this will first LOAD ALL LOGS for the parent business object (which may be slow).
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Logs.Find(CargoWise.EntityFramework.ZQuery)">
+            <summary>
+            Performs a search on the logs collection. Note that this will first LOAD ALL LOGS for the parent business object (which may be slow).
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Logs.DatabaseHasLogs(CargoWise.EntityFramework.ZQuery)">
+            <summary>
+            Returns true if any StmALog records exist in the DATABASE for this business object matching the given filter (this may not be the same as the FACTORY!). 
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Logs.AddNew">
+            <summary>
+            Adds a new StmALog to the collection. 
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Logs.AddNew(Enterprise.ZArchitecture.Business.Event)">
+            <summary>
+            Adds a new StmALog to the collection. Use Events.* to specify an Event type.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Logs.AddNew(Enterprise.ZArchitecture.Business.Event,CargoWise.Types.ZString)">
+            <summary>
+            Adds a new StmALog to the collection. Use Events.* to specify an Event type.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Logs.MostRecentLogByEventTime(Enterprise.ZArchitecture.Business.Event)">
+            <summary>
+            Loads the most recent log based on SL_EventTime for a given Event.
+            Cancelled events are not retrieved by this method
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Logs.MostRecentLogByEventTime(Enterprise.ZArchitecture.Business.Event,CargoWise.Types.ZString)">
+            <summary>
+            Loads the most recent log based on SL_EventTime and SL_Reference for a given Event.
+            Cancelled events are not retrieved by this method
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Logs.MostRecentLogByEventTime(Enterprise.ZArchitecture.Business.Event,CargoWise.EntityFramework.ZQuery)">
+            <summary>
+            Loads the most recent log based on SL_EventTime and ExtraQuery for a given Event.
+            Cancelled events are not retrieved by this method
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Logs.CreateRecreateOrUpdateEventLog(Enterprise.ZArchitecture.Business.Event,Enterprise.ZArchitecture.Business.EstimateActual,CargoWise.Types.ZDateTime)">
+            <summary>
+            Creates a new event log and cancels the existing log (if found).
+            - If eventTime is valid and an event log already exists in memory, it is updated instead of being re-created.
+            - If eventTime is empty and there is an existing uncommitted (not in db) log, it is deleted.
+            - If eventTime is empty, and there is an existing committed (saved) log, the existing log is cancelled.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.Logs.AutoCreatedLogDefaultSL_Reference">
+            <summary>
+            Default SL_Reference to include on log entries. May be appended with CustomLogReference in BusinessObject
+            </summary>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.Business.StmNote.TypeDecider">
+            to be removed in favour or collection support for loading the existing type from the cache - see Geoff
+        </member>
+        <member name="T:Enterprise.ZArchitecture.Business.LogsForNominatedEvent.Test.TestHelperStmNote">
+            <summary>
+            This is a test helper class than will have a LogsForNominatedEvent collection as a property
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.AutoStmDataValidation.Add(Enterprise.ZArchitecture.Business.AutoStmDataValidation)">
+            <summary>
+            Add more validation to the StmData's base validation. This will not replace existing validation 
+            (to replace existing validation you should override the 'Validation' property in the business object).
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.AutoStmDataValidation.Remove(Enterprise.ZArchitecture.Business.AutoStmDataValidation)">
+            <summary>
+            Remove validation. The StmData's base validation object cannot be removed.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.AutoStmDataValidation.AutoValidationType">
+            <summary>
+            The auto validation type.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.AutoStmEventValidation.Add(Enterprise.ZArchitecture.Business.AutoStmEventValidation)">
+            <summary>
+            Add more validation to the StmEvent's base validation. This will not replace existing validation 
+            (to replace existing validation you should override the 'Validation' property in the business object).
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.AutoStmEventValidation.Remove(Enterprise.ZArchitecture.Business.AutoStmEventValidation)">
+            <summary>
+            Remove validation. The StmEvent's base validation object cannot be removed.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.AutoStmEventValidation.AutoValidationType">
+            <summary>
+            The auto validation type.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.AutoStmNoteValidation.Add(Enterprise.ZArchitecture.Business.AutoStmNoteValidation)">
+            <summary>
+            Add more validation to the StmNote's base validation. This will not replace existing validation 
+            (to replace existing validation you should override the 'Validation' property in the business object).
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.AutoStmNoteValidation.Remove(Enterprise.ZArchitecture.Business.AutoStmNoteValidation)">
+            <summary>
+            Remove validation. The StmNote's base validation object cannot be removed.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.AutoStmNoteValidation.AutoValidationType">
+            <summary>
+            The auto validation type.
+            </summary>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.Business.PredefinedNoteTypes">
+            <summary>
+            The Predefined Notes Types are maintained by Richard.
+            *** Please see Richard or Geoff if you require a type that does not exist. ***
+            </summary>
+        </member>
+        <member name="E:Enterprise.ZArchitecture.Business.StmNoteCollectionView.NoteAddedInternal">
+            <summary>
+            Event fired when a new note is added. Contains a reference to the added Note.
+            </summary>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.Business.NoteAddedEventArgs">
+            <summary>
+            Event Arguments to use for the NoteAdded event.
+            </summary>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.Business.NoteAddedEventHandler">
+            <summary>
+            Event Handler for the NoteAdded event.
+            </summary>
+        </member>
+        <member name="E:Enterprise.ZArchitecture.Business.Notes.NoteAdded">
+            <summary>
+            This event is fired whenever a Note is added to a business object.
+            The event will contain the actual Note object added in it's event args.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.Notes.ShowRelatedNotes">
+            <summary>
+            THIS IS ONLY VISIBLE FOR BINDING. PLEASE DO NOT USE DIRECTLY.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.Notes.VisibleNotes">
+            <summary>
+            THIS IS ONLY VISIBLE FOR BINDING. PLEASE DO NOT USE DIRECTLY.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.Notes.ClientVisibleNotes">
+            <summary>
+            Notes with Visibility set to Public. Mostly used in Web projects and web services
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.Notes.HasNotes">
+            <summary>
+            Does the business object have notes in the Factory / DB?
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.Notes.HasRelatedNotes">
+            <summary>
+            Do any of the related business objects have notes in the Factory / DB?
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.NoteTypeCollection.#ctor">
+            <summary>
+            A collection of PredefinedNoteType objects, as used by the base BusinessObject.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Testing.AutoDummyLoggedValidation.Add(Enterprise.ZArchitecture.Business.Testing.AutoDummyLoggedValidation)">
+            <summary>
+            Add more validation to the DummyLogged's base validation. This will not replace existing validation 
+            (to replace existing validation you should override the 'Validation' property in the business object).
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.Testing.AutoDummyLoggedValidation.Remove(Enterprise.ZArchitecture.Business.Testing.AutoDummyLoggedValidation)">
+            <summary>
+            Remove validation. The DummyLogged's base validation object cannot be removed.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.Testing.AutoDummyLoggedValidation.AutoValidationType">
+            <summary>
+            The auto validation type.
+            </summary>
+        </member>
+        <member name="T:Enterprise.Core.Exceptions.Testing.CoreConcurrencyExceptionHandlerTest">
+            <summary>
+            Sitting in Z so have access to factory to make 
+            writing test much easier / more relevant
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ZAddress.OrgPK">
+            <summary>
+            FOR *BINDING ONLY* - DO NOT USE, INSTEAD, USE SetOrgWithoutSettingDefaultAddress(ZGuid);
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ZAddressList.PICAddressOrFallback">
+            <summary>
+            Returns an address PK from the list in the following order (first found): PIC, PAD, OFC, List[0], ZGuid.Empty.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ZAddressList.DLVAddressOrFallback">
+            <summary>
+            Returns an address PK from the list in the following order (first found): DLV, PAD, OFC, List[0], ZGuid.Empty.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ZAddressList.ARMAddressOrFallback">
+            <summary>
+            Returns an address PK from the list in the following order (first found): ARM, OFC, List[0], ZGuid.Empty.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ZAddressList.APMAddressOrFallback">
+            <summary>
+            Returns an address PK from the list in the following order (first found): APM, OFC, List[0], ZGuid.Empty.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ZAddressList.SQMAddressOrFallback">
+            <summary>
+            Returns an address PK from the list in the following order (first found): SQM, OFC, List[0], ZGuid.Empty.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Business.ZAddressList.OFCAddressOrFallback">
+            <summary>
+            Returns an address PK from the list in the following order (first found): OFC, List[0], ZGuid.Empty.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Data.Mutex.ZGlobalMutex.#ctor(Enterprise.ZArchitecture.Modules.MutexID)">
+            <summary>
+            Create a critical section for all users for the whole system. Only one
+            user can run the critical section at once. All users on other machines
+            will not be able to run the critical section.
+            </summary>
+            <param name="MutexID">To create one, edit MutexRegistration in ZModules project.</param>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Data.Mutex.ZGlobalMutex.#ctor(Enterprise.ZArchitecture.Modules.MutexID,CargoWise.Types.ZString)">
+            <summary>
+            Create a critical section for all users for the whole system. Only one
+            user can run the critical section at once. All users on other machines
+            will not be able to run the critical section.
+            </summary>
+            <param name="MutexID">To create one, edit MutexRegistration in ZModules project.</param>
+            <param name="RecordIdentifier">Allows multiple locks of the same type for different records (eg, different shipments).</param>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Data.Mutex.ZGlobalMutex.Lock">
+            <summary>
+            If the process is not running, stamp the process as started.
+            </summary>
+            <returns>
+            FALSE: If it's already running or
+                   If can't stamp as started (cannot create semaphore)
+            TRUE : If lock was succesfully acquired
+            </returns>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Data.Mutex.ZGlobalMutex.Unlock">
+            <summary>
+            Ends the lock.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Data.Mutex.ZGlobalMutex.GetLockInfo">
+            <summary>
+            Tells you about the lock and the lock holder. Returns null if there is no lock.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Data.Mutex.ZGlobalMutex.IsLocked">
+            <summary>
+            Is this mutex locked?
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.Data.Mutex.ZGlobalMutex.HasLock">
+            <summary>
+            Is this mutex locked by current?
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.FilterBusinessObject.SetInitialCodeForSearch(CargoWise.Types.ZString,System.Type)">
+            <summary>
+            Copies a code (eg, from findbox textbox) across into the filter business object (eg, used by the findbox popup).
+            Override this to perform custom logic for the findbox popup.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.ZQueryProviderCodeDescription.#ctor(CargoWise.Types.ZString,CargoWise.Types.ZString,Enterprise.ZArchitecture.Business.IQueryProvider[])">
+            <summary>
+            For example:
+            new ZFilterQueryProviderCodeDescriptionPair(
+            	"LDG", "Load / Discharge",
+            	new MySubQueryContainerNoProvider(),
+            	new ZComparisonQueryProvider(JobConsol.Schema.JK_MasterBill))
+            </summary>
+            <param name="QueryProviders">
+            The query providers. Typically this will have 1 parameter for a number query, 2 parameters for an Organisation or Port pair.
+            </param>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.ZQueryProviderCodeDescription.#ctor(CargoWise.Types.ZString,CargoWise.Types.ZString,CargoWise.EntityFramework.SQLComparisonOperator,Enterprise.ZArchitecture.Business.IQueryProvider[])">
+            <summary>
+            For example:
+            new ZFilterQueryProviderCodeDescriptionPair(
+            	"LDG", "Load / Discharge",
+            	new MySubQueryContainerNoProvider(),
+            	new ZComparisonQueryProvider(JobConsol.Schema.JK_MasterBill))
+            </summary>
+            <param name="QueryProviders">
+            The query providers. Typically this will have 1 parameter for a number query, 2 parameters for an Organisation or Port pair.
+            </param>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.ZQueryProviderCodeDescriptionListBase.AddQueryProviderComposition(CargoWise.Types.ZString,CargoWise.Types.ZString,System.Int32,System.String[])">
+            <summary>
+            Add's a composition of items to a query provider list. For example, "Most Common".
+            </summary>
+            <param name="Code">The text to use - "Most Common"</param>
+            <param name="Description">Description - "Most Common"</param>
+            <param name="IndexToInsertAt">Position to Insert at</param>
+            <param name="QueryCodesInvolvedInComposition">The query providers that are included in this composition</param>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.ZQueryProviderCodeDescriptionListWith2FilterArguments.Add(CargoWise.Types.ZString,CargoWise.Types.ZString,Enterprise.ZArchitecture.Business.AddToQueryDelegate)">
+            <summary>
+            Typically this will be used for FROM - TO date filter
+            </summary>        
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.ZQueryProviderCodeDescriptionListWith2FilterArguments.Add(CargoWise.Types.ZString,CargoWise.Types.ZString,CargoWise.EntityFramework.SQLComparisonOperator,Enterprise.ZArchitecture.Business.AddToQueryDelegate)">
+            <summary>
+            Typically this will be used for FROM - TO date filter
+            </summary>        
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.ZQueryProviderCodeDescriptionListWith2FilterArguments.Add(CargoWise.Types.ZString,CargoWise.Types.ZString,Enterprise.ZArchitecture.Business.IQueryProvider)">
+            <summary>
+            Typically this will be used for FROM - TO date filter
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.ZQueryProviderCodeDescriptionListWith2FilterArguments.Add(CargoWise.Types.ZString,CargoWise.Types.ZString,CargoWise.EntityFramework.SQLComparisonOperator,Enterprise.ZArchitecture.Business.IQueryProvider)">
+            <summary>
+            Typically this will be used for FROM - TO date filter
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.ZQueryProviderCodeDescriptionListWith2FilterArguments.Add(CargoWise.Types.ZString,CargoWise.Types.ZString,CargoWise.Schema.SchemaColumn)">
+            <summary>
+            Typically this will be used for FROM - TO date filter
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Business.ZQueryProviderCodeDescriptionListWith2FilterArguments.Add(CargoWise.Types.ZString,CargoWise.Types.ZString,CargoWise.EntityFramework.SQLComparisonOperator,CargoWise.Schema.SchemaColumn)">
+            <summary>
+            Typically this will be used for FROM - TO date filter
+            </summary>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.ZWeight.Empty">
+            <summary>
+            Default empty weight - 0 Kilograms
+            </summary>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.ZWeight.Invalid">
+            <summary>
+            Invalid Weight - 0 empty units
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.ZWeight.op_Addition(Enterprise.ZArchitecture.ZWeight,Enterprise.ZArchitecture.ZWeight)">
+            <summary>
+            Operator overload - will return ZWeight.Invalid if either weight is invalid
+            </summary>
+            <param name="LHS"></param>
+            <param name="RHS"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.ZWeight.op_Subtraction(Enterprise.ZArchitecture.ZWeight,Enterprise.ZArchitecture.ZWeight)">
+            <summary>
+            Operator overload - will return ZWeight.Invalid if either weight is invalid
+            </summary>
+            <param name="LHS"></param>
+            <param name="RHS"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.ZWeight.op_Division(Enterprise.ZArchitecture.ZWeight,System.Decimal)">
+            <summary>
+            Operator overload - will throw exception if Divisor is zero
+            </summary>
+            <param name="LHS"></param>
+            <param name="Divisor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.ZWeight.op_GreaterThan(Enterprise.ZArchitecture.ZWeight,Enterprise.ZArchitecture.ZWeight)">
+            <summary>
+            Operator overload - throws ArgumentException if either weight is invalid
+            </summary>
+            <param name="LHS"></param>
+            <param name="RHS"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.ZWeight.op_GreaterThanOrEqual(Enterprise.ZArchitecture.ZWeight,Enterprise.ZArchitecture.ZWeight)">
+            <summary>
+            Operator overload - throws ArgumentException if either weight is invalid
+            </summary>
+            <param name="LHS"></param>
+            <param name="RHS"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.ZWeight.op_LessThan(Enterprise.ZArchitecture.ZWeight,Enterprise.ZArchitecture.ZWeight)">
+            <summary>
+            Operator overload - throws ArgumentException if either weight is invalid
+            </summary>
+            <param name="LHS"></param>
+            <param name="RHS"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.ZWeight.op_LessThanOrEqual(Enterprise.ZArchitecture.ZWeight,Enterprise.ZArchitecture.ZWeight)">
+            <summary>
+            Operator overload - throws ArgumentException if either weight is invalid
+            </summary>
+            <param name="LHS"></param>
+            <param name="RHS"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.ZWeight.op_Equality(Enterprise.ZArchitecture.ZWeight,Enterprise.ZArchitecture.ZWeight)">
+            <summary>
+            Operator overload - throws ArgumentException if either weight is invalid
+            </summary>
+            <param name="LHS"></param>
+            <param name="RHS"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.ZWeight.ConvertTo(System.String)">
+            <summary>
+            Converts the current object to the target unit supplied.
+            This will throw an ArgumentException if the weight is invalid, or the target unit is unknown.
+            </summary>
+            <param name="TargetUnit"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Enterprise.ZArchitecture.ZWeight.Amount">
+            <summary>
+            The amount the weight object represents, expressed in Units
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.ZWeight.InKilogramsSafe">
+            <summary>
+            Returns the weight converted to kilograms.
+            If the weight unit is unknown or empty, it will return 0m.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.ZWeight.InKilograms">
+            <summary>
+            Returns the weight converted to kilograms.
+            This will throw an exception if .IsValid is false
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.ZWeight.InPoundsSafe">
+            <summary>
+            Returns the weight converted to pounds.
+            If the weight unit is unknown or empty, it will return 0m.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.ZWeight.InPounds">
+            <summary>
+            Returns the weight converted to pounds.
+            This will throw an exception if .IsValid is false
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.ZWeight.IsEmpty">
+            <summary>
+            Returns whether the weight amount is zero
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.ZWeight.Unit">
+            <summary>
+            The unit the weight object represents.
+            </summary>
+        </member>
+        <member name="P:Enterprise.ZArchitecture.ZWeight.IsValid">
+            <summary>
+            Indicates whether the unit passed to the weight constructor is valid
+            </summary>
+        </member>
+        <member name="T:Enterprise.ZArchitecture.FieldType">
+            <summary>
+            Used to specify what type of editor to provide for a MultiCombinationControl.
+            </summary>
+        </member>
+        <member name="M:Enterprise.ZArchitecture.Xml.ZXmlSchema.Try3Times(Enterprise.ZArchitecture.Xml.ZXmlSchema.Try3TimesDelegate)">
+            <summary>
+            This is required because a .NET bug causes an ExternalException 'Cannot execute a program' intermittently when
+            a domain controller goes down. It is a rare bug, but one that almost always recovers.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current"
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>
+    <CommonPowershellFunctionsFilePath>$(RootDirectory)Common.ps1</CommonPowershellFunctionsFilePath>
+    <_XtDeployment Condition="'$(_XtDeployment)' == ''">$(RootDirectory)XT.REST.Deployment\</_XtDeployment>
+    <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">C:\Program Files (x86)\MSBuildExtensionPack\4.0</MSBuildExtensionsPackPath>
+    <MSBuildTasksToolsFilePath Condition="'$(MSBuildTasksToolsFilePath)'==''">$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll</MSBuildTasksToolsFilePath>
+    <DeploymentFootprintDirectory>c:\eServices\Deployments\xT\</DeploymentFootprintDirectory>
+  </PropertyGroup>
+
+  <!--Import XT Deployment Tasks-->
+  <Import Project="$(_XtDeployment)XT.REST.Deployment.tasks" Condition="'$(_XtDeployment)'!=''" />
+
+  <!--Import Default deployment properties-->
+  <Import Project="$(RootDirectory)\Deployment\Deployment.props" Condition="'$(_DeploymentPropsImported)'==''"/>
+  <!--Import Profile deployment properties (overrides default)-->
+  <Import Project="$(RootDirectory)\Deployment\Profiles\$(Profile)\Deployment.props" Condition="'$(Profile)' != '' and '$(_ProfilePropsImported)'==''"/>
+
+  <UsingTask TaskName="CopyFile" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <LocalPath ParameterType="System.String" />
+      <TargetPath ParameterType="System.String" />
+      <Failures ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+        . $(CommonPowershellFunctionsFilePath)
+        $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -UseSslForDomainSession).Session
+        Try
+        {
+        $error.Clear()
+        [Microsoft.Build.Framework.ITaskItem[]] $Failures = @()
+        $TargetPath = $TargetPath.TrimEnd('\') + '\'
+        $LocalPath = $LocalPath.TrimEnd('\')
+        Invoke-Command -Session $session -ScriptBlock {New-Item -ItemType Directory -Force -Path "$args"} -ArgumentList "$TargetPath"
+        Copy-Item -ToSession $session $LocalPath -Destination $TargetPath -Recurse -Force
+        }
+        Finally
+        {
+          foreach ($err in $error)
+          {
+            $Failures += New-Object -TypeName Microsoft.Build.Utilities.TaskItem -ArgumentList $err.Exception.Message
+          }
+          #$session | Remove-PSSession
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="RemoveFile" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <TargetPath ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+        . $(CommonPowershellFunctionsFilePath)
+        $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -UseSslForDomainSession).Session
+        Try
+        {
+        $TargetPath = $TargetPath.TrimEnd('\') + '\'
+        Invoke-Command -Session $session -ScriptBlock {Remove-Item "$args" -Recurse -Force} -ArgumentList $TargetPath
+        }
+        Finally
+        {
+          #$session | Remove-PSSession
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="UpdateFootPrints" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <NewVersion ParameterType="System.String"/>
+      <FileName ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+        . $(CommonPowershellFunctionsFilePath)
+        $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -UseSslForDomainSession).Session
+        $sb = { param($FileName,$NewVersion)
+          if (-Not (Test-Path $FileName -PathType Leaf)) {
+            New-Item -Path $FileName -ItemType File -Force
+            $versions = [PSCustomObject]@{
+              CurrentVersion = '0'
+              PreviousVersion = '0'
+              PrePreviousVersion = '0'
+            }
+            $versions | ConvertTo-Json | Set-Content $FileName | Out-Null
+          } 
+          $versions = Get-Content $FileName | ConvertFrom-Json
+          $versions.PrePreviousVersion = $versions.PreviousVersion
+          $versions.PreviousVersion = $versions.CurrentVersion
+          $versions.CurrentVersion = "$NewVersion"
+          $versions | ConvertTo-Json | Set-Content $FileName | Out-Null
+        }
+        Try
+        {
+          Invoke-Command -Session $session -ScriptBlock $sb -ArgumentList $FileName, $NewVersion
+        }
+        Finally
+        {
+          #$session | Remove-PSSession
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+
+  <UsingTask TaskName="GetDeploymentInfo" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <FileName ParameterType="System.String" />
+      <CurrentVersion ParameterType="System.String" Output="true" />
+      <PreviousVersion ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+        . $(CommonPowershellFunctionsFilePath)
+        $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -UseSslForDomainSession).Session
+        $sb = { param($FileName,$NewVersion)
+          if (-Not (Test-Path $FileName -PathType Leaf)) {
+            return [PSCustomObject]@{
+              CurrentVersion = '0'
+              PreviousVersion = '0'
+              PrePreviousVersion = '0'
+            }
+          } 
+          return Get-Content $FileName | ConvertFrom-Json
+        }
+        Try
+        {
+          $versions = Invoke-Command -Session $session -ScriptBlock $sb -ArgumentList $FileName
+          $CurrentVersion = $versions.CurrentVersion
+          $PreviousVersion = $versions.PreviousVersion
+        }
+        Finally
+        {
+          #$session | Remove-PSSession
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="DeactivateHostedApplications" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <Applications ParameterType="Microsoft.Build.Framework.ITaskItem[]"/>
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+        . $(CommonPowershellFunctionsFilePath)
+        $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -UseSslForDomainSession).Session
+        $sb = { param($Applications)
+          $Applications | ForEach-Object { 
+            & 'C:\Program Files\Xware\xT\bin\xtcmd.exe' deactivate --uri $_
+          }
+        }
+        Try
+        {
+          RemoteRun -Session $session -ScriptBlock $sb -Logger $log -Arguments $Applications
+        }
+        Finally
+        {
+          #$session | Remove-PSSession
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="DeactivateHostedApplicationsTask" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" />
+  <UsingTask TaskName="DockerFileCopyTask" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll" />
+
+  <UsingTask TaskName="ActivateHostedApplications" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <Applications ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+        . $(CommonPowershellFunctionsFilePath)
+        $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -UseSslForDomainSession).Session
+        $sb = { param($Applications)
+          $Applications | ForEach-Object { 
+            & 'C:\Program Files\Xware\xT\bin\xtcmd.exe' activate --uri $_
+          }
+        }
+        Try
+        {
+          RemoteRun -Session $session -ScriptBlock $sb -Logger $log -Arguments $Applications
+        }
+        Finally
+        {
+          #$session | Remove-PSSession
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="WaitForHostedAppToStop" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <Applications ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+      <FailedToStop ParameterType="System.Boolean" Output="True" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+        . $(CommonPowershellFunctionsFilePath)
+        $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -UseSslForDomainSession).Session
+        $sb = {
+          return & 'C:\Program Files\Xware\xT\bin\xt.exe' application list
+        }
+        Try
+        {
+          do
+          {
+            $i++
+            $stopped = $true
+            $runningApps = RemoteRun -Session $session -ScriptBlock $sb -Logger $log
+            $Applications | ForEach-Object { 
+              $ApplicationID = $_ -replace 'xt-hostedapp:{(.*?)}', '$1'
+              $appStopped = ($runningApps | Where-Object {
+			          $_ -match "(.*?)$ApplicationID(.*)"
+			        }).Count -eq 0
+			        $stopped = $stopped -and $appStopped
+			        if ($appStopped)
+			        {
+			          $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$i] Application [$_] stopped.")
+			        }
+			        else
+			        {
+			          $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$i] Waiting for [$_] to stop.")
+			        }
+            }
+            Start-Sleep -Seconds 5
+          }
+          until($stopped -or $i -eq 6)
+        }
+        Finally
+        {
+          $FailedToStop = -Not $stopped
+          #$session | Remove-PSSession
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="checkIsAdmin" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserName ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <IsAdmin ParameterType="System.Boolean" Output="True" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+        . $(CommonPowershellFunctionsFilePath)
+        $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -UseSslForDomainSession).Session
+        $sb = {
+          return ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+         }
+        Try
+        {
+          $IsAdmin = [bool] (RemoteRun -Session $session -ScriptBlock $sb -Logger $log)
+        }
+        Finally
+        {
+          #$session | Remove-PSSession
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="suppressCustomsMonitor"
+            TaskFactory="PowerShellTaskFactory"
+            AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+        <MachineName ParameterType="System.String" />
+        <UserName ParameterType="System.String" />
+        <UserPassword ParameterType="System.String" />
+        <InterfaceName ParameterType="System.String" />
+        <SuppressResult ParameterType="System.String" Output="True"/>
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+        . $(CommonPowershellFunctionsFilePath)
+        
+        # Connect to the machine remotely
+        $session = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -UseSslForDomainSession).Session
+
+        # Prepare the body for the POST request and Send the POST request to the ConfigurationStorage API
+        $sb = {
+          param($InterfaceName)
+
+          $bodyArray = @(
+            @{
+              Key   = $InterfaceName
+              Value = @{
+                SuppressTillTime = ""
+                IsInterfaceName = "true"
+              }
+            }
+          )
+
+          $body = ConvertTo-Json -InputObject $bodyArray -Depth 3
+          $url = "http://localhost:9999/ConfigurationStorage/Upsert/MonitorExecutionSetting"
+          try
+          {
+            $response = Invoke-RestMethod -Uri $url -Method POST -Body $body -ContentType "application/json"
+            return $response.StatusCode + "Added the suppress setting into MonitorExecutionSetting dataset"
+          }
+          catch
+          {
+            return $_.Exception.Message
+          }
+        }
+
+        Try
+        {
+          $SuppressResult = [string] (RemoteRun -Session $session -ScriptBlock $sb -Logger $log -Arguments $InterfaceName)
+        }
+        Finally
+        {
+          #$session | Remove-PSSession
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <Target Name="bat:load:profiles" >
+    <LoadProfiles
+      DefaultProfileFile="$(RootDirectory)Deployment\Deployment.json"
+      ProfileFile="$(RootDirectory)Deployment\Profiles\$(Profile)\Deployment.json">
+      <Output TaskParameter="InterfaceName" PropertyName="InterfaceName" />
+    </LoadProfiles>
+  </Target>
+
+  <Target Name="bat:load:versions" >
+    <GetDeploymentInfo
+      MachineName="$(ServerName)"
+      UserName="$(UserName)"
+      UserPassword="$(Password)"
+      FileName="$(DeploymentFootprintDirectory)$(InterfaceName)\Versions.json">
+      <Output TaskParameter="PreviousVersion" PropertyName="PreviousVersion" />
+      <Output TaskParameter="CurrentVersion" PropertyName="CurrentVersion" />
+    </GetDeploymentInfo>
+  </Target>
+
+  <Target Name="bat:checkIsAdmin" >
+    <Message Importance="high" Text="Checking the deployment is running as Administrator." />
+    <CheckIsAdmin
+      MachineName="$(ServerName)"
+      UserName="$(UserName)"
+      UserPassword="$(Password)">
+      <Output TaskParameter="IsAdmin" PropertyName="IsAdmin" />
+    </CheckIsAdmin>
+    <Message Importance="high" Text=" Done." Condition="$(IsAdmin)" />
+    <Error
+      Text="The deployment is NOT running as Administrator"
+      Condition="!($(IsAdmin))" />
+  </Target>
+
+  <Target Name="bat:suppressCustomsMonitor">
+    <Message Importance="high" Text="To suppress monitor on $(InterfaceName)." />
+    <suppressCustomsMonitor       
+      MachineName="$(ServerName)"
+      UserName="$(UserName)"
+      UserPassword="$(Password)" 
+      InterfaceName="$(InterfaceName)">
+      <Output TaskParameter="SuppressResult" PropertyName="SuppressResult"/>
+    </suppressCustomsMonitor>
+    <Message Text="Suppress Customs Monitor on $(InterfaceName) in 5 minutes: $(SuppressResult)"/>
+  </Target>
+
+  <Target Name="bat:deploy" DependsOnTargets="bat:load:profiles">
+    <ListHostedApplications WorkingDirectory="$(RootDirectory)">
+      <Output TaskParameter="HostedApplications" ItemName="Applications" />
+    </ListHostedApplications>
+    <CallTarget Targets="bat:checkIsAdmin" Condition="@(Applications->Count()) > 0"/>
+    <CallTarget Targets="bat:suppressCustomsMonitor" Condition="$(InterfaceName.StartsWith('DirectxT.Customs.')) and '$(Profile)' == 'Test402'"/>
+    <Message Text="=================================================================="/>
+    <Message Condition="@(Applications->Count()) > 0" Text="Deactivating Hosted Applications: @(Applications->'%(Identity)')"/>
+    <Message Condition="@(Applications->Count()) == 0" Text="No Hosted Application To Deactivate"/>
+    <Message Text="=================================================================="/>
+    <DeactivateHostedApplications
+      Condition="@(Applications->Count()) > 0"
+      MachineName="$(ServerName)"
+      UserName="$(UserName)"
+      UserPassword="$(Password)"
+      Applications="@(Applications)"/>
+    <WaitForHostedAppToStop
+      Condition="@(Applications->Count()) > 0"
+      Applications="@(Applications)">
+      <Output TaskParameter="FailedToStop" PropertyName="FailedToStop" />
+    </WaitForHostedAppToStop>
+    <Error
+      Text="Couldn't deactivate some applications. Please check the server and try again."
+      Condition="@(Applications->Count()) > 0 And $(FailedToStop)" />
+    <PrepareDeployment WorkingDirectory="$(RootDirectory)">
+      <Output TaskParameter="InstalledInterfaceVersion"
+                  PropertyName="InterfaceVersion" />
+    </PrepareDeployment>
+    <FileExtractor>
+      <Output TaskParameter="ExtractedFiles" ItemName="ExtractedFiles"/>
+    </FileExtractor>
+    <Message Text="=================================================================="/>
+    <Message Text="Copying files to target server: $(RootDirectory)$(InterfaceName)\* -> $(InterfacesRootDirectory)\$(InterfaceName)\"/>
+    <Message Text="=================================================================="/>
+    <CopyFile
+      MachineName="$(ServerName)"
+      UserName="$(UserName)"
+      UserPassword="$(Password)"
+      LocalPath="$(RootDirectory)$(InterfaceName)\*"
+      TargetPath="$(InterfacesRootDirectory)\$(InterfaceName)\">
+      <Output TaskParameter="Failures" ItemName="CopyFailure"/>
+    </CopyFile>
+    <Error Text="Unable to copy some files. @(CopyFailure)"
+      Condition="@(CopyFailure->Count()) > 0" />
+    <Message Text="=================================================================="/>
+    <Message Text="@(ExtractedFiles->'%(Source) -> %(Destination)')" />
+    <Message Text="=================================================================="/>
+    <CopyFile
+      MachineName="$(ServerName)"
+      UserName="$(UserName)"
+      UserPassword="$(Password)"
+        LocalPath="%(ExtractedFiles.Source)"
+            TargetPath="%(ExtractedFiles.Destination)"
+      Condition= "'@(ExtractedFiles)'!= ''">
+      <Output TaskParameter="Failures" ItemName="CopyFailure"/>
+    </CopyFile>
+    <Error Text="Unable to copy some files. @(CopyFailure)"
+      Condition="@(CopyFailure->Count()) > 0" />
+    <Deploy WorkingDirectory="$(RootDirectory)"/>
+    <UpdateFootPrints
+      MachineName="$(ServerName)"
+      UserName="$(UserName)"
+      UserPassword="$(Password)"
+      NewVersion="$(InterfaceVersion)"
+      FileName="$(DeploymentFootprintDirectory)$(InterfaceName)\Versions.json"/>
+    <!--Add Backup when backup stategy is decided-->
+  </Target>
+
+  <Target Name="bat:DeployOnContainer" DependsOnTargets="bat:load:profiles">
+    <ListHostedApplications WorkingDirectory="$(RootDirectory)">
+      <Output TaskParameter="HostedApplications" ItemName="Applications" />
+    </ListHostedApplications>
+    <Message Text="=================================================================="/>
+    <Message Condition="@(Applications->Count()) > 0" Text="Deactivating Hosted Applications: @(Applications->'%(Identity)')"/>
+    <Message Condition="@(Applications->Count()) == 0" Text="No Hosted Application To Deactivate"/>
+    <Message Text="=================================================================="/>
+    <DeactivateHostedApplicationsTask
+       DockerHostAddress="$(DockerHostAddress)"
+       ContainerId="$(ContainerId)"
+       Applications="@(Applications)"
+       Condition="@(Applications->Count()) > 0" />
+    <WaitForHostedAppToStopTask
+        DockerHostAddress="$(DockerHostAddress)"
+        ContainerId="$(ContainerId)"
+        Applications="@(Applications)"
+        TimeoutSeconds="60">
+      <Output TaskParameter="FailedToStop" PropertyName="FailedToStop" />
+    </WaitForHostedAppToStopTask>
+    <Error
+     Text="Couldn't deactivate some applications. Please check the server and try again."
+     Condition="@(Applications->Count()) > 0 And $(FailedToStop)" />
+    <PrepareDeployment WorkingDirectory="$(RootDirectory)">
+      <Output TaskParameter="InstalledInterfaceVersion"
+                  PropertyName="InterfaceVersion" />
+    </PrepareDeployment>
+    <Message Text="=================================================================="/>
+    <Message Text="Copying files to target server: $(RootDirectory)$(InterfaceName)\* -> $(InterfacesRootDirectory)\$(InterfaceName)\"/>
+    <Message Text="=================================================================="/>
+    <DockerFileCopyTask
+        DockerHostAddress="$(DockerHostAddress)"
+        ContainerId="$(ContainerId)"
+        LocalPath="$(RootDirectory)$(InterfaceName)\"
+        TargetPath="$(InterfacesRootDirectory)\$(InterfaceName)\" />
+
+    <Message Text="==================================================================" />
+    <Message Text="Files copied to Docker container: $(InterfacesRootDirectory)$(InterfaceName)\\" />
+    <Message Text="==================================================================" />
+    <DeployOnContainer
+		DockerHostAddress="$(DockerHostAddress)"
+        ContainerId="$(ContainerId)"
+		WorkingDirectory="$(RootDirectory)"/>
+  </Target>
+
+  <Target Name="bat:remove" DependsOnTargets="bat:load:profiles;bat:load:versions">
+    <Remove
+      WorkingDirectory="$(RootDirectory)"
+      InterfaceVersion="$(CurrentVersion)">
+      <Output TaskParameter="RemovedInterfaceVersion" PropertyName="InterfaceVersion" />
+    </Remove>
+    <Message Text="=================================================================="/>
+    <Message Text="Removing files from target server : $(InterfacesRootDirectory)\$(InterfaceName)\ "/>
+    <Message Text="=================================================================="/>
+    <RemoveFile
+      MachineName="$(ServerName)"
+      UserName="$(UserName)"
+      UserPassword="$(Password)"
+      TargetPath="$(InterfacesRootDirectory)\$(InterfaceName)\" />
+    <!--Add Backup when backup stategy is decided-->
+    <UpdateFootPrints
+      MachineName="$(ServerName)"
+      UserName="$(UserName)"
+      UserPassword="$(Password)"
+      NewVersion="0"
+      FileName="$(DeploymentFootprintDirectory)$(InterfaceName)\Versions.json"/>
+  </Target>
+
+  <Target Name="bat:rollback" DependsOnTargets="bat:load:profiles;bat:load:versions">
+    <Deploy
+      WorkingDirectory="$(RootDirectory)"
+      InterfaceVersion="$(PreviousVersion)">
+      <Output TaskParameter="InstalledInterfaceVersion" PropertyName="InterfaceVersion" />
+    </Deploy>
+    <Message Text="=================================================================="/>
+    <Message Text="Copying processed files to target server : $(RootDirectory)$(InterfaceName)\* ->  $(InterfacesRootDirectory)\$(InterfaceName)\ "/>
+    <Message Text="=================================================================="/>
+    <CopyFile
+      MachineName="$(ServerName)"
+      UserName="$(UserName)"
+      UserPassword="$(Password)"
+      LocalPath="$(RootDirectory)$(InterfaceName)\*"
+      TargetPath="$(InterfacesRootDirectory)\$(InterfaceName)\" />
+    <!--Add Backup when backup stategy is decided-->
+    <UpdateFootPrints
+      MachineName="$(ServerName)"
+      UserName="$(UserName)"
+      UserPassword="$(Password)"
+      NewVersion="$(InterfaceVersion)"
+      FileName="$(DeploymentFootprintDirectory)$(InterfaceName)\Versions.json"/>
+  </Target>
+
+</Project>

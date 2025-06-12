@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="xdt:transform:test">
+
+  <PropertyGroup>
+    <XdtTransformsTasksImported>true</XdtTransformsTasksImported>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)..\..\..\Bin\Deployment\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+
+  <Target Name="xdt:transform" Returns="$(IsValid)">
+    <Error Text="Please specify the property XmlFile to the file to be xdt transformed." Condition="'$(XmlFile)'=='' or !Exists('$(XmlFile)')" />
+    <Error Text="No XDT transformation defined" Condition="'%(Xdt.Identity)'==''" />
+    <Message Text="%(Xdt.Identity): $(XmlFile)" Importance="high" />
+
+    <ValidateAsRequiredByTargetXdtTransformation
+      XmlFilePath="$(XmlFile)"
+      Validations="@(Validations)"
+      Condition="'$(IsValid)'==''">
+      <Output TaskParameter="InvalidXPath" ItemName="InvalidXPath" />
+      <Output TaskParameter="IsValid" PropertyName="IsValid" />
+    </ValidateAsRequiredByTargetXdtTransformation>
+
+    <XmlFile
+      File="$(XmlFile)"
+      TaskAction="%(Xdt.TaskAction)"
+      Namespaces="%(Xdt.Namespaces)"
+      Element="%(Xdt.Element)"
+      ParentElement="%(Xdt.ParentElement)"
+      Condition="'%(Xdt.TaskAction)'=='RemoveElement' and '$(IsValid)'=='true'"
+      ContinueOnError="true" />
+
+    <XmlFile
+      File="$(XmlFile)"
+      TaskAction="%(Xdt.TaskAction)"
+      Namespaces="%(Xdt.Namespaces)"
+      Element="%(Xdt.Element)"
+      ParentElement="%(Xdt.ParentElement)"
+      InnerXml="%(Xdt.InnerXml)"
+      InsertBeforeXPath="%(Xdt.InsertBeforeXPath)"
+      InsertAfterXPath="%(Xdt.InsertAfterXPath)"
+      Condition="'%(Xdt.TaskAction)'=='AddElement' and '$(IsValid)'=='true'"
+      ContinueOnError="true" />
+
+    <XmlFile
+      File="$(XmlFile)"
+      TaskAction="%(Xdt.TaskAction)"
+      Namespaces="%(Xdt.Namespaces)"
+      XPath="%(Xdt.XPath)"
+      Key="%(Xdt.Key)"
+      Value="%(Xdt.Value)"
+      Condition="'%(Xdt.TaskAction)'=='UpdateAttribute' and '$(IsValid)'=='true'" />
+
+    <!-- massage the content based on the provided regular expression pattern -->
+    <RegexReplace
+      XmlFilePath="$(XmlFile)"
+      XPath="%(Xdt.XPath)"
+      Pattern="%(Xdt.Pattern)"
+      Replace="%(Xdt.Replace)"
+      Condition="'%(Xdt.TaskAction)'=='RegexReplace' and '$(IsValid)'=='true'" />
+
+    <XmlFile
+      File="$(XmlFile)"
+      TaskAction="%(Xdt.TaskAction)"
+      Namespaces="%(Xdt.Namespaces)"
+      XPath="%(Xdt.XPath)"
+      InnerText="%(Xdt.InnerText)"
+      Condition="'%(Xdt.TaskAction)'=='UpdateElement' and '$(IsValid)'=='true'" />
+
+  </Target>
+
+  <!-- demo test you could provide with a directory path or a single file path to do a test -->
+  <Target Name="xdt:transform:test">
+    <PropertyGroup>
+      <XmlFilesPath Condition="'$(XmlFilesPath)'==''">$(MSBuildThisFileDirectory)..\..\..\..\Operation\Bindings\</XmlFilesPath>
+
+      <_ProjectId Condition="'$(_ProjectId)'==''">$(MSBuildProjectName)</_ProjectId>
+      <_TimeStamp>$([System.DateTime]::Now.ToString(`yyyyMMdd_HHmmss`))</_TimeStamp>
+      <_TempDirectory>$([System.IO.Path]::GetFullPath('$(TEMP)'))</_TempDirectory>
+      <_ZipContentsDirectory>$([System.IO.Path]::Combine('$(_TempDirectory)', '$(_TimeStamp)'))</_ZipContentsDirectory>
+      <_ZipFileName>$(_ProjectId).zip</_ZipFileName>
+      <_ZipFilesDirectory>$(_TempDirectory)</_ZipFilesDirectory>
+      <_ZipFilePath>$([System.IO.Path]::Combine('$(_ZipFilesDirectory)', '$(_ZipFileName)'))</_ZipFilePath>
+    </PropertyGroup>
+
+    <RemoveDir Directories="$(_ZipContentsDirectory)" Condition="Exists($(_ZipContentsDirectory))" />
+
+    <ItemGroup>
+      <XmlFiles Include="$(XmlFilesPath)**\*.xml" Condition="'$(XmlFilePath)'==''" />
+      <XmlFiles Include="$(XmlFilePath)" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(XmlFiles)" DestinationFolder="$(_ZipContentsDirectory)\%(RecursiveDir)" />
+
+    <ItemGroup>
+      <Files Include="$(_ZipContentsDirectory)\**\*.xml" />
+    </ItemGroup>
+
+    <MSBuild Projects="$(MSBuildProjectFile)" Targets="xdt:transform" Properties="XmlFile=%(Files.Identity)" />
+    <Message Text="$(_ZipContentsDirectory)" Importance="High" />
+    <Exec Command="Start $(_ZipContentsDirectory)" />
+    <!-- <RemoveDir Directories="$(_ZipContentsDirectory)" /> -->
+  </Target>
+
+  <UsingTask
+    TaskName="RegexReplace"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <XmlFilePath ParameterType="System.String" Required="true" />
+      <XPath ParameterType="System.String" Required="true" />
+      <Pattern ParameterType="System.String" Required="true" />
+      <Replace ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+
+    <Task>
+      if ($null -ne $error) { $error.Clear() }
+
+      try {
+        $isDirty = $false
+        $xmlFile = Get-Item $XmlFilePath
+        [xml]$xml = Get-Content $xmlFile
+
+        $xml | Select-Xml -XPath $XPath | % {
+
+          if ($null -ne $_) {
+            $node = $_.Node
+
+            switch ($_.Node.NodeType) {
+              "Element" {
+                $value = $node.InnerText
+                $node.InnerText = $value -Replace $Pattern, $Replace
+              }
+
+              "Attribute" {
+                $value = $node.'#text'
+                $node.'#text' = $value -Replace $Pattern, $Replace
+              }
+            }
+
+            $isDirty = $true
+          }
+        }
+
+        # save the updated xml
+        if ($isDirty) {
+          $xml.Save($XmlFilePath)
+        }
+
+      } catch {
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", $error)
+      }
+    </Task>
+
+  </UsingTask>
+
+  <!--
+    validate the $XmlFilePath against the list of $Validations where xpath are defined
+    to see if all can be peeked with values, $null peek will be deemed as invalid -->
+  <UsingTask
+    TaskName="ValidateAsRequiredByTargetXdtTransformation"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <XmlFilePath ParameterType="System.String" Required="true" />
+      <Validations ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <InvalidXPath ParameterType="System.String[]" Output="true" />
+      <IsValid ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      if ($null -ne $error) { $error.Clear() }
+
+      try {
+        $IsValid = $true
+        [string[]] $InvalidXPath = @()
+
+        $xmlFile = Get-Item $XmlFilePath
+        [xml]$xml = Get-Content $xmlFile
+
+        $Validations | % {
+
+          $validation = $_.GetMetadata("Identity")
+          $xpath = $_.GetMetadata("XPath")
+
+          $xmlPeeked = Select-Xml -Xml $xml -XPath $xpath
+          if ($null -eq $xmlPeeked) {
+            $InvalidXPath += $validation
+            $IsValid = $false
+          }
+        }
+      } catch {
+        $IsValid = $false
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Error ValidateAsRequiredByTargetXdtTransformation xml file: $XmlFilePath")
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", $error)
+      }
+    </Task>
+
+  </UsingTask>
+
+</Project>

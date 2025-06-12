@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DatDeploy xmlns="http://eservices.buildtools/datdeploy">
+  <Targets>
+    <Target Name="BAT=$(BinPath)\BAT\CargoWise.eServices.Billing.Collector.eHub.WindowsService.zip;p:Profile=Test;t:bat:deploy" Command="%CMD_EHUB_DAT%" Environment="Staging" />
+    <Target Name="BAT=$(BinPath)\BAT\CargoWise.eServices.Billing.Collector.eHub.WindowsService.zip;p:Profile=Production;t:bat:deploy" Command="%CMD_EHUB_DAT%" Environment="Production" />
+  </Targets>
+  <!-- Common Settings
+         Default settings that are available in deployments are:
+            DAT_DEPLOYMENT_CONFIGURATION  - Value of DeploymentConfiguration in Build.xml.
+            DAT_DEPLOYMENT_NAME           - DeploymentConfiguration with special characters removed.
+            DAT_SOURCE_PATH               - Path to root of repo source files.
+            DAT_BIN_PATH                  - Path to Bin folder.
+            TIMESTAMP                     - UTC time at start of build. Format is "yyyyMMdd.HHmmssZ".-->
+  <Settings>
+    <Add Name="CMD_EHUB_DAT" Value="powershell %DAT_SOURCE_PATH%\Deploy-eHub.ps1 '%DAT_DEPLOYMENT_CONFIGURATION%'" />
+    <Add Name="CMD_PUBLISH_PACKAGE">
+      <![CDATA[powershell "dir $env:PKG_PATH -Exclude *-rc[0-9]*.nupkg | sort | select -last 1 | %% { dotnet nuget push $_.FullName --source $env:BUILD_TOOLS_PUBLISH_PACKAGE_SOURCE --api-key $env:API_KEY --skip-duplicate }"]]>
+    </Add>
+    <Add Name="CMD_PUBLISH_PACKAGE_PRERELEASE">
+      <![CDATA[powershell "dir $env:PKG_PATH -Include *-rc[0-9]*.nupkg | sort | select -last 1 | %% { dotnet nuget push $_.FullName --source $env:BUILD_TOOLS_PUBLISH_PACKAGE_SOURCE --api-key $env:API_KEY --skip-duplicate }"]]>
+    </Add>
+    <Add Name="MSDEPLOY" Value="%ProgramFiles%\IIS\Microsoft Web Deploy V3\msdeploy.exe" />
+    <Add Name="DEPLOY_STAGING_PATH" Value="C:\eServices.Deploy\%DAT_DEPLOYMENT_CONFIGURATION%\%TIMESTAMP%" />
+  </Settings>
+  <!-- Secrets
+       Refer to DAT User Guild for instructions on how to encrpt.
+       https://wisetechglobal.sharepoint.com/:w:/r/Development/SoftwareOperationsPublic/_layouts/15/Doc.aspx?sourcedoc=%7BB9322557-11BD-4A68-BB03-D0775B26BE4F%7D&file=DAT%20User%20Guide.docx-->
+  <Secrets>
+    <Add Name="ESERVICES_DEPLOY_PWD_TEST" Value="EmpbeMx6xlacT3z/0wwHVhbyu/boop6H+qUqkETC2dQ6faPH7cQ3qtUdShdNfGtgQmO5pKnsmL7HSger8vpm8P/kP4bi29VeLg/NQtQHzGHy22gayb1wxyBNOxitM0H05gTaHO0DU+cUwD3M3sf42JkrBqAnvnhj8uylCYRVLPk=" />
+    <Add Name="ESERVICES_DEPLOY_PWD_PROD" Value="MauZO/OA4a2G5sfo+ME85Nz0q2eoEG61x/62iJJHvztcN6VZSzsGtyNaFLBzwKhxq6ph6cXARdw5IlfIK7Av4eVe+kNBpqPcg+nzGrN6BjJsu7NPyoaHph8QxRyS+tigfZuq7+M9mP1uJrLrdA/3UJ03uwG5j8+ozdsYRGZ1Igs=" />
+    <Add Name="PROGET_API_KEY" Value="nk+r5IbnfDgXKpdZC3lP2lxtAjM3Mk+Unj4zb3tirQ5oQx272c1wp/Tr9tVRgInATkz40SIEi+CsECp5PhZncsfUxcfUzFJ7yDTvGbSMeUSWbC8Dd5UjY6XN41qF4I1ptaK6fBgaQvl1Z0BFjj50iZtroLvM0PWjHWf/hzYzRmk=" />
+  </Secrets>
+</DatDeploy>

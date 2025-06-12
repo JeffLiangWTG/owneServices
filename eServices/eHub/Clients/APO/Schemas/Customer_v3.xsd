@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--$Header$ -->
+<!--2012-11-22 DT CMM v3.8.2 Add AlternateCustomerIds and Origination -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty/Customer:v1" xmlns:ns0="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" xmlns:ns1="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty:v1" xmlns:ns2="http://www.auspost.com.au/Schema/CommonDataModel/Core:v1" xmlns:ns3="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" xmlns:ns4="http://www.auspost.com.au/Schema/CommonDataModel/Product:v1" targetNamespace="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty/Customer:v1" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" schemaLocation="Address_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty:v1" schemaLocation="InvolvedParty_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Core:v1" schemaLocation="CoreTypes_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" schemaLocation="CommonTypes_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Product:v1" schemaLocation="Service_v3.xsd"/>
+	<xs:complexType name="DeliveryChoiceType">
+		<xs:sequence>
+			<xs:element name="DeliveryChoiceID" type="ns3:UUID" minOccurs="0"/>
+			<xs:element name="Description" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Description of a delivery address eg. My Work, Mum and Dad, etc</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="200"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Instructions" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates the delivery instructions for the shipment eg leave parcel in meter box</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="200"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="DeliveryAddressee" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="500"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="DeliveryAddress" type="ns0:AddressType"/>
+			<xs:element name="ElectronicContact" type="ns3:ElectronicContactType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="AdditionalServices" type="ns4:Services" minOccurs="0"/>
+			<xs:element name="isFavourite" type="xs:boolean" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Customer">
+		<xs:annotation>
+			<xs:documentation>Customer is a person or external organisation which consumes Australia Post products.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ns1:InvolvedPartyBaseType">
+				<xs:sequence>
+					<xs:element name="CustomerID" type="CustomerID" minOccurs="0"/>
+					<xs:element name="CommunicationDecision" type="CommunicationDecision" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Decisions about how customers want to be contacted and for what reason.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DeliveryPreference" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Contains a customer general delivery preferences 
+</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="Options" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Contains available delivery options. For Example
+Tracking
+Additional Insurance
+Notification etc.</xs:documentation>
+									</xs:annotation>
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="OptionCode" minOccurs="0">
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:maxLength value="30"/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:element>
+											<xs:element name="Description" minOccurs="0">
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:maxLength value="90"/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="Preference" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Contains the Delivery Preference, possible values
+Cheapest
+Fastest
+DayTime</xs:documentation>
+									</xs:annotation>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:maxLength value="20"/>
+											<xs:enumeration value="CHEAPEST"/>
+											<xs:enumeration value="FASTEST"/>
+											<xs:enumeration value="DAYTIME"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="DeliveryChoice" type="DeliveryChoiceType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Contains a customers address book entries with specified delivery preferences for the location
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AlternateCustomerIDs" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Contains Alternate Customer ID's held in different systems for a customer</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="AlternateCustomerID" minOccurs="0" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="Id" type="xs:string"/>
+											<xs:element name="SystemId" type="xs:string"/>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="Origination" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Contains the Product and Channel where the customer originated</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="Product" type="xs:string"/>
+								<xs:element name="Channel" type="xs:string"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="CustomerID">
+		<xs:annotation>
+			<xs:documentation>[SAP]Definite proprietary identifier for a business partner</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="CommunicationDecision">
+		<xs:sequence>
+			<xs:element name="DecisionCode" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:token">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Description" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="90"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="AllowableIndicator" type="ns2:Indicator" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Customer" type="Customer"/>
+</xs:schema>

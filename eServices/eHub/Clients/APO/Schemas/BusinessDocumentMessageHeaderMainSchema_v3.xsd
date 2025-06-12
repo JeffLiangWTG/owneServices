@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp1 (http://www.altova.com) by XMLSpy 2008 Professional Ed. Release 2, Installed for 4 users (Australia Post) -->
+<xsd:schema xmlns:p3="http://www.auspost.com.au/Schema/CommonDataModel/Core:v1" xmlns:p1="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:p2="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty:v1" xmlns="http://www.auspost.com.au/Schema/SAP/Common:v1" targetNamespace="http://www.auspost.com.au/Schema/SAP/Common:v1">
+	<!-- This schema is downloaded from PI ESR and modified to use the CMM definitions. -->
+	<xsd:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty:v1" schemaLocation="InvolvedParty_v3.xsd"/>
+	<xsd:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Core:v1" schemaLocation="CoreTypes_v3.xsd"/>
+	<xsd:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" schemaLocation="Common_v3.xsd"/>
+	<xsd:simpleType name="BusinessDocumentMessageID.Content">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="EN">Unique identifier of a business document in a (technical) message that is issued by the sender business application</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="50"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BusinessScopeID.Content">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="EN">Identifier of a BusinessScope</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="60"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BusinessScopeInstanceID.Content">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="EN">Identifier for the instance of a BusinessScope</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="36"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BusinessScopeTypeCode.Content">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="EN">Coded representation of the type of a BusinessScope</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="4"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BusinessSystemID">
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="60"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AgencyIdentificationCode">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="EN">An AgencyIdentificationCode is a code representation of the agency responsible for a code list or identifier scheme, respectively</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="BusinessScopeTypeCode">
+		<xsd:simpleContent>
+			<xsd:extension base="BusinessScopeTypeCode.Content">
+				<xsd:attribute name="listID">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:token">
+							<xsd:minLength value="1"/>
+							<xsd:maxLength value="60"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="listVersionID">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:token">
+							<xsd:minLength value="1"/>
+							<xsd:maxLength value="15"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="listAgencyID">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:token">
+							<xsd:minLength value="1"/>
+							<xsd:maxLength value="60"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="listAgencySchemeID">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:token">
+							<xsd:minLength value="1"/>
+							<xsd:maxLength value="60"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="listAgencySchemeAgencyID" type="AgencyIdentificationCode"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:element name="MessageHeader" type="BusinessDocumentMessageHeader"/>
+	<xsd:complexType name="BusinessDocumentMessageHeader">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="EN">Business information from the perspective of the sender application for identifying a business document (instance) within a (technical) message</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ID" type="BusinessDocumentMessageID" minOccurs="0"/>
+			<xsd:element name="UUID" type="p1:UUID" minOccurs="0"/>
+			<xsd:element name="ReferenceID" type="BusinessDocumentMessageID" minOccurs="0"/>
+			<xsd:element name="ReferenceUUID" type="p1:UUID" minOccurs="0"/>
+			<xsd:element name="HopList" type="BusinessDocumentMessageHeaderHopList" minOccurs="0"/>
+			<xsd:element name="CreationDateTime" type="p1:DateTime"/>
+			<xsd:element name="TestDataIndicator" type="p3:Indicator" minOccurs="0"/>
+			<xsd:element name="ReconciliationIndicator" type="p3:Indicator" minOccurs="0"/>
+			<xsd:element name="SenderBusinessSystemID" type="BusinessSystemID" minOccurs="0"/>
+			<xsd:element name="RecipientBusinessSystemID" type="BusinessSystemID" minOccurs="0"/>
+			<xsd:element name="SenderParty" type="p2:InvolvedPartyType" minOccurs="0"/>
+			<xsd:element name="RecipientParty" type="p2:InvolvedPartyType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="BusinessScope" type="BusinessScope" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BusinessScopeID">
+		<xsd:simpleContent>
+			<xsd:extension base="BusinessScopeID.Content">
+				<xsd:attribute name="schemeID">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:token">
+							<xsd:minLength value="1"/>
+							<xsd:maxLength value="60"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="schemeAgencyID">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:token">
+							<xsd:minLength value="1"/>
+							<xsd:maxLength value="60"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="BusinessScope">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="EN">Environment from which a message is sent</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="TypeCode" type="BusinessScopeTypeCode"/>
+			<xsd:element name="InstanceID" type="BusinessScopeInstanceID" minOccurs="0"/>
+			<xsd:element name="ID" type="BusinessScopeID" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BusinessDocumentMessageHeaderHopList">
+		<xsd:sequence>
+			<xsd:element name="IntermediateSystemMessageHop" type="IntermediateSystemMessageHop" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BusinessDocumentMessageID">
+		<xsd:simpleContent>
+			<xsd:extension base="BusinessDocumentMessageID.Content">
+				<xsd:attribute name="schemeID">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:token">
+							<xsd:minLength value="1"/>
+							<xsd:maxLength value="60"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="schemeAgencyID">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:token">
+							<xsd:minLength value="1"/>
+							<xsd:maxLength value="60"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="schemeAgencySchemeAgencyID" type="AgencyIdentificationCode"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="BusinessScopeInstanceID">
+		<xsd:simpleContent>
+			<xsd:extension base="BusinessScopeInstanceID.Content">
+				<xsd:attribute name="schemeID">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:token">
+							<xsd:minLength value="1"/>
+							<xsd:maxLength value="60"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="schemeAgencyID">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:token">
+							<xsd:minLength value="1"/>
+							<xsd:maxLength value="60"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="IntermediateSystemMessageHop">
+		<xsd:sequence>
+			<xsd:element name="IntermediateSystemMessageUUID" type="p1:UUID" minOccurs="0"/>
+			<xsd:element name="IntermediateSystemID" type="BusinessSystemID" minOccurs="0"/>
+			<xsd:element name="DateTime" type="p1:DateTime" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

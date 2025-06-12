@@ -1,0 +1,122 @@
+{
+  "eHub": {
+    "ConnectionString": "Data Source=localhost;Initial Catalog=master;Integrated Security=True;Encrypt=False;",
+    "MasterConfigID": "eHub",
+    "DacpacFile": "Databases\\eServices.eHubDatabase.Sql.Server.eHub\\eServices.eHubDatabase.Sql.Server.eHub.dacpac",
+    "DeployOptions": {
+      "ExcludeObjectTypes": [ "MasterKeys" ],
+      "AllowIncompatiblePlatform": true,
+      "BlockOnPossibleDataLoss": false,
+      "DropExtendedPropertiesNotInSource": false,
+      "IgnorePermissions": true,
+      "VerifyDeployment": false
+    },
+    "SqlCommandVariableValues": {
+      "clientDataStagingServer": "localhost",
+      "ediProdServer": "localhost",
+      "eHubArchiveServer": "localhost",
+      "eHubProdServer": "localhost"
+    }
+  },
+  "ediProd": {
+    "ConnectionString": "Data Source=localhost;Initial Catalog=master;Integrated Security=True;Encrypt=False;",
+    "Prerequisites": [ "eHub" ],
+    "DatabaseName": "ediProd",
+    "DacpacFile": "Databases\\eServices.eHubDatabase.Sql.DB.ediProdCache\\eServices.eHubDatabase.Sql.DB.ediProdCache.dacpac",
+    "PostDeploymentScripts": [ "Scripts\\EdiProd_PostDeploy.sql" ],
+    "DeployOptions": {
+      "ExcludeObjectTypes": [ "Users", "RoleMembership" ],
+      "AllowIncompatiblePlatform": true,
+      "BlockOnPossibleDataLoss": false,
+      "IgnorePermissions": true,
+      "VerifyDeployment": false
+    },
+    "SqlCommandVariableValues": {
+      "ediProdDB": "ediProd",
+      "UpdateCacheServer": "localhost"
+    }
+  },
+  "ediProdCache": {
+    "ConnectionString": "Data Source=localhost;Initial Catalog=master;Integrated Security=True;Encrypt=False;",
+    "DatabaseName": "ediProdCache",
+    "Prerequisites": [ "ediProd" ],
+    "DacpacFile": "Databases\\eServices.eHubDatabase.Sql.DB.ediProdCache\\eServices.eHubDatabase.Sql.DB.ediProdCache.dacpac",
+    "DeployOptions": {
+      "ExcludeObjectTypes": [ "Users", "RoleMembership" ],
+      "AllowIncompatiblePlatform": true,
+      "BlockOnPossibleDataLoss": false,
+      "IgnorePermissions": true,
+      "VerifyDeployment": false
+    },
+    "SqlCommandVariableValues": {
+      "ediProdDB": "ediProd",
+      "UpdateCacheServer": "localhost"
+    }
+  },
+  "eHubTransactions": {
+    "ConnectionString": "Data Source=localhost;Initial Catalog=master;Integrated Security=True;Encrypt=False;",
+    "DatabaseName": "eHubTransactions",
+    "Prerequisites": [ "ediProdCache" ],
+    "DacpacFile": "Databases\\eServices.eHubDatabase.Sql.DB.eHubTransactions\\eServices.eHubDatabase.Sql.DB.eHubTransactions.dacpac",
+    "DeployOptions": {
+      "ExcludeObjectTypes": [ "Users", "RoleMembership" ],
+      "AllowIncompatiblePlatform": true,
+      "BlockOnPossibleDataLoss": false,
+      "IgnorePermissions": true,
+      "VerifyDeployment": false
+    },
+    "SqlCommandVariableValues": {
+      "ediProdCacheDB": "ediProdCache",
+      "ediProdDB": "ediProd",
+      "RefDatabase": "ediProd",
+      "UpdateCacheServer": "localhost",
+      "USCustomsSBEndpoint": "localhost:4741",
+      "USCustomsSBTestEndpoint": "localhost:4741"
+    }
+  },
+  "eHubArchiveOnline": {
+    "ConnectionString": "Data Source=localhost;Initial Catalog=master;Integrated Security=True;Encrypt=False;",
+    "MasterConfigID": "eHubArchiveOnline",
+    "DacpacFile": "Databases\\eServices.eHubDatabase.Sql.Server.eHubArchiveOnlineSecondary\\eServices.eHubDatabase.Sql.Server.eHubArchiveOnlineSecondary.dacpac",
+    "DeployOptions": {
+      "AllowIncompatiblePlatform": true,
+      "BlockOnPossibleDataLoss": false,
+      "DropExtendedPropertiesNotInSource": false,
+      "IgnorePermissions": true,
+      "VerifyDeployment": false
+    },
+    "SqlCommandVariableValues": {
+      "eHubTransactionsServer": "localhost",
+      "eHubArchiveOffloadServer": "localhost"
+    }
+  },
+  "eHubArchiveOnlineMonthly": {
+    "ConnectionString": "Data Source=localhost;Initial Catalog=master;Integrated Security=True;Encrypt=False;",
+    "DatabaseName": "eHubArchiveOnlineMonthly",
+    "Prerequisites": [ "eHubArchiveOnline" ],
+    "DacpacFile": "Databases\\eServices.eHubDatabase.Sql.DB.eHubArchiveOnlineMonthly\\eServices.eHubDatabase.Sql.DB.eHubArchiveOnlineMonthly.dacpac",
+    "DeployOptions": {
+      "ExcludeObjectTypes": [ "Users", "RoleMembership" ],
+      "AllowIncompatiblePlatform": true,
+      "BlockOnPossibleDataLoss": false,
+      "IgnorePermissions": true,
+      "VerifyDeployment": false
+    }
+  },
+  "eHubArchiveOnlineView": {
+    "ConnectionString": "Data Source=localhost;Initial Catalog=master;Integrated Security=True;Encrypt=False;",
+    "DatabaseName": "eHubArchiveOnlineView",
+    "Prerequisites": [ "eHubArchiveOnline", "eHubArchiveOnlineMonthly" ],
+    "DacpacFile": "Databases\\eServices.eHubDatabase.Sql.DB.eHubArchiveOnlineView\\eServices.eHubDatabase.Sql.DB.eHubArchiveOnlineView.dacpac",
+    "DeployOptions": {
+      "ExcludeObjectTypes": [ "Users", "RoleMembership" ],
+      "AllowIncompatiblePlatform": true,
+      "BlockOnPossibleDataLoss": false,
+      "IgnorePermissions": true,
+      "VerifyDeployment": false
+    },
+    "SqlCommandVariableValues": {
+      "eHubArchiveOnlineMonthly": "eHubArchiveOnlineMonthly"
+    }
+  }
+}

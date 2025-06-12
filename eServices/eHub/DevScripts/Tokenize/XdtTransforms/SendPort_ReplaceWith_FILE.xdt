@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <SendPortReplaceWithFILEImported>true</SendPortReplaceWithFILEImported>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <MSBuildNamespaces Include="MSBuildNamespace">
+      <Prefix>x</Prefix>
+      <Uri>http://schemas.microsoft.com/developer/msbuild/2003</Uri>
+    </MSBuildNamespaces>
+  </ItemGroup>
+
+  <!-- validation rules on the target xml file this xdt transformation can be applied -->
+  <ItemGroup>
+    <Validations Remove="@(Validations)" />
+
+    <Validations Include="Not-IsTwoWay">
+      <!-- not two ways -->
+      <XPath><![CDATA[/SendPort[@IsTwoWay="false"]/@IsTwoWay]]></XPath>
+    </Validations>
+    <Validations Include="Selective-TransportTypes">
+      <!-- not WCF-SQL not FILE -->
+      <XPath><![CDATA[/SendPort/PrimaryTransport/TransportType[not(starts-with(@Name, "WCF")) and @Name!="FILE" and @Name!="NULL"]/@Name]]></XPath>
+    </Validations>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Xdt Include="TransportType.Name.UpdateAttribute">
+      <XPath>/SendPort/PrimaryTransport/TransportType</XPath>
+      <Namespaces>@(MSBuildNamespaces)</Namespaces>
+      <TaskAction>UpdateAttribute</TaskAction>
+      <Key>Name</Key>
+      <Value>FILE</Value>
+    </Xdt>
+
+    <Xdt Include="TransportType.Capabilities.UpdateAttribute">
+      <XPath>/SendPort/PrimaryTransport/TransportType</XPath>
+      <Namespaces>@(MSBuildNamespaces)</Namespaces>
+      <TaskAction>UpdateAttribute</TaskAction>
+      <Key>Capabilities</Key>
+      <Value>11</Value>
+    </Xdt>
+
+    <Xdt Include="TransportType.ConfigurationClsid.UpdateAttribute">
+      <XPath>/SendPort/PrimaryTransport/TransportType</XPath>
+      <Namespaces>@(MSBuildNamespaces)</Namespaces>
+      <TaskAction>UpdateAttribute</TaskAction>
+      <Key>ConfigurationClsid</Key>
+      <Value>5e49e3a6.b4fc.4077.b44c.22f34a242fdb</Value>
+    </Xdt>
+
+    <Xdt Include="CustomProps.RemoveElement">
+      <ParentElement>/SendPort/PrimaryTransport/TransportTypeData</ParentElement>
+      <Element>CustomProps</Element>
+      <Namespaces>@(MSBuildNamespaces)</Namespaces>
+      <TaskAction>RemoveElement</TaskAction>
+    </Xdt>
+
+    <Xdt Include="CustomProps.AddElement">
+      <ParentElement>/SendPort/PrimaryTransport</ParentElement>
+      <Element>TransportTypeData</Element>
+      <Namespaces>@(MSBuildNamespaces)</Namespaces>
+      <TaskAction>AddElement</TaskAction>
+      <InnerXml><![CDATA[
+<CustomProps>
+  <UseTempFileOnWrite vt="11">0</UseTempFileOnWrite>
+  <AllowCacheOnWrite vt="11">0</AllowCacheOnWrite>
+  <CopyMode vt="19">1</CopyMode>
+  <FileName vt="8">${SendPort_PrimaryTransport_FileName}</FileName>
+</CustomProps>]]>
+      </InnerXml>
+    </Xdt>
+
+    <Xdt Include="TransportType.RemoveElement">
+      <ParentElement>/SendPort/PrimaryTransport/SendHandler</ParentElement>
+      <Element>TransportType</Element>
+      <Namespaces>@(MSBuildNamespaces)</Namespaces>
+      <TaskAction>RemoveElement</TaskAction>
+    </Xdt>
+
+    <Xdt Include="TransportType.AddElement">
+      <ParentElement>/SendPort/PrimaryTransport</ParentElement>
+      <Element>SendHandler</Element>
+      <Namespaces>@(MSBuildNamespaces)</Namespaces>
+      <TaskAction>AddElement</TaskAction>
+      <InnerXml><![CDATA[<TransportType Name="FILE" Capabilities="11" ConfigurationClsid="5e49e3a6-b4fc-4077-b44c-22f34a242fdb" />]]>
+      </InnerXml>
+    </Xdt>
+
+    <Xdt Include="SendHandler.Name.UpdateAttribute">
+      <XPath>/SendPort/PrimaryTransport/SendHandler</XPath>
+      <Namespaces>@(MSBuildNamespaces)</Namespaces>
+      <TaskAction>UpdateAttribute</TaskAction>
+      <Key>Name</Key>
+      <Value>BizTalkServerApplication</Value>
+    </Xdt>
+
+    <Xdt Include="SendHandler.HostTrusted.UpdateAttribute">
+      <XPath>/SendPort/PrimaryTransport/SendHandler</XPath>
+      <Namespaces>@(MSBuildNamespaces)</Namespaces>
+      <TaskAction>UpdateAttribute</TaskAction>
+      <Key>HostTrusted</Key>
+      <Value>${SendPort_SendHandler_HostTrusted}</Value>
+    </Xdt>
+
+    <Xdt Include="PrimaryTransport.Address.UpdateElement">
+      <XPath>/SendPort/PrimaryTransport/Address</XPath>
+      <Namespaces>@(MSBuildNamespaces)</Namespaces>
+      <TaskAction>UpdateElement</TaskAction>
+      <InnerText>${SendPort_PrimaryTransport_Address}</InnerText>
+    </Xdt>
+
+  </ItemGroup>
+
+  <!-- import the xdt transform tasks -->
+  <PropertyGroup>
+    <XdtTransformsTasksPath Condition="'$(XdtTransformsTasksPath)'==''">$(MSBuildThisFileDirectory)</XdtTransformsTasksPath>
+    <XdtTransformsTasks Condition="'$(XdtTransformsTasks)'==''">$(XdtTransformsTasksPath)XdtTransforms.tasks</XdtTransformsTasks>
+  </PropertyGroup>
+
+  <Import Project="$(XdtTransformsTasks)" Condition="'$(XdtTransformsTasksImported)'==''" />
+
+</Project>

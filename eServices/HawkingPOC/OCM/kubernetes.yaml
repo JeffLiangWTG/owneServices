@@ -1,0 +1,290 @@
+apiVersion: v1
+kind: List
+metadata: {}
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      io.kompose.service: api
+    name: api
+  spec:
+    ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 80
+      nodePort: 30080
+    selector:
+      io.kompose.service: api
+    type: NodePort
+  status:
+    loadBalancer: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      io.kompose.service: api
+    name: api
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        io.kompose.service: api
+    strategy: {}
+    template:
+      metadata:
+        labels:
+          io.kompose.service: api
+      spec:
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: kafka
+          - configMapRef:
+              name: mongodb
+          - configMapRef:
+              name: rabbitmq
+          - configMapRef:
+              name: sqlserver
+          env:
+          - name: RabbitMq__Queue__Input
+            value: ocm.poc.cw1.send
+          - name: RabbitMq__Queue__Output
+            value: ocm.poc.receive
+          image: localhost:5000/api
+          imagePullPolicy: Always
+          name: api
+          ports:
+          - containerPort: 80
+          resources: {}
+        restartPolicy: Always
+  status: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      io.kompose.service: core
+    name: core
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        io.kompose.service: core
+    strategy: {}
+    template:
+      metadata:
+        labels:
+          io.kompose.service: core
+      spec:
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: kafka
+          - configMapRef:
+              name: rabbitmq
+          - configMapRef:
+              name: sqlserver
+          env:
+          - name: RabbitMq__PreFetch
+            value: "0"
+          - name: RabbitMq__Queue__Input
+            value: ocm.poc.main
+          - name: RabbitMq__Queue__Output
+            value: ocm.poc.correlated
+          image: localhost:5000/corellator
+          imagePullPolicy: Always
+          name: correlator
+          resources: {}
+        - envFrom:
+          - configMapRef:
+              name: kafka
+          - configMapRef:
+              name: sqlserver
+          image: localhost:5000/event-processor
+          imagePullPolicy: Always
+          name: event-processor
+          resources: {}
+        - envFrom:
+          - configMapRef:
+              name: rabbitmq
+          env:
+          - name: Exchange__Recipient
+            value: headers:ocm.poc.xch.recipient:ocm.poc.unroutable
+          - name: Provider__001
+            value: Provider-A
+          - name: Provider__002
+            value: Provider-B
+          - name: Provider__003
+            value: CW1
+          - name: Queue__001
+            value: ocm.poc.receive>
+          - name: Queue__002
+            value: ocm.poc.main>
+          - name: Queue__003
+            value: ocm.poc.correlated>
+          image: localhost:5000/orchestrator
+          imagePullPolicy: Always
+          name: orchestrator
+          resources: {}
+        - envFrom:
+          - configMapRef:
+              name: rabbitmq
+          env:
+          - name: PartitionHeaders
+            value: Sender
+          - name: RabbitMq__Output__Queue
+            value: ocm.poc.main
+          - name: RabbitMq__PreFetch
+            value: "0"
+          - name: RabbitMq__Queue__Deadletter
+            value: ocm.poc.receive.dl
+          - name: RabbitMq__Queue__Input
+            value: ocm.poc.receive
+          - name: RabbitMq__Queue__InternalPrefix
+            value: ocm.poc.receive.internal
+          image: localhost:5000/paralleliser
+          imagePullPolicy: Always
+          name: receive-scaler
+          resources: {}
+        - envFrom:
+          - configMapRef:
+              name: rabbitmq
+          env:
+          - name: PartitionHeaders
+            value: Sender:Recipient
+          - name: RabbitMq__Output__Exchange
+            value: ocm.poc.xch.recipient
+          - name: RabbitMq__PreFetch
+            value: "0"
+          - name: RabbitMq__Queue__Deadletter
+            value: ocm.poc.main.dl
+          - name: RabbitMq__Queue__Input
+            value: ocm.poc.correlated
+          - name: RabbitMq__Queue__InternalPrefix
+            value: ocm.poc.send.internal
+          image: localhost:5000/paralleliser
+          imagePullPolicy: Always
+          name: send-scaler
+          resources: {}
+        - envFrom:
+          - configMapRef:
+              name: kafka
+          - configMapRef:
+              name: mongodb
+          - configMapRef:
+              name: rabbitmq
+          - configMapRef:
+              name: sqlserver
+          - configMapRef:
+              name: ftp
+          env:
+          - name: Connection__Port
+            value: "2021"
+          - name: Provider__Name
+            value: Provider-A
+          - name: RabbitMq__PreFetch
+            value: "0"
+          image: localhost:5000/ftp-transceiver
+          imagePullPolicy: Always
+          name: transceiver-provider-a
+          resources: {}
+        - envFrom:
+          - configMapRef:
+              name: kafka
+          - configMapRef:
+              name: mongodb
+          - configMapRef:
+              name: rabbitmq
+          - configMapRef:
+              name: sqlserver
+          - configMapRef:
+              name: ftp
+          env:
+          - name: Connection__Port
+            value: "2121"
+          - name: Provider__Name
+            value: Provider-B
+          - name: RabbitMq__PreFetch
+            value: "0"
+          image: localhost:5000/ftp-transceiver
+          imagePullPolicy: Always
+          name: transceiver-provider-b
+          resources: {}
+        restartPolicy: Always
+  status: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      io.kompose.service: receiveMapper
+    name: receive-mapper
+  spec:
+    replicas: 3
+    selector:
+      matchLabels:
+        io.kompose.service: receiveMapper
+    strategy: {}
+    template:
+      metadata:
+        labels:
+          io.kompose.service: receiveMapper
+      spec:
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: kafka
+          - configMapRef:
+              name: mongodb
+          - configMapRef:
+              name: rabbitmq
+          env:
+          - name: MappingMode
+            value: Receive
+          - name: RabbitMq__Queue__Input
+            value: ocm.poc.receive.internal.ip
+          - name: RabbitMq__Queue__Output
+            value: ocm.poc.receive.internal.op
+          image: localhost:5000/mapper
+          imagePullPolicy: Always
+          name: receive-mapper
+          resources: {}
+        restartPolicy: Always
+  status: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      io.kompose.service: sendMapper
+    name: send-mapper
+  spec:
+    replicas: 3
+    selector:
+      matchLabels:
+        io.kompose.service: sendMapper
+    strategy: {}
+    template:
+      metadata:
+        labels:
+          io.kompose.service: sendMapper
+      spec:
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: kafka
+          - configMapRef:
+              name: mongodb
+          - configMapRef:
+              name: rabbitmq
+          env:
+          - name: MappingMode
+            value: Send
+          - name: RabbitMq__Queue__Input
+            value: ocm.poc.send.internal.ip
+          - name: RabbitMq__Queue__Output
+            value: ocm.poc.send.internal.op
+          image: localhost:5000/mapper
+          imagePullPolicy: Always
+          name: send-mapper
+          resources: {}
+        restartPolicy: Always
+  status: {}

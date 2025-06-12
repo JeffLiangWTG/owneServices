@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+
+	<PropertyGroup>
+		<_UseProject>false</_UseProject>
+		<_TempDeployFolder>$(MSBuildThisFileDirectory)_deploy</_TempDeployFolder>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<BatProjects Include="CargoWise.eServices.Encryption.Client.Encryptor\CargoWise.eServices.Encryption.Client.Encryptor.csproj" />
+		<BatProjects Include="CargoWise.eServices.Encryption.Server.Decryptor\CargoWise.eServices.Encryption.Server.Decryptor.csproj" />
+		<BatProjects Include="CargoWise.eServices.Encryption.Server.Encryptor\CargoWise.eServices.Encryption.Server.Encryptor.csproj" />
+		<BatProjects Include="CargoWise.eServices.Encryption.Client.Decryptor\CargoWise.eServices.Encryption.Client.Decryptor.csproj" />
+	</ItemGroup>
+	
+	<Target Name="Build">
+		<MSBuild Projects="CargoWise.eServices.Encryption.sln" Targets="Build" />
+	</Target>
+	
+	<Target Name="Clean">
+		<MSBuild Projects="CargoWise.eServices.Encryption.sln" Targets="Clean" />
+	</Target>
+	
+	<Target Name="Rebuild" DependsOnTargets="Clean;Build" />
+
+	<Target Name="bat:package" DependsOnTargets="Build">
+		<MSBuild Projects="@(BatProjects)" Targets="bat:package" />
+	</Target>
+	
+	<Target Name="bat:deploy">
+		<MSBuild Projects="@(BatProjects)" Targets="bat:deploy" />
+	</Target>
+
+</Project>

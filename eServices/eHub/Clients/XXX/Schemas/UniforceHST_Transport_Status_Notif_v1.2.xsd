@@ -1,0 +1,854 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema attributeFormDefault = "unqualified" 
+            elementFormDefault   = "qualified"
+	        targetNamespace      = "http://uniforce-group.com/ns/v1" 
+            version              = "1.2"
+	        xmlns                = "http://uniforce-group.com/ns/v1" 
+            xmlns:xsd            = "http://www.w3.org/2001/XMLSchema" >
+    
+    
+	<xsd:element name="transportStatusNotificationMessage" type="TransportStatusNotificationMessageType" />
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="TransportStatusNotificationMessageType">
+		<xsd:sequence>
+			<xsd:element ref="StandardBusinessDocumentHeader" />
+			<xsd:element name="transportStatusNotification" type="TransportStatusNotificationType" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->    
+    
+	<xsd:complexType name="TransportStatusNotificationShipmentType">
+		<xsd:complexContent>
+			<xsd:extension base="Ecom_ShipmentIdentificationType">
+				<xsd:sequence>
+					<xsd:element name="transportReference" type="TransportReferenceType" minOccurs="0" maxOccurs="unbounded" />
+					<xsd:element name="transportStatus"    type="TransportStatusType"                  maxOccurs="unbounded" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="TransportStatusNotificationType">
+		<xsd:complexContent>
+			<xsd:extension base="EcomDocumentType">
+				<xsd:sequence>
+					<xsd:element name="transportStatusNotificationIdentification" type="Ecom_EntityIdentificationType" />
+					<xsd:element name="transportStatusInformationCode"            type="TransportStatusInformationEnumerationType" />
+					<xsd:element name="transportStatusObjectCode"                 type="TransportStatusObjectEnumerationType" />
+					<xsd:element name="transportStatusRequestor"                  type="TransactionalPartyType"  minOccurs="0" />
+					<xsd:element name="transportStatusProvider"                   type="TransactionalPartyType" />
+                    
+					<xsd:element name="transportStatusNotificationShipment"       type="TransportStatusNotificationShipmentType" 
+                                 minOccurs="0"  maxOccurs="unbounded" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="Ecom_AttributeValuePairListType">
+		<xsd:sequence>
+			<xsd:element name="eComStringAttributeValuePairList" type="EcomStringAttributeValuePairListType" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="Ecom_DocumentReferenceType">
+		<xsd:complexContent>
+			<xsd:extension base="Ecom_EntityIdentificationType">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" name="referencedDocumentUrl">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:anyURI">
+								<xsd:maxLength value="2000"/>
+								<xsd:minLength value="1"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="Ecom_EntityIdentificationType">
+		<xsd:sequence>
+			<xsd:element name="entityIdentification">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="80"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="Ecom_IndividualAssetIdentificationType">
+		<xsd:sequence>
+			<xsd:element name="giai" type="GIAIType" minOccurs="0" />
+            
+			<xsd:element name="additionalIndividualAssetIdentification"
+				         type="AdditionalIndividualAssetIdentificationType" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="Ecom_PartyIdentificationType">
+		<xsd:sequence>
+			<xsd:element name="gln" type="GLNType" minOccurs="0" />
+            
+			<xsd:element name="additionalPartyIdentification"
+				         type="AdditionalPartyIdentificationType" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="Ecom_ReturnableAssetIdentificationType">
+		<xsd:sequence>
+			<xsd:element minOccurs="0" name="grai" type="GRAIType" />
+            
+			<xsd:element name="additionalReturnableAssetIdentification"
+				         type="AdditionalReturnableAssetIdentificationType" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="Ecom_ShipmentIdentificationType">
+		<xsd:sequence>
+			<xsd:element name="additionalShipmentIdentification"
+				         type="AdditionalShipmentIdentificationType" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="EcomDocumentType">
+		<xsd:complexContent>
+			<xsd:extension base="DocumentType">
+				<xsd:sequence>
+					<xsd:element name="avpList" type="Ecom_AttributeValuePairListType" minOccurs="0" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="EcomStringAttributeValuePairListType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="attributeName"            type="String70Type" use="required" />
+				<xsd:attribute name="qualifierCodeName"        type="String70Type" />
+				<xsd:attribute name="qualifierCodeList"        type="String70Type" />
+				<xsd:attribute name="qualifierCodeListVersion" type="String70Type" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="IdentityDocumentType">
+		<xsd:sequence>
+            
+			<xsd:element name="identityDocumentNumber">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="80"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+            
+			<xsd:element name="identityDocumentType" type="IdentityDocumentTypeCodeType"/>
+            
+			<xsd:element minOccurs="0" name="identityDocumentIssuer">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="80"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+            
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="IdentityDocumentTypeCodeType">
+		<xsd:simpleContent>
+			<xsd:extension base="GS1CodeType"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="TransactionalPartyType">
+		<xsd:complexContent>
+			<xsd:extension base="Ecom_PartyIdentificationType">
+				<xsd:sequence>
+					<xsd:element name="address" type="AddressType"  minOccurs="0"                       />
+					<xsd:element name="contact" type="ContactType"  minOccurs="0" maxOccurs="unbounded" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="TransportReferenceType">
+		<xsd:complexContent>
+			<xsd:extension base="Ecom_DocumentReferenceType">
+				<xsd:sequence>
+					<xsd:element name="transportReferenceTypeCode" type="TransportReferenceTypeCodeType" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="TransportReferenceTypeCodeType">
+		<xsd:simpleContent>
+			<xsd:extension base="GS1CodeType" />
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="TransportStatusConditionCodeType">
+		<xsd:simpleContent>
+			<xsd:extension base="GS1CodeType" />
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="TransportStatusReasonCodeType">
+		<xsd:simpleContent>
+			<xsd:extension base="GS1CodeType" />
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->    
+    
+	<xsd:complexType name="TransportStatusType">
+		<xsd:sequence>
+			<xsd:element name="transportStatusConditionCode"     type="TransportStatusConditionCodeType"               maxOccurs="unbounded" />
+			<xsd:element name="transportStatusDateTime"          type="xsd:dateTime"                     minOccurs="0"                       />
+			<xsd:element name="transportStatusDescription"       type="Description500Type"               minOccurs="0"                       />
+			<xsd:element name="transportStatusReasonCode"        type="TransportStatusReasonCodeType"    minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="transportStatusReasonDescription" type="Description500Type"               minOccurs="0"                       />
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="AdditionalIndividualAssetIdentificationType">
+		<xsd:simpleContent>
+			<xsd:extension base="String80Type">
+				<xsd:attribute name="additionalIndividualAssetIdentificationTypeCode" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="80"/>
+							<xsd:minLength value="1"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="codeListVersion">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="35"/>
+							<xsd:minLength value="1"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="AdditionalPartyIdentificationType">
+		<xsd:simpleContent>
+			<xsd:extension base="String80Type">
+				<xsd:attribute name="additionalPartyIdentificationTypeCode" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="80"/>
+							<xsd:minLength value="1"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="codeListVersion">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="35"/>
+							<xsd:minLength value="1"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="AdditionalReturnableAssetIdentificationType">
+		<xsd:simpleContent>
+			<xsd:extension base="String80Type">
+				<xsd:attribute name="additionalReturnableAssetIdentificationTypeCode" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="80"/>
+							<xsd:minLength value="1"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="codeListVersion">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="35"/>
+							<xsd:minLength value="1"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->    
+    
+	<xsd:complexType name="AdditionalShipmentIdentificationType">
+		<xsd:simpleContent>
+			<xsd:extension base="String80Type">
+				<xsd:attribute name="additionalShipmentIdentificationTypeCode" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="80"/>
+							<xsd:minLength value="1"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="codeListVersion">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="35"/>
+							<xsd:minLength value="1"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="AddressType">
+		<xsd:sequence>
+			<xsd:element minOccurs="0" name="city">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="200"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="cityCode">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="80"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="countryCode" type="CountryCodeType"/>
+			<xsd:element minOccurs="0" name="countyCode">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="80"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="crossStreet">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="200"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="currencyOfPartyCode" type="CurrencyCodeType"/>
+			<xsd:element minOccurs="0" name="languageOfThePartyCode" type="LanguageCodeType"/>
+			<xsd:element minOccurs="0" name="name">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="200"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="pOBoxNumber">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="80"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="postalCode">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="80"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="provinceCode">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="80"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="state">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="80"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="streetAddressOne">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="200"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="streetAddressTwo">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="200"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="streetAddressThree">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="200"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="geographicalCoordinates"
+				type="GeographicalCoordinatesType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="CommunicationChannelCodeType">
+		<xsd:simpleContent>
+			<xsd:extension base="GS1CodeType"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="CommunicationChannelType">
+		<xsd:sequence>
+			<xsd:element name="communicationChannelCode" type="CommunicationChannelCodeType"/>
+			<xsd:element name="communicationValue">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="200"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="communicationChannelName">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="200"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="ContactType">
+		<xsd:sequence>
+			<xsd:element minOccurs="0" name="contactTypeCode" type="ContactTypeCodeType"/>
+			<xsd:element minOccurs="0" name="personName">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="70"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="departmentName">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="70"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element minOccurs="0" name="jobTitle">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="70"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element maxOccurs="unbounded" minOccurs="0" name="communicationChannel"
+				type="CommunicationChannelType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="ContactTypeCodeType">
+		<xsd:simpleContent>
+			<xsd:extension base="GS1CodeType"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="CountryCodeType">
+		<xsd:simpleContent>
+			<xsd:extension base="GS1CodeType"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="CurrencyCodeType">
+		<xsd:simpleContent>
+			<xsd:extension base="GS1CodeType"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="Description500Type">
+		<xsd:simpleContent>
+			<xsd:extension base="String500Type">
+				<xsd:attribute name="languageCode" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="80"/>
+							<xsd:minLength value="1"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+				<xsd:attribute name="codeListVersion">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="35"/>
+							<xsd:minLength value="1"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType abstract="true" name="DocumentType">
+		<xsd:sequence>
+			<xsd:element name="creationDateTime" type="xsd:dateTime"/>
+			<xsd:element name="documentStatusCode" type="DocumentStatusEnumerationType"/>
+			<xsd:element minOccurs="0" name="documentActionCode"
+				type="DocumentActionEnumerationType"/>
+			<xsd:element minOccurs="0" name="lastUpdateDateTime" type="xsd:dateTime"/>
+			<xsd:element minOccurs="0" name="revisionNumber" type="xsd:positiveInteger"/>
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="GeographicalCoordinatesType">
+		<xsd:sequence>
+			<xsd:element name="latitude">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="80"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="longitude">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="80"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="GS1CodeType">
+		<xsd:simpleContent>
+			<xsd:extension base="String80Type">
+				<xsd:attribute name="codeListVersion">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="35"/>
+							<xsd:minLength value="1"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="LanguageCodeType">
+		<xsd:simpleContent>
+			<xsd:extension base="GS1CodeType"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:simpleType name="DocumentActionEnumerationType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ADD"/>
+			<xsd:enumeration value="CHANGE_BY_REFRESH"/>
+			<xsd:enumeration value="DELETE"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:simpleType name="DocumentStatusEnumerationType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ADDITIONAL_TRANSMISSION"/>
+			<xsd:enumeration value="COPY"/>
+			<xsd:enumeration value="ORIGINAL"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:simpleType name="GIAIType">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[-!&quot;%&amp;'()*+,./0-9:;&lt;=>?A-Z_a-z]{4,30}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:simpleType name="GLNType">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="\d{13}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:simpleType name="GRAIType">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="\d{14}[-!&quot;%&amp;'()*+,./0-9:;&lt;=>?A-Z_a-z]{0,16}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:simpleType name="String500Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="500"/>
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:simpleType name="String70Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="70"/>
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:simpleType name="String80Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="80"/>
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="DocumentIdentification">
+		<xsd:sequence>
+			<xsd:element form="qualified" name="Standard" type="xsd:string"/>
+			<xsd:element form="qualified" name="TypeVersion" type="xsd:string"/>
+			<xsd:element form="qualified" name="InstanceIdentifier" type="xsd:string"/>
+			<xsd:element form="qualified" name="Type" type="xsd:string"/>
+			<xsd:element form="qualified" name="CreationDateAndTime" type="xsd:dateTime"/>
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="Partner">
+		<xsd:sequence>
+			<xsd:element form="qualified" name="Identifier" type="PartnerIdentification"/>
+			<xsd:element form="qualified" maxOccurs="unbounded" minOccurs="0"
+				name="ContactInformation" type="ContactInformation"/>
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="PartnerIdentification">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute form="unqualified" name="Authority" type="xsd:string" use="required"
+				/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="ContactInformation">
+		<xsd:sequence>
+			<xsd:element form="qualified" name="Contact" type="xsd:string"/>
+			<xsd:element form="qualified" minOccurs="0" name="EmailAddress" type="xsd:string"/>
+			<xsd:element form="qualified" minOccurs="0" name="FaxNumber" type="xsd:string"/>
+			<xsd:element form="qualified" minOccurs="0" name="TelephoneNumber" type="xsd:string"/>
+			<xsd:element form="qualified" minOccurs="0" name="ContactTypeIdentifier"
+				type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:complexType name="StandardBusinessDocumentHeader">
+		<xsd:sequence>
+			<xsd:element name="HeaderVersion" type="xsd:string"/>
+			<xsd:element maxOccurs="unbounded" name="Sender" type="Partner"/>
+			<xsd:element maxOccurs="unbounded" name="Receiver" type="Partner"/>
+			<xsd:element name="DocumentIdentification" type="DocumentIdentification"/>
+		</xsd:sequence>
+	</xsd:complexType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:element name="StandardBusinessDocumentHeader" type="StandardBusinessDocumentHeader"/>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:simpleType name="TransportStatusInformationEnumerationType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="EVENT_LOG_ONLY"/>
+			<xsd:enumeration value="INFORMATION_ON_DELIVERY"/>
+			<xsd:enumeration value="STATUS_AND_MOVEMENT"/>
+			<xsd:enumeration value="STATUS_MOVEMENT_AND_EVENT_LOG"/>
+			<xsd:enumeration value="STATUS_ONLY"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+	<xsd:simpleType name="TransportStatusObjectEnumerationType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="CONSIGNMENT"/>
+			<xsd:enumeration value="LOGISTIC_UNIT"/>
+			<xsd:enumeration value="SHIPMENT"/>
+			<xsd:enumeration value="TRANSPORT_EQUIPMENT"/>
+			<xsd:enumeration value="TRANSPORT_MEANS"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    
+    
+<!-- ======================================================================================================== -->
+    
+</xsd:schema>

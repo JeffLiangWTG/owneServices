@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:ns0="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" xmlns:ns1="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" xmlns:ns2="http://www.auspost.com.au/Schema/CommonDataModel/Core:v1" xmlns="http://www.auspost.com.au/Schema/CommonDataModel/Product:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.auspost.com.au/Schema/CommonDataModel/Product:v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.10">
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" schemaLocation="CommonTypes_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" schemaLocation="Address_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Core:v1" schemaLocation="CoreTypes_v3.xsd"/>
+	<xs:complexType name="Services">
+		<xs:sequence>
+			<xs:element name="ServiceCodeGroup" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ServiceCodes" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="ServiceCode" type="ns0:string4"/>
+									<xs:element name="ServiceQualifier" minOccurs="0" maxOccurs="unbounded">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="ServiceAttributeName" type="ns0:string10"/>
+												<xs:choice minOccurs="0">
+													<xs:element name="TimePeriod" type="ns0:TimePeriod" minOccurs="0" maxOccurs="unbounded"/>
+													<xs:element name="Date" type="xs:date" minOccurs="0" maxOccurs="unbounded"/>
+													<xs:element name="Weekday" type="ns0:WeekdayCode" minOccurs="0" maxOccurs="unbounded"/>
+													<xs:element name="ServiceAttributeQualifier" type="ns0:string50" minOccurs="0" maxOccurs="unbounded"/>
+												</xs:choice>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BarcodeMask">
+		<xs:annotation>
+			<xs:documentation>Auspost detailed barcode data </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MaskID">
+				<xs:annotation>
+					<xs:documentation>Unique identifier for barcode mark</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Mask" type="ns0:string50">
+				<xs:annotation>
+					<xs:documentation>Actual barcode mask</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MaxLength" type="ns0:int3">
+				<xs:annotation>
+					<xs:documentation>Maximum barcode length</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MinLength" type="ns0:int3">
+				<xs:annotation>
+					<xs:documentation>Minimum barcode length</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BarcodeType" type="ns0:int3">
+				<xs:annotation>
+					<xs:documentation>Barcode type, e.g. Article, WCC, Contract</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SubType" type="ns0:int3">
+				<xs:annotation>
+					<xs:documentation>Barcode sub type, e.g. TOPS, Driver, Truck</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Exclude" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Flag to select barcode as invalid</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MerchantLocationID" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Merchant location ID used in barcodes</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ValidPeriod" type="ns0:ValidPeriod"/>
+			<xs:element name="CheckDigitType" type="ns0:int3" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Check digit algorithm</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SortOrder" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="FurtherReference" type="ns0:FurtherReferences" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Further reference of the barcode mark, such as Default Product ID, Sub Product ID, Default Service Code, Mask Profile and etc are placed here as name value pairs</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BarcodeMaskExtension" type="BarcodeMaskExtension" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Additional barcode mask attributes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ModificationAudit" type="ns0:ModificationAudit" minOccurs="0"/>
+			<xs:element name="Standardised" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Standard Australia Post barcode</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Product">
+		<xs:annotation>
+			<xs:documentation>Auspost detailed product data </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ProductID" type="ns0:string3">
+				<xs:annotation>
+					<xs:documentation>Auspost product primary key (unique identifier)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProductName" type="ns0:string50">
+				<xs:annotation>
+					<xs:documentation>Product name (product group, e.g. eParcel)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProductType" type="ns0:string2"/>
+			<xs:element name="SubProductType" type="ns0:int1">
+				<xs:annotation>
+					<xs:documentation>Sub product type</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ValidPeriod" type="ns0:ValidPeriod"/>
+			<xs:element name="SubProduct" type="SubProduct" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Detailed sub product data</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ModificationAudit" type="ns0:ModificationAudit" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SubProduct">
+		<xs:annotation>
+			<xs:documentation>Auspost detailed sub product data </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="SubProductID" type="ns0:string3">
+				<xs:annotation>
+					<xs:documentation>Auspost sub product primary key (unique identifier)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SubProductName" type="ns0:string50">
+				<xs:annotation>
+					<xs:documentation>Product name (product group, e.g. eParcel)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DefaultSubProductFlag" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Flag: Default Sub product</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EventNotification" type="ns0:string2" minOccurs="0"/>
+			<xs:element name="ServiceCode" type="ns0:string4">
+				<xs:annotation>
+					<xs:documentation>Default Base Service code</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AllowedAdditionalServiceCodes" type="ns0:string4" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="DeliveryNetwork" type="ns0:string2" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Represents the delivery network</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ValidPeriod" type="ns0:ValidPeriod"/>
+			<xs:element name="ModificationAudit" type="ns0:ModificationAudit" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Service">
+		<xs:sequence>
+			<xs:element name="ServiceAttributeName" type="ns0:string10">
+				<xs:annotation>
+					<xs:documentation>Service Attribute Name</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Description" type="ns0:string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Service Attribute Description</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ServiceAttributeValue" type="ns0:string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Service Attribute Value</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ModificationAudit" type="ns0:ModificationAudit" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceCode">
+		<xs:annotation>
+			<xs:documentation>Auspost detailed service option data </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ServiceCode" type="ns0:string4">
+				<xs:annotation>
+					<xs:documentation>Primary key (unique identifier)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ServiceDescription" type="ns0:string50">
+				<xs:annotation>
+					<xs:documentation>Represents the description of the service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Service" type="Service" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="ServiceCodeExtension" type="ServiceCodeExtension" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Additional service code attributes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ValidPeriod" type="ns0:ValidPeriod"/>
+			<xs:element name="ModificationAudit" type="ns0:ModificationAudit" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MaskProfile">
+		<xs:annotation>
+			<xs:documentation>Barcode specific metadata, used by SAP ERP and EM system</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ProfileID" type="ns0:string10">
+				<xs:annotation>
+					<xs:documentation>Profile identifer </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProfileDetails" type="MaskProfileDetails" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Mask profile details used by SAP ERP and EM system in name value pairs</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MaskProfileDetails">
+		<xs:annotation>
+			<xs:documentation>Mask profile details used by SAP ERP and EM system in name value pairs</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="SequenceNumber">
+				<xs:annotation>
+					<xs:documentation>SAP sequence number</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Parameter">
+				<xs:annotation>
+					<xs:documentation>Parameter name, such as Product Off, Service Off and etc</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="16"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Value" type="ns0:string10">
+				<xs:annotation>
+					<xs:documentation>Value for a given parameter</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ModificationAudit" type="ns0:ModificationAudit" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ProofOfIdentity" type="ns0:ProofOfIdentity"/>
+	<xs:complexType name="Barcode">
+		<xs:annotation>
+			<xs:documentation>Datatype of an envelope to carry barcode related data including BarcodeMask, Product, SubProduct, Service and Profile as independent objects</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="BarcodeMask" type="BarcodeMask" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Auspost detailed barcode data</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Product" type="Product" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Auspost detailed product data</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ServiceCodes" type="ServiceCode" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Auspost detailed service option data</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Profile" type="MaskProfile" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Mask profile details used by SAP ERP and EM system</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="ServiceProfile" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="ProofOfIdentity" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Barcode" type="Barcode"/>
+	<xs:simpleType name="BarcodeMaskID">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="5"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="BarcodeMaskExtension">
+		<xs:sequence>
+			<xs:element name="SequenceNumber" type="SequenceNumber"/>
+			<xs:element name="Description" type="ns0:string50"/>
+			<xs:element name="MaskExtensionIdentification">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="MaskExtensionCodeSet" type="ns0:string20"/>
+						<xs:element name="MaskExtensionID" type="ns0:string50"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ModificationAudit" type="ns0:ModificationAudit" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="SequenceNumber">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ServiceCodeExtension">
+		<xs:sequence>
+			<xs:element name="ServicePoint">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ServiceProfileID" type="ns0:string10"/>
+			<xs:element name="ValidPeriod" type="ns0:ValidPeriod"/>
+			<xs:element name="ModificationAudit" type="ns0:ModificationAudit" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceProfile">
+		<xs:sequence>
+			<xs:element name="ServiceProfileID" type="ns0:string10"/>
+			<xs:element name="Description" type="ns0:string50"/>
+			<xs:element name="ServiceProfileActions" type="ServiceProfileActions" maxOccurs="unbounded"/>
+			<xs:element name="POIReference" type="ns0:POIReference" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="ModificationAudit" type="ns0:ModificationAudit" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceProfileActions">
+		<xs:sequence>
+			<xs:element name="SequenceNumber" type="SequenceNumber"/>
+			<xs:element name="ActionID" type="ns0:string10"/>
+			<xs:element name="Description" type="ns0:string50"/>
+			<xs:element name="ModificationAudit" type="ns0:ModificationAudit" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ServiceProfile" type="ServiceProfile"/>
+	<xs:annotation>
+		<xs:documentation>The type and element definitions below were added as part of the Omega (Load &amp; Go) Project, Phase 2</xs:documentation>
+		<xs:documentation>These definitions live in this schema (Service_v1) rather than in Product_v1 to avoid circular inlcudes and imports further up the dependency tree. This needs to be fixed in a future major version of the CMM.</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="ProductID">
+		<xs:annotation>
+			<xs:documentation>Identifies a product, e.g. by material number in ERP or another inventory system. This does not refer to a particular instance of a product.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="ns2:Identifier"/>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="ProductInstanceID">
+		<xs:annotation>
+			<xs:documentation>Uniquely identifies one particular instance of a product</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="ns2:Identifier"/>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="ProductClass">
+		<xs:sequence>
+			<xs:element name="ProductClassID" type="ns2:Identifier"/>
+			<xs:element name="Description" type="ns2:Description"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProductBasicDetails">
+		<xs:annotation>
+			<xs:documentation>
+				Modeled on the "Product" Entity in the Australia Post Logical Data Model, hosted in the EKB. 
+				A PRODUCT is the lowest level for which inventory and sales records are retained within the Enterprise.
+				A unique identifier for a grouping of one or more products or services and the corresponding price plan, rate structure or unit charge that may marketed by the organization for the purpose of generating revenue. A product is what a customer purchases or subscribes.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ProductID" type="ProductID"/>
+			<xs:element name="OwnerPartyID" type="ns0:InvolvedPartyIdType" minOccurs="0"/>
+			<xs:element name="VendorPartyID" type="ns0:InvolvedPartyIdType" minOccurs="0"/>
+			<xs:element name="ProductName" type="ns2:Name" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Description" type="ns2:Description" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="SKU" type="ns2:Code" minOccurs="0"/>
+			<xs:element name="ProductSubclass" type="ProductClass" minOccurs="0"/>
+			<xs:element name="ProductClass" type="ProductClass" minOccurs="0"/>
+			<xs:element name="BrandID" type="ns2:Identifier" minOccurs="0"/>
+			<xs:element name="PricingUOMCode" type="ns2:MeasureUnitCode" minOccurs="0"/>
+			<xs:element name="CommodityCode" type="ns2:Code" minOccurs="0"/>
+			<xs:element name="ProductSubtypeID" type="ns2:Identifier" minOccurs="0"/>
+			<xs:element name="InventoryItemIndicator" type="ns2:Indicator" minOccurs="0"/>
+			<xs:element name="SalableItemIndicator" type="ns2:Indicator" minOccurs="0"/>
+			<xs:element name="ServiceItemIndicator" type="ns2:Indicator" minOccurs="0"/>
+			<xs:element name="NonRevenueItemIndicator" type="ns2:Indicator" minOccurs="0"/>
+			<xs:element name="MultiItemIndicator" type="ns2:Indicator" minOccurs="0"/>
+			<xs:element name="CountryOfOriginCode" type="ns2:Code" minOccurs="0"/>
+			<xs:element name="DigitalItemIndicator" type="ns2:Indicator" minOccurs="0"/>
+			<xs:element name="TitleID" type="ns2:Identifier" minOccurs="0"/>
+			<xs:element name="FranchiseID" type="ns2:Identifier" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Product_v2">
+		<xs:annotation>
+			<xs:documentation>This is called "v2" to avoid conflicts with the Product defined above, which is about *mail* products and should never have been called just plain "Product".</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ProductBasicDetails">
+				<xs:sequence>
+					<xs:element name="ParentProduct" type="ProductBasicDetails" minOccurs="0"/>
+					<xs:element name="ModificationAudit" type="ns0:ModificationAudit" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

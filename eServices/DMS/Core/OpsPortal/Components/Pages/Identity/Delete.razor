@@ -1,0 +1,74 @@
+﻿@page "/identity/delete/{id}"
+@attribute [Authorize(Policy = "eServicesAdmins")]
+
+@inject UserManager<AppUser> UserManager
+@inject NavigationManager NavigationManager
+
+<PageTitle>App Access Delete</PageTitle>
+
+<h2>App Access</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <hr />
+    @if (user is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">ID</dt>
+            <dd class="col-sm-10">@user.UserName</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Claims</dt>
+            <dd class="col-sm-10">@claims</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Contact</dt>
+            <dd class="col-sm-10">@user.Email</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Locked Out?</dt>
+            <dd class="col-sm-10">@(user.LockoutEnd.GetValueOrDefault() > DateTimeOffset.UtcNow)</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Access Failed Count</dt>
+            <dd class="col-sm-10">@user.AccessFailedCount</dd>
+        </dl>
+        <EditForm method="post" Model="user" OnValidSubmit="Deleteuser" FormName="delete" Enhance>
+            <button id="delete" type="submit" class="btn btn-danger" disabled="@(user is null)">Delete</button> |
+            <a href="/identity">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    AppUser? user;
+    string? claims;
+
+    [Parameter]
+    public required string Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserManager.FindByNameAsync(Id);
+
+        if (user is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+
+        claims = string.Join(", ", await UserManager.GetRolesAsync(user));
+    }
+
+    public async Task Deleteuser()
+    {
+        if (!(await UserManager.DeleteAsync(user!)).Succeeded)
+        {
+            throw new InvalidOperationException("Failed to delete user");
+        }
+        NavigationManager.NavigateTo("/identity");
+    }
+}

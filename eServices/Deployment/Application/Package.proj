@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(MSBuildThisFileDirectory)\..\package-common.tasks</PackageCommonTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+
+  <Target Name="bat:package">
+    <!-- initialize package variables and temporary folders for zip contents -->
+    <CallTarget Targets="bat:package:init"/>
+
+    <ItemGroup>
+      <FilesToInclude Include="$(OutputPath)\**\*"/>
+      <FilesToInclude Include="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Files\**\*"/>
+    </ItemGroup>
+
+    <Copy SourceFiles="@(FilesToInclude)"
+          DestinationFolder="$(_ZipContentsDirectory)\%(RecursiveDir)"/>
+
+    <!-- Create package -->
+    <CallTarget Targets="bat:package:zip"/>
+  </Target>
+</Project>

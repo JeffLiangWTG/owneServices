@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!-- Title: "TRACKING STEP"                                          -->
+<!--                                                                 -->
+<!-- Purpose:                                                        -->
+<!-- This message type is used by the CoreFreight system to send     -->
+<!-- general tracking step information to external systems.          -->
+<!--                                                                 -->
+<!-- Created by: Riaan Potgieter                                     -->
+<!-- Version: 1.01                                                   -->
+<!-- Last updated: 02 Sep 2005                                       -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           elementFormDefault="qualified">
+
+<!-- Upfront declarations: -->
+
+<xs:simpleType name="Str35">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="35"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str35" -->
+
+<xs:simpleType name="MsgTypeConstant">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="TrackingStep" />
+  </xs:restriction>
+</xs:simpleType>    <!-- "MsgTypeConstant" -->
+
+<xs:simpleType name="MsgHdrActionType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="Add" />
+    <xs:enumeration value="Update" />
+    <xs:enumeration value="Delete" />
+  </xs:restriction>
+</xs:simpleType>    <!-- "MsgHdrActionType" -->
+
+<xs:complexType name="MessageHeaderType">
+  <xs:sequence>
+    <xs:element name="SenderID"    type="Str35" />
+    <xs:element name="RecipientID" type="Str35" />
+    <xs:element name="MessageID"   type="xs:positiveInteger" />
+    <xs:element name="MessageType" type="MsgTypeConstant" />
+    <xs:element name="Timestamp"   type="xs:dateTime" />
+    <xs:element name="Action"      type="MsgHdrActionType" />
+  </xs:sequence>
+</xs:complexType>    <!-- "MessageHeaderType" -->
+
+<xs:simpleType name="CFRefNoType">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="15"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "CFRefNoType" -->
+
+<xs:simpleType name="ExtUniqueIDType">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="50"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "ExtUniqueIDType" -->
+
+<xs:simpleType name="CustUniqueNoType">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="10"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "CustUniqueNoType" -->
+
+<xs:simpleType name="ExternalCustomsCodeType">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="50"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "CustUniqueNoType" -->
+
+<xs:complexType name="AdditionalInfoType">
+  <xs:sequence>
+    <xs:element name="Label"      type="xs:string" />
+    <xs:element name="LabelValue" type="xs:string" />
+  </xs:sequence>
+</xs:complexType>    <!-- "AdditionalInfoType" -->
+
+<!-- Define the root node: "TrackingStep" -->
+<xs:element name="TrackingStep">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="MessageHeader"    type="MessageHeaderType" />
+      <xs:element name="CoreFreightRefNo" type="CFRefNoType" />
+      <xs:element name="ExternalUniqueID" type="ExtUniqueIDType" />
+      <xs:element name="CustomsUniqueNo"  type="CustUniqueNoType" />
+      <xs:element name="ExternalCustomsCode"  type="ExternalCustomsCodeType" />
+      <xs:element name="Timestamp"        type="xs:dateTime" />
+      <xs:element name="StepDesc"         type="xs:string" />
+     <xs:element name="FETrackingID"         type="xs:positiveInteger" />
+      <xs:element name="TrackStepID"         type="xs:positiveInteger" />
+      <xs:element name="AdditionalInfo"   type="AdditionalInfoType" 
+                                          minOccurs="0" 
+                                          maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+</xs:schema>

@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(MSBuildExtensionsPath)\ExtensionPack\4.0</MSBuildExtensionsPackPath>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <_Projects Include="$(MSBuildProjectFullPath)"/>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <!--Uncomment items to add targets if required.-->
+
+    <!--<BATPreCleanTargets Include="noop"/>-->
+    <BATCleanTargets Include="Clean"/>
+    <!--<BATPostCleanTargets Include=""/>-->
+
+    <!--<BATValidateTargets Include=""/>-->
+    <!--<BATInitializeTargets Include=""/>-->
+    <!--<BATGenerateSourcesTargets Include=""/>-->
+    <!--<BATProcessSourcesTargets Include=""/>-->
+    <!--<BATGenerateResourcesTargets Include=""/>-->
+    <!--<BATProcessResourcesTargets Include=""/>-->
+    <BATCompileTargets Include="Build"/>
+    <!--<BATTestTargets Include=""/>-->
+    <!--<BATPreparePackageTargets Include=""/>-->
+    <!--<BATPackageTargets Include=""/>-->
+    <!--<BATPreIntegrationTestTargets Include=""/>-->
+    <!--<BATIntegrationTestTargets Include=""/>-->
+    <!--<BATPostIntegrationTestTargets Include=""/>-->
+    <!--<BATVerifyTargets Include=""/>-->
+    <!--<BATInstallTargets Include=""/>-->
+    <!--<BATDeployTargets Include=""/>-->
+
+    <!--<BATPreSiteTargets Include=""/>-->
+    <!--<BATSiteTargets Include=""/>-->
+    <!--<BATPostSiteTargets Include=""/>-->
+    <!--<BATSiteDeployTargets Include=""/>-->
+  </ItemGroup>
+
+  <Target Name="bat-start">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text=" ______        _     _________" Importance="high" />
+    <Message text="|_   _ \      / \   |  _   _  |" Importance="high" />
+    <Message text="  | |_) |    / _ \  |_/ | | \_|" Importance="high" />
+    <Message text="  |  __'.   / ___ \     | |" Importance="high" />
+    <Message text=" _| |__) |_/ /   \ \_  _| |_" Importance="high" />
+    <Message text="|_______/|____| |____||_____|" Importance="high" />
+    <Message text="    Build Automation Tool" Importance="high" />
+    <Message text="=================================================================================" Importance="high"/>
+  </Target>
+
+  
+  <Target Name="bat-pre-clean" DependsOnTargets="bat-start">
+    <CallTarget Targets="bat-pre-clean-impl"/>
+  </Target>
+  <Target Name="bat-pre-clean-impl" Condition="'@(BATPreCleanTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-pre-clean" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATPreCleanTargets)" />
+  </Target>
+  <Target Name="bat-clean" DependsOnTargets="bat-pre-clean">
+    <CallTarget Targets="bat-clean-impl"/>
+  </Target>
+  <Target Name="bat-clean-impl" Condition="'@(BATCleanTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-clean" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATCleanTargets)"/>
+  </Target>
+  <Target Name="bat-post-clean" DependsOnTargets="bat-clean">
+    <CallTarget Targets="bat-post-clean-impl"/>
+  </Target>
+  <Target Name="bat-post-clean-impl" Condition="'@(BATPostCleanTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-post-clean" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATPostCleanTargets)"/>
+  </Target>
+
+
+  <Target Name="bat-validate" DependsOnTargets="bat-start">
+    <CallTarget Targets="bat-validate-impl"/>
+  </Target>
+  <Target Name="bat-validate-impl" Condition="'@(BATValidateTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-validate" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATValidateTargets)"/>
+  </Target>
+  <Target Name="bat-initialize" DependsOnTargets="bat-validate">
+    <CallTarget Targets="bat-initialize-impl"/>
+  </Target>
+  <Target Name="bat-initialize-impl" Condition="'@(BATInitializeTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-initialize" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATInitializeTargets)"/>
+  </Target>
+  <Target Name="bat-generate-sources" DependsOnTargets="bat-initialize">
+    <CallTarget Targets="bat-generate-sources-impl"/>
+  </Target>
+  <Target Name="bat-generate-sources-impl" Condition="'@(BATGenerateSourcesTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-generate-sources" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATGenerateSourcesTargets)"/>
+  </Target>
+  <Target Name="bat-process-sources" DependsOnTargets="bat-generate-sources">
+    <CallTarget Targets="bat-process-sources-impl"/>
+  </Target>
+  <Target Name="bat-process-sources-impl" Condition="'@(BATProcessSourcesTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-process-sources" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATProcessSourcesTargets)"/>
+  </Target>
+  <Target Name="bat-generate-resources" DependsOnTargets="bat-process-sources">
+    <CallTarget Targets="bat-generate-resources-impl"/>
+  </Target>
+  <Target Name="bat-generate-resources-impl" Condition="'@(BATGenerateResourcesTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-generate-resources" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATGenerateResourcesTargets)"/>
+  </Target>
+  <Target Name="bat-process-resources" DependsOnTargets="bat-generate-resources">
+    <CallTarget Targets="bat-process-resources-impl"/>
+  </Target>
+  <Target Name="bat-process-resources-impl" Condition="'@(BATProcessResourcesTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-process-resources" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATProcessResourcesTargets)"/>
+  </Target>
+  <Target Name="bat-compile" DependsOnTargets="bat-process-resources">
+    <CallTarget Targets="bat-compile-impl"/>
+  </Target>
+  <Target Name="bat-compile-impl" Condition="'@(BATCompileTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-compile" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATCompileTargets)"/>
+  </Target>
+  <Target Name="bat-test" DependsOnTargets="bat-compile">
+    <CallTarget Targets="bat-test-impl"/>
+  </Target>
+  <Target Name="bat-test-impl" Condition="'@(BATTestTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-test" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATTestTargets)"/>
+  </Target>
+  <Target Name="bat-prepare-package" DependsOnTargets="bat-test">
+    <CallTarget Targets="bat-prepare-package-impl"/>
+  </Target>
+  <Target Name="bat-prepare-package-impl" Condition="'@(BATPreparePackageTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-prepare-package" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATPreparePackageTargets)"/>
+  </Target>
+  <Target Name="bat-package" DependsOnTargets="bat-prepare-package">
+    <CallTarget Targets="bat-package-impl"/>
+  </Target>
+  <Target Name="bat-package-impl" Condition="'@(BATPackageTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-package" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATPackageTargets)"/>
+  </Target>
+  <Target Name="bat-pre-integration-test" DependsOnTargets="bat-package">
+    <CallTarget Targets="bat-pre-integration-test-impl"/>
+  </Target>
+  <Target Name="bat-pre-integration-test-impl" Condition="'@(BATPreIntegrationTestTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-pre-integration-test" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATPreIntegrationTestTargets)"/>
+  </Target>
+  <Target Name="bat-integration-test" DependsOnTargets="bat-pre-integration-test">
+    <CallTarget Targets="bat-integration-test-impl"/>
+  </Target>
+  <Target Name="bat-integration-test-impl" Condition="'@(BATIntegrationTestTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-integration-test" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATIntegrationTestTargets)"/>
+  </Target>
+  <Target Name="bat-post-integration-test" DependsOnTargets="bat-integration-test">
+    <CallTarget Targets="bat-post-integration-test-impl"/>
+  </Target>
+  <Target Name="bat-post-integration-test-impl" Condition="'@(BATPostIntegrationTestTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-post-integration-test" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATPostIntegrationTestTargets)"/>
+  </Target>
+  <Target Name="bat-verify" DependsOnTargets="bat-post-integration-test">
+    <CallTarget Targets="bat-verify-impl"/>
+  </Target>
+  <Target Name="bat-verify-impl" Condition="'@(BATVerifyTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-verify" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATVerifyTargets)"/>
+  </Target>
+  <Target Name="bat-install" DependsOnTargets="bat-verify">
+    <CallTarget Targets="bat-install-impl"/>
+  </Target>
+  <Target Name="bat-install-impl" Condition="'@(BATInstallTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-install" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATInstallTargets)"/>
+  </Target>
+  <Target Name="bat-deploy" DependsOnTargets="bat-install">
+    <CallTarget Targets="bat-deploy-impl"/>
+  </Target>
+  <Target Name="bat-deploy-impl" Condition="'@(BATDeployTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-deploy" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATDeployTargets)"/>
+  </Target>
+
+
+  <Target Name="bat-pre-site" DependsOnTargets="bat-start">
+    <CallTarget Targets="bat-pre-site-impl"/>
+  </Target>
+  <Target Name="bat-pre-site-impl" Condition="'@(BATPreSiteTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-pre-site" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATPreSiteTargets)"/>
+  </Target>
+  <Target Name="bat-site" DependsOnTargets="bat-pre-site">
+    <CallTarget Targets="bat-site-impl"/>
+  </Target>
+  <Target Name="bat-site-impl" Condition="'@(BATSiteTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-site" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATSiteTargets)"/>
+  </Target>
+  <Target Name="bat-post-site" DependsOnTargets="bat-site">
+    <CallTarget Targets="bat-post-site-impl"/>
+  </Target>
+  <Target Name="bat-post-site-impl" Condition="'@(BATPostSiteTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-post-site" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATPostSiteTargets)"/>
+  </Target>
+  <Target Name="bat-site-deploy" DependsOnTargets="bat-post-site">
+    <CallTarget Targets="bat-site-deploy-impl"/>
+  </Target>
+  <Target Name="bat-site-deploy-impl" Condition="'@(BATSiteDeployTargets)'!=''">
+    <Message text="=================================================================================" Importance="high"/>
+    <Message text="bat-site-deploy" Importance="high"/>
+    <Message text="=================================================================================" Importance="high"/>
+    <MSBuild Projects="@(_Projects)" Targets="@(BATSiteDeployTargets)"/>
+  </Target>
+
+</Project>

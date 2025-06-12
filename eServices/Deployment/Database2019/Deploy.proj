@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+
+    <MSBuildTaksToolsFilePath>$(MSBuildBinPath)\Microsoft.Build.Tasks.Core.dll</MSBuildTaksToolsFilePath>
+    <MSBuildTasksToolsFilePath Condition="!Exists('$(MSBuildTasksToolsFilePath)')">$(MSBuildProgramFiles32)\MSBuild\$(MSBuildToolsVersion)\Bin\Microsoft.Build.Tasks.v$(MSBuildUseVersion).dll</MSBuildTasksToolsFilePath>
+
+    <Configuration Condition="'$(Configuration)'==''">Debug</Configuration>
+    <DeployingFromUnzippedPackagePath Condition="Exists('$(MSBuildThisFileDirectory)Deployment')">True</DeployingFromUnzippedPackagePath>
+
+    <BaseDeploymentProps>$(MSBuildThisFileDirectory)\Deployment\Deployment.props</BaseDeploymentProps>
+    <ProfiledDeploymentProps>$(MSBuildThisFileDirectory)\Deployment\Profiles\$(Profile)\Deployment.props</ProfiledDeploymentProps>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+
+  <!-- base Deployment.props is imported always -->
+  <!-- then, profiled Deployment.props could be overwritten by profiled props -->
+  <Import Project="$(BaseDeploymentProps)" Condition="'$(_DeploymentPropsImported)'=='' and Exists('$(BaseDeploymentProps)')"/>
+  <Import Project="$(ProfiledDeploymentProps)" Condition="'$(Profile)' != '' and '$(_ProfilePropsImported)'=='' and Exists('$(ProfiledDeploymentProps)')"/>
+
+  <PropertyGroup>
+    <SQLServer2008R2>$(MSBuildProgramFiles32)\Microsoft SQL Server\105\DAC\bin</SQLServer2008R2>
+    <SQLServer2012>$(MSBuildProgramFiles32)\Microsoft SQL Server\110\DAC\bin</SQLServer2012>
+    <SQLServer2014>$(MSBuildProgramFiles32)\Microsoft SQL Server\120\DAC\bin</SQLServer2014>
+    <SQLServer2016>$(MSBuildProgramFiles32)\Microsoft SQL Server\130\DAC\bin</SQLServer2016>
+    <VisualStudio2013>$(MSBuildProgramFiles32)\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\Microsoft\SQLDB\DAC\</VisualStudio2013>
+    <VisualStudio2019>$(MSBuildProgramFiles32)\Microsoft Visual Studio\2019\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\DAC\</VisualStudio2019>
+
+    <SqlPackageExe>sqlpackage.exe</SqlPackageExe>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <_DatabaseFilesPath>$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(OutputPath)'))</_DatabaseFilesPath>
+    <_DatabaseFilesPath Condition="!Exists('$(_DatabaseFilesPath)')">$(MSBuildThisFileDirectory)</_DatabaseFilesPath>
+    <_DatabaseFilesPath>$([System.IO.Path]::GetFullPath('$(_DatabaseFilesPath)'))</_DatabaseFilesPath>
+    <_SourceFilePath>$([System.IO.Path]::Combine('$(_DatabaseFilesPath)', '$(_DacpacFileName)'))</_SourceFilePath>
+  </PropertyGroup>
+
+  <!-- publish config start -->
+
+  <!-- case 1of2: in project deploy, ie from $(MSBuildProjectDirectory)-->
+  <PropertyGroup Condition="'$(DeployingFromUnzippedPackagePath)'==''">
+    <SqlPublishProfilePath>$(MSBuildProjectDirectory)\$(Configuration).publish.xml</SqlPublishProfilePath>
+    <SqlPublishProfilePath Condition="'$(Profile)' != ''">$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Config.publish.xml</SqlPublishProfilePath>
+  </PropertyGroup>
+
+    <!-- case 2of2: zip deploy, ie bat:deploy invoked from unzipped package path $(MSBuildThisFileDirectory) -->
+    <!-- please name your profiled publish xml file after the configuration name, such as Debug.publish.xml;Release.publish.xml;Production.publish.xml;Test.publish.xml;etc.-->
+  <PropertyGroup Condition="'$(DeployingFromUnzippedPackagePath)'=='True'">
+    <SqlPublishProfilePath Condition="'$(Profile)' == ''">$(MSBuildThisFileDirectory)$(Configuration).publish.xml</SqlPublishProfilePath>
+    <SqlPublishProfilePath Condition="'$(Profile)' != ''">$(MSBuildThisFileDirectory)Deployment\Profiles\$(Profile)\Config.publish.xml</SqlPublishProfilePath>
+  </PropertyGroup>
+
+  <Import Project="$(SqlPublishProfilePath)" Condition="Exists('$(SqlPublishProfilePath)')" />
+
+  <!-- publish config end -->
+
+  <PropertyGroup>
+    <_Credentials Condition="'$(UserName)' == '' Or '$(Password)' == ''">Integrated Security=True</_Credentials>
+    <_Credentials Condition="'$(UserName)' != '' And '$(Password)' != ''">User ID=$(UserName);Password='$(Password)'</_Credentials>
+    <_TargetDatabaseName Condition="'$(TargetDatabaseName)'!=''">$(TargetDatabaseName)</_TargetDatabaseName>
+    <TargetConnectionString>Data Source=$(_Server);Database=$(_TargetDatabaseName);$(_Credentials);Persist Security Info=False;Pooling=False</TargetConnectionString>
+    <VersionCheckConnectionString>Data Source=localhost;Integrated Security=True;Pooling=False</VersionCheckConnectionString>
+  </PropertyGroup>
+
+  <Target Name="bat:deploy" Returns="$(_TargetDatabaseName)">
+    <ItemGroup>
+      <SqlPackageExeFiles Include="$(SQLServer2008R2)/**/$(SqlPackageExe)" />
+      <SqlPackageExeFiles Include="$(SQLServer2012)/**/$(SqlPackageExe)" />
+      <SqlPackageExeFiles Include="$(SQLServer2014)/**/$(SqlPackageExe)" />
+      <SqlPackageExeFiles Include="$(SQLServer2016)/**/$(SqlPackageExe)" />
+      <SqlPackageExeFiles Include="$(VisualStudio2013)/**/$(SqlPackageExe)" />
+      <SqlPackageExeFiles Include="$(VisualStudio2019)/**/$(SqlPackageExe)" />
+    </ItemGroup>
+
+    <Error Text="Cannot find $(SqlPackageExe). Please install SSDT for Visual Studio." Condition="@(SqlPackageExeFiles->Count()) &lt; 1" />
+    <GetLastItem Items="@(SqlPackageExeFiles)">
+      <Output TaskParameter="LastItem" PropertyName="SQLPackagePath"/>
+    </GetLastItem>
+
+    <Exec Command="&quot;$(SQLPackagePath)&quot; /Action:Publish /SourceFile:&quot;$(_SourceFilePath)&quot; /TargetConnectionString:&quot;$(TargetConnectionString)&quot; /Profile:&quot;$(SqlPublishProfilePath)&quot;"/>
+  </Target>
+
+  <Target Name="bat:remove" Returns="$(_TargetDatabaseName)">
+    <Message
+      Condition="'$(_TargetDatabaseName)' == 'master'"
+      Text="'master' database cannot be deleted."/>
+    <Message Text="Removing database $(_TargetDatabaseName)" Importance="high" />
+
+    <PropertyGroup>
+      <SqlCmdLogOn Condition="'$(UserName)' != '' And '$(Password)' != ''">$(UserName)</SqlCmdLogOn>
+      <SqlCmdPassword Condition="'$(UserName)' != '' And '$(Password)' != ''">$(Password)</SqlCmdPassword>
+    </PropertyGroup>
+
+    <SqlCmd
+      TaskAction="Execute"
+      Server="$(_Server)"
+      LogOn="$(SqlCmdLogOn)"
+      Password="$(SqlCmdPassword)"
+      Condition="'$(_TargetDatabaseName)' != 'master'"
+      CommandLineQuery="
+      alter database [$(_TargetDatabaseName)] set single_user with rollback immediate;
+      drop database [$(_TargetDatabaseName)];"/>
+
+  </Target>
+
+  <UsingTask
+    TaskName="GetLastItem"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="$(MSBuildTasksToolsFilePath)">
+    <ParameterGroup>
+      <Items ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <LastItem ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <Using Namespace="System.Linq"/>
+      <Code Type="Fragment" Language="cs">LastItem = Items.Last().ItemSpec;</Code>
+    </Task>
+  </UsingTask>
+
+</Project>

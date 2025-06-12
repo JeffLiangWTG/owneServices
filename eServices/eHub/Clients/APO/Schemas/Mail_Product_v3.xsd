@@ -1,0 +1,906 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp1 (http://www.altova.com) by XMLSpy 2008 Professional Ed. Release 2, Installed for 4 users (Australia Post) -->
+<!--Created with Liquid XML Studio - 30 Day Trial Edition 7.0.5.906 (http://www.liquid-technologies.com)-->
+<!--History-->
+<xs:schema xmlns:ns0="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" xmlns:ns1="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" xmlns:ns2="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty/Customer:v1" xmlns:ns3="http://www.auspost.com.au/Schema/CommonDataModel/Product:v1" xmlns="http://www.auspost.com.au/Schema/CommonDataModel/Mail_Product:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.auspost.com.au/Schema/CommonDataModel/Mail_Product:v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.9">
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" schemaLocation="CommonTypes_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" schemaLocation="Address_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty/Customer:v1" schemaLocation="Customer_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Product:v1" schemaLocation="Service_v3.xsd"/>
+	<xs:complexType name="TrackableObject">
+		<xs:annotation>
+			<xs:documentation>Abstract datatype defining the schema for a trackable object</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="TrackingIdentification" type="ns0:TrackingIdentification" minOccurs="0"/>
+			<xs:element name="FurtherReferences" type="ns0:FurtherReferences" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="TrackableObject" type="TrackableObject">
+		<xs:annotation>
+			<xs:documentation>Abstract element used to define/placehold trackable objects</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="Insurance">
+		<xs:sequence>
+			<xs:element name="InsuranceRequired" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User can specify whether Insurance is required for International Delivery. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="InsuranceAmount" type="Amount" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Fraction digits 2 in AUD $. This is mandatory if InsuranceRequired is Yes.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="InsuranceChargeAmount" type="ns0:DollarAmount" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Transit Cover in PCMS</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="InsuranceSDR" type="Amount" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>SDR stands for Special Drawing Rights.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DeliveryContact">
+		<xs:sequence>
+			<xs:element ref="ns2:Customer"/>
+			<xs:element name="DeliveryContactType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="0"/>
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Comments" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="0"/>
+						<xs:maxLength value="200"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Article">
+		<xs:complexContent>
+			<xs:extension base="TrackableObject">
+				<xs:sequence>
+					<xs:element name="ActionCode" type="ns0:ActionCode"/>
+					<xs:element name="ArticleId" type="ns0:string50">
+						<xs:annotation>
+							<xs:documentation>Identifier for the article</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ProductID" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The Id of the Product
+</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="3"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="ProductName" type="ns0:string50" minOccurs="0"/>
+					<xs:element name="SubProductID" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The Id of the SubProduct
+</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+						<!-- Change for PI/EM compatibility
+							<xs:restriction base="ns0:string3"/> -->
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="3"/>
+							</xs:restriction>
+							<!-- End change-->
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="SubProductName" type="ns0:string50" minOccurs="0"/>
+					<xs:element name="BaseServiceCode" minOccurs="0">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="0"/>
+								<xs:maxLength value="2"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="AdditionalServices" type="ns3:Services" minOccurs="0"/>
+					<xs:element name="LoadingStatus" type="ns0:string1" minOccurs="0"/>
+					<xs:element name="Quantity" type="xs:integer" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Number of items for this article.  This is currently required as the articles come through as line items from the source application.  Articles are consolidated to a single line item where items have the same cubic dimensions.  PCMS Note: PCMS does not use this.  Instead, each article will have a separate record as each article will have a unique id.  For PCMS users are able to record the quantity of items in the article</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Height" type="ns0:Dimension" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Height cubic dimension for the article</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Length" type="ns0:Dimension" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Length cubic dimension for the article</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Width" type="ns0:Dimension" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Width cubic dimension for the article</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ActualWeight" type="ns0:Weight" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Weight for the article</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Volume" type="ns0:Weight" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Volume/Cubic Weight for the parcel.  PCMS Note: The greater of the Actual Weight and Cubic Weight is used for charging purposes. Cubic weight is the dimension of the article x cubing factor.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Description" type="ns0:string50" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Description fo the article</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="FullBarcode" type="ns0:string100" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Full barcode - as scanned - of the article</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="MailCategory" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>A : Airmail or Priority mail
+B : S.A.L. mail/ Non-priority mail
+C : Surface mail/ Non-priority mail
+D : Priority mail sent by surface transportation</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="1"/>
+								<xs:enumeration value="A"/>
+								<xs:enumeration value="B"/>
+								<xs:enumeration value="C"/>
+								<xs:enumeration value="D"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="Express" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Express service indicator.  Used for International artiocles</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="EventNotification" minOccurs="0">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="2"/>
+								<xs:minLength value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="Value" type="ns0:DollarAmount" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Declared value of article</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="TransitCoverRequired" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>User can specify whether Transit Cover is required for Domestic Delivery. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="TransitAmount" type="Amount" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Fraction digits 2 in AUD $. This is mandatory if TransitCoverRequired is Yes .</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="InternationalDetails" type="InternationalDetails" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>User can specify how the article is to be returned by in case of non delivery for International Delivery. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ContentsItem" type="ArticleContentsItemType" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Description of the goods within the article </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Status" type="ArticleStatus" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Status of the article, such as delivered, lodged and etc. Mulitple status are allowed to attached to a single article</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="TOPS" type="TOPS" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>TOPS Article information
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CTCDollarAmount" type="ns0:DollarAmount" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Cash To Collect Dollar Amount
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DeliveryContacts" type="DeliveryContact" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="AcceptancePostcode" type="ns1:InternationalPostCode" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Postcode of where parcel was first accepted into the network</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Insurance" type="Insurance" minOccurs="0"/>
+					<xs:element name="RecordModificationDateTime" type="ns0:DateTime">
+						<xs:annotation>
+							<xs:documentation>Date the record was modificed in the source application</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CustomerAccountNumber" minOccurs="0">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="35"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="Article" type="Article"/>
+	<xs:complexType name="Consignment">
+		<xs:complexContent>
+			<xs:extension base="TrackableObject">
+				<xs:sequence>
+					<xs:element name="ActionCode" type="ns0:ActionCode"/>
+					<xs:element name="ConsignmentId" type="ns0:string50">
+						<xs:annotation>
+							<xs:documentation>Identifier for the consignment as passed form the source application</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ConsignmentDateTime" type="ns0:DateTime" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Date / Time for the creation of the consignment in the source application</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="MerchantId" type="ns0:MerchantId" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Merchant ID for the consignment</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="MerchantLocationId" type="ns0:MerchantLocationId" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Merchant location ID for the consignment</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ServiceProfiles" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>The service profile specified to the consignment, typically on lodgement</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="ServiceProfileID">
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:maxLength value="10"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:element>
+								<xs:element name="ServicePoint" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>The point in the process where the service profile is applied e.g. lodgement or delivery</xs:documentation>
+									</xs:annotation>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:minLength value="0"/>
+											<xs:maxLength value="10"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="TransportServiceType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Identifes the product/service table. For domestic its one character code from A to Z. For international (PCMS requirement) there will be a four-digit code</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="0"/>
+								<xs:maxLength value="4"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="DeliveryTimetableCode" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The delivery timetable code associated with the price schedule template. Eg. 01</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="2"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="ExpectedDeliveryDateTime" type="ns0:DateTime" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Expected Date / Time for the delivery of the consignment</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DeliveryContacts" type="DeliveryContact" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="SparsSequenceNumber" type="ns0:string20" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>4 digit number representing that the file has been charged</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ParcelCount" type="xs:integer" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Number of parcels for the consignment</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="TotalActualWeight" type="ns0:Weight" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Total weight in KGs for the consignment</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="TotalVolume" type="ns0:Weight" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Total volume for the consignment</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Remarks" type="ns0:Comments" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Remarks for the consignment.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ReferenceDetails" type="ReferenceDetails" minOccurs="0" maxOccurs="2">
+						<xs:annotation>
+							<xs:documentation>Customer assigned refernce number line </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Insurance" type="Insurance" minOccurs="0"/>
+					<xs:element name="AdditionalCODAmount" type="ns0:DollarAmount" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>CTC (Cash to Collect) in PCMS</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="SignatureRequired" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Indicates if customer requires a signature for the parcel</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ConsignmentChargeDate" type="ns0:DateTime" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Date used for invoicing cutoff</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ConsignmentChargeAmount" type="ns0:DollarAmount" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Consignment charge amount</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DangerousGoodsIndicator" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The user can specify whether an article in the consignment contains Dangerous Goods.  PCMS Requirement</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DeliverPartConsignmentIndicator" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The user can specify whether the consignment has to be delivered at once or split.  PCMS Requirement</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="OrderNumbers" type="OrderNumber" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Customer order number for the consignment. PCMS Note: Articles for the consignment.  These are currently received as consignment line items rather than individual articles</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="PostChargeToAccount" type="ns0:string20" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Merchant account to which Australia Post “post” the charges against for invoicing purposes.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="InternationalDelivery" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The user can specify whether the consignment is to be delivered outside Australia. "true" for international </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="InternalChargeBackAccount" type="ns0:string20" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Merchant’s internal account to which the consignment should be charged back to.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ExpectedDespatchDate" type="ns0:DateTime" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Expected Date / Time for the Despatch of the consignment</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AdditionalServices" type="ns3:Services" minOccurs="0"/>
+					<xs:element name="RecordModificationDateTime" type="ns0:DateTime">
+						<xs:annotation>
+							<xs:documentation>Date the record was modificed in the source application</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="Consignment" type="Consignment"/>
+	<xs:complexType name="Manifest">
+		<xs:complexContent>
+			<xs:extension base="TrackableObject">
+				<xs:sequence>
+					<xs:element name="ActionCode" type="ns0:ActionCode"/>
+					<xs:element name="ManifestNumber" type="ns0:ManifestNumber">
+						<xs:annotation>
+							<xs:documentation>Identifier for the manifest in the source system</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ArrivedDate" type="ns0:DateTime" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Date the manifest was processed in the source system</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CollectionDate" type="ns0:DateTime" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Date the merchant created the manifest</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="MerchantId" type="ns0:MerchantId" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Merchant Id for the customer that raised this manifest.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="MerchantLocationId" type="ns0:MerchantLocationId" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Merchant Location where the manifest was lodged</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="SparsSequenceNumber" type="ns0:string20" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>4 digit number representing that the file has been has been invoiced. PCMS Note: Obsolete - SPARS replaced by SAP CSP</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="RecordModificationDateTime" type="ns0:DateTime">
+						<xs:annotation>
+							<xs:documentation>Date the record was modified in the source application</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="Manifest" type="Manifest"/>
+	<xs:complexType name="ArticleStatus">
+		<xs:sequence>
+			<xs:element name="StatusAttributeName" type="ns0:string80"/>
+			<xs:element name="StatusAttributeValue" type="ns0:string80"/>
+			<xs:element name="StatusModificationDateTime" type="ns0:DateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The Date/time when the article changed its state to the current status</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ArticleContentsItemType">
+		<xs:sequence>
+			<xs:element name="Description" type="ns0:string50" minOccurs="0"/>
+			<xs:element name="Weight" type="ns0:Weight" minOccurs="0"/>
+			<xs:element name="Quantity" type="xs:integer" minOccurs="0"/>
+			<xs:element name="UnitValue" type="Amount" minOccurs="0"/>
+			<xs:element name="Value" type="Amount" minOccurs="0"/>
+			<xs:element name="InternationalContentsItemDetails" type="InternationalContentsItemType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Description details of goods applicable to International Article.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InternationalContentsItemType">
+		<xs:sequence>
+			<xs:element name="ProductType" type="ns0:string50" minOccurs="0"/>
+			<xs:element name="CountryOriginCode" type="ns0:string3" minOccurs="0"/>
+			<xs:element name="HSTariff" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A six – twelve digit number that represents the Harmonised Commodity Description and coding system developed by the world customs organisation for each description of goods.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ProductClassification" type="ns0:string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Classification category of the goods within the article.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="Amount">
+		<xs:annotation>
+			<xs:documentation>Decimal value for amount</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="14"/>
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="DeliveryFailureDetailsType">
+		<xs:sequence>
+			<xs:element name="ReturnBySurface" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="ReturnByAirmail" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="TreatAsAbandoned" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="RedirectBySurface" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="RedirectByAirmail" type="xs:boolean" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ReferenceDetails">
+		<xs:sequence>
+			<xs:element name="ReferenceNumber" type="ns0:string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Customer assigned refernce number </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PrintLabelReference" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Print label Reference </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InternationalDetails">
+		<xs:sequence>
+			<xs:element name="ExportReasons" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Free text to enter Export reasons for International delivery</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="256"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ExportClearanceNumber" type="ns0:string20" minOccurs="0"/>
+			<xs:element name="DeliveryFailureDetails" type="DeliveryFailureDetailsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User can specify how and where the article is to be returned, if failed to delivered for International Delivery. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MailClass" type="ns0:MailClass" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>International Mail Class.  E=EMS, C=Parcels, U=Letters</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MailSubClass" type="ns0:string2" minOccurs="0"/>
+			<xs:element name="ServiceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>OR = Ordinary, IN=Insured, RG= Registered
+FC = Free of charge, PW = POW/Civilian Internee, SR= Service
+RD=Recorded Delivery</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="OR"/>
+						<xs:enumeration value="PW"/>
+						<xs:enumeration value="RD"/>
+						<xs:enumeration value="SR"/>
+						<xs:enumeration value="IN"/>
+						<xs:enumeration value="RG"/>
+						<xs:enumeration value="FC"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OrderNumber">
+		<xs:sequence>
+			<xs:element name="OrderNumber" type="ns0:string20" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Customer order number for the consignment. Note from PCMS: Articles for the consignment.  These are currently received as consignment line items rather than individual articles </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BulkDeliveryManifest">
+		<xs:complexContent>
+			<xs:extension base="TrackableObject">
+				<xs:sequence>
+					<xs:element name="ActionCode" type="ns0:ActionCode"/>
+					<xs:element name="BulkDeliveryManifestID" type="ns0:string50"/>
+					<xs:element name="TransportServiceType" minOccurs="0">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="0"/>
+								<xs:maxLength value="4"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="ParcelCountTotal" type="xs:int" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Number of parcels for the consignment
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="TotalActualWeight" type="ns0:Weight" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Total weight in KGs for the consignment
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="TotalVolume" type="ns0:Weight" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Total volume for the consignment
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Remarks" type="ns0:Comments" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Remarks for the consignment
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="InternationalDelivery" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The user can specify whether the consignment is to be delivered outside Australia. "true" for international
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="RecordModificationDateTime" type="xs:dateTime">
+						<xs:annotation>
+							<xs:documentation>Date the record was modificed in the source application
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="Despatch">
+		<xs:complexContent>
+			<xs:extension base="TrackableObject">
+				<xs:sequence>
+					<xs:element name="ActionCode" type="ns0:ActionCode"/>
+					<xs:element name="DespatchID" type="ns0:string50"/>
+					<xs:element name="Addressee" type="ns2:Customer"/>
+					<xs:element name="ParcelCountTotal" type="xs:int" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Number of parcels for the consignment
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="TotalActualWeight" type="ns0:Weight" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Total weight in KGs for the consignment
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="TotalVolume" type="ns0:Weight" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Total volume for the consignment
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Remarks" type="ns0:Comments" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Remarks for the consignment
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="InternationalDelivery" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The user can specify whether the consignment is to be delivered outside Australia. "true" for international
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="RecordModificationDateTime" type="xs:dateTime">
+						<xs:annotation>
+							<xs:documentation>Date the record was modificed in the source application
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="Device">
+		<xs:complexContent>
+			<xs:extension base="TrackableObject">
+				<xs:sequence>
+					<xs:element name="ActionCode" type="ns0:ActionCode"/>
+					<xs:element name="DeviceID" type="ns0:string50">
+						<xs:annotation>
+							<xs:documentation>Handheld device identification number
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="SerialNumber" type="ns0:string30" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Serial Number of the handheld device
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DeviceModel" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Device Model
+</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="15"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="Version" type="ns0:string20" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Device software version
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AssetNumber" type="ns0:string10" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Device Asset number
+</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AdministrativeGroup" type="ns0:string20" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Financial reporting structure for a device</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="Device" type="Device"/>
+	<xs:element name="BulkDeliveryManifest" type="BulkDeliveryManifest"/>
+	<xs:complexType name="TOPS">
+		<xs:annotation>
+			<xs:documentation>TOPS Track Event data elements</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="TruckId" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Identifier for the Truck that was used to carry the TOPS article</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ParcelSize">
+				<xs:annotation>
+					<xs:documentation>Parcel size denoting the Mail Category for the TOPS article.  Values are L = Large, S = Small</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ParcelShape" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Parcel shape for the TOPS article.  Values are: Space = normal, E = Envelope, P = Packet</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ScheduledArrivalDateTime" type="ns0:DateTime" minOccurs="0"/>
+			<xs:element name="ActualArrivalDateTime" type="ns0:DateTime" minOccurs="0"/>
+			<xs:element name="MisSortedStatus" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Mis-sorted status for the TOPS article.  Values are: M = Missorted, I = Incorrectly labelled</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="M"/>
+						<xs:enumeration value="I"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InternationalReceptacle">
+		<xs:complexContent>
+			<xs:extension base="TrackableObject">
+				<xs:sequence>
+					<xs:element name="ActionCode" type="ns0:ActionCode"/>
+					<xs:element name="ReceptacleID" type="ns0:string50"/>
+					<xs:element name="MailSubClass" type="ns0:string2" minOccurs="0"/>
+					<xs:element name="ArticleCount" type="xs:int" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The number of articles in the receptacle.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Weight" type="ns0:Weight" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The weight of receptacles represented in kilograms</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="PostalStatus" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The postal status code.</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="2"/>
+								<xs:minLength value="0"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="SealNumber" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The seal number of the receptacle.</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="0"/>
+								<xs:maxLength value="15"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="ProductType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The product type code.</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="0"/>
+								<xs:maxLength value="2"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="DocumentType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Type of the document.</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="0"/>
+								<xs:maxLength value="20"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="Document" minOccurs="0" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="ArticleID" type="ns0:string50">
+									<xs:annotation>
+										<xs:documentation>The identifier of the Article</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="ListNumber">
+									<xs:annotation>
+										<xs:documentation>The list number of the article on the document</xs:documentation>
+									</xs:annotation>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:minLength value="0"/>
+											<xs:maxLength value="4"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:element>
+								<xs:element name="LineNumber" type="xs:int">
+									<xs:annotation>
+										<xs:documentation>The line number of the article on the document</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="TransportDetails" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="FlightDetails" type="ns0:FlightDetails" minOccurs="0" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="InternationalReceptacle" type="InternationalReceptacle"/>
+</xs:schema>

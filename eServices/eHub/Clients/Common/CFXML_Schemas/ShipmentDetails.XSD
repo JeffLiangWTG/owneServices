@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!-- Title: "SHIPMENT DETAILS FOR FREIGHT FORWARDING PURPOSES"       -->
+<!--                                                                 -->
+<!-- Purpose:                                                        -->
+<!-- To send freight forwarding (shipment) information to and from   -->
+<!-- the CoreFreight system. Details for multiple shipments may be   -->
+<!-- batched together by the sender into one XML document.           -->
+<!--                                                                 -->
+<!-- Created by: Core Freight Systems                                -->
+<!-- Version: 1.15                                                   -->
+<!-- Last updated: 23 July 2013                                      -->
+
+<xs:schema targetNamespace    = "http://cargowise.com/ehub/clients/common/cfxml/2017/11" 
+           version            = "1.1" 
+           xmlns              = "http://cargowise.com/ehub/clients/common/cfxml/2017/11"
+           xmlns:xs           = "http://www.w3.org/2001/XMLSchema" 
+           elementFormDefault = "qualified">
+
+<!-- Upfront declarations: -->
+
+<xs:simpleType name="Str500">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="500"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str500" -->
+
+<xs:simpleType name="Str255">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="255"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str255" -->
+
+<xs:simpleType name="Str100">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="100"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str100" -->
+
+<xs:simpleType name="Str50">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="50"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str50" -->
+
+<xs:simpleType name="Str35">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="35"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str35" -->
+
+<xs:simpleType name="Str30">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="30"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str30" -->
+
+<xs:simpleType name="Str20">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="20"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str20" -->
+
+<xs:simpleType name="Str17">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="17"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str17" -->
+
+<xs:simpleType name="Str11">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="11"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str11" -->
+
+<xs:simpleType name="Str10">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="10"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str10" -->
+
+<xs:simpleType name="Str9">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="9"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str9" -->
+
+<xs:simpleType name="Str7">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="7"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str7" -->
+
+<xs:simpleType name="Str6">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="6"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str6" -->
+
+<xs:simpleType name="Str5">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="5"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str5" -->
+
+<xs:simpleType name="Str4">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="4"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str4" -->
+
+<xs:simpleType name="Str3">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="3"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "Str3" -->
+
+
+<xs:simpleType name="AdditionalReferenceType">
+  <xs:restriction base="xs:string">
+    <xs:maxLength value="50"/>
+  </xs:restriction>
+</xs:simpleType>    <!-- "AdditionalReferenceType" -->
+
+
+<xs:simpleType name="MsgTypeConstant">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="ShipmentDetails" />
+  </xs:restriction>
+</xs:simpleType>    <!-- "MsgTypeConstant" -->
+
+
+<xs:simpleType name="MsgHdrActionType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="Add" />
+    <xs:enumeration value="Update" />
+    <xs:enumeration value="Delete" />
+  </xs:restriction>
+</xs:simpleType>    <!-- "MsgHdrActionType" -->
+
+
+<xs:complexType name="MessageHeaderType">
+  <xs:sequence>
+    <xs:element name="SenderID"    type="Str35" />
+    <xs:element name="RecipientID" type="Str35" />
+    <xs:element name="MessageID"   type="xs:positiveInteger" />
+    <xs:element name="MessageType" type="MsgTypeConstant" />
+    <xs:element name="Timestamp"   type="xs:dateTime" />
+    <xs:element name="Action"      type="MsgHdrActionType" />
+  </xs:sequence>
+</xs:complexType>    <!-- "MessageHeaderType" -->
+
+
+<xs:simpleType name="AvailableContainerShipmentType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="LCL"    />    <!-- "Less Than Container Load" -->
+    <xs:enumeration value="FCL"    />    <!-- "Full Container Load" -->
+    <xs:enumeration value="FCLG"   />    <!-- "Full Container Load Groupage" -->
+    <xs:enumeration value="BULK"   />
+    <xs:enumeration value="BBK"    />    <!-- "Break Bulk" -->
+    <xs:enumeration value="EMPTY"  />    <!-- "Empty Container" -->
+    <xs:enumeration value="CLG"    />    <!-- "Co-load Groupage" -->
+    <xs:enumeration value="TANKER" />
+  </xs:restriction>
+</xs:simpleType>    <!-- "AvailableContainerShipmentType" -->
+
+
+<xs:complexType name="ContainerRecord">
+  <xs:sequence>
+    <xs:element name="ContainerShipmentType" type="AvailableContainerShipmentType" />
+    <xs:element name="ContainerNo"           type="Str35" />
+    <xs:element name="NoOfPackages"          type="xs:nonNegativeInteger" />
+    <xs:element name="GrossWeightKG"         type="xs:decimal" />
+    <xs:element name="NetWeightKG"           type="xs:decimal"  minOccurs="0" />
+    <xs:element name="VolumeCM"              type="xs:decimal" />
+    <xs:element name="ContainerSealNo"       type="Str20" />
+    <xs:element name="ContainerSize"         type="Str20" />
+    <xs:element name="ContainerSpec"         type="Str255" />
+    <xs:element name="TerminalCode"          type="Str10"   minOccurs="0" />
+    <xs:element name="TerminalName"          type="Str100"  minOccurs="0" />
+    <xs:element name="DepotCode"             type="Str10"   minOccurs="0" />
+    <xs:element name="DepotName"             type="Str100"  minOccurs="0" />
+    <xs:element name="MASCode"               type="Str10"   minOccurs="0" />
+    <xs:element name="MASDescription"        type="Str255"  minOccurs="0" />
+    <xs:element name="MASType"               type="Str10"   minOccurs="0" />
+    <xs:element name="MASTypeDescription"    type="Str255"  minOccurs="0" />
+    <xs:element name="ReleasedToPartyCode"   type="Str10"   minOccurs="0" />
+    <xs:element name="ReleasedToPartyName"   type="Str255"  minOccurs="0" />
+    <xs:element name="ContainerDescription"  type="Str255"  minOccurs="0" />
+    <xs:element name="AtmosphericControl"    type="Str50"   minOccurs="0" />
+    <xs:element name="ColdStoreLoadPoint"    type="Str50"   minOccurs="0" />
+    <xs:element name="LoadDateTime"          type="xs:dateTime"  minOccurs="0" />
+    <xs:element name="Product"               type="Str50"   minOccurs="0" />
+    <xs:element name="Vents"                 type="Str50"   minOccurs="0" />
+    <xs:element name="Transporter"           type="Str50"   minOccurs="0" />
+    <xs:element name="BookingRefNo"          type="Str20"   minOccurs="0" />
+    <xs:element name="NoOfPallets"           type="xs:nonNegativeInteger"  minOccurs="0" />
+    <xs:element name="StorageApplicableDate" type="xs:dateTime"  minOccurs="0" />
+    <xs:element name="TempCode"              type="Str50"        minOccurs="0" />
+    <xs:element name="UnpackID"              type="xs:integer"   minOccurs="0" />
+    <xs:element name="DeliveryDateTime"      type="xs:dateTime"  minOccurs="0" />
+    <xs:element name="NonISOContainer"       type="xs:boolean"   minOccurs="0" />
+  </xs:sequence>
+</xs:complexType>    <!-- "ContainerRecord" -->
+
+
+<xs:simpleType name="PrepaidCollectType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="P" />    <!-- P for Prepaid -->
+    <xs:enumeration value="C" />    <!-- C for Collect -->
+    <xs:enumeration value="U" />    <!-- U for Unknown or Unspecified -->
+  </xs:restriction>
+</xs:simpleType>    <!-- "PrepaidCollectType" -->
+
+
+<xs:complexType name="SundryChargeType">
+  <xs:sequence>
+    <xs:element name="SundryChargeCode"     type="Str35" />
+    <xs:element name="SundryChargeCurrency" type="Str35" />
+    <xs:element name="SundryChargeAmount"   type="xs:decimal" />
+    <xs:element name="PrepaidCollect"       type="PrepaidCollectType" />
+  </xs:sequence>
+</xs:complexType>    <!-- "SundryChargeType" -->
+
+
+<xs:simpleType name="TransportMethodType">
+  <xs:restriction base="xs:string" >
+    <xs:enumeration value="AIR"  />
+    <xs:enumeration value="SEA"  />
+    <xs:enumeration value="ROAD" />
+    <xs:enumeration value="RAIL" />
+  </xs:restriction>
+</xs:simpleType>    <!-- "TransportMethodType" -->
+
+
+<xs:simpleType name="ShipmentType">
+  <xs:restriction base="xs:string" >
+    <xs:enumeration value="EXPORTS" />
+    <xs:enumeration value="IMPORTS" />
+  </xs:restriction>
+</xs:simpleType>    <!-- "ShipmentType" -->
+
+
+<xs:complexType name="PackageDimensionsType">
+  <xs:sequence>
+    <xs:element name="Length_cm"     type="xs:positiveInteger" />
+    <xs:element name="Depth_cm"      type="xs:positiveInteger" />
+    <xs:element name="Height_cm"     type="xs:positiveInteger" />
+    <xs:element name="Quantity"      type="xs:positiveInteger" />
+    <xs:element name="PackTypeCode"  type="Str4"      minOccurs="0" />
+  </xs:sequence>
+</xs:complexType>    <!-- "PackageDimensionsType" -->
+
+
+<xs:complexType name="PackageDetailsType">
+  <xs:sequence>
+    <!--<xs:element name="PackageType"     type="Str35" /> -->
+    <xs:element name="Description"  type="Str255" />
+    <xs:element name="ContainerNo"  type="Str35" />
+    <xs:element name="Quantity"     type="xs:positiveInteger" />
+    <xs:element name="VolumeCM"     type="xs:decimal" />
+    <xs:element name="WeightKG"     type="xs:decimal" />
+    <xs:element name="CountableQuantityCode" type="Str4" />		
+	<xs:element name="TariffCode"         type="Str10" />
+	<xs:element name="HazardCode"         type="Str4" />
+	<xs:element name="HazardDesc"         type="Str500" />
+	<xs:element name="UNDGNumber"         type="Str10" />
+	<xs:element name="UNDGCode"           type="Str7" />
+	<xs:element name="IMOPageNo"          type="Str7" />
+	<xs:element name="HazardCodeVerNo"    type="Str10" />	
+	<xs:element name="UNDGFlashPoint"     type="xs:positiveInteger" />
+	<xs:element name="UNDGPackingGroup"   type="Str3" />
+	<xs:element name="UNDGEMSNumber"      type="Str6" />
+	<xs:element name="UNDGMedGuide"       type="Str4" />
+	<xs:element name="UNDGTremCardNo"     type="Str10" />
+	<xs:element name="UNDGFlashPointUnit" type="Str3" />	
+  </xs:sequence>
+</xs:complexType>    <!-- "PackageDetailsType" -->
+
+
+<xs:complexType name="ContactInfoType">
+  <xs:sequence>
+    <xs:element name="ContactPersonFirstName" type="Str30"  />
+    <xs:element name="ContactPersonSurname"   type="Str30"  />
+    <xs:element name="TelephoneNo"            type="Str30"  />
+    <xs:element name="EmailAddress"           type="Str100" />
+  </xs:sequence>
+</xs:complexType>    <!-- "ContactInfoType" -->
+
+
+<xs:complexType name="TransshipDetailsType">
+  <xs:sequence>
+    <xs:element name="TransshipVessel" type="Str20" />
+    <xs:element name="TransshipVoyage" type="Str11" />
+    <xs:element name="TransshipPort"   type="Str35" />
+    <xs:element name="TransshipDate"   type="xs:date" />
+  </xs:sequence>
+</xs:complexType>    <!-- "TransshipDetailsType" -->
+
+
+<xs:complexType name="AWBLineDetailsType">
+  <xs:sequence>
+    <xs:element name="NoOfPieces"         type="xs:nonNegativeInteger" />
+    <xs:element name="GrossWeight"        type="xs:decimal" />
+    <xs:element name="RateClass"          type="Str4" />
+    <xs:element name="ChargeableWeight"   type="xs:decimal" />
+    <xs:element name="Rate"               type="xs:decimal" />
+    <xs:element name="LineTotal"          type="xs:decimal" />
+    <xs:element name="NatureAndQuantity"  type="Str255" />
+  </xs:sequence>
+</xs:complexType>    <!-- "AWBLineDetailsType" -->
+
+
+<xs:complexType name="FreightAmountDetailsType">
+  <xs:sequence>
+    <xs:element name="FreightAmount"       type="xs:decimal" />
+    <xs:element name="FreightCurrencyCode" type="Str35" />
+  </xs:sequence>
+</xs:complexType>    <!-- "FreightAmountDetailsType" -->
+
+
+<xs:complexType name="MasterBillDetailsType">
+  <xs:sequence>
+    <xs:element name="UniqueShipmentID"           type="Str50" />
+    <xs:element name="Branch"                     type="Str6" />
+    <xs:element name="ExternalBranchCode"         type="Str30"  minOccurs="0" />
+    <xs:element name="TransportMethod"            type="TransportMethodType" />
+    <xs:element name="ShipmentTypeInSourceSystem" type="ShipmentType" />
+    <xs:element name="ShipmentTypeInTargetSystem" type="ShipmentType" minOccurs="0" />
+    <xs:element name="ShipmentNumber"             type="Str10" />
+    <xs:element name="MasterBillPrefix"           type="Str3" />
+    <xs:element name="MasterBillNo"               type="Str35" />
+    <xs:element name="SubBillNo"                  type="Str35" />
+    <xs:element name="IsHazardous"                type="xs:boolean" />
+    <xs:element name="CountryOfLoading"           type="Str35" />
+    <xs:element name="CountryOfLoadingName"       type="Str30"  minOccurs="0" />
+    <xs:element name="PortOfLoading"              type="Str35" />
+    <xs:element name="PortOfLoadingName"          type="Str50"  minOccurs="0" />
+    <xs:element name="CountryOfDeparture"         type="Str35" />
+    <xs:element name="CountryOfDepartureName"     type="Str30"  minOccurs="0" />
+    <xs:element name="PortOfDeparture"            type="Str35" />
+    <xs:element name="PortOfDepartureName"        type="Str50"  minOccurs="0" />
+    <xs:element name="CountryOfDischarge"         type="Str35" />
+    <xs:element name="CountryOfDischargeName"     type="Str30"  minOccurs="0" />
+    <xs:element name="PortOfDischarge"            type="Str35" />
+    <xs:element name="PortOfDischargeName"        type="Str50"  minOccurs="0" />
+    <xs:element name="CountryOfDestination"       type="Str35" />
+    <xs:element name="CountryOfDestinationName"   type="Str30"  minOccurs="0" />
+    <xs:element name="PortOfDestination"          type="Str35" />
+    <xs:element name="PortOfDestinationName"      type="Str50"  minOccurs="0" />
+    <xs:element name="LocalForwardingAgent"       type="Str255" />
+    <xs:element name="Vessel"                     type="Str20" />
+    <xs:element name="FlightOrVoyageNo1"          type="Str11" />
+    <xs:element name="FlightOrVoyageNo2"          type="Str11" />
+    <xs:element name="FlightOrVoyageNo3"          type="Str11" />
+    <xs:element name="NoOfPieces"                 type="xs:nonNegativeInteger" />
+    <xs:element name="PackType"                   type="Str255" />
+    <xs:element name="NoOfHouseBills"             type="xs:nonNegativeInteger" />
+    <xs:element name="GrossWeightKG"              type="xs:decimal" />
+    <xs:element name="ChargeableWeightKG"         type="xs:decimal" />
+    <xs:element name="CubicMeters"                type="xs:decimal" />
+    <xs:element name="NoOfContainers"             type="xs:nonNegativeInteger" />
+    <xs:element name="FreightAmountDetails"       type="FreightAmountDetailsType"  minOccurs="0" />
+    <xs:element name="PrepaidCollect"             type="PrepaidCollectType" />
+    <xs:element name="NatureOfGoods"              type="Str255" />
+    <xs:element name="ExecutionDate"              type="xs:date"  minOccurs="0" />
+    <xs:element name="BookingReservedOn"          type="xs:date"  minOccurs="0" />
+    <xs:element name="ShipmentDate"               type="xs:date" />
+    <xs:element name="DepartureDate"              type="xs:date" />
+    <xs:element name="ArrivalDate"                type="xs:date" />
+    <xs:element name="PortOfIssue"                type="Str35" />
+    <xs:element name="PortOfIssueName"            type="Str50"  minOccurs="0" />
+    <xs:element name="MasterCarrierTransportMethod" type="TransportMethodType" />
+    <xs:element name="MasterCarrierCode"          type="Str10"  minOccurs="0" />
+    <xs:element name="MasterCarrierName"          type="Str255" />
+    <xs:element name="VesselRadioCallSign"        type="Str9" />
+    <xs:element name="CarrierCode"                type="Str10"  minOccurs="0" />
+    <xs:element name="CarrierName"                type="Str255" />
+    <xs:element name="CarrierAddr1"               type="Str255" />
+    <xs:element name="CarrierAddr2"               type="Str255" />
+    <xs:element name="CarrierAddr3"               type="Str255" />
+    <xs:element name="CarrierAddr4"               type="Str255" />
+    <xs:element name="CarrierAddrCode"            type="Str9" />
+    <xs:element name="CarrierCountryCode"         type="Str35" />
+    <xs:element name="CarrierCountryName"         type="Str30"  minOccurs="0" />
+	<xs:element name="DegroupDepot"               type="Str35"  minOccurs="0" />
+    <xs:element name="BookingRef"                 type="Str35" />
+    <xs:element name="LocalAgentShortCode"        type="Str10"   minOccurs="0" />
+    <xs:element name="LocalAgentName"             type="Str255"  minOccurs="0" />
+    <xs:element name="LocalAgentAddr1"            type="Str255"  minOccurs="0" />
+    <xs:element name="LocalAgentAddr2"            type="Str255"  minOccurs="0" />
+    <xs:element name="LocalAgentAddr3"            type="Str255"  minOccurs="0" />
+    <xs:element name="LocalAgentAddr4"            type="Str255"  minOccurs="0" />
+    <xs:element name="LocalAgentAddrCode"         type="Str9"    minOccurs="0" />
+    <xs:element name="OverseasAgentName"          type="Str255" />
+    <xs:element name="OverseasAgentAddr1"         type="Str255" />
+    <xs:element name="OverseasAgentAddr2"         type="Str255" />
+    <xs:element name="OverseasAgentAddr3"         type="Str255" />
+    <xs:element name="OverseasAgentAddr4"         type="Str255" />
+    <xs:element name="OverseasAgentAddrCode"      type="Str9" />
+    <xs:element name="OverseasAgentCountryCode"   type="Str35" />
+    <xs:element name="OverseasAgentShortCode"     type="Str20" />
+    <xs:element name="ExternalOverseasAgentCode"  type="Str30"            minOccurs="0" />
+    <xs:element name="HazardousDescription"  type="Str255"                 minOccurs="0"     maxOccurs="unbounded" />
+    <xs:element name="HandlingInstructions"  type="Str255"                 minOccurs="0"     maxOccurs="unbounded" />
+    <xs:element name="AccountingInfo"        type="Str255"                 minOccurs="0"     maxOccurs="unbounded" />
+    <xs:element name="PackageDimensions"     type="PackageDimensionsType"  minOccurs="0"     maxOccurs="unbounded" />
+    <xs:element name="SundryCharge"          type="SundryChargeType"       minOccurs="0"     maxOccurs="unbounded" />
+    <xs:element name="ContactInfo"           type="ContactInfoType"        minOccurs="0" />
+    <xs:element name="AWBLineDetails"        type="AWBLineDetailsType"     minOccurs="0"     maxOccurs="unbounded" />
+    <xs:element name="HouseBillDetails"      type="HouseBillDetailsType"                     maxOccurs="unbounded" />
+  </xs:sequence>
+</xs:complexType>    <!-- "MasterBillDetailsType" -->
+
+
+<xs:complexType name="HouseBillDetailsType">
+  <xs:sequence>
+    <xs:element name="HouseBillNo"          type="Str35" />
+    <xs:element name="HouseBillUniqueNo"    type="Str50" />
+    <xs:element name="IsHazardous"          type="xs:boolean" />
+    <xs:element name="ShipperName"          type="Str255" />
+    <xs:element name="ShipperAddr1"         type="Str255" />
+    <xs:element name="ShipperAddr2"         type="Str255" />
+    <xs:element name="ShipperAddr3"         type="Str255" />
+    <xs:element name="ShipperAddr4"         type="Str255" />
+    <xs:element name="ShipperAddrCode"      type="Str9" />
+    <xs:element name="ShipperCountryCode"   type="Str35" />
+    <xs:element name="ShipperShortCode"     type="Str20" />
+    <xs:element name="ShipperRefNo"         type="Str20" />
+    <xs:element name="ConsigneeName"        type="Str255" />
+    <xs:element name="ConsigneeAddr1"       type="Str255" />
+    <xs:element name="ConsigneeAddr2"       type="Str255" />
+    <xs:element name="ConsigneeAddr3"       type="Str255" />
+    <xs:element name="ConsigneeAddr4"       type="Str255" />
+    <xs:element name="ConsigneeAddrCode"    type="Str9" />
+    <xs:element name="ConsigneeCountryCode" type="Str35" />
+    <xs:element name="ConsigneeShortCode"   type="Str20" />
+    <xs:element name="ConsigneeRefNo"       type="Str20" />
+    <xs:element name="NotifyPartyName"      type="Str255" />
+    <xs:element name="NotifyPartyAddr1"     type="Str255" />
+    <xs:element name="NotifyPartyAddr2"     type="Str255" />
+    <xs:element name="NotifyPartyAddr3"     type="Str255" />
+    <xs:element name="NotifyPartyAddr4"     type="Str255" />
+    <xs:element name="NotifyPartyAddrCode"  type="Str9" />
+    <xs:element name="NotifyPartyCountryCode" type="Str35" />
+    <xs:element name="NotifyPartyShortCode"  type="Str20" />
+    <xs:element name="NotifyPartyRefNo"      type="Str20" />
+    <xs:element name="DeliveryTerms"         type="Str35" />
+    <xs:element name="IncoTerms"             type="Str3" />
+    <xs:element name="NoOfPieces"            type="xs:nonNegativeInteger" />
+    <xs:element name="PackType"              type="Str255" />
+    <xs:element name="GrossWeightKG"         type="xs:decimal" />
+    <xs:element name="ChargeableWeightKG"    type="xs:decimal" />
+    <xs:element name="CubicMeters"           type="xs:decimal" />
+    <xs:element name="NoOfContainers"        type="xs:nonNegativeInteger" />
+    <xs:element name="ContainerTypeCode"     type="Str5"  minOccurs="0" />
+    <xs:element name="FreightAmountDetails"  type="FreightAmountDetailsType"  minOccurs="0" />
+    <xs:element name="PrepaidCollect"        type="PrepaidCollectType" />
+    <xs:element name="NatureOfGoods"         type="Str255" />
+    <xs:element name="CountryOfLoading"      type="Str35" />
+    <xs:element name="CountryOfLoadingName"  type="Str30"  minOccurs="0" />
+    <xs:element name="PortOfLoading"         type="Str35" />
+    <xs:element name="PortOfLoadingName"     type="Str50"  minOccurs="0" />
+    <xs:element name="FinalDestCountry"      type="Str35" />
+    <xs:element name="FinalDestCountryName"  type="Str30"  minOccurs="0" />
+    <xs:element name="FinalDestPort"         type="Str35" />
+    <xs:element name="FinalDestPortName"     type="Str50"  minOccurs="0" />
+    <xs:element name="LocalClearingAgent"    type="Str255" />
+    <xs:element name="OverseasAgentName"     type="Str255" />
+    <xs:element name="OverseasAgentAddr1"    type="Str255" />
+    <xs:element name="OverseasAgentAddr2"    type="Str255" />
+    <xs:element name="OverseasAgentAddr3"    type="Str255" />
+    <xs:element name="OverseasAgentAddr4"    type="Str255" />
+    <xs:element name="OverseasAgentAddrCode"      type="Str9" />
+    <xs:element name="OverseasAgentCountryCode"   type="Str35" />
+    <xs:element name="OverseasAgentShortCode"     type="Str20" />
+    <xs:element name="ExternalOverseasAgentCode"  type="Str30"  minOccurs="0" />
+    <xs:element name="ExternalReference1"    type="AdditionalReferenceType" />
+    <xs:element name="ExternalReference2"    type="AdditionalReferenceType" />
+    <xs:element name="ExternalReference3"    type="AdditionalReferenceType" />
+    <xs:element name="ExternalReference4"    type="AdditionalReferenceType" />
+    <xs:element name="ExternalReference5"    type="AdditionalReferenceType" />
+    <xs:element name="ExternalReference6"    type="AdditionalReferenceType" />
+    <xs:element name="ExternalReference7"    type="AdditionalReferenceType" />
+    <xs:element name="ExternalReference8"    type="AdditionalReferenceType" />
+    <xs:element name="ExternalReference9"    type="AdditionalReferenceType" />
+    <xs:element name="ExternalReference10"   type="AdditionalReferenceType" />
+    <xs:element name="MarksAndNumbers"       type="Str100"                minOccurs="0"   maxOccurs="unbounded" />
+    <xs:element name="Endorsements"          type="Str50"                 minOccurs="0"   maxOccurs="unbounded" />
+    <xs:element name="HazardousDescription"  type="Str255"                minOccurs="0"   maxOccurs="unbounded" />
+    <xs:element name="HandlingInstructions"  type="Str255"                minOccurs="0"   maxOccurs="unbounded" />
+    <xs:element name="AccountingInfo"        type="Str255"                minOccurs="0"   maxOccurs="unbounded" />
+    <xs:element name="PackageDimensions"     type="PackageDimensionsType" minOccurs="0"   maxOccurs="unbounded" />
+    <xs:element name="PackageDetails"        type="PackageDetailsType"    minOccurs="0"   maxOccurs="unbounded" />
+    <xs:element name="Container"             type="ContainerRecord"       minOccurs="0"   maxOccurs="unbounded" />
+    <xs:element name="SundryCharge"          type="SundryChargeType"      minOccurs="0"   maxOccurs="unbounded" />
+    <xs:element name="TransshipDetails"      type="TransshipDetailsType"  minOccurs="0" />
+    <xs:element name="AWBLineDetails"        type="AWBLineDetailsType"    minOccurs="0"   maxOccurs="unbounded" />
+	<xs:element name="DebtorCode"    type="Str255" />
+	<xs:element name="DebtorName"    type="Str255" />
+  </xs:sequence>
+</xs:complexType>    <!-- "HouseBillDetailsType" -->
+
+
+<xs:complexType name="ShipmentDetailsType">
+  <xs:sequence>
+    <xs:element name="MasterBillDetails"  type="MasterBillDetailsType" />
+  </xs:sequence>
+</xs:complexType>    <!-- "ShipmentDetailsType" -->
+
+
+<!-- Define the root node: "ShipmentBatch" -->
+<xs:element name="ShipmentBatch">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="MessageHeader"    type="MessageHeaderType" />
+      <xs:element name="ShipmentDetails"  type="ShipmentDetailsType"  maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>    <!-- "ShipmentBatch" -->
+
+</xs:schema>

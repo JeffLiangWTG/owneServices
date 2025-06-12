@@ -1,0 +1,801 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:rct="http://agriculture.gov.au/nexdoc/common/rex/CommonTypes_1.0"
+	xmlns:ct="http://agriculture.gov.au/nexdoc/common/CommonTypes_1.0" targetNamespace="http://agriculture.gov.au/nexdoc/common/rex/CommonTypes_1.0"
+	elementFormDefault="qualified" xmlns:et="http://agriculture.gov.au/nexdoc/common/EnumTypes_1.0" version="1.1">
+	<xsd:import namespace="http://agriculture.gov.au/nexdoc/common/EnumTypes_1.0" schemaLocation="../EnumTypes.xsd" />
+	<xsd:import namespace="http://agriculture.gov.au/nexdoc/common/CommonTypes_1.0" schemaLocation="../CommonTypes.xsd" />
+
+	<xsd:complexType name="ExportDetailsType">
+		<xsd:annotation>
+			<xsd:documentation>
+				This type consists of elements which constitute the export related information for a Rex record.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+		  <xsd:element name="commodityType" type="ct:CommodityType" />
+			<xsd:element name="priority" type="ct:Priority" minOccurs="0" nillable="true" />
+			<xsd:element name="departureDate" type="xsd:date" minOccurs="0" />
+			<xsd:element name="transportDetails" type="rct:TransportDetailsType" minOccurs="0" />
+			<xsd:element name="destinationCity" type="ct:CityType" minOccurs="0" nillable="true" />
+
+			<xsd:element name="dischargePorts" minOccurs="0">
+				<xsd:complexType>
+					<xsd:choice minOccurs="0">
+						<xsd:sequence maxOccurs="3">
+							<xsd:element name="dischargePort" type="ct:PortType" />
+						</xsd:sequence>
+						<xsd:sequence maxOccurs="1">
+							<xsd:element name="removeExistingSet" type="xsd:boolean" default="false" />
+						</xsd:sequence>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="destinationCountry" type="ct:CountryType" minOccurs="0" />
+			<xsd:element name="transitCountries" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Wrapper element which contains multiple sets of transit countries. Alternatively allows the
+						deletion of the existing transit countries through an amend service call by applying removeExistingSet with a
+						value of 'true'.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice minOccurs="0">
+						<xsd:sequence maxOccurs="4">
+							<xsd:element name="transitCountry" type="ct:CountryType" />
+						</xsd:sequence>
+						<xsd:sequence maxOccurs="1">
+							<xsd:element name="removeExistingSet" type="xsd:boolean" default="false" />
+						</xsd:sequence>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="borderInspectionPort" type="ct:PortType" minOccurs="0" nillable="true" />
+
+			<xsd:element name="loadingPorts" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Wrapper element which contains multiple sets of loading ports. Alternatively allows the deletion
+						of the existing loading ports through an amend service call by applying removeExistingSet with a value of 'true'.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice minOccurs="0">
+						<xsd:sequence maxOccurs="5">
+							<xsd:element name="loadingPort" type="ct:PortType" />
+						</xsd:sequence>
+						<xsd:sequence maxOccurs="1">
+							<xsd:element name="removeExistingSet" type="xsd:boolean" default="false" />
+						</xsd:sequence>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="importPermits" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Wrapper element which contains multiple sets of import permits. Alternatively allows the
+						deletion of the existing permits through an amend service call by applying removeExistingSet with a value of
+						'true'.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice minOccurs="0">
+						<xsd:sequence maxOccurs="99">
+							<xsd:element name="importPermit" type="rct:ImportPermitType" />
+						</xsd:sequence>
+						<xsd:sequence maxOccurs="1">
+							<xsd:element name="removeExistingSet" type="xsd:boolean" default="false" />
+						</xsd:sequence>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+
+			<xsd:element name="sew" type="rct:CustomsDetailsType" minOccurs="0" />
+
+			<xsd:element name="ownerExporterId" type="ct:ExporterNumberType" minOccurs="0"/>
+		  <xsd:element name="imaDetailsList" type="rct:ImaDetailsListType"  minOccurs="0"/>
+			<xsd:element name="exporterDeclaration" type="ct:ExporterDeclarationType" minOccurs="0" />
+			<xsd:element name="exporterReference" type="ct:AlphaNumeric35Type" minOccurs="0" nillable="true" />
+
+			<xsd:element name="consigneeDetails" type="ct:ConsigneeType" minOccurs="0" />
+			<xsd:element name="messageAcknowledgements" type="ct:MessageAcknowledgements" minOccurs="0" />
+			<xsd:element name="preferredWeightUnit" type="ct:WeightUnitType" minOccurs="0" />
+			<xsd:element name="tracesApprovalId" type="xsd:string" minOccurs="0" />
+
+			<xsd:element name="quotaFlag" type="et:YesNoType" default="N" minOccurs="0"/>
+			<xsd:element name="quotaType" type="ct:AlphaNumeric3Type" minOccurs="0"/>
+			<xsd:element name="shipStoresFlag" type="et:YesNoType" default="N" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="RexSubmissionIdentificationType">
+		<xsd:complexContent>
+			<xsd:extension base="ct:IdentificationType">
+				<xsd:sequence>
+					<xsd:element name="lastAmendDateTime" type="xsd:dateTime" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="RexResponseDetailsType">
+		<xsd:sequence>
+			<xsd:element minOccurs="0" name="identification" type="ct:IdentificationType" />
+			<xsd:element minOccurs="0" name="complianceStatus" type="et:CompletionStatusType" />
+			<xsd:element minOccurs="0" name="lastAmendDateTime" type="xsd:dateTime" />
+
+			<!-- <xsd:element minOccurs="0" name="rexStatusDateTime" type="xsd:dateTime" /> <xsd:element minOccurs="0" name="rexLodgementDateTime" 
+				type="xsd:dateTime" /> <xsd:element minOccurs="0" name="transferStatus" type="et:YesNoType" /> <xsd:element minOccurs="0" 
+				name="embargoStatus" type="ct:AlphaNumeric1Type" /> <xsd:element minOccurs="0" name="exporterDetails" type="rct:ExporterDetailsResponseType" 
+				/> -->
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ExporterDetailsType">
+		<xsd:sequence>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ExporterDetailsResponseType">
+		<xsd:complexContent>
+			<xsd:extension base="rct:ExporterDetailsType">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" name="exporterPermitNumber" type="ct:Number10Digits" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="CustomsDetailsType">
+		<xsd:sequence>
+			<xsd:element name="customsAgentIndicator" type="ct:CustomsAgentType" minOccurs="0" />
+			<xsd:element name="edn" type="ct:ExportPermitNumberType" minOccurs="0" />
+			<xsd:element name="currency" type="ct:CurrencyUnitType" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="RexLineTypeResponse">
+		<xsd:sequence>
+			<xsd:element name="lineNumber" type="ct:Number2Digits" />
+			<!-- generated production description -->
+			<xsd:element minOccurs="0" name="healthCertificateDescription" type="xsd:string" />
+			<!-- assigned primary certificate -->
+			<xsd:element minOccurs="0" name="primaryCertificate" type="rct:FormType" />
+			<!-- assigned secondary certificate -->
+			<xsd:element minOccurs="0" name="secondaryCertificate" type="rct:FormType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="FormType">
+		<xsd:sequence>
+			<xsd:element name="templateCode" type="ct:AlphaNumeric6Type" />
+			<xsd:element minOccurs="0" name="endorsementNumber" type="ct:Number5Digits" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ImportPermitType">
+		<xsd:annotation>
+			<xsd:documentation>This type identifies a import permit number, and it's associated date.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="importPermitNumber" type="ct:ImportPermitNumberType" />
+			<xsd:element name="importPermitDate" type="xsd:date" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="EstablishmentType">
+		<xsd:annotation>
+			<xsd:documentation>
+				This type recognises an establishment record by its name, address and a contact number. This is
+				not an establishment contained within the establishment register.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="establishmentName" type="ct:AlphaNumeric50Type" />
+			<xsd:element name="establishmentAddress" type="ct:AddressType" />
+			<xsd:element name="contactPhoneNumber" type="ct:TelephoneNumberType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ContainerType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Contains the container number and seal numbers associated with a container record.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="containerNumber" type="ct:ContainerNumberType" />
+			<xsd:element name="containerSeals" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence maxOccurs="99" minOccurs="0">
+						<xsd:element name="containerSeal" type="rct:ContainerSealType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ContainerSealType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Specifies the container seal number applied to the container if relevant. Alternatively a range of
+				seal numbers can be provided if relevant.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element name="sealNumber" type="ct:AlphaNumeric7Type" />
+				<xsd:sequence>
+					<xsd:element name="sealStartNumber" type="ct:AlphaNumeric7Type" minOccurs="0" />
+					<xsd:element name="sealEndNumber" type="ct:AlphaNumeric7Type" minOccurs="0" />
+				</xsd:sequence>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="VesselHoldSealType">
+		<xsd:annotation>
+			<xsd:documentation>Specifies the vessel hold seal number ranges applied to the vessel relevant.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="sealStartNumber" type="ct:AlphaNumeric7Type" minOccurs="0" />
+			<xsd:element name="sealEndNumber" type="ct:AlphaNumeric7Type" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+	<xsd:complexType name="ProductionProcessType">
+		<xsd:annotation>
+			<xsd:documentation>
+				This type specifies the details pertaining to one of the production process relating to the
+				enclosing Rex line record.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="processGroup" type="ct:ProcessType" minOccurs="0" />
+			<xsd:element name="processingStartDate" type="xsd:date" />
+			<xsd:element name="processingEndDate" type="xsd:date" />
+			<xsd:element name="establishmentIndicator" type="ct:ProcessingIndicatorType" />
+			<xsd:choice>
+				<xsd:element name="processingEstablishmentNumber" type="ct:EstablishmentNumberType" />
+				<xsd:element name="processingEstablishment" type="rct:EstablishmentType" />
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="TreatmentType">
+		<xsd:annotation>
+			<xsd:documentation>Specifies the treatments which have been applied to a particular product.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="treatmentCode" type="ct:TreatmentCodeType" />
+			<xsd:element name="treatmentStartDate" type="xsd:date" />
+			<xsd:element name="treatmentEndDate" type="xsd:date" />
+			<xsd:element name="treatmentInformation" type="ct:TreatmentInformationType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ProductDetails">
+		<xsd:annotation>
+			<xsd:documentation>Specifies the product details which relate to the enclosing Rex Line.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="productType" type="ct:ProductType" />
+			<xsd:element name="category" type="ct:ProductCategoryType" minOccurs="0" />
+			<xsd:element name="packType" type="ct:PackageType" />
+			<xsd:element name="preservationType" type="ct:PreservationType" />
+			<xsd:element name="cutType" type="ct:CutType" minOccurs="0" />
+			<xsd:element name="suppCode" type="ct:SuppCodeType" minOccurs="0" />
+			<xsd:element name="outerProductPackaging" type="rct:OuterProductPackagingType" minOccurs="0" />
+			<xsd:element name="intermediateProductPackaging" type="rct:ProductPackagingType" minOccurs="0" />
+			<xsd:element name="innerProductPackaging" type="rct:ProductPackagingType" minOccurs="0" />
+			<xsd:element name="netMetricWeight" type="ct:WeightType" minOccurs="0" />
+			<xsd:element name="netImperialWeight" type="ct:WeightType" minOccurs="0" />
+			<xsd:element name="importedProductFlag" type="et:YesNoType" default="N" minOccurs="0" />
+			<xsd:element name="manualCertificateProductDescription" type="ct:AlphaNumeric254Type" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ProductPackagingType">
+		<xsd:annotation>
+			<xsd:documentation>
+				This type specifies the packaging and it's weight of the product related to the productLine. This
+				can be either one of inner, outer or intermediate.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="quantity">
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="ct:Number6Digits">
+							<xsd:attribute name="packageType" type="ct:PackageType" />
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="unitAmount" type="ct:WeightType" />
+			<xsd:element name="packageMeasureAccuracy" type="et:PackageMeasureAccuracyType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="OuterProductPackagingType">
+		<xsd:annotation>
+			<xsd:documentation>
+				An extension to packageType, this contains shipping marks applicable to outer packaging only.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="rct:ProductPackagingType">
+				<xsd:sequence>
+					<xsd:element name="shippingMarks" type="ct:ShippingMarksType" minOccurs="0" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:simpleType name="TransitLocationType">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="C">
+				<xsd:annotation>
+					<xsd:documentation>Custom Warehouse</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="S">
+				<xsd:annotation>
+					<xsd:documentation>Ship Supplier</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+  <xsd:complexType name="ImaDetailsListType">
+    <xsd:annotation>
+      <xsd:documentation>A wrapper type which encapsulates the IMA Details List Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="imaDetails" maxOccurs="99" type="rct:ImaDetailsType" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ImaDetailsType">
+    <xsd:annotation>
+      <xsd:documentation>A wrapper type which encapsulates the IMA Details Type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="serialNumber" type="ct:AlphaNumeric100Type" minOccurs="0"/>
+      <xsd:element name="containerNumber" type="ct:ContainerNumberType"/>
+      <xsd:element name="invoiceDate" type="xsd:date" minOccurs="0"/>
+      <xsd:element name="invoiceNumber" type="ct:AlphaNumeric20Type" minOccurs="0"/>
+      <xsd:element name="grossWeight" type="ct:WeightType" minOccurs="0"/>
+      <xsd:element name="netWeight" type="ct:WeightType" minOccurs="0"/>
+      <xsd:element name="productDescription" type="ct:AlphaNumeric255Type" minOccurs="0"/>
+      <xsd:element name="quotaYear" type="ct:Number4Digits" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+	<xsd:complexType name="ProductLinesType">
+		<xsd:annotation>
+			<xsd:documentation>A wrapper type which encapsulates the product line items.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="productLine" maxOccurs="99" type="rct:ProductLineType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="AdditionalTextsType">
+		<xsd:annotation>
+			<xsd:documentation>A wrapper type which encapsulates the Additional Text Type</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="additionalText" type="rct:AdditionalTextType" minOccurs="0" maxOccurs="20" />
+			<!--<xsd:element name="dischargeAdditionalTexts" minOccurs="0"> -->
+			<!--<xsd:complexType> -->
+			<!--<xsd:choice minOccurs="0"> -->
+			<!--<xsd:sequence maxOccurs="3"> -->
+			<!--<xsd:element name="dischargeAdditionalTexts" type="ct:PortType" /> -->
+			<!--</xsd:sequence> -->
+			<!--<xsd:sequence maxOccurs="1"> -->
+			<!--<xsd:element name="removeExistingSet" type="xsd:boolean" default="false" /> -->
+			<!--</xsd:sequence> -->
+			<!--</xsd:choice> -->
+			<!--</xsd:complexType> -->
+			<!--</xsd:element> -->
+		</xsd:sequence>
+
+	</xsd:complexType>
+
+	<xsd:complexType name="EUTransit">
+		<xsd:annotation>
+			<xsd:documentation></xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ProductLineType">
+		<xsd:annotation>
+			<xsd:documentation>
+				The productLine type contains the detailed information for a product relating to a Rex record. A
+				given Rex record can contain multiple product line records, where each product line is identified by its designated
+				line number, which must be unique for that given Rex record. For an amend operation, an existing productLine entry
+				may be removed by quoting the lineNumber in addition to the removeEntry element set to 'true'.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:sequence>
+				<xsd:element name="lineNumber" type="ct:Number2Digits" />
+				<xsd:choice>
+					<xsd:sequence maxOccurs="1">
+						<xsd:element name="removeEntry" type="xsd:boolean" default="false" minOccurs="0" />
+					</xsd:sequence>
+					<xsd:sequence>
+						<xsd:element name="productDetails" type="rct:ProductDetails" />
+
+						<xsd:element name="containers" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>
+									Wrapper element which allows
+									multiple container elements to be
+									applied against a productLine.
+									Alternatively allows the deletion of
+									the existing containers through an
+									amend service call by applying
+									removeExistingSet with a value of
+									'true'.
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice minOccurs="0">
+									<xsd:sequence maxOccurs="99">
+										<xsd:element name="container" type="rct:ContainerType" />
+									</xsd:sequence>
+									<xsd:sequence maxOccurs="1">
+										<xsd:element name="removeExistingSet" type="xsd:boolean" default="false" />
+									</xsd:sequence>
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="treatments" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>
+									Wrapper element which allows
+									multiple treatments to be applied
+									against a productLine.
+									Alternatively
+									allows the deletion of the existing
+									treatments through an amend service
+									call by applying
+									removeExistingSet
+									with a value of 'true'.
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice minOccurs="0">
+									<xsd:sequence maxOccurs="99">
+										<xsd:element name="treatmentType" type="rct:TreatmentType" />
+									</xsd:sequence>
+									<xsd:sequence maxOccurs="1">
+										<xsd:element name="removeExistingSet" type="xsd:boolean" default="false" />
+									</xsd:sequence>
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="productionProcesses" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>
+									Wrapper element which allows
+									multiple production processes to be
+									applied against a productLine.
+									Alternatively allows the deletion of
+									the existing processes through an
+									amend service call by applying
+									removeExistingSet with a value of
+									'true'.
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice minOccurs="0">
+									<xsd:sequence maxOccurs="99">
+										<xsd:element name="productionProcess" type="rct:ProductionProcessType" />
+									</xsd:sequence>
+									<xsd:sequence maxOccurs="1">
+										<xsd:element name="removeExistingSet" type="xsd:boolean" default="false" />
+									</xsd:sequence>
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+
+						<xsd:element name="sew" type="rct:ProductLineCustomsDetailsType" minOccurs="0"/>
+
+						<!-- <xsd:element name="amlcPerformanceExporterNumber" type="ct:ExporterNumberType" minOccurs="0" /> -->
+						<xsd:element name="durabilityStartDate" type="xsd:date" minOccurs="0" />
+						<xsd:element name="durabilityEndDate" type="xsd:date" minOccurs="0" />
+						<xsd:element name="aheccCode" type="ct:AheccCodeType" minOccurs="0" />
+						<xsd:element name="batchCode" type="xsd:string" maxOccurs="1" minOccurs="0" />
+						<xsd:element name="additionalTexts" type="rct:AdditionalTextsType" minOccurs="0" />
+						<xsd:element name="productSourceCountries" minOccurs="0">
+							<xsd:complexType>
+								<xsd:choice minOccurs="0">
+									<xsd:sequence maxOccurs="3">
+										<xsd:element name="productSourceCountry" type="ct:CountryType" />
+									</xsd:sequence>
+									<xsd:sequence maxOccurs="1">
+										<xsd:element name="removeExistingSet" type="xsd:boolean" default="false" />
+									</xsd:sequence>
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:choice>
+
+			</xsd:sequence>
+		</xsd:choice>
+	</xsd:complexType>
+
+	<xsd:complexType name="ProductLineCustomsDetailsType">
+		<xsd:sequence>
+			<xsd:element name="netCustomsWeight" type="ct:WeightType" minOccurs="0" />
+			<xsd:element name="grossMetricWeight" type="ct:WeightType" minOccurs="0" />
+			<xsd:element name="fobAmount" type="ct:CurrencyValueType" minOccurs="0" />
+			<xsd:element name="productSourceState" type="ct:StateType" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ManufacturerDetailsType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Contains the elements which identify certificate request details. This includes the print
+				information across the entire Rex record, as well as any specific certificate requests associated with the said Rex
+				record.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="manufacturer" maxOccurs="99" type="rct:ManufacturerLineType" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ManufacturerLineType">
+		<xsd:annotation>
+			<xsd:documentation>
+				A certificate request which encapsulates both the certificate request details, as well as the
+				productLines applicable to the request.
+			</xsd:documentation>
+		</xsd:annotation>
+
+		<xsd:sequence>
+			<xsd:element name="lineNumbers">
+				<xsd:complexType>
+					<xsd:sequence maxOccurs="unbounded">
+						<xsd:element name="lineNumber" type="ct:Number2Digits" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="manufacturerDetails" type="rct:LineManufacturerDetailsType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="LineManufacturerDetailsType">
+		<xsd:annotation>
+			<xsd:documentation>
+				A certificate request which encapsulates both the certificate request details, as well as the
+				productLines applicable to the request.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="name" type="ct:AlphaNumeric50Type" />
+			<xsd:element name="address" type="ct:AddressType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CertificateDetailsType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Contains the elements which identify certificate request details. This includes the print
+				information across the entire Rex record, as well as any specific certificate requests associated with the said Rex
+				record.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="certificatePrintControls" type="rct:CertificatePrintType" minOccurs="0" />
+			<xsd:element name="certificates" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="certificate" maxOccurs="99" type="rct:CertificateLineType" minOccurs="0" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CertificatePrintType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Provides the common certificate print information which relates to a Rex submission.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="certificatePrintIndicator" type="et:CertificatePrintIndicatorType" />
+			<xsd:choice>
+				<xsd:element name="certificatePrintRegion" type="ct:AlphaNumeric7Type" />
+				<xsd:element name="certificateRequiredClientGroup" type="ct:PartyExternalIdType" />
+			</xsd:choice>
+			<!-- <xsd:element name="remotePrint" type="et:YesNoType" minOccurs="0" /> -->
+			<xsd:element name="separateBy" type="et:CertificateSeparatorType" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+	<xsd:complexType name="LineCertificatePrintType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Provides the common certificate print information which relates to a Rex submission.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element name="certificatePrintRegion" type="ct:AlphaNumeric7Type" />
+				<xsd:element name="certificateRequiredClientGroup" type="ct:PartyExternalIdType" />
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CertificateLineType">
+		<xsd:annotation>
+			<xsd:documentation>
+				A certificate request which encapsulates both the certificate request details, as well as the
+				productLines applicable to the request.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element name="removeEntry" type="xsd:boolean" default="false" minOccurs="0" />
+				<xsd:element name="lineNumbers">
+					<xsd:complexType>
+						<xsd:sequence maxOccurs="unbounded">
+							<xsd:element name="lineNumber" type="ct:Number2Digits" />
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="certificateDetails" type="rct:LineCertificateDetailsType" />
+			<xsd:element name="certificatePrintDetails" type="rct:LineCertificatePrintType" minOccurs="0" />
+		</xsd:sequence>
+
+	</xsd:complexType>
+
+	<xsd:complexType name="LineCertificateDetailsType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Optional certificate print details which can override the respective details provided at the REX
+				level.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="certificateTemplate" type="ct:CertificateTemplateType" />
+			<xsd:element name="certificateEndorsement" type="ct:CertificateEndoresementType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="RexLinesResponseType">
+		<xsd:sequence>
+			<xsd:element name="rexLine" maxOccurs="99" type="rct:RexLineTypeResponse">
+				<xsd:unique name="lineNumberUnique">
+					<xsd:selector xpath="rexLine" />
+					<xsd:field xpath="lineNumber" />
+				</xsd:unique>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="TransportDetailsType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Contains the elements which identify the transportation information pertaining to a Rex record.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="transportMode" type="et:TransportType" minOccurs="0" />
+			<xsd:element name="voyageOrFlightNumber" type="ct:AlphaNumeric6Type" minOccurs="0" nillable="true" />
+			<xsd:element name="vesselName" type="ct:AlphaNumeric254Type" minOccurs="0" nillable="true" />
+			<xsd:element name="shippingCompany" type="ct:AlphaNumeric254Type" minOccurs="0" nillable="true" />
+			<xsd:element name="storeTransportTemperature" type="ct:TemperatureType" minOccurs="0"  nillable="true"/>
+			<xsd:element name="vesselHoldSeals" type="rct:VesselHoldSealType" minOccurs="0" nillable="true" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="InspectionProcessType">
+		<xsd:sequence>
+			<xsd:element name="inspectionRequestedDate" type="xsd:date" />
+			<xsd:element name="authorisedStartDate" type="xsd:date" />
+			<xsd:element name="authorisedEndDate" type="xsd:date" />
+			<xsd:element name="authorisedEstablishmentNumber" type="ct:EstablishmentNumberType" />
+			<xsd:element name="authorisedOfficer" type="ct:UserIdType" />
+			<xsd:element name="shipsHoldInspectionProcess" type="rct:ShipsHoldInspectionProcessType" minOccurs="0" />
+			<xsd:element name="approvedCertifier" type="ct:AlphaNumeric5Type" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ShipsHoldInspectionProcessType">
+		<xsd:sequence>
+			<xsd:element name="compartments">
+				<xsd:complexType>
+					<xsd:sequence maxOccurs="unbounded">
+						<xsd:element name="compartment" type="ct:AlphaNumeric3Type" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="inspectionPort" type="ct:PortType" />
+			<xsd:element name="shipsHoldInspectionDate" type="xsd:date" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="AdditionalTextType">
+		<xsd:sequence>
+			<xsd:element name="code" type="xsd:token" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="text" type="xsd:string" minOccurs="1" maxOccurs="50" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="EUTransitType">
+		<xsd:sequence>
+			<xsd:element name="personResponsible" type="rct:PersonResponsibleType" minOccurs="0"/>
+			<xsd:element name="placeOfDestinationDetails" type="rct:PlaceOfDestinationDetailsType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="PersonResponsibleType">
+		<xsd:sequence>
+			<xsd:element name="address" type="ct:AddressType" minOccurs="0"/>
+			<xsd:element name="firstName" type="ct:AlphaNumeric100Type" />
+			<xsd:element name="lastName" type="ct:AlphaNumeric100Type" />
+			<xsd:element name="phoneNumber" type="ct:AlphaNumeric20Type" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="PlaceOfDestinationDetailsType">
+		<xsd:sequence>
+			<xsd:element name="name" type="ct:AlphaNumeric255Type" minOccurs="0"/>
+			<xsd:element name="address" type="ct:AddressType" minOccurs="0"/>
+			<xsd:element name="phoneNumber" type="ct:AlphaNumeric20Type" minOccurs="0" />
+			<xsd:element name="approvalNumber" type="ct:AlphaNumeric50Type" minOccurs="0"/>
+			<xsd:element name="transitLocationType" type="rct:TransitLocationType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<!-- REX Withdrawal response -->
+	<xsd:complexType name="WithdrawalRexMessageResponse">
+		<xsd:sequence>
+			<xsd:element name="value" type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<!-- REX copy response -->
+	<xsd:complexType name="CopyRexMessageResponse">
+		<xsd:sequence>
+			<xsd:element name="value" type="xsd:string" />
+			<xsd:element name="newRexNumber" type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+	<!-- REX replace certificate response -->
+	<xsd:complexType name="ReplaceCertificateMessageResponse">
+		<xsd:sequence>
+			<xsd:element name="value" type="xsd:string" />
+			<xsd:element name="newRexNumber" type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ReplaceReasonType">
+		<xsd:choice>
+			<xsd:element name="replaceReasonCode" type="ct:ReplaceReasonCodeType" maxOccurs="1" minOccurs="0" />
+			<xsd:element name="replaceReasonText" type="ct:ReplaceReasonTextType" maxOccurs="1" minOccurs="0" />
+		</xsd:choice>
+	</xsd:complexType>
+
+
+
+</xsd:schema>

@@ -1,0 +1,2539 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--EXTERNAL_PROPERTIES: Profile;UserName;Password;_Server;_SiteName;_ServiceName;_AppPoolName;_AppPoolUserName;DeployManagedRuntimeVersion;_AppPoolUserPassword;_ServicePackagePath;_BackupRequired;_BackupFolder;_LogsFolder;_PreloadEnabled;_StartMode;_IdleTimeout-->
+<!--EXTERNAL_ITEMS (optional): _Binding; Metadata: Protocol, IPAddress, Port, BindingInformation, HostHeader, SSLThumbprint, SSLFriendlyName, SSLSubject -->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup>
+        <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+        <MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+
+        <DatIntegrationAssemblyFilePath>$(MSBuildThisFileDirectory)..\..\DAT\Dat.Integration.dll</DatIntegrationAssemblyFilePath>
+        <DatIntegrationAssemblyFilePath Condition="!Exists('$(DatIntegrationAssemblyFilePath)')">$(MSBuildThisFileDirectory)Dat.Integration.dll</DatIntegrationAssemblyFilePath>
+
+        <MicrosoftWebPublishingPath Condition="'$(MicrosoftWebPublishingPath)' == ''">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\</MicrosoftWebPublishingPath>
+        <MicrosoftWebPublishingTasksDllPath Condition="'$(MicrosoftWebPublishingTasksDllPath)' == ''">$(MicrosoftWebPublishingPath)Microsoft.Web.Publishing.Tasks.dll</MicrosoftWebPublishingTasksDllPath>
+
+        <MSDeployPath Condition="'$(MSDeployPath)' == ''">$(ProgramFiles)\IIS\Microsoft Web Deploy V3</MSDeployPath>
+        <DeployManagedRuntimeVersion Condition="'$(DeployManagedRuntimeVersion)' == ''">v4.0</DeployManagedRuntimeVersion>
+
+        <CommonPowershellFunctionsFilePath>.\Common.ps1</CommonPowershellFunctionsFilePath>
+        <CommonPowershellFunctionsFilePath Condition="!Exists('$(CommonPowershellFunctionsFilePath)')">$(MSBuildThisFileDirectory)\..\CommonScripts\Common.ps1</CommonPowershellFunctionsFilePath>
+    </PropertyGroup>
+
+    <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+
+    <Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props" Condition="'$(_DeploymentPropsImported)'==''"/>
+    <Import Project="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Deployment.props" Condition="'$(Profile)' != '' and '$(_ProfilePropsImported)'==''"/>
+
+    <UsingTask TaskName="TransformXml"
+               AssemblyFile="$(MicrosoftWebPublishingTasksDllPath)"/>
+
+    <UsingTask TaskName="CreateDir"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <Path Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($Path)
+                New-Item -ItemType directory -Path $Path
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Creating directory [$Path]")
+
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Path
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="GetWebsiteInfo"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <SiteName Required="true" ParameterType="System.String" />
+            <Exists Output="true" ParameterType="System.Boolean" />
+            <Id Output="true" ParameterType="System.String" />
+            <PhysicalPath Output="true" ParameterType="System.String" />
+            <ApplicationPool Output="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            <# Log session related info to help diagnose on an error "Could not create a session on local machine:[localhost]" #>
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[Begin GetWebsiteInfo debug logging]")
+
+            $WinRM_service_status = (Get-Service winrm | ft -AutoSize)
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "WinRM service status: $WinRM_service_status")
+
+            $WinRM_config = (Winrm get winrm/config)
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "WinRM config: $WinRM_config")
+
+            $WinRM_config_listener = (winrm e winrm/config/listener)
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "WinRM listener config: $WinRM_config_listener")
+
+            $WinRM_listener = (netsh http show iplisten)
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "WinRM listeners: $WinRM_listener")
+
+            $WinRM_port_stat = (netstat -ano | findstr 5985)
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "WinRM listening port 5985: $WinRM_port_stat")
+
+            $WinRM_identify = (winrm identify)
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "WinRM identify: $WinRM_identify")
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "-MachineName [$MachineName] -UserName [$UserName]")
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[End GetWebsiteInfo debug logging]")
+
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($SiteName)
+                Import-Module WebAdministration
+                <# DO NOT CHANGE: Get-WebSite, Reason: Environment Compatibility Issue, Returns all websites if used directly with -Name parameter #>
+                $WebSite = Get-Website | Where {$_.Name -eq $SiteName}
+                if ($null -ne $WebSite)
+                {
+                    New-Object PSObject -property @{
+                        Exists = $TRUE
+                        Id = $WebSite.Id
+                        PhysicalPath = $WebSite.PhysicalPath.ToString()
+                        ApplicationPool = $WebSite.ApplicationPool
+                    }
+                }
+                else
+                {
+                    New-Object PSObject -property @{
+                        Exists = $FALSE
+                        Id = $null
+                        PhysicalPath = $null
+                        ApplicationPool = $null
+                    }
+                }
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Getting parameters of website [$SiteName]")
+
+            Try
+            {
+                $result = Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $SiteName
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+
+            $Exists = $result.Exists
+            $Id = $result.Id
+            $PhysicalPath = $result.PhysicalPath
+            $ApplicationPool = $result.ApplicationPool
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Website [$SiteName] exists: [$Exists]")
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Website's ID [$Id]")
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Physical path of website [$SiteName]: [$PhysicalPath]")
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: AppPool of website [$SiteName]: [$ApplicationPool]")
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="GetWebApplicationInfo"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <SiteName Required="true" ParameterType="System.String" />
+            <AppName Required="true" ParameterType="System.String" />
+            <Exists Output="true" ParameterType="System.Boolean" />
+            <PhysicalPath Output="true" ParameterType="System.String" />
+            <ApplicationPool Output="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($AppName,$SiteName)
+                Import-Module WebAdministration
+                $WebApplication = Get-WebApplication -Name "/$AppName" -Site $SiteName
+                if ($null -ne $WebApplication)
+                {
+                    New-Object PSObject -property @{
+                        Exists = $TRUE
+                        PhysicalPath = $WebApplication.PhysicalPath.ToString()
+                        ApplicationPool = $WebApplication.ApplicationPool
+                    }
+                }
+                else
+                {
+                    New-Object PSObject -property @{
+                        Exists = $FALSE
+                        PhysicalPath = $null
+                        ApplicationPool = $null
+                    }
+                }
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Getting parameters of application [$SiteName/$AppName]")
+
+            Try
+            {
+                $result = Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $AppName,$SiteName
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+
+            $Exists = $result.Exists
+            $PhysicalPath = $result.PhysicalPath
+            $ApplicationPool = $result.ApplicationPool
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Application [$SiteName/$AppName] exists: [$Exists]")
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Physical path for application [$SiteName/$AppName]: [$PhysicalPath]")
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: AppPool for application [$SiteName/$AppName]: [$ApplicationPool]")
+
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="CreateWebsite"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <SiteName Required="true" ParameterType="System.String" />
+            <ManagedRuntimeVersion Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($SiteName,$ManagedRuntimeVersion)
+                Import-Module WebAdministration
+                <# DO NOT CHANGE: Get-WebSite, Reason: Environment Compatibility Issue, Returns all websites if used directly with -Name parameter #>
+                $WebSite = Get-WebSite | Where { $_.Name -eq $SiteName }
+                if ($WebSite -eq $null)
+                {
+                    $PhysicalPath = $env:SystemDrive + "\inetpub\wwwroot\$SiteName"
+                    New-Item $PhysicalPath -ItemType Directory
+                    New-WebAppPool -Name $SiteName
+                    Set-ItemProperty -Path "IIS:\AppPools\$SiteName" managedRuntimeVersion $ManagedRuntimeVersion
+                    New-Website -Name $SiteName -ApplicationPool $SiteName -PhysicalPath $PhysicalPath
+                    Get-WebBinding -Name $SiteName | Remove-WebBinding
+                    if ($null -ne $error[0])
+                    {
+                        Throw $error[0]
+                    }
+                }
+                else
+                {
+                    Throw "Website [$SiteName] already exists."
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Creating website [$SiteName]")
+
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $SiteName,$ManagedRuntimeVersion
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="CreateWebApplication"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <Name Required="true" ParameterType="System.String" />
+            <SiteName Required="true" ParameterType="System.String" />
+            <AppPoolName Required="true" ParameterType="System.String" />
+            <PhysicalPath Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($Name,$SiteName,$AppPoolName,$PhysicalPath)
+                Import-Module WebAdministration
+                $FullPath = [System.Environment]::ExpandEnvironmentVariables($PhysicalPath)
+                New-Item $FullPath -ItemType Directory
+                New-WebApplication -Site $SiteName -Name $Name -PhysicalPath $PhysicalPath -ApplicationPool $AppPoolName
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Creating web application [$Name] with application pool [$AppPoolName] and physical path [$PhysicalPath] on website [$SiteName]")
+
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Name,$SiteName,$AppPoolName,$PhysicalPath
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="ApplyWebApplicationSettings"
+                TaskFactory="PowershellTaskFactory"
+                AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+            <Name Required="true" ParameterType="System.String" />
+            <SiteName Required="true" ParameterType="System.String" />
+            <PreloadEnabled ParameterType="System.String" />
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+
+            if ($null -eq $MachineName) 
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+            
+            $providedParams = "MachineName: $MachineName, Name: $Name, SiteName: $SiteName, PreloadEnabled: $PreloadEnabled"
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Starting ApplyWebApplicationSettings with parameters: $providedParams")
+            
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+            
+            $sb = { param($Name,$SiteName,$PreloadEnabled)
+                Import-Module WebAdministration
+                Set-ItemProperty "IIS:\Sites\$SiteName\$Name" -Name preloadEnabled -Value $PreloadEnabled
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+            
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Name,$SiteName,$PreloadEnabled
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="StopWebsite"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <SiteName Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($SiteName)
+                Import-Module WebAdministration
+                Stop-Website -Name $SiteName
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Stopping website [$SiteName]")
+
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $SiteName
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="StartWebsite"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <SiteName Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+            
+            $sb = { param($SiteName)
+                Import-Module WebAdministration
+                Start-Website -Name $SiteName
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+            
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+            
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Starting website [$SiteName]")
+            
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $SiteName
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="RemoveWebsite"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <SiteName Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+            
+            $sb = { param($SiteName)
+                Import-Module WebAdministration
+                Remove-Website -Name $SiteName
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+            
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+            
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Removing website [$SiteName]")
+            
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $SiteName
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="CheckAppPoolExists"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <Name Required="true" ParameterType="System.String" />
+            <Exists Output="true" ParameterType="System.Boolean" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($Name)
+                Import-Module WebAdministration
+                Try
+                {
+                    $state = Get-WebAppPoolState -Name $Name
+                    New-Object PSObject -property @{
+                        Exists = $TRUE
+                    }
+                }
+                Catch
+                {
+                    New-Object PSObject -property @{
+                        Exists = $FALSE
+                    }
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Checking whether application pool [$Name] exists")
+
+            Try
+            {
+                $result = Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Name
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+
+            $Exists = $result.Exists
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Application pool [$Name] exists: [$Exists]")
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="CreateAppPool"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <Name Required="true" ParameterType="System.String" />
+            <ManagedRuntimeVersion Required="true" ParameterType="System.String" />
+            <AppPoolUserName ParameterType="System.String" />
+            <AppPoolUserPassword ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($Name, $ManagedRuntimeVersion, $UserName, $Password)
+                Import-Module WebAdministration
+                $appPool = New-WebAppPool -Name $Name
+                Set-ItemProperty -Path "IIS:\AppPools\$Name" managedRuntimeVersion $ManagedRuntimeVersion
+                if ($null -ne $UserName -and $null -ne $Password)
+                {
+                    $appPool.processModel.userName = $UserName
+                    $appPool.processModel.password = $Password
+                    $appPool.processModel.identityType = "SpecificUser"
+                    $appPool | Set-Item
+                }
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Creating application pool [$Name] with .NET CLR version [$ManagedRuntimeVersion]")
+
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Name,$ManagedRuntimeVersion,$AppPoolUserName,$AppPoolUserPassword
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="ApplyAppPoolSettings"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+	    <ParameterGroup>
+		    <MachineName ParameterType="System.String" />
+		    <UserName ParameterType="System.String" />
+		    <UserPassword ParameterType="System.String" />
+		    <Name Required="true" ParameterType="System.String" />
+		    <PortNumber ParameterType="System.Int32"/>
+		    <StartMode ParameterType="System.String"/>
+		    <IdleTimeout ParameterType="System.String"/>
+	    </ParameterGroup>
+	    <Task>
+		    <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $providedParams = "MachineName: $MachineName, Name: $Name, StartMode: $StartMode, IdleTimeout: $IdleTimeout"
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Applying new settings to application pool with parameters: $providedParams")
+
+            $sb = { param($Name, $StartMode, $IdleTimeout)
+                Import-Module WebAdministration
+				if ($null -ne $StartMode)
+				{
+					Set-ItemProperty -Path "IIS:\AppPools\$Name" -name startMode -Value $StartMode
+				}
+				if ($null -ne $IdleTimeout)
+				{
+					Set-ItemProperty -Path "IIS:\AppPools\$Name" -name processModel.idleTimeout -Value $IdleTimeout
+				}
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Name,$StartMode,$IdleTimeout
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+	    </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="CreateUserAccountOnWindows"
+             TaskFactory="PowershellTaskFactory"
+             AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <UserCreatedOnWindows ParameterType="System.String" />
+            <PasswordForCreatedUser ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+            $decryptedPassword = Decrypt -EncryptedPassword $PasswordForCreatedUser -DatIntegrationAssemblyFilePath $(DatIntegrationAssemblyFilePath) -Logger $log
+                
+            $sb = { param($MachineName, $UserCreatedOnWindows, $PasswordForCreatedUser)
+
+                $CompObject = [ADSI]"WinNT://$MachineName"
+                $NewObj = $CompObject.Create("User",$UserCreatedOnWindows)
+                $NewObj.SetPassword($PasswordForCreatedUser)
+                $NewObj.SetInfo()
+                NET LOCALGROUP "Users" $UserCreatedOnWindows /add
+
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Creating User with Username: [$UserCreatedOnWindows]")
+
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $MachineName,$UserCreatedOnWindows,$decryptedPassword
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="StopAppPool"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <Name Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($Name)
+                Import-Module WebAdministration
+                if ((Get-WebAppPoolState -Name $Name).Value -ne "Stopped")
+                {
+                    Stop-WebAppPool -Name $Name
+                }
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+                do
+                {
+                    Start-Sleep -Seconds 1
+                    $i++
+                }
+                until((Get-WebAppPoolState -Name $Name).Value -eq "Stopped" -or $i -eq 30)
+              
+                if((Get-WebAppPoolState -Name $Name).Value -ne "Stopped")
+                {
+                    Throw "App pool was not stopped successfully."
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Stopping application pool [$Name]")
+
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Name
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="StartAppPool"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <Name Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($Name)
+                Import-Module WebAdministration
+                Start-WebAppPool -Name $Name
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+                do
+                {
+                    Start-Sleep -Seconds 1
+                    $i++
+                }
+                until((Get-WebAppPoolState -Name $Name).Value -eq "Started" -or $i -eq 30)
+              
+                if((Get-WebAppPoolState -Name $Name).Value -ne "Started")
+                {
+                    Throw "App pool was not started successfully."
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Starting application pool [$Name]")
+
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Name
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="RemoveAppPool"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <Name Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+            
+            $sb = { param($Name)
+                Import-Module WebAdministration
+                Remove-WebAppPool -Name $Name
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+            
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+            
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Removing application pool [$Name]")
+            
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Name
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="GetApplicationsInAppPoolCount"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <Name Required="true" ParameterType="System.String" />
+            <Count Output="true" ParameterType="System.Int32" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+            
+            $sb = { param($Name)
+                Import-Module WebAdministration
+                New-Object PSObject -property @{
+                    Count = @(Get-WebConfigurationProperty "/system.applicationHost/sites/site/application[@applicationPool='$Name']" "machine/webroot/apphost" -name path).Count
+                }
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+            
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+            
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Getting count of applications in application pool [$Name]")
+            
+            Try
+            {
+                $result = Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Name
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            
+            $Count = $result.Count
+            
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Number of applications in application pool [$Name]: [$Count]")
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="RemoveWebBinding"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <SiteName Required="true" ParameterType="System.String" />
+            <Protocol Required="true" ParameterType="System.String" />
+            <IPAddress Required="true" ParameterType="System.String" />
+            <Port Required="true" ParameterType="System.String" />
+            <HostHeader ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+            
+            $sb = { param($SiteName,$Protocol,$IPAddress,$Port,$HostHeader)
+                Import-Module WebAdministration
+                Remove-WebBinding -HostHeader $HostHeader -IPAddress $IPAddress -Name $SiteName -Port $Port -Protocol $Protocol
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+            
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+            
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Removing binding [$Protocol`:$IPAddress`:$Port`:$HostHeader] of website [$SiteName]")
+            
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $SiteName,$Protocol,$IPAddress,$Port,$HostHeader
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="AddWebBindingIfNotExists"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <SiteName Required="true" ParameterType="System.String" />
+            <Protocol Required="true" ParameterType="System.String" />
+            <IPAddress ParameterType="System.String" />
+            <Port ParameterType="System.String" />
+            <BindingInformation ParameterType="System.String" />
+            <HostHeader ParameterType="System.String" />
+            <SSLThumbprint ParameterType="System.String" />
+            <SSLFriendlyName ParameterType="System.String" />
+            <SSLCertificate ParameterType="System.String" />
+            <SSLSubject ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+            
+            $sb = { param($MachineName,$SiteName,$Protocol,$IPAddress,$Port,$HostHeader,$SSLThumbprint,$SSLFriendlyName,$SSLCertificate,$SSLSubject,$BindingInformation)
+                Import-Module WebAdministration
+                if ($BindingInformation -eq $null)
+                {
+                    $binding = Get-WebBinding -HostHeader $HostHeader -IPAddress $IPAddress -Name $SiteName -Port $Port -Protocol $Protocol
+                }
+                else
+                {
+                    Add-Type -Path C:\Windows\System32\inetsrv\Microsoft.Web.Administration.dll
+                    $srvmgr = New-Object Microsoft.web.administration.servermanager
+                    $binding = $srvmgr.Sites.Bindings | where-object {($_.Protocol -eq $Protocol) -And ($_.BindingInformation -eq $BindingInformation)}
+                }
+              
+                if ($null -eq $binding)
+                {
+                    Import-Module WebAdministration
+                  
+                    if ($Protocol -eq "http")
+                    {
+                        New-WebBinding -HostHeader $HostHeader -IPAddress $IPAddress -Name $SiteName -Port $Port -Protocol $Protocol
+                    }
+                    elseif ($Protocol -eq "https")
+                    {
+                        if ($SSLThumbprint)
+                        {
+                            $propertyname = "Thumbprint"
+                            $propertyvalue = $SSLThumbprint
+                        }
+                        elseif ($SSLFriendlyName)
+                        {
+                            $propertyname = "FriendlyName"
+                            $propertyvalue = $SSLFriendlyName
+                        }
+                        elseif ($SSLSubject)
+                        {
+                            $propertyname = "Subject"
+                            $propertyvalue = $SSLSubject
+                        }
+                        else
+                        {
+                            $certSubject = if($HostHeader -eq "") { $MachineName } else { $HostHeader }
+                            $propertyname = "Subject"
+                            $propertyvalue = "CN=$certSubject"
+                        }
+                      
+                        $cert = Get-ChildItem Cert:\LocalMachine\My,Cert:\LocalMachine\WebHosting -SSLServerAuthentication |
+                        where-object { ($_.$propertyname -eq "$propertyvalue") -Or $_.$propertyname -like "*$propertyvalue*" }
+                      
+                        if ($null -eq $cert)
+                        {
+                            Throw "There is no certificate with $propertyname $propertyvalue on $MachineName"
+                        }
+                        elseif ($cert.Count -gt 1)
+                        {
+                            Throw "There are multiple certificates with $propertyname $propertyvalue on $MachineName or there is no binding for Https port 443."
+                        }
+                        else
+                        {
+                            $cert = $cert | select -First 1
+                            if ($HostHeader) { $sslFlags = 1 } else {$sslFlags = 0}
+                            New-WebBinding -HostHeader $HostHeader -IPAddress $IPAddress -Name $SiteName -Port $Port -Protocol $Protocol -SslFlags $sslFlags
+                            New-Item "IIS:\SslBindings\$IPAddress!$Port!$HostHeader" -Value $cert -SslFlags $sslFlags
+                        }
+                    }
+                    else
+                    {
+                        New-ItemProperty IIS:\Sites\$SiteName -name bindings -value @{protocol=$Protocol;bindingInformation=$BindingInformation}
+                    }
+                }
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+            
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+            
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Creating binding [$Protocol`:$IPAddress`:$Port`:$HostHeader] for website [$SiteName]")
+            
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $MachineName,$SiteName,$Protocol,$IPAddress,$Port,$HostHeader,$SSLThumbprint,$SSLFriendlyName,$SSLCertificate,$SSLSubject,$BindingInformation
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="SetWebApplicationAuthentication"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <SiteName Required="true" ParameterType="System.String" />
+            <AppName ParameterType="System.String" />
+            <AuthenticationName Required="true" ParameterType="System.String" />
+            <Enabled Required="true" ParameterType="System.Boolean" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+            
+            $sb = { param($SiteName,$AppName,$AuthenticationName,$Enabled)
+                Import-Module WebAdministration
+                Set-WebConfigurationProperty -filter /system.WebServer/security/authentication/$AuthenticationName -name enabled -value $Enabled -location $SiteName/$AppName
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+            
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+            
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "[$MachineName]: Setting $AuthenticationName to $Enabled for [$SiteName\$AppName]")
+            
+            
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $SiteName,$AppName,$AuthenticationName,$Enabled
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="SetWebApplicationAppPool"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <SiteName Required="true" ParameterType="System.String" />
+            <AppName ParameterType="System.String" />
+            <AppPoolName Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($SiteName,$AppName,$AppPoolName)
+                Import-Module WebAdministration
+                Set-ItemProperty -Path "IIS:\Sites\$SiteName\$AppName" -Name 'applicationPool' -Value $AppPoolName
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "[$MachineName]: Setting [$SiteName\$AppName] application pool to [$AppPoolName]")
+
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $SiteName,$AppName,$AppPoolName
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+
+    <UsingTask TaskName="GetWebConfigurationLock"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <FilterXPath Required="true" ParameterType="System.String" />
+            <Locked Output="true" ParameterType="System.Boolean" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($FilterXPath)
+                Import-Module WebAdministration
+                $lock = Get-WebConfigurationLock -PSPath "IIS:\" -Filter $FilterXPath
+                if ($null -eq $lock)
+                {
+                    New-Object PSObject -property @{
+                        Locked = $FALSE
+                    }
+                }
+                else
+                {
+                    New-Object PSObject -property @{
+                        Locked = $TRUE
+                    }
+                }
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "[$MachineName]: Getting web configuration lock status for [$FilterXPath]")
+
+            Try
+            {
+                $result = Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $FilterXPath
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+
+            $Locked = $result.Locked
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "[$MachineName]: Is web configuration locked for [$FilterXPath]: [$Locked]")
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="GetRegistryValue"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <Path Required="true" ParameterType="System.String" />
+            <Name Required="true" ParameterType="System.String" />
+            <Value Output="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($Path,$Name)
+                $FullPath = "Registry::$Path"
+                $result = New-Object PSObject -property @{
+                    Value = $null
+                }
+                if (Test-Path $FullPath)
+                {
+                    $Key = Get-Item -LiteralPath $FullPath
+                    $Value = $Key.GetValue($Name, $null)
+                    if ($null -ne $Value)
+                    {
+                        $result.Value = $Value
+                    }
+                }
+                $result
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "[$MachineName]: Getting registry value of [$Name] at [$Path]")
+
+            Try
+            {
+                $result = Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Path,$Name
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+
+            $Value = $result.Value
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "[$MachineName]: Registry value of [$Name] at [$Path]: [$Value]")
+      ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="SetAccessRule"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <Path Required="true" ParameterType="System.String" />
+            <Identity Required="true" ParameterType="System.String" />
+            <FileSystemRights Required="true" ParameterType="System.String" />
+            <InheritanceFlags Required="true" ParameterType="System.String" />
+            <PropagationFlags Required="true" ParameterType="System.String" />
+            <AccessControlType Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($Path,$Identity,$FileSystemRights,$InheritanceFlags,$PropagationFlags,$AccessControlType)
+                Import-Module Microsoft.PowerShell.Security
+                $FullPath = [System.Environment]::ExpandEnvironmentVariables($Path)
+                New-Item -ItemType directory -Path $FullPath -Force
+                $Acl = Get-Acl $FullPath
+                $Ar = New-Object system.security.accesscontrol.filesystemaccessrule($Identity,$FileSystemRights,$InheritanceFlags,$PropagationFlags,$AccessControlType)
+                $Acl.SetAccessRule($Ar)
+                Set-Acl $FullPath $Acl
+                if ($null -ne $error[0])
+                {
+                    Throw $error[0]
+                }
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "[$MachineName]: Setting '$Identity' access rule '$AccessControlType $FileSystemRights' for '$Path'")
+
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $Path,$Identity,$FileSystemRights,$InheritanceFlags,$PropagationFlags,$AccessControlType
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="SetEnabledProtocols"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <AppName Required="true" ParameterType="System.String" />
+            <Protocols Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+
+            $sb = { param($AppName,$Protocols)
+                cmd /c %windir%\system32\inetsrv\appcmd set app $AppName /enabledProtocols:$Protocols
+            }
+
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "[$MachineName]: Enabling protocols [$Protocols] on [$AppName]")
+
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $AppName,$Protocols
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+      ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="EncryptWebConfig"
+       TaskFactory="PowershellTaskFactory"
+       AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <SiteName ParameterType="System.String" />
+            <ServiceName ParameterType="System.String" />
+            <EncryptedSection Required="true" ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+            $sb = { param($EncryptedSection,$SiteName,$ServiceName)
+                $regiis = (Join-Path $env:windir Microsoft.NET\Framework\v4.0.30319\aspnet_regiis.exe)
+                $EncryptedSection.Split(",") | ForEach {
+                    . $regiis -pe $_ -site "$SiteName" -app "/$ServiceName" -prov "RsaProtectedConfigurationProvider"
+                }
+            }
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "[$MachineName]: Encrypted section(s) [$EncryptedSection] of web.config of [$SiteName/$ServiceName]")
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $EncryptedSection,$SiteName,$ServiceName
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+    <UsingTask TaskName="OverrideItem" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildTasksToolsFilePath)" >
+        <ParameterGroup>
+            <Items ParameterType="Microsoft.Build.Framework.ITaskItem[]"/>
+            <OutputItems Output="true" ParameterType="Microsoft.Build.Framework.ITaskItem[]"/>
+        </ParameterGroup>
+        <Task>
+            <Code Type="Fragment" Language="cs">
+                <![CDATA[
+                OutputItems = Items.Where(item => !(item.GetMetadata("Identity").Contains("_Override") || item.GetMetadata("Identity").Contains("_Remove"))).ToArray();
+                Items = Items.Except(OutputItems).ToArray();
+                OutputItems = OutputItems.Except(OutputItems.Where(item => Items.Where(x => x.GetMetadata("Identity") == item.GetMetadata("Identity") + "_Remove").Any()).ToArray()).ToArray();
+                foreach (var item in OutputItems)
+                {
+                    foreach (var overwriteItem in Items)
+                    {
+                        if (overwriteItem.GetMetadata("Identity") == item.GetMetadata("Identity") + "_Override")
+                        {
+                            foreach (string metadata in overwriteItem.MetadataNames)
+                            {
+                                if (metadata != "Identity")
+                                {
+                                    item.SetMetadata(metadata, overwriteItem.GetMetadata(metadata));
+                                }
+                            }
+                        }
+                    }
+                }
+                ]]>
+            </Code>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="CheckFileIsAccessible"
+             TaskFactory="PowershellTaskFactory"
+             AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <FilePath ParameterType="System.String" />
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            $sb = { param($FilePath)
+                $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", $isAccessible)
+                $file = New-Object System.IO.FileInfo $FilePath
+                try {
+                    $stream = $file.Open([System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+                    if ($stream) {
+                        $stream.Close()
+                    }
+                    $isAccessible = $true
+                    $isAccessible
+                } catch {}
+            }
+            do
+            {
+                $isAccessible = Invoke-Command -ScriptBlock $sb -ArgumentList $FilePath
+                Start-Sleep -Seconds 1
+                $i++
+            }
+            until($isAccessible -or $i -eq 10)
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="InstallCertificates" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <MetadataFile ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            InstallCertificate -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -MetadataFile $MetadataFile -DatIntegrationAssemblyFilePath $(DatIntegrationAssemblyFilePath) -Logger $log -PortNumber $PortNumber
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="UninstallCertificates" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <MetadataFile ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            UninstallCertificate -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -MetadataFile $MetadataFile -DatIntegrationAssemblyFilePath $(DatIntegrationAssemblyFilePath) -Logger $log -PortNumber $PortNumber
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="FlattenItemMetadata" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildTasksToolsFilePath)" >
+        <ParameterGroup>
+            <Items ParameterType="Microsoft.Build.Framework.ITaskItem[]"/>
+            <Delimiter />
+            <Metadata />
+            <FlatMetadata Output="true" />
+        </ParameterGroup>
+        <Task>
+            <Code Type="Fragment" Language="cs">
+                <![CDATA[
+                FlatMetadata = string.Join(Delimiter, Items.Select(item => item.GetMetadata(Metadata).ToString()).ToArray());
+                ]]>
+            </Code>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="SetSSLAndClientCertificatesSettings"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <MachineName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <UserPassword ParameterType="System.String" />
+            <RequireSSL ParameterType="System.Boolean" />
+            <ClientCertificates ParameterType="System.String" />
+            <WebApplication ParameterType="System.String" />
+            <PortNumber ParameterType="System.Int32"/>
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            . $(CommonPowershellFunctionsFilePath)
+            $s = (Connect -MachineName $MachineName -UserName $UserName -UserPassword $UserPassword -PortNumber $PortNumber).Session
+            if ($null -eq $MachineName)
+            {
+                $MachineName = $env:COMPUTERNAME
+            }
+            if ($RequireSSL -eq $null)
+            {
+                $RequireSSL = $false
+            }
+            if ($ClientCertificates -eq $null)
+            {
+                $ClientCertificates = "Ignore"
+            }
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]: Set SSL Settings on [$WebApplication]")
+            $sb = { param($RequireSSL,$ClientCertificates,$WebApplication)
+                Import-Module WebAdministration
+                $Value = 0
+                if ($RequireSSL -eq $False) {
+                    if ($ClientCertificates -eq "Accept") {
+                        $Value = 'SslNegotiateCert'
+                    }
+                }
+                else {
+                    if ($ClientCertificates -eq "Ignore") {
+                        $Value = "Ssl"
+                    }
+                    elseif ($ClientCertificates -eq "Accept") {
+                        $Value = "Ssl,SslNegotiateCert"
+                    }
+                    elseif ($ClientCertificates -eq "Require") {
+                        $Value = 'Ssl,SslNegotiateCert,SslRequireCert'
+                    }
+                }
+                try {
+                    Set-WebConfiguration -value  $Value -filter "system.webserver/security/access" -location $WebApplication
+                }
+                finally {
+                    if ($null -ne $error[0]) {
+                        Throw $error[0]
+                    }
+                }
+            }
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]:   Require SSL [$RequireSSL]")
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "[$MachineName]:   Client Certificates [$ClientCertificates]")
+            Try
+            {
+                Invoke-Command -Session $s -ScriptBlock $sb -ArgumentList $RequireSSL,$ClientCertificates,$WebApplication
+            }
+            Finally
+            {
+                remove-pssession -session $s
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="GetMsDeployCredential"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <ComputerName ParameterType="System.String" />
+            <UserName ParameterType="System.String" />
+            <Password ParameterType="System.String" />
+            <MsDeployCredential Output="true" ParameterType="System.String" />
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+            if (($UserName -eq '') -or ($env:UserName -eq $UserName)) {
+                $MsDeployCredential = ",AuthType='NTLM'"
+            } else {
+                $isDomain = [Regex]::IsMatch($UserName, ".*\@.*")
+                if (-not $isDomain){
+                    $UserName = "$ComputerName\$UserName"
+                }
+                
+                $MsDeployCredential = ",userName=`"$UserName`",password=`"$Password`""
+            }
+            ]]>
+        </Task>
+    </UsingTask>
+
+    <UsingTask TaskName="RegexMatch"
+               TaskFactory="PowershellTaskFactory"
+               AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+        <ParameterGroup>
+            <InputString ParameterType="System.String" Required="true" />
+            <Pattern ParameterType="System.String" Required="true" />
+            <GroupIndex ParameterType="System.Int32" Required="true" />
+            <GroupValue ParameterType="System.String" Output="true" />
+            <IsSuccessful ParameterType="System.Boolean" Output="true" />
+        </ParameterGroup>
+        <Task>
+            <![CDATA[
+                    $match = [Regex]::Match($InputString, $Pattern);
+                    if ($match.Success)
+                    {
+                        $IsSuccessful = $true;
+                        $GroupValue = $match.Groups[$GroupIndex].Value;
+                    }
+                    else
+                    {
+                        $IsSuccessful = $false;
+                        $GroupValue = '';
+                    }
+                ]]>
+        </Task>
+    </UsingTask>
+
+    <Target Name="CreateWebSite">
+
+        <!-- Create Web Site if not exists -->
+
+        <GetWebsiteInfo MachineName="$(_Server)"
+                        UserName="$(UserName)"
+                        UserPassword="$(Password)"
+                        SiteName="$(_SiteName)"
+                        PortNumber="$(_PortNumber)">
+            <Output TaskParameter="Exists" PropertyName="WebsiteExists"/>
+        </GetWebsiteInfo>
+        <CreateWebsite Condition="'$(WebsiteExists)' == 'False'"
+                       MachineName="$(_Server)"
+                       UserName="$(UserName)"
+                       UserPassword="$(Password)"
+                       SiteName="$(_SiteName)"
+                       ManagedRuntimeVersion="$(DeployManagedRuntimeVersion)"
+                       PortNumber="$(_PortNumber)"/>
+
+        <OverrideItem Items="@(_Binding)">
+            <Output TaskParameter="OutputItems"
+                    ItemName="OverridenBinding" />
+        </OverrideItem>
+
+        <AddWebBindingIfNotExists MachineName="$(_Server)"
+                                  UserName="$(UserName)"
+                                  UserPassword="$(Password)"
+                                  SiteName="$(_SiteName)"
+                                  IPAddress="%(OverridenBinding.IPAddress)"
+                                  Port="%(OverridenBinding.Port)"
+                                  Protocol="%(OverridenBinding.Protocol)"
+                                  BindingInformation="%(OverridenBinding.BindingInformation)"
+                                  HostHeader="%(OverridenBinding.HostHeader)"
+                                  SSLThumbprint="%(OverridenBinding.CertificateThumbprint)"
+                                  SSLFriendlyName="%(OverridenBinding.CertificateFriendlyName)"
+                                  SSLSubject="%(OverridenBinding.CertificateSubject)"
+                                  PortNumber="$(_PortNumber)"/>
+
+        <StartWebsite  MachineName="$(_Server)"
+                       UserName="$(UserName)"
+                       UserPassword="$(Password)"
+                       SiteName="$(_SiteName)"
+                       PortNumber="$(_PortNumber)"/>
+
+    </Target>
+
+    <Target Name="StartWebServiceAppPool">
+
+        <StartAppPool MachineName="$(_Server)"
+                      UserName="$(UserName)"
+                      UserPassword="$(Password)"
+                      Name="$(_WebServiceAppPool)"
+                      PortNumber="$(_PortNumber)"/>
+    </Target>
+
+    <Target Name="StartAppPoolWebDeploy">
+        <GetMsDeployCredential UserName="$(UserName)" Password="$(Password)" ComputerName="$(_ComputerName)">
+            <Output TaskParameter="MsDeployCredential" PropertyName="MsDeployCredential" />
+        </GetMsDeployCredential>
+        <Exec Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+            -verb:sync ^
+            -allowUntrusted ^
+            -source:recycleApp ^
+            -dest:recycleApp=&quot;$(_IISWebApplicationName)&quot;$(_Destwmsvc)$(MsDeployCredential),recycleMode=&quot;StartAppPool&quot; ^
+            -retryAttempts:10 ^
+            -retryInterval:6000 ^
+            -verbose" />
+    </Target>
+
+    <Target Name="StopAppPoolWebDeploy">
+        <GetMsDeployCredential UserName="$(UserName)" Password="$(Password)" ComputerName="$(_ComputerName)">
+            <Output TaskParameter="MsDeployCredential" PropertyName="MsDeployCredential" />
+        </GetMsDeployCredential>
+        <Exec Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+            -verb:sync ^
+            -allowUntrusted ^
+            -source:recycleApp ^
+            -dest:recycleApp=&quot;$(_IISWebApplicationName)&quot;$(_Destwmsvc)$(MsDeployCredential),recycleMode=&quot;StopAppPool&quot; ^
+            -retryAttempts:10 ^
+            -retryInterval:6000 ^
+            -verbose" />
+    </Target>
+
+    <PropertyGroup>
+        <_DestComputerName Condition="'$(_Server)' != ''">,computerName=$(_Server)</_DestComputerName>
+        <_ComputerName Condition="'$(_Server)' != ''">$(_Server.Split('.')[0])</_ComputerName>
+        <_DestUserName Condition="'$(UserName)' != ''">,userName=&quot;$(UserName)&quot;</_DestUserName>
+        <_DestPassword Condition="'$(Password)' != ''">,password=&quot;$(Password)&quot;</_DestPassword>
+        <_DestLocalUserName Condition="'$(UserName)' != '' And '$(_ComputerName)' != ''">,userName=&quot;$(_ComputerName)\$(UserName)&quot;</_DestLocalUserName>
+        <_IISWebApplicationName Condition="'$(_ServiceName)' == ''">$(_SiteName)</_IISWebApplicationName>
+        <_IISWebApplicationName Condition="'$(_IISWebApplicationName)' == ''">$(_SiteName)/$(_ServiceName)</_IISWebApplicationName>
+        <_Destwmsvc Condition="'$(_Server)' != ''">,wmsvc=&quot;https://$(_Server):8172/msdeploy.axd?Site=$(_SiteName)&quot;</_Destwmsvc>
+    </PropertyGroup>
+
+    <Target Name="PrepareForDeploy">
+
+        <!-- Get website info -->
+        <GetWebsiteInfo MachineName="$(_Server)"
+                        UserName="$(UserName)"
+                        UserPassword="$(Password)"
+                        SiteName="$(_SiteName)"
+                        PortNumber="$(_PortNumber)">
+            <Output TaskParameter="ApplicationPool" PropertyName="_WebsiteAppPool"/>
+            <Output TaskParameter="PhysicalPath" PropertyName="_WebsitePhysicalPath"/>
+        </GetWebsiteInfo>
+
+        <!-- Get application info -->
+        <GetWebApplicationInfo Condition="'$(_ServiceName)' != ''"
+                               MachineName="$(_Server)"
+                               UserName="$(UserName)"
+                               UserPassword="$(Password)"
+                               SiteName="$(_SiteName)"
+                               AppName="$(_ServiceName)"
+                               PortNumber="$(_PortNumber)">
+            <Output TaskParameter="Exists" PropertyName="_WebServiceExists"/>
+            <Output TaskParameter="ApplicationPool" PropertyName="_WebServiceAppPool"/>
+            <Output TaskParameter="PhysicalPath" PropertyName="_WebServicePhysicalPath"/>
+        </GetWebApplicationInfo>
+
+        <!-- Init properties -->
+        <PropertyGroup>
+            <_WebServiceExists Condition="'$(_ServiceName)' == ''">True</_WebServiceExists>
+            <_WebServiceAppPool Condition="'$(_WebServiceAppPool)' == '' And '$(_AppPoolName)' != ''">$(_AppPoolName)</_WebServiceAppPool>
+            <_WebServiceAppPool Condition="'$(_WebServiceAppPool)' == '' And '$(_ServiceName)' == ''">$(_WebsiteAppPool)</_WebServiceAppPool>
+            <_WebServiceAppPool Condition="'$(_WebServiceAppPool)' == ''">$(_SiteName)_$(_ServiceName)</_WebServiceAppPool>
+            <_WebServicePhysicalPath Condition="'$(_WebServicePhysicalPath)' == ''">$([System.IO.Path]::Combine($(_WebsitePhysicalPath), '$(_ServiceName)'))</_WebServicePhysicalPath>
+        </PropertyGroup>
+
+    </Target>
+
+    <UsingTask TaskName="DecryptPasswordInConfigFile" TaskFactory="PowershellTaskFactory" AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <Key ParameterType="System.String" />
+      <EncryptedPassword ParameterType="System.String" />
+      <ConfigFile ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+      . $(CommonPowershellFunctionsFilePath)
+      $Password = Decrypt -EncryptedPassword $EncryptedPassword -DatIntegrationAssemblyFilePath $(DatIntegrationAssemblyFilePath) -Logger $log
+      $content = Get-Content -Path $ConfigFile
+      if (-Not ($content -match [Regex]::Escape($Key)))
+      {
+        $log.LogWarning("[$ConfigFile] doesn't contain the encrypted password key [$Key]")
+      }
+
+      $newContent = $content.replace($Key, $Password)
+      Set-Content -Path $ConfigFile -Value $newContent
+        ]]>
+    </Task>
+  </UsingTask>
+
+    <Target Name="bat:deploy"
+            DependsOnTargets="CreateWebSite;PrepareForDeploy">
+
+        <GetMsDeployCredential UserName="$(UserName)" Password="$(Password)" ComputerName="$(_ComputerName)">
+            <Output TaskParameter="MsDeployCredential" PropertyName="MsDeployCredential" />
+        </GetMsDeployCredential>
+
+        <!-- Precheck -->
+        <PropertyGroup>
+            <_BackupRequired Condition="'$(_BackupRequired)' == '' And '$(_Server)' != '' And $(_WebServiceExists)">True</_BackupRequired>
+            <_BackupRequired Condition="'$(_BackupRequired)' == ''">False</_BackupRequired>
+        </PropertyGroup>
+        <Error Condition="$(_BackupRequired) And '$(_BackupFolder)' == ''"
+               Text="Backup folder was not specified."/>
+
+        <PropertyGroup>
+            <_TempFolder Condition="$(_TempFolder) == ''">$(MSBuildProjectDirectory)\temp</_TempFolder>
+            <_TempPackageFolder>$(_TempFolder)\package</_TempPackageFolder>
+            <_TempPackagePath>$(_TempFolder)\package.zip</_TempPackagePath>
+        </PropertyGroup>
+
+        <!-- Clean temp folder and package -->
+        <RemoveDir Directories="$(_TempFolder)" />
+
+        <!-- Unpack package to temp -->
+        <Zip TaskAction="Extract"
+             ExtractPath="$(_TempPackageFolder)"
+             ZipFileName="$(_ServicePackagePath)" />
+
+        <!-- Apply config transform to Web.config and log4net.config -->
+        <ItemGroup>
+            <_WebConfig Include="$(_TempPackageFolder)\Content\**\Web.config" />
+            <_Log4netConfig Include="$(_TempPackageFolder)\Content\**\*.log4net.config" />
+        </ItemGroup>
+        <PropertyGroup>
+            <_WebConfigPath>%(_WebConfig.FullPath)</_WebConfigPath>
+            <_WebConfigDirectory>%(_WebConfig.RootDir)%(_WebConfig.Directory)</_WebConfigDirectory>
+            <_WebConfigTempPath>$(_WebConfigDirectory)web.temp.config</_WebConfigTempPath>
+            <_WebConfigTransformPath>$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Web.config</_WebConfigTransformPath>
+          <_Log4NetConfigTransformPath>$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\%(_Log4netConfig.Filename).config</_Log4NetConfigTransformPath>
+        </PropertyGroup>
+        <Copy DestinationFiles="$(_WebConfigTempPath)" SourceFiles="$(_WebConfigPath)" />
+        <TransformXml Condition="Exists('$(_WebConfigTransformPath)')"
+                      Source="$(_WebConfigTempPath)"
+                      Transform="$(_WebConfigTransformPath)"
+                      Destination="$(_WebConfigPath)" />
+        <TransformXml Condition="Exists('$(_Log4NetConfigTransformPath)')"
+                      Source="@(_Log4netConfig)"
+                      Transform="$(_Log4NetConfigTransformPath)"
+                      Destination="@(_Log4netConfig)" />
+
+        <DecryptPasswordInConfigFile
+        Key="%(EncryptedPassword.Identity)"
+        EncryptedPassword="%(EncryptedPassword.Value)"
+        ConfigFile="$(_WebConfigPath)"
+        Condition="'@(EncryptedPassword->Count())' &gt; 0"/>
+
+        <CheckFileIsAccessible FilePath="$(_WebConfigTempPath)" />
+
+        <Delete Files="$(_WebConfigTempPath)"/>
+
+
+        <!-- Copy files in Files folder of selected profile -->
+        <ItemGroup>
+            <_SourceFiles Include="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Files\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(_SourceFiles)" DestinationFiles="@(_SourceFiles->'$(_WebConfigDirectory)%(RecursiveDir)%(Filename)%(Extension)')" />
+
+        <!-- Check if ipSecurity is used -->
+        <ItemGroup>
+            <_IpSecurityElements/>
+        </ItemGroup>
+        <XmlFile File="$(_WebConfigPath)"
+                 TaskAction="ReadElements"
+                 XPath="//configuration/system.webServer/security/ipSecurity">
+            <Output TaskParameter="Elements" ItemName="_IpSecurityElements"/>
+        </XmlFile>
+        <PropertyGroup>
+            <_IpSecurityElementExists Condition="'@(_IpSecurityElements->Count())' &gt; 0">True</_IpSecurityElementExists>
+            <_IpSecurityFeatureInstalled/>
+            <_IpSecurityLocked/>
+        </PropertyGroup>
+
+        <GetRegistryValue MachineName="$(_Server)"
+                          UserName="$(UserName)"
+                          UserPassword="$(Password)"
+                          Path="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\InetStp\Components"
+                          Name="IPSecurity"
+                          PortNumber="$(_PortNumber)">
+            <Output TaskParameter="Value" PropertyName="_IpSecurityFeatureInstalled"/>
+        </GetRegistryValue>
+        <Error Condition="'$(_IpSecurityElementExists)' == 'True' And '$(_IpSecurityFeatureInstalled)' != '1'"
+               Text="ipSecurity is used in Web.config file, but this feature is not installed. To use IP security on IIS, you must install this role service or Windows feature."/>
+        <GetWebConfigurationLock Condition="'$(_IpSecurityElementExists)' == 'True'"
+                                 MachineName="$(_Server)"
+                                 UserName="$(UserName)"
+                                 UserPassword="$(Password)"
+                                 FilterXPath="//system.webServer/security/ipSecurity"
+                                 PortNumber="$(_PortNumber)">
+            <Output TaskParameter="Locked" PropertyName="_IpSecurityLocked"/>
+        </GetWebConfigurationLock>
+        <Error Condition="'$(_IpSecurityElementExists)' == 'True' And '$(_IpSecurityLocked)' == 'True'"
+               Text="ipSecurity is used in Web.config file, but overriding this element is locked in IIS. You can unlock it in the file '%SYSTEM32%\inetsrv\config\applicationHost.config' by changing overrideModeDefault attribute of section with name=&quot;ipSecurity&quot;"/>
+
+        <!-- Repack -->
+        <Zip TaskAction="Create"
+             CompressPath="$(_TempPackageFolder)"
+             ZipFileName="$(_TempPackagePath)"
+             RemoveRoot="$(_TempPackageFolder)"/>
+
+        <!-- Create App Pool if not exists -->
+        <CheckAppPoolExists MachineName="$(_Server)"
+                            UserName="$(UserName)"
+                            UserPassword="$(Password)"
+                            Name="$(_WebServiceAppPool)"
+                            PortNumber="$(_PortNumber)">
+            <Output TaskParameter="Exists" PropertyName="AppPoolExists"/>
+        </CheckAppPoolExists>
+        <CreateAppPool Condition="'$(AppPoolExists)' == 'False'"
+                       MachineName="$(_Server)"
+                       UserName="$(UserName)"
+                       UserPassword="$(Password)"
+                       Name="$(_WebServiceAppPool)"
+                       ManagedRuntimeVersion="$(DeployManagedRuntimeVersion)"
+                       AppPoolUserName="$(_AppPoolUserName)"
+                       AppPoolUserPassword="$(_AppPoolUserPassword)"
+                       PortNumber="$(_PortNumber)"/>
+
+        <ApplyAppPoolSettings Condition="'$(_StartMode)' != '' OR '$(_IdleTimeout)' != ''"
+                              MachineName="$(_Server)"
+                              UserName="$(UserName)"
+                              UserPassword="$(Password)"
+                              Name="$(_WebServiceAppPool)"
+                              PortNumber="$(_PortNumber)"
+                              StartMode="$(_StartMode)"
+                              IdleTimeout="$(_IdleTimeout)"/>
+
+        <!-- Stop App Pool -->
+        <StopAppPool MachineName="$(_Server)"
+                     UserName="$(UserName)"
+                     UserPassword="$(Password)"
+                     Name="$(_WebServiceAppPool)"
+                     PortNumber="$(_PortNumber)"/>
+
+        <!-- Backup if required -->
+        <CreateDir Condition="'$(_BackupRequired)' == 'True'"
+                   MachineName="$(_Server)"
+                   UserName="$(UserName)"
+                   UserPassword="$(Password)"
+                   Path="$(_BackupFolder)"
+                   PortNumber="$(_PortNumber)"/>
+
+        <CreateUserAccountOnWindows Condition="'@(UserAccount)' != ''"
+                    ContinueOnError="WarnAndContinue"
+                    MachineName="$(_Server)"
+                    UserName="$(UserName)"
+                    UserPassword="$(Password)"
+                    UserCreatedOnWindows="%(UserAccount.UserCreatedOnWindows)"
+                    PasswordForCreatedUser="%(UserAccount.PasswordForCreatedUser)"
+                    PortNumber="$(_PortNumber)"/>
+
+        <PropertyGroup>
+            <_BackupFile>$([System.IO.Path]::Combine($(_BackupFolder), '$([System.DateTime]::Now.ToString(yyyyMMdd - HHmmss)).zip'))</_BackupFile>
+            <_SkipRule Condition="'$(_LogsFolder)' != ''">-skip:objectName=dirPath,absolutePath=&quot;$([System.Text.RegularExpressions.Regex]::Escape($(_LogsFolder)))&quot;</_SkipRule>
+        </PropertyGroup>
+        <Exec Condition="'$(_BackupRequired)' == 'True'"
+              Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+                -verb:sync ^
+                -source:iisApp=&quot;$(_IISWebApplicationName)&quot;$(_DestComputerName)$(MsDeployCredential) ^
+                -dest:package=&quot;$(_BackupFile)&quot;$(_DestComputerName)$(MsDeployCredential) ^
+                $(_SkipRule)"/>
+
+        <ItemGroup>
+            <_MetadataFiles Condition="$(Profile)==''" Include="$(MSBuildProjectDirectory)\Deployment\Certificates\*.ps1" />
+            <_MetadataFiles Condition="$(Profile)!=''" Include="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Certificates\*.ps1" />
+        </ItemGroup>
+        <InstallCertificates Condition="'@(_MetadataFiles)' != ''" MachineName="$(_Server)" UserName="$(UserName)" UserPassword="$(Password)" MetadataFile="%(_MetadataFiles.Identity)" PortNumber="$(_PortNumber)" />
+
+        <!-- Create Web Application if not exists -->
+        <CreateWebApplication Condition="'$(_WebServiceExists)' == 'False'"
+                              MachineName="$(_Server)"
+                              UserName="$(UserName)"
+                              UserPassword="$(Password)"
+                              Name="$(_ServiceName)"
+                              SiteName="$(_SiteName)"
+                              AppPoolName="$(_WebServiceAppPool)"
+                              PhysicalPath="$(_WebServicePhysicalPath)"
+                              PortNumber="$(_PortNumber)"/>
+
+        <ApplyWebApplicationSettings Condition="'$(_PreloadEnabled)' != ''"
+                             MachineName="$(_Server)"
+                             UserName="$(UserName)"
+                             UserPassword="$(Password)"
+                             Name="$(_ServiceName)"
+                             SiteName="$(_SiteName)"
+                             PortNumber="$(_PortNumber)"
+                             PreloadEnabled="$(_PreloadEnabled)"/>
+
+        <!-- Deploy -->
+        <Exec Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+            -verb:sync ^
+            -source:package=$(_TempPackagePath) ^
+            -dest:auto$(_DestComputerName)$(MsDeployCredential) ^
+            -disableLink:AppPoolExtension ^
+            -disableLink:ContentExtension ^
+            -disableLink:CertificateExtension ^
+            -enableRule:DoNotDeleteRule ^
+            -setParam:&quot;IIS Web Application Name&quot;=&quot;$(_IISWebApplicationName)&quot;" />
+
+        <EncryptWebConfig MachineName="$(_Server)"
+                          UserName="$(UserName)"
+                          UserPassword="$(Password)"
+                          EncryptedSection="$(_EncryptedSection)"
+                          SiteName="$(_SiteName)"
+                          ServiceName="$(_ServiceName)"
+                          Condition="$(_EncryptConfigRequired) == 'true'"
+                          PortNumber="$(_PortNumber)" />
+        <FlattenItemMetadata Items="@(OverridenBinding)" Delimiter="," Metadata="Protocol">
+            <Output TaskParameter="FlatMetadata" PropertyName="FlatProtocols"/>
+        </FlattenItemMetadata>
+
+        <SetEnabledProtocols  MachineName="$(_Server)"
+                              UserName="$(UserName)"
+                              UserPassword="$(Password)"
+                              AppName="$(_IISWebApplicationName)"
+                              Protocols="$(FlatProtocols)"
+                              PortNumber="$(_PortNumber)" />
+
+        <!-- Give access to folders -->
+        <PropertyGroup>
+            <_WebServiceLogsPath Condition="'$(_LogsFolder)' != ''">$([System.IO.Path]::Combine($(_WebServicePhysicalPath),$(_LogsFolder)))</_WebServiceLogsPath>
+        </PropertyGroup>
+        <SetAccessRule Condition="$(_WebServiceLogsPath) != ''"
+                       MachineName="$(_Server)"
+                       UserName="$(UserName)"
+                       UserPassword="$(Password)"
+                       Path="$(_WebServiceLogsPath)"
+                       Identity="IIS AppPool\$(_WebServiceAppPool)"
+                       FileSystemRights="Read, Write"
+                       InheritanceFlags="ObjectInherit"
+                       PropagationFlags="None"
+                       AccessControlType="Allow"
+                       PortNumber="$(_PortNumber)"/>
+        <SetAccessRule Condition="$(_WebServicePhysicalPath) != ''"
+                   MachineName="$(_Server)"
+                   UserName="$(UserName)"
+                   UserPassword="$(Password)"
+                   Path="$(_WebServicePhysicalPath)"
+                   Identity="IIS AppPool\$(_WebServiceAppPool)"
+                   FileSystemRights="Read, Write"
+                   InheritanceFlags="ContainerInherit,ObjectInherit"
+                       PropagationFlags="None"
+                       AccessControlType="Allow"
+                       PortNumber="$(_PortNumber)"/>
+
+        <!-- Configure SSL -->
+        <PropertyGroup>
+            <_AnonymousAuthenticationEnabled Condition="'$(_AnonymousAuthenticationEnabled)' == ''">false</_AnonymousAuthenticationEnabled>
+            <_WindowsAuthenticationEnabled Condition="'$(_WindowsAuthenticationEnabled)' == ''">false</_WindowsAuthenticationEnabled>
+            <_BasicAuthenticationEnabled Condition="'$(_BasicAuthenticationEnabled)' == ''">false</_BasicAuthenticationEnabled>
+            <_SecurityAccessConfiguration Condition="'$(_SecurityAccessConfiguration)' == ''">Ssl</_SecurityAccessConfiguration>
+        </PropertyGroup>
+        <SetWebApplicationAuthentication MachineName="$(_Server)"
+                                         UserName="$(UserName)"
+                                         UserPassword="$(Password)"
+                                         SiteName="$(_SiteName)"
+                                         AppName="$(_ServiceName)"
+                                         AuthenticationName="AnonymousAuthentication"
+                                         Enabled="$(_AnonymousAuthenticationEnabled)"
+                                         PortNumber="$(_PortNumber)"/>
+        <SetWebApplicationAuthentication MachineName="$(_Server)"
+                                         UserName="$(UserName)"
+                                         UserPassword="$(Password)"
+                                         SiteName="$(_SiteName)"
+                                         AppName="$(_ServiceName)"
+                                         AuthenticationName="WindowsAuthentication"
+                                         Enabled="$(_WindowsAuthenticationEnabled)"
+                                         PortNumber="$(_PortNumber)"/>
+        <SetWebApplicationAuthentication MachineName="$(_Server)"
+                                         UserName="$(UserName)"
+                                         UserPassword="$(Password)"
+                                         SiteName="$(_SiteName)"
+                                         AppName="$(_ServiceName)"
+                                         AuthenticationName="BasicAuthentication"
+                                         Enabled="$(_BasicAuthenticationEnabled)"
+                                         PortNumber="$(_PortNumber)"/>
+        <SetSSLAndClientCertificatesSettings MachineName="$(_Server)"
+                                        UserName="$(UserName)"
+                                        UserPassword="$(Password)"
+                                             WebApplication="$(_IISWebApplicationName)"
+                                             RequireSSL="$(_RequireSSL)"
+                                             ClientCertificates="$(_ClientCertificates)"/>
+
+        <!-- Clean temp folder -->
+        <RemoveDir Directories="$(_TempFolder)" />
+
+        <CallTarget Targets="StartWebServiceAppPool" />
+
+        <OnError ExecuteTargets="StartWebServiceAppPool"/>
+
+    </Target>
+
+    <Target Name="PrepareForRemove">
+
+        <!-- Get website info -->
+        <GetWebsiteInfo MachineName="$(_Server)"
+                        UserName="$(UserName)"
+                        UserPassword="$(Password)"
+                        SiteName="$(_SiteName)"
+                        PortNumber="$(_PortNumber)">
+            <Output TaskParameter="Exists" PropertyName="_WebsiteExists"/>
+            <Output TaskParameter="ApplicationPool" PropertyName="_WebsiteAppPool"/>
+        </GetWebsiteInfo>
+        <Error Condition="'$(_WebsiteExists)' != 'True'"
+               Text="The specified website [$(_SiteName)] does not exist on the server [$(_Server)]"/>
+
+        <!-- Get application info -->
+        <PropertyGroup Condition="'$(_ServiceName)' == ''">
+            <_WebServiceExists>True</_WebServiceExists>
+            <_WebServiceAppPool>$(_WebsiteAppPool)</_WebServiceAppPool>
+        </PropertyGroup>
+        <GetWebApplicationInfo Condition="'$(_ServiceName)' != ''"
+                               MachineName="$(_Server)"
+                               UserName="$(UserName)"
+                               UserPassword="$(Password)"
+                               SiteName="$(_SiteName)"
+                               AppName="$(_ServiceName)"
+                               PortNumber="$(_PortNumber)">
+            <Output TaskParameter="Exists" PropertyName="_WebServiceExists"/>
+            <Output TaskParameter="ApplicationPool" PropertyName="_WebServiceAppPool"/>
+        </GetWebApplicationInfo>
+        <Error Condition="!$(_WebServiceExists)"
+               Text="The specified web service [$(_ServiceName)] does not exist on the website [$(_SiteName)] of the server [$(_Server)]"/>
+        <GetApplicationsInAppPoolCount MachineName="$(_Server)"
+                                       UserName="$(UserName)"
+                                       UserPassword="$(Password)"
+                                       Name="$(_WebServiceAppPool)"
+                                       PortNumber="$(_PortNumber)">
+            <Output TaskParameter="Count" PropertyName="_WebServiceAppPoolApplicationsCount"/>
+        </GetApplicationsInAppPoolCount>
+
+    </Target>
+
+    <Target Name="bat:remove"
+            DependsOnTargets="PrepareForRemove">
+
+        <!-- Stop Application Pool & Website-->
+        <StopAppPool MachineName="$(_Server)"
+                     UserName="$(UserName)"
+                     UserPassword="$(Password)"
+                     Name="$(_WebServiceAppPool)"
+                     PortNumber="$(_PortNumber)"/>
+        <StopWebsite Condition="'$(_ServiceName)' == ''"
+                     MachineName="$(_Server)"
+                     UserName="$(UserName)"
+                     UserPassword="$(Password)"
+                     SiteName="$(_SiteName)"
+                     PortNumber="$(_PortNumber)"/>
+
+        <!-- Remove web service (and website, if service was in the root) -->
+        <Exec Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+            -verb:delete ^
+            -dest:apphostconfig=&quot;$(_IISWebApplicationName)&quot;$(_DestComputerName)$(MsDeployCredential)" />
+        <RemoveWebsite Condition="'$(_ServiceName)' == ''"
+                       MachineName="$(_Server)"
+                       UserName="$(UserName)"
+                       UserPassword="$(Password)"
+                       SiteName="$(_SiteName)"
+                       PortNumber="$(_PortNumber)"/>
+
+        <!-- Remove web service application pool if it is not used -->
+        <RemoveAppPool Condition="$(_WebServiceAppPoolApplicationsCount) == 1"
+                       MachineName="$(_Server)"
+                       UserName="$(UserName)"
+                       UserPassword="$(Password)"
+                       Name="$(_WebServiceAppPool)"
+                       PortNumber="$(_PortNumber)"/>
+
+        <ItemGroup>
+            <_MetadataFiles Condition="$(Profile)==''" Include="$(MSBuildProjectDirectory)\Deployment\Certificates\*.ps1" />
+            <_MetadataFiles Condition="$(Profile)!=''" Include="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Certificates\*.ps1" />
+        </ItemGroup>
+        <UninstallCertificates Condition="'@(_MetadataFiles)' != ''" MachineName="$(_Server)" UserName="$(UserName)" UserPassword="$(Password)" MetadataFile="%(_MetadataFiles.Identity)" PortNumber="$(_PortNumber)" />
+
+        <CallTarget Targets="StartWebServiceAppPool"
+                    Condition="$(_WebServiceAppPoolApplicationsCount) > 1" />
+
+        <OnError ExecuteTargets="StartWebServiceAppPool"
+                 Condition="$(_WebServiceAppPoolApplicationsCount) > 1" />
+
+    </Target>
+
+    <Target Name="bat:removeApp_only" Condition="'$(_ServiceName)' != '' and '$(_SiteName)' != ''">
+        <GetMsDeployCredential UserName="$(UserName)" Password="$(Password)" ComputerName="$(_ComputerName)">
+            <Output TaskParameter="MsDeployCredential" PropertyName="MsDeployCredential" />
+        </GetMsDeployCredential>
+
+        <!--Stop App Pool then delete physical directory-->
+        <CallTarget Condition="$(_UsingSitePhysicalPath) != 'True'" Targets="StopAppPoolWebDeploy"/>
+
+        <Exec Condition="$(_UsingSitePhysicalPath) != 'True'" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:delete ^
+        -allowUntrusted ^
+        -dest:iisApp=&quot;$(_IISWebApplicationName)&quot;$(_Destwmsvc)$(MsDeployCredential) ^
+        -skip:objectName=createApp ^
+        $(RemoveAppSkipRules) ^
+        -verbose" />
+
+        <CallTarget Condition="$(_UsingSitePhysicalPath) != 'True'" Targets="StartAppPoolWebDeploy"/>
+
+        <!--Delete IIS Application only-->
+        <Exec Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:delete ^
+        -allowUntrusted ^
+        -dest:iisApp=&quot;$(_IISWebApplicationName)&quot;$(_Destwmsvc)$(MsDeployCredential) ^
+        -skip:objectName=contentPath -skip:objectName=dirPath -skip:objectName=filePath ^
+        -verbose" />
+
+        <Exec IgnoreExitCode="True" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runcommand='%systemroot%\system32\inetsrv\appcmd list app /apppool.name:&quot;$(_AppPoolName)&quot; ',successReturnCodes=0;1,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+        $(_SkipRule)" ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="ListAppOutput" />
+        </Exec>
+
+        <Exec IgnoreExitCode="True" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runcommand='%systemroot%\system32\inetsrv\appcmd list apppool &quot;$(_AppPoolName)&quot; ',successReturnCodes=0;1,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+        $(_SkipRule)" ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="ListAppPoolOutput" />
+        </Exec>
+
+        <PropertyGroup>
+            <IISAppPoolInUsed>$([System.Text.RegularExpressions.Regex]::IsMatch($(ListAppOutput), 'APP "[^"]+"'))</IISAppPoolInUsed>
+            <IISAppPoolExists>$(ListAppPoolOutput.Contains('APPPOOL "$(_AppPoolName)"'))</IISAppPoolExists>
+        </PropertyGroup>
+
+        <Message Text="IISAppPoolInUsed: $(IISAppPoolInUsed)" />
+        <Message Text="IISAppPoolExists: $(IISAppPoolExists)" />
+
+        <!--Delete app pool-->
+        <Exec Condition="$(IISAppPoolInUsed) == 'False' and $(IISAppPoolExists) == 'True'" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runcommand='%systemroot%\system32\inetsrv\appcmd delete apppool &quot;$(_AppPoolName)&quot; ',successReturnCodes=0,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+        $(_SkipRule) ^
+        -verbose" />
+
+    </Target>
+
+    <Target Name="bat:createApp_only" Condition="'$(_ServiceName)' != '' and '$(_SiteName)' != ''">
+        <GetMsDeployCredential UserName="$(UserName)" Password="$(Password)" ComputerName="$(_ComputerName)">
+            <Output TaskParameter="MsDeployCredential" PropertyName="MsDeployCredential" />
+        </GetMsDeployCredential>
+        <Exec IgnoreExitCode="True" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runcommand='%systemroot%\system32\inetsrv\appcmd list app &quot;$(_IISWebApplicationName)&quot; ',successReturnCodes=0;1,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+        $(_SkipRule)" ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="ListAppOutput" />
+        </Exec>
+
+        <Exec IgnoreExitCode="True" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runcommand='%systemroot%\system32\inetsrv\appcmd list apppool &quot;$(_AppPoolName)&quot; ',successReturnCodes=0;1,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+        $(_SkipRule)" ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="ListAppPoolOutput" />
+        </Exec>
+
+        <PropertyGroup>
+            <IISApplicationExists>$(ListAppOutput.Contains('APP "$(_IISWebApplicationName)"'))</IISApplicationExists>
+            <IISAppPoolExists>$(ListAppPoolOutput.Contains('APPPOOL "$(_AppPoolName)"'))</IISAppPoolExists>
+        </PropertyGroup>
+
+        <Message Text="IISApplicationExists : $(IISApplicationExists)"/>
+        <Message Text="IISAppPoolExists : $(IISAppPoolExists)"/>
+
+        <Exec IgnoreExitCode="True" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runcommand='%systemroot%\system32\inetsrv\appcmd list vdir $(_SiteName)/',successReturnCodes=0;1,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+        $(_SkipRule)" ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="VdirOutput" />
+        </Exec>
+
+        <RegexMatch InputString="$(VdirOutput)" Pattern="\(physicalPath:([^)]+)\)" GroupIndex="1">
+            <Output TaskParameter="GroupValue" PropertyName="PhysicalPath" />
+            <Output TaskParameter="IsSuccessful" PropertyName="PhysicalPathExists" />
+        </RegexMatch>
+
+        <Message Text="PhysicalPath : $(PhysicalPath)"/>
+
+        <!--Create application-->
+        <Exec Condition="$(IISApplicationExists) == 'False'" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+            -verb:sync ^
+            -allowUntrusted ^
+            -source:createApp ^
+            -dest:createApp=&quot;$(_IISWebApplicationName)&quot;$(_Destwmsvc)$(MsDeployCredential) ^
+            $(_SkipRule) ^
+            -retryAttempts:10 ^
+            -retryInterval:6000 ^
+            -verbose" />
+
+        <!--Set physical path-->
+        <Exec Condition="$(PhysicalPathExists) == 'True' and $(_UsingSitePhysicalPath) == 'True'" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runcommand='%systemroot%\system32\inetsrv\appcmd set app &quot;$(_IISWebApplicationName)&quot; -[path='/'].physicalPath:&quot;$(PhysicalPath.Replace('(physicalPath:','').Replace(')',''))&quot; ',successReturnCodes=0,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+        $(_SkipRule) ^
+        -verbose" />
+
+        <!--Create app pool -->
+        <Exec Condition="$(IISAppPoolExists) == 'False'" Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runcommand='%systemroot%\system32\inetsrv\appcmd add apppool /name:&quot;$(_AppPoolName)&quot; /managedRuntimeVersion:&quot;v4.0&quot; /managedPipelineMode:&quot;Integrated&quot; ',successReturnCodes=0,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+        $(_SkipRule) ^
+        -verbose" />
+
+        <!--Setting app pool-->
+        <Exec Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runcommand='%systemroot%\system32\inetsrv\appcmd set app &quot;$(_IISWebApplicationName)&quot; /applicationPool:&quot;$(_AppPoolName)&quot; ',successReturnCodes=0,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+        $(_SkipRule) ^
+        -verbose" />
+
+        <CallTarget Targets="StartAppPoolWebDeploy"/>
+
+    </Target>
+  
+  <Target Name="bat:deploy_only">
+    <GetMsDeployCredential UserName="$(UserName)" Password="$(Password)" ComputerName="$(_ComputerName)">
+      <Output TaskParameter="MsDeployCredential" PropertyName="MsDeployCredential" />
+    </GetMsDeployCredential>
+
+    <PropertyGroup>
+      <_BackupRequired Condition="'$(_BackupRequired)' == ''">True</_BackupRequired>
+      <_TempFolder Condition="$(_TempFolder) == ''">$(MSBuildProjectDirectory)\temp</_TempFolder>
+      <_TempPackageFolder>$(_TempFolder)\package</_TempPackageFolder>
+      <_TempPackagePath>$(_TempFolder)\package.zip</_TempPackagePath>
+      <_SkipRule Condition="'$(_LogsFolder)' != ''">-skip:objectName=dirPath,absolutePath=&quot;$([System.Text.RegularExpressions.Regex]::Escape($(_LogsFolder)))&quot;</_SkipRule>
+    </PropertyGroup>
+
+    <!-- Clean temp folder and package -->
+    <RemoveDir Directories="$(_TempFolder)" />
+
+    <!-- Unpack package to temp -->
+    <Zip TaskAction="Extract"
+       ExtractPath="$(_TempPackageFolder)"
+       ZipFileName="$(_ServicePackagePath)" />
+
+    <!-- Apply config transform to Web.config and log4net.config -->
+    <ItemGroup>
+      <_WebConfig Include="$(_TempPackageFolder)\Content\**\Web.config" />
+      <_Log4netConfig Include="$(_TempPackageFolder)\Content\**\*.log4net.config" />
+    </ItemGroup>
+    <PropertyGroup>
+      <_WebConfigPath>%(_WebConfig.FullPath)</_WebConfigPath>
+      <_WebConfigDirectory>%(_WebConfig.RootDir)%(_WebConfig.Directory)</_WebConfigDirectory>
+      <_WebConfigTempPath>$(_WebConfigDirectory)web.temp.config</_WebConfigTempPath>
+      <_WebConfigTransformPath>$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Web.config</_WebConfigTransformPath>
+      <_Log4NetConfigTransformPath>$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\%(_Log4netConfig.Filename).config</_Log4NetConfigTransformPath>
+    </PropertyGroup>
+    <Copy DestinationFiles="$(_WebConfigTempPath)" SourceFiles="$(_WebConfigPath)" />
+
+    <TransformXml Condition="Exists('$(_WebConfigTransformPath)')"
+            Source="$(_WebConfigTempPath)"
+            Transform="$(_WebConfigTransformPath)"
+            Destination="$(_WebConfigPath)" />
+    <TransformXml Condition="Exists('$(_Log4NetConfigTransformPath)')"
+            Source="@(_Log4netConfig)"
+            Transform="$(_Log4NetConfigTransformPath)"
+            Destination="@(_Log4netConfig)" />
+
+    <DecryptPasswordInConfigFile
+            Key="%(EncryptedPassword.Identity)"
+            EncryptedPassword="%(EncryptedPassword.Value)"
+            ConfigFile="$(_WebConfigPath)"
+            Condition="'@(EncryptedPassword->Count())' &gt; 0"/>
+
+    <Delete Files="$(_WebConfigTempPath)"/>
+
+    <!-- Copy files in Files folder of selected profile -->
+    <ItemGroup>
+      <_SourceFiles Include="$(MSBuildProjectDirectory)\Deployment\Profiles\$(Profile)\Files\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_SourceFiles)" DestinationFiles="@(_SourceFiles->'$(_WebConfigDirectory)%(RecursiveDir)%(Filename)%(Extension)')" />
+    
+    <!-- Check if ipSecurity is used -->
+    <ItemGroup>
+      <_IpSecurityElements/>
+    </ItemGroup>
+    <XmlFile File="$(_WebConfigPath)"
+         TaskAction="ReadElements"
+         XPath="//configuration/system.webServer/security/ipSecurity">
+      <Output TaskParameter="Elements" ItemName="_IpSecurityElements"/>
+    </XmlFile>
+
+    <!-- Repack -->
+    <Zip TaskAction="Create"
+       CompressPath="$(_TempPackageFolder)"
+       ZipFileName="$(_TempPackagePath)"
+       RemoveRoot="$(_TempPackageFolder)"/>
+
+        <!-- Back up -->
+        <Exec Condition="$(_BackupRequired)"
+            Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+                -verb:sync ^
+                -allowUntrusted ^
+                -source:backupSettings ^
+                -dest:backupSettings=&quot;$(_IISWebApplicationName)&quot;$(_Destwmsvc)$(MsDeployCredential),enabled=&quot;False&quot;,numberOfBackups=15,addExcludedProviders=&quot;dbFullSql;dbMySql;appPoolEnable32Bit;appPoolNetFx;appPoolPipeline;setAcl;createApp;&quot; ^
+                -retryAttempts:10 ^
+                -retryInterval:6000 ^
+                -verbose" />
+
+        <Exec Condition="$(_BackupRequired)"
+            Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+                -verb:sync ^
+                -allowUntrusted ^
+                -source:backupManager ^
+                -dest:backupManager=&quot;$(_IISWebApplicationName)&quot;$(_Destwmsvc)$(MsDeployCredential) ^
+                $(_SkipRule) ^
+                -retryAttempts:10 ^
+                -retryInterval:6000 ^
+                -verbose" />
+
+        <CallTarget Targets="StopAppPoolWebDeploy"/>
+        
+    <!-- Deploy -->
+    <Exec Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:package=$(_TempPackagePath) ^
+        -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+        $(_SkipRule) ^
+        -skip:objectName=createApp ^
+        -retryAttempts:10 ^
+        -retryInterval:6000 ^
+        -verbose ^
+        -setParam:&quot;IIS Web Application Name&quot;=&quot;$(_IISWebApplicationName)&quot;" />
+
+    <!-- Apply Settings -->
+    <Exec Condition="$(_StartMode) != ''"
+          Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+		  -verb:sync ^
+		  -allowUntrusted ^
+		  -source:runCommand='%systemroot%\system32\inetsrv\appcmd set apppool /apppool.name:&quot;$(_AppPoolName)&quot; /startMode:&quot;$(_StartMode)&quot; ',successReturnCodes=0,waitAttempts=3,waitInterval=10000  ^
+		  -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+		  $(_SkipRule) ^
+		  -verbose" />
+
+    <Exec Condition="$(_IdleTimeout) != ''"
+          Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+		  -verb:sync ^
+		  -allowUntrusted ^
+		  -source:runCommand='%systemroot%\system32\inetsrv\appcmd set apppool /apppool.name:&quot;$(_AppPoolName)&quot; /processModel.idleTimeout:&quot;$(_IdleTimeout)&quot; ',successReturnCodes=0,waitAttempts=3,waitInterval=10000 ^
+		  -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+		  $(_SkipRule) ^
+		  -verbose" />
+
+    <Exec Condition="$(_PreloadEnabled) != ''"
+          Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+		  -verb:sync ^
+		  -allowUntrusted ^
+		  -source:runCommand='%systemroot%\system32\inetsrv\appcmd set app /app.name:&quot;$(_SiteName)/&quot; /preloadEnabled:&quot;$(_PreloadEnabled)&quot; ',successReturnCodes=0,waitAttempts=3,waitInterval=10000 ^
+		  -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+		  $(_SkipRule) ^
+		  -verbose" />
+
+    <!-- Encrypt config file -->
+    <ItemGroup Condition="$(_EncryptedSection) != ''">
+        <SplitEncryptSections Include="$(_EncryptedSection.Split(','))" />
+    </ItemGroup>
+
+    <Exec Condition="($(_EncryptConfigRequired) == 'true' AND @(SplitEncryptSections->Count()) > 0)" 
+        Command="&quot;$(MSDeployPath)\msdeploy.exe&quot; ^
+        -verb:sync ^
+        -allowUntrusted ^
+        -source:runcommand=' &quot;C:\Windows\Microsoft.NET\Framework\v4.0.30319\aspnet_regiis.exe&quot; -pe &quot;%(SplitEncryptSections.Identity)&quot; -site &quot;$(_SiteName)&quot; -app &quot;/$(_ServiceName)&quot; -prov &quot;RsaProtectedConfigurationProvider&quot; ',successReturnCodes=0,waitAttempts=3,waitInterval=10000 ^
+        -dest:auto$(_Destwmsvc)$(MsDeployCredential) ^
+        $(_SkipRule) ^
+        -verbose" />
+
+    <CallTarget Targets="StartAppPoolWebDeploy"/>
+
+    <OnError ExecuteTargets="StartAppPoolWebDeploy" />
+  </Target>
+</Project>

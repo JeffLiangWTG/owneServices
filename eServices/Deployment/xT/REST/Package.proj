@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--Import Default deployment properties-->
+  <Import Project="$(MSBuildProjectDirectory)\Deployment\Deployment.props" />
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <MSBuildCommonTasks Condition="!Exists('$(MSBuildCommonTasks)')">$(MSBuildThisFileDirectory)\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <_OutputDirectory Condition="$(_OutputDirectory) == ''">bin</_OutputDirectory>
+    <_DeployProjFile>$(MSBuildThisFileDirectory)Deploy.proj</_DeployProjFile>
+    <_TempPackageFolder>$(MSBuildProjectDirectory)\bin\temp</_TempPackageFolder>
+    <_PackageZipFilePath>$(_OutputDirectory)\BAT\$(MSBuildProjectName).zip</_PackageZipFilePath>
+    <_XtDeployment>$(MSBuildThisFileDirectory)\..\..\Bin\XT.REST.Deployment\</_XtDeployment>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <_DeploymentFiles Include="$(MSBuildProjectDirectory)\Deployment\**\*" />
+  </ItemGroup>
+  
+  <!--Import XT Deployment Tasks-->
+  <Import Project="$(_XtDeployment)netstandard2.0\XT.REST.Deployment.tasks" Condition="'$(_XtDeployment)'!=''" />
+  
+  <Target Name="CreateInterfaceZipFile" AfterTargets="Build">
+    <!--Remove existing temp folder-->
+    <RemoveDir Directories="$(_TempPackageFolder)" />
+
+    <!--Create temp folder-->
+    <MakeDir Directories="$(_TempPackageFolder)" Condition="!Exists('$(_TempPackageFolder)')" />
+
+    <!--Create BAT folder if not exist-->
+    <MakeDir Directories="$(_OutputDirectory)\BAT" Condition="!Exists('$(_OutputDirectory)\BAT\')" />
+
+    <ItemGroup>
+      <_CommonScripts Include="$(RootLevelBin)\Deployment\CommonScripts\**\*" />
+      <_XtDeploymentFiles Include="$(_XtDeployment)net48\**\*.*" />
+    </ItemGroup>
+
+    <!--Copy all common deployment scripts-->
+    <Copy SourceFiles="@(_CommonScripts)" DestinationFolder="$(_TempPackageFolder)\%(RecursiveDir)" />
+
+    <!--Copy XT.REST.Deployment assemblies-->
+    <Copy SourceFiles="@(_XtDeploymentFiles)" DestinationFolder="$(_TempPackageFolder)\xT.REST.Deployment\%(RecursiveDir)" />
+
+    <!--Copy all files from Deployment directory (incl. Profiles)-->
+    <Copy SourceFiles="@(_DeploymentFiles)" DestinationFolder="$(_TempPackageFolder)\Deployment\%(RecursiveDir)" />
+
+    <!--Copy Deploy.proj-->
+    <Copy SourceFiles="$(_DeployProjFile)" DestinationFolder="$(_TempPackageFolder)\" />
+
+    <!--Copy MsBuildCommonTasks-->
+    <Copy SourceFiles="$(MSBuildCommonTasks)" DestinationFolder="$(_TempPackageFolder)\" />
+
+    <LoadProfiles DefaultProfileFile="$(_TempPackageFolder)\Deployment\Deployment.json" ProfileFile="$(_TempPackageFolder)\Deployment\Profiles\$(Profile)\Deployment.json">
+      <Output TaskParameter="InterfaceName" PropertyName="InterfaceName" />
+      <Output TaskParameter="InterfaceVersion" PropertyName="InterfaceVersion" />
+    </LoadProfiles>
+    <Build WorkingDirectory="$(_TempPackageFolder)" />
+    <ItemGroup>
+      <FilesToSign Include="$(_TempPackageFolder)\$(InterfaceName)\**\*.exe" />
+    </ItemGroup>
+    <Message Importance="High" Text="Signing files: @(FilesToSign->Identity)" Condition="@(FilesToSign->Count()) > 0 and $(DAT_IS_BUILDING) != ''" />
+    <Sign Files="@(FilesToSign)" Condition="@(FilesToSign->Count()) > 0 and $(DAT_IS_BUILDING) != ''" />
+
+    <!--Remove downloaded packages-->
+    <RemoveDir Directories="$(_TempPackageFolder)\Packages" />
+
+    <!--Remove build directory-->
+    <Delete Files="$(_TempPackageFolder)\build\**\*" />
+
+    <!--Create the zip file-->
+    <ZipDirectory SourceDirectory="$(_TempPackageFolder)" DestinationFile="$(_PackageZipFilePath)" Overwrite="True" />
+
+    <!--Remove temp folder-->
+    <Delete Files="$(_TempPackageFolder)\**\*" />
+  </Target>
+
+</Project>

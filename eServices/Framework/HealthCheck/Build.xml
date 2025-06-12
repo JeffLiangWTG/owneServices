@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Build xmlns="http://wisetechglobal.com/DevTools/Build.xsd">
+  <Solutions>
+    <Solution Filename="eServices.HealthCheck.sln" />
+  </Solutions>
+  <PreBuild>
+    <Command cacheable="false">cmd /c dotnet tool restore</Command>
+  </PreBuild>
+  <Tasks>
+    <Task Name="Initialize eServices.BuildTools.DatTool">
+      <Step>dotnet esv-dattool init --output Bin\DatTool</Step>
+    </Task>
+    <Task Name="Pack eServices.HealthCheck">
+      <Dependency Type="Solution">eServices.HealthCheck.sln</Dependency>
+      <Step>dotnet esv-pack --project HealthCheck\eServices.HealthCheck.csproj --package-source https://proget.wtg.zone/nuget/WTG-Internal/v3/index.json</Step>
+    </Task>
+  </Tasks>
+  <BuildConfigurations>
+    <Configuration BuildOnDat="true" TestOnDat="true" Publishable="false" GenerateMSBuildBinLogs="true">Release</Configuration>
+  </BuildConfigurations>
+  <DatSettings IntegrationAssembliesSubdir="DatTool\net48" BuildDeployerType="eServices.BuildTools.DatDeploy.Deployer, eServices.BuildTools.DatDeploy" DisableWorkspaceJobs="true">
+    <TestAdapter Type="Dat.Implementation.VSTest.VSTestAdapter, Dat.Implementation.VSTest">
+      <Options>
+        <Option Name="TestAssemblyFileFilter">*Tests.dll</Option>
+      </Options>
+    </TestAdapter>
+    <DeploymentTargets>
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.HealthCheck-Prerelease" IsProduction="false" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.HealthCheck" />
+    </DeploymentTargets>
+  </DatSettings>
+</Build>

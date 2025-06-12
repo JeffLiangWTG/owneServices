@@ -1,0 +1,2 @@
+﻿CREATE LOGIN [AuthenticationService]
+    WITH PASSWORD = N'9FwVtv@=h8yG-zrh', SID = 0x5DDFC714A6CC604196F9DB8ECD5D2B06, DEFAULT_LANGUAGE = [us_english];

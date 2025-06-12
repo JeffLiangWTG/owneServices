@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(MSBuildThisFileDirectory)\..\package-common.tasks</PackageCommonTasks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(MsBuildProjectExtension)' == '.sqlproj' ">
+    <PublishProfilePath>$(MSBuildProjectDirectory)\$(Configuration).publish.xml</PublishProfilePath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+
+  <Target Name="bat:package" Returns="$(_TargetZipFilePath)">
+    <CallTarget Targets="bat:package:init"/>
+
+    <ItemGroup>
+      <_ProjectOutput Include="$(OutputPath)\**\*"/>
+      <_PublishFiles Include="$(MSBuildProjectDirectory)\*.publish.xml" />
+      <_DeploymentFiles Include="$(MSBuildProjectDirectory)\Deployment\**\*"/>
+      <_DeploymentProject Include="$(DeploymentProjectPath)" />
+      <_DeploymentProject Include="$(MSBuildCommonTasks)" />
+      <MSBuildNamespaces Include="MSBuildNamespace">
+        <Prefix>x</Prefix>
+        <Uri>http://schemas.microsoft.com/developer/msbuild/2003</Uri>
+      </MSBuildNamespaces>
+    </ItemGroup>
+
+    <RemoveDir Directories="$(_ZipContentsDirectory)" />
+
+    <!-- Copy Project output -->
+    <Copy SourceFiles="@(_ProjectOutput)"
+          DestinationFolder="$(_ZipContentsDirectory)\$(_BinPath)\%(RecursiveDir)"/>
+
+    <!-- Copy publish config xml files -->
+    <Copy SourceFiles="@(_PublishFiles)"
+          DestinationFolder="$(_ZipContentsDirectory)" />
+
+    <!-- Copy Deployment files -->
+    <Copy SourceFiles="@(_DeploymentFiles)"
+          DestinationFolder="$(_ZipContentsDirectory)\Deployment\%(RecursiveDir)"/>
+    <XmlFile File="$(_ZipContentsDirectory)\Deployment\Deployment.props"
+             TaskAction="UpdateElement"
+             Namespaces="@(MSBuildNamespaces)"
+             XPath="//x:Project/x:PropertyGroup/x:_DacpacFileName"
+             InnerText="$(MSBuildProjectName).dacpac" />
+
+    <!-- Copy Deployment project -->
+    <Copy SourceFiles="@(_DeploymentProject)"
+          DestinationFolder="$(_ZipContentsDirectory)"/>
+
+    <!-- Create package -->
+    <CallTarget Targets="bat:package:zip"/>
+  </Target>
+</Project>

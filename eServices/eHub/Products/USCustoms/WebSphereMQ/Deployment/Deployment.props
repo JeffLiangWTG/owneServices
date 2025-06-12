@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+   <PropertyGroup>
+      <_ComputerName>SYDCO-WDIV-2-BT.sand.wtg.zone</_ComputerName>
+      <_UserName>CORP\Divya.Divya</_UserName>
+      <_UserPassword>01000000d08c9ddf0115d1118c7a00c04fc297eb01000000cade5c1792fcbb48b1b70b2db1744b910000000002000000000003660000c000000010000000305dacfa9d2be2876710fba5c09b91dc0000000004800000a0000000100000004a148b8346c03e31ed49618bb2ea044b2000000097f39cc8ff0932d6164b7e04f06e5ed09c7aa7503b8e1b9383bbfa199b5b3f2c1400000093ca9617eba770b923f0696b053aaa6db445e993</_UserPassword>
+   </PropertyGroup>
+   <ItemGroup>
+      <_QueueManagerName Include="QM_CRGWP">
+         <_MQSC_DESCR>'US Customs Production'</_MQSC_DESCR>
+         <_MQSC_AUTHOREV>ENABLED</_MQSC_AUTHOREV>
+         <_MQSC_MONACLS>LOW</_MQSC_MONACLS>
+         <_MQSC_lp>100</_MQSC_lp>
+         <_MQSC_ls>100</_MQSC_ls>
+         <_MQSCOPT_sa>sa</_MQSCOPT_sa>
+      </_QueueManagerName>
+   </ItemGroup>
+   <ItemGroup>
+      <_QueueManagerName Include="QM_CRGWT">
+         <_MQSC_DESCR>'US Customs Test'</_MQSC_DESCR>
+         <_MQSC_AUTHOREV>ENABLED</_MQSC_AUTHOREV>
+         <_MQSC_MONACLS>LOW</_MQSC_MONACLS>
+         <_MQSC_lp>100</_MQSC_lp>
+         <_MQSC_ls>100</_MQSC_ls>
+         <_MQSCOPT_sa>sa</_MQSCOPT_sa>
+      </_QueueManagerName>
+   </ItemGroup>
+   <ItemGroup>
+      <_KeyDatabaseFilePath Include="$(_KeyDatabaseFilePath)">
+         <_KeyDatabasePassword>$(_KeyDatabasePassword)</_KeyDatabasePassword>
+      </_KeyDatabaseFilePath>
+   </ItemGroup>
+   <ItemDefinitionGroup>
+      <_ListenerName>
+         <_QueueManagerName>$(_QueueManagerName)</_QueueManagerName>
+      </_ListenerName>
+      <_QueueName>
+         <_QueueManagerName>$(_QueueManagerName)</_QueueManagerName>
+      </_QueueName>
+      <_ChannelName>
+         <_QueueManagerName>$(_QueueManagerName)</_QueueManagerName>
+      </_ChannelName>
+   </ItemDefinitionGroup>
+   <ItemGroup>
+      <_ListenerName Include="LISTENER.TCP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_MQSC_CONTROL>QMGR</_MQSC_CONTROL>
+         <_MQSC_PORT>1415</_MQSC_PORT>
+         <_MQSC_DESCR>EDI</_MQSC_DESCR>
+      </_ListenerName>
+   </ItemGroup>
+   <ItemGroup>
+      <_ListenerName Include="LISTENER.TCP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_MQSC_CONTROL>QMGR</_MQSC_CONTROL>
+         <_MQSC_PORT>1415</_MQSC_PORT>
+         <_MQSC_DESCR>EDI</_MQSC_DESCR>
+      </_ListenerName>
+   </ItemGroup>
+   <ItemGroup>
+      <_QueueName Include="ABIP.3901INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'Customs Team - local testing'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="ABIP.3902INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'Customs Team - local testing'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="ABIP.DEAD.LETTER.QUEUE">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Dead Letter Queue'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>NO</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="ABIP.INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=USC_Inbound_Prod_ABI_ACE on ordwp-sapp-3'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="ABIP.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DESCR>'eHub|Provider=USC_Outbound on ordwp-sapp-3'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>ACS.BRK.INBOUND</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGP2</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWP</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="ACEP.INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=USC_Inbound_Prod_ABI_ACE on ordwp-sapp-3'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="ACEP.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DESCR>'eHub|Provider=USC_Outbound on ordwp-sapp-3'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>NO</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>ACE.TRK.EDI.INPUT</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGP2</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWP</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="AESP.176017689INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'Customs Team - not used'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="AESP.861161674INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'Customs Team - not used'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="AESP.INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=USC_Inbound_Prod_AES on ordwp-sapp-3'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="AESP.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DESCR>'eHub|Provider=USC_Outbound on ordwp-sapp-3'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>AES.EDI.INPUT.MQM</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGP2</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWP</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="AIRP.P513INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=ACS_US_Rcv on WG1-VBTS-1'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="AMSP.8CWSINBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'Customs Team - not used'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="ACASP.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DESCR>'eHub|Provider=ACS_US_Snd on WG1-VBTS-1'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>CBP.ACAS.INBOUND</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGP2</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWP</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="AMSP.INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=USC_Inbound_Prod_AMS on ordwp-sapp-3'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="AMSP.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DESCR>'eHub|Provider=USC_Outbound on ordwp-sapp-3'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>AMS.SEA.CARRIER.INPUT</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGP2</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWP</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="BAPLIE.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DESCR>'Customs Team - customer connection'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>NO</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>AMS.BAPLIE.CARRIER.SOURCE.LIMITED</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGP2</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWP</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="DISP.INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=USDIS_MQ_Receive on WG1-VBTS-1'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+	  <_QueueName Include="DISP.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DEFPSIST>NO</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>ATS.DIS.MSG.INBOUND</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGP2</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWP</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="QM_CRGWP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Transmission'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+         <_MQSC_GET>ENABLED</_MQSC_GET>
+         <_MQSC_USAGE>XMITQ</_MQSC_USAGE>
+      </_QueueName>
+   </ItemGroup>
+   <ItemGroup>
+      <_QueueName Include="ABIT.3901INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'Customs Team - local testing'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="ABIT.3902INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'Customs Team - local testing'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="ABIT.INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=USC_Inbound_Test_ABI_ACE on $(COMPUTERNAME)'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="ABIT.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DESCR>'eHub|Provider=USC_Outbound on $(COMPUTERNAME)'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>NO</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>ACS.BRK.INBOUND</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGC1</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWT</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="ACAST.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DESCR>'eHub|Provider=ACS_US_TST_Snd on WG1-VBTS-1'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>CBP.ACAS.INBOUND</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGC1</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWT</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="ACET.INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=USC_Inbound_Test_ABI_ACE on $(COMPUTERNAME)'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="ACET.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=USC_Outbound on $(COMPUTERNAME)'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>NO</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>ACE.TRK.EDI.INPUT</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGC1</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWT</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="AEST.INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=USC_Inbound_Test_AES on $(COMPUTERNAME)'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="AEST.176017689INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'Customs Team - not used'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="AEST.861161674INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'Customs Team - not used'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="AEST.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DESCR>'eHub|Provider=USC_Outbound on $(COMPUTERNAME)'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>NO</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>AES.EDI.INPUT.MQM</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGC1</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWT</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="AIRT.P513INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=ACS_US_TST_Rcv on WG1-VBTS-1'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="AMST.INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=USC_Inbound_Test_AMS on $(COMPUTERNAME)'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="AMST.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DESCR>'eHub|Provider=USC_OUTBOUND on $(COMPUTERNAME)'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>AMS.SEA.CARRIER.INPUT</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGC1</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWT</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="BAPLIE.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DESCR>'Customs Team - customer connection'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>NO</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>AMS.BAPLIE.CARRIER.SOURCE.LIMITED</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGC1</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWT</_MQSC_XMITQ>
+      </_QueueName>
+      <_QueueName Include="DIST.INBOUND.FROM.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Consumer=USDISTest_MQ_Receive on WG1-VBTS-1'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="DLQ">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Dead Letter Queue'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+      </_QueueName>
+      <_QueueName Include="QM_CRGWT">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Local</_Type>
+         <_MQSC_DESCR>'eHub|Transmission'</_MQSC_DESCR>
+         <_MQSC_DEFPSIST>YES</_MQSC_DEFPSIST>
+         <_MQSC_MAXDEPTH>100000</_MQSC_MAXDEPTH>
+         <_MQSC_GET>ENABLED</_MQSC_GET>
+         <_MQSC_USAGE>XMITQ</_MQSC_USAGE>
+      </_QueueName>
+      <_QueueName Include="DIST.OUTBOUND.TO.CBP">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>Remote</_Type>
+         <_MQSC_DEFPSIST>NO</_MQSC_DEFPSIST>
+         <_MQSC_RNAME>ATS.DIS.MSG.INBOUND</_MQSC_RNAME>
+         <_MQSC_RQMNAME>CBP_QGC1</_MQSC_RQMNAME>
+         <_MQSC_XMITQ>QM_CRGWT</_MQSC_XMITQ>
+      </_QueueName>
+   </ItemGroup>
+   <ItemGroup>
+      <_ChannelName Include="CARGOWISE">
+         <_Type>SVRCONN</_Type>
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_MQSC_HBINT>300</_MQSC_HBINT>
+         <_MQSC_SSLCIPH>TLS_RSA_WITH_AES_256_CBC_SHA256</_MQSC_SSLCIPH>
+      </_ChannelName>
+      <_ChannelName Include="CBP_QGC1.QM_CRGWT">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>RCVR</_Type>
+         <_MQSC_DESCR>Receiver</_MQSC_DESCR>
+         <_MQSC_HBINT>300</_MQSC_HBINT>
+         <_MQSC_MCAUSER>MUSR_EHUB</_MQSC_MCAUSER>
+      </_ChannelName>
+      <_ChannelName Include="EHUBT.SVRCONN">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_Type>SVRCONN</_Type>
+         <_MQSC_HBINT>300</_MQSC_HBINT>
+      </_ChannelName>
+      <_ChannelName Include="QM_CRGWT.CBP_QGC1">
+         <_QueueManagerName>QM_CRGWT</_QueueManagerName>
+         <_MQSC_CONNAME>$(_MQSC_CONNAME)</_MQSC_CONNAME>
+         <_Type>SDR</_Type>
+         <_MQSC_DESCR>Sender</_MQSC_DESCR>
+         <_MQSC_HBINT>300</_MQSC_HBINT>
+         <_MQSC_DISCINT>0</_MQSC_DISCINT>
+         <_MQSC_XMITQ>QM_CRGWT</_MQSC_XMITQ>
+         <_MQSC_TRPTYPE>TCP</_MQSC_TRPTYPE>
+      </_ChannelName>
+   </ItemGroup>
+   <ItemGroup>
+      <_ChannelName Include="CARGOWISE">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>SVRCONN</_Type>
+         <_MQSC_HBINT>300</_MQSC_HBINT>
+         <_MQSC_SSLCIPH>TLS_RSA_WITH_AES_256_CBC_SHA256</_MQSC_SSLCIPH>
+      </_ChannelName>
+      <_ChannelName Include="CBP_QGP2.QM_CRGWP">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>RCVR</_Type>
+         <_MQSC_DESCR>Receiver</_MQSC_DESCR>
+         <_MQSC_HBINT>300</_MQSC_HBINT>
+      </_ChannelName>
+      <_ChannelName Include="EHUBP.SVRCONN">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>SVRCONN</_Type>
+         <_MQSC_HBINT>300</_MQSC_HBINT>
+      </_ChannelName>
+      <_ChannelName Include="QM_CRGWP.CBP_QGP2">
+         <_QueueManagerName>QM_CRGWP</_QueueManagerName>
+         <_Type>SDR</_Type>
+         <_MQSC_DESCR>Sender</_MQSC_DESCR>
+         <_MQSC_CONNAME>$(_MQSC_CONNAME)</_MQSC_CONNAME>
+         <_MQSC_HBINT>300</_MQSC_HBINT>
+         <_MQSC_DISCINT>6000</_MQSC_DISCINT>
+         <_MQSC_XMITQ>QM_CRGWP</_MQSC_XMITQ>
+         <_MQSC_TRPTYPE>TCP</_MQSC_TRPTYPE>
+      </_ChannelName>
+   </ItemGroup>
+</Project>

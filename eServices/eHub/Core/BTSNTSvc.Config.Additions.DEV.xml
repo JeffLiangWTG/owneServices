@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <configSections>
+    <sectionGroup name="eHub">
+      <section name="orchestrationLogging" type="CargoWise.eHub.Core.Logging.LoggerConfigSection, CargoWise.eHub.Core.Logging, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350, processorArchitecture=MSIL" />
+      <section name="pipelineLogging" type="CargoWise.eHub.Core.Logging.LoggerConfigSection, CargoWise.eHub.Core.Logging, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350, processorArchitecture=MSIL" />
+      <section name="hostLogging" type="CargoWise.eHub.Core.Logging.LoggerConfigSection, CargoWise.eHub.Core.Logging, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350, processorArchitecture=MSIL" />
+    </sectionGroup>
+    <sectionGroup name="common">
+      <section name="logging" type="Common.Logging.ConfigurationSectionHandler, Common.Logging, Version=2.2.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL"/>
+    </sectionGroup>
+    <section name="log4net" type="log4net.Config.Log4NetConfigurationSectionHandler, log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL" />
+    <section name="entityFramework" type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" />
+  </configSections>
+
+  <eHub>
+    <orchestrationLogging logDir="C:\Logs\BizTalk\Orchestrations">
+      <loggers>
+        <add name="CargoWise.eHub.Clients.TLX.Orchestrations.TLXCentralInternalService_ImportEmail" level="DEBUG" />
+      </loggers>
+    </orchestrationLogging>
+    <pipelineLogging logDir="C:\Logs\BizTalk\Pipelines">
+      <loggers>
+        <add name="Gateway_SelectInboxMessageByStatus_WCF-SQL+Receive#RoutingRuleEngine" level="TRACE" />
+      </loggers>
+    </pipelineLogging>
+    <hostLogging logDir="C:\Logs\BizTalk\Hosts">
+      <loggers>
+        <add name="InboxReceive#RoutingRuleEngine.CacheCleanUp" level="TRACE" />
+      </loggers>
+    </hostLogging>
+  </eHub>
+
+  <common>
+    <logging>
+      <factoryAdapter type="Common.Logging.Log4Net.Log4NetLoggerFactoryAdapter, Common.Logging.Log4Net208">
+        <arg key="configType" value="INLINE"/>
+      </factoryAdapter>
+    </logging>
+  </common>
+
+  <log4net>
+    <root>
+      <appender-ref ref="WindowsEventLog" />
+    </root>
+    <appender name="WindowsEventLog" type="log4net.Appender.EventLogAppender">
+      <applicationName value="eHub BizTalk" />
+      <layout type="log4net.Layout.PatternLayout"/>
+      <threshold value="ERROR" />
+    </appender>
+  </log4net>
+
+  <entityFramework>
+    <providers>
+      <provider invariantName="System.Data.SqlClient" type="System.Data.Entity.SqlServer.SqlProviderServices, EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
+    </providers>
+  </entityFramework>
+
+  <appSettings>
+		<add key="CargoWise.eHub.DataAccess.SecirutyAccessor" value="CargoWise.eHub.DataAccess.Sql.SecurityAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350"/>
+		<add key="CargoWise.eHub.DataAccess.OutboxAccessor" value="CargoWise.eHub.DataAccess.Sql.OutboxAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350"/>
+		<add key="CargoWise.eHub.DataAccess.ExceptionsAccessor" value="CargoWise.eHub.DataAccess.Sql.ExceptionsAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350"/>
+		<add key="CargoWise.eHub.DataAccess.PartyAccessor" value="CargoWise.eHub.DataAccess.Cache.PartyAccessor, CargoWise.eHub.DataAccess.Cache, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350"/>
+		<add key="CargoWise.eHub.DataAccess.TransformAccessor" value="CargoWise.eHub.DataAccess.Cache.TransformAccessor, CargoWise.eHub.DataAccess.Cache, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350"/>
+    <add key="CargoWise.eHub.DataAccess.SubscriptionAccessor" value="CargoWise.eHub.DataAccess.Cache.SubscriptionAccessor, CargoWise.eHub.DataAccess.Cache, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350"/>
+
+    <add key="CargoWise.eHub.DataAccess.Cache.PartyAccessor" value="CargoWise.eHub.DataAccess.Sql.PartyAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350"/>
+		<add key="CargoWise.eHub.DataAccess.Cache.TransformAccessor" value="CargoWise.eHub.DataAccess.Sql.TransformAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350"/>
+    <add key="CargoWise.eHub.DataAccess.Cache.SubscriptionAccessor" value="CargoWise.eHub.DataAccess.Sql.SubscriptionAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350"/>
+    <!--Data cache expiry time in minutes-->
+    <add key="DataCacheExpiry" value="10"/>
+    <!-- Used during logging to allow a redirect in the BAM portal to the custom message viewer ASP page -->
+    <add key="MessageViewerUrl" value="http://biztalk-web.dev.corporate.cargowise.com/eHubMessageViewer/Default.aspx"/>
+    <!-- Used to determine when to compress a stream before logging it in BAM-->
+    <add key="CompressionThresholdBytes" value="1048576"/>
+    <!--Size of buffers used when programmatically managing streams (eg) xpathreader, re-encoding, etc-->
+    <add key="StreamingBufferSize" value="32768"/>
+    <add key="eHubTransactionsContext.CommandTimeout" value="300"/>
+  </appSettings>
+  <connectionStrings>
+    <add name="CargoWise.eHub.DataAccess.Sql.eHubTransactions" connectionString="Data Source=ehub-db.dev.corporate.cargowise.com;Initial Catalog=eHubTransactions;Integrated Security=SSPI;" />
+    <add name="eHubTransactionsContext" connectionString="Data Source=ehub-db.dev.corporate.cargowise.com;Initial Catalog=eHubTransactions;Integrated Security=SSPI;" providerName="System.Data.SqlClient" />
+	</connectionStrings>
+  <system.diagnostics>
+    <switches>
+      <!-- 0,1,2,3, and 4 correspond to Off, Error, Warning, Info, and Verbose -->
+      <add name="eHubTraceLevel" value="3" />
+      <add name="BizTalkESBToolkit20" value="3" />
+    </switches>
+  </system.diagnostics>
+</configuration>

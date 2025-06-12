@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="install">
+
+  <PropertyGroup>
+    <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(ProgramFiles)\MSBuild\ExtensionPack\4.0\</MSBuildExtensionsPackPath>
+    <MSBuildExtensionsPackPath Condition="!Exists('$(MSBuildExtensionsPackPath)')">$(ProgramFiles)\MSBuildExtensionPack\4.0\</MSBuildExtensionsPackPath>
+    <ProfilesPath>$(MSBuildThisFileDirectory)Profiles\</ProfilesPath>
+    <ProfilesTasks>$(ProfilesPath)Profiles.tasks</ProfilesTasks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SqlFilesPath>$(MSBuildThisFileDirectory)\SQL\</SqlFilesPath>
+    <BinFilesPath>$(MSBuildThisFileDirectory)\Bin\</BinFilesPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks" Condition="'$(BuildPath)'==''"/>
+  <Import Project="$(ProfilesTasks)" Condition="'$(ProfilesIncluded)'==''"/>
+
+  <Target Name="install">
+    <Message Text="Installing..." />
+    <Error Text="No connection string specified, process cannot continue." Condition="'$(ConnectionString)'==''" />
+
+    <ItemGroup>
+      <SqlScripts Include="$(SqlFilesPath)*.sql" />
+    </ItemGroup>
+
+    <MSBuild.ExtensionPack.SqlServer.SqlExecute
+      TaskAction="Execute"
+      Retry="true"
+      UseTransaction="true"
+      Files="@(SqlScripts)"
+      ConnectionString="$(ConnectionString)"/>
+
+  </Target>
+
+</Project>

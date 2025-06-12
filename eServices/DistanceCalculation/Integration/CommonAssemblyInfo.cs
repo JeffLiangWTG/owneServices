@@ -1,0 +1,27 @@
+using System.Reflection;
+using System.Resources;
+using System.Runtime.CompilerServices;
+
+[assembly: AssemblyCompany("CargoWise edi Pty. Ltd.")]
+[assembly: AssemblyProduct("ediEnterprise")]
+[assembly: AssemblyCopyright("Copyright CargoWise edi 2001-2008")]
+[assembly: AssemblyTrademark("CargoWise edi")]
+
+[assembly: AssemblyDelaySign(false)]
+
+#if !SGEN // SGen already generates this for us
+[assembly: AssemblyVersion("2.0.0.0")]
+#endif
+[assembly: AssemblyFileVersion("1.4.3607.0")] // Version number is automatically updated by BuildIt.bat
+#if !PocketPC
+[assembly: StringFreezing] // when combined with NGen, this saves time and memory creating strings at runtime.
+#endif
+
+[assembly: NeutralResourcesLanguage("en-US")]
+
+internal static class CommonAssemblyInfo
+{
+	public const string PublicKey = "0024000004800000940000000602000000240000525341310004000001000100dd81107145159ef74a16159de9575e9d49a7038ce8abf4d12445c50b6ac89c71034e02e783d04ee4820779121ec441843d12f4103385a118911b98b33f3e32c2393f761299b87b38cf2825d8cd295c4d567e6dc46e4295c3850de6c39b21e8f9db896639a0a0b360e5f858112a5f15aad857633842e7bc692c6e5fa45d0e13ba";
+	public const string PublicKeyToken = "4f570df270576350";
+	public const string AssemblyVersion = "2.0.0.0";
+}

@@ -1,0 +1,73 @@
+<Project ToolsVersion="4.0" DefaultTargets="Default" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <TPath Condition="Exists('$(MSBuildExtensionsPath)\..\MSBuildExtensionPack\4.0\MSBuild.ExtensionPack.tasks')">$(MSBuildExtensionsPath)\..\MSBuildExtensionPack\4.0\MSBuild.ExtensionPack.tasks</TPath>
+    <TPath Condition="Exists('$(MSBuildExtensionsPath)\ExtensionPack\4.0\MSBuild.ExtensionPack.tasks')">$(MSBuildExtensionsPath)\ExtensionPack\4.0\MSBuild.ExtensionPack.tasks</TPath>
+  </PropertyGroup>
+  <Import Project="$(TPath)"/>
+
+  <PropertyGroup>
+    <Dir>$(BuildDir)</Dir>
+    <Dir Condition="'$(BuildDir)'==''">.</Dir>
+    <Server>$(ServerName)</Server>
+    <Server Condition="'$(ServerName)'==''">.</Server>
+    <ScriptDir Condition="'$(ScriptDir)'==''">C:\Deploy\Scripts</ScriptDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CoreBizTalkAssemblies Include="$(Dir)\*Core.*Schemas.dll;$(Dir)\*Core.*Pipelines.dll;$(Dir)\*Core.*Transforms.dll" Exclude="$(Dir)\*Test*.dll" />
+    <EdiBizTalkAssemblies Include="$(Dir)\*EDI.*Schemas*.dll;$(Dir)\*EDI.*Transforms*.dll;$(Dir)\*EDI.*Universal*.dll" Exclude="$(Dir)\*Test*.dll" />
+    <SharedBizTalkAssemblies Include="$(Dir)\*HPO.Schemas.dll;$(Dir)\*SAP.Schemas.dll;$(Dir)\*TPE.Schemas.dll" Exclude="$(Dir)\*Tests*.dll" />
+    <OtherBizTalkAssemblies Include="$(Dir)\*Schema*.dll;$(Dir)\*Pipelines*.dll;$(Dir)\*Transform*.dll;$(Dir)\*Orchestration*.dll" Exclude="$(Dir)\*Helper*.dll;$(Dir)\*Test*.dll;@(CoreBizTalkAssemblies);@(EdiBizTalkAssemblies);@(SharedBizTalkAssemblies)" />
+    <BizTalkAssemblies Include="@(CoreBizTalkAssemblies);@(EdiBizTalkAssemblies);@(SharedBizTalkAssemblies);@(OtherBizTalkAssemblies)" />
+    <Assemblies Include="$(Dir)\*.dll" Exclude="@(BizTalkAssemblies);$(Dir)\*Test*.dll" />
+    <AllAssemblies Include="@(BizTalkAssemblies);@(Assemblies)" />
+  </ItemGroup>
+
+  <Target Name="StopApplication">
+    <MSBuild.ExtensionPack.Web.Iis7Website TaskAction="Stop" Name="Default Web Site"/>
+    <MSBuild.ExtensionPack.Web.Iis7Website TaskAction="Stop" Name="GEI-ITWS"/>
+    <Exec Command='SCHTASKS /change /TN "\eServices\Restart BizTalk Hosts" /DISABLE' />
+    <MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="DisableAllReceiveLocations" MachineName="$(Server)" Applications="CargoWise.eHub;CargoWise.eHub.Rcv"/>
+  </Target>
+
+  <Target Name="StopHostInstances">
+    <MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Get">
+      <Output TaskParameter="HostInstances" ItemName="HostInstances"/>
+    </MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance>
+    <ItemGroup>
+      <Hosts Include="@(HostInstances)" Condition="%(HostType) == 1 and %(ServiceState) == 4 and !%(IsDisabled)"/>
+    </ItemGroup>
+    <MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance Condition="'%(Hosts.Identity)' != ''" TaskAction="Stop" HostName="%(Hosts.Identity)"/>
+  </Target>
+
+  <Target Name="AddAssemblies">
+    <MSBuild.ExtensionPack.BizTalk.BizTalkAssembly Condition="'%(AllAssemblies.FullPath)'!=''" TaskAction="Add" Force="true" Gac="true" MachineName="$(COMPUTERNAME)" DatabaseServer="$(Server)" Application="CargoWise.eHub" Assemblies="@(AllAssemblies)" GacOnAddResource="true" GacOnMSIFileImport="true" GacOnMSIFileInstall="true" />
+    <MSBuild.ExtensionPack.Framework.Gac Condition="'%(Assemblies.FullPath)'!=''" TaskAction="AddAssembly" AssemblyPath="%(Assemblies.FullPath)"/>
+  </Target>
+
+  <Target Name="ImportBindings">
+    <Exec Condition="Exists('$(Dir)\Bindings')" Command="powershell.exe -executionpolicy remotesigned -File $(ScriptDir)\BuildBindings.ps1 $(Dir) -BindingFile $(Dir)\Bindings\CargoWise.eHub.BindingInfo.xml" />
+    <MSBuild.ExtensionPack.BizTalk.BizTalkApplication Condition="Exists('$(Dir)\Bindings\CargoWise.eHub.BindingInfo.xml')" TaskAction="ImportBindings" BindingFile="$(Dir)\Bindings\CargoWise.eHub.BindingInfo.xml" MachineName="$(COMPUTERNAME)" DatabaseServer="$(Server)" Application="CargoWise.eHub" />
+  </Target>
+
+  <Target Name="StartHostInstances">
+    <MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="StartAllSendPorts" MachineName="$(Server)" Applications="CargoWise.eHub"/>
+    <MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="StartAllOrchestrations" MachineName="$(Server)" Applications="CargoWise.eHub"/>
+    <MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance TaskAction="Get">
+      <Output TaskParameter="HostInstances" ItemName="HostInstances"/>
+    </MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance>
+    <ItemGroup>
+      <Hosts Include="@(HostInstances)" Condition="%(HostType) == 1 and %(ServiceState) == 1 and !%(IsDisabled)"/>
+    </ItemGroup>
+    <MSBuild.ExtensionPack.BizTalk.BizTalkHostInstance Condition="'%(Hosts.Identity)' != ''" TaskAction="Start" HostName="%(Hosts.Identity)"/>
+  </Target>
+
+  <Target Name="StartApplication">
+    <MSBuild.ExtensionPack.BizTalk.BizTalkApplication TaskAction="StartAll" MachineName="$(Server)" Applications="CargoWise.eHub;CargoWise.eHub.Rcv"/>
+    <MSBuild.ExtensionPack.Web.Iis7Website TaskAction="Start" Name="Default Web Site"/>
+    <MSBuild.ExtensionPack.Web.Iis7Website TaskAction="Start" Name="GEI-ITWS"/>
+    <Exec Command='SCHTASKS /change /TN "\eServices\Restart BizTalk Hosts" /ENABLE' />
+  </Target>
+
+</Project>

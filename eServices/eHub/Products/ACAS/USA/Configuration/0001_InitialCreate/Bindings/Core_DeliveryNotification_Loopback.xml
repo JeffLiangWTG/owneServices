@@ -1,0 +1,112 @@
+<SendPort Name="Core_DeliveryNotification_Loopback" IsStatic="true" IsTwoWay="true" BindingOption="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Description xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  <TransmitPipeline Name="CargoWise.eHub.Core.Pipelines.Snd_PassThruLoopbackPromote" FullyQualifiedName="CargoWise.eHub.Core.Pipelines.Snd_PassThruLoopbackPromote, CargoWise.eHub.Core.Pipelines, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350" Type="2" TrackingOption="ServiceStartEnd MessageSendReceive PipelineEvents" Description="" />
+  <SendPipelineData>
+    <Root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <Stages>
+        <Stage CategoryId="9d0e4101-4cce-4536-83fa-4a5040674ad6">
+          <Components>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.DynamicValuePromotionComponent">
+              <Properties>
+                <DynamicPropertyType vt="8">http://cargowise.com/ehub/routing/2010/06#ErrorDescription</DynamicPropertyType>
+                <DynamicPropertyValueFormat vt="8">{0}</DynamicPropertyValueFormat>
+                <Enabled vt="11">-1</Enabled>
+                <ExistingValuePropertyTypes vt="8">http://schemas.microsoft.com/BizTalk/2003/system-properties#AckDescription</ExistingValuePropertyTypes>
+              </Properties>
+            </Component>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.DynamicValuePromotionComponent">
+              <Properties>
+                <DynamicPropertyType vt="8">http://cargowise.com/ehub/routing/2010/06#ErrorCode</DynamicPropertyType>
+                <DynamicPropertyValueFormat vt="8">{0}</DynamicPropertyValueFormat>
+                <Enabled vt="11">-1</Enabled>
+                <ExistingValuePropertyTypes vt="8">http://schemas.microsoft.com/BizTalk/2003/system-properties#AckType</ExistingValuePropertyTypes>
+              </Properties>
+            </Component>
+          </Components>
+        </Stage>
+        <Stage CategoryId="9d0e4108-4cce-4536-83fa-4a5040674ad6">
+          <Components>
+            <Component Name="CargoWise.eHub.Core.PipelineComponents.StaticValuePromotionComponent">
+              <Properties>
+                <Value vt="8">DeliverToNotificationOrchestration</Value>
+              </Properties>
+            </Component>
+          </Components>
+        </Stage>
+      </Stages>
+    </Root>
+  </SendPipelineData>
+  <PrimaryTransport>
+    <Address>loopback://deliverynotification/</Address>
+    <TransportType Name="Loopback" Capabilities="8450" ConfigurationClsid="ef707bc2-02a7-4d2e-b4ba-a204d813a295" />
+    <TransportTypeData>
+      <CustomProps>
+        <AdapterConfig vt="8">
+          <Config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <uri>loopback://deliverynotification/</uri>
+            <Name>DeliveryNotification</Name>
+          </Config>
+        </AdapterConfig>
+      </CustomProps>
+    </TransportTypeData>
+    <RetryCount>3</RetryCount>
+    <RetryInterval>5</RetryInterval>
+    <ServiceWindowEnabled>false</ServiceWindowEnabled>
+    <FromTime>2000-01-01T14:00:00</FromTime>
+    <ToTime>2000-01-01T13:59:59</ToTime>
+    <Primary>true</Primary>
+    <OrderedDelivery>false</OrderedDelivery>
+    <DeliveryNotification>1</DeliveryNotification>
+    <SendHandler Name="BizTalkServerApplication" HostTrusted="false">
+      <TransportType Name="Loopback" Capabilities="8450" ConfigurationClsid="ef707bc2-02a7-4d2e-b4ba-a204d813a295" />
+    </SendHandler>
+  </PrimaryTransport>
+  <SecondaryTransport>
+    <Address />
+    <RetryCount>3</RetryCount>
+    <RetryInterval>5</RetryInterval>
+    <ServiceWindowEnabled>false</ServiceWindowEnabled>
+    <FromTime>2000-01-01T14:00:00</FromTime>
+    <ToTime>2000-01-01T13:59:59</ToTime>
+    <Primary>false</Primary>
+    <OrderedDelivery>false</OrderedDelivery>
+    <DeliveryNotification>1</DeliveryNotification>
+    <SendHandler xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  </SecondaryTransport>
+  <ReceivePipeline Name="Microsoft.BizTalk.DefaultPipelines.PassThruReceive" FullyQualifiedName="Microsoft.BizTalk.DefaultPipelines.PassThruReceive, Microsoft.BizTalk.DefaultPipelines, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" Type="1" TrackingOption="None" Description="" />
+  <ReceivePipelineData xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  <Tracking>0</Tracking>
+  <Filter>&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;Filter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;Group&gt;
+    &lt;Statement Property="BTS.AckSendPortName" Operator="5" Value="AlertService_Loopback" /&gt;
+    &lt;Statement Property="BTS.AckReceivePortName" Operator="0" Value="Gateway_SelectInboxMessageByStatus_OCM" /&gt;
+    &lt;Statement Property="BTS.AckType" Operator="0" Value="NACK" /&gt;
+  &lt;/Group&gt;
+  &lt;Group&gt;
+    &lt;Statement Property="BTS.AckReceivePortName" Operator="0" Value="Core_dbo_SelectOutboxMessageByEnvelopeID_WCF-SQL" /&gt;
+    &lt;Statement Property="BTS.AckType" Operator="6" /&gt;
+  &lt;/Group&gt;
+  &lt;Group&gt;
+    &lt;Statement Property="BTS.AckSendPortName" Operator="0" Value="CargoWise.eHub.Products.OceanCarrierMessaging.Orchestrations_3.0.0.0_CargoWise.eHub.Products.OceanCarrierMessaging.Orchestrations.Carrier_Email_SendPort_4f570df270576350" /&gt;
+    &lt;Statement Property="BTS.AckType" Operator="6" /&gt;
+  &lt;/Group&gt;
+  &lt;Group&gt;
+    &lt;Statement Property="BTS.AckSendPortName" Operator="0" Value="AlertService_Loopback" /&gt;
+    &lt;Statement Property="BTS.AckReceivePortName" Operator="0" Value="Gateway_SelectInboxMessageByStatus_FPM" /&gt;
+    &lt;Statement Property="BTS.AckType" Operator="0" Value="NACK" /&gt;
+  &lt;/Group&gt;
+  &lt;Group&gt;
+    &lt;Statement Property="BTS.AckSendPortName" Operator="5" Value="AlertService_Loopback" /&gt;
+    &lt;Statement Property="BTS.AckReceivePortName" Operator="0" Value="Gateway_SelectInboxMessageByStatus_ACAS" /&gt;
+    &lt;Statement Property="BTS.AckType" Operator="0" Value="NACK" /&gt;
+  &lt;/Group&gt;
+&lt;/Filter&gt;</Filter>
+  <Transforms />
+  <InboundTransforms />
+  <OrderedDelivery>false</OrderedDelivery>
+  <Priority>5</Priority>
+  <StopSendingOnFailure>false</StopSendingOnFailure>
+  <RouteFailedMessage>false</RouteFailedMessage>
+  <ApplicationName>CargoWise.eHub</ApplicationName>
+</SendPort>

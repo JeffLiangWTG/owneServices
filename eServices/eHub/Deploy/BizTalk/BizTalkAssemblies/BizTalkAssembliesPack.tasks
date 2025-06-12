@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="unit-test">
+
+  <PropertyGroup>
+    <BizTalkAssembliesPackTasksImported>true</BizTalkAssembliesPackTasksImported>
+
+    <RelativeBinPath Condition="'$(RelativeBinPath)'==''">..\..\..\Bin\</RelativeBinPath>
+    <OutputPath Condition="'$(OutputPath)'==''">$(RelativeBinPath)</OutputPath>
+    <BinPath Condition="'$(BinPath)'==''">$(MSBuildThisFileDirectory)$(RelativeBinPath)</BinPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BinPath>$([System.IO.Path]::GetFullPath('$(BinPath)'))</BinPath>
+    <BinPath Condition="$(BinPath.EndsWith('\\'))">$(BinPath.TrimEnd('\\'))</BinPath>
+
+    <DeploymentRootPath Condition="'$(DeploymentRootPath)'==''">$(BinPath)\Deployment\</DeploymentRootPath>
+    <CommonScriptsPath Condition="'$(CommonScriptsPath)'==''">$(DeploymentRootPath)Common\</CommonScriptsPath>
+    <BizTalkAssembliesConfigPath>$(MSBuildThisFileDirectory)Config\</BizTalkAssembliesConfigPath>
+
+    <ProfilesPropsDirectory>$(MSBuildThisFileDirectory)..\Profiles\</ProfilesPropsDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BizTalkAssembliesXml>$(BizTalkAssembliesConfigPath)BizTalkAssemblies.xml</BizTalkAssembliesXml>
+    <ReferenceGACFilePath>$(ProfilesPropsDirectory)GAC.txt</ReferenceGACFilePath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <MSBuildCommonTasks Condition="'$(MSBuildCommonTasks)'==''">$(CommonScriptsPath)MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks Condition="'$(PackageCommonTasks)'==''">$(DeploymentRootPath)package-common.tasks</PackageCommonTasks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ToolsDir>$(BinPath)\Tools</ToolsDir>
+    <DependencyTreeBuilderAssemblyPath>$(ToolsDir)\CargoWise.eHub.Tools.MSBuild.DependencyTreeBuilder.dll</DependencyTreeBuilderAssemblyPath>
+    <AssemblyUtilsAssemblyPath>$(ToolsDir)\AssemblyUtils.dll</AssemblyUtilsAssemblyPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(BizTalkAssembliesXml)" Condition="'$(BizTalkAssembliesXmlImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+
+  <!-- filter unit-test and not strong name signed assemblies -->
+  <Target Name="00:assemblies:other-assemblies" DependsOnTargets="this:init" Returns="@(OtherAssemblyFiles)">
+    <Error Text="Bin path $(BinPath) is not found." Condition="!Exists('$(BinPath)')" />
+    <Message Text="Filtering out unit-test and not strong name signed assemblies..." Importance="High" />
+
+    <GetUnitTestOrNotSignedAssemblies BinPath="$(BinPath)">
+      <Output TaskParameter="OutputItems" ItemName="OtherAssemblyFiles" />
+    </GetUnitTestOrNotSignedAssemblies>
+
+    <ItemGroup>
+      <OtherAssemblyFileNames Include="$([System.IO.Path]::GetFileName(%(OtherAssemblyFiles.FullPath)))" />
+    </ItemGroup>
+
+    <WriteLinesToFile
+      File="$(OtherAssemblyFilesFilePath)"
+      Lines="@(OtherAssemblyFileNames)"
+      Overwrite="true"
+      Encoding="utf-8"/>
+
+    <Message Text="%(OtherAssemblyFileNames.Identity)" />
+    <Message Text="$(OtherAssemblyFilesFilePath)" Importance="High" />
+    <Error Text="$(OtherAssemblyFilesFilePath) does not exist." Condition="!Exists('$(OtherAssemblyFilesFilePath)')" />
+  </Target>
+
+  <!-- filter biztalk-only assemblies, excluding @(OtherAssemblyFiles) -->
+  <Target Name="01:assemblies:biztalk-only-assemblies" DependsOnTargets="this:init;00:assemblies:other-assemblies" Returns="@(BizTalkOnlyAssemblies)">
+    <Error Text="Assembly utils assembly path $(AssemblyUtilsAssemblyPath) is not found." Condition="!Exists('$(AssemblyUtilsAssemblyPath)')" />
+    <Error Text="Bin path $(BinPath) is not found." Condition="!Exists('$(BinPath)')" />
+    <Message Text="Filtering out BizTalk only assemblies..." Importance="High" />
+
+    <GetBizTalkOnlyAssemblies BinPath="$(BinPath)">
+      <Output TaskParameter="OutputItems" ItemName="OutputBizTalkOnlyAssemblies" />
+    </GetBizTalkOnlyAssemblies>
+
+    <ItemGroup>
+      <BizTalkOnlyAssemblies Include="@(OutputBizTalkOnlyAssemblies)" />
+    </ItemGroup>
+
+    <WriteLinesToFile
+      File="$(BizTalkOnlyAssembliesFilePath)"
+      Lines="@(BizTalkOnlyAssemblies)"
+      Overwrite="true"
+      Encoding="utf-8"/>
+
+    <Message Text="%(BizTalkOnlyAssemblies.Identity)" />
+    <Message Text="$(BizTalkOnlyAssembliesFilePath)" Importance="High" />
+    <Error Text="$(BizTalkOnlyAssembliesFilePath) does not exist." Condition="!Exists('$(BizTalkOnlyAssembliesFilePath)')" />
+  </Target>
+
+  <!-- generate assemblies dependencies graph, including assemblies referenced in the ext_xml files using reflection -->
+  <Target Name="02:assemblies:build-dependencies-graph" DependsOnTargets="this:init;01:assemblies:biztalk-only-assemblies" Returns="@(DependenciesGraph)">
+    <Error Text="Bin path $(BinPath) is not found." Condition="!Exists('$(BinPath)')" />
+    <Error Text="Please specify a path to output the result dependencies graph." Condition="'$(DependenciesGraphFilePath)'==''" />
+    <Message Text="Building dependencies graph from $(BinPath) folder..." Importance="High" />
+
+    <DependencyBuildTask BinPath="$(BinPath)" DependenciesGraphFilePath="$(DependenciesGraphFilePath)">
+      <Output TaskParameter="Dependencies" ItemName="DependenciesGraph" />
+    </DependencyBuildTask>
+
+    <Message Text="%(DependenciesGraph.Identity)" />
+    <Message Text="$(DependenciesGraphFilePath)" Importance="High" />
+  </Target>
+
+  <!-- get dependent reference assemblies for the listed BizTalkAssemblies, excluding @(OtherAssemblyFiles) -->
+  <Target Name="03:assemblies:get-referenced-assemblies" DependsOnTargets="this:init;01:assemblies:biztalk-only-assemblies;02:assemblies:build-dependencies-graph" Returns="@(DependentReferenceAssemblies)">
+    <Error Text="Bin path $(BinPath) is not found." Condition="!Exists('$(BinPath)')" />
+    <Error Text="Dependencies graph file path $(DependenciesGraphFilePath) is not found." Condition="!Exists('$(DependenciesGraphFilePath)')" />
+    <Error Text="No assemblies is given to find their reference assemblies." Condition="@(BizTalkOnlyAssemblies->Count()) == 0" />
+    <Message Text="Filtering out unit-test and not strong name signed assemblies..." Importance="High" />
+
+    <GetDependentFiles AssemblyFileNames="@(BizTalkOnlyAssemblies)" DependenciesGraphFilePath="$(DependenciesGraphFilePath)">
+      <Output TaskParameter="Dependencies" ItemName="outputDependentAssemblies" />
+    </GetDependentFiles>
+
+    <ItemGroup>
+      <DistinctDependentReferenceAssemblies Include="@(outputDependentAssemblies->Distinct())" />
+      <DependentReferenceAssemblies Include="@(DistinctDependentReferenceAssemblies)" Exclude="@(OtherAssemblyFiles)" />
+    </ItemGroup>
+
+    <WriteLinesToFile
+      File="$(DependentReferenceAssembliesFilePath)"
+      Lines="@(DependentReferenceAssemblies)"
+      Overwrite="true"
+      Encoding="utf-8"/>
+
+    <Message Text="%(DependentReferenceAssemblies.Identity)" />
+    <Message Text="$(DependentReferenceAssembliesFilePath)" Importance="High" />
+    <Error Text="$(DependentReferenceAssembliesFilePath) does not exist." Condition="!Exists('$(DependentReferenceAssembliesFilePath)')" />
+  </Target>
+
+  <!-- sort assemblies, excluding non-exist files, based on the order the assemblies appear on the provided dependencies graph -->
+  <Target Name="04:assemblies:sort-on-dependencies-graph" DependsOnTargets="this:init;01:assemblies:biztalk-only-assemblies;02:assemblies:build-dependencies-graph;03:assemblies:get-referenced-assemblies" Returns="@(SortedAssemblyFileNames)">
+    <Error Text="Bin path $(BinPath) is not found." Condition="!Exists('$(BinPath)')" />
+    <Message Text="Building dependencies graph from $(BinPath) folder..." Importance="High" />
+
+    <!-- extract just file names to enable sorting -->
+    <ItemGroup>
+      <AssembliesPack Include="@(BizTalkOnlyAssemblies)" />
+      <AssembliesPack Include="@(DependentReferenceAssemblies)" />
+      <AssembliesPack Include="@(SpecificIncludedBizTalkAssemblies" />
+
+      <AssemblyFileNames Include="$([System.IO.Path]::GetFileName(%(AssembliesPack.FullPath)))" />
+    </ItemGroup>
+
+    <ExcludeNonExistFiles AssemblyFileNames="@(AssemblyFileNames)" BinPath="$(BinPath)">
+      <Output TaskParameter="OutputItems" ItemName="FileExistsAssemblyFileNames" />
+    </ExcludeNonExistFiles>
+
+    <ItemGroup>
+      <ValidAssemblyFileNames Include="@(FileExistsAssemblyFileNames)" Exclude="@(ExcludeAssemblyFileNames);@(OtherAssemblyFileNames)" />
+    </ItemGroup>
+
+    <!-- sort on assemblies based on the order in the @(DependenciesGraph) -->
+    <SortDependenciesTask Items="@(ValidAssemblyFileNames)" Dependencies="@(DependenciesGraph)">
+      <Output TaskParameter="SortedItems" ItemName="SortedAssemblyFileNames" />
+    </SortDependenciesTask>
+
+    <WriteLinesToFile
+      File="$(SortedAssemblyFileNamesFilePath)"
+      Lines="@(SortedAssemblyFileNames)"
+      Overwrite="true"
+      Encoding="utf-8"/>
+
+    <Message Text="%(SortedAssemblyFileNames.Identity)" />
+    <Message Text="$(SortedAssemblyFileNamesFilePath)" Importance="High" />
+    <Error Text="$(SortedAssemblyFileNamesFilePath) does not exist." Condition="!Exists('$(SortedAssemblyFileNamesFilePath)')" />
+
+    <!-- compare the selected against gold reference GAC list exported from production system -->
+    <CollectionContains
+      MasterItems="@(SortedAssemblyFileNames)"
+      SubItems="@(ReferenceGacAssemblyFileNames)">
+      <Output TaskParameter="ItemsNotFound" ItemName="GacItemsNotFoundOnSortedList" />
+      <Output TaskParameter="ItemsFound" ItemName="ItemsFound" />
+    </CollectionContains>
+
+    <CollectionContains
+      MasterItems="@(ReferenceGacAssemblyFileNames)"
+      SubItems="@(SortedAssemblyFileNames)">
+      <Output TaskParameter="ItemsNotFound" ItemName="SortedItemsNotFoundOnGacList" />
+      <Output TaskParameter="ItemsFound" ItemName="ItemsFound" />
+    </CollectionContains>
+
+    <WriteLinesToFile
+      File="$(NewAddedAssembliesFilePath)"
+      Lines="@(SortedItemsNotFoundOnGacList)"
+      Overwrite="true"
+      Encoding="utf-8" />
+      
+    <WriteLinesToFile
+      File="$(AssembliesMissingFromReferenceGacFilePath)"
+      Lines="@(GacItemsNotFoundOnSortedList)"
+      Overwrite="true"
+      Encoding="utf-8" />
+  </Target>
+
+  <!-- create required output directories -->
+  <Target Name="this:init" Returns="$(LogDirectory)" DependsOnTargets="bat:package:init">
+    <PropertyGroup>
+      <tempDirectory>$([System.IO.Path]::GetFullPath('$(TEMP)'))</tempDirectory>
+      <timeStamp>$([System.DateTime]::Now.ToString(`yyyyMMdd_HHmmss`))</timeStamp>
+
+      <_ZipContentsDirectory Condition="'$(_ZipContentsDirectory)'==''">$([System.IO.Path]::Combine('$(_ZipContentsDirectory)', '$(timeStamp)')</_ZipContentsDirectory>
+      <LogDirectory Condition="'$(LogDirectory)'==''">$(_ZipContentsDirectory)\Logs\</LogDirectory>
+    </PropertyGroup>
+
+    <!-- the output files of intermediate process -->
+    <PropertyGroup>
+      <BizTalkOnlyAssembliesFilePath>$(LogDirectory)BizTalkOnlyAssemblies.txt</BizTalkOnlyAssembliesFilePath>
+      <DependenciesGraphFilePath>$(LogDirectory)DependenciesGraph.json</DependenciesGraphFilePath>
+      <SortedAssemblyFileNamesFilePath>$(LogDirectory)SortedAssemblyFileNames.txt</SortedAssemblyFileNamesFilePath>
+      <DependentReferenceAssembliesFilePath>$(LogDirectory)DependentReferenceAssemblies.txt</DependentReferenceAssembliesFilePath>
+      <OtherAssemblyFilesFilePath>$(LogDirectory)OtherAssemblyFiles.txt</OtherAssemblyFilesFilePath>
+      <ExcludeAssembliesFilePath>$(LogDirectory)ExcludeAssemblies.txt</ExcludeAssembliesFilePath>
+      <GacReferenceAssembliesFilePath>$(LogDirectory)GacReferenceAssemblies.txt</GacReferenceAssembliesFilePath>
+      <NewAddedAssembliesFilePath>$(LogDirectory)NewAddedAssembliesPreviouslyNotOnReferenceGacList.txt</NewAddedAssembliesFilePath>
+      <AssembliesMissingFromReferenceGacFilePath>$(LogDirectory)MissingAssembliesButShownOnReferenceGacList.txt</AssembliesMissingFromReferenceGacFilePath>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(LogDirectory)" Condition="!Exists('$(LogDirectory)')" />
+
+    <ItemGroup>
+      <ExcludeAssemblyFileNames Include="$([System.IO.Path]::GetFileName(%(ExcludeAssemblies.FullPath)))" />
+    </ItemGroup>
+
+    <WriteLinesToFile
+      File="$(ExcludeAssembliesFilePath)"
+      Lines="@(ExcludeAssemblyFileNames)"
+      Overwrite="true"
+      Encoding="utf-8" />
+
+    <ReadLinesFromFile File="$(ReferenceGACFilePath)" Condition="Exists('$(ReferenceGACFilePath)')" >
+      <Output TaskParameter="Lines" ItemName="ReferenceGacAssemblyNames"/>
+    </ReadLinesFromFile>
+
+    <ItemGroup>
+      <ReferenceGacAssemblyFileNames Include="@(ReferenceGacAssemblyNames->'%(Identity).dll')" />
+    </ItemGroup>
+    <WriteLinesToFile
+      File="$(GacReferenceAssembliesFilePath)"
+      Lines="@(ReferenceGacAssemblyFileNames)"
+      Overwrite="true"
+      Encoding="utf-8" />
+
+  </Target>
+
+  <!-- process and sort out the assemblies of interest to the $(_ZipContentsDirectory) -->
+  <Target Name="assemblies:select-biztalk-assemblies" Returns="@(SortedAssemblyFileNames)">
+    <Error Text="'$(_ZipContentsDirectory)' not found." Condition="!Exists('$(_ZipContentsDirectory)')" />
+
+    <CallTarget Targets="04:assemblies:sort-on-dependencies-graph" />
+  </Target>
+
+  <!-- unit test to verify the assembly files picked are as expected -->
+  <Target Name="unit-test">
+    <ReadLinesFromFile File="$(ReferenceGACFilePath)" Condition="Exists('$(ReferenceGACFilePath)')" >
+      <Output TaskParameter="Lines" ItemName="ReferenceGacFiles"/>
+    </ReadLinesFromFile>
+
+    <PropertyGroup>
+      <ExtraGacItemsFilePath>$([System.IO.Path]::GetTempFileName())</ExtraGacItemsFilePath>
+      <ExtraGacItemsFilePath>$([System.IO.Path]::ChangeExtension('$(ExtraGacItemsFilePath)','.txt'))</ExtraGacItemsFilePath>
+    </PropertyGroup>
+
+    <!-- verify @(BizTalkAssemblies) is a subset of @(ReferenceGacFiles) -->
+    <CollectionContains
+      MasterItems="@(ReferenceGacFiles)"
+      SubItems="@(BizTalkAssemblies)">
+      <Output TaskParameter="ItemsNotFound" ItemName="ItemsNotFound" />
+      <Output TaskParameter="ItemsFound" ItemName="ItemsFound" />
+    </CollectionContains>
+
+    <PropertyGroup>
+      <Exists Condition="@(ItemsNotFound->Count()) > 0">true</Exists>
+    </PropertyGroup>
+
+    <Message Text="ItemsNotFound" Importance="High" Condition="'$(Exists)'!='true'" />
+    <Message TEXT="%(ItemsNotFound.Identity)" Condition="'$(Exists)'!='true'" />
+    <Error Text="BizTalkAssemblies some not found in the ReferenceGacFiles list" Condition="'$(Exists)'!='true'" />
+    <Message Text="(/) Good! BizTalkAssemblies all found in the ReferenceGacFiles list." Condition="'$(Exists)'=='true'" />
+
+    <!-- list out items not included in @(BizTalkAssemblies) as shown in the @(ReferenceGacFiles) -->
+    <Message Text="Total: @(ItemsNotFound->Count()) extra items not included BizTalkAssemblies list but appear in the $(ReferenceGACFilePath):" Importance="High" />
+    <WriteLinesToFile
+      File="$(ExtraGacItemsFilePath)"
+      Lines="@(ItemsNotFound)"
+      Overwrite="true"
+      Encoding="utf-8"/>
+    <Exec Command='start "$(ExtraGacItemsFilePath)"' Condition="Exists('$(ExtraGacItemsFilePath)')" />
+
+    <!-- verify @(ExcludeAssemblies) are excluded from @(BizTalkAssemblies) -->
+    <CollectionContains
+      MasterItems="@(BizTalkAssemblies)"
+      SubItems="@(ExcludeAssemblies)">
+      <Output TaskParameter="ItemsNotFound" ItemName="ItemsNotFound" />
+      <Output TaskParameter="ItemsFound" ItemName="ItemsFound" />
+    </CollectionContains>
+
+    <PropertyGroup>
+      <Exists Condition="@(ItemsFound->Count()) > 0">true</Exists>
+    </PropertyGroup>
+
+    <Message Text="ItemsFound" Importance="High" Condition="'$(Exists)'=='true'" />
+    <Message TEXT="%(ItemsFound.Identity)" Condition="'$(Exists)'=='true'" />
+    <Error Text="Excluded assemblies found in the BizTalkAssemblies list, total: @(ItemsFound->Count())" Condition="'$(Exists)'=='true'" />
+    <Message Text="(/) Good! Excluded assemblies not found in the BizTalkAssemblies list." Condition="'$(Exists)'!='true'" />
+
+    <!-- verify @(SpecificIncludedBizTalkAssemblies) are included in @(BizTalkAssemblies) -->
+    <CollectionContains
+      MasterItems="@(BizTalkAssemblies)"
+      SubItems="@(SpecificIncludedBizTalkAssemblies)">
+      <Output TaskParameter="ItemsNotFound" ItemName="ItemsNotFound" />
+      <Output TaskParameter="ItemsFound" ItemName="ItemsFound" />
+    </CollectionContains>
+
+    <PropertyGroup>
+      <Exists Condition="@(ItemsNotFound->Count()) > 0">true</Exists>
+    </PropertyGroup>
+
+    <Message Text="ItemsNotFound" Importance="High" Condition="'$(Exists)'!='true'" />
+    <Message TEXT="%(ItemsNotFound.Identity)" Condition="'$(Exists)'!='true'" />
+    <Error Text="SpecificIncludedBizTalkAssemblies some not found in the BizTalkAssemblies list" Condition="'$(Exists)'!='true'" />
+    <Message Text="(/) Good! Specific Included BizTalkAssemblies all found in the BizTalkAssemblies list." Condition="'$(Exists)'=='true'" />
+
+    <!-- list out @(BizTalkAssemblies) -->
+    <!-- <Message Text="BizTalkAssemblies list:" Importance="High" /> -->
+    <!-- <Message Text="%(BizTalkAssemblies.Identity)" /> -->
+    <!-- <Message Text="Total: @(BizTalkAssemblies->Count())" Importance="High" /> -->
+  </Target>
+
+  <UsingTask
+    TaskName="CollectionContains"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MasterItems ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <SubItems ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <ItemsNotFound ParameterType="System.String[]" Output="true" />
+      <ItemsFound ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      [string[]]$ItemsNotFound = @()
+      [string[]]$ItemsFound = @()
+
+      [string[]] $collection = @()
+      $MasterItems | % {
+        $collection += $_.GetMetadata("Identity")
+      }
+
+      $SubItems | % {
+        $item = $_.GetMetadata("Identity")
+
+        if (-not ($collection -Contains $item)) {
+          $ItemsNotFound += $item
+        } else {
+          $ItemsFound += $item
+        }
+      }
+    </Task>
+  </UsingTask>
+
+  <UsingTask
+    TaskName="ExcludeNonExistFiles"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(ExtensionPackPowershellFilePath)">
+    <ParameterGroup>
+      <AssemblyFileNames ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <BinPath ParameterType="System.String" Required="true" />
+      <OutputItems ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        $OutputItems = @()
+        $AssemblyFileNames | % {
+            $fileName = $_.GetMetadata("Identity")
+            $filePath = Join-Path $BinPath $_
+            if (Test-Path $filePath) {
+                $OutputItems += $fileName
+            }
+        }
+      ]]>
+    </Task>
+
+  </UsingTask>
+
+  <UsingTask
+    TaskName="GetDependentFiles"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(ExtensionPackPowershellFilePath)">
+    <ParameterGroup>
+      <AssemblyFileNames ParameterType="System.String[]" Required="true" />
+      <DependenciesGraphFilePath ParameterType="System.String" Required="true" />
+      <Dependencies ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+            $Dependencies = @()
+            $jsonGraph = Get-Content -Raw -Path $DependenciesGraphFilePath | Out-String | ConvertFrom-Json
+            
+            function GetAllDependentAssemblies {
+                param (
+                    $referenceAssembly,
+                    $jsonGraph
+                )
+
+                $result = @()
+
+                $key = $referenceAssembly
+                $array = @()
+                $dependents = $jsonGraph.$key
+                if ($null -ne $dependents) {
+                    $array += $dependents
+                }
+
+                if ($array.Count -gt 0) {
+                    $array | % {
+                        $result += GetAllDependentAssemblies -referenceAssembly $_ -jsonGraph $jsonGraph
+                    }
+                    
+                    $result += $array
+                }
+
+                return $result
+            }
+
+            $AssemblyFileNames | % {
+                $Dependencies += GetAllDependentAssemblies -referenceAssembly $_ -jsonGraph $jsonGraph
+            }
+      ]]>
+    </Task>
+
+  </UsingTask>
+
+  <UsingTask
+    TaskName="DependencyBuildTask"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(ExtensionPackPowershellFilePath)">
+    <ParameterGroup>
+      <BinPath ParameterType="System.String" Required="true" />
+      <DependenciesGraphFilePath ParameterType="System.String" Required="true" />
+      <Dependencies ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+            Add-Type -Path $(DependencyTreeBuilderAssemblyPath)
+            $dependenciesBuilder = New-Object CargoWise.eHub.Tools.MSBuild.DependencyBuildTask
+            $Dependencies = $dependenciesBuilder.Execute($BinPath)
+            $json = $dependenciesBuilder.DependencyGraphToJsonString()
+
+            $json | Out-File $DependenciesGraphFilePath -Encoding utf8
+        ]]>
+    </Task>
+
+  </UsingTask>
+
+  <UsingTask
+    TaskName="SortDependenciesTask"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(ExtensionPackPowershellFilePath)">
+    <ParameterGroup>
+      <Items ParameterType="System.String[]" Required="true" />
+      <Dependencies ParameterType="System.String[]" Required="true" />
+      <SortedItems Output="true" ParameterType="System.String[]" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+            Add-Type -Path $(DependencyTreeBuilderAssemblyPath)
+            $sortDependenciesBuilder = New-Object CargoWise.eHub.Tools.MSBuild.SortDependenciesTask
+            $SortedItems = $sortDependenciesBuilder.SortItems($Items, $Dependencies)
+        ]]>
+    </Task>
+
+  </UsingTask>
+
+  <UsingTask
+    TaskName="GetBizTalkOnlyAssemblies"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(ExtensionPackPowershellFilePath)">
+    <ParameterGroup>
+      <BinPath ParameterType="System.String" Required="true" />
+      <OutputItems ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+            Add-Type -Path $(AssemblyUtilsAssemblyPath)
+            $util = New-Object AssemblyUtils.AssemblyChecker
+            $OutputItems = $util.GetAssemblyNamesWithReferencing($BinPath, $null)
+        ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask
+    TaskName="GetUnitTestOrNotSignedAssemblies"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(ExtensionPackPowershellFilePath)">
+    <ParameterGroup>
+      <BinPath ParameterType="System.String" Required="true" />
+      <OutputItems ParameterType="System.String[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <![CDATA[
+            Add-Type -Path $(AssemblyUtilsAssemblyPath)
+            $util = New-Object AssemblyUtils.AssemblyChecker
+            $OutputItems = @()
+            (Get-ChildItem $BinPath "*.dll" -Recurse) | % {
+                $filePath = $_.FullName
+                if (-not ($util.IsStrongNameSigned($filePath)) -or $util.IsUnitTestAssembly($filePath)) {
+                    $OutputItems += $filePath
+                }
+            }
+        ]]>
+    </Task>
+  </UsingTask>
+
+</Project>
+
+<!--
+  BizTalkAssembliesPack.tasks is responsible to select assembly files from common output bin path that are meant for
+  BizTalk Server runtime.
+
+  They must fall into one of the following categories:
+  1. Required as they are referenced by BizTalk projects;
+  2. Are of the assemblies that must be installed onto system GAC;
+  3. The produces from $/eServices/eHub/Products;
+  4. They are referenced in the BindingsInfo.xml files;
+  5. They are referenced in the individual mappings "*_extxml.xml" files;
+  6. Any additional files manually specified in a Config/BizTalkAssemblies.xml file;
+  7. They must appear on the list of a GAC.txt file that was exported from the production system.
+
+  Since common output Bin folder contains everything, filters will be applied to exclude assemblies not intended
+  to be used by BizTalk Server environment, such as the outputs for most database projects, US customs projects, utilities, etc. 
+-->

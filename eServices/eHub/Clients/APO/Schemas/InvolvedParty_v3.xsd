@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty:v1" xmlns:cmm2="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" xmlns:cmm3="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" targetNamespace="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty:v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" schemaLocation="StandardAddress_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" schemaLocation="CommonTypes_v3.xsd"/>
+	<xs:include schemaLocation="Individual_v3.xsd"/>
+	<xs:include schemaLocation="Organisation_v3.xsd"/>
+	<!-- A base type InvolvedPartyBaseType is defined as Customer, Supplier etc are InvolvedParties and will be implemented as required as extensions of InvolvedParty -->
+	<xs:complexType name="InvolvedPartyBaseType" abstract="true">
+		<xs:sequence>
+			<xs:element name="InvolvedPartyId" type="cmm3:InvolvedPartyIdType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A unique identifier for an Involved Party. It does not contain any business information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="InvolvedPartyRelationship" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>An Involved Party Relationship is a relationship between two or more Involved Parties.  For example:
+- Supplier / Customer relationship
+- Competitor / Competitor relationship
+- Business Partner / Business Partner relationship
+- Employer / Employee relationship
+</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="RelationshipType" type="RelationshipType">
+							<xs:annotation>
+								<xs:documentation>Identifies the type of the Involved Party Relationship</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="InvolvedPartyId" type="cmm3:InvolvedPartyIdType"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:choice>
+				<xs:element ref="Individual"/>
+				<xs:element ref="Organisation"/>
+			</xs:choice>
+			<xs:element name="ElectronicContact" type="cmm3:ElectronicContactType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Address" type="cmm2:AddressType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="ModificationAudit" type="cmm3:ModificationAudit" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The latest modification information including by whom and when the modification has been made</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PartyIdentification" type="PartyIdentification" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InvolvedPartyType">
+		<xs:complexContent>
+			<xs:extension base="InvolvedPartyBaseType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="InvolvedParty" type="InvolvedPartyType"/>
+	<xs:simpleType name="RelationshipType">
+		<xs:annotation>
+			<xs:documentation>Identifies the type of the Involved Party Relationship</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="50"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="PartyIdentification">
+		<xs:sequence>
+			<xs:element name="IdentityDocument" type="IdentityDocument" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IdentityDocument">
+		<xs:sequence>
+			<xs:element name="IdentificationType" type="xs:token">
+				<xs:annotation>
+					<xs:documentation>Records the type of identification document or record</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IdentificationNumber" type="xs:token">
+				<xs:annotation>
+					<xs:documentation>Records the unique number of the identification document or record, e.g. passport number, ABN, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IssuerInformation" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="IssuingAuthority" type="xs:token" minOccurs="0"/>
+						<xs:element name="StateOrTerritory" type="cmm2:StandardInternationalAddressLine" minOccurs="0"/>
+						<xs:element name="Country" type="cmm2:CountryType" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ValidPeriod" type="cmm3:ValidPeriod" minOccurs="0"/>
+			<xs:element name="PhotoIdentification" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="InspectionDate" type="cmm3:LOCALOFFSET_DateTime" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

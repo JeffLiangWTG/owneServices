@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Mit XMLSpy v2013 sp1 (x64) (http://www.altova.com) von Uwe Droste (CargoSoft GmbH) bearbeitet -->
+<!-- edited with XMLSpy v2006 sp2 U (http://www.altova.com) by Matthias Menz (CargoSoft GmbH) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:annotation>
+    <xs:appinfo>
+      <schemaInfo root_reference="Timezone" displayroot_reference="Timezone" xmlns="http://schemas.microsoft.com/BizTalk/2003" />
+    </xs:appinfo>
+  </xs:annotation>
+  
+	<xs:complexType name="ComplexCode">
+		<xs:sequence>
+			<xs:element name="Description" type="xs:string" minOccurs="0"/>
+			<xs:element name="Codes" type="Codes" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AdditionalFieldType">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element name="AdditionalField">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Codes" type="ComplexCode" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Not all additionalFields do have an code</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="TextValue" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>For freetext fields use this field instead of Codes.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="DateTime" type="DateTimeType" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>For date fields use this field instead of Codes or TextValue.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="type" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>What kind of additionalField</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Remarks">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element name="Remark">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="type" type="xs:string"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Location">
+		<xs:sequence>
+			<xs:element name="Codes" type="Codes" minOccurs="0"/>
+			<xs:element name="Name" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Unit">
+		<xs:sequence>
+			<xs:element name="Packagecode">
+				<xs:annotation>
+					<xs:documentation>Identisch mit dem Verpackungscode aus der Warenbeschreibung</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Code">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string">
+										<xs:attribute name="type">
+											<xs:annotation>
+												<xs:documentation>cs, foreign</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:enumeration value="cs"/>
+													<xs:enumeration value="foreign"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Quantity" type="xs:integer"/>
+			<xs:element name="Length" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Height" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Width" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Stackable" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="PalletInformation" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Palletcode">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Code">
+										<xs:complexType>
+											<xs:simpleContent>
+												<xs:extension base="xs:string">
+													<xs:attribute name="type">
+														<xs:annotation>
+															<xs:documentation>cs, foreign</xs:documentation>
+														</xs:annotation>
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:enumeration value="cs"/>
+																<xs:enumeration value="foreign"/>
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:attribute>
+												</xs:extension>
+											</xs:simpleContent>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="Quantity" type="xs:integer"/>
+						<xs:element name="UnitsPerLayer" type="xs:integer" minOccurs="0"/>
+						<xs:element name="NumberOfLayers" type="xs:integer" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MinQuantity" type="xs:integer" minOccurs="0"/>
+			<xs:element name="MaxQuantity" type="xs:integer" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Message">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="SenderID">
+					<xs:annotation>
+						<xs:documentation>Sender of the message</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="30"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="ReceiverID">
+					<xs:annotation>
+						<xs:documentation>Receiver of the message</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="30"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element ref="Timezone" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>MET, UTC, EST, ...</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="MessageID" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Unique id for this Message</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="MessageDate" type="DateTimeType">
+					<xs:annotation>
+						<xs:documentation>Date / time of preparation</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Provider" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CargoSoftDatabaseVersion" type="xs:string" minOccurs="0"/>
+							<xs:element name="CargoServiceVersion" type="xs:string" minOccurs="0"/>
+							<xs:element name="InterfaceRevisionNumber" type="xs:string" minOccurs="0"/>
+							<xs:element name="InterfaceModificationDate" type="xs:string" minOccurs="0"/>
+							<xs:element name="InterfaceModificationUser" type="xs:string" minOccurs="0"/>
+							<xs:element name="InterfaceConfigurationHash" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Timezone" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>MET, UTC, ...</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="DateTimeType">
+		<xs:annotation>
+			<xs:documentation>Single dateTime or seperated date/time values</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="DateTime" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>yyyy-mm-ddThh:mm:ss</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:sequence>
+				<xs:element name="Date" type="xs:date">
+					<xs:annotation>
+						<xs:documentation>yyyy-mm-dd</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Time" type="xs:time" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>hh:mm:ss</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="AddressType">
+		<xs:sequence>
+			<xs:element name="Codes" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Code" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string">
+										<xs:attribute name="type" use="required">
+											<xs:annotation>
+												<xs:documentation>cs, foreign, scac</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:enumeration value="cs"/>
+													<xs:enumeration value="foreign"/>
+													<xs:enumeration value="scac"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Unformated" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Line" type="xs:string" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Formated" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Name" type="xs:string" minOccurs="0" maxOccurs="3"/>
+						<xs:element name="Street" type="xs:string" minOccurs="0"/>
+						<xs:element name="PostalCode" type="xs:string" minOccurs="0"/>
+						<xs:element name="City" type="xs:string" minOccurs="0"/>
+						<xs:element name="POBox" type="xs:string" minOccurs="0"/>
+						<xs:element name="POBoxPostalCode" type="xs:string" minOccurs="0"/>
+						<xs:element name="State" type="xs:string" minOccurs="0"/>
+						<xs:element name="Country" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="CountryCode" type="xs:string" minOccurs="0"/>
+									<xs:element name="Name" type="xs:string" minOccurs="0"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Contact" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Name" type="xs:string" minOccurs="0"/>
+						<xs:element name="Telefon" type="xs:string" minOccurs="0"/>
+						<xs:element name="Fax" type="xs:string" minOccurs="0"/>
+						<xs:element name="Mail" type="xs:string" minOccurs="0"/>
+						<xs:element name="Department" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="References" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Reference" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string">
+										<xs:attribute name="type" type="xs:string" use="required"/>
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="AdditionalFields" type="AdditionalFieldType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:annotation>
+				<xs:documentation>CZ, CN, N1, N2, IV, FW, TE, AGT, TR, P1, P2. P3, P4, P5, DC, CS, ST, CA</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string"/>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="InvoiceAddressType">
+		<xs:sequence>
+			<xs:element name="Codes" type="Codes"/>
+			<xs:element name="Unformated" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Line" type="xs:string" maxOccurs="5"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Formated" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Name" type="xs:string" minOccurs="0" maxOccurs="3"/>
+						<xs:element name="Street" type="xs:string" minOccurs="0"/>
+						<xs:element name="PostalCode" type="xs:string" minOccurs="0"/>
+						<xs:element name="City" type="xs:string" minOccurs="0"/>
+						<xs:element name="POBox" type="xs:string" minOccurs="0"/>
+						<xs:element name="POBoxPostalCode" type="xs:string" minOccurs="0"/>
+						<xs:element name="State" type="xs:string" minOccurs="0"/>
+						<xs:element name="Country" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="CountryCode" type="xs:string" minOccurs="0"/>
+									<xs:element name="Name" type="xs:string" minOccurs="0"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Contact" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Name" type="xs:string" minOccurs="0"/>
+						<xs:element name="Telefon" type="xs:string" minOccurs="0"/>
+						<xs:element name="Fax" type="xs:string" minOccurs="0"/>
+						<xs:element name="Mail" type="xs:string" minOccurs="0"/>
+						<xs:element name="Department" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="References" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Reference" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string">
+										<xs:attribute name="type" type="xs:string" use="required"/>
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:annotation>
+				<xs:documentation>CZ, CN, N1, N2, IV, FW, TE, AGT, TR, P1, P2. P3, P4, P5, DC, CS, ST, CA</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string"/>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="AttachmentType">
+		<xs:sequence>
+			<xs:element name="Filename" type="xs:string"/>
+			<xs:element name="References" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Reference" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string">
+										<xs:attribute name="type" type="xs:string" use="required">
+											<xs:annotation>
+												<xs:documentation>cs, foreign</xs:documentation>
+											</xs:annotation>
+										</xs:attribute>
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Description" type="xs:string" minOccurs="0"/>
+			<xs:element name="Codes" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Code" minOccurs="0" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string">
+										<xs:attribute name="type" use="required">
+											<xs:annotation>
+												<xs:documentation>cs, foreign</xs:documentation>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:enumeration value="cs"/>
+													<xs:enumeration value="foreign"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="FileDate" type="DateTimeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Timezone = Message/Timezone</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Content" type="xs:base64Binary" minOccurs="0"/>
+			<xs:element name="ContentInformation" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="function" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="FileNumberType">
+		<xs:sequence>
+			<xs:element name="Number">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Company">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="Code"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Office">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="Code"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Comments">
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element name="Comment">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="SenderID"/>
+							<xs:element name="AssignedTo" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence maxOccurs="unbounded">
+										<xs:element name="Code" type="xs:string"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="CreationDate" type="xs:dateTime"/>
+							<xs:element name="Text" type="xs:string"/>
+							<xs:element name="Author" type="xs:string"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SenderID">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:integer">
+					<xs:attribute name="ReceiverID" type="xs:integer"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="InvoiceAmount">
+		<xs:sequence>
+			<xs:element name="NetAmount" type="Amounts">
+				<xs:annotation>
+					<xs:documentation>Netto amount</xs:documentation>
+					<xs:documentation>db field: eafako_t.rech_betrag</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="VATInformation" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Contains information about VAT</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VAT" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>VAT Code</xs:documentation>
+								<xs:documentation>db field: eafako_t.fk_ust_sch</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Description" type="xs:string" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Optional will not be processed</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="Codes" type="Codes" minOccurs="0"/>
+									<xs:element name="VATRate" type="xs:double" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>VAT Rate in %</xs:documentation>
+											<xs:documentation>db field: ust_tab.ust_proz_nto</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="VATAmount" type="Amounts" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>VAT amount</xs:documentation>
+								<xs:documentation>db field: eafako_t.ust_betrag
+</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Codes">
+		<xs:sequence>
+			<xs:element name="Code" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="Type" type="xs:string" use="required">
+								<xs:annotation>
+									<xs:documentation>iso,cs,foreign,scac etc.</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Amounts">
+		<xs:sequence>
+			<xs:element name="Amount" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>For each currency one amount tag will be generated</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Currency" type="Currency" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Currency Code</xs:documentation>
+								<xs:documentation>db_field: eafako_t.fk_wg_sch</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Value" type="xs:double"/>
+						<xs:element name="ExchangeRate" type="xs:double" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Based on the domestic currency</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="isDomesticCurrency" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>Import: Will be ignored
+Export: Will be set to true if the domesticCurrency will be exported</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Currency">
+		<xs:sequence>
+			<xs:element name="Description" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Optional will not be processed</xs:documentation>
+					<xs:documentation>db field: wg_tab.wg_bez</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Codes" type="Codes" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="References">
+		<xs:sequence>
+			<xs:element name="Reference" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="type" use="required">
+								<xs:simpleType>
+									<xs:restriction base="xs:string"/>
+								</xs:simpleType>
+							</xs:attribute>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CodeAndDescription">
+		<xs:sequence>
+			<xs:element name="Description" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Optional will not be processed</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Codes" type="Codes"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

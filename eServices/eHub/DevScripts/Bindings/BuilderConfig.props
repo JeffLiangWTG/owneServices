@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <BuilderConfigPropsImported>true</BuilderConfigPropsImported>
+    <BindingInfo_OrchestrationBasePath>/BindingInfo/ModuleRefCollection</BindingInfo_OrchestrationBasePath>
+    <BindingInfo_SendPortBasePath>/BindingInfo/SendPortCollection</BindingInfo_SendPortBasePath>
+    <BindingInfo_ReceivePortBasePath>/BindingInfo/ReceivePortCollection</BindingInfo_ReceivePortBasePath>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <!-- /BindingInfo/SendPortCollection/SendPort/PrimaryTransport[starts-with(Address, 'mssql://') and ends-with(Address, 'eHubTransactions')] -->
+    <!-- /BindingInfo/SendPortCollection/SendPort/PrimaryTransport[starts-with(Address, 'mssql://') and contains(Address, 'eHubTransactions')] -->
+    <eHubTransactionsSendPort>/SendPort/PrimaryTransport[starts-with(Address, 'mssql://') and contains(Address, 'eHubTransactions')]</eHubTransactionsSendPort>
+
+    <!-- /BindingInfo/SendPortCollection/SendPort/PrimaryTransport[starts-with(Address,'loopback://')] -->
+    <loopbackSendPort>/SendPort/PrimaryTransport[starts-with(Address,'loopback://')]</loopbackSendPort>
+
+    <!-- /BindingInfo/ReceivePortCollection/ReceivePort/ReceiveLocations/ReceiveLocation[starts-with(Address, 'mssql://') and contains(Address, 'eHubTransactions')] -->
+    <eHubTransactionsReceiveLocation>/ReceivePort/ReceiveLocations/ReceiveLocation[starts-with(Address, 'mssql://') and contains(Address, 'eHubTransactions')]</eHubTransactionsReceiveLocation>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- mssql host address must be replaced with local  host -->
+    <patternWcfSqlHostAddress><![CDATA[^mssql://(?<hostAddress>.*)//.*$]]></patternWcfSqlHostAddress>
+
+    <!-- File handler transport type -->
+    <!--  XPath = /ReceivePort/ReceiveLocations/ReceiveLocation/ReceiveHandler -->
+    <ReceiveLocation_ReceiveHandler_File><![CDATA[<TransportType Name="FILE" Capabilities="11" ConfigurationClsid="5e49e3a6-b4fc-4077-b44c-22f34a242fdb" />]]></ReceiveLocation_ReceiveHandler_File>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ReplaceSendPortExcludeXPaths Include="$(eHubTransactionsSendPort)" />
+    <ReplaceSendPortExcludeXPaths Include="$(loopbackSendPort)" />
+
+    <ReplaceReceiveLocationExcludeXPaths Include="$(eHubTransactionsReceiveLocation)" />
+  </ItemGroup>
+</Project>

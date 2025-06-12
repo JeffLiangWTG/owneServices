@@ -1,0 +1,26 @@
+CREATE TABLE edi.StagingBatch
+(
+    TX_ID                BIGINT           NOT NULL,
+    TX_Category          VARCHAR (3)      NOT NULL,
+    TX_PriceItemCode     VARCHAR (3)      NOT NULL,
+    TX_BillableCount     INT              NOT NULL,
+    TX_ReportingSource   VARCHAR (3)      NOT NULL,
+    TX_ServiceOccuredUTC DATETIME2 (7)    NOT NULL,
+    TX_ClientID          VARCHAR (9)      NOT NULL,
+    TX_ClientNumber      VARCHAR (50)     NULL,
+    TX_ClientStaffCode   VARCHAR (3)      NULL,
+    TX_Reference1        VARCHAR (50)     NOT NULL,
+    TX_Reference2        VARCHAR (50)     NULL,
+    TX_Reference3        VARCHAR (50)     NULL,
+    TX_Reference4        VARCHAR (50)     NULL,
+    TX_Reference5        VARCHAR (50)     NULL,
+    TX_SystemCreateUTC   DATETIME2 (0)    DEFAULT (sysutcdatetime()) NOT NULL,
+    TX_Version           INT              DEFAULT ((0)) NOT NULL,
+    TX_Branch            VARCHAR (3)      NULL,
+    TX_MessageTrackingID VARCHAR (36)     NULL,
+    TX_Period            INT              NOT NULL DEFAULT 0,
+    IsRefSwapped         BIT              NOT NULL default(0),
+    ProcessingStatus     TINYINT          NOT NULL default(0),
+    DatabaseNumber       INT              NOT NULL default(0),
+    CompanyNumber        SMALLINT         NOT NULL default(0)
+)

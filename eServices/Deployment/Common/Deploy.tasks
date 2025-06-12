@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="deploy">
+
+  <PropertyGroup>
+    <DeployTasksImported>$true</DeployTasksImported>
+    <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(ProgramFiles)\MSBuildExtensionPack\4.0\</MSBuildExtensionsPackPath>
+    <CommonDeployScriptFilePath Condition="'$(CommonDeployScriptFilePath)' == ''">$(MSBuildThisFileDirectory)Deploy.ps1</CommonDeployScriptFilePath>
+    <DeployCommonImported>$true</DeployCommonImported>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks" Condition="'$(BuildPath)'==''"/>
+
+  <Target Name="bat:deploy" Outputs="$(TaskResult)" DependsOnTargets="ps-remote:test-connection">
+
+    <CallTarget Targets="bat:package">
+      <Output
+          TaskParameter="TargetOutputs"
+          PropertyName="_PackageFilePath" />
+    </CallTarget>
+
+    <Error Condition="'$(_PackageFilePath)'==''" Text="No package file is provided to deploy, deployment process terminates." ContinueOnError="False" />
+    <PropertyGroup>
+      <TaskResult>$false</TaskResult>
+    </PropertyGroup>
+
+    <Message Text="Deploying $(_PackageFilePath) to $(Server)" />
+    <Deploy
+        ZipFile="$(_PackageFilePath)"
+        DeploymentFolder="$(_DeploymentFolder)"
+        MachineName="$(Server)"
+        UserId="$(UserId)"
+        UserPassword="$(Password)"
+        Profile="$(Profile)">
+
+      <Output TaskParameter="DeployResult" PropertyName="DeployResult" />
+    </Deploy>
+
+    <Delete Files="$(_PackageFilePath)" Condition="Exists('$(_PackageFilePath)')" />
+    <Message Text="$(_PackageFilePath) has been successfully deployed to $(Server)" Condition="'$(DeployResult)'=='True'" />
+    <Error Text="Failed to deploy $(_PackageFilePath) $(Server)" Condition="'$(DeployResult)'=='False'" />
+
+  </Target>
+
+  <UsingTask
+      TaskName="DeployExtractedPackages"
+      TaskFactory="PowershellTaskFactory"
+      AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <MachineName ParameterType="System.String" />
+      <UserId ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <PackageFilesDir ParameterType="System.String" Required="true" />
+      <DeployResult ParameterType="System.Boolean" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        Add-Type -AssemblyName "Microsoft.Build.Framework"
+
+        . $(CommonDeployScriptFilePath)
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Deploying $PackageFilesDir to $MachineName...")
+
+        try {
+            $DeployResult = [bool] (DeployExtractedPackages -MachineName $MachineName -UserId $UserId -UserPassword $UserPassword -PackageFilesDir $PackageFilesDir)
+
+            if ($DeployResult) {
+                $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Successfully deployed $PackageFilesDir to $MachineName.")
+            } else {
+                $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Failed to deploy $PackageFilesDir to $MachineName!")
+            }
+
+        } catch {
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Failed to deploy $PackageFilesDir to $MachineName with errors:")
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", $error[0])
+
+            $DeployResult = $false
+            throw $error
+        }
+      ]]>
+    </Task>
+
+  </UsingTask>
+
+  <UsingTask
+      TaskName="Deploy"
+      TaskFactory="PowershellTaskFactory"
+      AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <ZipFile ParameterType="System.String" Required="true" />
+      <DeploymentFolder ParameterType="System.String" />
+      <MachineName ParameterType="System.String" />
+      <UserId ParameterType="System.String" />
+      <UserPassword ParameterType="System.String" />
+      <Profile ParameterType="System.String" />
+      <PreDeployScript ParameterType="System.String" />
+      <PostDeployScript ParameterType="System.String" />
+      <DeployResult ParameterType="System.Boolean" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        Add-Type -AssemblyName "Microsoft.Build.Framework"
+
+        if ([string]::IsNullOrEmpty($Profile)) { $Profile = [string]::Empty }
+
+        Set-ExecutionPolicy unrestricted
+        . $(CommonDeployScriptFilePath)
+        $MachineName | AddMachineToTrustedHosts
+
+        $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Deploying $ZipFile to $MachineName...")
+
+        try {
+          $DeployResult = [bool] (Deploy -ZipFilePath $ZipFile -InstallDir $DeploymentFolder -MachineName $MachineName -UserId $UserId -UserPassword $UserPassword -Profile $Profile -PreDeployScript $PreDeployScript -PostDeployScript $PostDeployScript)
+
+        } catch {
+          $DeployResult = $false
+          throw $error
+        }
+      ]]>
+    </Task>
+
+  </UsingTask>
+
+  <Target Name="ps-remote:test-connection">
+    <Message Text="Test connection to $(Server) with credential from $(UserId)" Importance="High" />
+
+    <TestPowerShellRemote Server="$(Server)" UserId="$(UserId)" Password="$(Password)">
+      <Output TaskParameter="Result" PropertyName="Result" />
+      <Output TaskParameter="Message" PropertyName="Message" />
+    </TestPowerShellRemote>
+
+    <Message Text="Successfully connected to $(Server)" Condition="'$(Result)'=='True'" Importance="High" />
+    <Error Text="Failed to connect to $(Server) with credential from $(UserId): $Message" Condition="'$(Result)'!='True'" />
+  </Target>
+
+  <Target Name="ps-remote:test-dbconnection:trusted">
+    <Message Text="Test db connection to database server $(DatabaseServer) on server $(Server) with credential from $(UserId)" Importance="High" />
+
+    <TestDatabaseConnection Server="$(Server)" DatabaseServer="$(DatabaseServer)" UserId="$(UserId)" Password="$(Password)">
+      <Output TaskParameter="Result" PropertyName="Result" />
+      <Output TaskParameter="Message" PropertyName="Message" />
+    </TestDatabaseConnection>
+
+    <Message Text="Successfully connected to db $(DatabaseServer) on server $(Server)" Condition="'$(Result)'=='True'" Importance="High" />
+    <Error Text="Failed to connect to db $(DatabaseServer) on server $(Server) with credential from $(UserId): $Message" Condition="'$(Result)'!='True'" />
+  </Target>
+
+  <Target Name="path:new-temp-dir" Returns="$(newTempDir)">
+    <PropertyGroup>
+      <timeStamp>$([System.DateTime]::Now.ToString(`yyyyMMdd_HHmmss`))</timeStamp>
+      <tempDirectory>$([System.IO.Path]::GetFullPath('$(TEMP)'))</tempDirectory>
+      <newTempDir>$([System.IO.Path]::Combine('$(tempDirectory)', '$(timeStamp)'))</newTempDir>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(newTempDir)" />
+    <Error Text="Failed to create $(newTempDir)" Condition="!Exists('$(newTempDir)')" />
+  </Target>
+
+  <UsingTask
+    TaskName="TestPowerShellRemote"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <Server ParameterType="System.String" Required="true" />
+      <UserId ParameterType="System.String" Required="true" />
+      <Password ParameterType="System.String" Required="true" />
+      <Result ParameterType="System.Boolean" Output="true" />
+      <Message ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        Add-Type -AssemblyName "Microsoft.Build.Framework"
+
+        if ($null -ne $Error) { $Error.Clear() }
+
+        Set-ExecutionPolicy unrestricted
+        . $(CommonDeployScriptFilePath)
+        $Server | AddMachineToTrustedHosts
+
+        $Session = $null
+
+        try
+        {
+          $Result = $false
+          $Session = Connect Connect -MachineName $Server -UserId $UserId -UserPassword $Password
+          $expectedMessage = "Gday! I am from ${env:ComputerName}."
+
+          if ($null -ne $Session) {
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Successfully established a remote session to $Server from ${env:ComputerName}, ${env:UserDomain}\${env:UserName}.")
+
+            [String] $Message = Invoke-Command -Session $Session -ScriptBlock {
+                Param($message)
+                Invoke-Expression -Command:"cmd.exe /c 'echo $message'" | Write-Output
+            } -ArgumentList $expectedMessage
+
+            $Result = $Message -eq $expectedMessage
+            Write-Output "Returned message from server ${Server}: $Message"
+
+          } else {
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Unable to establish a remote session to $Server from ${env:ComputerName}, ${env:UserDomain}\${env:UserName}.")
+          }
+        } catch {
+            $error | % {
+              $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", $_)
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Error connecting to $Server from ${env:ComputerName}, ${env:UserDomain}\${env:UserName}.")
+        } finally {
+          if ($null -ne $Session) {
+            Remove-PsSession -Session $Session
+          }
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+  <UsingTask
+    TaskName="TestDatabaseConnection"
+    TaskFactory="PowershellTaskFactory"
+    AssemblyFile="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.TaskFactory.PowerShell.dll">
+    <ParameterGroup>
+      <Server ParameterType="System.String" Required="true" />
+      <DatabaseServer ParameterType="System.String" Required="true" />
+      <UserId ParameterType="System.String" Required="true" />
+      <Password ParameterType="System.String" Required="true" />
+      <Result ParameterType="System.Boolean" Output="true" />
+      <Message ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+
+    <Task>
+      <![CDATA[
+        Add-Type -AssemblyName "Microsoft.Build.Framework"
+
+        if ($null -ne $Error) { $Error.Clear() }
+
+        Set-ExecutionPolicy unrestricted
+        . $(CommonDeployScriptFilePath)
+        $Server | AddMachineToTrustedHosts
+
+        $Session = $null
+
+        try
+        {
+          if ($null -ne $Error) { $Error.Clear() }
+
+          $Result = $false
+          $Session = Connect Connect -MachineName $Server -UserId $UserId -UserPassword $Password
+          $expectedMessage = "Gday! I am from ${env:ComputerName}."
+
+          if ($null -ne $Session) {
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Successfully established a remote session to $Server from ${env:ComputerName}, ${env:UserDomain}\${env:UserName}.")
+
+            [String] $Message = Invoke-Command -Session $Session -ScriptBlock {
+              Param($DatabaseServer, $expectedMessage)
+              try {
+                Invoke-Expression -Command:"sqlcmd -S $DatabaseServer -E"
+                Write-Output $expectedMessage
+              } catch {
+                $Error | % { Write-Output $_ }
+              }
+            } -ArgumentList $DatabaseServer, $expectedMessage
+
+            $Result = $Message -eq $expectedMessage
+            Write-Output "Returned message from server ${Server}: $Message"
+          } else {
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", "Unable to establish a remote session to $Server from ${env:ComputerName}, ${env:UserDomain}\${env:UserName}.")
+          }
+        } catch {
+            $error | % {
+              $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"Normal", $_)
+            }
+
+            $log.LogMessage([Microsoft.Build.Framework.MessageImportance]"High", "Error connecting to $Server from ${env:ComputerName}, ${env:UserDomain}\${env:UserName}.")
+        } finally {
+          if ($null -ne $Session) {
+            Remove-PsSession -Session $Session
+          }
+        }
+      ]]>
+    </Task>
+  </UsingTask>
+
+</Project>

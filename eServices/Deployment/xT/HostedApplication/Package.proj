@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)..\..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(MSBuildThisFileDirectory)..\..\package-common.tasks</PackageCommonTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+
+  <Target Name="bat:package">
+    <CallTarget Targets="bat:package:init"/>
+
+    <ItemGroup>
+      <_ProjectOutput Include="$(OutputPath)\**\*"/>
+      <_DeploymentFiles Include="$(MSBuildProjectDirectory)\Deployment\**\*"/>
+      <_DeploymentProject Include="$(DeploymentProjectPath)" />
+      <_DeploymentProject Include="$(MSBuildThisFileDirectory)..\..\CommonScripts\**\*" />
+      <_DeploymentProject Include="$(MSBuildCommonTasks)" />
+      <_DATIntegration Include="$(MSBuildThisFileDirectory)..\..\..\DAT\Dat.Integration.dll" />
+    </ItemGroup>
+
+    <!-- Copy Project output -->
+    <Copy SourceFiles="@(_ProjectOutput)"
+          DestinationFolder="$(_ZipContentsDirectory)\Bin\%(RecursiveDir)"/>
+
+    <!-- Copy Deployment files -->
+    <Copy SourceFiles="@(_DeploymentFiles)"
+          DestinationFolder="$(_ZipContentsDirectory)\Deployment\%(RecursiveDir)"/>
+
+    <!-- Copy Deployment project -->
+    <Copy SourceFiles="@(_DeploymentProject)"
+          DestinationFolder="$(_ZipContentsDirectory)"/>
+
+    <!-- Copy DAT assemblies -->
+    <Copy SourceFiles="@(_DATIntegration)"
+          DestinationFolder="$(_ZipContentsDirectory)"/>
+    
+    <!-- Create package -->
+    <CallTarget Targets="bat:package:zip"/>
+  </Target>
+</Project>

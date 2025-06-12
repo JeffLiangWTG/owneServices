@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bindinginfo:build">
+
+  <PropertyGroup>
+    <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(ProgramFiles)\MSBuild\ExtensionPack\4.0\</MSBuildExtensionsPackPath>
+    <MSBuildExtensionsPackPath Condition="!Exists('$(MSBuildExtensionsPackPath)')">$(ProgramFiles)\MSBuildExtensionPack\4.0\</MSBuildExtensionsPackPath>
+
+    <DeployCommonPath Condition="'$(DeployCommonPath)' == ''">$(MSBuildThisFileDirectory)Common\</DeployCommonPath>
+    <BindingInfoFileName>CargoWise.eHub.BindingInfo.xml</BindingInfoFileName>
+    <BindingItemsDir>$([System.IO.Path]::GetDirectoryName("$(MSBuildThisFileDirectory)Bindings\"))</BindingItemsDir>
+    <DeployTasks>$(DeployCommonPath)Deploy.tasks</DeployTasks>
+
+    <ScriptsDir>$(MSBuildThisFileDirectory)Scripts</ScriptsDir>
+    <ReplaceTokensWithValuesPs1>$(ScriptsDir)\ReplaceTokensWithValues.ps1</ReplaceTokensWithValuesPs1>
+    <BuildBindingInfoPs1>$(ScriptsDir)\BuildBindingInfo.ps1</BuildBindingInfoPs1>
+
+    <ProfileTasks>$(MSBuildThisFileDirectory)Profiles\Profiles.tasks</ProfileTasks>
+    <BizTalkCommonTasks>$(MSBuildThisFileDirectory)BizTalkCommon\BizTalkCommon.tasks</BizTalkCommonTasks>
+    <BindingBuilderTasks>$(MSBuildThisFileDirectory)Builder.tasks</BindingBuilderTasks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BinPath Condition="'$(BinPath)'==''">$(MSBuildThisFileDirectory)Bin</BinPath>
+    <OutputBindingInfoFilePath>$(BinPath)\$(BindingInfoFileName)</OutputBindingInfoFilePath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks" Condition="'$(BuildPath)'==''"/>
+  <Import Project="$(ProfileTasks)" Condition="'$(ProfilesIncluded)' == '' and Exists('$(ProfileTasks)')"/>
+
+  <Import Project="$(DeployTasks)" Condition="'$(DeployCommonImported)'=='' and Exists('$(DeployTasks)')"/>
+  <Import Project="$(BizTalkCommonTasks)" Condition="'$(BizTalkCommonImported)' == '' and Exists('$(BizTalkCommonTasks)')"/>
+  <Import Project="$(BindingBuilderTasks)" Condition="'$(BizTalkBindingsBuilderTasksImported)'==''"/>
+
+  <Target Name="install" DependsOnTargets="GacAssemblies; BizTalkAssemblies">
+    <CallTarget Targets="bindinginfo:build" />
+    <CallTarget Targets="ImportBindings" />
+  </Target>
+
+</Project>

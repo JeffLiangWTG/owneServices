@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bat:package">
+
+  <PropertyGroup>
+    <_ProjectId>BizTalkBindings</_ProjectId>
+
+    <RelativeBinPath>..\..\..\Bin</RelativeBinPath>
+    <RelativeSourcePath>..\..\..</RelativeSourcePath>
+    <OutputPath>$(RelativeBinPath)</OutputPath>
+
+    <BinPath Condition="'$(BinPath)'==''">$(MSBuildThisFileDirectory)$(RelativeBinPath)</BinPath>
+    <SourcePath Condition="'$(SourcePath)'==''">$(MSBuildThisFileDirectory)$(RelativeSourcePath)</SourcePath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SourcePath Condition="'$(SourcePath)'==''">..\..\..\Products</SourcePath>
+    <SourcePath Condition="'$(SourcePath)'!=''">$([System.IO.Path]::GetFullPath('$(SourcePath)'))</SourcePath>
+
+    <BinPath Condition="'$(BinPath)'==''">..\..\..\Bin</BinPath>
+    <OutputPath Condition="'$(OutputPath)'==''">$(BinPath)\</OutputPath>
+    <DeploymentLibrariesPath>$(BinPath)\Deployment</DeploymentLibrariesPath>
+
+    <BindingInfoPath>$([System.IO.Path]::Combine('$(MSBuildThisFileDirectory)', '..\Bindings'))</BindingInfoPath>
+    <BindingComponentsFolder>$([System.IO.Path]::GetFullPath('$(BindingInfoPath)'))</BindingComponentsFolder>
+
+    <DeploymentManifest>$(MSBuildThisFileDirectory)Deployment\Deployment.manifest</DeploymentManifest>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DeploymentPath>$(BinPath)\Deployment\</DeploymentPath>
+    <DeployCommonPath Condition="Exists('$(DeploymentPath)\Common\Deploy.tasks')">$(DeploymentPath)Common\</DeployCommonPath>
+    <DeployCommonPath Condition="'$(DeployCommonPath)' == ''">$(MSBuildThisFileDirectory)Common\</DeployCommonPath>
+    <BindingScriptsPath>$(DeploymentPath)BizTalkBindings\Scripts\</BindingScriptsPath>
+
+    <BizTalkCommonDirectory>$(MSBuildThisFileDirectory)..\BizTalkCommon\</BizTalkCommonDirectory>
+    <BizTalkCommonTasks>$(BizTalkCommonDirectory)BizTalkCommon.tasks</BizTalkCommonTasks>
+    <BizTalkCommonProfilesDirectory>$(BizTalkCommonDirectory)Profiles</BizTalkCommonProfilesDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BindingDependenciesFilePath>$(BinPath)\BindingDependencies.txt</BindingDependenciesFilePath>
+    <ExtractDependentAssembliesPs1>$(BindingScriptsPath)ExtractDependentAssemblies.ps1</ExtractDependentAssembliesPs1>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DeployCommonDeployTasks>$(DeployCommonPath)Deploy.tasks</DeployCommonDeployTasks>
+    <BizTalkBindingsPackageProj>$(DeploymentLibrariesPath)\BizTalkBindings\Package.proj</BizTalkBindingsPackageProj>
+  </PropertyGroup>
+
+  <Import Project="$(BizTalkCommonTasks)" Condition="'$(BizTalkCommonImported)' == ''"/>
+  <Import Project="$(DeployCommonDeployTasks)" Condition="'$(DeployCommonImported)' == ''"/>
+  <Import Project="$(BizTalkBindingsPackageProj)" Condition="'$(BizTalkBindingsPackageProjImported)'==''" />
+
+  <!-- where the @(BindingItems) are defined -->
+  <Import Project="$(DeploymentManifest)" />
+
+  <!-- extract the referenced assemblies from the given CargoWise.eHub.BindingInfo.xml -->
+  <Target Name="dependencies:build">
+
+    <ItemGroup>
+      <RequiredFiles Include="$(ExtractDependentAssembliesPs1)" />
+      <RequiredFiles Include="$(BindingInfoPath)" />
+    </ItemGroup>
+
+    <Error Text="'%(RequiredFiles.Identity)' not found." Condition="!Exists('%(RequiredFiles.Identity)')" />
+
+    <Exec Command="powershell.exe -ExecutionPolicy RemoteSigned -File $(ExtractDependentAssembliesPs1) -Folder $(BindingInfoPath) -DependenciesFilePath $(BindingDependenciesFilePath)">
+      <Output TaskParameter="ConsoleOutput" PropertyName="ConsoleOutput" />
+    </Exec>
+    <Message Text="ConsoleOutput: $(ConsoleOutput)" />
+
+    <Message Text="$(BindingDependenciesFilePath) has been successfully created at $(BindingDependenciesFilePath)" Condition="Exists('$(BindingDependenciesFilePath)')" />
+    <Error Text="Failed to create the $(BindingDependenciesFilePath) file" Condition="!Exists('$(BindingDependenciesFilePath)')" />
+
+  </Target>
+  
+  <!-- target invoked by the imported $(BizTalkBindingsPackageProj) to let the project copy additional files to the zip content directory -->
+  <Target Name="on:bat:package">
+    <ItemGroup>
+      <RequiredPath Include="$(_ZipContentsDirectory)" />
+    </ItemGroup>
+
+    <Error Text="'%(RequiredPath.Identity)' not found." Condition="!Exists('%(RequiredPath.Identity)')" />
+
+    <PropertyGroup>
+      <TargetDir>$(_ZipContentsDirectory)</TargetDir>
+      <TargetBinDir>$(TargetDir)\Bin</TargetBinDir>
+      <TargetBindingsDir>$(TargetDir)\Bindings</TargetBindingsDir>
+      <TargetBizTalkCommonDir>$(TargetDir)\BizTalkCommon</TargetBizTalkCommonDir>
+    </PropertyGroup>
+
+    <!-- the common BizTalkCommon tasks that handles all biztalk related tasks -->
+    <Copy SourceFiles="$(BizTalkCommonTasks)" DestinationFolder="$(TargetBizTalkCommonDir)" />
+
+    <!-- assembly files that will be installed on site -->
+    <Copy SourceFiles="@(BizTalkAssemblies)" DestinationFolder="$(TargetBinDir)\%(RecursiveDir)" />
+  </Target>
+
+</Project>

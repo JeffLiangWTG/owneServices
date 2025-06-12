@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bat:package">
+
+  <PropertyGroup>
+    <RootPath>..\..\</RootPath>
+    <BinPath Condition="'$(BinPath)'==''">$(RootPath)Bin</BinPath>
+    <OutputPath Condition="'$(OutputPath)'==''">$(BinPath)\</OutputPath>
+
+    <DeploymentLibrariesPath>$(BinPath)\Deployment\</DeploymentLibrariesPath>
+    <TokenizeTasks>$(RootPath)DevScripts\Tokenize\Tokenize.tasks</TokenizeTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)Deployment\Deployment.manifest" />
+  <Import Project="$(DeploymentLibrariesPath)BizTalkBindings\Package.proj" />
+  <Import Project="$(DeploymentLibrariesPath)BizTalkBindings\Deploy.proj" />
+  <Import Project="$(TokenizeTasks)" Condition="'$(TokenizeTasksImported)'==''" />
+
+</Project>

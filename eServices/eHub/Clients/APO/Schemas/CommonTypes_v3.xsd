@@ -1,0 +1,723 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 rel. 2 sp1 (http://www.altova.com) by Silvio Zarb (Australia Post) -->
+<!--History
+Note: In CMM v3 CommonTypes_v1.xsd is marked as depricated.  CommonTypes_v1.xsd will eventually be replaced by Common_v1.xsd.  It is still part of CMM v3 as other projects are extensively using it.   Please note without approval no type should be moved to Common_v1.xsd. Also String 5, String10 etc types must not be move to Common.v1xsd. and should not be used.
+-->
+<xs:schema xmlns:ns1="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" xmlns:ns2="http://www.auspost.com.au/Schema/CommonDataModel/Core:v1" xmlns="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.10">
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" schemaLocation="Address_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Core:v1" schemaLocation="CoreTypes_v3.xsd"/>
+	<xs:include schemaLocation="BaseCommonTypes_v3.xsd"/>
+	<xs:include schemaLocation="ContactDetails_v3.xsd"/>
+	<xs:include schemaLocation="Common_v3.xsd"/>
+	<xs:complexType name="TrackingIdentification">
+		<xs:sequence>
+			<xs:element name="TrackingIDCodeSet" type="string20">
+				<xs:annotation>
+					<xs:documentation>Type of the id for the event message. As of October 2008, possible values are MANIFEST_ID, CONSIGNMENT_ID, BARCODE_NUMBER, or ARTICLE_ID etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TrackingID" type="string50">
+				<xs:annotation>
+					<xs:documentation>Tracking ID of the event message. Possible values are barcode or id number of the manifest, consignment, article or barcode number etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProviderID" type="string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Provider ID for this tracking ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProviderName" type="string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Provider name for this tracking ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProofOfDelivery">
+		<xs:annotation>
+			<xs:documentation>Proof of delivery record</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="SignerName">
+				<xs:annotation>
+					<xs:documentation>Proof of delivery name. Name captured on the device when the consignment was signed for</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Signature" type="xs:string" minOccurs="0"/>
+			<xs:element name="ContentType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>MIME type describing Signature format (ie "image/jpg", "image/png")</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="NatureOfAuthority" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Proof of Delivery Nature of Authority data type</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GeneralTextSegment">
+		<xs:sequence>
+			<xs:element name="TextLine" maxOccurs="unbounded">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="132"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TelephoneNumberExtended">
+		<xs:annotation>
+			<xs:documentation>Extended Telephone number type to allow for separation of STD code and number</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="STD" type="TelephoneSTDNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>STD prefix for the telephone number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Number" type="TelephoneNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Local number for the telephone number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="TelephoneNumber">
+		<xs:annotation>
+			<xs:documentation>Telephone number data type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="30"/>
+			<xs:minLength value="0"/>
+		</xs:restriction>
+		<!--
+  <xs:simpleType name="TelephoneNumber">
+    <xs:annotation>
+      <xs:documentation>Telephone number data type</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="15" />
+      <xs:minLength value="0" />
+    </xs:restriction>
+  </xs:simpleType>
+-->
+	</xs:simpleType>
+	<xs:simpleType name="TelephoneSTDNumber">
+		<xs:annotation>
+			<xs:documentation>Telephone STD number data type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="5"/>
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EmailAddress">
+		<xs:annotation>
+			<xs:documentation>Email address data type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="50"/>
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="InvolvedPartyIdType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="50"/>
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DollarAmount">
+		<xs:annotation>
+			<xs:documentation>Dollar Amount data type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="12"/>
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Weight">
+		<xs:annotation>
+			<xs:documentation>Weight data type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="10"/>
+			<xs:fractionDigits value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Comments">
+		<xs:annotation>
+			<xs:documentation>Comments data type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="1028"/>
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ActionCode">
+		<xs:annotation>
+			<xs:documentation>Action code used for records that are retreived as part of a data feed from legacy applications.  Values are N - New, U - Updated, D - Deleted</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="1"/>
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ManifestNumber">
+		<xs:annotation>
+			<xs:documentation>Manifest number data type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MerchantId">
+		<xs:annotation>
+			<xs:documentation>Merchant Id data type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="9"/>
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MerchantLocationId">
+		<xs:annotation>
+			<xs:documentation>Merchant Location Id data type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="3"/>
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DateTime">
+		<xs:restriction base="xs:dateTime"/>
+	</xs:simpleType>
+	<xs:simpleType name="Duration">
+		<xs:restriction base="xs:duration">
+			<xs:pattern value="PnYnMnDTnHnMnS"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="DatePeriod">
+		<xs:sequence>
+			<xs:element name="StartDate" type="ns2:Date" minOccurs="0"/>
+			<xs:element name="EndDate" type="ns2:Date" minOccurs="0"/>
+			<xs:element name="Duration" type="Duration" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TimePeriod">
+		<xs:sequence>
+			<xs:element name="StartTime" type="ns2:Time" minOccurs="0"/>
+			<xs:element name="EndTime" type="ns2:Time" minOccurs="0"/>
+			<xs:element name="Duration" type="Duration" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="WeekdayCode">
+		<xs:annotation>
+			<xs:documentation>A WeekdayCode is a coded representation of a day in a week</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token">
+			<xs:length value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="string20">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="string50">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="50"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="string40">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="40"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Dimension">
+		<xs:annotation>
+			<xs:documentation>Article Dimension data type</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="10"/>
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="string10">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DriverName">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="32"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="int3">
+		<xs:restriction base="xs:int">
+			<xs:totalDigits value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ValidPeriod">
+		<xs:sequence>
+			<xs:element name="ValidFrom" type="DateTime" minOccurs="0"/>
+			<xs:element name="ValidTo" type="DateTime" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FurtherReferences">
+		<xs:sequence>
+			<xs:element name="ReferenceCodeSet" type="string20">
+				<xs:annotation>
+					<xs:documentation>Additional type of reference the event message. Possible values are MANIFEST_ID, CONSIGNMENT_ID or ARTICLE_ID etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ReferenceID" type="string50">
+				<xs:annotation>
+					<xs:documentation>Additional ID of the event message. Possible values are ids of manifest, consignment or article etc.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProviderID" type="string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Provider id of the additional reference</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ProviderName" type="string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Provider name of the additional reference</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="int2">
+		<xs:restriction base="xs:int">
+			<xs:totalDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ModificationAudit">
+		<xs:annotation>
+			<xs:documentation>The latest modification information including by whom and when the modification has been made</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="UserID" type="string20" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User who made the change</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="LastModified" type="DateTime">
+				<xs:annotation>
+					<xs:documentation>When the last modification has been made</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ModificationType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Nature of the last modification. Possible values "Create", "Update", etc</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="string80">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="80"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="string1">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="string30">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="30"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="string2">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="string3">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="string4">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="string100">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="100"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="int1">
+		<xs:restriction base="xs:int">
+			<xs:totalDigits value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="DeliveryDetailsType">
+		<xs:annotation>
+			<xs:documentation>User can specify address, phone number, Email ID details of the Consignment or Article </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Type">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Delivery"/>
+						<xs:enumeration value="PickUp"/>
+						<xs:enumeration value="Return"/>
+						<xs:enumeration value="Sender"/>
+						<xs:enumeration value="DeliveryFailure"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Address" type="PostalDetails" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Mailing details of the Consignment or Article </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ContactNumber" type="ContactDetailsType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Phone number details of the Consignment or Article</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EmailAddress" type="EmailAddress" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Email Address of the Contact</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Instructions" type="Comments" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Instructions that should appear on the label</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PostalDetails">
+		<xs:annotation>
+			<xs:documentation> Address details for the Consignment or Article </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Name of the customer / person that the consignment Article is to be delivered to</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CompanyName" type="string50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Name for the company that the consignment Article is to be delivered to</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="UnstructuredAddress">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AddressLine" type="ns1:InternationalAddressLine" maxOccurs="4"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SuburbOrTownOrLocality" type="ns1:InternationalAddressLine" minOccurs="0"/>
+			<xs:element name="StateOrTerritoryOrProvince" type="ns1:InternationalAddressLine" minOccurs="0"/>
+			<xs:element name="CountryCode" type="ns1:InternationalCountryCode" minOccurs="0"/>
+			<xs:element name="PostCode" type="ns1:InternationalPostCode" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ContactDetailsType">
+		<xs:annotation>
+			<xs:documentation> Contact details for the Consignment or Article </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Type">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Mobile"/>
+						<xs:enumeration value="Telephone"/>
+						<xs:enumeration value="Fax"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Number" type="TelephoneNumberExtended" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Contact telephone number for the company / person that the consignment or article is being delivered to</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PrintNumberOnLabel" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates whether to print contact number on the label</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ContactNumber">
+		<xs:annotation>
+			<xs:documentation>Extended Telephone number type to allow for separation of STD code and number</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="STD" type="TelephoneSTDNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>STD prefix for the telephone number if applicable </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Number" type="string30" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>telephone number of any format</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TrackingNotification">
+		<xs:sequence>
+			<xs:element name="ContactType" type="string20">
+				<xs:annotation>
+					<xs:documentation>Transmission medium eg. SMS, Email
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ContactAddress" type="string100">
+				<xs:annotation>
+					<xs:documentation>The address to be contacted 
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="NotificationServices" type="string10" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A code which represents the notification service e.g OnBoard, carded at post office etc
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Lodgement">
+		<xs:annotation>
+			<xs:documentation>Internation Parcel Lodgement grouping.  Contains data elements required for IPL</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="RecipientName" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The name of the addressee/recipient of a parcel</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="AcceptancePostcode" type="ns1:InternationalPostCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Postcode of where parcel was first accepted into the network</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DestinationPostcode" type="ns1:InternationalPostCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>International Postcode (no validation) where international parcel will be delivered to</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DestinationCountry" type="ns1:InternationalCountryCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>County where international parcel will be delivered to</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DeliveryOffice" type="WorkCentreCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Work centre code of the delivery office</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceAction">
+		<xs:sequence>
+			<xs:element name="ActionID" type="string10">
+				<xs:annotation>
+					<xs:documentation>The Id of the Service Action</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TypeID" type="string10" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The Reference type e.g. DL</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SubTypeID" type="string10" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The Reference Subtype i.e. VIC</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Reference" type="string30">
+				<xs:annotation>
+					<xs:documentation>The reference such as DriverLicense</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="POIType">
+		<xs:annotation>
+			<xs:documentation>Proof of identification type.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="POITypeID" type="POITypeID"/>
+			<xs:element name="Description" type="string50"/>
+			<xs:element name="ModificationAudit" type="ModificationAudit" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="POISubType">
+		<xs:annotation>
+			<xs:documentation>Proof of identification sub type.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="POISubTypeID" type="POISubTypeID"/>
+			<xs:element name="Description" type="string50"/>
+			<xs:element name="ModificationAudit" type="ModificationAudit" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProofOfIdentity">
+		<xs:sequence>
+			<xs:element name="POIType" type="POIType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="POISubType" type="POISubType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="POITypeID">
+		<xs:restriction base="string10"/>
+	</xs:simpleType>
+	<xs:simpleType name="POISubTypeID">
+		<xs:restriction base="string10"/>
+	</xs:simpleType>
+	<xs:complexType name="POIReference">
+		<xs:sequence>
+			<xs:element name="SequenceNumber">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+						<xs:minLength value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="POITypeID" type="POITypeID"/>
+			<xs:element name="POISubTypeID" type="POISubTypeID" minOccurs="0"/>
+			<xs:element name="ValidPeriod" type="ValidPeriod"/>
+			<xs:element name="ModificationAudit" type="ModificationAudit" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FurtherDetails">
+		<xs:sequence>
+			<xs:element name="Usage" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Usage of Further details is defined here eg... SOCIAL INTEREST, PRODUCT INTEREST, MARKETING etc.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Description">
+				<xs:annotation>
+					<xs:documentation>Typically will be descriptive text.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Text">
+				<xs:annotation>
+					<xs:documentation>This will hold the value against the description.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FlightDetails">
+		<xs:sequence>
+			<xs:element name="FlightNo" type="string20"/>
+			<xs:element name="DepartureAirportCode" type="string5" minOccurs="0"/>
+			<xs:element name="DepartureDateTime" type="DateTime" minOccurs="0"/>
+			<xs:element name="ArrivalAirportCode" type="string5" minOccurs="0"/>
+			<xs:element name="ArrivalDateTime" type="DateTime" minOccurs="0"/>
+			<xs:element name="LegNumber" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Leg number is the sequence in which a multi leg flight operates.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="string5">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="5"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MailClass">
+		<xs:annotation>
+			<xs:documentation>International Mail Class.  E=EMS, C=Parcels, U=Letters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="string1">
+			<xs:enumeration value="E"/>
+			<xs:enumeration value="C"/>
+			<xs:enumeration value="U"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="NameValue">
+		<xs:sequence>
+			<xs:element name="Name" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Value" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="PasswordText">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="40"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Username">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="255"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="UserID">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="12"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- Moved to Common_v1.xsd -->
+	<!--	<xs:simpleType name="WorkCentreCode">
+				<xs:restriction base="xs:string">
+					<xs:maxLength value="6"/>
+				</xs:restriction>
+			</xs:simpleType>
+	-->
+</xs:schema>

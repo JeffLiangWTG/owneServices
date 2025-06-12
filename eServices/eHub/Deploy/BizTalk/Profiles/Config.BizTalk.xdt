@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+
+  <configSections>
+    <sectionGroup name="eHub" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+    <sectionGroup name="common" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+    <section name="log4net" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+    <section name="entityFramework" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+  
+    <sectionGroup name="eHub" xdt:Locator="Match(name)" xdt:Transform="Insert">
+      <section name="orchestrationLogging" type="CargoWise.eHub.Core.Logging.LoggerConfigSection, CargoWise.eHub.Core.Logging, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350, processorArchitecture=MSIL"/>
+      <section name="pipelineLogging" type="CargoWise.eHub.Core.Logging.LoggerConfigSection, CargoWise.eHub.Core.Logging, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350, processorArchitecture=MSIL"/>
+      <section name="hostLogging" type="CargoWise.eHub.Core.Logging.LoggerConfigSection, CargoWise.eHub.Core.Logging, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350, processorArchitecture=MSIL"/>
+    </sectionGroup>
+    <sectionGroup name="common" xdt:Locator="Match(name)" xdt:Transform="Insert">
+      <section name="logging" type="Common.Logging.ConfigurationSectionHandler, Common.Logging, Version=2.2.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+    </sectionGroup>
+    <section name="log4net" type="log4net.Config.Log4NetConfigurationSectionHandler, log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing"/>
+    <section name="entityFramework" type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing"/>
+  </configSections>
+
+  <eHub xdt:Transform="Remove"/>
+  <eHub xdt:Transform="Insert">
+    <orchestrationLogging logDir="C:\Logs\BizTalk\Orchestrations">
+      <loggers>
+        <add name="CargoWise.eHub.Clients.TLX.Orchestrations.TLXCentralInternalService_ImportEmail" level="DEBUG" />
+        <add name="CargoWise.eHub.Products.ZACustoms.Orchestrations.SendAS2" level="DEBUG" />
+        <add name="CargoWise.eHub.Products.SGCustoms.MHAccess.Orchestrations.Send.eHub2MHAccess" level="TRACE" />
+        <add name="CargoWise.eHub.Products.SGCustoms.MHAccess.Orchestrations.Receive.MHAccess2eHub" level="TRACE" />
+        <add name="CargoWise.eHub.Core.Orchestrations.Mutex.MutexController" level="DEBUG" />
+        <add name="CargoWise.eHub.Products.CACustoms.DocImg.BT.Orchestrations.LPCOSend" level="TRACE" />
+        <add name="CargoWise.eHub.Products.AirMessaging.Orchestrations.CCNSend" level="DEBUG" />
+        <add name="CargoWise.eHub.Products.ZACustoms.Orchestrations.SupportingDocumentV10_1Client" level="DEBUG" />
+      </loggers>
+    </orchestrationLogging>
+    <pipelineLogging logDir="C:\Logs\BizTalk\Pipelines">
+      <loggers>
+        <add name="Gateway_SelectInboxMessageByStatus_WCF-SQL+Receive#RoutingRuleEngine" level="INFO" maxSizeRollBackups="50" maximumFileSize="5MB" />
+        <add name="ZAC_EDIFACT_PRD_Rcv+Receive" level="DEBUG" maxSizeRollBackups="25" maximumFileSize="5MB"/>
+        <add name="ZAC_EDIFACT_TST_Rcv+Receive" level="DEBUG" maxSizeRollBackups="25" maximumFileSize="5MB"/>
+        <add name="Core_MutexZombieKiller+Receive" level="DEBUG" maxSizeRollBackups="25" maximumFileSize="5MB"/>
+        <add name="CSS_OceanInsights_Rcv_Prod+Receive" level="DEBUG" maxSizeRollBackups="25" maximumFileSize="5MB"/>
+      </loggers>
+    </pipelineLogging>
+    <hostLogging logDir="C:\Logs\BizTalk\Hosts">
+      <loggers>
+        <add name="InboxReceive#RoutingRuleEngine.CacheCleanUp" level="ERROR" />
+        <add name="TrackingHost#UpdateStatusEvent" level="WARN" />
+      </loggers>
+    </hostLogging>
+  </eHub>
+
+  <common xdt:Transform="Remove"/>
+  <common xdt:Transform="Insert">
+    <logging>
+      <factoryAdapter type="Common.Logging.Log4Net.Log4NetLoggerFactoryAdapter, Common.Logging.Log4Net1211, Version=2.2.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+        <arg key="configType" value="INLINE"/>
+      </factoryAdapter>
+    </logging>
+  </common>
+
+  <log4net xdt:Transform="Remove"/>
+  <log4net xdt:Transform="Insert">
+    <root>
+      <appender-ref ref="WindowsEventLog"/>
+    </root>
+    <appender name="WindowsEventLog" type="log4net.Appender.EventLogAppender">
+      <applicationName value="eHub BizTalk"/>
+      <layout type="log4net.Layout.PatternLayout"/>
+      <threshold value="ERROR"/>
+    </appender>
+  </log4net>
+
+  <entityFramework xdt:Transform="Remove"/>
+  <entityFramework xdt:Transform="Insert">
+    <providers>
+      <provider invariantName="System.Data.SqlClient" type="System.Data.Entity.SqlServer.SqlProviderServices, EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"/>
+    </providers>
+  </entityFramework>
+
+  <appSettings xdt:Transform="Remove"/>
+  <appSettings xdt:Transform="Insert">
+    <add key="CargoWise.eHub.DataAccess.InboxAccessor" value="CargoWise.eHub.DataAccess.Sql.InboxAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.SecirutyAccessor" value="CargoWise.eHub.DataAccess.Sql.SecurityAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.OutboxAccessor" value="CargoWise.eHub.DataAccess.Sql.OutboxAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.ExceptionsAccessor" value="CargoWise.eHub.DataAccess.Sql.ExceptionsAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.PartyAccessor" value="CargoWise.eHub.DataAccess.Cache.PartyAccessor, CargoWise.eHub.DataAccess.Cache, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.TransformAccessor" value="CargoWise.eHub.DataAccess.Cache.TransformAccessor, CargoWise.eHub.DataAccess.Cache, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.SubscriptionAccessor" value="CargoWise.eHub.DataAccess.Cache.SubscriptionAccessor, CargoWise.eHub.DataAccess.Cache, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.RegistryAccessor" value="CargoWise.eHub.DataAccess.Cache.RegistryAccessor, CargoWise.eHub.DataAccess.Cache, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.EnterpriseExeDetailAccessor" value="CargoWise.eHub.DataAccess.Sql.EnterpriseExeDetailAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.EHubClientSystemAccessor" value="CargoWise.eHub.DataAccess.Sql.EHubClientSystemAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+
+    <add key="CargoWise.eHub.DataAccess.Cache.PartyAccessor" value="CargoWise.eHub.DataAccess.Sql.PartyAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.Cache.TransformAccessor" value="CargoWise.eHub.DataAccess.Sql.TransformAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.Cache.SubscriptionAccessor" value="CargoWise.eHub.DataAccess.Sql.SubscriptionAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.Cache.RegistryAccessor" value="CargoWise.eHub.DataAccess.Sql.RegistryAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+
+    <add key="CargoWise.eHub.DataAccess.InboxAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Sql.InboxAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.SecurityAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Sql.SecurityAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.OutboxAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Sql.OutboxAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.ExceptionsAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Sql.ExceptionsAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.PartyAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Cache.PartyAccessor, CargoWise.eHub.DataAccess.Cache, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.TransformAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Cache.TransformAccessor, CargoWise.eHub.DataAccess.Cache, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.SubscriptionAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Cache.SubscriptionAccessor, CargoWise.eHub.DataAccess.Cache, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.RegistryAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Cache.RegistryAccessor, CargoWise.eHub.DataAccess.Cache, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.EnterpriseExeDetailAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Sql.EnterpriseExeDetailAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.EHubClientSystemAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Sql.EHubClientSystemAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+
+    <add key="CargoWise.eHub.DataAccess.Cache.PartyAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Sql.PartyAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.Cache.TransformAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Sql.TransformAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.Cache.SubscriptionAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Sql.SubscriptionAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    <add key="CargoWise.eHub.DataAccess.Cache.RegistryAccessor, Version=3.0.0.0" value="CargoWise.eHub.DataAccess.Sql.RegistryAccessor, CargoWise.eHub.DataAccess.Sql, Version=3.0.0.0, Culture=Neutral, PublicKeyToken=4f570df270576350" />
+    
+    <!--Data cache expiry time in minutes-->
+    <add key="DataCacheExpiry" value="10"/>
+    <!-- Used during logging to allow a redirect in the BAM portal to the custom message viewer ASP page -->
+    <add key="MessageViewerUrl" value="http://biztalk-web.ausyd.eservices.cargowise.net/eHubMessageViewer/Default.aspx"/>
+    <!-- Used to determine when to compress a stream before logging it in BAM-->
+    <add key="CompressionThresholdBytes" value="1048576"/>
+    <!--Size of buffers used when programmatic ally managing streams (eg) xpathreader, re-encoding, etc-->
+    <add key="StreamingBufferSize" value="32768"/>
+    <add key="CargoWise.eHub.DataAccess.Sql.eHubTransactions.CommandTimeout" value="300"/>
+    <add key="AdapterLoggingDirectory" value="C:\Logs\BizTalk\Adapters"/>
+    <add key="eHubTransactionsContext.CommandTimeout" value="3600"/>
+    <add key="DatabaseAccessRetryTimeLimit" value="600"/>
+  </appSettings>
+
+  <connectionStrings xdt:Transform="Remove"/>
+  <connectionStrings xdt:Transform="Insert">
+    <add name="CargoWise.eHub.DataAccess.Sql.eHubTransactions" connectionString="Data Source=localhost;Initial Catalog=eHubTransactions;Integrated Security=True;Connect Timeout=120;Application Name=eHub BizTalk"/>
+    <add name="eHubTransactionsContext" connectionString="Data Source=localhost;Initial Catalog=eHubTransactions;Integrated Security=True;Connect Timeout=120;Application Name=eHub BizTalk" providerName="System.Data.SqlClient"/>
+  </connectionStrings>
+
+  <system.diagnostics xdt:Transform="Remove"/>
+  <system.diagnostics xdt:Transform="Insert">
+    <switches>
+      <!-- 0,1,2,3, and 4 correspond to Off, Error, Warning, Info, and Verbose -->
+      <add name="eHubTraceLevel" value="0" />
+      <add name="BizTalkESBToolkit20" value="0" />
+    </switches>
+  </system.diagnostics>
+
+</configuration>

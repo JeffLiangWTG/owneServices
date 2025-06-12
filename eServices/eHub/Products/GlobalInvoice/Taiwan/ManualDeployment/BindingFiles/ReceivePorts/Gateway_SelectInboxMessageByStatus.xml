@@ -1,0 +1,111 @@
+<ReceivePort Name="Gateway_SelectInboxMessageByStatus" IsTwoWay="false" BindingOption="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Description xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  <ReceiveLocations>
+    <ReceiveLocation Name="Gateway_SelectInboxMessageByStatus_WCF-SQL">
+      <Description xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+      <Address>mssql://ehubtransactions.db.wisegrid.net//eHubTransactions?InboundId=SelectInboxMessagesByStatus</Address>
+      <PublicAddress />
+      <Primary>true</Primary>
+      <ReceiveLocationServiceWindowEnabled>false</ReceiveLocationServiceWindowEnabled>
+      <ReceiveLocationFromTime>2000-01-01T00:00:00</ReceiveLocationFromTime>
+      <ReceiveLocationToTime>2000-01-01T23:59:59</ReceiveLocationToTime>
+      <ReceiveLocationStartDateEnabled>false</ReceiveLocationStartDateEnabled>
+      <ReceiveLocationStartDate>2000-01-01T00:00:00</ReceiveLocationStartDate>
+      <ReceiveLocationEndDateEnabled>false</ReceiveLocationEndDateEnabled>
+      <ReceiveLocationEndDate>2000-01-01T23:59:59</ReceiveLocationEndDate>
+      <ReceiveLocationTransportType Name="WCF-SQL" Capabilities="779" ConfigurationClsid="59b35d03-6a06-4734-a249-ef561254ecf7" />
+      <ReceiveLocationTransportTypeData>
+        <CustomProps>
+          <BindingConfiguration vt="8">
+            <binding name="sqlBinding" closeTimeout="00:05:00" openTimeout="00:05:00" sendTimeout="00:05:00" polledDataAvailableStatement="EXEC [dbo].[SelectInboxMessagesByStatusCount] @ExcludedSenders='EDIAUSSYD,APOMELMEL,APOMELMEL_TRK,SHIPPING_INSTRUCTION,CONTAINER_TRACKING,FLIGHT_MONITORING_SYSTEM,SCHEDULE_FEED_SERVICE,T_____EML,SGCustoms,SGCustomsTest,CACustoms,CACustomsTest,eHubAirService', @ExcludedRecipients='EDIAUSSYD,APOMELMEL_EPR,SHIPPING_INSTRUCTION,FORWARDING_PORT_MESSAGE,CONTAINER_TRACKING,FLIGHT_MONITORING_SYSTEM,SCHEDULE_FEED_SERVICE,SGCustoms,SGCustomsTest,CACustoms,CACustomsTest,RAILINCFC,eHubAirService,GLB_ELEC_INVOICING,GLB_ELEC_INVOICINGTest'" pollingStatement="EXEC [dbo].[SelectInboxMessagesByStatus] @ExcludedSenders='EDIAUSSYD,APOMELMEL,APOMELMEL_TRK,SHIPPING_INSTRUCTION,CONTAINER_TRACKING,FLIGHT_MONITORING_SYSTEM,SCHEDULE_FEED_SERVICE,T_____EML,SGCustoms,SGCustomsTest,CACustoms,CACustomsTest,eHubAirService', @ExcludedRecipients='EDIAUSSYD,APOMELMEL_EPR,SHIPPING_INSTRUCTION,FORWARDING_PORT_MESSAGE,CONTAINER_TRACKING,FLIGHT_MONITORING_SYSTEM,SCHEDULE_FEED_SERVICE,SGCustoms,SGCustomsTest,CACustoms,CACustomsTest,RAILINCFC,eHubAirService,GLB_ELEC_INVOICING,GLB_ELEC_INVOICINGTest'" pollingIntervalInSeconds="2" pollWhileDataFound="true" inboundOperationType="TypedPolling" />
+          </BindingConfiguration>
+          <InboundBodyPathExpression vt="8" />
+          <InboundBodyLocation vt="8">UseBodyElement</InboundBodyLocation>
+          <AffiliateApplicationName vt="8" />
+          <BindingType vt="8">sqlBinding</BindingType>
+          <DisableLocationOnFailure vt="11">0</DisableLocationOnFailure>
+          <UserName vt="8">eHubBizTalk</UserName>
+          <ServiceBehaviorConfiguration vt="8">
+            <behavior name="ServiceBehavior">
+              <sqlAdapterInboundTransactionBehavior transactionTimeout="00:02:00" />
+            </behavior>
+          </ServiceBehaviorConfiguration>
+          <EndpointBehaviorConfiguration vt="8">
+            <behavior name="EndpointBehavior" />
+          </EndpointBehaviorConfiguration>
+          <OutboundXmlTemplate vt="8">
+            <bts-msg-body xmlns="http://www.microsoft.com/schemas/bts2007" encoding="xml" />
+          </OutboundXmlTemplate>
+          <IncludeExceptionDetailInFaults vt="11">-1</IncludeExceptionDetailInFaults>
+          <InboundNodeEncoding vt="8">Xml</InboundNodeEncoding>
+          <CredentialType vt="8">UserAccount</CredentialType>
+          <OutboundBodyLocation vt="8">UseBodyElement</OutboundBodyLocation>
+          <Password vt="1" />
+          <SuspendMessageOnFailure vt="11">-1</SuspendMessageOnFailure>
+          <OrderedProcessing vt="11">0</OrderedProcessing>
+        </CustomProps>
+      </ReceiveLocationTransportTypeData>
+      <ReceivePipeline Name="CargoWise.eHub.Gateway.Pipelines.Rcv_ResolveInboundGatewayMessage" FullyQualifiedName="CargoWise.eHub.Gateway.Pipelines.Rcv_ResolveInboundGatewayMessage, CargoWise.eHub.Gateway.Pipelines, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350" Type="1" TrackingOption="ServiceStartEnd MessageSendReceive PipelineEvents" Description="" />
+      <ReceivePipelineData>
+        <Root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <Stages>
+            <Stage CategoryId="9d0e4103-4cce-4536-83fa-4a5040674ad6">
+              <Components>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.StreamWrapperComponent">
+                  <Properties />
+                </Component>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.TrackingIDAssignmentComponent">
+                  <Properties />
+                </Component>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.SingleTransfomationComponent">
+                  <Properties>
+                    <Enabled vt="11">-1</Enabled>
+                    <TargetSchema vt="8">CargoWise.eHub.Gateway.Schemas.SendRequestStream, CargoWise.eHub.Gateway.Schemas, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350</TargetSchema>
+                    <TransformationType vt="8">CargoWise.eHub.Gateway.Transforms.dbo_SelectInboxMessagesByStatus2SendRequestStream.dbo_SelectInboxMessagesByStatus2SendRequestStream, CargoWise.eHub.Gateway.Transforms.dbo_SelectInboxMessagesByStatus2SendRequestStream, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350</TransformationType>
+                  </Properties>
+                </Component>
+              </Components>
+            </Stage>
+            <Stage CategoryId="9d0e4105-4cce-4536-83fa-4a5040674ad6">
+              <Components>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.SchemaResolveDisassembleComponent">
+                  <Properties>
+                    <EnvelopeSchema vt="8">CargoWise.eHub.Gateway.Schemas.SendRequestStream, CargoWise.eHub.Gateway.Schemas, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4f570df270576350</EnvelopeSchema>
+                    <FlatFileDataBaseDecodeEnabled vt="11">-1</FlatFileDataBaseDecodeEnabled>
+                    <FlatFileDataXPath vt="8">/*[local-name()='Message']</FlatFileDataXPath>
+                  </Properties>
+                </Component>
+              </Components>
+            </Stage>
+            <Stage CategoryId="9d0e410e-4cce-4536-83fa-4a5040674ad6">
+              <Components>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.PartyResolutionComponent">
+                  <Properties />
+                </Component>
+                <Component Name="CargoWise.eHub.Core.PipelineComponents.StaticValuePromotionComponent">
+                  <Properties>
+                    <PromoteValue vt="11">-1</PromoteValue>
+                    <PropertyType vt="8">http://cargowise.com/ehub/routing/2010/06#NextStep</PropertyType>
+                    <Value vt="8">DeliverToOutboxInbox</Value>
+                  </Properties>
+                </Component>
+              </Components>
+            </Stage>
+          </Stages>
+        </Root>
+      </ReceivePipelineData>
+      <SendPipeline xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+      <SendPipelineData xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+      <Enable>true</Enable>
+      <ReceiveHandler Name="InboxReceive" HostTrusted="false">
+        <TransportType Name="WCF-SQL" Capabilities="779" ConfigurationClsid="59b35d03-6a06-4734-a249-ef561254ecf7" />
+      </ReceiveHandler>
+    </ReceiveLocation>
+  </ReceiveLocations>
+  <SendPipelineData xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
+  <Authentication>0</Authentication>
+  <Tracking>0</Tracking>
+  <Transforms />
+  <RouteFailedMessage>true</RouteFailedMessage>
+  <ApplicationName>CargoWise.eHub</ApplicationName>
+</ReceivePort>

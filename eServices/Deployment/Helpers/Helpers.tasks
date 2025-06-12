@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <HelperTasksImported>true</HelperTasksImported>
+
+    <MSBuildCommonTasks>$(MSBuildThisFileDirectory)..\Common\MSBuildCommon.tasks</MSBuildCommonTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+
+  <!-- create a new temporary GUID dir for unit tests to copy the contents to -->
+  <Target Name="helper:CreateContentDir">
+    <CallTarget Targets="helper:CreateTempGuidDir">
+      <Output
+        TaskParameter="TargetOutputs"
+        PropertyName="ZipContentsDirectory" />
+    </CallTarget>
+    <Message Text="ZipContentsDirectory: $(ZipContentsDirectory)" Importance="High" />
+  </Target>
+
+  <!-- create a new temporary GUID dir under temp folder -->
+  <Target Name="helper:CreateTempGuidDir" Returns="$(TempGuidDir)">
+    <PropertyGroup>
+      <TempDir>$([System.IO.Path]::GetFullPath('$(TEMP)'))</TempDir>
+      <NewGuid>$([System.Guid]::NewGuid())</NewGuid>
+      <TempGuidDir>$([System.IO.Path]::Combine('$(TempDir)', '$(NewGuid)'))</TempGuidDir>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(TempGuidDir)" />
+  </Target>
+
+  <!-- create a new timestamp based dir under temp folder -->
+  <Target Name="helper:CreateTimeStampedDir" Returns="$(TempDir)">
+    <PropertyGroup>
+      <TimeStamp>$([System.DateTime]::Now.ToString(`yyyyMMdd_HHmmss_fff`))</TimeStamp>
+      <TempDir>$([System.IO.Path]::Combine('$(_TempDirectory)', '$(currentTimeStamp)'))</TempDir>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(TempDir)" />
+  </Target>
+
+  <Target Name="helper:CleanUp">
+    <RemoveItem FilePath="$(FilePath)" />
+    <Message Text="[pass]: '$(FilePath)' not found" Importance="High" Condition="'$(FilePath)' !='' and !Exists('$(FilePath)')" />
+    <Error Text="$(FilePath) still exists" Condition="'$(FilePath)' !='' and Exists('$(FilePath)')" />
+  </Target>
+
+  <Target Name="helper:TargetItems:Exist">
+    <Message Text="TargetItems: %(TargetItems.Identity)" />
+    <Message Text="[pass]: '%(TargetItems.Identity)' exists" Importance="High" Condition="'%(TargetItems.Identity)' !='' and Exists('%(TargetItems.Identity)')" />
+    <Error Text="%(TargetItems.Identity) not found" Condition="'%(TargetItems.Identity)' !='' and !Exists('%(TargetItems.Identity)')" />
+  </Target>
+
+  <Target Name="helper:TargetItems:NotExist">
+    <Message Text="TargetItems: %(TargetItems.Identity)" />
+    <Message Text="[pass]: '%(TargetItems.Identity)' not found" Importance="High" Condition="'%(TargetItems.Identity)' !='' and !Exists('%(TargetItems.Identity)')" />
+    <Error Text="%(TargetItems.Identity) still exists" Condition="'%(TargetItems.Identity)' !='' and Exists('%(TargetItems.Identity)')" />
+  </Target>
+
+  <Target Name="helper:ItemsToRemove:Remove">
+    <Message Text="ItemsToRemove: %(ItemsToRemove.Identity)" />
+
+    <RemoveItem FilePath="%(ItemsToRemove.Identity)" />
+    <Message Text="[pass]: '%(ItemsToRemove.Identity)' not found" Importance="High" Condition="'%(ItemsToRemove.Identity)' !='' and !Exists('%(ItemsToRemove.Identity)')" />
+    <Error Text="%(ItemsToRemove.Identity) still exists" Condition="'%(ItemsToRemove.Identity)' !='' and Exists('%(ItemsToRemove.Identity)')" />
+  </Target>
+
+  <UsingTask
+    TaskName="RemoveItem"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="$(MSBuildTasksToolsFilePath)" >
+    <ParameterGroup>
+      <FilePath ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        if (!string.IsNullOrEmpty(FilePath)) {
+          string path = System.IO.Path.GetFullPath(FilePath);
+          if (System.IO.File.GetAttributes(path).HasFlag(FileAttributes.Directory)) {
+            System.IO.Directory.Delete(path, true);
+          } else {
+            System.IO.File.Delete(path);
+          }
+        }
+      ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+</Project>

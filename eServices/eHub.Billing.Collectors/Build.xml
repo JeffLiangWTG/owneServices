@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Build xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" MSBuild="16.0" xmlns="http://wisetechglobal.com/DevTools/Build.xsd">
+  <Solutions>
+    <Solution Filename="CargoWise.eServices.Billing.sln">
+      <Dependency Type="Repository">Billing</Dependency>
+      <Dependency Type="Repository">eHubDatabase</Dependency>
+    </Solution>
+  </Solutions>
+  <PreBuild>
+    <Command>setup.cmd</Command>
+  </PreBuild>
+  <PostBuild>
+    <Command cacheable="false">post-build.cmd</Command>
+  </PostBuild>
+  <Tasks>
+    <Task Name="Initialize eServices.BuildTools.DatTool">
+      <Step>dotnet esv-dattool init --output Bin\DAT --framework net48</Step>
+    </Task>
+  </Tasks>
+  <Dependencies>
+    <Dependency Repository="https://github.com/WiseTechGlobal/CargoWise.Shared" Path="CargoWise.Billing.API">
+      <Copy Source="net48\librdkafka" Target="librdkafka"/>
+      <Copy Source="net48\Confluent.Kafka.dll"/>
+      <Copy Source="net48\System.Memory.dll" />
+      <Copy Source="net48\CargoWise.Billing.API.dll" />
+      <Copy Source="net48\CargoWise.Billing.API.Tests.dll" />
+      <Copy Source="net48\CargoWise.Billing.Kafka.API.dll" />
+    </Dependency>
+    <Dependency Repository="https://github.com/WiseTechGlobal/CargoWise.Shared" Path="CargoWise.Billing.Client">
+      <Copy Source="net48\CargoWise.Billing.Client.dll" />
+    </Dependency>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/Billing" Name="Billing">
+      <Copy Source="CargoWise.eServices.Billing.Collector.WindowsService.Common.dll" />
+      <Copy Source="CargoWise.eServices.Billing.Collector.WindowsService.Common.Tests.dll" />
+      <Copy Source="Databases\CargoWise.eServices.Billing.Database\CargoWise.eServices.Billing.Database.dacpac" Target="Databases\CargoWise.eServices.Billing.Database" />
+      <Copy Source="Databases\CargoWise.eServices.Billing.Database\MASTER.DACPAC" Target="Databases\CargoWise.eServices.Billing.Database" />
+      <Copy Source="CargoWise.eServices.Billing.Tests.Common.dll" />
+      <Copy Source="CargoWise.eServices.Billing.WcfService.IntegrationTests.dll" />
+      <Copy Source="WcfService" Target="WcfService" />
+    </Dependency>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/Deployment">
+      <Copy Source="Deployment" Target="Deployment" />
+    </Dependency>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/DatImplementation">
+      <Copy Source="Dat.Integration.dll" Target="DAT" />
+      <Copy Source="eHub.DatImplementation.Deployment.dll" Target="DAT" />
+      <Copy Source="Microsoft.Build.dll" Target="DAT" />
+      <Copy Source="Microsoft.Build.Framework.dll" Target="DAT" />
+      <Copy Source="Microsoft.Build.Tasks.Core.dll" Target="DAT" />
+      <Copy Source="Microsoft.Build.Utilities.Core.dll" Target="DAT" />
+      <Copy Source="System.Buffers.dll" Target="DAT" />
+      <Copy Source="System.Collections.Immutable.dll" Target="DAT" />
+      <Copy Source="System.Memory.dll" Target="DAT" />
+      <Copy Source="System.Numerics.Vectors.dll" Target="DAT" />
+      <Copy Source="System.Runtime.CompilerServices.Unsafe.dll" Target="DAT" />
+      <Copy Source="System.Threading.Tasks.Dataflow.dll" Target="DAT" />
+    </Dependency>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/Shared/eHubDatabase" Name="eHubDatabase">
+      <Copy Source="Databases" Target="Databases" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\eServices.eHubDatabase.Tests.Common.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\CargoWise.eServices.TestHelpers.Database.Common.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\CargoWise.eServices.TestHelpers.Database.Deployment.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\Microsoft.Data.Tools.Schema.Sql.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\Microsoft.Data.Tools.Utilities.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\Microsoft.SqlServer.Dac.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\Microsoft.SqlServer.Dac.Extensions.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\Microsoft.SqlServer.TransactSql.ScriptDom.dll" />
+    </Dependency>
+    <Dependency Repository="https://github.com/WiseTechGlobal/CargoWise.Shared" Path="CargoWise.Billing.CollectorService">
+      <Copy Source="net48\CargoWise.Billing.CollectorService.Plugin.dll" />
+      <Copy Source="Plugin.Tests\net48\CargoWise.Billing.CollectorService.Plugin.Tests.dll" />
+    </Dependency>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/CargoWise/_git/ApplicationManager" Path="/">
+      <Copy Source="CargoWise.ApplicationManager.Common.dll" />
+    </Dependency>
+  </Dependencies>
+  <OtherFiles>
+    <Filename CopyFrom="packages\EntityFramework\lib\net45">EntityFramework.dll</Filename>
+    <Filename CopyFrom="packages\Common.Logging.Core\lib\net40">Common.Logging.Core.dll</Filename>
+    <Filename CopyFrom="packages\EntityFramework\lib\net45">EntityFramework.SqlServer.dll</Filename>
+    <Filename CopyFrom="packages\Common.Logging\lib\net40">Common.Logging.dll</Filename>
+    <Filename CopyFrom="packages\Common.Logging.Log4Net208\lib\net40">Common.Logging.Log4Net208.dll</Filename>
+    <Filename CopyFrom="packages\log4net\lib\net40-full">log4net.dll</Filename>
+    <Filename DeployToClients="false" CopyFrom="packages\NUnit\lib\net45">nunit.framework.dll</Filename>
+    <Filename DeployToClients="false" CopyFrom="packages\Moq\lib\net45">Moq.dll</Filename>
+    <Filename CopyFrom="packages\Microsoft.Extensions.Logging.Log4Net.AspNetCore\lib\netstandard2.0">Microsoft.Extensions.Logging.Log4Net.AspNetCore.dll</Filename>
+    <Filename CopyFrom="packages\Microsoft.Extensions.Logging\lib\net462">Microsoft.Extensions.Logging.dll</Filename>
+    <Filename CopyFrom="packages\Microsoft.Extensions.Logging.Abstractions\lib\net462">Microsoft.Extensions.Logging.Abstractions.dll</Filename>
+    <Filename CopyFrom="packages\Microsoft.Extensions.Options\lib\net462">Microsoft.Extensions.Options.dll</Filename>
+    <Filename CopyFrom="packages\System.Memory\lib\net461">System.Memory.dll</Filename>
+    <Filename CopyFrom="packages\CargoWise.eServices.Encryption.Server.Decryptor\lib\net45">CargoWise.eServices.Encryption.Server.Decryptor.dll</Filename>
+    <Filename CopyFrom="packages\CargoWise.eServices.Encryption.Server.Encryptor\lib\net45">CargoWise.eServices.Encryption.Server.Encryptor.dll</Filename>
+    <Filename CopyFrom="packages\CargoWise.eServices.Encryption.Client.Decryptor\lib\net45">CargoWise.eServices.Encryption.Client.Decryptor.dll</Filename>
+    <Filename CopyFrom="packages\CargoWise.eServices.Encryption.Client.Encryptor\lib\net45">CargoWise.eServices.Encryption.Client.Encryptor.dll</Filename>
+    <Filename CopyFrom="packages\WTG.ErrorReporting\lib\net46">WTG.ErrorReporting.dll</Filename>
+    <Filename DeployToClients="false" CopyFrom="packages\Castle.Core\lib\net45">Castle.Core.dll</Filename>
+    <Filename CopyFrom="packages\Newtonsoft.Json\lib\net45">Newtonsoft.Json.dll</Filename>
+    <Filename DeployToClients="false" CopyFrom="packages\System.Threading.Tasks.Extensions\lib\net461">System.Threading.Tasks.Extensions.dll</Filename>
+    <Filename CopyFrom="packages\CsvHelper\lib\net45">CsvHelper.dll</Filename>
+  </OtherFiles>
+  <DatSettings BuildDeployerType="eServices.BuildTools.DatDeploy.Deployer, eServices.BuildTools.DatDeploy" IntegrationAssembliesSubdir="DAT">
+    <TestAdapters>
+      <TestAdapter Key="VSTest" Type="Dat.Implementation.VSTest.VSTestAdapter, Dat.Implementation.VSTest">
+        <Options>
+          <Option Name="PreferredTargetPlatform">x86</Option>
+          <Option Name="TestAssemblyReferenceFilter">Microsoft.VisualStudio.QualityTools.UnitTestFramework</Option>
+        </Options>
+      </TestAdapter>
+      <TestAdapter Key="NUnit" Type="Dat.Implementation.NUnit3.NUnit3TestAdapter, Dat.Implementation.NUnit3">
+        <Options>
+          <Option Name="TestAssemblyReferenceFilter">nunit.framework</Option>
+          <Option Name="TestAssemblyFileFilter">*Tests.dll</Option>
+        </Options>
+      </TestAdapter>
+    </TestAdapters>
+    <DeploymentTargets>
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\CargoWise.eServices.Billing.Collector.eHub.WindowsService.zip;p:Profile=Test;t:bat:deploy" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\CargoWise.eServices.Billing.Collector.eHub.WindowsService.zip;p:Profile=Production;t:bat:deploy" />
+    </DeploymentTargets>
+  </DatSettings>
+</Build>

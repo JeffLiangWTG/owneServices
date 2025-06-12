@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bat:package">
+
+  <PropertyGroup>
+    <DeploymentRootPath>$(MSBuildThisFileDirectory)..\..\..\Bin\Deployment\</DeploymentRootPath>
+    <CommonScriptsPath>$(DeploymentRootPath)Common\</CommonScriptsPath>
+    <InstallCommonPath>$(DeploymentRootPath)Install\</InstallCommonPath>
+    <ProfilesPropsDirectory>$(MSBuildThisFileDirectory)..\Profiles\</ProfilesPropsDirectory>
+    <BizTalkCommonDirectory>$(MSBuildThisFileDirectory)..\BizTalkCommon\</BizTalkCommonDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <_ProjectId>BizTalkAdapters</_ProjectId>
+
+    <RelativeBinPath>..\..\..\Bin\</RelativeBinPath>
+    <OutputPath>$(RelativeBinPath)</OutputPath>
+
+    <BinPath Condition="'$(BinPath)'==''">$(MSBuildThisFileDirectory)$(RelativeBinPath)</BinPath>
+    <SourcePath Condition="'$(SourcePath)'==''">$(MSBuildThisFileDirectory)..\..\..\</SourcePath>
+    <BizTalkAdaptersSolutionDirectory>$(SourcePath)BizTalkAdapters\</BizTalkAdaptersSolutionDirectory>
+
+    <RegistryScriptsDirectory>$(DeploymentRootPath)Registry\</RegistryScriptsDirectory>
+    <RegistryFilesPath>$(BizTalkAdaptersSolutionDirectory)Setup\Registry</RegistryFilesPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DeployCommonPath Condition="Exists('$(CommonScriptsPath)Deploy.tasks')">$(CommonScriptsPath)</DeployCommonPath>
+    <DeployCommonPath Condition="'$(DeployCommonPath)' == ''">$(MSBuildThisFileDirectory)Common\</DeployCommonPath>
+    <DeployTasks>$(DeployCommonPath)Deploy.tasks</DeployTasks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(CommonScriptsPath)MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(DeploymentRootPath)package-common.tasks</PackageCommonTasks>
+    <BizTalkCommonTasks>$(BizTalkCommonDirectory)BizTalkCommon.tasks</BizTalkCommonTasks>
+    <ProfilesTasks>$(ProfilesPropsDirectory)Profiles.tasks</ProfilesTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+  <Import Project="$(ProfilesTasks)" Condition="'$(ProfilesIncluded)'==''" />
+  <Import Project="$(BizTalkCommonTasks)" Condition="'$(BizTalkCommonImported)'==''"/>
+  <Import Project="$(DeployTasks)" Condition="'$(DeployCommonImported)'==''"/>
+
+  <Target Name="paket">
+    <Exec Command="$(SourcePath)paket.exe restore" />
+  </Target>
+
+  <Target Name="bat:package" Returns="$(_TargetZipFilePath)" DependsOnTargets="bat:props:init">
+    <!-- initialize package variables and temporary folders for zip contents -->
+    <CallTarget Targets="bat:package:init"/>
+
+    <ItemGroup>
+      <ProgramFiles Remove="@(ProgramFiles)" />
+      <GACAssemblies Remove="@(GACAssemblies)" />
+
+      <ProgramFiles Include="@(BinFileNames->'$(BinPath)\%(Identity)')" />
+      <GACAssemblies Include="@(GACFileNames->'$(BinPath)\%(Identity)')" />
+
+      <Scripts Include="$(MSBuildThisFileDirectory)Scripts\**\*" />
+      <Scripts Include="$(RegistryScriptsDirectory)*.ps1" />
+      
+      <RegistryJsonFiles Include="$(RegistryFilesPath)\*.json" />
+
+      <InstallCommonFiles Include="$(InstallCommonPath)**\*" />
+      <DeployCommonFiles Include="$(DeployCommonPath)**\*" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <OutputBinPath>$(_ZipContentsDirectory)\$(_BinPath)</OutputBinPath>
+        <OutputAdaptersBinPath>$(_ZipContentsDirectory)\$(_AdaptersBinPath)</OutputAdaptersBinPath>
+        <OutputGACBinPath>$(_ZipContentsDirectory)\$(_GACBinPath)</OutputGACBinPath>
+    </PropertyGroup>
+
+    <!-- download latest assemblies -->
+    <CallTarget Targets="paket" />
+
+    <RemoveDir Directories="$(_ZipContentsDirectory)" Condition="Exists($(_ZipContentsDirectory))" />
+    <MakeDir Directories="$(_ZipContentsDirectory)" />
+
+    <!-- Copy package files -->
+    <CallTarget Targets="bat:profiles:copy-output" />
+
+    <Copy SourceFiles="@(ProgramFiles)" DestinationFolder="$(OutputAdaptersBinPath)" />
+    <Copy SourceFiles="@(GACAssemblies)" DestinationFolder="$(OutputGACBinPath)" />
+
+    <Copy SourceFiles="@(RegistryJsonFiles)" DestinationFolder="$(_ZipContentsDirectory)\Registry" />
+
+    <Copy SourceFiles="@(Scripts)" DestinationFolder="$(_ZipContentsDirectory)\%(RecursiveDir)" />
+    <Copy SourceFiles="@(InstallCommonFiles)" DestinationFolder="$(_ZipContentsDirectory)\%(RecursiveDir)" />
+    <Copy SourceFiles="@(DeployCommonFiles)" DestinationFolder="$(_ZipContentsDirectory)\Common\%(RecursiveDir)" />
+    <!-- End package files -->
+
+    <!-- Create package -->
+    <CallTarget Targets="bat:package:zip"/>
+  </Target>
+
+</Project>

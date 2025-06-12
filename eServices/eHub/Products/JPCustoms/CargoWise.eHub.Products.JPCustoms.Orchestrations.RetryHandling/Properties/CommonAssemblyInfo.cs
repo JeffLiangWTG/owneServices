@@ -1,0 +1,17 @@
+using System.Reflection;
+using System.Resources;
+using System.Runtime.InteropServices;
+
+[assembly: AssemblyCompany("WiseTech Global")]
+[assembly: AssemblyProduct("eHub")]
+[assembly: AssemblyCopyright("Copyright WiseTech Global © 2019")]
+[assembly: AssemblyTrademark("CargoWise")]
+[assembly: AssemblyCulture("")]
+
+[assembly: NeutralResourcesLanguage("en-US")]
+
+// Setting ComVisible to false makes the types in this assembly not visible 
+// to COM components.  If you need to access a type in this assembly from 
+// COM, set the ComVisible attribute to true on that type.
+[assembly: ComVisible(false)]
+

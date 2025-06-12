@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="bat:package">
+
+  <PropertyGroup>
+    <DeploymentRootPath>$(MSBuildThisFileDirectory)..\..\Bin\Deployment\</DeploymentRootPath>
+    <CommonScriptsPath>$(DeploymentRootPath)Common\</CommonScriptsPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <_ProjectId>Encryption.Common</_ProjectId>
+
+    <RelativeBinPath>..\..\Bin\</RelativeBinPath>
+    <OutputPath>$(RelativeBinPath)</OutputPath>
+
+    <BinPath Condition="'$(BinPath)'==''">$(MSBuildThisFileDirectory)$(RelativeBinPath)</BinPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BinPath>$([System.IO.Path]::GetFullPath('$(BinPath)'))</BinPath>
+    <EncryptionAssemblyFilePath>$(BinPath)\Encryption.Common\Encryption.Common.dll</EncryptionAssemblyFilePath>
+    <EncryptionAssemblyFilePath>$([System.IO.Path]::GetFullPath('$(EncryptionAssemblyFilePath)'))</EncryptionAssemblyFilePath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <MSBuildCommonTasks>$(CommonScriptsPath)MSBuildCommon.tasks</MSBuildCommonTasks>
+    <PackageCommonTasks>$(DeploymentRootPath)package-common.tasks</PackageCommonTasks>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommonTasks)" Condition="'$(MSBuildCommonTasksImported)'==''"/>
+  <Import Project="$(PackageCommonTasks)" Condition="'$(PackageCommonTasksImported)'==''"/>
+
+  <Target Name="bat:package" Returns="$(_TargetZipFilePath)">
+    <!-- initialize package variables and temporary folders for zip contents -->
+    <CallTarget Targets="bat:package:init"/>
+
+    <ItemGroup>
+      <ProgramFiles Include="$(MSBuildThisFileDirectory)Encryption.Common.proj" />
+      <EncryptionLibFiles Include="$(EncryptionAssemblyFilePath)" />
+    </ItemGroup>
+
+    <!-- Copy package files -->
+    <Copy SourceFiles="@(ProgramFiles)" DestinationFolder="$(_ZipContentsDirectory)" />
+    <Copy SourceFiles="@(EncryptionLibFiles)" DestinationFolder="$(_ZipContentsDirectory)\Encryption.Common" />
+    <!-- End package files -->
+
+    <!-- Create package -->
+    <CallTarget Targets="bat:package:zip"/>
+  </Target>
+
+</Project>

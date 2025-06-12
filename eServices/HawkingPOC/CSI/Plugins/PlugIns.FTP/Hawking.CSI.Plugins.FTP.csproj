@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\FluentFTP\Hawking.CSI.FluentFtp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hawking.CSI.Utilities" Version="1.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <VersionPrefix>1.0.6</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+  </PropertyGroup>
+
+  <Target Name="CopyPackage" AfterTargets="Pack">
+    <Exec Command="rd /s /q c:\inetpub\wwwroot\repo\Packages\$(PackageId)\%Version%" />
+    <Copy SourceFiles="$(OutputPath)..\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="c:\inetpub\wwwroot\repo\Packages" />
+    <Exec Command="dotnet nuget locals all --clear" />
+  </Target>
+
+</Project>

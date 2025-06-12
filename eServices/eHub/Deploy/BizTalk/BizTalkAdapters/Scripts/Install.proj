@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="install">
+
+  <PropertyGroup>
+    <MSBuildExtensionsPackPath Condition="'$(MSBuildExtensionsPackPath)' == ''">$(ProgramFiles)\MSBuild\ExtensionPack\4.0\</MSBuildExtensionsPackPath>
+    <MSBuildExtensionsPackPath Condition="!Exists('$(MSBuildExtensionsPackPath)')">$(ProgramFiles)\MSBuildExtensionPack\4.0\</MSBuildExtensionsPackPath>
+    <DeployCommonPath Condition="'$(DeployCommonPath)' == ''">$(MSBuildThisFileDirectory)Common\</DeployCommonPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildExtensionsPackPath)\MSBuild.ExtensionPack.tasks" Condition="'$(BuildPath)'==''"/>
+  <Import Project="$(DeployCommonPath)Deploy.tasks" Condition="'$(MSbuildCommonImported)' == ''"/>
+  <Import Project="$(MSBuildThisFileDirectory)Profiles\Profiles.tasks" Condition="'$(ProfilesIncluded)' == ''"/>
+
+  <Import Project="$(MSBuildThisFileDirectory)Deployment.props" Condition="'$(_DeploymentPropsImported)' == ''"/>
+
+  <!-- invoke extension pack tasks to add adapters to BizTalk -->
+  <Target Name="install" Inputs="@(Adapters)" Outputs="%(Identity)" DependsOnTargets="gac:install">
+    <Message Text="UserId=$(UserId); MachineName=$(Server); DatabaseServer=$(DatabaseServer)" Importance="High" />
+
+    <BizTalkAdaptor TaskAction="CheckExists" AdaptorName="%(Adapters.Identity)" MachineName="$(Server)" DatabaseServer="$(DatabaseServer)">
+      <Output TaskParameter="Exists" PropertyName="Exists" />
+    </BizTalkAdaptor>
+
+    <Message Text="Deleting adaptor: '%(Adapters.Identity)' as found already exists." Condition="'$(Exists)'=='True'" />
+    <BizTalkAdaptor TaskAction="Delete" AdaptorName="%(Adapters.Identity)" Condition="'$(Exists)'=='True'" />
+
+    <BizTalkAdaptor
+        TaskAction="Create"
+        AdaptorName="%(Adapters.Identity)"
+        MachineName="$(Server)"
+        DatabaseServer="$(DatabaseServer)"
+        MgmtCLSID="%(Adapters.CLSID)" />
+
+  </Target>
+
+  <Target Name="gac:install" DependsOnTargets="bat:props:init">
+    <ItemGroup>
+      <GacAssemblies Remove="@(GacAssemblies)" />
+      <GacAssemblies Include="@(GACFileNames->'$(_GACBinPath)\%(Identity)')" />
+    </ItemGroup>
+
+    <MSBuild.ExtensionPack.Framework.Gac
+        TaskAction="AddAssembly"
+        AssemblyPath="%(GacAssemblies.FullPath)" />
+  </Target>
+
+</Project>

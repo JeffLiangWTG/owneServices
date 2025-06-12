@@ -1,0 +1,58 @@
+﻿@page "/messages"
+@using eServices.eHubDataModel.eHubTransactionsCore
+@attribute [Authorize(Policy = "MessagesUser")]
+@inject IDbContextFactory<eHubTransactionsContext> DbFactory
+
+
+<PageTitle>Messages</PageTitle>
+
+<h1>Messages</h1>
+
+@if (messages is not null)
+{
+    @* For development, this page will query from DmsMessages SQL database. To maintain proper Domain Driven Design, do not enable this for other environments. *@
+    <QuickGrid Class="table" Items="messages" Virtualize="true">
+        <PropertyColumn Title="InsertUTC" Property="msg => msg.EI_InsertUTC" />
+        <PropertyColumn Title="Sender" Property="msg => msg.EI_CC_Sender" />
+        <PropertyColumn Title="Recipient" Property="msg => msg.EI_CC_Recipient" />
+        <PropertyColumn Title="Status" Property="msg => msg.EI_Status" />
+
+        <TemplateColumn Context="msg">
+            <a href="@($"messages/details?id={msg.EI_PK}")" target="_blank">Details</a>
+        </TemplateColumn>
+    </QuickGrid>
+}
+else
+{
+    <p>
+        To search for messages, please use the <a href="https://eye.wtg.ws/s/eservices/app/r/s/oZg6X" target="_blank">eHub Messages Dashboard</a>.
+    </p>
+}
+
+@code {
+    eHubTransactionsContext context = default!;
+    IQueryable<Message>? messages;
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+        if (context.Database.IsSqlServer())
+        {
+            messages = (await context.eHubInboxMessage.OrderByDescending(i => i.EI_InsertUTC)
+                .Select(i => new Message(
+                    i.EI_InsertUTC,
+                    i.EI_PK,
+                    i.EI_CC_SenderNavigation.CC_ID,
+                    i.EI_CC_RecipientNavigation == null ? string.Empty : i.EI_CC_RecipientNavigation.CC_ID,
+                    i.EI_Status == 0 ? "Received" :
+                        i.EI_Status < 3 ? "Processed" :
+                        i.EI_Status == 3 ? "Completed" :
+                        i.EI_Status == 255 ? "Failed" :
+                        i.EI_Status.ToString()
+                ))
+                .Take(1000).ToListAsync()).AsQueryable();
+        }
+    }
+
+    record Message(DateTime EI_InsertUTC, Guid EI_PK, string EI_CC_Sender, string EI_CC_Recipient, string EI_Status);
+}

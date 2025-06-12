@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty:v1" xmlns:ns0="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" xmlns:ns1="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" targetNamespace="http://www.auspost.com.au/Schema/CommonDataModel/InvolvedParty:v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Common:v1" schemaLocation="ContactDetails_v3.xsd"/>
+	<xs:import namespace="http://www.auspost.com.au/Schema/CommonDataModel/Location:v1" schemaLocation="Address_v3.xsd"/>
+	<xs:include schemaLocation="Individual_v3.xsd"/>
+	<xs:complexType name="OrganisationType">
+		<xs:annotation>
+			<xs:documentation>Details of an organisation.  An organisation is an distinct type of involved Party</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="OrganisationName">
+				<xs:annotation>
+					<xs:documentation>An Organisation Name is a full title of an Organisations name by which it trades or recognised under</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="200"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="RegistrationDetails" type="OrganisationRegistrationType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OrganisationRegistrationType">
+		<xs:annotation>
+			<xs:documentation>Details of the registration acquired by the organisation. An organization may have multiple registrations. Each registration has a start date and an optional end date</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="RegistrationIdentifier">
+				<xs:annotation>
+					<xs:documentation>A unique identifier for an Organisation Registration</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="RegistrationDescription" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Description of the registration an organisation has acquired.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="200"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="StartDate" type="xs:date" minOccurs="0"/>
+			<xs:element name="EndDate" type="xs:date" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Organisation" type="OrganisationType"/>
+	<xs:element name="RegistrationDetails" type="OrganisationRegistrationType"/>
+</xs:schema>

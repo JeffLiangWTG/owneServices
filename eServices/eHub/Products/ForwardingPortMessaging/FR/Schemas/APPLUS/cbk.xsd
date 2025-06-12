@@ -1,0 +1,1183 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<xs:schema elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://www.cargowise.com/Schemas/FPM/APPLUS"
+           targetNamespace="http://www.cargowise.com/Schemas/FPM/APPLUS">
+
+  <xs:include schemaLocation="patterns.xsd"/>
+
+  <xs:complexType name="user_type">
+    <xs:attribute name="user" use="required">
+      <xs:annotation>
+        <xs:documentation>Code utilisateur du tiers profession du message.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tiersProf" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant tiers profession du message.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="email" type="xs:string" use="optional"/>
+    <xs:attribute name="adresse" type="xs:string" use="optional"/>
+    <xs:attribute name="reseau" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="notification_type">
+    <xs:choice>
+      <xs:element name="confirmation-booking">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="references-cbk" type="reference_cbk_type">
+              <xs:annotation>
+                <xs:documentation>Ensemble des references de rattachement de la confirmation de booking.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="voyage-cbk">
+              <xs:annotation>
+                <xs:documentation>Voyage sur lequel est affectee la confirmation de booking.</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="voyage_cbk_type">
+                    <xs:sequence>
+                      <xs:element name="lieux-cbk" type="lieux_cbk_type">
+                        <xs:annotation>
+                          <xs:documentation>Lieux de destination de la marchandise de la confirmation de booking.</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="tiers-cbk" type="tiers_cbk_type">
+              <xs:annotation>
+                <xs:documentation>Ensemble des tiers concernes par la confirmation de booking.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="lieu-reception-cbk" type="lieu_reception_cbk_type" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>Lieu de réception de la confirmation de booking.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="reference-annexe" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>Reference(s) annexe(s) a laquelle la confirmation de booking est rattachee.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="equipement-cbk" type="equipement_cbk_type" minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>Equipement(s) contenu(s) dans la confirmation de booking.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="lmarchandise-cbk" type="lmarchandise_cbk_type" minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>Ligne(s) marchandise(s) contenue(s) dans la confirmation de booking.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <!-- ** xs:element ref="liste-lpc"/ -->
+      <!-- ** xs:element ref="lpe"/ -->
+    </xs:choice>
+    <xs:attribute name="id" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant fonctionnel du document envoyé ou imprimé.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" use="required">
+      <xs:annotation>
+        <xs:documentation>Type du document notifié ou imprimé (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0"/>
+          <xs:maxLength value="7"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="action" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code fonction du document (Codification SIC)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="CREATE|UPDATE|DELETE|ADD|ERASE|PRINT|UKN"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="statut" type="xs:string" use="optional"/>
+    <xs:attribute name="ref" type="xs:string" use="optional"/>
+    <xs:attribute name="aerien" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="reference_cbk_type">
+    <xs:annotation>
+      <xs:documentation>1..1</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="commentaires" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Commentaires generaux relatifs a la confirmation de booking.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="210"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="sic" type="IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identification SIC de la confirmation de booking (Obligatoire en notification)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ext" use="required">
+      <xs:annotation>
+        <xs:documentation>Reference booking de l'agent fret</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="cot" use="optional">
+      <xs:annotation>
+        <xs:documentation>Reference de cotation de l'agent fret associee a la reference booking</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dem" use="optional">
+      <xs:annotation>
+        <xs:documentation>Reference du dossier du demandeur du booking</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="trans" use="optional">
+      <xs:annotation>
+        <xs:documentation>Reference du dossier du transitaire portuaire</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="statut" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Statut du document. Les valeurs sont codifiees dans le SIC.
+        </xs:documentation>
+        <xs:documentation>PRO = Provisoire</xs:documentation>
+        <xs:documentation>VAF = Valide Agent Fret</xs:documentation>
+        <xs:documentation>VTP = Valide Transitaire Portuaire</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="3"/>
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="trsic" type="IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du dossier du transitaire portuaire</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="demsic" type="IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du dossier du demandeur du booking.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="date" type="DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Date d'attribution du statut de la confirmation de booking dans le SIC (31/12/2004 10:00).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="carriermerchant" type="xs:string" use="optional"/>
+    <xs:attribute name="MAD" type="Booleen_type"/>
+    <xs:attribute name="paiement" type="xs:string"/>
+    <xs:attribute name="version" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="voyage_cbk_type">
+    <xs:annotation>
+      <xs:documentation>1..1</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="refotc" use="optional">
+      <xs:annotation>
+        <xs:documentation>Reference OTC de l'agent fret</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="refser" use="optional">
+      <xs:annotation>
+        <xs:documentation>Reference service de l'agent fret</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="armement" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'arment du service ou de l'OTC</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="armement-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'arment du service ou de l'OTC</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="atp" type="IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'ATP</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="refarm" type="xs:string" use="optional"/>
+    <xs:attribute name="otc" type="IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'OTC</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ser" type="IdSic_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du service (Codification SIC).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="eta" type="DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>"30/12/2004" Date estimee de l'arrivee du navire. Renseignee en notification et impression si l'OTC du booking est rattachee a un booking.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="etd" type="DateLongue_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>"31/12/2004" Date estimee de depart du navire. Renseignee si l'OTC de la confirmation de booking est rattachee a une OTC.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="nav" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dateDepart" type="DateLongue_type" use="optional"/>
+    <xs:attribute name="dateDestination" type="DateLongue_type" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="lieux_cbk_type">
+    <xs:annotation>
+      <xs:documentation>1..1</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="fin" use="required">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du lieu de destination finale.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="5"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="fin-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du lieu de destination finale.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tbt" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification du premier port de dechargement</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="5"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="tbt-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du lieu de destination finale.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dest" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du port de destination.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="5"/>
+          <xs:maxLength value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dest-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Codification SIC du lieu de destination finale.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="tiers_cbk_type">
+    <xs:annotation>
+      <xs:documentation>1..1</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="creat" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du createur de la confirmation de booking. (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="creat-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du createur de la confirmation de booking. (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dem" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du demandeur du booking (Codification SIC)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="dem-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du demandeur du booking (Codification SIC)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="trans" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du transitaire portuaire (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="trans-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du transitaire portuaire (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="exp" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'expediteur (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="exp-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de l'expediteur (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="manut" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du manutentionaire responsable de la zone de RL où doit être receptionnee la marchandise de la confirmation de booking (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="manut-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du manutentionaire responsable de la zone de RL où doit être receptionnee la marchandise de la confirmation de booking (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du lieu de RL où la marchandise doit être receptionnee (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du lieu de RL où la marchandise doit être receptionnee (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="zone" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de la zone portuaire où la marchandise de la confirmation de booking doit être receptionnee (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="zone-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de la zone portuaire où la marchandise de la confirmation de booking doit être receptionnee (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="nomdem" use="optional">
+      <xs:annotation>
+        <xs:documentation>Nom du demandeur du booking. A renseigner obligatoirement si l'attribut "creat " n'est pas renseigne.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ctatrans" use="optional">
+      <xs:annotation>
+        <xs:documentation>Contact chez le transitaire portuaire.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ctadem" use="optional">
+      <xs:annotation>
+        <xs:documentation>Contact du demandeur du booking.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="afret" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="afret-lib" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="lieu_reception_cbk_type">
+    <xs:annotation>
+      <xs:documentation>0..1</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="manut" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du manutentionaire responsable de la zone de RL où doit être receptionnee la marchandise de la confirmation de booking (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="9"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="manut-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du manutentionaire responsable de la zone de RL où doit être receptionnee la marchandise de la confirmation de booking (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du lieu de RL où la marchandise doit être receptionnee (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="8"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="lieu-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC du lieu de RL où la marchandise doit être receptionnee (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="zone" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de la zone portuaire où la marchandise de la confirmation de booking doit être receptionnee (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="zone-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant SIC de la zone portuaire où la marchandise de la confirmation de booking doit être receptionnee (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="lmarchandise_cbk_type">
+    <xs:annotation>
+      <xs:documentation>0..1</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="description">
+        <xs:annotation>
+          <xs:documentation>Description de la nature de la marchandise.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="70"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="nb" use="required">
+      <xs:annotation>
+        <xs:documentation>Nombre d'unites de conditionnement de la ligne marchandise.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code" use="required">
+      <xs:annotation>
+        <xs:documentation>Code du conditionnement de la ligne marchandise (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code du conditionnement de la ligne marchandise (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="poids" type="Poids_type" use="required">
+      <!--<xs:simpleType>
+                <xs:restriction base="xs:integer">
+                    <xs:totalDigits value="9"/>
+                </xs:restriction>
+            </xs:simpleType>-->
+    </xs:attribute>
+    <xs:attribute name="frigo" type="Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur frigo (Y=Oui N=Non)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="dgx" type="Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur dangereux (Y= Oui N= Non).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="polluant" type="Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur polluant (Y = Oui N = Non)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="sic" type="xs:string" use="optional"/>
+    <xs:attribute name="ref" use="optional">
+      <xs:annotation>
+        <xs:documentation>Reference de la ligne marchandise.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="rang" use="optional">
+      <xs:annotation>
+        <xs:documentation>Numero de rang (Obligatoire pour creation automatique d'AMQ).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="amq" type="Booleen_type" use="optional"/>
+    <xs:attribute name="min" type="Temperature_type" use="optional"/>
+    <xs:attribute name="max" type="Temperature_type" use="optional"/>
+    <xs:attribute name="consigne" type="Temperature_type" use="optional"/>
+    <xs:attribute name="unite" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="CEL|FAH"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="equipement_cbk_type">
+    <xs:annotation>
+      <xs:documentation>0..1</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="description" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="70"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="dangereux-cbk" type="dangereux_cbk_type" minOccurs="0" maxOccurs="3"/>
+      <xs:element name="acheminement-cbk" type="acheminement_cbk_type" minOccurs="0"/>
+      <xs:element name="surdimension-cbk" type="surdimension_cbk_type" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="code" use="required">
+      <xs:annotation>
+        <xs:documentation>Code conditionnement (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="code-lib" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code conditionnement (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="nb" use="required">
+      <xs:annotation>
+        <xs:documentation>Nombre d'equipements.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="poids" type="Poids_type" use="required">
+      <xs:annotation>
+        <xs:documentation>Poids brut total de la ligne equipement (exprime en kilogrammes).</xs:documentation>
+      </xs:annotation>
+      <!--<xs:simpleType>
+                <xs:restriction base="xs:integer">
+                    <xs:totalDigits value="9"/>
+                </xs:restriction>
+            </xs:simpleType>-->
+    </xs:attribute>
+    <xs:attribute name="id" use="optional">
+      <xs:annotation>
+        <xs:documentation>Identifiant de l'equipement.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="17"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="rang" use="optional">
+      <xs:annotation>
+        <xs:documentation>Numero de rang de l'equipement. Obligatoire pour creation automatique d'AMQ.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="vide" type="Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur vide, precise le caractere vide de l'equipement (Valeur Y= Oui ou N=Non).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="dim" type="Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur sur-dimension (Valeur Y= Oui ou N=Non).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="frigo" type="Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur frigo (Valeur Y= Oui ou N=Non).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="dgx" type="Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur dangereux (Valeur Y= Oui ou N=Non).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="polluant" type="Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur polluant (Valeur Y= Oui ou N=Non).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="amq" type="Booleen_type" use="optional"/>
+    <xs:attribute name="min" type="Temperature_type" use="optional"/>
+    <xs:attribute name="max" type="Temperature_type" use="optional"/>
+    <xs:attribute name="consigne" type="Temperature_type" use="optional"/>
+    <xs:attribute name="unite" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="CEL|FAH"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="dangereux_cbk_type">
+    <xs:attribute name="ClasseImo" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="7"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ONU" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="GroupEmb" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="EtatMatiere" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="QteLimite" type="Booleen_type" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicateur Qte limite (Valeur Y= Oui ou N=Non).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="nb" use="required">
+      <xs:annotation>
+        <xs:documentation>Nombre d'equipements.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="4"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="poids" type="Poids_type" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="acheminement_cbk_type">
+    <xs:attribute name="preAch" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="modeTransport" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="3"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="Instruction" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="255"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="date" type="DateLongue_type" use="optional"/>
+    <xs:attribute name="lieu" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:maxLength value="255"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="surdimension_cbk_type">
+    <xs:attribute name="oh" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur dépassement hauteur exprimée en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="owl" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur dépassement largeur gauche exprimée en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="owr" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur dépassement largeur droite exprimée en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="olf" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur dépassement longueur avant exprimée en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="olb" use="optional">
+      <xs:annotation>
+        <xs:documentation>Valeur dépassement longueur arrière exprimée en centimètres.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:integer">
+          <xs:totalDigits value="5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="request_type">
+    <xs:choice>
+      <xs:element name="confirmation-booking">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="references-cbk" type="reference_cbk_type">
+              <xs:annotation>
+                <xs:documentation>Ensemble des references de rattachement de la confirmation de booking.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="voyage-cbk">
+              <xs:annotation>
+                <xs:documentation>Voyage sur lequel est affectee la confirmation de booking.</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="voyage_cbk_type">
+                    <xs:sequence>
+                      <xs:element name="lieux-cbk" type="lieux_cbk_type">
+                        <xs:annotation>
+                          <xs:documentation>Lieux de destination de la marchandise de la confirmation de booking.</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="tiers-cbk" type="tiers_cbk_type">
+              <xs:annotation>
+                <xs:documentation>Ensemble des tiers concernes par la confirmation de booking.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="lieu-reception-cbk" type="lieu_reception_cbk_type" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>Lieu de réception de la confirmation de booking.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="reference-annexe" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>Reference(s) annexe(s) a laquelle la confirmation de booking est rattachee.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="equipement-cbk" type="equipement_cbk_type" minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>Equipement(s) contenu(s) dans la confirmation de booking.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="lmarchandise-cbk" type="lmarchandise_cbk_type" minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>Ligne(s) marchandise(s) contenue(s) dans la confirmation de booking.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="action" use="optional">
+      <xs:annotation>
+        <xs:documentation>Code fonction du document (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="CREATE|UPDATE|DELETE|ADD|ERASE|UKN"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="id" use="required">
+      <xs:annotation>
+        <xs:documentation>Identifiant fonctionnel du message utilisé pour effectuer le suivi de l intégration.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="75"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="type" use="required">
+      <xs:annotation>
+        <xs:documentation>Type du document à intégrer (Codification SIC).</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="0"/>
+          <xs:maxLength value="7"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="statut" use="optional">
+      <xs:simpleType>
+        <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:element name="Request" type="request_type">
+    <xs:annotation>
+      <xs:documentation>Request précise la nature du document à intégrer.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Notification" type="notification_type">
+    <xs:annotation>
+      <xs:documentation>Notification précise la nature du document à notifier ou imprimer</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Interchanges">
+    <xs:annotation>
+      <xs:documentation>Interchanges décrit le contexte de la transmission des données entre le SIC et le système partenaire.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="MessageSet" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant interchange</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="from" use="required">
+        <xs:annotation>
+          <xs:documentation>Nom du système émetteur</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="75"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="to" use="required">
+        <xs:annotation>
+          <xs:documentation>Nom du système destinataire</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="75"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="servername" type="xs:string" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MessageSet">
+    <xs:annotation>
+      <xs:documentation>MessageSet identifie le message et permet d'assurer le suivi des échanges.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Destinataire"/>
+        <xs:element ref="Emetteur"/>
+        <xs:element name="Messages" type="messages_type">
+          <xs:annotation>
+            <xs:documentation>Messages contient le document à integrer, à notifier, à imprimer ou à acquitter</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant du message</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="icid" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifiant interchange de rattachement du message</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="14"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="date" type="DateLongue_type" use="required">
+        <xs:annotation>
+          <xs:documentation>"31/12/2004 23:59:59" Date d'envoi du message.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Destinataire" type="user_type">
+    <xs:annotation>
+      <xs:documentation>Identification du tiers destinataire du message</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="Emetteur" type="user_type">
+    <xs:annotation>
+      <xs:documentation>Identification de l'émetteur du message</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="messages_type">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element ref="Request"/>
+      <xs:element ref="Notification"/>
+    </xs:choice>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,1 @@
+[System.Diagnostics.EventLog]::CreateEventSource("eHub Portal Web Site", "Application")
