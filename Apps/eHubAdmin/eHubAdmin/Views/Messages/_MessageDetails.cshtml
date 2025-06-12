@@ -1,0 +1,244 @@
+@model eServices.eHubAdmin.ViewModels.Messages.InboxMessage
+
+<style>
+  .popover {
+    white-space: pre-wrap;
+    max-width: 400px;
+  }
+
+  .popover-content {
+    max-height: 400px;
+    word-wrap: break-word;
+    overflow-y: auto;
+  }
+
+  .blue-glyph {
+    color: dodgerblue;
+    margin-left: 5px;
+  }
+
+  .action-glyph {
+    cursor: pointer;
+    font-size: 15px;
+  }
+
+  .message-details {
+    border-left: 1px solid #dddddd;
+    border-right: 1px solid #dddddd;
+    padding: 25px 25px 10px 25px;
+    background-color: rgba(255,255,255,0.7);
+  }
+
+  .tableHeader {
+    background-color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  #outboxMessagesTable > thead > tr > th {
+    border-bottom: 1px solid #dddddd;
+  }
+
+  #pretty-print-button {
+    vertical-align: text-bottom;
+    transform: scale(1.2);
+    height: 15px;
+    width: 15px;
+  }
+</style>
+
+<div class="message-details">
+  @if (Model != null)
+  {
+    <dl class="dl-horizontal" style="display: inline-block">
+      <dt>@Html.DisplayNameFor(model => model.Status)</dt>
+      <dd>@Html.DisplayFor(model => model.StatusDescription)</dd>
+
+      @if (!string.IsNullOrWhiteSpace(Model.Error))
+      {
+        <dt>@Html.DisplayNameFor(model => model.Error)</dt>
+        <dd>
+          <pre id="error-message" class="pre-nowrap">@Html.DisplayFor(model => model.Error)</pre>
+          <button class="btn btn-default btn-sm" data-toggle="button" onclick="toggleErrorTextWrap()">Wrap Text</button>
+        </dd>
+      }
+
+      <dt>@Html.DisplayNameFor(model => model.ApplicationCode)</dt>
+      <dd>@(ViewBag.ApplicationCodeAndDescription)<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Model.GetMessageType()" title="Message Type"></span></dd>
+    </dl>
+   <div style="display:inline-block; float:right; margin-top: 10px;">
+     <label>
+       <input class="pretty-print-button" id="pretty-print-button" type="checkbox">
+       Pretty-Print Formatted
+     </label>
+    </div>
+    <div class="panel panel-default" id="inbox-message">
+      <div class="panel-heading">Inbox Message</div>
+      <div class="table-responsive">
+        <table class="table">
+          <tr>
+            <th>Inbox Insert</th>
+            <th>Sender</th>
+            <th>Recipient</th>
+            <th>FileName/Subject</th>
+            <th>Status (Desc)</th>
+            <th>Raw</th>
+            <th>XML</th>
+            <th>IDs</th>
+          </tr>
+          <tr>
+            <td class="received-local-time">@Model.Received.GetValueOrDefault().ToString("yyyy-MM-ddTHH:mm:ssZ")</td>
+            <td>
+              @if (!string.IsNullOrEmpty(Model.Sender))
+                {
+                  @Html.DisplayFor(model => model.Sender)
+                  <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@(ViewBag.InboxSender)" title="@Html.DisplayFor(modelItem => Model.Sender)"></span>
+              }
+            </td>
+            <td>
+              @if (!string.IsNullOrEmpty(Model.Recipient))
+              {
+                @Html.DisplayFor(model => model.Recipient)
+                <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@(ViewBag.InboxRecipient)" title="@Html.DisplayFor(modelItem => Model.Recipient)"></span>
+              }
+            </td>
+
+            <td>
+              @if (!string.IsNullOrWhiteSpace(Model.FileName))
+              {
+                @Html.DisplayFor(model => model.FileName)
+              }
+              @if (!string.IsNullOrWhiteSpace(Model.Subject))
+              {
+                if (!string.IsNullOrWhiteSpace(Model.FileName))
+                {
+                  <br />
+                }
+              }
+            </td>
+            <td>@Html.DisplayFor(model => model.FullStatus)</td>
+            <td style="white-space: nowrap">
+              @if (Model.ContentRawLength.GetValueOrDefault() > 0)
+              {
+                <span>@Model.ContentRawLength.Value B</span>
+                <span tabindex="0" class="glyphicon glyphicon-search blue-glyph action-glyph preview-click" data-placement="left" preview-id="InboxRaw" message-pk="@(Model.PK)" archive-pk="@(Model.AM_PK)" data-toggle="popover" data-trigger="focus" data-content="Retrieving, please wait..." title="Preview"></span>
+                <a href="#" class="view-click" onClick="viewClick('InboxRaw', '@Model.PK', '@Model.AM_PK', event)" target="_blank"> <span class="glyphicon glyphicon-eye-open blue-glyph"></span></a>
+                <a href="#" class="download-click" onClick="downloadClick('InboxRaw', '@Model.PK', '@Model.AM_PK', event)"><span class="glyphicon glyphicon-save blue-glyph"></span></a>
+              }
+            </td>
+            <td style="white-space: nowrap">
+              @if (Model.ContentXmlLength.GetValueOrDefault() > 0)
+              {
+                <span>@Model.ContentXmlLength.Value B</span>
+                <span tabindex="0" class="glyphicon glyphicon-search blue-glyph action-glyph preview-click" data-placement="left" preview-id="InboxXml" message-pk="@(Model.PK)" archive-pk="@(Model.AM_PK)" data-toggle="popover" data-trigger="focus" data-content="Retrieving, please wait..." title="Preview"></span>
+                <a href="@Url.Action("Download", "Messages", new { id = "InboxXml", EI_PK = Model.PK, AM_PK=Model.AM_PK})" target="_blank"><span class="glyphicon glyphicon-eye-open blue-glyph"></span></a>
+                <a download href="@Url.Action("Download", "Messages", new { id = "InboxXml", EI_PK = Model.PK, AM_PK=Model.AM_PK})"><span class="glyphicon glyphicon-save blue-glyph"></span></a>
+              }
+            </td>
+            <td>
+              <span tabindex="0" class="more-info glyphicon glyphicon-asterisk blue-glyph action-glyph" data-placement="left" style="font-size:15px" aria-hidden="true" data-toggle="popover" data-trigger="focus" data-content="@(ViewBag.PKIDsHTML)" title="IDs" data-html="true"></span>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    if (Model.OutboxMessages.Any())
+    {
+      <div class="panel panel-default" id="outbox-message">
+        <div class="panel-heading">Outbox Message(s)</div>
+        <div class="table-responsive" style="max-height: 200px; overflow-y: auto;">
+          <table id="outboxMessagesTable" class="table" style="border-collapse: separate;">
+            <thead class="tableHeader">
+              <tr>
+                <th>Outbox Insert</th>
+                <th>Sender</th>
+                <th>Recipient</th>
+                <th>FileName/Subject</th>
+                <th>Status (Desc)</th>
+                <th>Raw</th>
+                <th>XML</th>
+                <th>IDs</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach (var outboxMsg in Model.OutboxMessages)
+              {
+                <tr>
+                  <td>
+                    <span class="processed-local-time">@outboxMsg.Processed.GetValueOrDefault().ToString("yyyy-MM-ddTHH:mm:ssZ")</span>
+                    @if (outboxMsg.Delivered.HasValue)
+                    {
+                      <span class="delivered-local-time more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content='@outboxMsg.Delivered.Value.ToString("yyyy-MM-ddTHH:mm:ssZ")' title="Delivered"></span>
+                    }
+                  </td>
+                  <td>
+                    @if (!string.IsNullOrEmpty(outboxMsg.Sender))
+                    {
+                      @Html.DisplayFor(model => outboxMsg.Sender)
+                      <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Model.GetMoreInfo(outboxMsg.SenderObject)" title="@Html.DisplayFor(modelItem => outboxMsg.Sender)"></span>
+                    }
+                  </td>
+                  <td>
+                    @if (!string.IsNullOrEmpty(outboxMsg.Recipient))
+                    {
+                      @Html.DisplayFor(model => outboxMsg.Recipient)
+                      <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Model.GetMoreInfo(outboxMsg.RecipientObject)" title="@Html.DisplayFor(modelItem => outboxMsg.Recipient)"></span>
+                    }
+                  </td>
+                  <td>
+                    @if (!string.IsNullOrWhiteSpace(outboxMsg.FileName))
+                    {
+                      @outboxMsg.FileName
+                    }
+                    @if (!string.IsNullOrWhiteSpace(outboxMsg.Subject))
+                    {
+                      if (!string.IsNullOrWhiteSpace(outboxMsg.FileName))
+                      {
+                        <br />
+                      }
+                    }
+                  </td>
+                  @if (string.IsNullOrWhiteSpace(outboxMsg.Error))
+                  {
+                    <td>@outboxMsg.FullStatus</td>
+                  }
+                  else
+                  {
+                    <td data-toggle="tooltip" data-placement="bottom" data-container="body" title="@(outboxMsg.Error)">@outboxMsg.FullStatus</td>
+                  }
+                  <td style="white-space: nowrap">
+                    @if (outboxMsg.ContentRawLength.GetValueOrDefault() > 0)
+                    {
+                      <span>@outboxMsg.ContentRawLength.Value B</span>
+                      <span tabindex="0" class="glyphicon glyphicon-search blue-glyph action-glyph preview-click" data-placement="left" preview-id="OutboxRaw" message-pk="@(outboxMsg.PK)" archive-pk="@(outboxMsg.AM_PK)" data-toggle="popover" data-trigger="focus" data-content="Retrieving, please wait..." title="Preview"></span>
+                      <a href="#" class="view-click" onClick="viewClick('OutboxRaw', '@(outboxMsg.PK)', '@(outboxMsg.AM_PK)', event)" target="_blank"> <span class="glyphicon glyphicon-eye-open blue-glyph"></span></a>
+                      <a href="#" class="download-click" onClick="downloadClick('OutboxRaw', '@(outboxMsg.PK)', '@(outboxMsg.AM_PK)', event)"><span class="glyphicon glyphicon-save blue-glyph"></span></a>
+                    }
+                  </td>
+                  <td style="white-space: nowrap">
+                    @if (outboxMsg.ContentXmlLength.GetValueOrDefault() > 0)
+                    {
+                      <span>@outboxMsg.ContentXmlLength.Value B</span>
+                      <span tabindex="0" class="glyphicon glyphicon-search blue-glyph action-glyph preview-click" data-placement="left" preview-id="OutboxXml" message-pk="@(outboxMsg.PK)" archive-pk="@(outboxMsg.AM_PK)" data-toggle="popover" data-trigger="focus" data-content="Retrieving, please wait..." title="Preview"></span>
+                      <a href="@Url.Action("Download", "Messages", new { id = "OutboxXml", OI_PK = outboxMsg.PK, AM_PK = outboxMsg.AM_PK })" target="_blank"><span class="glyphicon glyphicon-eye-open blue-glyph"></span></a>
+                      <a download href="@Url.Action("Download", "Messages", new { id = "OutboxXml", OI_PK = outboxMsg.PK, AM_PK = outboxMsg.AM_PK })"><span class="glyphicon glyphicon-save blue-glyph"></span></a>
+                    }
+                  </td>
+                  <td>
+                    <span tabindex="0" class="more-info glyphicon glyphicon-asterisk blue-glyph action-glyph" data-placement="left" style="font-size:15px" aria-hidden="true" data-toggle="popover" data-trigger="focus" data-content="@outboxMsg.GetPKIDsHTML()" title="IDs" data-html="true"></span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+  else
+  {
+    <div>Message not found</div>
+  }
+</div>

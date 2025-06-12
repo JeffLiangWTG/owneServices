@@ -1,0 +1,124 @@
+﻿@page "/code-maps/{owner?}"
+@implements IAsyncDisposable
+@inject IAccessGroupService AccessGroupService
+@inject IDbContextFactory<eHubTransactionsContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject ILogger<Index> Logger
+
+<PageTitle>Code Maps@(Owner is null ? "" : $" - {OwnerId.LookupOwnerName(Owner)}")</PageTitle>
+
+<h1>Code Maps</h1>
+
+@if (codeMaps is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="grid" tabindex="-1">
+        <QuickGrid Class="table w-auto" Items="@filteredCodeMaps">
+            <PropertyColumn Title="Sender" Property="item => item.Sender" Sortable="true">
+                <ColumnOptions>
+                    <div class="search-box">
+                        <input type="search" autofocus @bind="filterSender" @bind:event="oninput" class="form-control" placeholder="Sender..." />
+                    </div>
+                </ColumnOptions>
+            </PropertyColumn>
+            <PropertyColumn Title="Recipient" Property="item => item.Recipient" Sortable="true">
+                <ColumnOptions>
+                    <div class="search-box">
+                        <input type="search" autofocus @bind="filterRecipient" @bind:event="oninput" class="form-control" placeholder="Recipient..." />
+                    </div>
+                </ColumnOptions>
+            </PropertyColumn>
+            <PropertyColumn Title="Transform" Property="item => item.Transform" Sortable="true">
+                <ColumnOptions>
+                    <div class="search-box">
+                        <input type="search" autofocus @bind="filterTransform" @bind:event="oninput" class="form-control" placeholder="Transform..." />
+                    </div>
+                </ColumnOptions>
+            </PropertyColumn>
+            <PropertyColumn Title="Code Set" Property="item => item.CodeSet" Sortable="true">
+                <ColumnOptions>
+                    <div class="search-box">
+                        <input type="search" autofocus @bind="filterCodeSet" @bind:event="oninput" class="form-control" placeholder="Code Set..." />
+                    </div>
+                </ColumnOptions>
+            </PropertyColumn>
+            <TemplateColumn Context="item">
+                <div class="hstack gap-1">
+                    <a href="@($"code-maps/details/{item.CSID}")" class="btn btn-primary" title="Details">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    @if (isAuthorizedWrite)
+                    {
+                        <a href="@($"code-maps/edit/{item.CSID}")" class="btn btn-danger" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    }
+                </div>
+            </TemplateColumn>
+        </QuickGrid>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? Owner { get; set; }
+
+    private string? authorizedFor;
+    private bool? isAuthorizedRead;
+    private bool isAuthorizedWrite = false;
+
+    private eHubTransactionsContext context = default!;
+    private List<(string Sender, string Recipient, string Transform, string CodeSet, Guid CSID)>? codeMaps;
+    private string? filterSender;
+    private string? filterRecipient;
+    private string? filterTransform;
+    private string? filterCodeSet;
+    private IQueryable<(string Sender, string Recipient, string Transform, string CodeSet, Guid CSID)> filteredCodeMaps
+    {
+        get
+        {
+            var result = (codeMaps ?? []).AsQueryable();
+            result = result.Where(x => x.Sender.Contains(filterSender ?? "", StringComparison.InvariantCultureIgnoreCase));
+            result = result.Where(x => x.Recipient.Contains(filterRecipient ?? "", StringComparison.InvariantCultureIgnoreCase));
+            result = result.Where(x => x.Transform.Contains(filterTransform ?? "", StringComparison.InvariantCultureIgnoreCase));
+            result = result.Where(x => x.CodeSet.Contains(filterCodeSet ?? "", StringComparison.InvariantCultureIgnoreCase));
+            return result;
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (isAuthorizedRead.GetValueOrDefault() && authorizedFor == Owner)
+        {
+            return;
+        }
+
+        isAuthorizedRead = await AccessGroupService.IsAuthorizedForRead(Owner);
+        if (!isAuthorizedRead.Value)
+        {
+            NavigationManager.NavigateTo("/access-denied");
+            return;
+        }
+        isAuthorizedWrite = await AccessGroupService.IsAuthorizedForWrite(Owner);
+        authorizedFor = Owner;
+
+        context ??= await DbFactory.CreateDbContextAsync();
+        var codeMapsSource = await context.eHubCodeSet
+            .Where(x => x.CS_OW == Owner)
+            .Select(x => new
+            {
+                Sender = x.CS_CC_SenderNavigation.CC_ID,
+                Recipient = x.CS_CC_RecipientNavigation.CC_ID,
+                Transform = (x.CS_TSNavigation == null ? "" : x.CS_TSNavigation.TS_Name),
+                CodeSet = x.CS_Name,
+                CSID = x.CS_PK
+            }).ToListAsync();
+        codeMaps = codeMapsSource.Select(x => (x.Sender, x.Recipient, x.Transform, x.CodeSet, x.CSID)).Order().ToList();
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Build MSBuild="17" xmlns="http://wisetechglobal.com/DevTools/Build.xsd">
+  <Solutions>
+    <Solution Filename="eServices.ApplicationEvent.sln" />
+  </Solutions>
+  <Dependencies>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/Shared/eHubDatabase" Name="eHubDatabase">
+      <Copy Target="Dependencies\eServices.eHubDatabase\Databases" Source="Databases" />
+      <Copy Target="Dependencies\eServices.eHubDatabase\Scripts" Source="Scripts" />
+    </Dependency>
+  </Dependencies>
+  <Tasks>
+    <Task Name="Initialize eServices.BuildTools.DatTool">
+      <Step><![CDATA[cmd /c "dotnet tool restore && dotnet esv-dattool init --output Bin\DatTool"]]></Step>
+    </Task>
+    <Task Name="Publish eServices.ApplicationEvent.EnrichmentService">
+      <Dependency Type="Solution">eServices.ApplicationEvent.sln</Dependency>
+      <Step>dotnet publish EnrichmentService\eServices.ApplicationEvent.EnrichmentService.csproj --no-build</Step>
+    </Task>
+  </Tasks>
+  <BuildConfigurations>
+    <Configuration BuildOnDat="true" TestOnDat="true" Publishable="false" GenerateMSBuildBinLogs="true">Release</Configuration>
+  </BuildConfigurations>
+  <DatSettings IntegrationAssembliesSubdir="DatTool\net48" BuildDeployerType="eServices.BuildTools.DatDeploy.Deployer, eServices.BuildTools.DatDeploy" DisableWorkspaceJobs="true">
+    <TestAdapter Type="Dat.Implementation.VSTest.VSTestAdapter, Dat.Implementation.VSTest">
+      <Options>
+        <Option Name="TestAssemblyAnyItemFilter">Microsoft.NET.Test.Sdk</Option>
+      </Options>
+    </TestAdapter>
+    <DeploymentTargets>
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.ApplicationEvent.EnrichmentService_STG_au2sp-sesv-401" IsProduction="false" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.ApplicationEvent.EnrichmentService_PRD_au2wp-smsg-403a" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.ApplicationEvent.EnrichmentService_PRD_au2wp-smsg-403b" />
+    </DeploymentTargets>
+  </DatSettings>
+</Build>

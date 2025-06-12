@@ -1,0 +1,177 @@
+﻿@model eServices.Shared.RoutingRuleEngine.Criterion
+@using eServices.Shared.RoutingRuleEngine
+@{
+    var group = Model as Group;
+    var condition = Model as Condition;
+}
+@if (group != null)
+{
+    <div class="panel panel-default" style="margin-bottom: 0px">
+        <div class="panel-heading" role="tab">
+            <div>
+                <table>
+                    <tr>
+                        <td class="col-sm-1 text-right text-primary">
+                            <a role="button" data-toggle="collapse" href="#@(group.ReferenceID)">Group:</a>
+                        </td>
+                        <td class="col-sm-1">@(group.MatchMultiple ? "Match Multple" : "Match First")</td>
+                        @if (group.DefaultServiceProvider != null)
+                        {
+                            if (group.ErrorCode != null)
+                            {
+                                <td class="col-sm-2 text-right">Default Provider:</td>
+                                <td class="col-sm-1">@(group.DefaultServiceProvider.ProviderClient.CC_ID)</td>
+                                <td class="col-sm-2 text-right">Default Reject Code:</td>
+                                <td class="col-sm-1">@(group.ErrorCode)</td>
+                                <td class="col-sm-2 text-right">Reject Description:</td>
+                                <td class="col-sm-3">@(group.ErrorDescription)</td>
+                            }
+                            else
+                            {
+                                <td class="col-sm-2 text-right">Default Provider:</td>
+                                <td class="col-sm-7">@(group.DefaultServiceProvider.ProviderClient.CC_ID)</td>
+                            }
+                        }
+                        else if (group.DefaultRecipient != null)
+                        {
+                            <td class="col-sm-2 text-right">Default Recipient:</td>
+                            <td class="col-sm-7">@(group.DefaultRecipient.CC_ID)</td>
+                        }
+                        else if (group.Value != null)
+                        {
+                            <td class="col-sm-2 text-right">Default Value:</td>
+                            <td class="col-sm-7">@(group.Value)</td>
+                        }
+                        else if (group.ErrorCode != null)
+                        {
+                            <td class="col-sm-2 text-right">Default Reject Code:</td>
+                            <td class="col-sm-1">@(group.ErrorCode)</td>
+                            <td class="col-sm-2 text-right">Reject Description:</td>
+                            <td class="col-sm-5">@(group.ErrorDescription)</td>
+                        }
+                        else
+                        {
+                            <td class="col-sm-10"></td>
+                        }
+
+                        @if (group.GroupName != null)
+                        {
+                            <td class="col-sm-2 text-right">Group Name:</td>
+                            <td class="col-sm-7">@(group.GroupName)</td>
+                        }
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="@(group.ReferenceID)" class="panel-body collapse in">
+
+            <ul class="list-group">
+                @foreach (var subrule in group.SubRules)
+                {
+                    @(Html.Partial("~/Views/RoutingRules/_RuleDetails.cshtml", subrule))
+                }
+            </ul>
+
+            @if (Model.FailedSubRule != null)
+            {
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab">
+                        <div role="button" data-toggle="collapse" href="#@(Model.ReferenceID)_Default">Default Rule</div>
+                    </div>
+                    <div id="@(Model.ReferenceID)_Default" class="panel-body collapse in table-bordered">
+                        @(Html.Partial("~/Views/RoutingRules/_RuleDetails.cshtml", Model.FailedSubRule))
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <li class="list-group-item highlight">
+        <table class="table-responsive">
+            <tr class="row">
+                <td class="col-sm-1 text-primary">
+                    <a role="button" data-toggle="collapse" href="#@(condition.ReferenceID)">Condition:</a>
+                </td>
+                @if (condition.ErrorDescription != null && condition.ServiceProvider != null)
+                {
+                    <td class="col-sm-6">@(condition.Expression)</td>
+                    <td class="col-sm-1 text-right">Provider:</td>
+                    <td class="col-sm-1">@(condition.ServiceProvider.ProviderClient.CC_ID)</td>
+                    <td class="col-sm-1 text-right">Reject Code:</td>
+                    <td class="col-sm-1">@(condition.ErrorCode)</td>
+                    <td class="col-sm-1 text-right">Reject Description:</td>
+                    <td class="col-sm-3">@(condition.ErrorDescription)</td>
+                }
+                else
+                {
+                    if (condition.ErrorDescription != null)
+                    {
+                        <td class="col-sm-4 wrap">@(condition.Expression)</td>
+                        <td class="col-sm-1 text-right">Reject Code:</td>
+                        <td class="col-sm-1">@(condition.ErrorCode)</td>
+                        <td class="col-sm-1 text-right">Reject Description:</td>
+                        <td class="col-sm-3 wrap">@(condition.ErrorDescription)</td>
+                    }
+                    else if (condition.ServiceProvider != null)
+                    {
+                        <td class="col-sm-9 wrap">@(condition.Expression)</td>
+                        <td class="col-sm-1">Provider:</td>
+                        <td class="col-sm-1">@(condition.ServiceProvider.ProviderClient.CC_ID)</td>
+                    }
+                    else if (condition.Recipient != null)
+                    {
+                        <td class="col-sm-9 wrap">@(condition.Expression)</td>
+                        <td class="col-sm-1">Recipient:</td>
+                        <td class="col-sm-1">@(condition.Recipient.CC_ID)</td>
+                    }
+                    else if (condition.Value != null)
+                    {
+                        <td class="col-sm-9 wrap">@(condition.Expression)</td>
+                        <td class="col-sm-1">Result:</td>
+                        <td class="col-sm-1">@(condition.Value)</td>
+                    }
+                    else
+                    {
+                        <td class="col-sm-11 wrap">@(condition.Expression)</td>
+                    }
+                }
+            </tr>
+        </table>
+    </li>
+
+    if (condition.SuccessSubRule != null || condition.FailedSubRule != null)
+    {
+        <div id="@(condition.ReferenceID)" class="collapse in" style="margin-bottom: 0px;">
+            <ul class="list-group">
+                @if (condition.SuccessSubRule != null)
+                {
+                    <li class="list-group-item">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" class="col-sm-1">
+                                <div role="button" class="text-primary" data-toggle="collapse" href="#@(condition.ReferenceID)_Success">Success</div>
+                            </div>
+                            <div id="@(condition.ReferenceID)_Success" class="panel-body collapse in table-bordered">
+                                @(Html.Partial("~/Views/RoutingRules/_RuleDetails.cshtml", condition.SuccessSubRule))
+                            </div>
+                        </div>
+                    </li>
+                }
+                @if (condition.FailedSubRule != null)
+                {
+                    <li class="list-group-item">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab">
+                                <div role="button" data-toggle="collapse" href="#@(condition.ReferenceID)_Failed">Failed</div>
+                            </div>
+                            <div id="@(condition.ReferenceID)_Failed" class="panel-body collapse in table-bordered">
+                                @(Html.Partial("~/Views/RoutingRules/_RuleDetails.cshtml", condition.FailedSubRule))
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+}

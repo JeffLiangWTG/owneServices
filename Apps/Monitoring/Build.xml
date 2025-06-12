@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Build xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" MSBuild="16.0"
+  xmlns="http://wisetechglobal.com/DevTools/Build.xsd">
+  <Solutions>
+	<Solution Filename="HealthCheckService.sln">
+      <Dependency Type="Repository">Framework</Dependency>
+      <Dependency Type="Repository">ArchiveService</Dependency>
+    </Solution>
+  </Solutions>
+  <BuildConfigurations>
+    <Configuration BuildOnDat="true" Publishable="true">RELEASE</Configuration>
+    <Configuration BuildOnDat="true" TestOnDat="true">DEBUG</Configuration>
+  </BuildConfigurations>
+  <PreBuild>
+    <Command cacheable="false">cmd.exe /C if not exist Bin\LocalRepo mkdir Bin\LocalRepo || ver>nul</Command>
+  </PreBuild>
+  <PostBuild>
+    <Command cacheable="false">Bin\Deployment\BAT\post-build.cmd</Command>
+  </PostBuild>
+  <Dependencies>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/Deployment">
+      <Copy Source="Deployment\BAT" Target="Deployment\BAT" />
+      <Copy Source="Deployment\Common" Target="Deployment\Common" />
+      <Copy Source="Deployment\CommonScripts" Target="Deployment\CommonScripts" />
+      <Copy Source="Deployment\WindowsService" Target="Deployment\WindowsService" />
+      <Copy Source="Deployment\WebService" Target="Deployment\WebService" />
+      <Copy Source="Deployment\WebServiceDotNetCore" Target="Deployment\WebServiceDotNetCore" />
+      <Copy Source="Deployment\package-common.tasks" Target="Deployment" />
+      <Copy Source="Deployment\SetMSBuild.cmd" Target="Deployment" />
+    </Dependency>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/DatImplementation">
+      <Copy Source="Dat.Integration.dll" Target="DAT" />
+      <Copy Source="eHub.DatImplementation.Deployment.dll" Target="DAT" />
+      <Copy Source="Microsoft.Build.dll" Target="DAT" />
+      <Copy Source="Microsoft.Build.Framework.dll" Target="DAT" />
+      <Copy Source="Microsoft.Build.Tasks.Core.dll" Target="DAT" />
+      <Copy Source="Microsoft.Build.Utilities.Core.dll" Target="DAT" />
+      <Copy Source="System.Collections.Immutable.dll" Target="DAT" />
+      <Copy Source="System.Buffers.dll" Target="DAT" />
+      <Copy Source="System.Memory.dll" Target="DAT" />
+      <Copy Source="System.Numerics.Vectors.dll" Target="DAT" />
+      <Copy Source="System.Runtime.CompilerServices.Unsafe.dll" Target="DAT" />
+      <Copy Source="System.Threading.Tasks.Dataflow.dll" Target="DAT" />
+    </Dependency>
+	<Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/XH/Framework" Name="Framework">
+      <Copy Source="LocalRepo" Target="LocalRepo" />
+    </Dependency>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/XH/XT/ArchiveService" Name="ArchiveService">
+      <Copy Source="XH.XT.ArchiveService.Common\net8.0-windows\XH.XT.ArchiveService.Common.dll" />
+    </Dependency>
+  </Dependencies>
+  <DatSettings BuildDeployerType="eHub.DatImplementation.Deployment.BuildDeployer, eHub.DatImplementation.Deployment" IntegrationAssembliesSubdir="DAT">
+    <TestAdapters>
+      <TestAdapter Key="VSTest" Type="Dat.Implementation.VSTest.VSTestAdapter, Dat.Implementation.VSTest">
+        <Options>
+          <Option Name="TestAssemblyAnyItemFilter">Microsoft.NET.Test.Sdk</Option>
+        </Options>
+      </TestAdapter>
+    </TestAdapters>
+    <DeploymentTargets>
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1;t:bat:deploy_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1\Accounting;t:bat:createApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1\Accounting;t:bat:removeApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1\Customs;t:bat:createApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1\Customs;t:bat:removeApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1\CustomsServers;t:bat:createApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1\CustomsServers;t:bat:removeApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1\International;t:bat:createApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1\International;t:bat:removeApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1\GRPC;t:bat:createApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1\GRPC;t:bat:removeApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1\TrackingMessage;t:bat:createApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test1\TrackingMessage;t:bat:removeApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2;t:bat:deploy_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2\Accounting;t:bat:createApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2\Accounting;t:bat:removeApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2\Customs;t:bat:createApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2\Customs;t:bat:removeApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2\CustomsServers;t:bat:createApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2\CustomsServers;t:bat:removeApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2\International;t:bat:createApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2\International;t:bat:removeApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2\GRPC;t:bat:createApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2\GRPC;t:bat:removeApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2\TrackingMessage;t:bat:createApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Test2\TrackingMessage;t:bat:removeApp_only" IsProduction="false" TimeOutInMinutes="120" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1;t:bat:deploy_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1\Accounting;t:bat:createApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1\Accounting;t:bat:removeApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1\Customs;t:bat:createApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1\Customs;t:bat:removeApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1\CustomsServers;t:bat:createApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1\CustomsServers;t:bat:removeApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1\International;t:bat:createApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1\International;t:bat:removeApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1\GRPC;t:bat:createApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1\GRPC;t:bat:removeApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1\TrackingMessage;t:bat:createApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production1\TrackingMessage;t:bat:removeApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2;t:bat:deploy_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2\Accounting;t:bat:createApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2\Accounting;t:bat:removeApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2\Customs;t:bat:createApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2\Customs;t:bat:removeApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2\CustomsServers;t:bat:createApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2\CustomsServers;t:bat:removeApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2\International;t:bat:createApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2\International;t:bat:removeApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2\GRPC;t:bat:createApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2\GRPC;t:bat:removeApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2\TrackingMessage;t:bat:createApp_only" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="BAT=$(BinPath)\BAT\XH.XT.Monitoring.HealthCheckService.zip;p:Profile=Production2\TrackingMessage;t:bat:removeApp_only" />
+    </DeploymentTargets>
+  </DatSettings>
+</Build>

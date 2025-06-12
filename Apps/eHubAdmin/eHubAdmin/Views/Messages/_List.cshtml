@@ -1,0 +1,129 @@
+﻿@model IEnumerable<eServices.eHubAdmin.ViewModels.Messages.InboxMessage>
+
+<div>
+  <table>
+    @foreach (var item in Model)
+    {
+      <tr class="list-detail @(item.StatusContextColour)" onclick="ExtendAccordionViewPopulate({ PK: '@item.PK', AM_PK: '@item.AM_PK', Ref: '@(item.PK.HasValue ? item.Received.GetValueOrDefault().ToBinary().ToString() : null)'}, event, this)">
+        <td>@(item.Received.GetValueOrDefault().ToString("yyyy-MM-dd HH:mm:ss"))</td>
+        <td class="received-local-time">@TimeZoneInfo.ConvertTimeFromUtc(item.Received.GetValueOrDefault(), ViewBag.TimeZone).ToString("yyyy-MM-dd HH:mm:ss")</td>
+        <td class="left-border-td">
+          @if (item.SenderObject != null)
+          {
+            @(item.Sender.ShortName())
+            <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@item.GetMoreInfo(item.SenderObject)" title="@Html.DisplayFor(modelItem => item.Sender)"></span>
+          }
+        </td>
+        <td>
+          @if (item.RecipientObject != null)
+          {
+            @(item.Recipient.ShortName())
+            <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@item.GetMoreInfo(item.RecipientObject)" title="@Html.DisplayFor(modelItem => item.Recipient)"></span>
+          }
+        </td>
+
+        @if (item.OutboxMessages.Any())
+        {
+          if (item.OutboxMessages.Select(o => o.Sender).Distinct().Count() == 1)
+          {
+            <td class="left-border-td">
+              @item.OutboxMessages.First().Sender.ShortName()
+              <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@item.GetMoreInfo(item.OutboxMessages.First().SenderObject)" title="@Html.DisplayFor(modelItem => item.OutboxMessages.First().Sender)"></span>
+            </td>
+          }
+          else
+          {
+            <td>
+              [Multiple]
+              <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@string.Join(Environment.NewLine, item.OutboxMessages.Select(o => o.Sender).Distinct().OrderBy(s => s))" title="Multiple Recipients" />
+            </td>
+          }
+          if (item.OutboxMessages.Select(o => o.Recipient).Distinct().Count() == 1)
+          {
+            <td>
+              @item.OutboxMessages.First().Recipient.ShortName()
+              <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@item.GetMoreInfo(item.OutboxMessages.First().RecipientObject)" title="@Html.DisplayFor(modelItem => item.OutboxMessages.First().Recipient)"></span>
+            </td>
+          }
+          else
+          {
+            <td>
+              [Multiple]
+              <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Html.Raw(string.Join(" ", item.OutboxMessages.Select(o => o.Recipient).Distinct().OrderBy(s => s)))" title="Multiple Recipients" />
+            </td>
+          }
+        }
+        else
+        {
+          <td class="left-border-td" />
+          <td />
+        }
+        <td class="left-border-td">
+          @if (item.Status == 3)
+          {
+            if (!item.OutboxMessages.Any() && !string.IsNullOrEmpty(item.Recipient))
+            {
+              <span class="received-local-time">@TimeZoneInfo.ConvertTimeFromUtc(item.Received.GetValueOrDefault(), ViewBag.TimeZone).ToString("yyyy-MM-dd HH:mm:ss")</span>
+            }
+            else if (item.OutboxMessages.Any(x => x.Delivered.HasValue))
+            {
+              var earliestDeliveredTime = item.OutboxMessages.Where(x => x.Delivered.HasValue).Select(x => x.Delivered.Value).Min();
+              <span class="delivered-local-time">@TimeZoneInfo.ConvertTimeFromUtc(earliestDeliveredTime, ViewBag.TimeZone).ToString("yyyy-MM-dd HH:mm:ss")</span>
+            }
+          }
+        </td>
+        <td>
+          @Html.DisplayFor(modelItem => item.ApplicationCode)
+          <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@(item.GetApplicationCodeDetails())" title="Application Code" />
+        </td>
+        <td>
+          @if (item.RecipientObject == null && !item.OutboxMessages.Any() && item.Status == 3)
+          {
+            <span>Discarded</span>
+          }
+          else
+          {
+            @Html.DisplayFor(modelItem => item.StatusDescription)
+          }
+          <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@(item.GetStatusDetails())" title="Status" />
+        </td>
+        <td id="accordionButton" style="cursor: pointer;">
+          <span class="glyphicon glyphicon-chevron-down" />
+        </td>
+        <td id="messageDetailsTab">
+          @Html.ActionLink(" ", "Details", "Messages", new { EI_PK = item.PK, item.AM_PK, Ref = item.PK.HasValue ? item.Received.GetValueOrDefault().ToBinary().ToString() : null }, new { target = "_blank", @class = "glyphicon glyphicon-align-justify" })
+        </td>
+      </tr>
+      <tr class="list-detail accordion">
+        <td class="accordionView @(item.StatusContextColour)" colspan="100" style="padding: 0px; max-width: 1840px;">
+          <div id="list-loader-accordion" class="loader" style="background-color: rgba(255,255,255,0.7); ">
+            <img class="glyphicon" height="22" width="22" src="~/Content/Images/ajax-loader.gif" alt="Loading..."/>
+          </div>
+        </td>
+      </tr>
+    }
+  </table>
+  <div id="list-footer">
+    @if (ViewBag.Exception != null)
+    {
+      <p class="text-danger">
+        &nbsp; @ViewBag.Exception
+      </p>
+    }
+    else
+    {
+      if (ViewBag.ShowLoadMore)
+      {
+        <button class="btn btn-default" type="button" onclick="@ViewBag.LoadMoreOnClick" id="load-more-btn">Load More</button>
+      }
+      else if (@ViewBag.SearchLimit != null)
+      {
+        var searchLimitLocal = TimeZoneInfo.ConvertTimeFromUtc(ViewBag.SearchLimit, ViewBag.TimeZone);
+        var offset = ViewBag.TimeZone.GetUtcOffset(searchLimitLocal);
+        var formattedOffset = offset.Hours.ToString("+00;-00") + ":" + Math.Abs(offset.Minutes).ToString("00");
+        <button class="btn btn-default" type="button" onclick="@ViewBag.LoadMoreOnClick" id="load-more-btn">Load More Results</button>
+        <span>&nbsp; Searched up to @searchLimitLocal.ToString("yyyy-MM-dd HH:mm:ss") @formattedOffset</span>
+      }
+    }
+  </div>
+</div>

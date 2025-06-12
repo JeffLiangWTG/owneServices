@@ -1,0 +1,925 @@
+@using System.Configuration
+@model eServices.eHubAdmin.ViewModels.Messages.Query
+
+@{
+  ViewBag.Title = "Messages";
+}
+
+<style>
+  .form-control {
+    height: 32px;
+  }
+
+  input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month'] {
+    line-height: 18px;
+  }
+
+  input[disabled] {
+    pointer-events: none;
+  }
+
+  .tooltip-inner {
+    text-align: left;
+  }
+
+  th.left-border {
+    border-bottom: none;
+    border-top: none;
+    border-left: 2px solid #dedede;
+  }
+
+  th.center-align {
+    text-align: center
+  }
+
+  td.left-border-td {
+    border-left: 2px solid #dedede;
+  }
+
+  .popover {
+    white-space: pre-wrap;
+    max-width: 400px;
+  }
+
+  .popover-content {
+    word-wrap: break-word;
+  }
+</style>
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-5 col-md-5 col-sm-5" style="padding-left: 0;">
+      <div class="col-lg-4 col-md-4 col-sm-4" style="padding: 0;">
+        <h2>Messages</h2>
+      </div>
+      <div class="col-lg-7 col-md-7 col-sm-7" style="padding: 20px 0 0 0;">
+        <button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseQuery" id="query_button">Query</button>
+        <button class="btn btn-default" type="button" onclick="LoadList(true)" id="refresh">Refresh</button>
+        @if (Model.SearchType == "Advanced")
+        {
+          <input id="advanced_search" type="checkbox" checked data-toggle="toggle" data-on="Advanced Search" data-off="Basic Search" data-width="150px" onchange="ToggleSearchType()">
+        }
+        else
+        {
+          <input id="basic_search" type="checkbox" data-toggle="toggle" data-on="Advanced Search" data-off="Basic Search" data-width="150px" onchange="ToggleSearchType()">
+        }
+        <img class="glyphicon loader" id="refresh-loader" height="25" width="25" src="~/Content/Images/ajax-loader.gif" style="display: none" alt="Loading..." />
+      </div>
+    </div>
+
+    <div class="col-lg-2 col-md-2 col-sm-2" style="padding-top: 35px; float: right; display: @(Model.Refresh.GetValueOrDefault() > 0 ? "block" : "none")">
+      <div class="checkbox checkbox-inline">
+        <input id="autoRefreshCheckbox" type="checkbox" onchange="onAutoRefreshChanged()" />
+        <label for="autoRefreshCheckbox">Auto-refresh: <span id="autoRefreshInterval"></span></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="collapseQuery" class="@(ViewBag.ShowQuery ?? false ? "in" : "collapse")">
+  <div class="well">
+    @using (Html.BeginForm("Query", "Messages", FormMethod.Post, new { name = "Query", id = "Query" }))
+    {
+      @Html.AntiForgeryToken()
+      @Html.HiddenFor(model => model.SearchType)
+      @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+      if (Model.SearchType == "Advanced")
+      {
+        <div id="advancedSearch" class="form-horizontal">
+          <div class="form-group" onclick="EnableDisableRoleFields('radioAnyRole')">
+            <label class="control-label col-md-2" for="Role">Any Role @Html.RadioButtonFor(model => model.Role, "Any", new { id = "radioAnyRole" })<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Any Role" data-content='@Constants.FunctionDescription["Any Role"]'></span></label>
+            <div class="col-md-2">
+              @Html.LabelFor(model => model.AnyRole, new { @class = "sr-only" })
+              @Html.EditorFor(model => model.AnyRole, new { htmlAttributes = new { @class = "form-control", placeholder = "Client ID", style = "cursor: text" } })
+            </div>
+          </div>
+          @Html.ValidationMessageFor(model => model.Role, "", new { @class = "text-danger" })
+          <div class="form-group" onclick="EnableDisableRoleFields('radioSpecificRole')">
+            <label class="control-label col-md-2" for="Role">Specific Role @Html.RadioButtonFor(model => model.Role, "Specific", new { id = "radioSpecificRole" })<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Specific Role" data-content='@Constants.FunctionDescription["Specific Role"]'></span></label>
+            <div class="col-md-2">
+              @Html.LabelFor(model => model.SenderInbox, new { @class = "sr-only" })
+              @Html.EditorFor(model => model.SenderInbox, new { htmlAttributes = new { @class = "form-control", placeholder = "Inbox Sender", style = "cursor: text" } })
+            </div>
+            <div class="col-md-2">
+              @Html.LabelFor(model => model.RecipientInbox, new { @class = "sr-only" })
+              @Html.EditorFor(model => model.RecipientInbox, new { htmlAttributes = new { @class = "form-control", placeholder = "Inbox Recipient", style = "cursor: text" } })
+            </div>
+            <div class="col-md-2">
+              @Html.LabelFor(model => model.SenderOutbox, new { @class = "sr-only" })
+              @Html.EditorFor(model => model.SenderOutbox, new { htmlAttributes = new { @class = "form-control", placeholder = "Outbox Sender", style = "cursor: text" } })
+            </div>
+            <div class="col-md-2">
+              @Html.LabelFor(model => model.RecipientOutbox, new { @class = "sr-only" })
+              @Html.EditorFor(model => model.RecipientOutbox, new { htmlAttributes = new { @class = "form-control", placeholder = "Outbox Recipient", style = "cursor: text" } })
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-md-2">@Html.DisplayNameFor(m => m.Status)<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Status" data-content='@Constants.FunctionDescription["Status"]'></span></label>
+            <div class="col-md-2">
+              @Html.DropDownListFor(model => model.Status, new SelectList(Constants.MessageStatusTypes, Model.Status), "All", new { @class = "form-control" })
+              @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+            </div>
+            <label class="control-label col-md-2">@Html.DisplayNameFor(model => model.ApplicationCode)<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Application Code" data-content='@Constants.FunctionDescription["Application Code"]'></span></label>
+            <div class="col-md-2">
+              @Html.DropDownListFor(model => model.ApplicationFull, new SelectList(Constants.ApplicationCodeTypes.OrderBy(a => a.Key).Select(a => string.Format("{0} - {1}", a.Key, a.Value)), Model.ApplicationFull), "All", new { @class = "form-control" })
+              @Html.ValidationMessageFor(model => model.ApplicationCode, "", new { @class = "text-danger" })
+            </div>
+          </div>
+          <div class="form-group" onclick="EnableDisableRangeFields('radioDateRange')">
+            <label class="control-label col-md-2" for="DateFilterType">Date Range @Html.RadioButtonFor(model => model.DateFilterType, "WithinDates", new { id = "radioDateRange" })<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Date Range" data-content='@Constants.FunctionDescription["Date Range"]'></span></label>
+            @Html.LabelFor(model => model.FromDate, new { @class = "control-label col-md-1" })
+            <div class="col-md-2">
+              @Html.EditorFor(model => model.FromDate, new { htmlAttributes = new { @class = "form-control", style = "cursor: text" } })
+              @Html.ValidationMessageFor(model => model.FromDate, "", new { @class = "text-danger" })
+            </div>
+            @Html.LabelFor(model => model.FromTime, new { @class = "sr-only" })
+            <div class="col-md-2">
+              @Html.EditorFor(model => model.FromTime, new { htmlAttributes = new { @class = "form-control", style = "cursor: text" } })
+              @Html.ValidationMessageFor(model => model.FromTime, "", new { @class = "text-danger" })
+            </div>
+            @Html.LabelFor(model => model.ToDate, new { @class = "control-label col-md-1" })
+            <div class="col-md-2">
+              @Html.EditorFor(model => model.ToDate, new { htmlAttributes = new { @class = "form-control", style = "cursor: text" } })
+              @Html.ValidationMessageFor(model => model.ToDate, "", new { @class = "text-danger" })
+            </div>
+            @Html.LabelFor(model => model.ToTime, new { @class = "sr-only" })
+            <div class="col-md-2">
+              @Html.EditorFor(model => model.ToTime, new { htmlAttributes = new { @class = "form-control", style = "cursor: text" } })
+              @Html.ValidationMessageFor(model => model.ToTime, "", new { @class = "text-danger" })
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+              <h5 id="within-dates-warning" class="text-danger"></h5>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-md-2">Date Range Type</label>
+            <div class="col-md-2">
+              @Html.DropDownListFor(model => model.DateRangeType, new SelectList(Constants.DateRangeTypes, Model.DateRangeType), new { @class = "form-control" })
+            </div>
+            <div class="col-md-8">
+              <h5 id="date-range-type-info" class="text-danger" />
+            </div>
+          </div>
+          <div class="form-group" onclick="EnableDisableRangeFields('radioWithinPeriod')">
+            <label class="control-label col-md-2" for="DateFilterType">Period @Html.RadioButtonFor(model => model.DateFilterType, "WithinPeriod", new { id = "radioWithinPeriod" })<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Period" data-content='@Constants.FunctionDescription["Period"]'></span></label>
+            <label class="control-label col-md-1" TextAlign="left">From&nbsp;Previous</label>
+            <div class="col-md-2">
+              @Html.EditorFor(model => model.FromPeriodValue, new { htmlAttributes = new { @class = "form-control", id = "textboxFromPeriodValue", type = "text", style = "cursor: text" } })
+              @Html.ValidationMessageFor(model => model.FromPeriodValue, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-1">
+              @Html.DropDownListFor(model => model.FromPeriodType, new SelectList(Constants.PeriodOptions, "Value", "Text", Model.FromPeriodType), new { @class = "form-control", id = "dropdownFromPeriodType", style = "cursor: default" })
+            </div>
+            <label class="control-label col-md-1" TextAlign="left">Up&nbsp;to&nbsp;Previous</label>
+            <div class="col-md-2">
+              @Html.EditorFor(model => model.ToPeriodValue, new { htmlAttributes = new { @class = "form-control", id = "textboxToPeriodValue", type = "text", style = "cursor: text" } })
+              @Html.ValidationMessageFor(model => model.ToPeriodValue, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-1">
+              @Html.DropDownListFor(model => model.ToPeriodType, new SelectList(Constants.PeriodOptions, "Value", "Text", Model.ToPeriodType), new
+              {
+                @class = "form-control",
+                id = "dropdownToPeriodType",
+                style = "cursor: default"
+              })
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+              <h5 id="within-period-warning" class="text-danger"></h5>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-md-2">@Html.DisplayNameFor(model => model.Key)<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Key" data-content='@Constants.FunctionDescription["Key"]'></span></label>
+            <div class="col-md-3">
+              @Html.DropDownListFor(model => model.KeyType, new SelectList(Constants.MessageKeyTypes, "Key", "Value", Model.KeyType), "Select", new { @class = "form-control" })
+            </div>
+            @Html.LabelFor(model => model.Key, new { @class = "sr-only" })
+            <div class="col-md-4">
+              @Html.EditorFor(model => model.Key, new { htmlAttributes = new { @class = "form-control" } })
+              @Html.ValidationMessageFor(model => model.Key, "", new { @class = "text-danger" })
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+              <p id="key-code-warning" class="text-danger"></p>
+            </div>
+          </div>
+          <div class="form-group" id="SearchLocation">
+            <label class="control-label col-md-2">
+              <span id="PartialSearchLocationWarning" data-toggle="tooltip" data-trigger="hover" data-placement="right" data-container="body" title="Partial Search! Results might not contain expected messages.">
+                <span class="glyphicon glyphicon-exclamation-sign alert-warning"></span>
+              </span>
+              Search Location
+              <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Search Location" data-content='@Constants.FunctionDescription["Search Location"]'></span>
+            </label>
+            <div class="col-sm-2">
+              @Html.CheckBox("IsIncludingMessageBox", Model.IsIncludingMessageBox)
+              @Html.LabelFor(model => model.IsIncludingMessageBox, new { @class = "control-label" })
+            </div>
+            <div class="col-sm-2">
+              @Html.CheckBox("IsIncludingArchiveStaging", Model.IsIncludingArchiveStaging)
+              @Html.LabelFor(model => model.IsIncludingArchiveStaging, new { @class = "control-label" })
+              <span id="ArchiveStagingWarning" data-toggle="tooltip" data-trigger="hover" data-placement="right" data-container="body" title="@ViewBag.ArchiveStagingWarning @Html.DescriptionFor(model => model.IsIncludingArchiveStaging)">
+                <span class="glyphicon glyphicon-exclamation-sign alert-warning"></span>
+              </span>
+            </div>
+            <div class="col-sm-2">
+              @Html.CheckBox("IsIncludingArchive", Model.IsIncludingArchive)
+              @Html.LabelFor(model => model.IsIncludingArchive, new { @class = "control-label" })
+            </div>
+          </div>
+        </div>
+      }
+      else
+      {
+        <div id="basicSearch" class="form-horizontal">
+          <div class="form-group" onclick="EnableDisableRoleFields('radioAnyRole')">
+            <label class="control-label col-md-2" for="Role">Any Role @Html.RadioButtonFor(model => model.Role, "Any", new { id = "radioAnyRole" })<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Any Role" data-content='@Constants.FunctionDescription["Any Role"]'></span></label>
+            <div class="col-md-2">
+              @Html.LabelFor(model => model.AnyRole, new { @class = "sr-only" })
+              @Html.EditorFor(model => model.AnyRole, new { htmlAttributes = new { @class = "form-control", placeholder = "Client ID", style = "cursor: text" } })
+            </div>
+            <label class="control-label col-md-2">@Html.DisplayNameFor(m => m.Status)<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Status" data-content='@Constants.FunctionDescription["Status"]'></span></label>
+            <div class="col-md-2">
+              @Html.DropDownListFor(model => model.Status, new SelectList(Constants.MessageStatusTypes, Model.Status), "All", new { @class = "form-control" })
+              @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-md-2">@Html.DisplayNameFor(model => model.ApplicationCode)<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Application Code" data-content='@Constants.FunctionDescription["Application Code"]'></span></label>
+            <div class="col-md-2">
+              @Html.DropDownListFor(model => model.ApplicationFull, new SelectList(Constants.ApplicationCodeTypes.OrderBy(a => a.Key).Select(a => string.Format("{0} - {1}", a.Key, a.Value)), Model.ApplicationFull), "All", new { @class = "form-control" })
+              @Html.ValidationMessageFor(model => model.ApplicationCode, "", new { @class = "text-danger" })
+            </div>
+            <label class="control-label col-md-2" for="DateFilterType">Period @Html.RadioButtonFor(model => model.DateFilterType, "WithinPeriod", new { id = "radioWithinPeriod" })<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Period" data-content='@Constants.FunctionDescription["Period"]'></span></label>
+            <div class="col-md-2">
+              @Html.EditorFor(model => model.FromPeriodValue, new { htmlAttributes = new { @class = "form-control", id = "textboxFromPeriodValue", type = "text", style = "cursor: text" } })
+              @Html.ValidationMessageFor(model => model.FromPeriodValue, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-2">
+              @Html.DropDownListFor(model => model.FromPeriodType, new SelectList(Constants.PeriodOptions, "Value", "Text", Model.FromPeriodType), new { @class = "form-control", id = "dropdownFromPeriodType", style = "cursor: default" })
+            </div>
+          </div>
+        </div>
+      }
+      <div class="form-group" style="margin-bottom: 40px;">
+        <div class="col-md-offset-2 col-md-10">
+          <input type="submit" value="Submit" class="btn btn-default" />
+          <input type="button" value="Clear" class="btn btn-default" onclick="ClearInputFields()" />
+          <input type="button" value="Reset" class="btn btn-default" onclick="ResetInputFields()" />
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<div id="list" class="table-responsive">
+  <table id="list-table" class="table">
+    <tr>
+      <th></th>
+      <th></th>
+      <th class="left-border center-align" colspan="2"><font size="+1">Received in eHub Inbox</font><span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Html.Raw(Constants.HeaderInfoDescriptions["Received"])" title="Received in eHub Inbox" /></th>
+      <th class="left-border center-align" colspan="2"><font size="+1">Sent to eHub Outbox</font><span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Html.Raw(Constants.HeaderInfoDescriptions["Sent"])" title="Sent to eHub Outbox" /></th>
+      <th class="left-border" colspan="5"></th>
+    </tr>
+    <tr>
+      <th style="border-top:none">Received (UTC)</th>
+      <th style="border-top:none" id="received-local-time-th">[PLACEHOLDER]</th>
+      <th class="left-border" style="border-top:none">Sender</th>
+      <th style="border-top:none">Recipient</th>
+      <th class="left-border" style="border-top:none">Sender</th>
+      <th style="border-top:none">Recipient</th>
+      <th class="left-border" style="border-top:none">Delivered</th>
+      <th style="border-top:none">Code</th>
+      <th style="border-top:none">Status</th>
+      <th style="border-top:none"></th>
+    </tr>
+  </table>
+</div>
+<div id="list-loader" class="loader">
+  <img class="glyphicon" height="25" width="25" src="~/Content/Images/ajax-loader.gif" alt="Loading..." />
+</div>
+
+@section Scripts {
+  @Scripts.Render("~/bundles/jqueryval")
+
+<script type="text/javascript">
+    var defaultAutoRefreshInterval = 60;
+    var autoRefreshInterval = @Model.Refresh.GetValueOrDefault() > 0 ? @Model.Refresh.GetValueOrDefault() : defaultAutoRefreshInterval;
+    var autoRefresh;
+    var isBodyQuery = false;
+    var bodySearchTimePeriod = @ConfigurationManager.AppSettings["BodySearchTimePeriod"];
+    var bodySearchWarningText = "Message Body searches are limited to messages with a size < 50kb";
+    var bodySearchTimeWarningText = "Message Body searches are limited to a " + bodySearchTimePeriod + " hour time period";
+    var InvalidDateRangeWarningText = "Invalid Date Range Selected";
+    var localDateRangeTypeInfo = "If your local time zone supports DST, there will be ambiguous times near DST switch. These times will always be converted to UTC as if they are standard time";
+    var keyCodeWarningText = "Key searches requires either both the Key Type and Code to be present or none.";
+    var previousSearchType = "Advanced";
+
+    $(function () {
+      const searchType = document.getElementById('SearchType').value;
+      const urlParams = new URLSearchParams(window.location.search);
+
+      $('[data-toggle="popover"]').popover({ trigger: "hover focus", container: 'body' });
+      $('[data-toggle="tooltip"]').tooltip();
+      $("#query_button").prop("disabled", false);
+      EnableDisableRoleFields();
+      EnableDisableRangeFields();
+      EnableUncheckedRadioButtons();
+      $("#list-loader").hide();
+      if (urlParams.size > 0) {
+        LoadList(false, null);
+      }
+
+      $('#received-local-time-th').text('Received (' + Intl.DateTimeFormat().resolvedOptions().timeZone + ')');
+      $("#autoRefreshInterval").text(autoRefreshInterval + "s");
+      $("#autoRefreshCheckbox").prop("checked", @Model.Refresh.GetValueOrDefault() > 0);
+      if (searchType === "Advanced") {
+        $("#IsIncludingArchiveStaging").prop("checked", "@Model.IsIncludingArchiveStaging".toLowerCase() === 'true'); // js doesn't understand [F]alse ...
+
+        if ("@ViewBag.ArchiveStagingWarning" != "")
+          $('#ArchiveStagingWarning').show();
+        else
+          $('#ArchiveStagingWarning').hide();
+        if (@Model.Refresh.GetValueOrDefault() > 0) {
+          AutoRefresh(autoRefreshInterval * 1000);
+        }
+        if (!Modernizr.inputtypes.date) {
+          $('#FromDate,#ToDate').datepicker({ dateFormat: "yy-mm-dd" });
+        }
+      }
+
+      function DisableMessageBodyAndResetKey() {
+        if ($('#KeyType').prop('value') === 'AM_PK') {
+          $('#KeyType').prop('value', '');
+        }
+      }
+
+      $('#IsIncludingMessageBox').change(function() {
+        if ($(this).is(':checked')) {
+          DisableMessageBodyAndResetKey();
+        }
+        ShowPartialSearchLocationWarning();
+      });
+
+      $('#IsIncludingArchive').change(function() {
+        ShowPartialSearchLocationWarning();
+      });
+
+      $('#KeyType').change(function() {
+        if ($(this).prop('value') === 'AM_PK') {
+          $('#IsIncludingMessageBox').prop('checked', false);
+          $('#IsIncludingArchiveStaging').prop('checked', false);
+          $('#IsIncludingArchive').prop('checked', true);
+        }
+      });
+
+      $.validator.addMethod('ValidateTimePeriod', (value, element) => ValidateTimePeriod());
+      $('#textboxFromPeriodValue')
+        .rules("add", { ValidateTimePeriod: true, messages: { ValidateTimePeriod: "" } });
+      if (searchType === "Advanced") {
+        $.validator.addMethod('ValidateKeyCode', (value, element) => ValidateKeyCode());
+        $('#KeyType').rules("add", { ValidateKeyCode: true, messages: { ValidateKeyCode: "" } });
+        $('#Key').rules("add", { ValidateKeyCode: true, messages: { ValidateKeyCode: "" } });
+        $('#FromDate').rules("add", { ValidateTimePeriod: true, messages: { ValidateTimePeriod: "" } });
+      }
+
+      $('#textboxToPeriodValue').rules("add", { ValidateTimePeriod: true, messages: { ValidateTimePeriod: "" } });
+      if (searchType === "Advanced") {
+        $.validator.addMethod('ValidateKeyCode', (value, element) => ValidateKeyCode());
+        $('#KeyType').rules("add", { ValidateKeyCode: true, messages: { ValidateKeyCode: "" } });
+        $('#Key').rules("add", { ValidateKeyCode: true, messages: { ValidateKeyCode: "" } });
+        $('#FromDate').rules("add", { ValidateTimePeriod: true, messages: { ValidateTimePeriod: "" } });
+      }
+
+      $('#IsIncludingArchiveStaging').change(function() {
+        if ($(this).is(':checked')) {
+          DisableMessageBodyAndResetKey();
+          $.post("@Url.Action("ShowArchiveStagingWarning")", function(data) {
+            if (data != "") {
+              console.log(data);
+              $('#ArchiveStagingWarning').attr('data-original-title', data + ' @Html.DescriptionFor(model => model.IsIncludingArchiveStaging)');
+              $('#ArchiveStagingWarning').show();
+            }
+            else
+              $('#ArchiveStagingWarning').hide();
+          });
+        } else
+          $('#ArchiveStagingWarning').hide();
+        ShowPartialSearchLocationWarning();
+      });
+      ShowPartialSearchLocationWarning();
+    });
+
+    function ShowPartialSearchLocationWarning() {
+      var anyUnchecked = $('#SearchLocation').find('input[type=checkbox]:not(:checked)').length;
+      if (anyUnchecked)
+        $('#PartialSearchLocationWarning').show();
+      else
+        $('#PartialSearchLocationWarning').hide();
+    }
+
+    function EnableUncheckedRadioButtons() {
+      var rangeRadioButtons = document.getElementsByName("Range");
+      var booRadio;
+      for (var x = 0; x < rangeRadioButtons.length; x++) {
+        rangeRadioButtons[x].onclick = function() {
+          if (booRadio === this){
+            this.checked = false;
+            booRadio = null;
+          } else {
+            booRadio = this;
+          }
+          EnableDisableRangeFields();
+        };
+      }
+    }
+
+    function AutoRefresh(delay) {
+      if (!$("#refresh").prop("disabled") && document.getElementById('autoRefreshCheckbox').checked) {
+        LoadList(true, null);
+      }
+      autoRefresh = setTimeout(function(){AutoRefresh(delay);}, delay);
+    }
+
+    function ClearInputFields() {
+      $('input:text,input[type=date],input[type=time]').val('');
+      $('select').each(function () { $(this).val($('option:first', this).val()) });
+      $('select#dropdownFromPeriodType').val('Hour');
+      $('select#dropdownToPeriodType').val('Hour');
+      $('input:radio[name="Role"][value="Any"]').prop('checked', true);
+
+      $("#textboxFromPeriodValue").val(1);
+      $("#textboxToPeriodValue").val(0);
+      document.getElementById("radioWithinPeriod").checked = true;
+
+      EnableDisableRoleFields();
+      EnableDisableRangeFields();
+
+      $("#Query").valid();
+      $("#Query").validate().element("#textboxFromPeriodValue");
+      $("#Query").validate().element("#textboxToPeriodValue");
+    }
+
+    function ResetInputFields() {
+      $('#Query').trigger('reset');
+      $('select').each(function() { $(this).val($('option[selected]', this).length ? $('option[selected]', this).val() : $('option:first', this).val()) });
+      EnableDisableRoleFields();
+      EnableDisableRangeFields();
+      $("#Query").valid();
+      $("#Query").validate().element("#textboxFromPeriodValue");
+      $("#Query").validate().element("#textboxToPeriodValue");
+    }
+
+    function EnableDisableRoleFields(selection) {
+      if (selection) {
+        document.getElementById(selection).checked = true;
+      }
+
+      var any = document.getElementById("radioAnyRole").checked;
+      $("#AnyRole").attr('disabled', !any);
+      $("#SenderInbox, #RecipientInbox, #SenderOutbox, #RecipientOutbox").attr('disabled', any);
+    }
+
+    function EnableDisableRangeFields(selection) {
+      if (selection) {
+        document.getElementById(selection).checked = true;
+      }
+
+      var dateRangeUsed = false;
+      var periodRangeUsed = false;
+
+      if ($('input:radio[id="radioDateRange"]:checked').val() === "WithinDates") {
+        dateRangeUsed = true;
+        $('#within-period-warning').hide();
+
+        var dateRangeType = $('#DateRangeType').val();
+        if (dateRangeType === "Local") {
+          $('#date-range-type-info').text(localDateRangeTypeInfo).show();
+        } else if (dateRangeType === "UTC") {
+          $('#date-range-type-info').hide();
+        }
+
+        $('#DateRangeType').on('change', function () {
+          var dateRangeType = $('#DateRangeType').val();
+          if (dateRangeType === "Local") {
+            $('#date-range-type-info').text(localDateRangeTypeInfo).show();
+          } else if (dateRangeType === "UTC") {
+            $('#date-range-type-info').hide();
+          }
+        });
+      } else if ($('input:radio[id="radioWithinPeriod"]:checked').val() === "WithinPeriod") {
+        periodRangeUsed = true;
+        $('#within-dates-warning').hide();
+        $('#DateRangeType').off('change');
+        $('#date-range-type-info').hide();
+      }
+      $("#FromDate, #ToDate, #FromTime, #ToTime, #DateRangeType").attr('disabled', !dateRangeUsed);
+      $("#textboxFromPeriodValue, #dropdownFromPeriodType, #textboxToPeriodValue, #dropdownToPeriodType")
+        .attr('disabled', !periodRangeUsed);
+    }
+
+    function ValidateWithinDates() {
+      var toDate = $('#ToDate').val();
+      var toTime = $('#ToTime').val();
+
+      if (toTime === "") { toTime = "23:59"; }
+
+      var fromDate = $('#FromDate').val();
+      var fromTime = $('#FromTime').val();
+
+      if (fromTime === "") { fromTime = "00:00"; }
+
+      if ((toDate === "" && toTime === "") || (fromDate === "" && fromTime === "")) {
+        $('#within-dates-warning').text(bodySearchTimeWarningText).show();
+      } else {
+        var toDateTime = new Date(toDate + " " + toTime);
+        var fromDateTime = new Date(fromDate + " " + fromTime);
+
+        var hours = (toDateTime - fromDateTime) / (1000 * 60 * 60);
+
+        if (hours < 0) {
+          $('#within-dates-warning').text(InvalidDateRangeWarningText).show();
+          return false;
+        } else if (hours > bodySearchTimePeriod && isBodyQuery) {
+          $('#within-dates-warning').text(bodySearchTimeWarningText).show();
+          return false;
+        } else {
+          $('#within-dates-warning').hide();
+          return true;
+        }
+      }
+    }
+
+    function ValidateWithinPeriod() {
+      var frommins = GetMinsByPeriod(parseInt($('#textboxFromPeriodValue').val()),
+        $('#dropdownFromPeriodType').val());
+      var tomins = GetMinsByPeriod(parseInt($('#textboxToPeriodValue').val()),
+        $('#dropdownToPeriodType').val());
+
+      var mins = (frommins - tomins);
+
+      if (mins < 0) {
+        $('#within-period-warning').text(InvalidDateRangeWarningText).show();
+        return false;
+      } else if (mins / 60 > bodySearchTimePeriod && isBodyQuery) {
+        $('#within-period-warning').text(bodySearchTimeWarningText).show();
+        return false;
+      } else {
+        $('#within-period-warning').hide();
+        return true;
+      }
+    }
+
+    function ValidateTimePeriod() {
+      var result = false;
+      if ($('input:radio[id="radioDateRange"]:checked').val() === "WithinDates") {
+        result = ValidateWithinDates();
+      } else if ($('input:radio[id="radioWithinPeriod"]:checked').val() === "WithinPeriod") {
+        result = ValidateWithinPeriod();
+      }
+      return result;
+    }
+
+    function ValidateKeyCode() {
+      $('#key-code-warning').hide();
+      let result = true;
+      let keyType = document.getElementById('KeyType').value;
+      let keyValue = document.getElementById('Key').value;
+      if (keyType === '' && keyValue !== '') result = false;
+      if (keyType !== '' && keyValue === '') result = false;
+      if (result === false) $('#key-code-warning').text(keyCodeWarningText).show();
+      return result;
+    }
+
+    function LoadList(reload, searchLimit) {
+      $('[data-toggle="tooltip"]').tooltip('destroy');
+      $("#list-footer").remove();
+      $("#refresh").prop("disabled", true);
+      if (reload) {
+        ResetInputFields();
+        $("#refresh-loader").show();
+      } else {
+        $("#list-loader").show();
+      }
+      var data = @Html.Raw(Json.Encode(new {
+                Model.Role,
+                Model.AnyRole,
+                Model.SenderInbox,
+                Model.RecipientInbox,
+                Model.SenderOutbox,
+                Model.RecipientOutbox,
+                Model.Status,
+                Model.ApplicationCode,
+                ToDate = Model.ToDate.ToString(),
+                ToTime = Model.ToTime.ToString(),
+                FromDate = Model.FromDate.ToString(),
+                FromTime = Model.FromTime.ToString(),
+                Model.DateRangeType,
+                Model.DateFilterType,
+                Model.FromPeriodType,
+                Model.ToPeriodType,
+                Model.FromPeriodValue,
+                Model.ToPeriodValue,
+                Model.KeyType,
+                Model.Key,
+                Model.IsIncludingArchiveStaging,
+                Model.IsIncludingArchive,
+                Model.IsIncludingMessageBox
+            }));
+      data.SearchLimit = searchLimit;
+      data.TimeZoneIdIANA = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      $.ajax({
+        url: "@Url.Action("List")",
+        type: "POST",
+        data: data,
+          success: function (partialViewResult) {
+          if (reload) {
+            $(".list-detail").remove();
+          }
+          $(partialViewResult).find("#list-footer").insertAfter("#list");
+          $(partialViewResult).find(".list-detail").appendTo("#list-table > tbody");
+          $("#list-loader").hide();
+          $("#refresh-loader").hide();
+          $('[data-toggle="tooltip"]').tooltip();
+          $('[data-toggle="popover"]').popover({ trigger: "hover" });
+          $("#refresh").prop("disabled", false);
+          $('tr.list-detail.accordion').hide();
+          $('.glyphicon-chevron-up').closest("tr").next().slideToggle();
+        },
+        error: function (error) {
+          $(error.responseText).insertAfter("#list");
+        }
+      });
+    }
+
+    function onAutoRefreshChanged() {
+      if (document.getElementById('autoRefreshCheckbox').checked) {
+        autoRefreshInterval = @Model.Refresh.GetValueOrDefault() > 0 ? @Model.Refresh.GetValueOrDefault() : defaultAutoRefreshInterval;
+        AutoRefresh(autoRefreshInterval * 1000);
+      } else {
+        autoRefreshInterval = 0;
+        clearTimeout(autoRefresh);
+      }
+    }
+
+    function ToggleSearchType() {
+      let searchType = document.getElementById('SearchType').value;
+      if (searchType === "") searchType = "Advanced";
+      if (searchType === "Advanced") searchType = "Basic";
+      else searchType = "Advanced";
+      $("#refresh").prop("disabled", true);
+      $("#query_button").prop("disabled", true);
+      $(".list-detail").remove();
+      $("#list-loader").show();
+      window.location.href = `Messages/ChangeSearchType?searchType=${searchType}`;
+    }
+
+    function GetMinsByPeriod(periodValue, periodType) {
+      var mins = periodValue;
+      switch (periodType) {
+      case "Month":
+        mins *= 30 * 24 * 60;
+      case "Week":
+        mins *= 7 * 24 * 60;
+      case "Day":
+        mins *= 24 * 60;
+      case "Hour":
+        mins *= 60;
+      }
+      return mins;
+    }
+
+    function ExtendAccordionViewPopulate(itemDetails, event, element) {
+      var $target = $(event.target);
+      if ($target.closest("td").attr('id') == 'messageDetailsTab') {
+        return;
+      }
+      event.stopPropagation();
+
+      var isMessageApiCalled = false;
+      if (element.hasAttribute('isMessageApiCalled')) {
+        isMessageApiCalled = element.getAttribute('isMessageApiCalled');
+      } else {
+        element.setAttribute('isMessageApiCalled', true);
+      }
+
+      if ($target.closest("td").attr("colspan") > 1) {
+        $target.slideUp();
+      } else {
+        $target.closest("tr").next().slideToggle();
+        $(element).find("td#accordionButton > span").toggleClass("glyphicon glyphicon-chevron-down glyphicon glyphicon-chevron-up");
+          
+        if (isMessageApiCalled == false) {
+          $.ajax({
+            url: "@Url.Action("MessageBasicDetails")",
+            type: "GET",
+            data: {
+              EI_PK: itemDetails.PK,
+              AM_PK: itemDetails.AM_PK,
+              Ref: itemDetails.Ref
+            },
+            success: function (response) {
+              element.nextElementSibling.firstElementChild.innerHTML = response;
+              $(document).ready(function () {
+              $('[data-toggle="popover"]').popover();
+             });
+            },
+            error: function (error) {
+              var errorMessage = $("<div'>" + error.responseText + "</div>");
+              errorMessage.find('style').remove();
+              errorMessage.find('title').remove();
+              element.nextElementSibling.firstElementChild.innerHTML = "<div style='padding:20px; background-color:rgba(255,255,255,0.7);'>Failed to fetch message details. Error:<br> <br> <pre>" + errorMessage.text().trim() + "</pre></div>";
+            }
+          });
+        } else {
+          $target.closest("tr").next().find("td > div").slideToggle();
+        }
+      }
+    }
+
+    var errorTextWrap = false;
+    function toggleErrorTextWrap() {
+      errorTextWrap = !errorTextWrap;
+      if (errorTextWrap) {
+        $('#error-message').removeClass('pre-nowrap');
+        $('#error-message').addClass('pre-wrap');
+      } else {
+        $('#error-message').removeClass('pre-wrap');
+        $('#error-message').addClass('pre-nowrap');
+      }
+    }
+
+    function copyToClipboard(text) {
+        var copyTest = document.queryCommandSupported('copy');
+
+        if (copyTest === true) {
+            var copyTextArea = document.createElement("textarea");
+            copyTextArea.value = text;
+            document.body.appendChild(copyTextArea);
+            copyTextArea.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.log('Unable to copy');
+            }
+            document.body.removeChild(copyTextArea);
+        } else {
+            window.prompt("Copy to clipboard: Ctrl+C or Command+C, Enter", text);
+        }
+    }
+
+    $(document).on("mousedown", ".copy-click", function () {
+        var text = $(this).attr('data-copy');
+        copyToClipboard(text);
+    });
+
+    function createUrl(buttonID, messagePK, archivePK) {
+        var url = "@Url.Action("Download", "Messages")/";
+
+        url += buttonID;
+        url += '?';
+        if (buttonID.includes('Inbox')) {
+            url += 'EI_PK=' + messagePK;
+        }
+        if (buttonID.includes('Outbox')) {
+            url += 'OI_PK=' + messagePK;
+        }
+        url += '&AM_PK=' + archivePK;
+
+        return url;
+    }
+
+    async function fetchPreview(url, control) {
+        var popover;
+
+        try {
+            var response = await fetch(url);
+            if (!response.ok) {
+                popover = control.attr('data-content', 'ERROR: Cannot preview data\n\n' + response.statusText).data('bs.popover');
+                popover.setContent();
+                control.popover('show');
+                return;
+            }
+
+            var data = await response.text();
+            var finalResponse = formatPrettyPrint(true, data);
+            finalResponse = finalResponse.substring(0, 1024)
+            popover = control.attr('data-content', finalResponse).data('bs.popover');
+        } catch (error) {
+            popover = control.attr('data-content', 'ERROR: Cannot preview data\n\n' + error).data('bs.popover');
+        }
+
+        popover.setContent();
+        control.popover('show');
+    }
+
+    $(document).on("click", ".preview-click", function () {
+        if (($(this).attr('data-content')).substring(0, 10) != 'Retrieving') {
+            return;
+        }
+        $(this).popover('show');
+        $(this).attr('visibility', 'visible');
+        var previewID = $(this).attr('preview-id');
+        var messagePK = $(this).attr('message-pk') || '';
+        var archivePK = $(this).attr('archive-pk') || '';
+
+        var url = createUrl(previewID, messagePK, archivePK);
+        fetchPreview(url, $(this));
+    });
+
+    async function downloadClick(downloadID, messagePK, archivePK, event) {
+        event.preventDefault();
+        var url = createUrl(downloadID, messagePK, archivePK);
+        var linkElement = document.createElement('a');
+        linkElement.download = downloadID;
+
+        try {
+            var response = await fetch(url);
+            if (!response.ok) {
+                console.log(response.statusText);
+                linkElement.href = url;
+                linkElement.click();
+                linkElement.remove();
+                return;
+            }
+
+            var data = await response.arrayBuffer();
+            var isChecked = $(event.target).closest(".message-details").find("#pretty-print-button").prop('checked');
+            var finalResponse = formatPrettyPrint(isChecked, data);
+            var downloadBlob = new Blob([finalResponse], { type: 'text/plain' });
+            linkElement.href = window.URL.createObjectURL(downloadBlob);
+        } catch (error) {
+            console.log(error);
+            linkElement.href = url;
+        }
+
+        linkElement.click();
+        linkElement.remove();
+    }
+
+    async function viewClick(viewID, messagePK, archivePK, event) {
+        event.preventDefault();
+        var url = createUrl(viewID, messagePK, archivePK);
+
+        try {
+            var response = await fetch(url);
+            if (!response.ok) {
+                displayError(url, response.statusText);
+                return;
+            }
+
+            var data = await response.text();
+            var isChecked = $(event.target).closest(".message-details").find("#pretty-print-button").prop('checked');
+            var finalResponse = formatPrettyPrint(isChecked, data);
+            var w = window.open(url);
+            w.document.writeln("<pre style='word-wrap: break-word; white-space: pre-wrap;'></pre>");
+            $(w.document).find("pre").text(finalResponse);
+            w.history.pushState("", "", url);
+        } catch (error) {
+            displayError(url, error);
+        }
+    }
+
+    function displayError(url, error) {
+        var w = window.open(url);
+        w.document.writeln(error);
+        w.history.pushState("", "", url);
+    }
+
+    function formatPrettyPrint(isChecked, data) {
+        var result = data;
+        if (isChecked) {
+            try {
+                data = new TextDecoder().decode(data);
+            } catch {
+                // data is already decoded.
+            }
+            result = data.split(/\r?\n/).map(replaceLineSeparators).join("\n");
+        }
+        return result;
+    }
+
+    function replaceLineSeparators(result) {
+        var edifactStart = new RegExp(/^(UNA:|UNB\+)/);
+        var edifactEnd = new RegExp(/(\'UNZ\+)[^\']+\'$/);
+        if (edifactStart.test(result) && edifactEnd.test(result)) {
+            var linefeedRegex = new RegExp(/(?<!\?)\'/g);
+            result = result.replace(linefeedRegex, "\'\n");
+        }
+
+        var x12Start = new RegExp(/^(ISA\*)/);
+        var x12End = new RegExp(/(\~IEA\*)[^\~]+\~$/);
+        if (x12Start.test(result) && x12End.test(result)) {
+            var linefeedRegex = new RegExp(/\~/g);
+            result = result.replace(linefeedRegex, "\~\n");
+        }
+        return result;
+    }
+
+</script>
+}

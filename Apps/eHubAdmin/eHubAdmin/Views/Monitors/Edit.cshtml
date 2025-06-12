@@ -1,0 +1,227 @@
+@using eServices.eHubAdmin.ViewModels.Monitors
+@model eServices.eHubAdmin.ViewModels.Monitors.MonitorEdit
+
+@{
+    ViewBag.Title = Model.MO_ID + " Edit";
+}
+
+<h2>@Model.MO_ID</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <h4>Edit</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.MO_ID)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ErrorDelayMins, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-1">
+            @Html.EditorFor(model => model.ErrorDelayMins, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.ErrorDelayMins, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Enabled, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <div class="checkbox">
+                @Html.CheckBoxFor(model => model.Enabled, new { style = "opacity: initial" })
+                @Html.ValidationMessageFor(model => model.Enabled, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Notes, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextAreaFor(model => model.Notes, 10, 100, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Notes, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <h4>Maintenance Schedule</h4>
+    <hr />
+    <div class="form-group">
+        @Html.LabelFor(model => model.MaintenanceStartDayOfWeek, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-1">
+            @Html.DropDownListFor(model => model.MaintenanceStartDayOfWeek, new SelectList(Constants.DayOfWeek, "Key", "Value", Model.MaintenanceStartDayOfWeek), new { @class = "form-control", onchange = "setStartTime()" })
+            @Html.ValidationMessageFor(model => model.MaintenanceStartDayOfWeek, "", new { @class = "text-danger" })
+        </div>
+        @Html.LabelFor(model => model.MaintenanceStartTime, new { @class = "sr-only" })
+        <div class="col-md-1">
+            @Html.EditorFor(model => model.MaintenanceStartTime, new { htmlAttributes = new { @class = "form-control", style = "cursor: text" } })
+            @Html.ValidationMessageFor(model => model.MaintenanceStartTime, "", new { @class = "text-danger" })
+        </div>
+        @Html.LabelFor(model => model.MaintenanceEndDayOfWeek, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-1">
+            @Html.DropDownListFor(model => model.MaintenanceEndDayOfWeek, new SelectList(Constants.DayOfWeek, "Key", "Value", Model.MaintenanceStartDayOfWeek), new { @class = "form-control", onchange = "setEndTime()" })
+            @Html.ValidationMessageFor(model => model.MaintenanceEndDayOfWeek, "", new { @class = "text-danger" })
+        </div>
+        @Html.LabelFor(model => model.MaintenanceEndTime, new { @class = "sr-only" })
+        <div class="col-md-1">
+            @Html.EditorFor(model => model.MaintenanceEndTime, new { htmlAttributes = new { @class = "form-control", style = "cursor: text" } })
+            @Html.ValidationMessageFor(model => model.MaintenanceEndTime, "", new { @class = "text-danger" })
+        </div>
+      
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">Date Range Type</label>
+        <div class="col-md-2">
+            @Html.DropDownListFor(model => model.DateRangeType, new SelectList(Constants.DateRangeTypes, Model.DateRangeType), new { @class = "form-control", onchange = "handleChange('" + Html.Raw(Json.Encode(Model)) + "')" })
+        </div>
+
+        <script>
+            function setStartTime() {
+                var maintenanceStartDayOfWeek = document.getElementById("MaintenanceStartDayOfWeek");
+                var maintenanceStartTime = document.getElementById("MaintenanceStartTime");
+
+                if (maintenanceStartDayOfWeek.value === "0") {
+                    maintenanceStartTime.value = null;
+                } else if (maintenanceStartTime.value === "") {
+                    maintenanceStartTime.value = "00:00";
+                }
+            }
+
+            function setEndTime() {
+                var maintenanceEndDayOfWeek = document.getElementById("MaintenanceEndDayOfWeek");
+                var maintenanceEndTime = document.getElementById("MaintenanceEndTime");
+
+                if (maintenanceEndDayOfWeek.value === "0") {
+                    maintenanceEndTime.value = null;
+                } else if (maintenanceEndTime.value === "") {
+                    maintenanceEndTime.value = "23:59";
+                }
+            }
+
+         function handleChange(modelJson) {
+  var model = JSON.parse(modelJson);
+  var selectedValue = document.querySelector('#DateRangeType').value;
+  var startTime = document.querySelector('#MaintenanceStartTime').value;
+  var startDay = document.querySelector('#MaintenanceStartDayOfWeek').value;
+  var endTime = document.querySelector('#MaintenanceEndTime').value;
+  var endDay = document.querySelector('#MaintenanceEndDayOfWeek').value;
+
+  $.ajax({
+    url: "/Monitors/ConvertDayAndTimesEdit",
+    type: 'POST',
+    data: { model: model, dateRangeType: selectedValue, startTime: startTime, endTime: endTime, startDay: startDay, endDay: endDay },
+    success: function (result) {
+      model.MaintenanceEndTime = result.MaintenanceEndTime;
+      model.MaintenanceEndDayOfWeek = result.MaintenanceEndDayOfWeek;
+      document.querySelector('#MaintenanceEndTime').value = normalizeTime(result.MaintenanceEndTime);
+      document.querySelector('#MaintenanceEndDayOfWeek').value = result.MaintenanceEndDayOfWeek;
+
+      model.MaintenanceStartTime = result.MaintenanceStartTime;
+      model.MaintenanceStartDayOfWeek = result.MaintenanceStartDayOfWeek;
+      document.querySelector('#MaintenanceStartTime').value = normalizeTime(result.MaintenanceStartTime);
+      document.querySelector('#MaintenanceStartDayOfWeek').value = result.MaintenanceStartDayOfWeek;
+    }
+  });
+}
+
+function normalizeTime(time) {
+  var hours = time.Hours;
+  var minutes = time.Minutes;
+
+  if (hours >= 24) {
+    hours = hours - 24;
+  }
+
+  return (hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0'));
+}
+
+
+
+        </script>
+
+        <div class="col-md-8">
+            <h5 id="date-range-type-info" class="text-danger" />
+        </div>
+    </div>
+
+    <div class="form-group">
+
+        @Html.LabelFor(model => model.DisableMaintenance, htmlAttributes: new { @class = "control-label col-md-2"})
+        <div class="col-md-2">
+            <div class="checkbox">
+                @Html.CheckBoxFor(model => model.DisableMaintenance, new { style = "opacity: initial", onchange = "handleChangeChecked('" + Html.Raw(Json.Encode(Model)) + "')" })
+                @Html.ValidationMessageFor(model => model.DisableMaintenance, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <script>
+            function handleChangeChecked(modelJson) {
+    var model = JSON.parse(modelJson);
+
+
+               var disableMaintenanceScheduling = document.querySelector('#DisableMaintenance').checked;
+
+               if (disableMaintenanceScheduling) {
+                   // Set values to null
+                   model.MaintenanceStartTime = null;
+                   model.MaintenanceStartDayOfWeek = null;
+                   model.MaintenanceEndTime = null;
+                   model.MaintenanceEndDayOfWeek = null;
+
+                   // Clear the field values
+                   document.querySelector('#MaintenanceStartTime').value = '';
+                   document.querySelector('#MaintenanceStartDayOfWeek').value = '';
+                   document.querySelector('#MaintenanceEndTime').value = '';
+                   document.querySelector('#MaintenanceEndDayOfWeek').value = '';
+
+                   // Disable the fields
+                   document.querySelector('#MaintenanceStartTime').disabled = true;
+                   document.querySelector('#MaintenanceStartDayOfWeek').disabled = true;
+                   document.querySelector('#MaintenanceEndTime').disabled = true;
+                   document.querySelector('#MaintenanceEndDayOfWeek').disabled = true;
+               } else {
+                   // Enable the fields
+                   document.querySelector('#MaintenanceStartTime').disabled = false;
+                   document.querySelector('#MaintenanceStartDayOfWeek').disabled = false;
+                   document.querySelector('#MaintenanceEndTime').disabled = false;
+                   document.querySelector('#MaintenanceEndDayOfWeek').disabled = false;
+               }
+
+    $.ajax({
+        url: "@Url.Action("ConvertDayAndTimesEdit", "Monitors")",
+        type: 'POST',
+        data: { model: model, dateRangeType: selectedValue, startTime: startTime, endTime: endTime, startDay: startDay, endDay: endDay },
+        success: function (result) {
+            model.MaintenanceEndTime = result.MaintenanceEndTime;
+            model.MaintenanceEndDayOfWeek = result.MaintenanceEndDayOfWeek;
+            document.querySelector('#MaintenanceEndTime').value = new Date(1970, 0, result.MaintenanceEndTime.Days, result.MaintenanceEndTime.Hours, result.MaintenanceEndTime.Minutes, result.MaintenanceEndTime.Seconds).toLocaleTimeString('en-US', { hour12: false });
+            document.querySelector('#MaintenanceEndDayOfWeek').value = result.MaintenanceEndDayOfWeek;
+
+            model.MaintenanceStartTime = result.MaintenanceStartTime;
+            model.MaintenanceStartDayOfWeek = result.MaintenanceStartDayOfWeek;
+            document.querySelector('#MaintenanceStartTime').value = new Date(1970, 0, result.MaintenanceStartTime.Days, result.MaintenanceStartTime.Hours, result.MaintenanceStartTime.Minutes, result.MaintenanceStartTime.Seconds).toLocaleTimeString('en-US', { hour12: false });
+            document.querySelector('#MaintenanceStartDayOfWeek').value = result.MaintenanceStartDayOfWeek;
+        }
+    });
+            }
+            
+        </script>
+
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Save" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Details", "Details", new { id = Model.MO_ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

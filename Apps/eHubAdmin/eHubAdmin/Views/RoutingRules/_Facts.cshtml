@@ -1,0 +1,34 @@
+﻿@model eServices.Shared.RoutingRuleEngine.FactCollection
+@using eServices.Shared.RoutingRuleEngine
+
+
+<table class="table table-responsive">
+    <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Query</th>
+    </tr>
+
+@foreach (var fact in Model.OrderBy((Fact f) => f.Name))
+{
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => fact.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => fact.Type)
+        </td>
+        <td>
+            @if (fact.Type == "COMPUTED")
+            {
+                @(Html.Partial("~/Views/RoutingRules/_RuleDetails.cshtml", fact.ComputeRule))
+            }
+            else
+            {
+                @Html.DisplayFor(modelItem => fact.Query)
+            }
+        </td>
+    </tr>
+}
+
+</table>

@@ -1,0 +1,602 @@
+@using Markdig
+@model eServices.eHubAdmin.ViewModels.Monitors.MonitorDetails
+
+@{
+    ViewBag.Title = Model.eHubMonitor.MO_ID + " Details";
+}
+
+<h2>@Model.eHubMonitor.MO_ID</h2>
+
+<div>
+    <h4>Details</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            ID
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.eHubMonitor.MO_ID)
+        </dd>
+
+        <dt>
+            Description
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.eHubMonitor.MO_Description)
+        </dd>
+
+        <dt>
+            Alert Delay
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.eHubMonitor.MO_ErrorDelayMins)
+        </dd>
+
+        <dt>
+            Type
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.eHubMonitor.MO_Type)
+        </dd>
+
+        @{
+            List<MvcHtmlString> senderLinks = new List<MvcHtmlString>();
+            if (Model.eHubMonitor.MO_Type == "InboxSender")
+            {
+                senderLinks.AddRange(Model.eHubMonitor.eHubClients.Select(c => @Html.ActionLink(c.CC_ID, "Query", "Messages", new { SenderInbox = c.CC_ID, Status = "Not Delivered" }, new { target = "_blank" })));
+            }
+        }
+
+        @if (senderLinks.Any())
+        {
+            <dt>
+                <span>Senders IDs</span>
+            </dt>
+
+            <dd>
+                <table>
+                    @foreach (var link in senderLinks)
+                    {
+                        <tr>
+                            <td>
+                                @link
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </dd>
+        }
+
+        @{
+            List<MvcHtmlString> recipientLinks = new List<MvcHtmlString>();
+            if (Model.eHubMonitor.MO_Type == "InboxRecipient" || Model.eHubMonitor.MO_Type == "InboxRecipientProcessing" || Model.eHubMonitor.MO_Type == "OutboxRecipient")
+            {
+                switch (Model.eHubMonitor.MO_Type)
+                {
+                    case "InboxRecipient":
+                        recipientLinks.AddRange(Model.eHubMonitor.eHubClients.Select(c => @Html.ActionLink(c.CC_ID, "Query", "Messages", new { RecipientInbox = c.CC_ID, Status = "Not Delivered" }, new { target = "_blank" })));
+                        break;
+                    case "InboxRecipientProcessing":
+                        recipientLinks.AddRange(Model.eHubMonitor.eHubClients.Select(c => @Html.ActionLink(c.CC_ID, "Query", "Messages", new { RecipientInbox = c.CC_ID, Status = "Not Processed" }, new { target = "_blank" })));
+                        break;
+                    case "OutboxRecipient":
+                        recipientLinks.AddRange(Model.eHubMonitor.eHubClients.Select(c => @Html.ActionLink(c.CC_ID, "Query", "Messages", new { RecipientOutbox = c.CC_ID, Status = "Not Delivered" }, new { target = "_blank" })));
+                        break;
+                }
+            }
+            else
+            {
+                if (Model.eHubMonitor.MO_ID.StartsWith("OCM_OUT_") && Model.eHubMonitor.MO_Type == "Custom")
+                {
+                    recipientLinks.AddRange(Model.eHubMonitor.eHubClients.Select(c => @Html.ActionLink(c.CC_ID, "Query", "Messages", new { RecipientInbox = "SHIPPING_INSTRUCTION", RecipientOutbox = c.CC_ID, Status = "Not Delivered" }, new { target = "_blank" })));
+                }
+                if (Model.eHubMonitor.MO_ID.StartsWith("International_eRouter") && Model.eHubMonitor.MO_Type == "Custom")
+                {
+                    recipientLinks.AddRange(Model.eHubMonitor.eHubClients.Select(c => @Html.ActionLink(c.CC_ID, "Query", "Messages", new { SenderInbox = "1STOP_EMAIL", RecipientInbox = c.CC_ID, Status = "Not Delivered" }, new { target = "_blank" })));
+                }
+            }
+        }
+
+        @if (recipientLinks.Any())
+        {
+            <dt>
+                <span>Recipients IDs</span>
+            </dt>
+
+            <dd>
+                <table>
+                    @foreach (var link in recipientLinks)
+                    {
+                        <tr>
+                            <td>
+                                @link
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </dd>
+        }
+
+        <dt>
+            Enabled
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.eHubMonitor.MO_Enabled)
+        </dd>
+        @if (Model.MonitorCountDetails != null && Model.MonitorCountDetails.Any())
+        {
+            <dt>
+                <span id="SubItem">SubItem</span>
+            </dt>
+                <dd>
+                    <table class="table" style="width:30%">
+                        <tr>
+                            <th>SubItem ID</th>
+                            <th>Age</th>
+                            <th>Queue</th>
+                        </tr>
+                        @foreach (var subItem in Model.MonitorCountDetails)
+                        {
+                            <tr>
+                                <td>@subItem.SubItem</td>
+                                <td>@subItem.Age</td>
+                                <td>@subItem.Queue</td>
+                            </tr>
+                        }
+                    </table>
+                </dd>
+            
+        }
+        else
+        {
+            <dt>
+                @Html.DisplayNameFor(model => model.MonitorCounts.Age)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.MonitorCounts.Age)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.MonitorCounts.Queue)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.MonitorCounts.Queue)
+            </dd>
+        }
+
+
+        <dt>
+            Maintenance Start Day
+        </dt>
+
+        <dd>
+            @if (Model.MaintenanceStartDayOfWeek != null)
+            {
+                <span id="MaintenanceStartDayOfWeek">@Constants.DayOfWeek[(int)Model.MaintenanceStartDayOfWeek]</span>
+            }
+        </dd>
+
+        <dt>
+            Maintenance Start Time
+        </dt>
+
+        <dd>
+            @if (Model.MaintenanceStartTime != null)
+            {
+                <span id="MaintenanceStartTime">@Html.DisplayFor(model => model.MaintenanceStartTime)</span>
+            }
+        </dd>
+
+        <dt>
+            Maintenance End Day
+        </dt>
+        <dd>
+            @if (Model.MaintenanceEndDayOfWeek != null)
+            {
+                <span id="MaintenanceEndDayOfWeek">@Constants.DayOfWeek[(int)Model.MaintenanceEndDayOfWeek]</span>
+            }
+        </dd>
+
+        <dt>
+            Maintenance End Time
+        </dt>
+
+        <dd>
+            @if (Model.MaintenanceEndTime != null)
+            {
+                <span id="MaintenanceEndTime">@Html.DisplayFor(model => model.MaintenanceEndTime)</span>
+            }
+        </dd>
+
+        <dt>
+            UTC Time
+        </dt>
+        <dd>
+            <label>
+                @Html.CheckBox("isUTCTimeCheckbox", new { @checked = Model.DateRangeType != "Local", onchange = "handleChange()" })
+
+            </label>
+        </dd>
+
+
+        <dt>
+            Notes
+        </dt>
+
+        <dd>
+            @if (Model.eHubMonitor.MO_Notes != null)
+            {
+                <div class="markdown">
+                    @Html.Raw(Markdown.ToHtml(Model.eHubMonitor.MO_Notes, new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()))
+                </div>
+            }
+        </dd>
+
+    </dl>
+</div>
+
+<div id="list" class="table-responsive">
+    <table id="list-table" class="table">
+        <tr>
+            <th></th>
+            <th></th>
+            <th class="left-border center-align" colspan="2"><font size="+1">Received in eHub Inbox</font><span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Html.Raw(Constants.HeaderInfoDescriptions["Received"])" title="Received in eHub Inbox" /></th>
+            <th class="left-border center-align" colspan="2"><font size="+1">Sent to eHub Outbox</font><span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Html.Raw(Constants.HeaderInfoDescriptions["Sent"])" title="Sent to eHub Outbox" /></th>
+            <th class="left-border" colspan="5"></th>
+        </tr>
+        <tr>
+            <th style="border-top:none">Received (UTC)</th>
+            <th style="border-top:none">Received (Local Time)</th>
+            <th class="left-border" style="border-top:none">Sender</th>
+            <th style="border-top:none">Recipient</th>
+            <th class="left-border" style="border-top:none">Sender</th>
+            <th style="border-top:none">Recipient</th>
+            <th class="left-border" style="border-top:none">Delivered</th>
+            <th style="border-top:none">Code</th>
+            <th style="border-top:none">Status</th>
+            <th style="border-top:none"></th>
+        </tr>
+    </table>
+</div>
+<div id="list-loader" class="loader">
+    <img class="glyphicon" height="25" width="25" src="~/Content/Images/ajax-loader.gif" alt="Loading..." />
+</div>
+
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.eHubMonitor.MO_ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+
+
+@section Scripts {
+    <script type="text/javascript">
+       // Helper function to get the day of the week string based on the integer value
+function getDayOfWeekString(dayOfWeek) {
+  var dayOfWeekData = {
+    0: "",
+    1: "Sun",
+    2: "Mon",
+    3: "Tue",
+    4: "Wed",
+    5: "Thu",
+    6: "Fri",
+    7: "Sat"
+  };
+
+  return dayOfWeekData[dayOfWeek];
+}
+
+function handleChange() {
+  var isUTCTime = document.querySelector('#isUTCTimeCheckbox').checked;
+  var selectedValue = isUTCTime ? "UTC" : "Local";
+  var startDay = document.querySelector('#MaintenanceStartDayOfWeek').textContent;
+  var startTime = document.querySelector('#MaintenanceStartTime').textContent;
+  var endTime = document.querySelector('#MaintenanceEndTime').textContent;
+  var endDay = document.querySelector('#MaintenanceEndDayOfWeek').textContent;
+
+  $.ajax({
+    url: "@Url.Action("ConvertDayAndTimesDetails", "Monitors")",
+    type: 'POST',
+    data: {
+      dateRangeType: selectedValue,
+      startTime: startTime,
+      endTime: endTime,
+      startDay: startDay,
+      endDay: endDay
+    },
+    success: function (result) {
+        document.querySelector('#MaintenanceEndTime').textContent = normalizeTime(result.MaintenanceEndTime);
+      document.querySelector('#MaintenanceEndDayOfWeek').textContent = getDayOfWeekString(result.MaintenanceEndDayOfWeek);
+        document.querySelector('#MaintenanceStartTime').textContent = normalizeTime(result.MaintenanceStartTime);
+      document.querySelector('#MaintenanceStartDayOfWeek').textContent = getDayOfWeekString(result.MaintenanceStartDayOfWeek);
+    }
+  });
+}
+
+        function normalizeTime(time) {
+            var hours = time.Hours;
+            var minutes = time.Minutes;
+
+            if (hours >= 24) {
+                hours = hours - 24;
+            }
+
+            return (hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0'));
+        }
+
+    var pageIndex = 0;
+
+    $(function () {
+      $(".loader").hide();
+      $('#list').hide();
+      LoadList();
+    });
+
+    function LoadList() {
+      $('[data-toggle="tooltip"]').tooltip('destroy');
+      $("#list-footer").remove();
+      $("#list-loader").show();
+      var data = { 'id': '@Model.eHubMonitor.MO_ID' };
+      data.pageIndex = pageIndex;
+      data.TimeZoneIdIANA = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      $('#received-local-time-th').text('Received (' + Intl.DateTimeFormat().resolvedOptions().timeZone + ')');
+
+      $.ajax({
+        url: "@Url.Action("List")",
+        type: "POST",
+        data: data,
+        success: function (partialViewResult) {
+          if ($(partialViewResult).find(".list-detail").length > 0) {
+            $(partialViewResult).find("#list-footer").insertAfter("#list");
+            $(partialViewResult).find(".list-detail").appendTo("#list-table > tbody");
+            $('#list').show();
+            $('[data-toggle="tooltip"]').tooltip();
+            $('[data-toggle="popover"]').popover({ trigger: "hover" });
+            $('tr.list-detail.accordion').hide();
+            $("#list-loader").hide();
+            $('.glyphicon-chevron-up').closest("tr").next().slideToggle();
+            pageIndex++;
+          } else {
+            $('td[class="accordionView"]').hide();
+            $("#list-loader").hide();
+          }
+        },
+        error: function (error) {
+          $(".loader").hide();
+          $(error.responseText).insertAfter("#list");
+        }
+      });
+    }
+
+    function ExtendAccordionViewPopulate(itemDetails, event, element) {
+      var $target = $(event.target);
+      if ($target.closest("td").attr('id') == 'messageDetailsTab') {
+        return;
+      }
+      event.stopPropagation();
+
+      var isMessageApiCalled = false;
+      if (element.hasAttribute('isMessageApiCalled')) {
+        isMessageApiCalled = element.getAttribute('isMessageApiCalled');
+      } else {
+        element.setAttribute('isMessageApiCalled', true);
+      }
+
+      if ($target.closest("td").attr("colspan") > 1) {
+        $target.slideUp();
+      } else {
+        $target.closest("tr").next().slideToggle();
+        $(element).find("td#accordionButton > span").toggleClass("glyphicon glyphicon-chevron-down glyphicon glyphicon-chevron-up");
+
+        if (isMessageApiCalled == false) {
+          $.ajax({
+            url: "@Url.Action("MessageBasicDetails", "Messages")",
+            type: "GET",
+            data: {
+              EI_PK: itemDetails.PK,
+              AM_PK: itemDetails.AM_PK,
+              Ref: itemDetails.Ref
+            },
+            success: function (response) {
+              element.nextElementSibling.firstElementChild.innerHTML = response;
+              $(document).ready(function () {
+                $('[data-toggle="popover"]').popover();
+              });
+            },
+            error: function (error) {
+              var errorMessage = $("<div'>" + error.responseText + "</div>");
+              errorMessage.find('style').remove();
+              errorMessage.find('title').remove();
+              element.nextElementSibling.firstElementChild.innerHTML = "<div style='padding:20px; background-color:rgba(255,255,255,0.7);'>Failed to fetch message details. Error:<br> <br> <pre>" + errorMessage.text().trim() + "</pre></div>";
+            }
+          });
+        } else {
+          $target.closest("tr").next().find("td > div").slideToggle();
+        }
+      }
+    }
+
+    var errorTextWrap = false;
+    function toggleErrorTextWrap() {
+      errorTextWrap = !errorTextWrap;
+      if (errorTextWrap) {
+        $('#error-message').removeClass('pre-nowrap');
+        $('#error-message').addClass('pre-wrap');
+      } else {
+        $('#error-message').removeClass('pre-wrap');
+        $('#error-message').addClass('pre-nowrap');
+      }
+    }
+
+    function copyToClipboard(text) {
+        var copyTest = document.queryCommandSupported('copy');
+
+        if (copyTest === true) {
+            var copyTextArea = document.createElement("textarea");
+            copyTextArea.value = text;
+            document.body.appendChild(copyTextArea);
+            copyTextArea.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.log('Unable to copy');
+            }
+            document.body.removeChild(copyTextArea);
+        } else {
+            window.prompt("Copy to clipboard: Ctrl+C or Command+C, Enter", text);
+        }
+    }
+
+    $(document).on("mousedown", ".copy-click", function () {
+        var text = $(this).attr('data-copy');
+        copyToClipboard(text);
+    });
+
+    function createUrl(buttonID, messagePK, archivePK) {
+        var url = "@Url.Action("Download", "Messages")/";
+
+        url += buttonID;
+        url += '?';
+        if (buttonID.includes('Inbox')) {
+            url += 'EI_PK=' + messagePK;
+        }
+        if (buttonID.includes('Outbox')) {
+            url += 'OI_PK=' + messagePK;
+        }
+        url += '&AM_PK=' + archivePK;
+
+        return url;
+    }
+
+    async function fetchPreview(url, control) {
+        var popover;
+
+        try {
+            var response = await fetch(url);
+            if (!response.ok) {
+                popover = control.attr('data-content', 'ERROR: Cannot preview data\n\n' + response.statusText).data('bs.popover');
+                popover.setContent();
+                control.popover('show');
+                return;
+            }
+
+            var data = await response.text();
+            var finalResponse = formatPrettyPrint(true, data);
+            finalResponse = finalResponse.substring(0, 1024);
+            popover = control.attr('data-content', finalResponse).data('bs.popover');
+        } catch (error) {
+            popover = control.attr('data-content', 'ERROR: Cannot preview data\n\n' + error).data('bs.popover');
+        }
+
+        popover.setContent();
+        control.popover('show');
+    }
+
+    $(document).on("click", ".preview-click", function () {
+        if (($(this).attr('data-content')).substring(0, 10) != 'Retrieving') {
+            return;
+        }
+        $(this).popover('show');
+        $(this).attr('visibility', 'visible');
+        var previewID = $(this).attr('preview-id');
+        var messagePK = $(this).attr('message-pk') || '';
+        var archivePK = $(this).attr('archive-pk') || '';
+
+        var url = createUrl(previewID, messagePK, archivePK);
+        fetchPreview(url, $(this));
+    });
+
+    async function downloadClick(downloadID, messagePK, archivePK, event) {
+        event.preventDefault();
+        var url = createUrl(downloadID, messagePK, archivePK);
+        var linkElement = document.createElement('a');
+        linkElement.download = downloadID;
+
+        try {
+            var response = await fetch(url);
+            if (!response.ok) {
+                console.log(response.statusText);
+                linkElement.href = url;
+                linkElement.click();
+                linkElement.remove();
+                return;
+            }
+
+            var data = await response.arrayBuffer();
+            var isChecked = $(event.target).closest(".message-details").find("#pretty-print-button").prop('checked');
+            var finalResponse = formatPrettyPrint(isChecked, data);
+            var downloadBlob = new Blob([finalResponse], { type: 'text/plain' });
+            linkElement.href = window.URL.createObjectURL(downloadBlob);
+        } catch (error) {
+            console.log(error);
+            linkElement.href = url;
+        }
+
+        linkElement.click();
+        linkElement.remove();
+    }
+
+    async function viewClick(viewID, messagePK, archivePK, event) {
+        event.preventDefault();
+        var url = createUrl(viewID, messagePK, archivePK);
+
+        try {
+            var response = await fetch(url);
+            if (!response.ok) {
+                displayError(url, response.statusText);
+                return;
+            }
+
+            var data = await response.text();
+            var isChecked = $(event.target).closest(".message-details").find("#pretty-print-button").prop('checked');
+            var finalResponse = formatPrettyPrint(isChecked, data);
+            var w = window.open(url);
+            w.document.writeln("<pre style='word-wrap: break-word; white-space: pre-wrap;'></pre>");
+            $(w.document).find("pre").text(finalResponse);
+            w.history.pushState("", "", url);
+        } catch (error) {
+            displayError(url, error);
+        }
+    }
+
+    function displayError(url, error) {
+        var w = window.open(url);
+        w.document.writeln(error);
+        w.history.pushState("", "", url);
+    }
+
+    function formatPrettyPrint(isChecked, data) {
+        var result = data;
+        if (isChecked) {
+            try {
+                result = new TextDecoder().decode(result);
+            } catch {
+                // data is already decoded.
+            }
+
+            var edifactStart = new RegExp(/^(UNA:|UNB\+)/);
+            var edifactEnd = new RegExp(/(\'UNZ\+)[^\']+\'$/);
+            if (edifactStart.test(result) && edifactEnd.test(result)) {
+                var linefeedRegex = new RegExp(/(?<!\?)\'/g);
+                result = result.replace(linefeedRegex, "\'\n");
+            }
+
+            var x12Start = new RegExp(/^(ISA\*)/);
+            var x12End = new RegExp(/(\~IEA\*)[^\~]+\~$/);
+            if (x12Start.test(result) && x12End.test(result)) {
+                var linefeedRegex = new RegExp(/\~/g);
+                result = result.replace(linefeedRegex, "\~\n");
+            }
+        }
+        return result;
+    }
+
+    </script>
+}

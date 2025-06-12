@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.Web" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateAssemblyInfoFile>false</GenerateAssemblyInfoFile>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IntermediateOutputPath>..\Bin\TWCustomsGateway\obj</IntermediateOutputPath>
+    <OutputPath>..\Bin\TWCustomsGateway</OutputPath>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\EDI-Release-private.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TWCustomsGatewayAdapter\CargoWise.eHub.Products.TWCustoms.TWCustomsGatewayAdapter.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Deployment\Profiles\ProductionOne\web.config">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Deployment\Profiles\ProductionTwo\web.config">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Deployment\Profiles\Test\web.config">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Folder Include="Deployment\" CopyToPublishDirectory="Never"/>
+  </ItemGroup>
+  <PropertyGroup>
+    <PackageProjectPath>..\Bin\Deployment\WebServiceDotNetCore\Package.proj</PackageProjectPath>
+    <DeploymentProjectPath>..\Bin\Deployment\WebService\Deploy.proj</DeploymentProjectPath>
+    <CommonPowershellFunctionsFilePath>..\Bin\Deployment\CommonScripts\Common.ps1</CommonPowershellFunctionsFilePath>
+  </PropertyGroup>
+  <Import Project="$(PackageProjectPath)" Condition="Exists('$(PackageProjectPath)')" />
+  <Import Project="$(DeploymentProjectPath)" Condition="Exists('$(DeploymentProjectPath)')" />
+</Project>

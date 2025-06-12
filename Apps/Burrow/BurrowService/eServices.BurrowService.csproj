@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('eServices.BuildTools.props','$(MSBuildProjectDirectory)..\'))" />
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Copyright>© WiseTech Global</Copyright>
+    <BaseOutputPath>..\Bin\Build\$(MSBuildProjectName)</BaseOutputPath>
+    <OutputType>exe</OutputType>
+    <EnvironmentName Condition="'$(EnvironmentName)' == ''">$(BuildToolsEnvironment)</EnvironmentName>
+    <PublishDir>..\Bin\Publish\$(MSBuildProjectName)</PublishDir>
+    <NoWarn>MSB3246</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Include="System.Diagnostics" />
+    <Using Include="System.ComponentModel.DataAnnotations" />
+    <Using Include="Microsoft.Extensions.Options" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Burrow\**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Zookeeper\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Deployment\**\*" />
+    <None Include="Deployment\**\*" />
+    <EnvironmentFiles Include="Deployment\$(BuildToolsEnvironment)\**\*">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EnvironmentFiles>
+    <Content Remove="@(EnvironmentFiles->Metadata('Link'))" />
+    <Content Include="@(EnvironmentFiles)" />
+  </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
+</Project>

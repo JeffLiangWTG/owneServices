@@ -1,0 +1,178 @@
+﻿@model eServices.eHubAdmin.ViewModels.Air.Query
+
+@{
+  ViewBag.Title = "Air";
+}
+
+<style>
+  .form-control {
+    height: 32px;
+  }
+
+  input[type='date'], input[type='time'], input[type='datetime-local'], input[type='month'] {
+    line-height: 18px;
+  }
+
+  input[disabled] {
+    pointer-events: none;
+  }
+
+  .tooltip-inner {
+    text-align: left;
+  }
+
+  th.left-border {
+    border-bottom: none;
+    border-top: none;
+    border-left: 2px solid #dedede;
+  }
+
+  th.center-align {
+    text-align: center
+  }
+
+  td.left-border-td {
+    border-left: 2px solid #dedede;
+  }
+
+  .popover {
+    white-space: pre-wrap;
+    max-width: 400px;
+  }
+
+  .popover-content {
+    word-wrap: break-word;
+  }
+</style>
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-5 col-md-5 col-sm-5" style="padding-left: 0;">
+      <div class="col-lg-4 col-md-4 col-sm-4" style="padding: 0;">
+        <h2>Air Messages</h2>
+      </div>
+      <div class="col-lg-7 col-md-7 col-sm-7" style="padding: 20px 0 0 0;">
+        <button class="btn btn-default" type="button" data-toggle="collapse" data-target="#collapseQuery" id="query_button">Query</button>
+        <button class="btn btn-default" type="button" onclick="LoadList(true)" id="refresh">Refresh</button>
+        <img class="glyphicon loader" id="refresh-loader" height="25" width="25" src="~/Content/Images/ajax-loader.gif" style="display: none" alt="Loading..." />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="collapseQuery" class="@(ViewBag.ShowQuery ?? true ? "in" : "collapse")">
+    <div class="well">
+        @if (ViewBag.ST_ExpiryDays != null)
+        {
+            <div class="form-group">
+                <h5>You can only query waybills that are less than @ViewBag.ST_ExpiryDays days old. If you need to query older waybills, please contact the eServices team.</h5>
+            </div>
+        }
+        @using (Html.BeginForm("Query", "Air", FormMethod.Post, new { name = "Query", id = "Query" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div id="basicSearch" class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-md-2">@Html.DisplayNameFor(model => model.Waybill)<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" title="Waybill" data-content='@Constants.FunctionDescription["Waybill"]'></span></label>
+                    <div class="col-md-2">
+                        @Html.EditorFor(model => model.Waybill, new { htmlAttributes = new { @class = "form-control", id = "waybill", type = "text", style = "cursor: text" } })
+                        @Html.ValidationMessageFor(model => model.Waybill, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 40px;">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Submit" class="btn btn-default" />
+                    <input type="button" value="Clear" class="btn btn-default" onclick="ClearInputFields()" />
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div id="list" class="table-responsive">
+  <table id="list-table" class="table">
+    <tr>
+      <th></th>
+      <th></th>
+      <th class="left-border center-align" colspan="2"><font size="+1">Received in eHub Inbox</font><span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Html.Raw(Constants.HeaderInfoDescriptions["Received"])" title="Received in eHub Inbox" /></th>
+      <th class="left-border center-align" colspan="2"><font size="+1">Sent to eHub Outbox</font><span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Html.Raw(Constants.HeaderInfoDescriptions["Sent"])" title="Sent to eHub Outbox" /></th>
+      <th class="left-border" colspan="4"></th>
+    </tr>
+    <tr>
+      <th style="border-top:none">Received (UTC)</th>
+      <th style="border-top:none">Received (Local Time)</th>
+      <th class="left-border" style="border-top:none">Sender</th>
+      <th style="border-top:none">Recipient</th>
+      <th class="left-border" style="border-top:none">Sender</th>
+      <th style="border-top:none">Recipient</th>
+      <th class="left-border" style="border-top:none">Delivered</th>
+      <th style="border-top:none">Code</th>
+      <th style="border-top:none">Status</th>
+      <th style="border-top:none"></th>
+    </tr>
+  </table>
+</div>
+<div id="list-loader" class="loader">
+  <img class="glyphicon" height="25" width="25" src="~/Content/Images/ajax-loader.gif" alt="Loading..." />
+</div>
+
+@section Scripts {
+  @Scripts.Render("~/bundles/jqueryval")
+
+  <script type="text/javascript">
+
+    $(function() {
+      $("#query_button").prop("disabled", false);
+      $(".loader").hide();
+      LoadList(false, null);
+    });
+
+    function ClearInputFields() {
+      $('input:text,input[type=date],input[type=time]').val('');
+      $("#Query").valid();
+    }
+
+    function ResetInputFields() {
+      $('#Query').trigger('reset');
+      $("#Query").valid();
+    }
+
+    function LoadList(reload, searchLimit) {
+      $('[data-toggle="tooltip"]').tooltip('destroy');
+      $("#list-footer").remove();
+      $("#refresh").prop("disabled", true);
+      if (reload) {
+        ResetInputFields();
+        $("#refresh-loader").show();
+      } else {
+        $("#list-loader").show();
+      }
+      var data = @Html.Raw(Json.Encode(new {
+        Model.Waybill
+      }));
+      data.SearchLimit = searchLimit;
+      data.TimeZoneIdIANA = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      $.ajax({
+        url: "@Url.Action("List")",
+        type: "POST",
+        data: data,
+        success: function (partialViewResult) {
+          if (reload) {
+            $(".list-detail").remove();
+          }
+          $(partialViewResult).find("#list-footer").insertAfter("#list");
+          $(partialViewResult).find(".list-detail").appendTo("#list-table tbody");
+          $(".loader").hide();
+          $('[data-toggle="tooltip"]').tooltip();
+          $('[data-toggle="popover"]').popover({ trigger: "hover" });
+          $("#refresh").prop("disabled", false);
+        },
+        error: function (error) {
+          $(error.responseText).insertAfter("#list");
+        }
+      });
+    }
+  </script>
+}

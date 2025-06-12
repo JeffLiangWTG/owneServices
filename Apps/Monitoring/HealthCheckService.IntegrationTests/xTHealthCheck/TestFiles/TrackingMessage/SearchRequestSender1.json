@@ -1,0 +1,57 @@
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "customPublic.sourceParty": {
+              "query": "Sender1"
+            }
+          }
+        },
+        {
+          "match": {
+            "customPublic.destinationParty": {
+              "query": "Recipient1"
+            }
+          }
+        },
+        {
+          "bool": {
+            "should": [
+              {
+                "match": {
+                  "processResult": {
+                    "query": "Successful"
+                  }
+                }
+              },
+              {
+                "match": {
+                  "processResult": {
+                    "query": "Successful After Retry"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "match": {
+            "contract": {
+              "query": "Contract1"
+            }
+          }
+        },
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "now-45m",
+              "lte": "now"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

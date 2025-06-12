@@ -1,0 +1,188 @@
+﻿@page "/code-maps/details/{id:guid}"
+@implements IAsyncDisposable
+@inject IAccessGroupService AccessGroupService
+@inject IDbContextFactory<eHubTransactionsContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject ILogger<Index> Logger
+@inject IJSRuntime JS
+
+<PageTitle>Code Map - Details - @(codeSet?.CS_Name ?? "Loading")</PageTitle>
+
+<h1>Code Map - Details</h1>
+
+<hr />
+@if (codeSet is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="hstack gap-3">
+        <dl class="mb-0">
+            <dt>Sender</dt>
+            <dd>@codeSet.CS_CC_SenderNavigation.CC_ID</dd>
+        </dl>
+        <dl class="mb-0">
+            <dt>Recipient</dt>
+            <dd>@codeSet.CS_CC_RecipientNavigation.CC_ID</dd>
+        </dl>
+        <dl class="mb-0">
+            <dt>Transformation Set</dt>
+            <dd>@codeSet.CS_TSNavigation?.TS_Name</dd>
+        </dl>
+        <dl class="mb-0">
+            <dt>Code Set</dt>
+            <dd>@codeSet.CS_Name</dd>
+        </dl>
+    </div>
+    <div class="mb-2">
+        @if (isAuthorizedWrite)
+        {
+            <span>
+                <a href="@($"/code-maps/edit/{Id}")">Edit</a> |
+            </span>
+        }
+        <a href="@($"/code-maps/{codeSet.CS_OW}")">Back to List</a>
+    </div>
+    <div class="mb-2">
+        <button class="btn btn-primary" @onclick="DownloadCsv">
+            <i class="bi bi-download"></i> Download CSV
+        </button>
+    </div>
+    <div>
+        <QuickGrid Class="table w-auto" Items="@codeSet.eHubCodeMapKey.OrderBy(x => x.CK_Order).AsQueryable()">
+            <TemplateColumn Title="Order"><strong>@context.CK_Order</strong></TemplateColumn>
+            <TemplateColumn Title="@codeSet.CS_Key1Name"><strong>@context.CK_Key1Value</strong></TemplateColumn>
+            @if (codeSet.CS_Key2Name != null)
+            {
+                <TemplateColumn Title="@codeSet.CS_Key2Name"><strong>@context.CK_Key2Value</strong></TemplateColumn>
+            }
+            @if (codeSet.CS_Key3Name != null)
+            {
+                <TemplateColumn Title="@codeSet.CS_Key3Name"><strong>@context.CK_Key3Value</strong></TemplateColumn>
+            }
+            @if (codeSet.CS_Key4Name != null)
+            {
+                <TemplateColumn Title="@codeSet.CS_Key4Name"><strong>@context.CK_Key4Value</strong></TemplateColumn>
+            }
+            @if (codeSet.CS_Key5Name != null)
+            {
+                <TemplateColumn Title="@codeSet.CS_Key5Name"><strong>@context.CK_Key5Value</strong></TemplateColumn>
+            }
+            @foreach (var result in codeSet.eHubCodeSetResult.OrderBy(x => x.CR_Order))
+            {
+                <TemplateColumn Title="@result.CR_Name">
+                    @context.eHubCodeMapValue.First(x => x.CV_CR == result.CR_PK).CV_OutputCode
+                </TemplateColumn>
+            }
+
+        </QuickGrid>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private bool isAuthorizedWrite = false;
+
+    private eHubCodeSet? codeSet;
+
+    private eHubTransactionsContext context = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = await DbFactory.CreateDbContextAsync();
+        codeSet ??= await context.eHubCodeSet.AsNoTrackingWithIdentityResolution()
+            .Include(x => x.CS_CC_SenderNavigation)
+            .Include(x => x.CS_CC_RecipientNavigation)
+            .Include(x => x.CS_TSNavigation)
+            .Include(x => x.eHubCodeSetResult)
+            .Include(x => x.eHubCodeMapKey).ThenInclude(x => x.eHubCodeMapValue)
+            .Where(x => x.CS_PK == Id)
+            .FirstOrDefaultAsync();
+
+        if (codeSet is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+
+        if (!await AccessGroupService.IsAuthorizedForRead(codeSet!.CS_OW))
+        {
+            NavigationManager.NavigateTo("/access-denied");
+            return;
+        }
+        isAuthorizedWrite = await AccessGroupService.IsAuthorizedForWrite(codeSet.CS_OW);
+    }
+
+    private async Task DownloadCsv(MouseEventArgs args)
+    {
+        var csv = await Details.FormatCodeMapCsv(codeSet!);
+        var fileName = GetCodeMapName(codeSet!);
+        var fileStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(csv));
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
+
+    private string GetCodeMapName(eHubCodeSet codeSet)
+    {
+        var fileName = new StringBuilder(GetSafeName(codeSet!.CS_CC_SenderNavigation?.CC_ID ?? "Multiple"));
+        fileName.Append("-").Append(GetSafeName(codeSet.CS_CC_RecipientNavigation?.CC_ID ?? "Multiple"));
+        if (codeSet.CS_TSNavigation != null)
+        {
+            fileName.Append("-").Append(GetSafeName(codeSet.CS_TSNavigation.TS_Name));
+        }
+        fileName.Append("-").Append(GetSafeName(codeSet.CS_Name)).Append(".csv");
+        return fileName.ToString();
+    }
+
+    internal static async Task<string> FormatCodeMapCsv(eHubCodeSet codeSet)
+    {
+        var records = await Task.Run(() => codeSet.eHubCodeMapKey.OrderBy(x => x.CK_Order).Select(x =>
+        {
+            dynamic record = new ExpandoObject();
+            if (codeSet.CS_Key1Name != null)
+            {
+                ((IDictionary<string, object>)record)[GetSafeName(codeSet.CS_Key1Name)] = x.CK_Key1Value ?? "";
+            }
+            if (codeSet.CS_Key2Name != null)
+            {
+                ((IDictionary<string, object>)record)[GetSafeName(codeSet.CS_Key2Name)] = x.CK_Key2Value ?? "";
+            }
+            if (codeSet.CS_Key3Name != null)
+            {
+                ((IDictionary<string, object>)record)[GetSafeName(codeSet.CS_Key3Name)] = x.CK_Key3Value ?? "";
+            }
+            if (codeSet.CS_Key4Name != null)
+            {
+                ((IDictionary<string, object>)record)[GetSafeName(codeSet.CS_Key4Name)] = x.CK_Key4Value ?? "";
+            }
+            if (codeSet.CS_Key5Name != null)
+            {
+                ((IDictionary<string, object>)record)[GetSafeName(codeSet.CS_Key5Name)] = x.CK_Key5Value ?? "";
+            }
+
+            foreach (var result in codeSet.eHubCodeSetResult.OrderBy(x => x.CR_Order))
+            {
+                ((IDictionary<string, object>)record)[GetSafeName(result.CR_Name)]
+                = x.eHubCodeMapValue.First(x => x.CV_CR == result.CR_PK).CV_OutputCode!;
+            }
+
+            return record;
+        }));
+
+        using var wrt = new StringWriter();
+        using var csv = new CsvWriter(wrt, CultureInfo.InvariantCulture);
+        await csv.WriteRecordsAsync(records);
+
+        return wrt.ToString()!;
+    }
+
+    internal static string GetSafeName(string name) => Regex.Replace(name, @"[^a-zA-Z0-9_]", "");
+
+    public async ValueTask DisposeAsync()
+    {
+        await context.DisposeAsync();
+    }
+}

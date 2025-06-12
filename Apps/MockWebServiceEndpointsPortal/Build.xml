@@ -1,0 +1,55 @@
+<Build xmlns="http://wisetechglobal.com/DevTools/Build.xsd" MSBuild="17">
+	<Cleanup>
+		<Item>dist</Item>
+	</Cleanup>
+
+	<Dependencies>
+		<Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices"
+			Path="/Deployment">
+			<Copy Source="Deployment" Target="Deployment" />
+		</Dependency>
+		<Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices"
+			Path="/DatImplementation">
+			<Copy Source="Dat.Integration.dll" Target="DAT" />
+			<Copy Source="eHub.DatImplementation.Deployment.dll" Target="DAT" />
+			<Copy Source="Microsoft.Build.dll" Target="DAT" />
+			<Copy Source="Microsoft.Build.Framework.dll" Target="DAT" />
+			<Copy Source="Microsoft.Build.Tasks.Core.dll" Target="DAT" />
+			<Copy Source="Microsoft.Build.Utilities.Core.dll" Target="DAT" />
+			<Copy Source="System.Collections.Immutable.dll" Target="DAT" />
+			<Copy Source="System.Buffers.dll" Target="DAT" />
+			<Copy Source="System.Memory.dll" Target="DAT" />
+			<Copy Source="System.Numerics.Vectors.dll" Target="DAT" />
+			<Copy Source="System.Runtime.CompilerServices.Unsafe.dll" Target="DAT" />
+			<Copy Source="System.Threading.Tasks.Dataflow.dll" Target="DAT" />
+		</Dependency>
+	</Dependencies>
+
+	<Tasks>
+		<Task Name="Install">
+			<Uses>Install.bat</Uses>
+			<Uses>package-lock.json</Uses>
+			<Step>Install.bat</Step>
+		</Task>
+
+		<Task Name="Build">
+			<Dependency>Install</Dependency>
+			<Step>Build.bat</Step>
+		</Task>
+	</Tasks>
+
+	<DatSettings BuildDeployerType="eHub.DatImplementation.Deployment.BuildDeployer, eHub.DatImplementation.Deployment" IntegrationAssembliesSubdir="DAT">
+		<SupplementaryContent>
+			<SearchPath>angular.js</SearchPath>
+			<SearchPath>tsconfig.json</SearchPath>
+			<SearchPath>node_modules\*</SearchPath>
+			<SearchPath>src\*</SearchPath>
+		</SupplementaryContent>
+		<DeploymentTargets>
+			<DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE"
+				DeploymentConfiguration="BAT=$(BinPath)\BAT\MockWebServiceEndpointsPortal.zip;p:Profile=Test;t:bat:deploy_only"
+				IsProduction="false" TimeOutInMinutes="120" />
+		</DeploymentTargets>
+	</DatSettings>
+
+</Build>

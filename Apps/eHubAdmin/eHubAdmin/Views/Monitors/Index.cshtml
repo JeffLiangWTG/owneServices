@@ -1,0 +1,107 @@
+@model IEnumerable<eServices.eHubDataModel.eHubTransactions.eHubMonitor>
+
+@{
+    ViewBag.Title = Constants.ContollerDisplayName["Monitors"];
+}
+
+<div class="col-sm-7">
+    <h2>@ViewBag.Title</h2>
+</div>
+<div class="col-sm-1">
+  <button class="btn btn-default refresh-all" id="refresh-btn-all" type="button" onclick="LoadAllMonitorCounts()">Refresh All</button>
+  <img class="glyphicon loader" id="refresh-loader-all" height="25" width="25" src="~/Content/Images/ajax-loader.gif" style="display: none" alt="Loading..." />
+</div>
+
+<table class="table">
+    <tr>
+        <th class="col-sm-2">ID</th>
+        <th class="col-sm-3">Description</th>
+        <th class="col-sm-1">Alert Delay</th>
+        <th class="col-sm-1"></th>
+        <th class="col-sm-1">Age</th>
+        <th class="col-sm-1">Queue</th>
+        <th class="col-sm-1">Enabled</th>
+        <th class="col-sm-1"></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        var btnRefreshId = item.MO_ID + "_Refresh";
+        <tr id="@item.MO_PK">
+            <td>
+                @Html.DisplayFor(modelItem => item.MO_ID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MO_Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MO_ErrorDelayMins)
+            </td>
+            <td>
+              <button class="btn btn-default refresh" type="button" id="@btnRefreshId" onclick="LoadMonitorCounts('@item.MO_ID', '@item.MO_PK', @item.MO_ErrorDelayMins)">Refresh</button>
+              <img class="glyphicon loader" id="refresh-loader" height="25" width="25" src="~/Content/Images/ajax-loader.gif" style="display: none" alt="Loading..." />
+            </td>
+            <td class="age">
+            </td>
+            <td class="queue">
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MO_Enabled)
+            </td>
+            <td>
+                @Html.ActionLink("Details", "Details", new { id = item.MO_ID })
+            </td>
+        </tr>
+    }
+</table>
+
+@section Scripts {
+  <script type="text/javascript">
+
+    function LoadMonitorCounts(id, mo_pk, alertDelay) {
+      $(`#${mo_pk} .refresh`).prop("disabled", true);
+      $(`#${mo_pk} .loader`).show();
+
+      $.ajax({
+        url: "@Url.Action("MonitorCounts")",
+        type: "POST",
+        dataType: 'json',
+        data: { 'id': id },
+        success: function (monitorCounts) {
+          $(`#${mo_pk} .age`).text(monitorCounts.Age);
+          $(`#${mo_pk} .queue`).text(monitorCounts.Queue);
+
+          CheckValAndEnableRefreshBtn(mo_pk, monitorCounts.Age, alertDelay);
+        },
+        error: function (error) {
+          CheckValAndEnableRefreshBtn(mo_pk, -1, alertDelay);
+          $(`#${mo_pk} .age`).text(error.statusText);
+          $(`#${mo_pk}`).addClass('danger');
+        }
+      });
+    }
+
+    function LoadAllMonitorCounts() {
+      $('#refresh-btn-all').prop("disabled", true);
+      $('#refresh-loader-all').show();
+
+      $('.btn.refresh').click();
+    }
+
+    function CheckValAndEnableRefreshBtn(mo_pk, age, alertDelay) {
+      $(`#${mo_pk} .refresh`).prop("disabled", false);
+      $(`#${mo_pk} .loader`).hide();
+
+      if (age > alertDelay) {
+        $(`#${mo_pk}`).addClass('danger');
+      } else {
+        $(`#${mo_pk}`).removeClass('danger');
+      }
+
+      if ($('.btn.refresh:disabled').length == 0) {
+        $('#refresh-btn-all').prop("disabled", false);
+        $('#refresh-loader-all').hide();
+      }
+    }
+  </script>
+}

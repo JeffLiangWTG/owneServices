@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DatDeploy xmlns="http://eservices.buildtools/datdeploy">
+  <Targets>
+    <Target Name="eServices.ApplicationEvent.EnrichmentService_STG_au2sp-sesv-401">
+      <Settings>
+        <Add Name="PUBLISH_ENVIRONMENT" Value="Staging" />
+        <Add Name="DEST_CONNECTION" Value="wmsvc=au2sp-sesv-401.sand.wtg.zone,username=CORP\s_eServicesDeploy,password=&quot;$(Secrets:ESERVICES_DEPLOY_PWD_TEST)&quot;" />
+        <Add Name="KAFKA_MESSAGEEVENTS_PASSWORD" Value="$(Secrets:ESERVICES_MESSAGE_EVENTS_TEST)" />
+        <Add Name="KAFKA_APPLICATIONEVENTS_PASSWORD" Value="$(Secrets:ESERVICES_APPLICATION_EVENTS_TEST)" />
+        <Add Name="EHUBTRANSACTIONS_CONNECTIONSTRING" Value="Server=eHub-test.db.sand.wtg.zone;App=eServices.ApplicationEvent.EnrichmentService;Database=eHubTransactions;User=eHubDataReader;Password=$(Secrets:EHUBDATAREADER_PWD_TEST);Encrypt=False;" />
+      </Settings>
+      <Steps>
+        <Step Command="%CMD_VERIFY_DOTNET%" />
+        <Step Command="%CMD_CLEANUP_BACKUPS%" />
+        <Step Command="%CMD_PUBLISH_TO_STAGING_DIR%" />
+        <Step Command="%CMD_BACKUP_CURRENT_FILES%" />
+        <Step Command="%CMD_STOP_SERVICE%" />
+        <Step Command="%CMD_DEPLOY_RUNTIME_FILES%" />
+        <Step Command="%CMD_DEPLOY_SERVICE%" />
+        <Step Command="%CMD_CONFIGURE_STARTUP_AUTOMATIC%" />
+      </Steps>
+    </Target>
+    <Target Name="eServices.ApplicationEvent.EnrichmentService_PRD_au2wp-smsg-403a">
+      <Settings>
+        <Add Name="PUBLISH_ENVIRONMENT" Value="Production" />
+        <Add Name="DEST_CONNECTION" Value="wmsvc=au2wp-smsg-403a.wisecloud.zone,username=PROD\s_eServicesDeploy,password=&quot;$(Secrets:ESERVICES_DEPLOY_PWD_PROD)&quot;" />
+        <Add Name="SVC_FC_GROUP" Value="%SVC_FC_GROUP_PROD%" />
+        <Add Name="KAFKA_MESSAGEEVENTS_PASSWORD" Value="$(Secrets:ESERVICES_MESSAGE_EVENTS_PROD)" />
+        <Add Name="KAFKA_APPLICATIONEVENTS_PASSWORD" Value="$(Secrets:ESERVICES_APPLICATION_EVENTS_PROD)" />
+        <Add Name="EHUBTRANSACTIONS_CONNECTIONSTRING" Value="Server=ehubtransactions.db.wisegrid.net;App=eServices.ApplicationEvent.EnrichmentService;Database=eHubTransactions;User=eHubDataReader;Password=$(Secrets:EHUBDATAREADER_PWD_PROD);Encrypt=False;ApplicationIntent=ReadOnly" />
+      </Settings>
+      <Steps>
+        <Step Command="%CMD_VERIFY_DOTNET%" />
+        <Step Command="%CMD_CLEANUP_BACKUPS%" />
+        <Step Command="%CMD_PUBLISH_TO_STAGING_DIR%" />
+        <Step Command="%CMD_BACKUP_CURRENT_FILES%" />
+        <Step Command="%CMD_MOVE_FC_GROUP%" />
+        <Step Command="%CMD_DEPLOY_RUNTIME_FILES%" />
+        <Step Command="%CMD_DEPLOY_SERVICE%" />
+        <Step Command="%CMD_CONFIGURE_STARTUP_MANUAL%" />
+        <Step Command="%CMD_MOVE_FC_GROUP_LOCAL%" />
+      </Steps>
+    </Target>
+    <Target Name="eServices.ApplicationEvent.EnrichmentService_PRD_au2wp-smsg-403b">
+      <Settings>
+        <Add Name="PUBLISH_ENVIRONMENT" Value="Production" />
+        <Add Name="DEST_CONNECTION" Value="wmsvc=au2wp-smsg-403b.wisecloud.zone,username=PROD\s_eServicesDeploy,password=&quot;$(Secrets:ESERVICES_DEPLOY_PWD_PROD)&quot;" />
+        <Add Name="SVC_FC_GROUP" Value="%SVC_FC_GROUP_PROD%" />
+        <Add Name="KAFKA_MESSAGEEVENTS_PASSWORD" Value="$(Secrets:ESERVICES_MESSAGE_EVENTS_PROD)" />
+        <Add Name="KAFKA_APPLICATIONEVENTS_PASSWORD" Value="$(Secrets:ESERVICES_APPLICATION_EVENTS_PROD)" />
+        <Add Name="EHUBTRANSACTIONS_CONNECTIONSTRING" Value="Server=ehubtransactions.db.wisegrid.net;App=eServices.ApplicationEvent.EnrichmentService;Database=eHubTransactions;User=eHubDataReader;Password=$(Secrets:EHUBDATAREADER_PWD_PROD);Encrypt=False;ApplicationIntent=ReadOnly" />
+      </Settings>
+      <Steps>
+        <Step Command="%CMD_VERIFY_DOTNET%" />
+        <Step Command="%CMD_CLEANUP_BACKUPS%" />
+        <Step Command="%CMD_PUBLISH_TO_STAGING_DIR%" />
+        <Step Command="%CMD_BACKUP_CURRENT_FILES%" />
+        <Step Command="%CMD_MOVE_FC_GROUP%" />
+        <Step Command="%CMD_DEPLOY_RUNTIME_FILES%" />
+        <Step Command="%CMD_DEPLOY_SERVICE%" />
+        <Step Command="%CMD_CONFIGURE_STARTUP_MANUAL%" />
+        <Step Command="%CMD_MOVE_FC_GROUP_LOCAL%" />
+      </Steps>
+    </Target>
+  </Targets>
+  <!-- Common Settings
+         Default settings that are available in deployments are:
+            DAT_DEPLOYMENT_CONFIGURATION  - Value of DeploymentConfiguration in Build.xml.
+            DAT_DEPLOYMENT_NAME           - DeploymentConfiguration with special characters removed.
+            DAT_SOURCE_PATH               - Path to root of repo source files.
+            DAT_BIN_PATH                  - Path to Bin folder.
+            TIMESTAMP                     - UTC time at start of build. Format is "yyyyMMdd.HHmmssZ".-->
+  <Settings>
+    <Add Name="MSDEPLOY" Value="&quot;%ProgramFiles%\IIS\Microsoft Web Deploy V3\msdeploy.exe&quot; -allowUntrusted -verbose" />
+    <Add Name="PUBLISH_PATH" Value="%DAT_BIN_PATH%\Publish\eServices.ApplicationEvent.EnrichmentService" />
+    <Add Name="DEPLOY_STAGING_DIR" Value="C:\eServices.Deploy\%DAT_DEPLOYMENT_CONFIGURATION%" />
+    <Add Name="DEPLOY_STAGING_PATH" Value="%DEPLOY_STAGING_DIR%\%TIMESTAMP%" />
+    <Add Name="SVC_NAME" Value="eServices.ApplicationEvent.EnrichmentService" />
+    <Add Name="SVC_DISPNAME" Value="eServices Application Event Enrichment" />
+    <Add Name="SVC_PATH" Value="C:\eServices\eServices.ApplicationEvent.EnrichmentService" />
+    <Add Name="SVC_FC_GROUP_PROD" Value="esv-appevents" />
+    <Add Name="CMD_VERIFY_DOTNET">
+      <![CDATA[
+%MSDEPLOY% -verb:sync -source:runCommand="powershell $runtimes = (dotnet --list-runtimes ^| Select-Object @{n='Parts';e={$_ -split ' '}} ^| Select-Object @{n='Name';e={$_.Parts[0]}}, @{n='Version';e={[version]$_.Parts[1]}}); if (-not ($runtimes ^| Where-Object { ($_.Name -eq 'Microsoft.AspNetCore.App') -and ($_.Version -ge [version]'9.0.0') }) -or -not ($runtimes ^| Where-Object { ($_.Name -eq 'Microsoft.NETCore.App') -and ($_.Version -ge [version]'9.0.0') })) { Write-Host 'Installed runtimes:'; $runtimes ^| Write-Host; throw 'Missing required dotnet runtimes' }",waitAttempts=1,waitInterval=60000 -dest:auto,%DEST_CONNECTION%
+]]></Add>
+    <Add Name="CMD_STOP_SERVICE"><![CDATA[
+%MSDEPLOY% -verb:sync -source:runCommand="powershell if (Get-Service %SVC_NAME% -ErrorAction SilentlyContinue) { Stop-Service %SVC_NAME% -Force -Verbose }",waitAttempts=1,waitInterval=60000 -dest:auto,%DEST_CONNECTION%
+]]></Add>
+    <Add Name="CMD_START_SERVICE"><![CDATA[
+%MSDEPLOY% -verb:sync -source:runCommand="powershell Start-Service %SVC_NAME% -Verbose;",waitAttempts=1,waitInterval=60000 -dest:auto,%DEST_CONNECTION%
+]]></Add>
+    <Add Name="CMD_MOVE_FC_GROUP"><![CDATA[
+%MSDEPLOY% -verb:sync -source:runCommand="powershell Get-ClusterGroup %SVC_FC_GROUP% ^| Where-Object OwnerNode -EQ $env:COMPUTERNAME ^| Move-ClusterGroup -Verbose",waitAttempts=1,waitInterval=60000 -dest:auto,%DEST_CONNECTION%
+]]></Add>
+    <Add Name="CMD_MOVE_FC_GROUP_LOCAL"><![CDATA[
+%MSDEPLOY% -verb:sync -source:runCommand="powershell Move-ClusterGroup %SVC_FC_GROUP% $env:COMPUTERNAME -Verbose",waitAttempts=1,waitInterval=60000 -dest:auto,%DEST_CONNECTION%
+]]></Add>
+    <Add Name="CMD_CLEANUP_BACKUPS"><![CDATA[
+%MSDEPLOY% -verb:sync -source:runCommand="powershell if (Test-Path %DEPLOY_STAGING_DIR%) { Get-ChildItem %DEPLOY_STAGING_DIR% ^| Sort-Object Name ^| Select-Object -SkipLast 20 ^| Where-Object { ($_.Name -match '^^\d{8}\.\d{6}Z(\.Backup)?') } ^| Where-Object { ([DateTime]::ParseExact($_.Name.Substring(0,16), 'yyyyMMdd.HHmmssZ', $null) -lt [DateTime]::UtcNow.AddDays(-30)) } ^| Remove-Item -Recurse }",waitAttempts=1,waitInterval=60000 -dest:auto,%DEST_CONNECTION%
+]]></Add>
+    <Add Name="CMD_PUBLISH_TO_STAGING_DIR"><![CDATA[
+ROBOCOPY %PUBLISH_PATH%\Deployment\%PUBLISH_ENVIRONMENT% %PUBLISH_PATH%
+IF %ERRORLEVEL% GTR 8 EXIT /B %ERRORLEVEL%
+%MSDEPLOY% -verb:sync -source:dirPath="%PUBLISH_PATH%" -dest:dirPath="%DEPLOY_STAGING_PATH%",%DEST_CONNECTION%
+]]></Add>
+    <Add Name="CMD_BACKUP_CURRENT_FILES"><![CDATA[
+%MSDEPLOY% -verb:sync -source:runCommand="IF EXIST %SVC_PATH% ROBOCOPY %SVC_PATH% %DEPLOY_STAGING_PATH%.Backup /NFL /NDL /NP /NJH /NJS /E /XD Logs & IF %ERRORLEVEL% LEQ 8 EXIT /B 0",waitAttempts=1,waitInterval=60000 -dest:auto,%DEST_CONNECTION%
+]]></Add>
+    <Add Name="CMD_DEPLOY_RUNTIME_FILES"><![CDATA[
+%MSDEPLOY% -verb:sync -source:runCommand="ROBOCOPY %DEPLOY_STAGING_PATH% %SVC_PATH% /NP /NJH /NJS /MIR /XD Logs Deployment & IF %ERRORLEVEL% LEQ 8 EXIT /B 0",waitAttempts=1,waitInterval=60000 -dest:auto,%DEST_CONNECTION%
+]]></Add>
+    <Add Name="CMD_DEPLOY_SERVICE">
+      <![CDATA[
+%MSDEPLOY% -verb:sync -source:runCommand="powershell if ((Get-Service %SVC_NAME% -ErrorAction SilentlyContinue) -eq $null) { New-Service %SVC_NAME% 'dotnet' -Verbose }; Set-ItemProperty -Path HKLM:\System\CurrentControlSet\Services\%SVC_NAME% -Name ImagePath -Value '"""C:\Program Files\dotnet\dotnet.exe""" %SVC_PATH%\eServices.ApplicationEvent.EnrichmentService.dll --environment %PUBLISH_ENVIRONMENT% --Kafka:MessageEvents:Password %KAFKA_MESSAGEEVENTS_PASSWORD% --Kafka:ApplicationEvents:Password %KAFKA_APPLICATIONEVENTS_PASSWORD% --ConnectionStrings:eHubTransactions """%EHUBTRANSACTIONS_CONNECTIONSTRING%"""'; Set-Service %SVC_NAME% -DisplayName '%SVC_DISPNAME%';",waitAttempts=1,waitInterval=60000 -dest:auto,%DEST_CONNECTION%
+IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+]]></Add>
+    <Add Name="CMD_CONFIGURE_STARTUP_AUTOMATIC"><![CDATA[
+%MSDEPLOY% -verb:sync -source:runCommand="powershell Set-Service %SVC_NAME% -StartupType Automatic -Verbose; Set-ItemProperty -Path HKLM:\System\CurrentControlSet\Services\%SVC_NAME% -Name FailureActions -Value ([Convert]::FromBase64String('gFEBAAAAAAAAAAAAAwAAABQAAAABAAAAYOoAAAEAAABg6gAAAQAAAGDqAAA=')); Start-Service %SVC_NAME% -Verbose",waitAttempts=1,waitInterval=60000 -dest:auto,%DEST_CONNECTION%
+]]></Add>
+    <Add Name="CMD_CONFIGURE_STARTUP_MANUAL"><![CDATA[
+%MSDEPLOY% -verb:sync -source:runCommand="powershell Set-Service %SVC_NAME% -StartupType Manual -Verbose;",waitAttempts=1,waitInterval=60000 -dest:auto,%DEST_CONNECTION%
+]]></Add>
+  </Settings>
+  <!-- Secrets
+       Refer to DAT User Guide for instructions on how to encrpt.
+       https://wisetechglobal.sharepoint.com/:w:/r/Development/SoftwareOperationsPublic/_layouts/15/Doc.aspx?sourcedoc=%7BB9322557-11BD-4A68-BB03-D0775B26BE4F%7D&file=DAT%20User%20Guide.docx-->
+  <Secrets>
+    <Add Name="ESERVICES_DEPLOY_PWD_TEST" Value="NsQ+3Z/iXyZJ5WD4y+Gvm9I9wF/TxlfP7kOAUc23UYVxEFOqYyj+93xYIuDj8gKjR48XSyf1dcsztK+u9rAG6S5YyRpALfj+/cP1jVLFt5qT98zfAGMb8cK/y0XI6GdM/FGTRiGzoNOBh8G5Xc2E/cee4GBwzF11A9iczZbKTxE=" />
+    <Add Name="ESERVICES_MESSAGE_EVENTS_TEST" Value="ieFqOlyeqQXQjFIyTaThZz9vMpu39c6z1IMnqEE5qjE/gtvM5X7xfLGyNXLJ41UHoXWO/6LY6hl+aiBi1VB02qVYFzLTjlUCqKXS8T3PuBviYrTyTV8+kzRP6ch3wPdWvZeXiugqN3Sa/nOYyi5JTvIc7m9GkxSP4fcb9Q772Wk=" />
+    <Add Name="ESERVICES_APPLICATION_EVENTS_TEST" Value="plqMXgacfK2d+1iWl6M443AWm2rbIPXsImcB6ZcZeLrMcr4WIxd6kT3UFG0fXyEr38Fa/wzmdAHh1aBQpRX8FBGSRIgaTdNd9WK1suMxnQ4QSLh+HHwDItVvY2+geBAoGq4S3RkvExTzRcc+Si1mYR0bceFwSfzJY/bt+lQV5wk=" />
+    <Add Name="ESERVICES_DEPLOY_PWD_PROD" Value="MauZO/OA4a2G5sfo+ME85Nz0q2eoEG61x/62iJJHvztcN6VZSzsGtyNaFLBzwKhxq6ph6cXARdw5IlfIK7Av4eVe+kNBpqPcg+nzGrN6BjJsu7NPyoaHph8QxRyS+tigfZuq7+M9mP1uJrLrdA/3UJ03uwG5j8+ozdsYRGZ1Igs=" />
+    <Add Name="ESERVICES_MESSAGE_EVENTS_PROD" Value="jBL/SZ8rpl0sV75Lnopinr7FbxFYygc55BiKtv1aFG80La2FUPMrDoE9LblD3zYEzXnWLYLW+Vd0Jd+Pet8sAXJkXJdkMLeLZe+e5GMVRO/uv6zCAVwVKDbSbaN55ZHWH+qRAUigMGM0brpM1k5OsaObjIIKiK4QgV50xNjKhn8=" />
+    <Add Name="ESERVICES_APPLICATION_EVENTS_PROD" Value="dzs+9Vm3KOL37InXK+VIQ+M1Xl4nNGMwEjw/SAl0vrCKbr+OITBCjsYAfayJLz3vbUIfuuEoY/SjGDd1UR7WK8zo4SBXl4vDevhwGJiVeJWgUpIAbrt8TkI8KF3QFjGkTomo8ya3QaIFJSHOPOpTRxgl5u3p3Zb6OAFkO6iCZnQ=" />
+    <Add Name="EHUBDATAREADER_PWD_TEST" Value="k0EEmomxb96GHJZsnDPzuddWhrpyz1yp9qL8PsBpoftrFhOzkswrI5rvnsH3wzQAH5HZpvXvNwfWxRL6TCYJtUD5n/JSNdZbsejOkDwR971Gop0slnsyLhFfY2zvOPWEtCiIN9cwnP8dKP8mFe3F4cY6H8xIeSfmP843zGZ9fgw=" />
+    <Add Name="EHUBDATAREADER_PWD_PROD" Value="VuJ7qis0AXa9q77HEyLvihr6xCGxrwdafB9v/Vz26ChcJ73xCe8luUngR6650jnskDEkjpcWQ5XQ54r72PtSC+6lVwKlaRcfeRk1fLUwDv83TZ3MnKCyzOjJk45TEG3yzyRoEkyEln7gE8vog1Uze8QMUi02qqwNmZEBC5n3v5A=" />
+  </Secrets>
+</DatDeploy>

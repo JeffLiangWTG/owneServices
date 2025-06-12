@@ -1,0 +1,358 @@
+using System;
+using System.IO;
+using System.Text;
+using CargoWise.eHub.Adapter;
+using CargoWise.eHub.Common;
+using CargoWise.eHub.Common.Extensions;
+using NUnit.Framework;
+
+namespace CargoWise.eHub.Gateway.IntegrationTests.InboxMessageHandler
+{
+    internal class Sender
+    {
+        public Guid PK;
+        public string ID;
+    }
+
+    [TestFixture]
+    public class USAirAMSMessageTest : GatewayIntegrationTestBase
+    {
+        [Test]
+        public void TestUSAirAMSMessageTest_SenderWithNoProductionLicense_MessageInsertedIntoInbox()
+        {
+            var sender = new Sender()
+            {
+                PK = SenderPKWithNoProductionLicence,
+                ID = SenderIDWithNoProductionLicence
+            };
+
+            using (var stream = new MemoryStream(Encoding.ASCII.GetBytes(SampleMessage)))
+            {
+                var message = new eHubMessage(Guid.NewGuid(), sender.ID, RecipientIDForProduction, MessageSchemaType.Xml, ApplicationCode, SchemaName, stream);
+
+                var adapter = CreateAdapter(message.SenderID, TestClientPassword);
+                adapter.Outbox.AddMessage(message);
+                adapter.SendMessages();
+
+                var content = stream.CompressAndEncode().ReadToEnd();
+
+                Assert.IsTrue(FindInboxMessage(message.TrackingID, sender.PK, ApplicationCode, RecipientPKForNonProduction, SchemaName, "", "", content, 0));
+            }
+        }
+
+        [Test]
+        public void TestUSAirAMSMessageTest_SenderWithNoProductionLicense_MessageInsertedIntoInboxWithIncorrectClientID()
+        {
+            var sender = new Sender()
+            {
+                PK = SenderPKWithNoProductionLicence,
+                ID = SenderIDWithNoProductionLicence
+            };
+
+            using (var stream = new MemoryStream(Encoding.ASCII.GetBytes(SampleMessage)))
+            {
+                var message = new eHubMessage(Guid.NewGuid(), sender.ID, RecipientIDForProduction, MessageSchemaType.Xml, ApplicationCode, SchemaName, stream);
+
+                var adapter = CreateAdapter(message.SenderID, TestClientPassword);
+                adapter.Outbox.AddMessage(message);
+                adapter.SendMessages();
+
+                var content = stream.CompressAndEncode().ReadToEnd();
+
+                Assert.IsFalse(FindInboxMessage(message.TrackingID, sender.PK, ApplicationCode, RecipientPKForProduction, SchemaName, "", "", content, 0));
+            }
+        }
+
+        [Test]
+        public void TestUSAirAMSMessageTest_SenderWithProductionLicense_MessageInsertedIntoInbox()
+        {
+            var sender = new Sender()
+            {
+                PK = SenderPKWithProductionLicense,
+                ID = SenderIDWithProductionLicence
+            };
+
+            using (var stream = new MemoryStream(Encoding.ASCII.GetBytes(SampleMessage)))
+            {
+                var message = new eHubMessage(Guid.NewGuid(), sender.ID, RecipientIDForProduction, MessageSchemaType.Xml, ApplicationCode, SchemaName, stream);
+
+                var adapter = CreateAdapter(message.SenderID, TestAuthenticatedClientPassword);
+                adapter.Outbox.AddMessage(message);
+                adapter.SendMessages();
+
+                var content = stream.CompressAndEncode().ReadToEnd();
+
+                Assert.IsTrue(FindInboxMessage(message.TrackingID, sender.PK, ApplicationCode, RecipientPKForProduction, SchemaName, "", "", content, 0));
+            }
+        }
+
+		private const string ApplicationCode = "UDM";
+
+        private const string RecipientIDForNonProduction = "USAirAMSTest";
+        private readonly Guid RecipientPKForNonProduction = Guid.Parse("38602D21-8720-435D-B7F5-F414DA5A43BA");
+
+        private const string RecipientIDForProduction = "USAirAMS";
+        private readonly Guid RecipientPKForProduction = Guid.Parse("627EFB76-BDDC-40CB-81C9-66C1B7130B90");
+
+        private const string SenderIDWithNoProductionLicence = "ENTTSTSVZ";
+        private readonly Guid SenderPKWithNoProductionLicence = Guid.Parse("E0F40A8A-FA6B-43FE-A96E-1D731D34D1DA");
+
+        private const string SenderIDWithProductionLicence = "ENTTSTSVR";
+        private readonly Guid SenderPKWithProductionLicense = Guid.Parse("C3C7C44E-2BF3-43EB-97D7-04F2C12C70E1");
+
+        private const string SchemaName = "http://www.cargowise.com/Schemas/Universal";
+        private const string SampleMessage = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<UniversalShipment xmlns=""http:=""//www.cargowise.com/Schemas/Universal/2011/11"" version=""1.1"">
+    <Shipment>
+      <DataContext>
+        <DataSourceCollection>
+          <DataSource>
+            <Type></Type>
+            <Key></Key>
+          </DataSource>
+        </DataSourceCollection>
+        <ActionPurpose>
+          <Code></Code>
+          <Description></Description>
+        </ActionPurpose>
+        <TriggerCount></TriggerCount>
+        <TriggerDescription></TriggerDescription>
+        <TriggerType></TriggerType>
+        <RecipientRoleCollection>
+          <RecipientRole>
+            <Code></Code>
+            <Description></Description>
+          </RecipientRole>
+        </RecipientRoleCollection>
+      </DataContext>
+      <Branch>
+        <Code></Code>
+        <Name></Name>
+      </Branch>
+      <LloydsIMO></LloydsIMO>
+      <PortOfDischarge>
+        <Code></Code>
+        <Name></Name>
+      </PortOfDischarge>
+      <PortOfLoading>
+        <Code></Code>
+        <Name></Name>
+      </PortOfLoading>
+      <TransportMode>
+        <Code></Code>
+        <Description></Description>
+      </TransportMode>
+      <VesselCountryOfRegistration>
+        <Code></Code>
+        <Name></Name>
+      </VesselCountryOfRegistration>
+      <VesselName></VesselName>
+      <VoyageFlightNo></VoyageFlightNo>
+      <WayBillNumber></WayBillNumber>
+      <WayBillType>
+        <Code></Code>
+        <Description></Description>
+      </WayBillType>
+      <AddInfoCollection>
+        <AddInfo>
+          <Key></Key>
+          <Value></Value>
+        </AddInfo>
+      </AddInfoCollection>
+      <DateCollection>
+        <Date>
+          <Type></Type>
+          <IsEstimate></IsEstimate>
+          <Value></Value>
+        </Date>
+      </DateCollection>
+      <OrganizationAddressCollection>
+        <OrganizationAddress>
+          <AddressType></AddressType>
+          <AddressShortCode></AddressShortCode>
+          <OrganizationCode></OrganizationCode>
+          <Address1></Address1>
+          <Address2></Address2>
+          <AddressOverride></AddressOverride>
+          <City></City>
+          <CompanyName></CompanyName>
+          <Country>
+            <Code></Code>
+            <Name></Name>
+          </Country>
+          <Email></Email>
+          <Fax></Fax>
+          <GovRegNum></GovRegNum>
+          <GovRegNumType>
+            <Code></Code>
+            <Description></Description>
+          </GovRegNumType>
+          <Phone></Phone>
+          <Port>
+            <Code></Code>
+            <Name></Name>
+          </Port>
+          <Postcode></Postcode>
+          <ScreeningStatus>
+            <Code></Code>
+            <Description></Description>
+          </ScreeningStatus>
+          <State></State>
+          <RegistrationNumberCollection>
+            <RegistrationNumber>
+              <Type>
+                <Code></Code>
+                <Description></Description>
+              </Type>
+              <CountryOfIssue>
+                <Code></Code>
+                <Name></Name>
+              </CountryOfIssue>
+              <Value></Value>
+            </RegistrationNumber>
+          </RegistrationNumberCollection>
+        </OrganizationAddress>
+      </OrganizationAddressCollection>
+      <SubShipmentCollection>
+        <SubShipment>
+          <DataContext>
+            <DataSourceCollection>
+              <DataSource>
+                <Type></Type>
+                <Key></Key>
+              </DataSource>
+            </DataSourceCollection>
+            <ActionPurpose>
+              <Code></Code>
+              <Description></Description>
+            </ActionPurpose>
+            <TriggerCount></TriggerCount>
+            <TriggerDescription></TriggerDescription>
+            <TriggerType></TriggerType>
+          </DataContext>
+          <CommercialInfo>
+            <CommercialChargeCollection>
+              <CommercialCharge>
+                <ChargeType>
+                  <Code></Code>
+                  <Description></Description>
+                </ChargeType>
+                <Amount></Amount>
+              </CommercialCharge>
+            </CommercialChargeCollection>
+          </CommercialInfo>
+          <GoodsValue></GoodsValue>
+          <PortOfDestination>
+            <Code></Code>
+            <Name></Name>
+          </PortOfDestination>
+          <PortOfOrigin>
+            <Code></Code>
+            <Name></Name>
+          </PortOfOrigin>
+          <WayBillNumber></WayBillNumber>
+          <WayBillType>
+            <Code></Code>
+            <Description></Description>
+          </WayBillType>
+          <AddInfoCollection>
+            <AddInfo>
+              <Key></Key>
+              <Value></Value>
+            </AddInfo>
+          </AddInfoCollection>
+          <ContainerCollection Content=""Complete="""">
+            <Container>
+              <ContainerNumber></ContainerNumber>
+              <ContainerType>
+                <Code></Code>
+                <Category>
+                  <Code></Code>
+                  <Description></Description>
+                </Category>
+                <Description></Description>
+                <ISOCode></ISOCode>
+              </ContainerType>
+              <IsEmptyContainer></IsEmptyContainer>
+              <Seal></Seal>
+              <SecondSeal></SecondSeal>
+              <TotalHeight></TotalHeight>
+              <TotalLength></TotalLength>
+              <TotalWidth></TotalWidth>
+              <AddInfoCollection>
+                <AddInfo>
+                  <Key></Key>
+                  <Value></Value>
+                </AddInfo>
+              </AddInfoCollection>
+            </Container>
+          </ContainerCollection>
+          <NoteCollection>
+            <Note>
+              <Description></Description>
+              <IsCustomDescription></IsCustomDescription>
+              <NoteText></NoteText>
+            </Note>
+          </NoteCollection>
+          <OrganizationAddressCollection>
+            <OrganizationAddress>
+              <AddressType></AddressType>
+              <AddressShortCode></AddressShortCode>
+              <OrganizationCode></OrganizationCode>
+              <Address1></Address1>
+              <Address2></Address2>
+              <AddressOverride></AddressOverride>
+              <City></City>
+              <CompanyName></CompanyName>
+              <Country>
+                <Code></Code>
+                <Name></Name>
+              </Country>
+              <Email></Email>
+              <Fax></Fax>
+              <GovRegNum></GovRegNum>
+              <GovRegNumType>
+                <Code></Code>
+                <Description></Description>
+              </GovRegNumType>
+              <Phone></Phone>
+              <Port>
+                <Code></Code>
+                <Name></Name>
+              </Port>
+              <Postcode></Postcode>
+              <ScreeningStatus>
+                <Code></Code>
+                <Description></Description>
+              </ScreeningStatus>
+              <State></State>
+            </OrganizationAddress>
+          </OrganizationAddressCollection>
+          <PackingLineCollection>
+            <PackingLine>
+              <GoodsDescription></GoodsDescription>
+              <HarmonisedCode></HarmonisedCode>
+              <MarksAndNos></MarksAndNos>
+              <PackQty></PackQty>
+              <PackType>
+                <Code></Code>
+                <Description></Description>
+              </PackType>
+              <Volume></Volume>
+              <VolumeUnit>
+                <Code></Code>
+                <Description></Description>
+              </VolumeUnit>
+              <Weight></Weight>
+              <WeightUnit>
+                <Code></Code>
+                <Description></Description>
+              </WeightUnit>
+            </PackingLine>
+          </PackingLineCollection>
+        </SubShipment>
+      </SubShipmentCollection>
+    </Shipment>
+</UniversalShipment>";
+    }
+}

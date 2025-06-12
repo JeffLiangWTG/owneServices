@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Build xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" MSBuild="17" xmlns="http://wisetechglobal.com/DevTools/Build.xsd">
+  <Solutions>
+    <Solution Filename="eServices.eHubAdmin.sln" Restore="true">
+    </Solution>
+  </Solutions>
+  <Dependencies>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/Shared/eHubDataModel" Name="eHubDataModel">
+      <Copy Source="Build\eServices.eHubDataModel.Common\RELEASE\net48\eServices.eHubDataModel.Common.dll" />
+      <Copy Source="Build\eServices.eHubDataModel.eHubArchiveOnline\RELEASE\net48\eServices.eHubDataModel.eHubArchiveOnline.dll" />
+      <Copy Source="Build\eServices.eHubDataModel.eHubTransactions\RELEASE\net48\eServices.eHubDataModel.eHubTransactions.dll" />
+    </Dependency>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/Shared/eHubDatabase" Name="eHubDatabase">
+      <Copy Source="Databases" Target="Databases" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\eServices.eHubDatabase.Tests.Common.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\CargoWise.eServices.TestHelpers.Database.Common.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\CargoWise.eServices.TestHelpers.Database.Deployment.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\Microsoft.Data.Tools.Schema.Sql.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\Microsoft.Data.Tools.Utilities.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\Microsoft.SqlServer.Dac.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\Microsoft.SqlServer.Dac.Extensions.dll" />
+      <Copy Source="Build\eServices.eHubDatabase.Tests.Common\Release\net48\Microsoft.SqlServer.TransactSql.ScriptDom.dll" />
+    </Dependency>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/CargoWise/_git/ApplicationManager" Path="/">
+      <Copy Source="CargoWise.ApplicationManager.Common.dll" />
+    </Dependency>
+    <Dependency Repository="https://devops.wisetechglobal.com/wtg/eServices/_git/eServices" Path="/Monitoring/HealthCheck" Name="HealthCheck">
+      <Copy Source="net45/CargoWise.eServices.Monitoring.HealthCheck.API.dll" />
+      <Copy Source="net45/CargoWise.eServices.Monitoring.HealthCheck.API.Test.dll" />
+    </Dependency>
+  </Dependencies>
+  <OtherFiles>
+  </OtherFiles>
+  <PreBuild>
+    <Command cacheable="false"><![CDATA[cmd /c dotnet tool restore && dotnet esv-dattool init --output Bin\DAT --framework net48]]></Command>
+  </PreBuild>
+  <BuildConfigurations>
+    <Configuration BuildOnDat="true" TestOnDat="true" Publishable="true" GenerateMSBuildBinLogs="true">RELEASE</Configuration>
+  </BuildConfigurations>
+  <DatSettings BuildDeployerType="eServices.BuildTools.DatDeploy.Deployer, eServices.BuildTools.DatDeploy" IntegrationAssembliesSubdir="DAT">
+    <TestAdapter Type="Dat.Implementation.NUnit3.NUnit3TestAdapter, Dat.Implementation.NUnit3">
+      <Options>
+        <Option Name="TestAssemblyFileFilter">*Tests.dll</Option>
+      </Options>
+    </TestAdapter>
+    <DeploymentTargets>
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="STAGING" IsProduction="false" />
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="RELEASE" DeploymentConfiguration="PRODUCTION" />
+    </DeploymentTargets>
+  </DatSettings>
+</Build>

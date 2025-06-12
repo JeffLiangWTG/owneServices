@@ -1,0 +1,480 @@
+﻿@page "/code-maps/edit/{id:guid}"
+@inject ILogger<Index> Logger
+@inject IAccessGroupService AccessGroupService
+@inject IDbContextFactory<eHubTransactionsContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<PageTitle>Code Map - Edit - @(CodeSet?.CS_Name ?? "Loading")</PageTitle>
+
+<h1>Code Map - Edit</h1>
+
+<hr />
+@if (CodeSet is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="hstack gap-3">
+        <dl class="mb-0">
+            <dt>Sender</dt>
+            <dd>@CodeSet.CS_CC_SenderNavigation.CC_ID</dd>
+        </dl>
+        <dl class="mb-0">
+            <dt>Recipient</dt>
+            <dd>@CodeSet.CS_CC_RecipientNavigation.CC_ID</dd>
+        </dl>
+        <dl class="mb-0">
+            <dt>Transformation Set</dt>
+            <dd>@CodeSet.CS_TSNavigation?.TS_Name</dd>
+        </dl>
+        <dl class="mb-0">
+            <dt>Code Set</dt>
+            <dd>@CodeSet.CS_Name</dd>
+        </dl>
+    </div>
+    <div class="mb-2">
+        <a href="@($"/code-maps/details/{Id}")">Details</a> |
+        <a href="@($"/code-maps/{CodeSet.CS_OW}")">Back to List</a>
+    </div>
+    <div class="mb-2">
+        <button type="button" id="uploadModalShow" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#uploadModal">
+            <i class="bi bi-upload"></i> Upload CSV
+        </button>
+    </div>
+    <div>
+        <QuickGrid Class="table w-auto" Items="@CodeSet.eHubCodeMapKey.OrderBy(x => x.CK_Order).AsQueryable()">
+            <TemplateColumn Title="Order"><strong>@context.CK_Order</strong></TemplateColumn>
+            <TemplateColumn Title="@CodeSet.CS_Key1Name"><strong>@context.CK_Key1Value</strong></TemplateColumn>
+            @if (CodeSet.CS_Key2Name != null)
+            {
+                <TemplateColumn Title="@CodeSet.CS_Key2Name"><strong>@context.CK_Key2Value</strong></TemplateColumn>
+            }
+            @if (CodeSet.CS_Key3Name != null)
+            {
+                <TemplateColumn Title="@CodeSet.CS_Key3Name"><strong>@context.CK_Key3Value</strong></TemplateColumn>
+            }
+            @if (CodeSet.CS_Key4Name != null)
+            {
+                <TemplateColumn Title="@CodeSet.CS_Key4Name"><strong>@context.CK_Key4Value</strong></TemplateColumn>
+            }
+            @if (CodeSet.CS_Key5Name != null)
+            {
+                <TemplateColumn Title="@CodeSet.CS_Key5Name"><strong>@context.CK_Key5Value</strong></TemplateColumn>
+            }
+            @foreach (var result in CodeSet.eHubCodeSetResult.OrderBy(x => x.CR_Order))
+            {
+                <TemplateColumn Title="@result.CR_Name">
+                    @context.eHubCodeMapValue.First(x => x.CV_CR == result.CR_PK).CV_OutputCode
+                </TemplateColumn>
+            }
+            <TemplateColumn>
+                <div class="hstack gap-1">
+                    <button class="btn btn-outline-primary" id="itemEdit" @onclick="@(() => DisplayItem(context, "Edit"))" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    @if (context.CK_CSNavigation.CS_Key1Name is not null)
+                    {
+                        <button class="btn btn-outline-success" id="itemInsert" @onclick="@(() => DisplayItem(context, "Insert"))" title="Insert Above">
+                            <i class="bi bi-arrow-bar-up"></i>
+                        </button>
+                    }
+                    @if (context.CK_Order < CodeSet.eHubCodeMapKey.Count)
+                    {
+                        <button class="btn btn-outline-danger" id="itemDelete" @onclick="@(() => DisplayItem(context, "Delete"))" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    }
+                </div>
+            </TemplateColumn>
+        </QuickGrid>
+    </div>
+}
+
+<button type="button" id="itemModalShow" data-bs-toggle="modal" data-bs-target="#itemModal" tabindex="-1" hidden />
+<div class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @if (Input != null)
+            {
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="itemModalLabel">@Input.Mode</h1>
+                    <button type="button" class="btn-close" id="itemModalClose" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <EditForm method="post" Model="Input" OnValidSubmit="SubmitItem" FormName="edit" Enhance>
+                    <div class="modal-body">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary role="alert" />
+                        <input type="hidden" name="Input.CK_PK" value="@Input.CK_PK" />
+                        @foreach (var key in Input.Keys)
+                        {
+                            string id = Guid.NewGuid().ToString();
+                            <div class="mb-3 row">
+                                <label for="@id" class="col-4 col-form-label">@key.Name:</label>
+                                <div class="col-8">
+                                    <InputText id="@id" @bind-Value="key.Value" class="form-control" disabled="@(Input.Mode is "Delete" || Input.Default)" />
+                                </div>
+                            </div>
+                        }
+                        @foreach (var value in Input.Values)
+                        {
+                            string id = Guid.NewGuid().ToString();
+                            <div class="mb-3 row">
+                                <label for="@id" class="col-4 col-form-label">@value.Name:</label>
+                                <div class="col-8">
+                                    <InputText id="@id" @bind-Value="value.Value" class="form-control" disabled="@(Input.Mode is "Delete")" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        @if (Input.Mode is "Edit")
+                        {
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        }
+                        @if (Input.Mode is "Insert")
+                        {
+                            <button type="submit" class="btn btn-success">Insert</button>
+                        }
+                        else if (Input.Mode is "Delete")
+                        {
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        }
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="uploadModalLabel">Upload CSV</h1>
+                <button type="button" class="btn-close" id="uploadModalClose" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <InputFile id="uploadCsv" @key="uploadCsvId" OnChange="UploadCsv" class="form-control" />
+                </div>
+                @if (csvError != null)
+                {
+                    <div class="alert alert-danger mb-3" role="alert">
+                        @csvError
+                    </div>
+                }
+                else if (csvLoading)
+                {
+                    <div class="mb-3">
+                        <p>Loading...@(csvCount > 0 ? $" {csvCount} records" : "")</p>
+                    </div>
+                }
+                else if (csvResult != null)
+                {
+                    <div class="mb-3">
+                        <p>Success. @csvResult</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private eHubCodeSet? CodeSet { get; set; }
+
+    [SupplyParameterFromForm]
+    private InputModel? Input { get; set; }
+
+    private string uploadCsvId = Guid.NewGuid().ToString();
+    private bool csvLoading = false;
+    private int csvCount = 0;
+    private string? csvError;
+    private string? csvResult;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        CodeSet ??= await LoadCodeSet(context);
+
+        if (CodeSet is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+            return;
+        }
+
+        if (!await AccessGroupService.IsAuthorizedForWrite(CodeSet!.CS_OW))
+        {
+            NavigationManager.NavigateTo("/access-denied");
+            return;
+        }
+    }
+
+    private async Task<eHubCodeSet?> LoadCodeSet(eHubTransactionsContext context)
+        => await context.eHubCodeSet.AsNoTrackingWithIdentityResolution()
+            .Include(x => x.CS_CC_SenderNavigation)
+            .Include(x => x.CS_CC_RecipientNavigation)
+            .Include(x => x.CS_TSNavigation)
+            .Include(x => x.eHubCodeSetResult)
+            .Include(x => x.eHubCodeMapKey).ThenInclude(x => x.eHubCodeMapValue)
+            .Where(x => x.CS_PK == Id)
+            .SingleOrDefaultAsync();
+
+    private async Task DisplayItem(eHubCodeMapKey item, string mode)
+    {
+        Input = new InputModel() { Mode = mode, CK_PK = item.CK_PK };
+        if (item.CK_CSNavigation.CS_Key1Name is not null)
+            Input.Keys.Add(new() { Name = item.CK_CSNavigation.CS_Key1Name, Value = mode is "Insert" ? "" : item.CK_Key1Value });
+        if (item.CK_CSNavigation.CS_Key2Name is not null)
+            Input.Keys.Add(new() { Name = item.CK_CSNavigation.CS_Key2Name, Value = mode is "Insert" ? "" : item.CK_Key2Value });
+        if (item.CK_CSNavigation.CS_Key3Name is not null)
+            Input.Keys.Add(new() { Name = item.CK_CSNavigation.CS_Key3Name, Value = mode is "Insert" ? "" : item.CK_Key3Value });
+        if (item.CK_CSNavigation.CS_Key4Name is not null)
+            Input.Keys.Add(new() { Name = item.CK_CSNavigation.CS_Key4Name, Value = mode is "Insert" ? "" : item.CK_Key4Value });
+        if (item.CK_CSNavigation.CS_Key5Name is not null)
+            Input.Keys.Add(new() { Name = item.CK_CSNavigation.CS_Key5Name, Value = mode is "Insert" ? "" : item.CK_Key5Value });
+        foreach (var value in item.eHubCodeMapValue.OrderBy(v => v.CV_CRNavigation.CR_Order))
+        {
+            Input.Values.Add(new() { Name = value.CV_CRNavigation.CR_Name, Value = mode is "Insert" ? "" : value.CV_OutputCode });
+        }
+        await JS.InvokeVoidAsync("clickElement", "itemModalShow");
+    }
+
+    private async Task SubmitItem(EditContext args)
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        if (Input!.Mode is "Edit")
+        {
+            var codeMapKey = await context.eHubCodeMapKey
+                .Include(x => x.eHubCodeMapValue).ThenInclude(x => x.CV_CRNavigation)
+                .Where(x => x.CK_PK == Input.CK_PK)
+                .SingleOrDefaultAsync();
+            if (codeMapKey is null)
+            {
+                NavigationManager.NavigateTo("notfound");
+                return;
+            }
+            var beforeValues = new[] { codeMapKey.CK_Key1Value, codeMapKey.CK_Key2Value, codeMapKey.CK_Key3Value, codeMapKey.CK_Key4Value, codeMapKey.CK_Key5Value }
+                .Concat(codeMapKey.eHubCodeMapValue.OrderBy(v => v.CV_CRNavigation.CR_Order).Select(v => v.CV_OutputCode))
+                .OfType<string>().ToList();
+
+            var beforeValuesJson = JsonSerializer.Serialize(beforeValues);
+
+            if (Input.Keys.Count > 0) codeMapKey.CK_Key1Value = Input.Keys[0].Value;
+            if (Input.Keys.Count > 1) codeMapKey.CK_Key2Value = Input.Keys[1].Value;
+            if (Input.Keys.Count > 2) codeMapKey.CK_Key3Value = Input.Keys[2].Value;
+            if (Input.Keys.Count > 3) codeMapKey.CK_Key4Value = Input.Keys[3].Value;
+            if (Input.Keys.Count > 4) codeMapKey.CK_Key5Value = Input.Keys[4].Value;
+            foreach (var value in codeMapKey.eHubCodeMapValue)
+            {
+                var inputValue = Input.Values.First(v => v.Name == value.CV_CRNavigation.CR_Name);
+                value.CV_OutputCode = inputValue.Value;
+            }
+            await context.SaveChangesAsync();
+            Logger.LogInformation("CodeMap item edited. CS_PK: {CS_PK} Name: {CS_Name} Sender: {Sender} Recipient: {Recipient} Transform: {Transform} CK_PK: {CK_PK} CK_Order: {CK_Order} Before: {Before} After: {After}", 
+                CodeSet!.CS_PK, CodeSet.CS_Name, CodeSet.CS_CC_SenderNavigation.CC_ID, CodeSet.CS_CC_RecipientNavigation.CC_ID, CodeSet.CS_TSNavigation?.TS_Name, codeMapKey.CK_PK, codeMapKey.CK_Order, 
+                JsonSerializer.Serialize(beforeValues).ToString(),
+                JsonSerializer.Serialize(Input.Keys.Concat(Input.Values).Select(v => v.Value)).ToString());
+        }
+        else if (Input.Mode is "Insert")
+        {
+            var beforeItem = await context.eHubCodeMapKey
+                .Where(x => x.CK_PK == Input.CK_PK)
+                .SingleOrDefaultAsync();
+            if (beforeItem is null)
+            {
+                NavigationManager.NavigateTo("notfound");
+                return;
+            }
+            var codeMapKey = new eHubCodeMapKey { CK_PK = Guid.NewGuid(), CK_CS = beforeItem.CK_CS, CK_Order = beforeItem.CK_Order };
+            if (Input.Keys.Count > 0) codeMapKey.CK_Key1Value = Input.Keys[0].Value;
+            if (Input.Keys.Count > 1) codeMapKey.CK_Key2Value = Input.Keys[1].Value;
+            if (Input.Keys.Count > 2) codeMapKey.CK_Key3Value = Input.Keys[2].Value;
+            if (Input.Keys.Count > 3) codeMapKey.CK_Key4Value = Input.Keys[3].Value;
+            if (Input.Keys.Count > 4) codeMapKey.CK_Key5Value = Input.Keys[4].Value;
+            foreach (var result in CodeSet!.eHubCodeSetResult.OrderBy(r => r.CR_Order))
+            {
+                codeMapKey.eHubCodeMapValue.Add(new eHubCodeMapValue
+                    {
+                        CV_CR = result.CR_PK,
+                        CV_OutputCode = Input.Values.First(v => v.Name == result.CR_Name).Value
+                    });
+            }
+            foreach (var key in await context.eHubCodeMapKey.Where(k => k.CK_CS == CodeSet.CS_PK && k.CK_Order >= beforeItem.CK_Order).ToListAsync())
+            {
+                key.CK_Order++;
+            }
+            context.eHubCodeMapKey.Add(codeMapKey);
+            await context.SaveChangesAsync();
+            Logger.LogInformation("CodeMap item inserted. CS_PK: {CS_PK} Name: {CS_Name} Sender: {Sender} Recipient: {Recipient} Transform: {Transform} CK_PK: {CK_PK} CK_Order: {CK_Order} Values: {Values}",
+                CodeSet!.CS_PK, CodeSet.CS_Name, CodeSet.CS_CC_SenderNavigation.CC_ID, CodeSet.CS_CC_RecipientNavigation.CC_ID, CodeSet.CS_TSNavigation?.TS_Name, codeMapKey.CK_PK, codeMapKey.CK_Order,
+                JsonSerializer.Serialize(Input.Keys.Concat(Input.Values).Select(v => v.Value)).ToString());
+        }
+        else if (Input.Mode is "Delete")
+        {
+            var codeMapKey = await context.eHubCodeMapKey
+                .Include(x => x.eHubCodeMapValue)
+                .Where(x => x.CK_PK == Input.CK_PK)
+                .SingleOrDefaultAsync();
+            if (codeMapKey is null)
+            {
+                NavigationManager.NavigateTo("notfound");
+                return;
+            }
+            context.eHubCodeMapValue.RemoveRange(codeMapKey.eHubCodeMapValue);
+            context.eHubCodeMapKey.Remove(codeMapKey);
+            foreach (var key in await context.eHubCodeMapKey.Where(k => k.CK_CS == CodeSet!.CS_PK && k.CK_Order > codeMapKey.CK_Order).ToListAsync())
+            {
+                key.CK_Order--;
+            }
+            await context.SaveChangesAsync();
+            Logger.LogInformation("CodeMap item deleted. CS_PK: {CS_PK} Name: {CS_Name} Sender: {Sender} Recipient: {Recipient} Transform: {Transform} CK_PK: {CK_PK} CK_Order: {CK_Order} Values: {Values}",
+                CodeSet!.CS_PK, CodeSet.CS_Name, CodeSet.CS_CC_SenderNavigation.CC_ID, CodeSet.CS_CC_RecipientNavigation.CC_ID, CodeSet.CS_TSNavigation?.TS_Name, codeMapKey.CK_PK, codeMapKey.CK_Order,
+                JsonSerializer.Serialize(Input.Keys.Concat(Input.Values).Select(v => v.Value)).ToString());
+        }
+
+        CodeSet = await LoadCodeSet(context);
+        StateHasChanged();
+        await JS.InvokeVoidAsync("clickElement", "itemModalClose");
+    }
+
+    private async Task UploadCsv(InputFileChangeEventArgs args)
+    {
+        csvLoading = true;
+        csvError = null;
+        csvCount = 0;
+
+        try
+        {
+            List<string> keys = new[] { CodeSet!.CS_Key1Name, CodeSet.CS_Key2Name, CodeSet.CS_Key3Name, CodeSet.CS_Key4Name, CodeSet.CS_Key5Name }.OfType<string>().Select(Details.GetSafeName).ToList();
+            List<string> results = CodeSet.eHubCodeSetResult.OrderBy(r => r.CR_Order).Select(r => Details.GetSafeName(r.CR_Name)).ToList();
+
+            using var fs = args.File.OpenReadStream();
+            using var sr = new StreamReader(fs);
+            using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
+
+            await csv.ReadAsync();
+            csv.ReadHeader();
+
+            if (!csv.HeaderRecord!.SequenceEqual(keys.Concat(results)))
+            {
+                csvError = "CSV headers do not match code set. Expected headers are: " + string.Join(", ", keys.Concat(results));
+                throw new Exception(csvError);
+            }
+
+            bool parsedDefault = false;
+            List<eHubCodeMapKey> eHubCodeMapKeys = new();
+            while (await csv.ReadAsync())
+            {
+                if (parsedDefault)
+                {
+                    csvError = keys.Count > 0 ? "Default record is not last." : "CSV contains more than one set of default values.";
+                    throw new Exception(csvError);
+                }
+
+                var key = new eHubCodeMapKey
+                    {
+                        CK_PK = Guid.NewGuid(),
+                        CK_Order = ++csvCount,
+                        CK_CS = this.CodeSet.CS_PK,
+                    };
+                if (keys.Count > 0) key.CK_Key1Value = csv.GetField(keys[0]);
+                if (keys.Count > 1) key.CK_Key2Value = csv.GetField(keys[1]);
+                if (keys.Count > 2) key.CK_Key3Value = csv.GetField(keys[2]);
+                if (keys.Count > 3) key.CK_Key4Value = csv.GetField(keys[3]);
+                if (keys.Count > 4) key.CK_Key5Value = csv.GetField(keys[4]);
+                foreach (var result in results)
+                {
+                    key.eHubCodeMapValue.Add(new eHubCodeMapValue
+                        {
+                            CV_CR = this.CodeSet.eHubCodeSetResult.First(x => Details.GetSafeName(x.CR_Name) == result).CR_PK,
+                            CV_OutputCode = csv.GetField(result)
+                        });
+                }
+                eHubCodeMapKeys.Add(key);
+
+                parsedDefault = key.CK_Key1Value is "%" or null
+                    && key.CK_Key2Value is "%" or null
+                    && key.CK_Key3Value is "%" or null
+                    && key.CK_Key4Value is "%" or null
+                    && key.CK_Key5Value is "%" or null;
+
+                StateHasChanged();
+            }
+
+            if (eHubCodeMapKeys.Count is 0)
+            {
+                csvError = "CSV has no records.";
+                throw new Exception(csvError);
+            }
+
+            if (!parsedDefault)
+            {
+                csvError = "Default record is missing.";
+                throw new Exception(csvError);
+            }
+
+            using var context = DbFactory.CreateDbContext();
+            CodeSet = await LoadCodeSet(context);
+
+            var codeSetBefore = await Details.FormatCodeMapCsv(CodeSet!);
+
+            foreach (var eHubCodeMapKey in CodeSet!.eHubCodeMapKey)
+            {
+                context.eHubCodeMapValue.RemoveRange(eHubCodeMapKey.eHubCodeMapValue);
+                context.eHubCodeMapKey.Remove(eHubCodeMapKey);
+            }
+
+            foreach (var eHubCodeMapKey in eHubCodeMapKeys)
+            {
+                context.eHubCodeMapKey.Add(eHubCodeMapKey);
+            }
+
+            await context.SaveChangesAsync();
+
+            csvResult = $"{csvCount} records loaded.";
+            csvLoading = false;
+            StateHasChanged();
+
+            var codeSetAfter = await Details.FormatCodeMapCsv(CodeSet);
+            Logger.LogInformation("CodeSet updated from CSV upload. CS_PK: {CS_PK} Name: {CS_Name} Sender: {Sender} Recipient: {Recipient} Transform: {Transform} FileName: {FileName} Before: {Before} After: {After}", CodeSet.CS_PK, CodeSet.CS_Name, CodeSet.CS_CC_SenderNavigation.CC_ID, CodeSet.CS_CC_RecipientNavigation.CC_ID, CodeSet.CS_TSNavigation?.TS_Name, args.File.Name, codeSetBefore, codeSetAfter);
+
+            await Task.Delay(1000);
+            await JS.InvokeVoidAsync("clickElement", "uploadModalClose");
+            csvResult = null;
+            uploadCsvId = Guid.NewGuid().ToString();
+        }
+        catch (Exception ex)
+        {
+            csvError = ex.Message;
+            throw;
+        }
+        finally
+        {
+            csvLoading = false;
+        }
+    }
+
+    private class InputModel
+    {
+        public required string Mode { get; set; }
+        public Guid CK_PK { get; set; }
+        public List<NameValue> Keys { get; set; } = new();
+        public List<NameValue> Values { get; set; } = new();
+        public bool Default => Keys.All(k => k.Value == "%");
+
+        public class NameValue
+        {
+            public required string Name { get; set; }
+            public string? Value { get; set; }
+        }
+    }
+}

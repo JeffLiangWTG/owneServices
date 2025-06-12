@@ -1,0 +1,602 @@
+@model eServices.eHubAdmin.ViewModels.Messages.InboxMessage
+
+@{
+  ViewBag.Title = "Message Details";
+}
+
+<style>
+  .popover {
+    white-space: pre-wrap;
+    max-width: 400px;
+  }
+
+  .popover-content {
+    max-height: 400px;
+    word-wrap: break-word;
+    overflow-y: auto;
+  }
+
+  .blue-glyph {
+    color: dodgerblue;
+    margin-left: 5px;
+  }
+
+  .action-glyph {
+    cursor: pointer;
+    font-size: 15px;
+  }
+
+  #pretty-print-button {
+    vertical-align: text-bottom;
+    transform: scale(1.2);
+    height: 17px;
+    width: 17px;
+  }
+</style>
+
+<h2>Message</h2>
+
+<div>
+  <h4>Detail</h4>
+  <hr />
+  @if (Model != null)
+  {
+    <dl class="dl-horizontal" style="display: inline-block">
+      <dt>@Html.DisplayNameFor(model => model.Status)</dt>
+      <dd>@Html.DisplayFor(model => model.StatusDescription)</dd>
+
+      @if (!string.IsNullOrWhiteSpace(Model.Error))
+      {
+        <dt>@Html.DisplayNameFor(model => model.Error)</dt>
+        <dd>
+          <pre id="error-message" class="pre-nowrap">@Html.DisplayFor(model => model.Error)</pre>
+          <button class="btn btn-default btn-sm" data-toggle="button" onclick="toggleErrorTextWrap()">Wrap Text</button>
+        </dd>
+      }
+
+      <dt>@Html.DisplayNameFor(model => model.ApplicationCode)</dt>
+      <dd>@Model.GetApplicationCodeAndDescription()<span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Model.GetMessageType()" title="Message Type"></span></dd>
+    </dl>
+    <div style="display:inline-block; float:right; margin-top: 10px;">
+      <label>
+        <input id="pretty-print-button" type="checkbox">
+        Pretty-Print Formatted
+      </label>
+    </div>
+    <div class="panel panel-default" id="inbox-message">
+      <div class="panel-heading">Inbox Message</div>
+      <div class="table-responsive">
+        <table class="table">
+          <tr>
+            <th>Inbox Insert</th>
+            <th>Sender</th>
+            <th>Recipient</th>
+            <th>FileName/Subject</th>
+            <th>Status (Desc)</th>
+            <th>Raw</th>
+            <th>XML</th>
+            <th>IDs</th>
+          </tr>
+          <tr>
+            <td class="received-local-time">@Model.Received.GetValueOrDefault().ToString("yyyy-MM-ddTHH:mm:ssZ")</td>
+            <td>
+              @if (!string.IsNullOrEmpty(Model.Sender))
+              {
+                @Html.DisplayFor(model => model.Sender)
+                <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Model.GetMoreInfo(Model.SenderObject)" title="@Html.DisplayFor(modelItem => Model.Sender)"></span>
+              }
+            </td>
+            <td>
+              @if (!string.IsNullOrEmpty(Model.Recipient))
+              {
+                @Html.DisplayFor(model => model.Recipient)
+                <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Model.GetMoreInfo(Model.RecipientObject)" title="@Html.DisplayFor(modelItem => Model.Recipient)"></span>
+              }
+            </td>
+
+            <td>
+              @if (!string.IsNullOrWhiteSpace(Model.FileName))
+              {
+                @Html.DisplayFor(model => model.FileName)
+              }
+              @if (!string.IsNullOrWhiteSpace(Model.Subject))
+              {
+                if (!string.IsNullOrWhiteSpace(Model.FileName))
+                {
+                  <br />
+                }
+              }
+            </td>
+            <td>@Html.DisplayFor(model => model.FullStatus)</td>
+            <td style="white-space: nowrap">
+              @if (Model.ContentRawLength.GetValueOrDefault() > 0)
+              {
+                <span>@Model.ContentRawLength.Value B</span>
+                <span tabindex="0" class="glyphicon glyphicon-search blue-glyph action-glyph preview-click" data-placement="left" preview-id="InboxRaw" message-pk="@(Model.PK)" archive-pk="@(Model.AM_PK)" data-toggle="popover" data-trigger="focus" data-content="Retrieving, please wait..." title="Preview"></span>
+                <a href="#" class="view-click" onClick="viewClick('InboxRaw', '@Model.PK', '@Model.AM_PK', event)" target="_blank"> <span class="glyphicon glyphicon-eye-open blue-glyph"></span></a>
+                <a href="#" class="download-click" onClick="downloadClick('InboxRaw', '@Model.PK', '@Model.AM_PK', event)"><span class="glyphicon glyphicon-save blue-glyph"></span></a>
+              }
+            </td>
+            <td style="white-space: nowrap">
+              @if (Model.ContentXmlLength.GetValueOrDefault() > 0)
+              {
+                <span>@Model.ContentXmlLength.Value B</span>
+                <span tabindex="0" class="glyphicon glyphicon-search blue-glyph action-glyph preview-click" data-placement="left" preview-id="InboxXml" message-pk="@(Model.PK)" archive-pk="@(Model.AM_PK)" data-toggle="popover" data-trigger="focus" data-content="Retrieving, please wait..." title="Preview"></span>
+                <a href="../Messages/Download/InboxXml?EI_PK=@(Model.PK)&AM_PK=@(Model.AM_PK)" target="_blank"><span class="glyphicon glyphicon-eye-open blue-glyph"></span></a>
+                <a download href="../Messages/Download/InboxXml?EI_PK=@(Model.PK)&AM_PK=@(Model.AM_PK)"><span class="glyphicon glyphicon-save blue-glyph"></span></a>
+              }
+            </td>
+            <td>
+              <span tabindex="0" class="more-info glyphicon glyphicon-asterisk blue-glyph action-glyph" data-placement="left" style="font-size:15px" aria-hidden="true" data-toggle="popover" data-trigger="focus" data-content="@Model.GetPKIDsHTML()" title="IDs" data-html="true"></span>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    if (Model.OutboxMessages.Any())
+    {
+      <div class="panel panel-default">
+        <div class="panel-heading">Outbox Message(s)</div>
+        <div class="table-responsive">
+          <table class="table">
+            <tr>
+              <th>Outbox Insert</th>
+              <th>Sender</th>
+              <th>Recipient</th>
+              <th>FileName/Subject</th>
+              <th>Status (Desc)</th>
+              <th>Raw</th>
+              <th>XML</th>
+              <th>IDs</th>
+            </tr>
+            @foreach (var outboxMsg in Model.OutboxMessages)
+            {
+              <tr>
+                <td>
+                  <span class="processed-local-time">@outboxMsg.Processed.GetValueOrDefault().ToString("yyyy-MM-ddTHH:mm:ssZ")</span>
+                  @if (outboxMsg.Delivered.HasValue)
+                  {
+                    <span class="delivered-local-time more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content='@outboxMsg.Delivered.Value.ToString("yyyy-MM-ddTHH:mm:ssZ")' title="Delivered"></span>
+                  }
+                </td>
+                <td>
+                  @if (!string.IsNullOrEmpty(outboxMsg.Sender))
+                  {
+                    @Html.DisplayFor(model => outboxMsg.Sender)
+                    <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Model.GetMoreInfo(outboxMsg.SenderObject)" title="@Html.DisplayFor(modelItem => outboxMsg.Sender)"></span>
+                  }
+                </td>
+                <td>
+                  @if (!string.IsNullOrEmpty(outboxMsg.Recipient))
+                  {
+                    @Html.DisplayFor(model => outboxMsg.Recipient)
+                    <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-content="@Model.GetMoreInfo(outboxMsg.RecipientObject)" title="@Html.DisplayFor(modelItem => outboxMsg.Recipient)"></span>
+                  }
+                </td>
+                <td>
+                  @if (!string.IsNullOrWhiteSpace(outboxMsg.FileName))
+                  {
+                    @outboxMsg.FileName
+                  }
+                  @if (!string.IsNullOrWhiteSpace(outboxMsg.Subject))
+                  {
+                    if (!string.IsNullOrWhiteSpace(outboxMsg.FileName))
+                    {
+                      <br />
+                    }
+                  }
+                </td>
+                @if (string.IsNullOrWhiteSpace(outboxMsg.Error))
+                {
+                  <td>@outboxMsg.FullStatus</td>
+                }
+                else
+                {
+                  <td data-toggle="tooltip" data-placement="bottom" data-container="body" title="@(outboxMsg.Error)">@outboxMsg.FullStatus</td>
+                }
+                <td style="white-space: nowrap">
+                  @if (outboxMsg.ContentRawLength.GetValueOrDefault() > 0)
+                  {
+                    <span>@outboxMsg.ContentRawLength.Value B</span>
+                    <span tabindex="0" class="glyphicon glyphicon-search blue-glyph action-glyph preview-click" data-placement="left" preview-id="OutboxRaw" message-pk="@(outboxMsg.PK)" archive-pk="@(outboxMsg.AM_PK)" data-toggle="popover" data-trigger="focus" data-content="Retrieving, please wait..." title="Preview"></span>
+                    <a href="#" class="view-click" onClick="viewClick('OutboxRaw', '@(outboxMsg.PK)', '@(outboxMsg.AM_PK)', event)" target="_blank"> <span class="glyphicon glyphicon-eye-open blue-glyph"></span></a>
+                    <a href="#" class="download-click" onClick="downloadClick('OutboxRaw','@(outboxMsg.PK)', '@(outboxMsg.AM_PK)', event)"><span class="glyphicon glyphicon-save blue-glyph"></span></a>
+                  }
+                </td>
+                <td style="white-space: nowrap">
+                  @if (outboxMsg.ContentXmlLength.GetValueOrDefault() > 0)
+                  {
+                    <span>@outboxMsg.ContentXmlLength.Value B</span>
+                    <span tabindex="0" class="glyphicon glyphicon-search blue-glyph action-glyph preview-click" data-placement="left" preview-id="OutboxXml" message-pk="@(outboxMsg.PK)" archive-pk="@(outboxMsg.AM_PK)" data-toggle="popover" data-trigger="focus" data-content="Retrieving, please wait..." title="Preview"></span>
+                    <a href="../Messages/Download/OutboxXml?OI_PK=@(outboxMsg.PK)&AM_PK=@(outboxMsg.AM_PK)" target="_blank"><span class="glyphicon glyphicon-eye-open blue-glyph"></span></a>
+                    <a download href="../Messages/Download/OutboxXml?OI_PK=@(outboxMsg.PK)&AM_PK=@(outboxMsg.AM_PK)"><span class="glyphicon glyphicon-save blue-glyph"></span></a>
+                  }
+                </td>
+                <td>
+                  <span tabindex="0" class="more-info glyphicon glyphicon-asterisk blue-glyph action-glyph" data-placement="left" style="font-size:15px" aria-hidden="true" data-toggle="popover" data-trigger="focus" data-content="@outboxMsg.GetPKIDsHTML()" title="IDs" data-html="true"></span>
+                </td>
+              </tr>
+            }
+          </table>
+        </div>
+      </div>
+    }
+
+    var inboxStatus = Model.Status;
+    var outboxStatus = Model.OutboxMessages.FirstOrDefault() == null ? null : Model.OutboxMessages.FirstOrDefault().Status;
+    var isOutboxSendingMsgFound = (Model.OutboxMessages != null && Model.OutboxMessages.Any(o => o.Status >= 1));
+    var notInitiatedColor = "#D9D9D9";
+    var errorColor = "#FF6666";
+    var completedColor = "#C5E0B3";
+    var currentOrBusyColor = "#F7CAAC";
+    <div style="padding-right:0;padding-left:0" class="panel panel-default col-md-10">
+      <div class="panel-heading">EDI State Transition From CargoWise One</div>
+      <div class="table-responsive">
+        <table class="table">
+          <tr>
+            <th style="width:200px">eHub Inbox</th>
+            @if (inboxStatus == 255)
+            {
+              <th style="background-color:@(inboxStatus == 255 ? errorColor : notInitiatedColor)">
+                255 - Error
+                <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.EHubMessageStatusDescription["Inbox_255_Error"]" title="255 - Error"></span>
+              </th>
+            }
+            else
+            {
+              <th style="background-color:@(inboxStatus != 255 ? completedColor : notInitiatedColor)">
+                0 - Received
+                <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.EHubMessageStatusDescription["Inbox_0_Received"]" title="0 - Received"></span>
+              </th>
+              <th style="background-color:@(inboxStatus != 255 ? inboxStatus == 0 ? currentOrBusyColor : completedColor : notInitiatedColor)">
+                1 - Processing
+                <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.EHubMessageStatusDescription["Inbox_1_Processing"]" title="1 - Processing"></span>
+              </th>
+              <th style="background-color:@(inboxStatus != 255 && inboxStatus >= 1 ? inboxStatus == 1 ? currentOrBusyColor : completedColor : notInitiatedColor )">
+                @(inboxStatus != 255 && inboxStatus >= 2 && isOutboxSendingMsgFound ? "2 - Sending" : "2 - Processed")
+                <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@(inboxStatus != 255 && inboxStatus >= 2 && isOutboxSendingMsgFound ? Constants.EHubMessageStatusDescription["Inbox_2_Sending"] : Constants.EHubMessageStatusDescription["Inbox_2_Processed"])"
+                      title="@(inboxStatus != 255 && inboxStatus >= 2 && isOutboxSendingMsgFound ? "2 - Sending" : "2 - Processed")"></span>
+              </th>
+              <th style="background-color:@(inboxStatus != 255 && inboxStatus >= 2 ? inboxStatus == 2 ? currentOrBusyColor : completedColor : notInitiatedColor)">
+                3 - Delivered
+                <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.EHubMessageStatusDescription["Inbox_3_Delivered"]" title="3 - Delivered"></span>
+              </th>
+              <th style="background-color:@(inboxStatus == 3 ? !Model.AM_PK.HasValue ? currentOrBusyColor : completedColor : notInitiatedColor)">
+                3 - Archived
+                <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.EHubMessageStatusDescription["Inbox_3_Archived"]" title="3 - Archived"></span>
+              </th>
+            }
+          </tr>
+          <tr>
+            <th style="width:200px">CargoWise One</th>
+            @if (inboxStatus == 255)
+            {
+              <th style="background-color:@(inboxStatus == 255 ? errorColor : notInitiatedColor)">
+                FAL - Failed
+                <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-html="true" data-content="@Constants.CargowiseOneMessageStatusDescription["Inbox_FAL"]" title="FAL - Failed"></span>
+              </th>
+            }
+            else
+            {
+              <th style="background-color:@(inboxStatus != 255 ? inboxStatus <= 1 ? currentOrBusyColor : completedColor : notInitiatedColor )">
+                HPN - eHub Pending
+                <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.CargowiseOneMessageStatusDescription["Inbox_HPN"]" title="HPN - eHub Pending"></span>
+              </th>
+              <th style="background-color:@(inboxStatus != 255 ? inboxStatus <= 1 ? currentOrBusyColor : completedColor : notInitiatedColor )"></th>
+              <th style="background-color:@(inboxStatus != 255 ? inboxStatus <= 1 ? currentOrBusyColor : completedColor : notInitiatedColor )"></th>
+              <th style="background-color:@(inboxStatus != 255 && inboxStatus >= 2 ? inboxStatus == 2 ? currentOrBusyColor : completedColor : notInitiatedColor)">
+                SNT - Sent
+                <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.CargowiseOneMessageStatusDescription["Inbox_SNT"]" title="SNT - Sent"></span>
+              </th>
+              <th style="background-color:@(inboxStatus != 255 && inboxStatus >= 2 ? inboxStatus == 2 ? currentOrBusyColor : completedColor : notInitiatedColor)"></th>
+            }
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="clearfix"></div>
+
+    if (Model.OutboxMessages.Any())
+    {
+      <div style="padding-right:0;padding-left:0" class="panel panel-default col-md-10">
+        <div class="panel-heading">EDI State Transition To CargoWise One</div>
+        <div class="table-responsive">
+          <table class="table">
+            <tr>
+              <th style="width:200px">eHub Outbox</th>
+              @if (outboxStatus == 255)
+              {
+                <th style="background-color:@(outboxStatus == 255 ? errorColor : notInitiatedColor)">
+                  255 - Error
+                  <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.EHubMessageStatusDescription["Outbox_255_Error"]" title="255 - Error"></span>
+                </th>
+              }
+              else
+              {
+                <th style="background-color:@(outboxStatus != 255 ? completedColor : notInitiatedColor)">
+                  0 - Send Queue
+                  <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.EHubMessageStatusDescription["Outbox_0_SendQueue"]" title="0 - Send Queue"></span>
+                </th>
+                <th style="background-color:@(outboxStatus != 255 ? outboxStatus == 0 ? currentOrBusyColor : completedColor : notInitiatedColor)">
+                  1 - Sending
+                  <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.EHubMessageStatusDescription["Outbox_1_Sending"]" title="1 - Sending"></span>
+                </th>
+                <th style="background-color:@(outboxStatus != 255 && outboxStatus >= 1 ? outboxStatus == 1 ? currentOrBusyColor : completedColor : notInitiatedColor)">
+                  3 - Delivered
+                  <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.EHubMessageStatusDescription["Outbox_3_Delivered"]" title="3 - Delivered"></span>
+                </th>
+              }
+            </tr>
+            <tr>
+              <th style="width:200px">CargoWise One</th>
+              @if (outboxStatus == 255)
+              {
+                <th style="background-color:@(outboxStatus == 255 ? errorColor : notInitiatedColor)">
+                  ERR - Failed
+                  <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.CargowiseOneMessageStatusDescription["Outbox_ERR"]" title="ERR - Failed"></span>
+                </th>
+              }
+              else
+              {
+                <th style="background-color:@(outboxStatus != 255 ? completedColor : notInitiatedColor)">
+                  HPN - eHub Pending
+                  <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.CargowiseOneMessageStatusDescription["Outbox_HPN"]" title="HPN - eHub Pending"></span>
+                </th>
+                <th style="background-color:@(outboxStatus != 255 ? outboxStatus == 0 ? currentOrBusyColor : completedColor : notInitiatedColor)">
+                  QUE - Queued
+                  <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.CargowiseOneMessageStatusDescription["Outbox_QUE"]" title="QUE - Queued"></span>
+                </th>
+                <th style="background-color:@(outboxStatus != 255 && outboxStatus >= 1 ? outboxStatus == 1 ? currentOrBusyColor : completedColor : notInitiatedColor)">
+                  RCV - Received
+                  <span class="more-info glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" data-trigger="hover" data-placement="top" data-content="@Constants.CargowiseOneMessageStatusDescription["Outbox_RCV"]" title="RCV - Received"></span>
+                </th>
+              }
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+    }
+    <button style="background-color:@(notInitiatedColor);opacity:unset" type="button" class="btn disabled">Not Initiated</button>
+    <button style="background-color:@(errorColor);opacity:unset" type="button" class="btn disabled">Error</button>
+    <button style="background-color:@(completedColor);opacity:unset" type="button" class="btn disabled">Completed</button>
+    <button style="background-color:@(currentOrBusyColor);opacity:unset" type="button" class="btn disabled">Current/Busy</button>
+  }
+  else
+  {
+    <p class="text-danger">Message not found.</p>
+  }
+</div>
+
+@section Scripts {
+
+<script type="text/javascript">
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip();
+      $('[data-toggle="popover"]').popover();
+      $('.popover-dismiss').popover({
+        trigger: 'focus'
+      });
+
+      $('.received-local-time').each(function () {
+        var utcTime = $(this).text();
+        var localTime = new Date(utcTime);
+        var offset = localTime.getTimezoneOffset();
+        $(this).text(formatDateTime(localTime) + ' ' + formatOffset(offset));
+      });
+
+      $('.processed-local-time').each(function () {
+        var utcTime = $(this).text();
+        var localTime = new Date(utcTime);
+        var offset = localTime.getTimezoneOffset();
+        $(this).text(formatDateTime(localTime) + ' ' + formatOffset(offset));
+      });
+
+      $('span[class~="delivered-local-time"]').each(function () {
+        var utcTime = $(this).attr('data-content');
+        var localTime = new Date(utcTime);
+        var offset = localTime.getTimezoneOffset();
+        $(this).attr('data-content', formatDateTime(localTime) + ' ' + formatOffset(offset));
+      });
+    });
+
+    function formatDateTime(dateTime) {
+      var formattedDate = dateTime.getFullYear().toString() + '-' + (dateTime.getMonth() + 1).toString().padStart(2, '0') + '-' + dateTime.getDate().toString().padStart(2, '0');
+      var formattedTime = dateTime.getHours().toString().padStart(2, '0') + ':' + dateTime.getMinutes().toString().padStart(2, '0') + ':' + dateTime.getSeconds().toString().padStart(2, '0');
+      return formattedDate + ' ' + formattedTime;
+    }
+
+    function formatOffset(offset) {
+      var unsignedOffset = Math.abs(offset);
+      var result = Math.trunc(unsignedOffset / 60).toString().padStart(2, '0') + ':' + (unsignedOffset % 60).toString().padStart(2, '0');
+      if (offset > 0) {
+        result = '-' + result;
+      } else {
+        result = '+' + result;
+      }
+      return result;
+    }
+
+    var errorTextWrap = false;
+    function toggleErrorTextWrap() {
+      errorTextWrap = !errorTextWrap;
+      if (errorTextWrap) {
+        $('#error-message').removeClass('pre-nowrap');
+        $('#error-message').addClass('pre-wrap');
+      }
+      else {
+        $('#error-message').removeClass('pre-wrap');
+        $('#error-message').addClass('pre-nowrap');
+      }
+    }
+
+    function copyToClipboard(text) {
+      var copyTest = document.queryCommandSupported('copy');
+
+      if (copyTest === true) {
+        var copyTextArea = document.createElement("textarea");
+        copyTextArea.value = text;
+        document.body.appendChild(copyTextArea);
+        copyTextArea.select();
+        try {
+          var successful = document.execCommand('copy');
+        } catch (err) {
+          console.log('Unable to copy');
+        }
+        document.body.removeChild(copyTextArea);
+      } else {
+        window.prompt("Copy to clipboard: Ctrl+C or Command+C, Enter", text);
+      }
+    }
+
+    $(document).on("mousedown", ".copy-click", function () {
+      var text = $(this).attr('data-copy');
+      copyToClipboard(text);
+    });
+
+    function createUrl(buttonID, messagePK, archivePK) {
+        var url = "@Url.Action("Download", "Messages")/";
+
+        url += buttonID;
+        url += '?';
+        if (buttonID.includes('Inbox')) {
+            url += 'EI_PK=' + messagePK;
+        }
+        if (buttonID.includes('Outbox')) {
+            url += 'OI_PK=' + messagePK;
+        }
+        url += '&AM_PK=' + archivePK;
+
+        return url;
+    }
+
+    async function fetchPreview(url, control) {
+        var popover;
+
+        try {
+            var response = await fetch(url);
+            if (!response.ok) {
+                popover = control.attr('data-content', 'ERROR: Cannot preview data\n\n' + response.statusText).data('bs.popover');
+                popover.setContent();
+                control.popover('show');
+                return;
+            }
+
+            var data = await response.text();
+            var finalResponse = formatPrettyPrint(true, data);
+            finalResponse = finalResponse.substring(0, 1024);
+            popover = control.attr('data-content', finalResponse).data('bs.popover');
+        } catch (error) {
+            popover = control.attr('data-content', 'ERROR: Cannot preview data\n\n' + error).data('bs.popover');
+        }
+
+        popover.setContent();
+        control.popover('show');
+    }
+
+    $(document).on("click", ".preview-click", function () {
+        if (($(this).attr('data-content')).substring(0, 10) != 'Retrieving') {
+            return;
+        }
+        $(this).attr('visibility', 'visible');
+        var previewID = $(this).attr('preview-id');
+        var messagePK = $(this).attr('message-pk') || '';
+        var archivePK = $(this).attr('archive-pk') || '';
+
+        var url = createUrl(previewID, messagePK, archivePK);
+        fetchPreview(url, $(this));
+    });
+
+    async function downloadClick(downloadID, messagePK, archivePK, event) {
+        event.preventDefault();
+        var url = createUrl(downloadID, messagePK, archivePK);
+        var linkElement = document.createElement('a');
+        linkElement.download = downloadID;
+
+        try {
+            var response = await fetch(url);
+            if (!response.ok) {
+                console.log(response.statusText);
+                linkElement.href = url;
+                linkElement.click();
+                linkElement.remove();
+                return;
+            }
+
+            var data = await response.arrayBuffer();
+            var isChecked = $("#pretty-print-button").prop('checked');
+            var finalResponse = formatPrettyPrint(isChecked, data);
+            var downloadBlob = new Blob([finalResponse], { type: 'text/plain' });
+            linkElement.href = window.URL.createObjectURL(downloadBlob);
+        } catch (error) {
+            console.log(error);
+            linkElement.href = url;
+        }
+
+        linkElement.click();
+        linkElement.remove();
+    }
+
+    async function viewClick(viewID, messagePK, archivePK, event) {
+        event.preventDefault();
+        var url = createUrl(viewID, messagePK, archivePK);
+
+        try {
+            var response = await fetch(url);
+            if (!response.ok) {
+                displayError(url, response.statusText);
+                return;
+            }
+
+            var data = await response.text();
+            var isChecked = $("#pretty-print-button").prop('checked');
+            var finalResponse = formatPrettyPrint(isChecked, data);
+            var w = window.open(url);
+
+            w.document.writeln("<pre style='word-wrap: break-word; white-space: pre-wrap;'></pre>");
+            $(w.document).find("pre").text(finalResponse);
+            w.history.pushState("", "", url);
+        } catch (error) {
+            displayError(url, error);
+        }
+    }
+
+    function displayError(url, error) {
+        var w = window.open(url);
+        w.document.writeln(error);
+        w.history.pushState("", "", url);
+    }
+
+    function formatPrettyPrint(isChecked, data) {
+        var result = data;
+        if (isChecked) {
+            try {
+                data = new TextDecoder().decode(data);
+            } catch {
+                // data is already decoded.
+            }
+            result = data.split(/\r?\n/).map(replaceLineSeparators).join("\n");
+        }
+        return result;
+    }
+
+    function replaceLineSeparators(result) {
+        var edifactStart = new RegExp(/^(UNA:|UNB\+)/);
+        var edifactEnd = new RegExp(/(\'UNZ\+)[^\']+\'$/);
+        if (edifactStart.test(result) && edifactEnd.test(result)) {
+            var linefeedRegex = new RegExp(/(?<!\?)\'/g);
+            result = result.replace(linefeedRegex, "\'\n");
+        }
+
+        var x12Start = new RegExp(/^(ISA\*)/);
+        var x12End = new RegExp(/(\~IEA\*)[^\~]+\~$/);
+        if (x12Start.test(result) && x12End.test(result)) {
+            var linefeedRegex = new RegExp(/\~/g);
+            result = result.replace(linefeedRegex, "\~\n");
+        }
+        return result;
+    }
+
+</script>
+}

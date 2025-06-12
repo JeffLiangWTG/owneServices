@@ -1,0 +1,116 @@
+﻿<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+
+        <a class="navbar-brand" href="">
+            <img src="CW_Icon_RGB_BLUE_Logo.svg" alt="Logo" class="d-inline-block align-text-top" height="24" />
+            eHubPortal
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <AuthorizeView Policy="@AccessGroups.GlobalReadOnly">
+                    <Authorized>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-grid-1x2-fill" aria-hidden="true"></i>
+                                General
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="code-maps">
+                                        Code Maps
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Policy="@AccessGroups.AirReadOnly">
+                    <Authorized>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-airplane-fill" aria-hidden="true"></i>
+                                Air
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="@("code-maps/" + @OwnerId.Air)">
+                                        Code Maps
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Policy="@AccessGroups.CustomsReadOnly">
+                    <Authorized>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-building-fill" aria-hidden="true"></i>
+                                Customs
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="@("code-maps/" + @OwnerId.Customs)">
+                                        Code Maps
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Policy="@AccessGroups.OceanReadOnly">
+                    <Authorized>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-water" aria-hidden="true"></i>
+                                Ocean
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="@("code-maps/" + @OwnerId.Ocean)">
+                                        Code Maps
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Policy="@AccessGroups.Admin">
+                    <Authorized>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+                                eServices
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="@("code-maps/" + @OwnerId.eServices)">
+                                        Code Maps
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+            </ul>
+
+            <div class="d-flex gap-2">
+                <AuthorizeView>
+                    <Authorized>
+                        Hello, @context.User.Identity?.Name!
+                        <a href="MicrosoftIdentity/Account/SignOut">Log out</a>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="MicrosoftIdentity/Account/SignIn">Log in</a>
+                    </NotAuthorized>
+                </AuthorizeView>
+                <a href="/about">About</a>
+            </div>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,122 @@
+<div ng-class="hasId ? '' : 'jumbotron'" ng-cloak>
+    <h1 *ngIf="!hasId">Message Box</h1>
+    <div id="messageBoxHead" class="row no-margin">
+        <div class="col-md-12">
+            <br />
+            <div class="row" *ngIf="hasId">
+                <app-status [status]="messageBoxStatus"></app-status>
+            </div>
+			<div class="row" *ngIf="hasId">
+                <h3><a [routerLink]="['/messages', id]">{{title}}</a> <div *ngIf="subfolder">/{{subfolder}}</div></h3>
+            </div>
+            <div class="row" *ngIf="hasId">
+                <div class="input-group input-group-sm mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="search-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                    <input type="text" class="form-control full-width" placeholder="Search" aria-label="Search" aria-describedby="search-addon" [(ngModel)]="searchText" />
+                </div>
+                <div class="text-end mb-2">
+                    {{isVisibleFiles ? "active" : "inactive"}} messages
+                    <label class="switch">
+                        <input type="checkbox" [checked]="isVisibleFiles" (change)="isVisibleFiles = !isVisibleFiles; activeToggle()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="row" *ngIf="hasId">
+                <div class="list-group messagebox">
+                    <div class="list-group-item list-group-item-info active">
+                        <div class="row">
+                            <div class="col-md-3 col-sm-11">Name</div>
+                            <div class="col-md-1 text-end">Size(kb)</div>
+                            <div class="col-md-2 text-end">Created on</div>
+                            <div class="col-md-2 text-end">Modified on</div>
+                            <div class="col-md-4 text-end">{{isVisibleFiles ? "Inactive/Clone to Inactive" : "Active/Clone to Active"}}/View/Edit/Download/Remove</div>
+                        </div>
+                    </div>
+                    <div class="messagebox-rows">
+                        <div *ngIf="subfolder" class="list-group-item message-row">
+                            <div class="row">
+                                <div class="col-md-12 wraptext"><a [routerLink]="['/messages', id, getFolderPath('..')]"><i class="fa fa-folder-open"></i>..</a></div>
+                            </div>
+                        </div>
+                        <div *ngFor="let folder of folders | nameFilter: searchText" class="list-group-item message-row">
+                            <div class="row">
+                                <div class="col-md-3 wraptext"><a [routerLink]="['/messages', id, getFolderPath(folder.name)]"><i class="fa fa-folder-open"></i> {{folder.name}} </a></div>
+								<div class="col-md-1 text-end"></div>
+                                <div class="col-md-2 text-end"></div>
+                                <div class="col-md-2 text-end"></div>
+                                <div class="col-md-4 text-end">
+                                    <button type="button" class="btn btn-sm btn-danger" (click)="removeDir(folder)" title="Remove folder">
+                                        <span class="fa fa-trash"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngFor="let message of messages | nameFilter: searchText" class="list-group-item message-row">
+                            <div class="row" id="{{message.name}}">
+                                <div class="col-md-3 wraptext">{{message.name}}</div>
+                                <div class="col-md-1 text-end">{{message.size}}</div>
+                                <div class="col-md-2 text-end">{{message.created | date: 'dd/MM/yyyy hh:mm'}}</div>
+                                <div class="col-md-2 text-end">{{message.modified | date: 'dd/MM/yyyy hh:mm'}}</div>
+                                <div class="col-md-4 text-end">
+                                    <button type="button" class="btn btn-sm btn-light" *ngIf="!isVisibleFiles" (click)="active(message, 'false')" title="Active message">
+                                        <span class="fa fa-check-circle"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-primary" *ngIf="!isVisibleFiles" (click)="active(message, 'true')" title="Copy to Active">
+                                        <span class="fa fa-copy"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-secondary" *ngIf="isVisibleFiles" (click)="inactive(message, 'false')" title="Inactive message">
+                                        <span class="fa fa-times-circle"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-primary" *ngIf="isVisibleFiles" (click)="inactive(message, 'true')" title="Copy to Inactive">
+                                        <span class="fa fa-copy"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-info" (click)="view(message, false)" title="View message">
+                                        <span class="fa fa-eye"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-warning" (click)="edit(message)" title="Edit message">
+                                        <span class="fa fa-pencil-alt"></span>
+                                    </button>
+                                    <a class="btn btn-sm btn-success" href="{{mockEndpointsUrl}}/api/message/{{getPath()}}/download/{{message.name}}" download title="Download message">
+                                        <span class="fa fa-download"></span>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" (click)="remove(message)" title="Remove message">
+                                        <span class="fa fa-trash"></span>
+                                    </button>
+                                </div>
+                            </div>
+							<div class="alert alert-info word-wrap" [hidden]="!message.content" role="alert">
+								<div class="row">
+									<div class="col-md-6">
+										<span class="fa fa-envelope"></span> <strong>Message</strong>
+										<button type="button" class="btn btn-outline-info btn-sm" [cdkCopyToClipboard]="message.content">Copy</button>
+										<i class="fa fa-refresh fa-spin fa-3x fa-fw" *ngIf="message.status === MessageStatus.Saving"></i>
+										<span class="sr-only" *ngIf="message.status === MessageStatus.Saving">Loading...</span>
+									</div>
+									<div class="col-md-6 text-end">
+										<button type="button" class="btn btn-sm btn-success" *ngIf="message.status === MessageStatus.Editing" (click)="saveEditing(message)">
+											<span class="fa fa-circle-check"></span>
+										</button>
+										<button type="button" class="btn btn-sm btn-danger" (click)="close(message)">
+											<span class="fa fa-circle-xmark"></span>
+										</button>
+									</div>
+								</div>
+								<hr class="message-inner-separator">
+                                <div class="row">
+                                    <textarea class="form-control" *ngIf="message.status === MessageStatus.Editing" [(ngModel)]="message.content" editAutoSize style="resize: none; overflow-y:hidden;"></textarea>
+                                    <div *ngIf="message.status === MessageStatus.Opening" [textContent]="message.content" style="white-space: pre"></div>
+                                </div>
+                                
+							</div>
+                        </div>
+                        <div class="list-group-item" *ngIf="messages.length === 0">No Messages</div>
+                    </div>
+                </div>
+				<message-uploader [callback]="messagesCallback" [messageBoxStatus]="messageBoxStatus"></message-uploader>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DatDeploy xmlns="http://eservices.buildtools/datdeploy">
+	<Targets>
+		<Target Name="STAGING">
+			<Steps>
+				<Step Command="%DECRYPT_DB_PWD_IN_WEB_CONFIG%" />
+				<Step Command="%DEPLOY_STAGING%" />
+			</Steps>
+		</Target>
+		<Target Name="PRODUCTION">
+			<Steps>
+				<Step Command="%DECRYPT_DB_PWD_IN_WEB_CONFIG%" />
+				<Step Command="%DEPLOY_PRODUCTION%" />
+			</Steps>
+		</Target>
+	</Targets>
+	<Settings>
+		<Add Name="MSDEPLOY" Value="&quot;C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe&quot; -allowUntrusted -enableRule:AppOffline -enableRule:EncryptWebConfig -source:iisApp=&quot;%DAT_BIN_PATH%\eHubAdmin\%DAT_DEPLOYMENT_CONFIGURATION%&quot; -verbose -verb:sync" />
+		<Add Name="DECRYPT_DB_PWD_IN_WEB_CONFIG" Value="powershell &quot;(Get-Content '%DAT_BIN_PATH%\eHubAdmin\%DAT_DEPLOYMENT_CONFIGURATION%\Web.config') -replace '\$DBPassword\$', '$(Secrets:DB_PWD)' | Set-Content '%DAT_BIN_PATH%\eHubAdmin\%DAT_DEPLOYMENT_CONFIGURATION%\Web.config'&quot;" />
+		<Add Name="DEPLOY_STAGING" Value="%MSDEPLOY% -dest:iisApp=&quot;ehubadmin-test.wtg.zone&quot;,wmsvc=&quot;au2sp-shub-401.sand.wtg.zone&quot;,userName=&quot;s_eServicesDeploy@wtg.zone&quot;,password=&quot;$(Secrets:ESERVICES_DEPLOY_PWD)&quot;" />
+		<Add Name="DEPLOY_PRODUCTION" Value="%MSDEPLOY% -dest:iisApp=&quot;ehubadmin.wtg.zone&quot;,wmsvc=&quot;au2co-siis-401a.wtg.zone&quot;,userName=&quot;s_eServicesDeploy@wtg.zone&quot;,password=&quot;$(Secrets:ESERVICES_DEPLOY_PWD)&quot;" />
+	</Settings>
+	<Secrets>
+		<Add Name="ESERVICES_DEPLOY_PWD" Value="Z/FqwFtxIl2NWe/QomHAjP3XxZa6iqF4vWSlpfMjx+mKqlzeEdPedOaSUcjEcIOAJVUFXe5V/c9VuOx0eurkbXJwbaG4tElBcUbBvWQ4OqmmLOuYNVWATFyJD5sfEPBJFn0tNGTZ9tOOghkDqbTh2a/3OVkxo7Lt/EUUuoc9B/I=" />
+		<Add Name="DB_PWD" Value="ApuAh2pTjed/kuOfh177CBZnuwPh8LZO+x6KtLyhwwwZU94GL28XF4GNwAypdScbh6sbH2WGjVVfSaZvpIEcawIGI3us6/YwVL+4t61SXaxNU/+1Z9lbKPu+gc+mttm9Ez6D6bQlkNFPJQYK+Aa3d8xImm8XXGPH7qBAyS1iSEk=" />
+	</Secrets>
+</DatDeploy>

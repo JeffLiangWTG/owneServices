@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DatDeploy xmlns="http://eservices.buildtools/datdeploy">
+  <Targets>
+    <Target Name="eServices.BurrowService" Environment="Staging">
+      <Settings>
+		  <Add Name="DEST_CONNECTION" Value="wmsvc=au2sp-sesv-401.sand.wtg.zone,username=CORP\s_eServicesDeploy,password=&quot;$(Secrets:ESERVICES_DEPLOY_PWD_TEST)&quot;" />
+		  <Add Name="KAFKA_PASSWORD_SECRET" Value="$(Secrets:KAFKA_PW_TEST)" />
+      </Settings>
+      <Steps>
+        <Step Command="%DECRYPT_KAFKA_PWD_IN_TOML%" />
+        <Step Command="%CMD_DEPLOY_BRWSVC%" />
+      </Steps>
+    </Target>
+    <Target Name="eServices.BurrowService" Environment="Production">
+      <Settings>
+        <Add Name="DEST_CONNECTION" Value="wmsvc=au2wp-sews-401b.wisecloud.zone,username=PROD\s_eServicesDeploy,password=&quot;$(Secrets:ESERVICES_DEPLOY_PWD_PROD)&quot;" />
+		  <Add Name="KAFKA_PASSWORD_SECRET" Value="$(Secrets:KAFKA_PW_PROD)" />
+	  </Settings>
+	    <Steps>
+		    <Step Command="%DECRYPT_KAFKA_PWD_IN_TOML%" />
+		    <Step Command="%CMD_DEPLOY_BRWSVC%" />
+	    </Steps>
+    </Target>
+    <Target Name="eServices.BurrowMonitor" Command="%CMD_DEPLOY_BRWMON%" Environment="Staging">
+      <Settings>
+        <Add Name="DEST_CONNECTION" Value="wmsvc=SYDSP-STST-3.sand.wtg.zone,username=CORP\s_eServicesDeploy,password=&quot;$(Secrets:ESERVICES_DEPLOY_PWD_TEST)&quot;" />
+      </Settings>
+    </Target>
+    <Target Name="eServices.BurrowMonitor" Command="%CMD_DEPLOY_BRWMON%" Environment="Production">
+      <Settings>
+        <Add Name="DEST_CONNECTION" Value="wmsvc=au2wp-sews-401b.wisecloud.zone,username=PROD\s_eServicesDeploy,password=&quot;$(Secrets:ESERVICES_DEPLOY_PWD_PROD)&quot;" />
+      </Settings>
+    </Target>
+  </Targets>
+  <!-- Common Settings
+         Default settings that are available in deployments are:
+            DAT_DEPLOYMENT_CONFIGURATION  - Value of DeploymentConfiguration in Build.xml.
+            DAT_DEPLOYMENT_NAME           - DeploymentConfiguration with special characters removed.
+            DAT_SOURCE_PATH               - Path to root of repo source files.
+            DAT_BIN_PATH                  - Path to Bin folder.
+            TIMESTAMP                     - UTC time at start of build. Format is "yyyyMMdd.HHmmssZ".-->
+  <Settings>
+    <Add Name="MSDEPLOY" Value="&quot;%ProgramFiles%\IIS\Microsoft Web Deploy V3\msdeploy.exe&quot; -allowUntrusted -verbose" />
+    <Add Name="CMD_DEPLOY_BRWMON"><![CDATA[
+%MSDEPLOY% -verb:sync -source:contentPath="%DAT_BIN_PATH%\Publish\eServices.BurrowMonitor" -dest:contentPath="Default Web Site/BurrowMonitor",%DEST_CONNECTION% -skip:objectName=dirPath,absolutePath="logs"
+IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+%MSDEPLOY% -verb:sync -source:recycleApp -dest:recycleApp="Default Web Site/BurrowMonitor",%DEST_CONNECTION%
+]]></Add>
+    <Add Name="BRWSVC_NAME" Value="Burrow" />
+    <Add Name="BRWSVC_DISPNAME" Value="eServices Burrow" />
+    <Add Name="BRWSVC_PATH" Value="C:\eServices\Burrow" />
+    <Add Name="BRWSVC_CONFIG_PATH" Value="Publish\eServices.BurrowService\Burrow\config" />
+    <Add Name="DECRYPT_KAFKA_PWD_IN_TOML" Value="powershell &quot;(Get-Content '%DAT_BIN_PATH%\%BRWSVC_CONFIG_PATH%\burrow.toml') -replace '\$KAFKAPassword\$', '%KAFKA_PASSWORD_SECRET%' | Set-Content '%DAT_BIN_PATH%\%BRWSVC_CONFIG_PATH%\burrow.toml'&quot;" />
+    <Add Name="CMD_DEPLOY_BRWSVC"><![CDATA[
+%MSDEPLOY% -verb:sync -source:runCommand="powershell if (Get-Service %BRWSVC_NAME% -ErrorAction SilentlyContinue) { Stop-Service %BRWSVC_NAME% -Verbose }",waitAttempts=1,waitInterval=30000 -dest:auto,%DEST_CONNECTION%
+IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+%MSDEPLOY% -verb:sync -source:dirPath="%DAT_BIN_PATH%\Publish\eServices.BurrowService" -dest:dirPath="%BRWSVC_PATH%",%DEST_CONNECTION% -skip:objectName=dirPath,absolutePath="logs"
+IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+%MSDEPLOY% -verb:sync -source:runCommand="powershell if ((Get-Service %BRWSVC_NAME% -ErrorAction SilentlyContinue) -eq $null) { New-Service -Name %BRWSVC_NAME% -BinaryPathName 'dotnet %BRWSVC_PATH%\eServices.BurrowService.dll --environment %BUILD_TOOLS_ENVIRONMENT%' -DisplayName '%BRWSVC_DISPNAME%' -Verbose }",waitAttempts=1,waitInterval=30000 -dest:auto,%DEST_CONNECTION%
+IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
+%MSDEPLOY% -verb:sync -source:runCommand="powershell Start-Service %BRWSVC_NAME% -Verbose",waitAttempts=1,waitInterval=30000 -dest:auto,%DEST_CONNECTION%
+]]></Add>
+  </Settings>
+  <!-- Secrets
+       Refer to DAT User Guild for instructions on how to encrpt.
+       https://wisetechglobal.sharepoint.com/:w:/r/Development/SoftwareOperationsPublic/_layouts/15/Doc.aspx?sourcedoc=%7BB9322557-11BD-4A68-BB03-D0775B26BE4F%7D&file=DAT%20User%20Guide.docx-->
+  <Secrets>
+    <Add Name="ESERVICES_DEPLOY_PWD_TEST" Value="EmpbeMx6xlacT3z/0wwHVhbyu/boop6H+qUqkETC2dQ6faPH7cQ3qtUdShdNfGtgQmO5pKnsmL7HSger8vpm8P/kP4bi29VeLg/NQtQHzGHy22gayb1wxyBNOxitM0H05gTaHO0DU+cUwD3M3sf42JkrBqAnvnhj8uylCYRVLPk=" />
+    <Add Name="ESERVICES_DEPLOY_PWD_PROD" Value="MauZO/OA4a2G5sfo+ME85Nz0q2eoEG61x/62iJJHvztcN6VZSzsGtyNaFLBzwKhxq6ph6cXARdw5IlfIK7Av4eVe+kNBpqPcg+nzGrN6BjJsu7NPyoaHph8QxRyS+tigfZuq7+M9mP1uJrLrdA/3UJ03uwG5j8+ozdsYRGZ1Igs=" />
+	  <Add Name="KAFKA_PW_TEST" Value="NgMY/986v1Hq9hNs96F8BFvIZ4iuQLzcZ3+NDup96YBt0Lslc9D6EWRBJ9bqyskATeSfcChQRzaJUJ7FwAPdSqALJ9Z9chOFOWmuB27VHVj0a8B5HklZii2Pfxu9C0KvM/nV3cUgbsTleaDCNwMHx8ueD9FWrkhtU3QzE0ar7x8=" />
+	  <Add Name="KAFKA_PW_PROD" Value="ZwRzkFDMKKh2NzBNVXdDFg6gheS1m2myE0ErnLUcU3MpMJzWk2i2fdN32e/gJ3rNL/HpHike9adQeeIWJQDzIBK0D+XQ+UEZPtiRDac43mOqH7oJPxTnCKJP+L3wt6+en0vDOlF8KgfP08qJ7L/rnOxWBb7hPY9UxwjIcVPnWDw=" />
+  </Secrets>
+</DatDeploy>

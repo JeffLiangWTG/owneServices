@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DatDeploy xmlns="http://eservices.buildtools/datdeploy">
+  <Targets>
+    <Target Name="eServices.eHubPortal_STG_au2sp-shub-401">
+      <Settings>
+        <Add Name="PUBLISH_ENVIRONMENT" Value="Staging" />
+        <Add Name="DEST_CONNECTION" Value="wmsvc=au2sp-shub-401.sand.wtg.zone,username=CORP\s_eServicesDeploy,password=&quot;$(Secrets:ESERVICES_DEPLOY_PWD)&quot;" />
+        <Add Name="EHUBTRANSACTIONS_CONNECTIONSTRING" Value="Server=eHub-test.db.sand.wtg.zone;App=eServices.eHubPortal;Database=eHubTransactions;User=eHubPortal;Password=$(Secrets:EHUBPORTAL_PWD_TEST);Encrypt=False;" />
+      </Settings>
+      <Steps>
+        <Step Command="%SET_ENVIRONMENT%" />
+        <Step Command="%DEPLOY_STAGING%" />
+      </Steps>
+    </Target>
+    <Target Name="eServices.eHubPortal_PRD_au2co-siis-401b">
+      <Settings>
+        <Add Name="PUBLISH_ENVIRONMENT" Value="Production" />
+        <Add Name="DEST_CONNECTION" Value="wmsvc=au2co-siis-401b.wtg.zone,username=CORP\s_eServicesDeploy,password=&quot;$(Secrets:ESERVICES_DEPLOY_PWD)&quot;" />
+        <Add Name="EHUBTRANSACTIONS_CONNECTIONSTRING" Value="Server=ehubtransactions.db.wisegrid.net;App=eServices.eHubPortal;Database=eHubTransactions;User=eHubPortal;Password=$(Secrets:EHUBPORTAL_PWD_PROD);Encrypt=False" />
+      </Settings>
+      <Steps>
+        <Step Command="%SET_ENVIRONMENT%" />
+        <Step Command="%DEPLOY_PRODUCTION%" />
+      </Steps>
+    </Target>
+  </Targets>
+  <Settings>
+    <Add Name="PUBLISH_PATH" Value="%DAT_BIN_PATH%\Publish\eServices.eHubPortal" />
+    <Add Name="SET_ENVIRONMENT"><![CDATA[powershell "[xml]$cfg = Get-Content '%PUBLISH_PATH%\web.config'; $vars = $cfg.configuration.location.'system.webServer'.aspNetCore.AppendChild($cfg.CreateElement('environmentVariables')); $env = $vars.AppendChild($cfg.CreateElement('environmentVariable')); $env.SetAttribute('name', 'ASPNETCORE_ENVIRONMENT'); $env.SetAttribute('value', '%PUBLISH_ENVIRONMENT%'); $con = $vars.AppendChild($cfg.CreateElement('environmentVariable')); $con.SetAttribute('name', 'ASPNETCORE_ConnectionStrings__eHubTransactions'); $con.SetAttribute('value', '%EHUBTRANSACTIONS_CONNECTIONSTRING%'); $cfg.Save('%PUBLISH_PATH%\web.config');"]]></Add>
+    <Add Name="MSDEPLOY" Value="&quot;%ProgramFiles%\IIS\Microsoft Web Deploy V3\msdeploy.exe&quot; -allowUntrusted -verbose" />
+    <Add Name="MSDEPLOY_SITE" Value="%MSDEPLOY% -allowUntrusted -enableRule:AppOffline -enableRule:EncryptWebConfig -skip:objectName=dirPath,absolutePath='logs' -source:iisApp=&quot;%PUBLISH_PATH%&quot; -verbose -verb:sync" />
+    <Add Name="DEPLOY_STAGING" Value="%MSDEPLOY_SITE% -dest:iisApp=ehubportal-test-2.wtg.zone,%DEST_CONNECTION%" />
+    <Add Name="DEPLOY_PRODUCTION" Value="%MSDEPLOY_SITE% -dest:iisApp=ehubportal-2.wtg.zone,%DEST_CONNECTION%" />
+  </Settings>
+  <Secrets>
+    <Add Name="ESERVICES_DEPLOY_PWD" Value="Z/FqwFtxIl2NWe/QomHAjP3XxZa6iqF4vWSlpfMjx+mKqlzeEdPedOaSUcjEcIOAJVUFXe5V/c9VuOx0eurkbXJwbaG4tElBcUbBvWQ4OqmmLOuYNVWATFyJD5sfEPBJFn0tNGTZ9tOOghkDqbTh2a/3OVkxo7Lt/EUUuoc9B/I=" />
+    <Add Name="EHUBPORTAL_PWD_TEST" Value="tCrU1yu8od7C4zCI1ruQdWZfKezsKHXoxRHfQ57EH+hsffp33ERbeRFSRX/mCXp2YKgGgYiDc80cHOP8oYN0AAMZPviFOyHtQUjFUpiuFEe7b1gVPDVm2Z+ctLqv6BY6Lhn7nUDGfNoP3as1iENTjz69V+8oD1LushNlwTwCblQ=" />
+    <Add Name="EHUBPORTAL_PWD_PROD" Value="lVAs0UoxGcJ5m5kcI2D4LF7HxXnBNX9CumwZKJqNZrUApNmf9OTfaOUZdA+9bbkgp1COLzlo4VAB7A/Roh7Ee4pLTJ6Y2ZRsbHj/pDK30HXqhIxXg+6pUBVNcBeFSoShQc2RXxmosylt1dj8XUO2dRJF2Lec//K5qB1KsoqzA3c=" />
+  </Secrets>
+</DatDeploy>

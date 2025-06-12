@@ -1,0 +1,37 @@
+[general]
+pidfile="Burrow/burrow.pid"
+
+[zookeeper]
+servers=[ "localhost:2181" ]
+root-path="/burrow"
+
+[client-profile.eservices-a]
+kafka-version = "0.10.0"
+sasl = "eservices-sasl"
+tls = "eservices-a"
+
+[sasl.eservices-sasl]
+username = "topic-au1-test-billing-test"
+password = "$KAFKAPassword$"
+mechanism = "PLAIN" 
+
+[tls.eservices-a]
+noverify=true
+
+[cluster.eservices-a]
+class-name="kafka"
+servers=[ "106-cluster-kafka-q0-au2-brokers.kafka.wtg.ws:8044", "107-cluster-kafka-q0-au2-brokers.kafka.wtg.ws:8044", "108-cluster-kafka-q0-au2-brokers.kafka.wtg.ws:8044", "109-cluster-kafka-q0-au2-brokers.kafka.wtg.ws:8044", "110-cluster-kafka-q0-au2-brokers.kafka.wtg.ws:8044" ]
+client-profile="eservices-a"
+topic-refresh=120
+offset-refresh=30
+groups-reaper-refresh=0
+
+[consumer.eservices-lagchecker-a]
+class-name="kafka"
+cluster="eservices-a"
+servers=[ "106-cluster-kafka-q0-au2-brokers.kafka.wtg.ws:8044", "107-cluster-kafka-q0-au2-brokers.kafka.wtg.ws:8044", "108-cluster-kafka-q0-au2-brokers.kafka.wtg.ws:8044", "109-cluster-kafka-q0-au2-brokers.kafka.wtg.ws:8044", "110-cluster-kafka-q0-au2-brokers.kafka.wtg.ws:8044" ]
+client-profile="eservices-a"
+
+[httpserver.default]
+address=":8000"
+ 

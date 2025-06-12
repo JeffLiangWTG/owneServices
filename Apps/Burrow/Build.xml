@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Build xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" MSBuild="16.0"
+  xmlns="http://wisetechglobal.com/DevTools/Build.xsd">
+  <Solutions>
+    <Solution Filename="Burrow.sln" />
+  </Solutions>
+  <PreBuild>
+    <Command><![CDATA[cmd /c 
+    dotnet tool restore && 
+    dotnet paket restore]]></Command>
+  </PreBuild>
+  <Tasks>
+    <Task Name="Publish">
+      <Dependency Type="Solution">Burrow.sln</Dependency>
+      <Step>dotnet publish BurrowService\eServices.BurrowService.csproj --no-build</Step>
+      <Step>dotnet publish BurrowMonitor\eServices.BurrowMonitor.csproj --no-build</Step>
+    </Task>
+    <Task Name="Initialize eServices.BuildTools.DatTool">
+      <Step><![CDATA[cmd /c 
+      cd Bin && 
+      dotnet new tool-manifest && 
+      dotnet tool install eServices.BuildTools.DatTool && 
+      dotnet esv-dattool init --output DAT --framework net48"]]></Step>
+    </Task>
+  </Tasks>
+  <BuildConfigurations>
+    <Configuration BuildOnDat="true" TestOnDat="true">Release</Configuration>
+  </BuildConfigurations>
+  <DatSettings BuildDeployerType="eServices.BuildTools.DatDeploy.Deployer, eServices.BuildTools.DatDeploy" 
+               IntegrationAssembliesSubdir="DAT">
+    <TestAdapter Type="Dat.Implementation.VSTest.VSTestAdapter, Dat.Implementation.VSTest" />
+    <DeploymentTargets>
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.BurrowService"/>
+      <DeploymentTarget Type="DeployOnDemand" BuildConfiguration="Release" DeploymentConfiguration="eServices.BurrowMonitor"/>
+    </DeploymentTargets>
+  </DatSettings>
+</Build>
