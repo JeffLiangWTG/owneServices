@@ -1,0 +1,29 @@
+﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <WTGPaketPackagesRoot>$(MSBuildThisFileDirectory)\packages</WTGPaketPackagesRoot>
+    <WTGPaketBuildItemsGroupName>Build</WTGPaketBuildItemsGroupName>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PaketDisableGlobalRestore>true</PaketDisableGlobalRestore>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <WTGIsTestProject Condition="$(MSBuildProjectFile.Contains('.Test.'))">true</WTGIsTestProject>
+  </PropertyGroup>
+
+  <!-- Binding redirects -->
+  <PropertyGroup Condition="$(MSBuildProjectFile.Contains('.Tests.'))">
+    <AutoGenerateBindingRedirects Condition="'$(AutoGenerateBindingRedirects)' == ''">true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType Condition="'$(GenerateBindingRedirectsOutputType)' == ''">true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WTG.BuildConfiguration.Signing" />
+    <PackageReference Include="WTG.BuildConfiguration.Analysis.SYSLIB">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>build; contentfiles</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>
