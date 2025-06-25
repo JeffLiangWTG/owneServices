@@ -97,9 +97,9 @@ namespace CargoWise.eServices.Billing.WcfService
 			handler.AddUsageTransaction(internalTransaction);
 		}
 
-		public void AddUsageTransactionRange(UsageTransaction[] transactionList)
-		{
-			var internalList = new List<API.UsageTransaction>(transactionList.Length);
+                public void AddUsageTransactionRange(UsageTransaction[] transactionList)
+                {
+                        var internalList = new List<API.UsageTransaction>(transactionList.Length);
 
 			foreach (var transaction in transactionList)
 			{
@@ -108,8 +108,23 @@ namespace CargoWise.eServices.Billing.WcfService
 				internalList.Add(internalTransaction);
 			}
 
-			handler.AddUsageTransactions(internalList);
-		}
+                        handler.AddUsageTransactions(internalList);
+                }
+
+                public LicenseInfo[] GetLatestLicenses()
+                {
+                        return handler.GetLatestLicenses()
+                                .Select(l => new LicenseInfo
+                                {
+                                        EnterpriseCode = l.EnterpriseCode,
+                                        DatabaseNumber = l.DatabaseNumber,
+                                        ServerCode = l.ServerCode,
+                                        HostedLocation = l.HostedLocation,
+                                        IsActive = l.IsActive,
+                                        IsTeardownInProgress = l.IsTeardownInProgress
+                                })
+                                .ToArray();
+                }
 
 		static API.BillingTransaction Transform(BillingTransaction transaction)
 		{

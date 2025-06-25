@@ -437,7 +437,7 @@ namespace CargoWise.eServices.Billing.WcfService.IntegrationTests
 		}
 
 		[Test]
-		public void TestAddTransactionRangeLarge()
+                public void TestAddTransactionRangeLarge()
 		{
 			int SendCount = 2000;
 			var toSend = new List<BillingTransaction>();
@@ -462,7 +462,28 @@ namespace CargoWise.eServices.Billing.WcfService.IntegrationTests
 				};
 
 				toSend.Add(transaction);
-			}
+                }
+
+                [Test]
+                public void TestGetLatestLicenses()
+                {
+                        using (var con = BillingDataTestHelper.GetNewOpenConnection())
+                        {
+                                BillingDataTestHelper.ClearDatabaseAndCompanyList(con);
+                                BillingDataTestHelper.ExecuteNonQuery(con,
+                                        "INSERT INTO edi.LicenceDatabaseCodeHistory(SystemId, DatabaseNumber, EnterpriseCode, ServerCode, ValidFromUtc, HostedLocation, IsActive, IsTeardownInProgress) " +
+                                        "VALUES('AAA', 1, 'ENT', 'SRV', '2000-01-01', 'OLD', 1, 0)");
+                                BillingDataTestHelper.ExecuteNonQuery(con,
+                                        "INSERT INTO edi.LicenceDatabaseCodeHistory(SystemId, DatabaseNumber, EnterpriseCode, ServerCode, ValidFromUtc, HostedLocation, IsActive, IsTeardownInProgress) " +
+                                        "VALUES('AAA', 1, 'ENT', 'SRV', '2001-01-01', 'NEW', 1, 0)");
+
+                                using (var client = CreateBillingServiceClient())
+                                {
+                                        var licenses = client.GetLatestLicenses();
+                                        Assert.That(licenses.Any(l => l.DatabaseNumber == 1 && l.HostedLocation == "NEW"));
+                                }
+                        }
+                }
 
 			using (var con = BillingDataTestHelper.GetNewOpenConnection())
 			{

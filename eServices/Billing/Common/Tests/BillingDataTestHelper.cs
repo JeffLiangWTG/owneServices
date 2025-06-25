@@ -116,10 +116,15 @@ end");
 			return GetBillingRepository().CountStaging();
 		}
 
-		public static DateTime? OldestSystemCreateUTCInStaging()
-		{
-			return GetBillingRepository().OldestSystemCreateUTCInStaging();
-		}
+                public static DateTime? OldestSystemCreateUTCInStaging()
+                {
+                        return GetBillingRepository().OldestSystemCreateUTCInStaging();
+                }
+
+                public static IEnumerable<CargoWise.Billing.API.LicenseInfo> GetLatestLicenses()
+                {
+                        return GetBillingRepository().GetLatestLicenses();
+                }
 
 		public static BillingRepository GetBillingRepository(string connectionStringName = "BillingContext", ILog logger = null, bool logErrorsAsInfoMsgEvent = false, CancellationToken token = default)
 		{

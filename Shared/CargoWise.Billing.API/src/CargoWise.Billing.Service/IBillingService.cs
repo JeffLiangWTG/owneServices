@@ -1,4 +1,5 @@
 using System.ServiceModel;
+using CargoWise.Billing.API;
 
 namespace CargoWise.Billing.Service
 {
@@ -19,8 +20,11 @@ namespace CargoWise.Billing.Service
 		[OperationContract]
 		void AddUsageTransactionRange(UsageTransaction[] transactions);
 
-		[OperationContract]
-		[FaultContract(typeof(ValidationFault))]
-		bool Ping();
+        [OperationContract]
+        [FaultContract(typeof(ValidationFault))]
+        bool Ping();
+
+        [OperationContract]
+        LicenseInfo[] GetLatestLicenses();
 	}
 }
