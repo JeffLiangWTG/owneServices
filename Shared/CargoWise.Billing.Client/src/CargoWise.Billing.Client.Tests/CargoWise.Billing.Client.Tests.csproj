@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+	    <TargetFrameworks>net48;net8.0</TargetFrameworks>
+	    <LangVersion>latest</LangVersion>
+	    <DelaySign>false</DelaySign>
+      <CWDisableNetCoreTestDiscovery>true</CWDisableNetCoreTestDiscovery>
+    </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputPath>..\..\Bin\</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<OutputPath>..\..\Bin\</OutputPath>
+	</PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Moq" />
+    <PackageReference Include="NewtonSoft.Json" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit3TestAdapter" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CargoWise.Billing.Client\CargoWise.Billing.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="CargoWise.Billing.API" Condition="'$(TargetFramework)' == 'net48'">
+      <HintPath>..\..\bin\CargoWise.Billing.API\net48\CargoWise.Billing.API.dll</HintPath>
+    </Reference>
+    <Reference Include="CargoWise.Billing.API.Tests" Condition="'$(TargetFramework)' == 'net48'">
+      <HintPath>..\..\bin\CargoWise.Billing.API\net48\CargoWise.Billing.API.Tests.dll</HintPath>
+    </Reference>
+    <Reference Include="CargoWise.Billing.API" Condition="'$(TargetFramework)' == 'netstandard2.0'">
+      <HintPath>..\..\bin\CargoWise.Billing.API\netstandard2.0\CargoWise.Billing.API.dll</HintPath>
+    </Reference>
+    <Reference Include="CargoWise.Billing.API" Condition="'$(TargetFramework)' == 'net8.0'">
+      <HintPath>..\..\bin\CargoWise.Billing.API\net8.0\CargoWise.Billing.API.dll</HintPath>
+    </Reference>
+    <Reference Include="CargoWise.Billing.API.Tests" Condition="'$(TargetFramework)' == 'net8.0'">
+      <HintPath>..\..\bin\CargoWise.Billing.API\net8.0\CargoWise.Billing.API.Tests.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="NUnit.Framework" />
+  </ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(TargetFramework)'=='net48'">
+		<Exec Command="copy $(OutDir)$(TargetName).* ..\Bin" />
+	</Target>
+
+</Project>

@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;netstandard2.0;net8.0</TargetFrameworks>
+	  <LangVersion>latest</LangVersion>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputPath>..\..\Bin\</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<OutputPath>..\..\Bin\</OutputPath>
+	</PropertyGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Annotations" />
+    <PackageReference Include="System.ServiceModel.Http" />
+    <PackageReference Include="System.ServiceModel.Primitives" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Reference Include="CargoWise.Billing.API" Condition="'$(TargetFramework)' == 'net48'">
+      <HintPath>..\..\bin\CargoWise.Billing.API\net48\CargoWise.Billing.API.dll</HintPath>
+    </Reference>
+    <Reference Include="CargoWise.Billing.API" Condition="'$(TargetFramework)' == 'netstandard2.0'">
+      <HintPath>..\..\bin\CargoWise.Billing.API\netstandard2.0\CargoWise.Billing.API.dll</HintPath>
+    </Reference>
+    <Reference Include="CargoWise.Billing.API" Condition="'$(TargetFramework)' == 'net8.0'">
+      <HintPath>..\..\bin\CargoWise.Billing.API\net8.0\CargoWise.Billing.API.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(TargetFramework)'=='net48'">
+		<Exec Command="copy $(OutDir)$(TargetName).* ..\Bin" />
+	</Target>
+</Project>

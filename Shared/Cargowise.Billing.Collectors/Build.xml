@@ -1,0 +1,32 @@
+<Build xmlns="http://wisetechglobal.com/DevTools/Build.xsd" MSBuild="17">
+  <PreBuild>
+    <!-- paket is only used for code analyzers -->
+    <Command cacheable="false">pre-build.cmd</Command>
+  </PreBuild>
+	<Solutions>
+		<Solution Filename="src\Billing.Collectors.sln"/>
+	</Solutions>
+  <Tasks>
+    <Task Name="dotnet pack Billing.Collectors">
+      <Dependency Type="Solution">src\Billing.Collectors.sln</Dependency>
+      <Step Configuration="Debug">dotnet pack --configuration Debug --no-build src\Collectors\CargoWise.Billing.Collectors.csproj</Step>
+      <Step Configuration="Release">dotnet pack --configuration Release --no-build src\Collectors\CargoWise.Billing.Collectors.csproj</Step>
+    </Task>
+  </Tasks>
+   <OtherFiles>
+    <Filename CopyFrom="packages\build\WTG.DevTools.NuGetDeployer\lib\net8.0">Deployment\WTG.DevTools.NuGetDeployer.dll</Filename>
+  </OtherFiles>
+   <DatSettings 
+      BuildDeployerType="WTG.DevTools.NuGetDeployer.NuGetPackageDeployer, WTG.DevTools.NuGetDeployer" 
+      IntegrationAssembliesSubdir="Deployment"
+      BuildDeployerRuntime="DotNet64">
+      <TestAdapter Type="Dat.Implementation.VSTest.VSTestAdapter, Dat.Implementation.VSTest"/>
+      <DeploymentTargets>
+          <DeploymentTarget Type="AutoDeployLatestBuild" BuildConfiguration="RELEASE" IsProduction="false" DeploymentConfiguration="CargoWise.Billing.Collectors.*" />
+      </DeploymentTargets>
+  </DatSettings>
+
+	<Versioning>
+		<CSharpAssemblyFileVersion>CommonAssemblyInfo.cs</CSharpAssemblyFileVersion>
+	</Versioning>
+</Build>

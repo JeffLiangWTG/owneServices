@@ -1,0 +1,27 @@
+﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <WTGPaketPackagesRoot>$(MSBuildThisFileDirectory)\packages</WTGPaketPackagesRoot>
+    <WTGPaketBuildItemsGroupName>Build</WTGPaketBuildItemsGroupName>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PaketDisableGlobalRestore>true</PaketDisableGlobalRestore>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <LangVersion>10.0</LangVersion>
+    <WTGIsTestProject Condition="$(MSBuildProjectFile.Contains('.Test.'))">true</WTGIsTestProject>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\EDI-Release-private.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <!-- Binding redirects -->
+  <PropertyGroup Condition="$(MSBuildProjectFile.Contains('.Tests.'))">
+    <AutoGenerateBindingRedirects Condition="'$(AutoGenerateBindingRedirects)' == ''">true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType Condition="'$(GenerateBindingRedirectsOutputType)' == ''">true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
+    <None Include="..\..\EDI-Release-private.snk">
+      <Link>EDI-Release-private.snk</Link>
+    </None>
+  </ItemGroup>
+</Project>

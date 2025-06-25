@@ -1,0 +1,26 @@
+﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <WTGPaketPackagesRoot>$(MSBuildThisFileDirectory)\packages</WTGPaketPackagesRoot>
+    <WTGPaketBuildItemsGroupName>Build</WTGPaketBuildItemsGroupName>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PaketDisableGlobalRestore>true</PaketDisableGlobalRestore>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <LangVersion>10.0</LangVersion>
+    <WTGIsTestProject Condition="$(MSBuildProjectFile.Contains('.Test.'))">true</WTGIsTestProject>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\EDI-Release-private.snk</AssemblyOriginatorKeyFile>
+    <PackageOutputPath>$(MsBuildThisFileDirectory)Bin</PackageOutputPath>
+    <PackageVersion>$([System.DateTime]::Now.ToString("yyyy.Mdd.Hmm"))</PackageVersion>
+  </PropertyGroup>
+
+  <!-- Binding redirects -->
+  <PropertyGroup Condition="$(MSBuildProjectFile.Contains('.Test.'))">
+    <AutoGenerateBindingRedirects Condition="'$(AutoGenerateBindingRedirects)' == ''">true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType Condition="'$(GenerateBindingRedirectsOutputType)' == ''">true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)\CommonAssemblyInfo.cs" Link="Properties\CommonAssemblyInfo.cs" />
+  </ItemGroup>
+</Project>

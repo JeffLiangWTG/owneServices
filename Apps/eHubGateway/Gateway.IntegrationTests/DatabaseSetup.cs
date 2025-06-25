@@ -18,15 +18,15 @@ namespace CargoWise.eHub.Gateway.IntegrationTests
 			new BillingContext(SqlServerHelper.GetAdminConnectionString(BillingDatabaseName)).Database.Initialize(true);
 			try
 			{
-				Deployment.Deploy(
-					Master,
-					MasterSecondary,
-					EdiProd,
-					EdiProdCache,
-					EHubTransactions,
-					EHubArchiveOnlineSecondary,
-					Authentication,
-					EHubTransactionsProxy);
+				//Deployment.Deploy(
+				//	Master,
+				//	MasterSecondary,
+				//	EdiProd,
+				//	EdiProdCache,
+				//	EHubTransactions,
+				//	EHubArchiveOnlineSecondary,
+				//	Authentication,
+				//	EHubTransactionsProxy);
 			}
 			catch
 			{

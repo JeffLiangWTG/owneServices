@@ -1,0 +1,40 @@
+<Build xmlns="http://wisetechglobal.com/DevTools/Build.xsd" MSBuild="17">
+	<Solutions>
+		<Solution Filename="src\CollectorService.Plugin.sln">
+			<Dependency Type="Repository">BillingAPI</Dependency>
+			<Dependency Type="Repository">BillingClient</Dependency>
+		</Solution>
+	</Solutions>
+	<PreBuild>
+		<Command><![CDATA[cmd /c 
+dotnet tool restore && 
+dotnet paket restore]]></Command>
+	</PreBuild>
+
+	<Dependencies>
+		<Dependency Repository="https://github.com/WiseTechGlobal/CargoWise.Shared" Path="CargoWise.Billing.API" Name="BillingAPI">
+			<Copy Source="net48" Target="CargoWise.Billing.API\net48"/>
+			<Copy Source="netstandard2.0" Target="CargoWise.Billing.API\netstandard2.0"/>
+			<Copy Source="net8.0" Target="CargoWise.Billing.API\net8.0"/>
+		</Dependency>
+		<Dependency Repository="https://github.com/WiseTechGlobal/CargoWise.Shared" Path="CargoWise.Billing.Client" Name="BillingClient">
+			<Copy Source="net48" Target="CargoWise.Billing.Client\net48"/>
+			<Copy Source="netstandard2.0" Target="CargoWise.Billing.Client\netstandard2.0"/>
+			<Copy Source="net8.0" Target="CargoWise.Billing.Client\net8.0"/>
+		</Dependency>
+	</Dependencies>
+
+	<Versioning>
+		<CSharpAssemblyFileVersion>CommonAssemblyInfo.cs</CSharpAssemblyFileVersion>
+	</Versioning>
+
+	<DatSettings>
+		<TestAdapters>
+			<TestAdapter Key="VSTest" Type="Dat.Implementation.VSTest.VSTestAdapter, Dat.Implementation.VSTest">
+				<Options>
+					<Option Name="TestAssemblyFileFilter">*.Tests.dll</Option>
+				</Options>
+			</TestAdapter>
+		</TestAdapters>
+	</DatSettings>
+</Build>
