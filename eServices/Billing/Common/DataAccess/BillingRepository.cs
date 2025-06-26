@@ -198,7 +198,13 @@ namespace CargoWise.eServices.Billing.DataAccess
                                 con.Open();
                                 using (var cmd = con.CreateCommand())
                                 {
-                                        cmd.CommandText = "SELECT EnterpriseCode, DatabaseNumber, ServerCode, HostedLocation, IsActive, IsTeardownInProgress FROM dbo.GetLatestLicense()";
+                                        cmd.CommandText = @"SELECT EnterpriseCode, DatabaseNumber, ServerCode, HostedLocation, IsActive, IsTeardownInProgress
+FROM (
+        SELECT EnterpriseCode, DatabaseNumber, ServerCode, HostedLocation, IsActive, IsTeardownInProgress, LicenceType,
+               ROW_NUMBER() OVER(PARTITION BY DatabaseNumber ORDER BY ValidFromUtc DESC) AS LicenseRow
+        FROM edi.LicenceDatabaseCodeHistory
+) H
+WHERE H.LicenseRow = 1 AND ISNULL(H.LicenceType, '') <> 'PRD'";
                                         using (var reader = cmd.ExecuteReader())
                                         {
                                                 while (reader.Read())
