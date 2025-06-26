@@ -199,6 +199,7 @@ namespace CargoWise.Billing.Client
                                         DatabaseNumber = webLicense.DatabaseNumber,
                                         ServerCode = webLicense.ServerCode,
                                         HostedLocation = webLicense.HostedLocation,
+                                        LicenseType = webLicense.LicenseType,
                                         IsActive = webLicense.IsActive,
                                         IsTeardownInProgress = webLicense.IsTeardownInProgress
                                 });

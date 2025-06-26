@@ -18,6 +18,9 @@ namespace CargoWise.Billing.Service
         public string HostedLocation { get; set; }
 
         [DataMember]
+        public string LicenseType { get; set; }
+
+        [DataMember]
         public bool IsActive { get; set; }
 
         [DataMember]

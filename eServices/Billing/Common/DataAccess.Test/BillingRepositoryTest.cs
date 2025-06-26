@@ -349,6 +349,7 @@ namespace CargoWise.eServices.Billing.DataAccess.Tests
                                 Assert.That(licenses.Count, Is.EqualTo(1));
                                 Assert.That(licenses[0].DatabaseNumber, Is.EqualTo(1));
                                 Assert.That(licenses[0].HostedLocation, Is.EqualTo("NEW"));
+                                Assert.That(licenses[0].LicenseType, Is.EqualTo("DEV"));
                         }
                 }
 

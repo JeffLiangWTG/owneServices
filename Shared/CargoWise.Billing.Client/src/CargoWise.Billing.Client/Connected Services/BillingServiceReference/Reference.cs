@@ -701,6 +701,9 @@ namespace CargoWise.Billing.Client.BillingServiceReference
         private string HostedLocationField;
 
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string LicenseTypeField;
+
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private bool IsActiveField;
 
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -738,6 +741,13 @@ namespace CargoWise.Billing.Client.BillingServiceReference
         {
             get { return this.HostedLocationField; }
             set { if ((object.ReferenceEquals(this.HostedLocationField, value) != true)) { this.HostedLocationField = value; this.RaisePropertyChanged("HostedLocation"); } }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        internal string LicenseType
+        {
+            get { return this.LicenseTypeField; }
+            set { if ((object.ReferenceEquals(this.LicenseTypeField, value) != true)) { this.LicenseTypeField = value; this.RaisePropertyChanged("LicenseType"); } }
         }
 
         [System.Runtime.Serialization.DataMemberAttribute()]

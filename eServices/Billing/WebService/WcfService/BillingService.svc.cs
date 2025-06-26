@@ -120,6 +120,7 @@ namespace CargoWise.eServices.Billing.WcfService
                                         DatabaseNumber = l.DatabaseNumber,
                                         ServerCode = l.ServerCode,
                                         HostedLocation = l.HostedLocation,
+                                        LicenseType = l.LicenseType,
                                         IsActive = l.IsActive,
                                         IsTeardownInProgress = l.IsTeardownInProgress
                                 })

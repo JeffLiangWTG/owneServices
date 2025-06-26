@@ -198,13 +198,13 @@ namespace CargoWise.eServices.Billing.DataAccess
                                 con.Open();
                                 using (var cmd = con.CreateCommand())
                                 {
-                                        cmd.CommandText = @"SELECT EnterpriseCode, DatabaseNumber, ServerCode, HostedLocation, IsActive, IsTeardownInProgress
+                                        cmd.CommandText = @"SELECT EnterpriseCode, DatabaseNumber, ServerCode, HostedLocation, IsActive, IsTeardownInProgress, LicenceType
 FROM (
         SELECT EnterpriseCode, DatabaseNumber, ServerCode, HostedLocation, IsActive, IsTeardownInProgress, LicenceType,
                ROW_NUMBER() OVER(PARTITION BY DatabaseNumber ORDER BY ValidFromUtc DESC) AS LicenseRow
         FROM edi.LicenceDatabaseCodeHistory
 ) H
-WHERE H.LicenseRow = 1 AND ISNULL(H.LicenceType, '') <> 'PRD'";
+WHERE H.LicenseRow = 1";
                                         using (var reader = cmd.ExecuteReader())
                                         {
                                                 while (reader.Read())
@@ -215,6 +215,7 @@ WHERE H.LicenseRow = 1 AND ISNULL(H.LicenceType, '') <> 'PRD'";
                                                                 DatabaseNumber = Convert.ToInt32(reader["DatabaseNumber"]),
                                                                 ServerCode = reader["ServerCode"].ToString(),
                                                                 HostedLocation = reader["HostedLocation"].ToString(),
+                                                                LicenseType = reader["LicenceType"].ToString(),
                                                                 IsActive = Convert.ToBoolean(reader["IsActive"]),
                                                                 IsTeardownInProgress = Convert.ToBoolean(reader["IsTeardownInProgress"])
                                                         });
@@ -223,7 +224,7 @@ WHERE H.LicenseRow = 1 AND ISNULL(H.LicenceType, '') <> 'PRD'";
                                 }
                         }
 
-                        return result;
+                        return result.Where(l => !string.Equals(l.LicenseType, "PRD", StringComparison.OrdinalIgnoreCase));
                 }
 
 		static DataTable CreateBillingTransactionTableType()
