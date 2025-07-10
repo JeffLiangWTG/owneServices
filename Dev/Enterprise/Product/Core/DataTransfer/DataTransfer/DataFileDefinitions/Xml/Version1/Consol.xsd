@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.edi.com.au/EnterpriseService/" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Invoice.xsd"/>
+	<xs:include schemaLocation="Shipment.xsd"/>
+	<xs:include schemaLocation="Event.xsd"/>
+	<xs:include schemaLocation="Elements.xsd"/>
+	<xs:include schemaLocation="FinancialInvoice.xsd"/>
+	<xs:element name="Consols" type="Consols"/>
+	<xs:complexType name="ConsolIdentifier">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="ConsolIdentifierType" type="ConsolIdentifierType"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="Consol">
+		<xs:sequence>
+			<xs:element name="Events" type="Events" minOccurs="0"/>
+			<xs:element name="ConsolIdentifier" type="ConsolIdentifier" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="ConsolDetail" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="DateCreated" type="xs:dateTime" minOccurs="0"/>
+						<xs:element name="ConsolType" type="ConsolType" minOccurs="0"/>
+						<xs:element name="ContainerMode" type="ContainerMode" minOccurs="0"/>
+						<xs:element name="TransportMode" type="ConsolTransportMode" minOccurs="0"/>
+						<xs:element name="PortOfLoading" type="Movement" minOccurs="0"/>
+						<xs:element name="PortOfDischarge" type="Movement" minOccurs="0"/>
+						<xs:choice minOccurs="0">
+							<xs:sequence>
+								<xs:element name="RoadRailFlight" type="FlightWithFlightNumber"/>
+							</xs:sequence>
+							<xs:sequence>
+								<xs:element name="Vessel" type="SailingWithVesselVoyage"/>
+							</xs:sequence>
+						</xs:choice>
+						<xs:element name="PaymentType" type="PaymentType" minOccurs="0"/>
+						<xs:element name="PlannedLegs" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="PlannedLeg" type="PlannedLeg" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="SendingAgent" type="Organisation" minOccurs="0"/>
+						<xs:element name="ReceivingAgent" type="Organisation" minOccurs="0"/>
+						<xs:element name="Carrier" type="Organisation" minOccurs="0"/>
+						<xs:element name="CoLoadWith" type="Organisation" minOccurs="0"/>
+						<xs:element name="AgentReference" type="xs:string" minOccurs="0"/>
+						<xs:element name="BookingReference" type="xs:string" minOccurs="0"/>
+						<xs:element name="Arrival" type="PortInfo" minOccurs="0"/>
+						<xs:element name="Departure" type="PortInfo" minOccurs="0"/>
+						<xs:element name="PortFirstArrival" type="Movement" minOccurs="0"/>
+						<xs:element name="PortFirstForeign" type="Movement" minOccurs="0"/>
+						<xs:element name="PortLastForeign" type="Movement" minOccurs="0"/>
+						<xs:element name="Containers" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Container" type="Container" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="CustomsEntryNumbers" type="CustomsEntryNumbers" minOccurs="0"/>
+						<xs:element name="ExternalAgentReference" type="xs:string" minOccurs="0"/>
+						<xs:element name="Creditor" type="Organisation" minOccurs="0"/>
+						<xs:element name="NumberOfOriginalBills" type="xs:unsignedByte" minOccurs="0"/>
+						<xs:element name="NumberOfCopyBills" type="xs:unsignedByte" minOccurs="0"/>
+						<xs:element name="ReleaseType" type="xs:NMTOKEN" minOccurs="0"/>
+						<xs:element name="MasterBillIssueDate" type="xs:dateTime" minOccurs="0"/>
+						<xs:element name="CustomValues" type="CustomValues" minOccurs="0"/>
+						<xs:element name="Addresses" type="DocAddresses" minOccurs="0"/>
+						<xs:element name="ReferenceNumbers" type="ReferenceNumbers" minOccurs="0" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Shipments" type="Shipments" minOccurs="0"/>
+			<xs:element name="Notes" type="Notes" minOccurs="0"/>
+			<xs:element name="Documents" type="Documents" minOccurs="0"/>
+			<xs:element name="ARInvoices" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="TxnHeader" type="TxnHeader" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+      <xs:element name="AWBHeaders" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AWBHeader" type="AWBHeader" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PortInfo">
+		<xs:sequence>
+			<xs:element name="CTO" type="AddressReference" minOccurs="0"/>
+			<xs:element name="Depot" type="AddressReference" minOccurs="0"/>
+			<xs:element name="ContainerYard" type="AddressReference" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Schedule">
+		<xs:sequence>
+			<xs:element name="TransportMode" type="TransportMode"/>
+			<xs:element name="Carrier" type="Organisation" minOccurs="0"/>
+			<xs:choice>
+				<xs:element name="RoadRailFlight">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FlightNoJourneyNoTruckRegNo" type="xs:string"/>
+							<xs:element name="Flights">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Flight" type="FlightWithLoadDischargePortsAndConsols" maxOccurs="unbounded"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Sailing">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="VesselName" type="xs:string"/>
+							<xs:element name="VoyageNo" type="xs:string"/>
+							<xs:element name="Sailings">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Sailing" type="SailingWithLoadDischargePortsAndConsols" maxOccurs="unbounded"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Consols">
+		<xs:sequence>
+			<xs:element name="Consol" type="Consol" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SailingWithLoadDischargePorts">
+		<xs:complexContent>
+			<xs:extension base="Sailing">
+				<xs:sequence>
+					<xs:element name="LoadPort" type="xs:string" minOccurs="0"/>
+					<xs:element name="DischargePort" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="FlightWithLoadDischargePorts">
+		<xs:complexContent>
+			<xs:extension base="Flight">
+				<xs:sequence>
+					<xs:element name="LoadPort" type="xs:string"/>
+					<xs:element name="DischargePort" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="FlightWithLoadDischargePortsAndConsols">
+		<xs:complexContent>
+			<xs:extension base="FlightWithLoadDischargePorts">
+				<xs:sequence>
+					<xs:element name="Consols" type="Consols" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="SailingWithLoadDischargePortsAndConsols">
+		<xs:complexContent>
+			<xs:extension base="SailingWithLoadDischargePorts">
+				<xs:sequence>
+					<xs:element name="Consols" type="Consols" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="ConsolIdentifierType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="MasterWaybill"/>
+			<xs:enumeration value="Other"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ConsolType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="Agent"/>
+			<xs:enumeration value="GatewayAgent"/>
+			<xs:enumeration value="Direct"/>
+			<xs:enumeration value="Co-Load"/>
+			<xs:enumeration value="GatewayCoLoad"/>
+			<xs:enumeration value="Charter"/>
+			<xs:enumeration value="OnBoardCourier"/>
+			<xs:enumeration value="Courier"/>
+			<xs:enumeration value="Other"/>
+      <xs:enumeration value="AWBCoload"/>
+      <xs:enumeration value="MultiAWBMaster"/>
+    </xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ConsolTransportMode">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="AIR"/>
+			<xs:enumeration value="SEA"/>
+			<xs:enumeration value="ROA"/>
+			<xs:enumeration value="RAI"/>
+			<xs:enumeration value="MAI"/>
+			<xs:enumeration value="UNK"/>
+			<xs:enumeration value="ROR"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

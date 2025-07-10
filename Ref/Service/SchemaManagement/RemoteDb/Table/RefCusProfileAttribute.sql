@@ -1,0 +1,16 @@
+CREATE TABLE RefCusProfileAttribute
+(
+	XXY_PK UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_RefCusProfileAttribute_XXY_PK  DEFAULT (NEWID()),
+	XXY_XX0_Profile UNIQUEIDENTIFIER NOT NULL,
+	XXY_Name VARCHAR(35) NOT NULL,
+	XXY_Value NVARCHAR(MAX) NOT NULL
+
+	CONSTRAINT PK_RefCusProfileAttribute PRIMARY KEY CLUSTERED (XXY_PK ASC),
+	CONSTRAINT FK_RefCusProfileAttribute_RefCusProfile FOREIGN KEY(XXY_XX0_Profile) REFERENCES RefCusProfile (XX0_PK),
+	CONSTRAINT CK_RefCusProfileAttribute_XXY_Name CHECK (XXY_Name <> ''),
+	CONSTRAINT CK_RefCusProfileAttribute_XXY_Value CHECK (XXY_Value <> '')
+)
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusProfileAttribute_XXY_XX0_Profile ON RefCusProfileAttribute (XXY_XX0_Profile ASC)
+GO
+ALTER TABLE RefCusProfileAttribute SET (LOCK_ESCALATION = DISABLE);

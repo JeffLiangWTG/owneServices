@@ -1,0 +1,35 @@
+	<xs:schema id="SsasCubes" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xs:element name="SsasCubes" msdata:IsDataSet="true" msdata:Locale="">
+			<xs:complexType>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="SsasCubes" msdata:CaseSensitive="False" msdata:Locale="">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="SsasTables" msdata:CaseSensitive="False" msdata:Locale="" minOccurs="0" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:attribute name="SsasModelLogicalName" type="xs:string" />
+										<xs:attribute name="TableName" type="xs:string" use="required" />
+										<xs:attribute name="Query" type="xs:string" />
+										<xs:attribute name="PartitionKeyName" type="xs:string" />
+										<xs:attribute name="Message" type="xs:string" use="prohibited" />
+										<xs:attribute name="IsCalculated" type="xs:boolean" default="false" />
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+							<xs:attribute name="SsasModelFileName" type="xs:string" />
+							<xs:attribute name="SsasModelLogicalName" type="xs:string" />
+							<xs:attribute name="RequiresDataWarehouse" type="xs:boolean" default="true" />
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+			</xs:complexType>
+			<xs:unique name="Constraint2">
+				<xs:selector xpath=".//SsasCubes" />
+				<xs:field xpath="@SsasModelLogicalName" />
+			</xs:unique>
+			<xs:keyref name="FK_SsasCubes_SsasTables" refer="Constraint2" msdata:IsNested="true">
+				<xs:selector xpath=".//SsasTables" />
+				<xs:field xpath="@SsasModelLogicalName" />
+			</xs:keyref>
+		</xs:element>
+	</xs:schema>

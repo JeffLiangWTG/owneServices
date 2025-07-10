@@ -1,0 +1,13 @@
+CREATE TABLE [dbo].[DataProcessingClone]
+(
+	DPC_PK UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_DataProcessingClone_DPC_PK DEFAULT (NEWID()),
+	DPC_NewRecordPK UNIQUEIDENTIFIER NOT NULL,
+	DPC_ExpiredRecordPK UNIQUEIDENTIFIER NOT NULL,
+	DPC_TableCode varchar(3) NOT NULL,
+	DPC_Status varchar(3) NOT NULL,
+	DPC_SourceId UNIQUEIDENTIFIER NOT NULL,
+	CONSTRAINT [PK_DataProcessingClone_DPC_PK] PRIMARY KEY CLUSTERED (DPC_PK)
+)
+GO
+CREATE NONCLUSTERED INDEX [UX_DataProcessingClone_DPC_SourceId_DPC_TableCode_DPC_Status] ON [DataProcessingClone] (DPC_SourceId, DPC_TableCode, DPC_Status)
+GO

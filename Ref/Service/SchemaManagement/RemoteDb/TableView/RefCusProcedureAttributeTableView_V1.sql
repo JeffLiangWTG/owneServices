@@ -1,0 +1,6 @@
+CREATE VIEW RefCusProcedureAttributeTableView_V1 AS
+SELECT ZXB_PK,
+ZXB_ZZ6_ProcedureCode,
+ZXB_Name,
+ZXB_Value
+FROM RefCusProcedureAttribute

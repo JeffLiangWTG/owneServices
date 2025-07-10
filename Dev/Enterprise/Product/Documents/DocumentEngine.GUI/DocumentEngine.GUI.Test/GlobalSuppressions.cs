@@ -1,0 +1,14 @@
+// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Unit Test>", Scope = "member", Target = "~P:Enterprise.DocumentEngine.GUI.Testing.DocDeliveryFormTest.DocumentMenuItem")]
+[assembly: SuppressMessage("CargoWiseOne", "CW1051:Do not use BaseSourcePath", Justification = "<Pending>", Scope = "member", Target = "~P:Enterprise.DocumentEngine.GUI.Testing.ReportMenuCustomisationTest.ValidTemplateFilePath")]
+[assembly: SuppressMessage("CargoWiseOne", "CW1051:Do not use BaseSourcePath", Justification = "<Pending>", Scope = "member", Target = "~M:Enterprise.DocumentEngine.GUI.Testing.ReportMenuCustomisationTest.GetInvalidTemplateFilePathAndValidationErrorMessagePairs~System.Collections.Generic.KeyValuePair{System.String,System.String}[]")]
+[assembly: SuppressMessage("CargoWiseOne", "CW1199:Do Not Use Unnecessary Resource String In Unit Tests", Justification = "Baseline WI00893395", Scope = "member", Target = "~M:Enterprise.DocumentEngine.GUI.RuntimeOptions.Testing.RegistrationCodeUserControlTest.TestDesiredCaptionWidth")] // Enterprise/Product/Documents/DocumentEngine.GUI/DocumentEngine.GUI.Test/RuntimeOptions/RegistrationCode/RegistrationCodeUserControlTest.cs:33,77
+[assembly: SuppressMessage("CargoWiseOne", "CW1199:Do Not Use Unnecessary Resource String In Unit Tests", Justification = "Baseline WI00893395", Scope = "member", Target = "~M:Enterprise.DocumentEngine.GUI.DocumentMenu.Testing.ZDocumentMenuTestWithData.TestAllSystemDefinedDocumentCategoriesHaveResourceStrings")] // Enterprise/Product/Documents/DocumentEngine.GUI/DocumentEngine.GUI.Test/DocumentMenu/ZDocumentMenuTestWithData.cs:15,64
+[assembly: SuppressMessage("CargoWiseOne", "CW1199:Do Not Use Unnecessary Resource String In Unit Tests", Justification = "Baseline WI00893395", Scope = "member", Target = "~M:Enterprise.DocumentEngine.GUI.RuntimeOptions.Testing.MultipleSelectionLookupUserControlTest.TestDesiredCaptionWidth")] // Enterprise/Product/Documents/DocumentEngine.GUI/DocumentEngine.GUI.Test/RuntimeOptions/Lookup/MultipleSelectionLookupUserControlTest.cs:27,34
+[assembly: SuppressMessage("CargoWiseOne", "CW1199:Do Not Use Unnecessary Resource String In Unit Tests", Justification = "Baseline WI00893395", Scope = "member", Target = "~M:Enterprise.DocumentEngine.GUI.RuntimeOptions.Testing.RuntimeOptionUserControlBaseTest`1.TestDesiredCaptionWidth")] // Enterprise/Product/Documents/DocumentEngine.GUI/DocumentEngine.GUI.Test/RuntimeOptions/RuntimeOptionUserControlBaseTest.cs:44,35

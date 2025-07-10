@@ -1,0 +1,10 @@
+// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~M:CargoWise.Bi.Deployment.ReportingServices.PowerBiDeployer.CreateDataset(System.String,System.String,System.String)")] // C:\git\wtg\CargoWise\Dev\BusinessIntelligence\BiIntegration\Deployment\CargoWiseBiDeployment\ReportingServices\BiReportsService\PowerBiDeployer.cs:563:4
+[assembly: SuppressMessage("CargoWiseOne", "CW1161:Res.GetString Analyzer", Justification = "<Pending>", Scope = "member", Target = "~M:CargoWise.Bi.Deployment.ReportingServices.AuditApi.AuditApiScriptRunner.GetChangeData(System.String,System.String,System.Byte[],System.Byte[],System.Collections.Generic.List{System.String})~System.Collections.Generic.List{CargoWise.Bi.Deployment.ReportingServices.ChangeData}")]
+[assembly: SuppressMessage("CargoWiseOne", "CW1161:Res.GetString Analyzer", Justification = "<Pending>", Scope = "member", Target = "~M:CargoWise.Bi.Deployment.ReportingServices.AuditApiScriptRunner.GetChangeData(System.String,System.String,System.Byte[],System.Byte[],System.Collections.Generic.List{System.String})~System.Collections.Generic.List{CargoWise.Bi.Deployment.ReportingServices.ChangeData}")]
+[assembly: SuppressMessage("CargoWiseOne", "CW1161:Res.GetString Analyzer", Justification = "<Pending>", Scope = "member", Target = "~M:CargoWise.Bi.Deployment.ReportingServices.AuditApiScriptRunner.GetChangeData(System.String,System.String,System.Byte[],System.Byte[],System.Collections.Generic.List{System.String},System.Byte[],System.Int32,System.Int32,System.Int32)~System.Collections.Generic.List{CargoWise.Bi.Deployment.ReportingServices.ChangeData}")]

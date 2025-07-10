@@ -1,0 +1,79 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+    <IsSelfContainedWithILMergeAndReferencesAreCurated>true</IsSelfContainedWithILMergeAndReferencesAreCurated>
+    <SuppressObsoleteWarnings>SYSLIB0018;SYSLIB0051</SuppressObsoleteWarnings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.ActiveDirectory" />
+    <Reference Include="CargoWise.ApplicationManager.Common" />
+    <Reference Include="CargoWise.BrandManager" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="WTG.Authenticode" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <EmbeddedResource Include="..\..\..\..\Bin\CargoWise.ApplicationManager.Common.dll">
+      <Link>Resources\CargoWise.ApplicationManager.Common.dll</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\..\..\Bin\Enterprise.URLHandler.Integration.dll">
+      <Link>Resources\Enterprise.URLHandler.Integration.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\..\..\Bin\System.Resources.Extensions.dll">
+      <Link>Resources\System.Resources.Extensions.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\..\..\Bin\System.Buffers.dll">
+      <Link>Resources\System.Buffers.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\..\..\Bin\System.Memory.dll">
+      <Link>Resources\System.Memory.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\..\..\Bin\System.Numerics.Vectors.dll">
+      <Link>Resources\System.Numerics.Vectors.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\..\..\Bin\System.Runtime.CompilerServices.Unsafe.dll">
+      <Link>Resources\System.Runtime.CompilerServices.Unsafe.dll</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="GUI\CWNextProgressForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="GUI\CW1ProgressForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="GUI\InstallationResultsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Properties\Resources.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Design" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Resources.Extensions" />
+    <Reference Include="System.ServiceProcess" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreWindowsTargetFramework)' == 'true'">
+    <PackageReference Include="System.ServiceProcess.ServiceController" />
+    <Reference Include="System.Reflection.MetadataLoadContext" />
+  </ItemGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+</Project>

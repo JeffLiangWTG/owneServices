@@ -1,0 +1,7 @@
+CREATE VIEW RefMessagingBussCarrierInfoTableView_V1 AS
+SELECT ZMC_PK,
+ZMC_ZMP_PackageInfo,
+ZMC_CarrierCode,
+ZMC_CarrierName,
+ZMC_CountryCode
+FROM RefMessagingBussCarrierInfo

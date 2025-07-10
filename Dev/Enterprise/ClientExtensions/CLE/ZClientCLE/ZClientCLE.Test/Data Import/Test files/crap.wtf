@@ -1,0 +1,13 @@
+	DataTransferSwitchRegistryBusinessObject b = new DataTransferSwitchRegistryBusinessObject();
+            b.GroupPK = notificationGroupPK;
+            b.NextRunDateTime = ZDateTime.Now.AddMinutes(-20);
+            resourceRetriever = new EmbeddedResourceRetriever(GetType().Assembly);
+            b.Directory = resourceRetriever.SaveAllResourcesToFiles();
+            b.Interval = 25;
+            b.EnableInterface = true;
+            CLEDataRegistry.Instance.SwitchOrderImportItem.SetValue(GlbCompany.CurrentCompany.PK.ToGuid(), Guid.Empty, Guid.Empty, b);
+
+            LoggingInformation Logger = new LoggingInformation();
+            CLEOrdersImportProcessor batc = new CLEOrdersImportProcessor(Logger);
+            batc.ExecuteBatch();
+            Assert(Logger.UserLogStrings.Contains("\t\t\tOrder Data Import Error. Specified folder does not exist. Please check Admin->Registry->CLE Client Specific->Orders Import->Order Import Settings"));

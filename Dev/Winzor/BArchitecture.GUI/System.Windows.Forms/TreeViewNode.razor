@@ -1,0 +1,226 @@
+@namespace System.Windows.Forms
+@using WinzorFramework.Extensions
+@using System.Drawing
+
+@if (Node is not null && Node.TreeView is not null)
+{
+    var nodesArray = Node.Nodes is not null ? Node.Nodes.ToArray() : Array.Empty<TreeNode>();
+    var localTreeView = Node.TreeView;
+	<li class="treeview__node @(IsNodeSelectedStyle(localTreeView) ? "treeview__node--selected" : string.Empty)" @ref="Node.ElementReference" @ondrop=@(e => OnDragDrop.InvokeAsync((e, new TreeViewHitTestInfo(Node, TreeViewHitTestLocations.Label)))) @ondrop:stopPropagation draggable="@(localTreeView.AllowDrop ? "true" : "false")" @key="Node.TreeNodeKey">
+        <div class="treeview__nodecontent">
+            @if (ShowCheckbox)
+            {
+                <input class="treeview__nodecheckbox" type="checkbox" checked=@Node.Checked @onchange="Node.CheckedChangedAsync" />
+            }
+			@if (localTreeView.StateImageList?.Images.Any() ?? false)
+            {
+                <span class="treeview__nodestateimage" @onmousedown=@(e => OnNodeMouseDownAsync(e, TreeViewHitTestLocations.StateImage)) @onmousedown:stopPropagation>
+					<img src="@localTreeView.StateImageList?.Images[Node.StateImageIndex].ToBase64DataUrl()" />
+                </span>
+            }
+			@if (localTreeView.ImageList?.Images.Any() ?? false)
+            {
+                <span class="treeview__nodeimage" @onmousedown=@(e => OnNodeMouseDownAsync(e, TreeViewHitTestLocations.Image)) @onmousedown:stopPropagation>
+					<img src="@localTreeView.ImageList?.Images[Node.ImageIndex].ToBase64DataUrl()" />
+                </span>
+            }
+            @if (!string.IsNullOrEmpty(Node.Text))
+            {
+                <span class="treeview__nodetext" style="@NodeFontStyleString(localTreeView)" @onmousedown=@(e => OnNodeMouseDownAsync(e, TreeViewHitTestLocations.Label)) @onmousedown:stopPropagation tabindex="@_currentTabIndex">@Node.Text</span>   
+            }
+            @if (Node.NodeTokens is not null && Node.NodeTokens.Count > 0)
+            {
+                for (int i = 0; i < Node.NodeTokens.Count; i++)
+                {
+                    <p style="@TokensStyleString(Node.NodeTokens[i],i)" @onmousedown=@(e => OnNodeMouseDownAsync(e, TreeViewHitTestLocations.Label)) @onmousedown:stopPropagation>@Node.NodeTokens[i]</p>
+                }
+            }
+            @if (!string.IsNullOrEmpty(Node.Status))
+            {
+                <p style="@StatusStyle()" @onmousedown=@(e => OnNodeMouseDownAsync(e, TreeViewHitTestLocations.Label)) @onmousedown:stopPropagation>@Node.Status</p>
+            }
+        </div>
+        @if (nodesArray.Length > 0)
+        {
+            <button class="treeview__nodebutton" @onmousedown=OnNodeButtonMouseDownAsync @onmousedown:stopPropagation tabindex="-1">@(Node.IsExpanded ? "−" : "+")</button>
+            @if (Node.IsExpanded)
+            {
+                <ul class="treeview__nodes @NodesExtraClassName(localTreeView)">
+                    @foreach (var node in nodesArray)
+                    {
+                        <TreeViewNode Node=node Sorted=Sorted ShowCheckbox=ShowCheckbox OnSelect=OnSelect OnToggleExpand=OnToggleExpand OnClickNodeButton=OnClickNodeButton OnDragDrop=OnDragDrop  />
+                    }
+                </ul>
+            }
+        }
+    </li>
+}
+
+@code {
+    [Parameter] public TreeNode? Node { get; set; } = null;
+
+    [Parameter] public bool Sorted { get; set; }
+
+    [Parameter] public bool ShowCheckbox { get; set; }
+
+    [Parameter] public EventCallback<(WebMouseEventArgs, TreeViewHitTestInfo)> OnSelect { get; set; }
+
+    [Parameter] public EventCallback<TreeNode> OnToggleExpand { get; set; }
+
+    [Parameter] public EventCallback<(WebMouseEventArgs, TreeViewHitTestInfo)> OnClickNodeButton { get; set; }
+
+    [Parameter] public EventCallback<(WebDragEventArgs, TreeViewHitTestInfo)> OnDragDrop { get; set; }
+
+    [Parameter] public int InitialTabIndex { get; set; } = -1;
+
+    int _currentTabIndex;
+
+    bool IsNodeSelectedStyle(TreeView? treeView) => (Node is not null && Node.IsSelected) || (treeView is not null && treeView.SelectedNode is null && _currentTabIndex == 0);
+
+    const int TokenGap = 5;
+
+	string NodesExtraClassName(TreeView? treeView) => treeView?.ImageList is not null && treeView.ImageList.Images.Any() ? "treeview__nodes-has-img" : "";
+
+    protected override void OnInitialized()
+    {
+        _currentTabIndex = InitialTabIndex;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Node?.TreeView?.SelectedNode != null)
+        {
+            _currentTabIndex = Node.IsSelected ? 0 : -1;
+        }
+    }
+
+	string NodeFontStyleString(TreeView? treeView)
+    {
+        var fontStyleString = string.Empty;
+		if (Node is null || treeView is null || treeView.IsDisposed)
+        {
+            return fontStyleString;
+        }
+		var nodeForeColor = Node.ForeColor != Color.Empty ? Node.ForeColor : treeView.ForeColor;
+		var nodeBackColor = Node.BackColor != Color.Empty ? Node.BackColor : treeView.BackColor;
+
+        if (Node.IsSelected)
+        {
+            nodeForeColor = SystemColors.HighlightText;
+			nodeBackColor = treeView.Focused ? SystemColors.Highlight : Color.LightGray;
+        }
+
+		if (nodeForeColor != treeView.ForeColor)
+        {
+            fontStyleString += $"color:{nodeForeColor.GetColorStyleValue()};";
+        }
+
+		if (nodeBackColor != treeView.BackColor)
+        {
+            fontStyleString += $"background:{nodeBackColor.GetColorStyleValue()};";
+        }
+
+        if (Node.NodeFont != null)
+        {
+			if (Node.NodeFont.Bold && !treeView.Font.Bold)
+            {
+                fontStyleString += "font-weight:bold;";
+            }
+
+			if (Node.NodeFont.Italic && !treeView.Font.Italic)
+            {
+                fontStyleString += "font-style:italic;";
+            }
+
+			if (Node.NodeFont.Name != treeView.Font.Name)
+            {
+                fontStyleString += $"font-family:{Node.NodeFont.Name};";
+            }
+
+			if (Node.NodeFont.Size != treeView.Font.Size)
+            {
+                fontStyleString += $"font-size:{Node.NodeFont.Size}pt;";
+            }
+        }
+
+        return fontStyleString;
+    }
+    string StatusStyle()
+    {
+	    if (Node is null)
+	    {
+		    return string.Empty;
+	    }
+
+        var statusStyle = $"margin-left:{TokenGap}px;";
+
+        if (!string.IsNullOrEmpty(Node.StatusColor.ToString()))
+        {
+            statusStyle += $"color:{Node.StatusColor.GetColorStyleValue()};";
+        }
+
+        if (Node.StatusFont is not null)
+        {
+            statusStyle += $"font-family:{Node.StatusFont.Name};";
+            statusStyle += $"font-size:{Node.StatusFont.Size}pt;";
+            statusStyle += "font-weight:bold;";
+        }
+
+        return statusStyle;
+    }
+
+    string TokensStyleString(string token, int index)
+    {
+	    if (Node is null)
+	    {
+		    return string.Empty;
+	    }
+
+        var tokensStyleString = string.Empty;
+
+        if (!string.IsNullOrEmpty(Node.TokensColor.ToString()))
+        {
+            tokensStyleString += $"color:{Node.TokensColor.GetColorStyleValue()};";
+        }
+
+        if (Node.TokensCaptionFont is not null && token.Contains("(") || token.Contains(")") || token.Contains(",") || token.Contains(":"))
+        {
+            tokensStyleString += $"font-family:{Node.TokensCaptionFont!.Name};";
+            tokensStyleString += $"font-size:{Node.TokensCaptionFont.Size}pt;";
+            if (token.Contains(" "))
+            {
+                tokensStyleString += $"padding-right:{TokenGap}px;";
+            }
+        }
+        else
+        {
+            tokensStyleString += $"font-family:{Node.TokensFont.Name};";
+            tokensStyleString += $"font-size:{Node.TokensFont.Size}pt;";
+            tokensStyleString += "font-weight:bold;";
+        }
+
+        if (index == 0)
+        {
+            tokensStyleString += $"margin-left:{TokenGap}px;";
+        }
+
+        return tokensStyleString;
+    }
+
+    internal async Task OnNodeButtonMouseDownAsync(WebMouseEventArgs e)
+    {
+        await OnToggleExpand.InvokeAsync(Node);
+        await OnClickNodeButton.InvokeAsync((e, new TreeViewHitTestInfo(Node, TreeViewHitTestLocations.PlusMinus)));
+    }
+
+    internal async Task OnNodeMouseDownAsync(WebMouseEventArgs e, TreeViewHitTestLocations location)
+    {
+        await OnSelect.InvokeAsync((e, new TreeViewHitTestInfo(Node, location)));
+
+        //Multiple double clicks should continue to expand and collapse the node
+        if (e.Detail % 2 == 0)
+        {
+            await OnToggleExpand.InvokeAsync(Node);
+        }
+    }
+}

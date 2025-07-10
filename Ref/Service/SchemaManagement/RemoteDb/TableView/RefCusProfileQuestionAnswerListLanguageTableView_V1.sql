@@ -1,0 +1,6 @@
+CREATE VIEW RefCusProfileQuestionAnswerListLanguageTableView_V1 AS
+SELECT XAL_PK,
+XAL_XQ4_QuestionAnswer,
+XAL_Description,
+XAL_ZX6_NKLanguage
+FROM RefCusProfileQuestionAnswerListLanguage

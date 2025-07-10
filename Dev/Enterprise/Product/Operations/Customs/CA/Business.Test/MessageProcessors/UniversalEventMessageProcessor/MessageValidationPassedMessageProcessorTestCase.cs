@@ -1,0 +1,69 @@
+using System;
+using CargoWise.EntityFramework.Testing;
+using CargoWise.Types;
+using Enterprise.Customs.CA.Registry;
+using Enterprise.Environment;
+using Enterprise.MasterFiles.Business;
+using Enterprise.UniversalDataBuss.Integration;
+using Enterprise.UniversalDataBuss.Management;
+using Enterprise.UniversalDataBuss.Management.Testing;
+using UniversalEvent = Enterprise.UniversalDataBuss.DataObjects.Universal.Event;
+
+namespace Enterprise.Customs.CA.Business.MessageProcessors.Testing
+{
+	sealed class MessageValidationPassedMessageProcessorTestCase : TestCaseWithFactory
+	{
+		public void TestGetEmailRegistryValues()
+		{
+			var declaration = Factory.New<JobDeclaration>();
+			var entry = declaration.CustomsEntryHeaders.AddNew();
+
+			var processor = new MessageValidationPassedMessageProcessorForTesting(logger, universalEvent, message, entry);
+			AssertEquals("newGroupMM", newGroupNN.PK, processor.NotifyEmailGroup_Exposed);
+			AssertEquals("email Mode", Core.Constants.EmailTo.StaffMember, processor.NotifyEmailMode_Exposed);
+		}
+
+		public void TestGetAssociatedBusinessObjectDescription()
+		{
+			var declaration = Factory.New<JobDeclaration>();
+			var entry = declaration.CustomsEntryHeaders.AddNew();
+
+			var processor = new MessageValidationPassedMessageProcessorForTesting(logger, universalEvent, message, entry);
+
+			var expectedAssociatedBusinessObjectDescription = "A 'Message Acknowledged' response has been received from the CBSA for a(n) Test IID Declaration.";
+			AssertEquals("GetAssociatedBusinessObjectDescription", expectedAssociatedBusinessObjectDescription, processor.AssociatedBusinessObjectDescription_Exposed);
+		}
+
+		class MessageValidationPassedMessageProcessorForTesting : MessageValidationPassedMessageProcessor
+		{
+			public MessageValidationPassedMessageProcessorForTesting(IXmlSessionTracker logger, UniversalEvent universalEvent, UniversalEventMessage message, CusEntryHeader entry)
+				: base(logger, universalEvent, message, entry)
+			{ }
+
+			public ZGuid NotifyEmailGroup_Exposed => base.NotifyEmailGroup;
+
+			public ZString NotifyEmailMode_Exposed => base.NotifyEmailMode;
+
+			public ZString AssociatedBusinessObjectDescription_Exposed => base.GetAssociatedBusinessObjectDescription();
+		}
+
+		protected override void SetUp()
+		{
+			base.SetUp();
+			logger = new XmlSessionTracker(new ServiceTaskLogForTesting());
+			message = Factory.New<UniversalEventMessage>();
+			universalEvent = message.GetEM_MessageTextReader().Parse<UniversalEvent>();
+
+			newGroupNN = Factory.New<GlbGroup>();
+			newGroupNN.GG_Code = "NN1";
+
+			CACustomsDataRegistry.Instance.SendDeclarationMessageAcknowledgements.SetTemporaryValue(Env.CurrentCompany.PK, Guid.Empty, Guid.Empty, Core.Constants.EmailTo.StaffMember);
+			CACustomsDataRegistry.Instance.SendDeclarationMessageAcknowledgementsToGroup.SetTemporaryValue(GlbCompany.CurrentCompany.PK.ToGuid(), Guid.Empty, Guid.Empty, newGroupNN.PK.ToGuid());
+		}
+
+		GlbGroup newGroupNN;
+		IXmlSessionTracker logger;
+		UniversalEventMessage message;
+		UniversalEvent universalEvent;
+	}
+}

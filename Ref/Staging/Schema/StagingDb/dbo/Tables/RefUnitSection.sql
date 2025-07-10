@@ -1,0 +1,9 @@
+CREATE TABLE [RefUnitSection] (
+   [RUS_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefUnitSection_RUS_PK] DEFAULT (NEWID()),
+   [RUS_Code] VARCHAR(10) NOT NULL CONSTRAINT [DF_RefUnitSection_RUS_Code] DEFAULT (''),
+   [RUS_Description] VARCHAR(50) NOT NULL CONSTRAINT [DF_RefUnitSection_RUS_Description] DEFAULT (''),
+   [RUS_Group] VARCHAR(10) NOT NULL CONSTRAINT [DF_RefUnitSection_RUS_Group] DEFAULT (''),
+    CONSTRAINT [PK_RefUnitSection] PRIMARY KEY CLUSTERED ([RUS_PK] ASC),
+    CONSTRAINT [CK_RefUnitSection_RUS_Group] CHECK  ([RUS_Group] = 'CEDEX' OR [RUS_Group] = 'MERC')
+)
+GO

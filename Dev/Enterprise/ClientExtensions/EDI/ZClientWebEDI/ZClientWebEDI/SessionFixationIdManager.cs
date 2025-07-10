@@ -1,0 +1,79 @@
+using System;
+using System.Web;
+using System.Web.SessionState;
+using CargoWise.Data;
+using CargoWise.Definitions.Authentication;
+using Enterprise.ZArchitecture.GlowInterop;
+using Enterprise.ZArchitecture.Web.GUI.Login;
+using WTG.StaticAnalysis.Annotation;
+
+namespace Enterprise.ZClientWebCargoWiseEDI
+{
+	[CodeAlive("This class is a custom sessionIDManagerType referenced in the web.config sessionState")]
+	public class SessionFixationIdManager : ISessionIDManager
+	{
+		public SessionFixationIdManager() : this(new SessionIDManager()) { }
+
+		public SessionFixationIdManager(ISessionIDManager manager)
+		{
+			idManager = manager ?? throw new ArgumentNullException(nameof(manager));
+		}
+
+		readonly ISessionIDManager idManager;
+
+		public string CreateSessionID(HttpContext context)
+		{
+			return idManager.CreateSessionID(context);
+		}
+
+		public string GetSessionID(HttpContext context)
+		{
+			using (Db.DisposableActionForDbConnection())
+			{
+				if (context.Request.IsAuthenticated)
+				{
+					return idManager.GetSessionID(context);
+				}
+				else
+				{
+					var isAuthenticating = false;
+					var token = LoginRouter.GetIdentityTokenFromRequest(context.Request);
+					if (!string.IsNullOrEmpty(token))
+					{
+						var accessControl = (ITokenizedAccessControl)new TokenizedAccessControl();
+						using (Db.DisposableActionForDbConnection())
+						{
+							isAuthenticating = accessControl.TryPeek(token, AccessTokenTypes.LoginRouterIdentity, out _) || accessControl.TryPeek(token, AccessTokenTypes.LoginRouterMultiContactIdentity, out _);
+						}
+					}
+					return isAuthenticating ? idManager.GetSessionID(context) : null;
+				}
+			}
+		}
+
+		public void Initialize()
+		{
+			idManager.Initialize();
+		}
+
+		public bool InitializeRequest(HttpContext context, bool suppressAutoDetectRedirect, out bool supportSessionIDReissue)
+		{
+			return idManager.InitializeRequest(context, suppressAutoDetectRedirect, out supportSessionIDReissue);
+		}
+
+		public void RemoveSessionID(HttpContext context)
+		{
+			idManager.RemoveSessionID(context);
+		}
+
+		public void SaveSessionID(HttpContext context, string id, out bool redirected, out bool cookieAdded)
+		{
+			idManager.SaveSessionID(context, id, out redirected, out cookieAdded);
+		}
+
+		public bool Validate(string id)
+		{
+			return idManager.Validate(id);
+		}
+	}
+}

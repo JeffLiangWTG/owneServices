@@ -1,0 +1,9 @@
+CREATE TABLE [dbo].[RefPortPolygon]
+(
+	[RPP_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefPortPolygon_RPP_PK] DEFAULT (NEWID()),
+	[RPP_PortId] INT NOT NULL,
+	[RPP_SerializedPolygon] geography NULL CONSTRAINT [DF_RefPortPolygon_RPP_SerializedPolygon] DEFAULT geography::STPointFromText('POINT EMPTY', 4326),
+
+	CONSTRAINT [PK_UX_RPP_PK] PRIMARY KEY NONCLUSTERED ([RPP_PK] ASC)
+)
+GO

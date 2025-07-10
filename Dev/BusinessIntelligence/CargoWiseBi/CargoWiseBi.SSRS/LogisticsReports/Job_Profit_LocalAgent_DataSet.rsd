@@ -1,0 +1,672 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <Description />
+  <DataSet Name="Job_Profit_LocalAgent_DataSet">
+    <Query>
+      <DataSourceReference>LogisticsModel</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="Branch_Key">
+          <DefaultValue>Branch_Key</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Department_Key">
+          <DefaultValue>Department_Key</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Report_Month">
+          <DefaultValue>DATE(2015,10,1)</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>DateTime</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Transport_Mode">
+          <DefaultValue>=Nothing</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Container_Mode">
+          <DefaultValue>=Nothing</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Destination_Country_Code">
+          <DefaultValue>=Nothing</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Origin_Country_Code">
+          <DefaultValue>=Nothing</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Date_Type">
+          <DefaultValue>Date_Type</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Analyse_Type">
+          <DefaultValue>Analyse_Type</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>DEFINE
+    VAR LocalAgentAgg =
+        SUMMARIZECOLUMNS (
+            'Local Agent'[Local Agent],
+            FILTER (
+                'Company Branch',
+                (
+                    PATHCONTAINS ( @Branch_Key, 'Company Branch'[Branch Key] )
+                        &amp;&amp; @Analyse_Type = "Job"
+                )
+                    || @Analyse_Type = "Transaction"
+            ),
+            FILTER (
+                'Transaction Company Branch',
+                (
+                    PATHCONTAINS (
+                        @Branch_Key,
+                        'Transaction Company Branch'[Transaction Branch Key]
+                    )
+                        &amp;&amp; @Analyse_Type = "Transaction"
+                )
+                    || @Analyse_Type = "Job"
+            ),
+            FILTER (
+                'Department',
+                (
+                    PATHCONTAINS ( @Department_Key, 'Department'[Department Key] ) || @Department_Key = "-1"
+                        &amp;&amp; @Analyse_Type = "Job"
+                )
+                    || @Analyse_Type = "Transaction"
+            ),
+            FILTER (
+                'Transaction Department',
+                (
+                    PATHCONTAINS (
+                        @Department_Key,
+                        'Transaction Department'[Transaction Department Key]
+                    ) || @Department_Key = "-1"
+                        &amp;&amp; @Analyse_Type = "Transaction"
+                )
+                    || @Analyse_Type = "Job"
+            ),
+            FILTER (
+                VALUES ( 'Shipment'[Transport Mode] ),
+                PATHCONTAINS ( @Transport_Mode, 'Shipment'[Transport Mode] )
+                    || ISBLANK ( @Transport_Mode )
+                    || LEN ( @Transport_Mode ) = 0
+            ),
+            FILTER (
+                VALUES ( 'Shipment'[Container Mode] ),
+                PATHCONTAINS ( @Container_Mode, 'Shipment'[Container Mode] )
+                    || ISBLANK ( @Container_Mode )
+                    || LEN ( @Container_Mode ) = 0
+            ),
+            FILTER (
+                VALUES ( 'Port Of Destination'[Port Of Destination Country Code] ),
+                PATHCONTAINS (
+                    @Destination_Country_Code,
+                    'Port Of Destination'[Port Of Destination Country Code]
+                )
+                    || ISBLANK ( @Destination_Country_Code )
+                    || LEN ( @Destination_Country_Code ) = 0
+                    || @Destination_Country_Code = "-1"
+            ),
+            FILTER (
+                VALUES ( 'Port Of Origin'[Port Of Origin Country Code] ),
+                PATHCONTAINS (
+                    @Origin_Country_Code,
+                    'Port Of Origin'[Port Of Origin Country Code]
+                )
+                    || ISBLANK ( @Origin_Country_Code )
+                    || LEN ( @Origin_Country_Code ) = 0
+                    || @Origin_Country_Code = "-1"
+            ),
+	        FILTER (
+	            VALUES ( 'Recognition Date'[Month Date] ),
+	            ('Recognition Date'[Month Date] = VALUE ( @Report_Month )  &amp;&amp; @Date_Type = "Recognition")
+	                || @Date_Type = "Post"
+	        ),
+	        FILTER (
+	            VALUES ( 'Post Date'[Month Date] ),
+	            ('Post Date'[Month Date] = VALUE ( @Report_Month ) &amp;&amp; @Date_Type = "Post")
+	                || @Date_Type = "Recognition"
+	        ),
+            FILTER (
+                VALUES ( 'Shipment'[__Is Shipping] ),
+                NOT ( ISBLANK ( 'Shipment'[__Is Shipping] ) )
+            ),
+            // filter only shipments            
+            "Job Profit", [Job Profit],
+            "Revenue&amp;WIP", [Revenue] + [Work In Progress],
+            "Cost&amp;Accrual", - ( [Cost] + [Accrual] ),
+            "JHCount", COUNTAX ( 'Job Header', 'Job Header'[Job Header Key] )
+        )
+EVALUATE
+SELECTCOLUMNS (
+    UNION (
+        ////////////////Profitable Local Agents///////////////////////////////////
+        TOPN (
+            20,
+            FILTER ( LocalAgentAgg, [Job Profit] &gt; 0 ),
+            [Job Profit], 0
+        ),
+        ////////////////Loss Local Agents///////////////////////////////////   
+        TOPN (
+            5,
+            FILTER ( LocalAgentAgg, [Job Profit] &lt;= 0 ),
+            - [Job Profit], 0
+        )
+    ),
+    "Local Agent", IF (
+        LEN ( 'Local Agent'[Local Agent] ) &gt; 30,
+        LEFT ( 'Local Agent'[Local Agent], 28 ) &amp; "...",
+        'Local Agent'[Local Agent]
+    ),
+    "Local Agent Actual", 'Local Agent'[Local Agent],
+    "Job Profit", IF ( ISBLANK ( [Job Profit] ), 0, [Job Profit] ),
+    "Revenue&amp;WIP", IF ( ISBLANK ( [Revenue&amp;WIP] ), 0, [Revenue&amp;WIP] ),
+    "Cost&amp;Accrual", IF ( ISBLANK ( [Cost&amp;Accrual] ), 0, [Cost&amp;Accrual] ),
+    "Job Profit Avg", IF ( ISBLANK ( [Job Profit] ), 0, [Job Profit] / [JHCount] ),
+    "Revenue Avg", IF ( ISBLANK ( [Revenue&amp;WIP] ), 0, [Revenue&amp;WIP] / [JHCount] ),
+    "Cost Avg", IF ( ISBLANK ( [Cost&amp;Accrual] ), 0, [Cost&amp;Accrual] / [JHCount] ),
+    "Colour_Code", RANKX ( ALLSELECTED ( 'Local Agent'[Local Agent] ), 'Local Agent'[Local Agent] )
+)</CommandText>
+      <rd:DesignerState>
+        <QueryDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/AnalysisServices/QueryDefinition">
+          <CommandType>DMX</CommandType>
+          <Type>Query</Type>
+          <QuerySpecification xsi:type="DMXQuerySpecification">
+            <Select>
+              <Items>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[Local Agent]</ColumnName>
+                  </ID>
+                  <ItemCaption>[Local Agent]</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[Local Agent Actual]</ColumnName>
+                  </ID>
+                  <ItemCaption>[Local Agent Actual]</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[Job Profit]</ColumnName>
+                  </ID>
+                  <ItemCaption>[Job Profit]</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[Revenue&amp;WIP]</ColumnName>
+                  </ID>
+                  <ItemCaption>[Revenue&amp;WIP]</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[Cost&amp;Accrual]</ColumnName>
+                  </ID>
+                  <ItemCaption>[Cost&amp;Accrual]</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[Job Profit Avg]</ColumnName>
+                  </ID>
+                  <ItemCaption>[Job Profit Avg]</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[Revenue Avg]</ColumnName>
+                  </ID>
+                  <ItemCaption>[Revenue Avg]</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[Cost Avg]</ColumnName>
+                  </ID>
+                  <ItemCaption>[Cost Avg]</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[Colour_Code]</ColumnName>
+                  </ID>
+                  <ItemCaption>[Colour_Code]</ItemCaption>
+                </Item>
+              </Items>
+            </Select>
+            <AutoExecute>false</AutoExecute>
+            <Data>&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;DataminingQueryBuilderState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;SelectTablesControlState&gt;
+    &lt;Tables /&gt;
+  &lt;/SelectTablesControlState&gt;
+  &lt;IsSingletonQuery&gt;false&lt;/IsSingletonQuery&gt;
+  &lt;View&gt;Text&lt;/View&gt;
+  &lt;QueryText&gt;DEFINE
+    VAR LocalAgentAgg =
+        SUMMARIZECOLUMNS (
+            'Local Agent'[Local Agent],
+            FILTER (
+                'Company Branch',
+                (
+                    PATHCONTAINS ( @Branch_Key, 'Company Branch'[Branch Key] )
+                        &amp;amp;&amp;amp; @Analyse_Type = "Job"
+                )
+                    || @Analyse_Type = "Transaction"
+            ),
+            FILTER (
+                'Transaction Company Branch',
+                (
+                    PATHCONTAINS (
+                        @Branch_Key,
+                        'Transaction Company Branch'[Transaction Branch Key]
+                    )
+                        &amp;amp;&amp;amp; @Analyse_Type = "Transaction"
+                )
+                    || @Analyse_Type = "Job"
+            ),
+            FILTER (
+                'Department',
+                (
+                    PATHCONTAINS ( @Department_Key, 'Department'[Department Key] )
+                        &amp;amp;&amp;amp; @Analyse_Type = "Job"
+                )
+                    || @Analyse_Type = "Transaction"
+            ),
+            FILTER (
+                'Transaction Department',
+                (
+                    PATHCONTAINS (
+                        @Department_Key,
+                        'Transaction Department'[Transaction Department Key]
+                    )
+                        &amp;amp;&amp;amp; @Analyse_Type = "Transaction"
+                )
+                    || @Analyse_Type = "Job"
+            ),
+            FILTER (
+                VALUES ( 'Shipment'[Transport Mode] ),
+                PATHCONTAINS ( @Transport_Mode, 'Shipment'[Transport Mode] )
+                    || ISBLANK ( @Transport_Mode )
+                    || LEN ( @Transport_Mode ) = 0
+            ),
+            FILTER (
+                VALUES ( 'Shipment'[Container Mode] ),
+                PATHCONTAINS ( @Container_Mode, 'Shipment'[Container Mode] )
+                    || ISBLANK ( @Container_Mode )
+                    || LEN ( @Container_Mode ) = 0
+            ),
+            FILTER (
+                VALUES ( 'Port Of Destination'[Port Of Destination Country Code] ),
+                PATHCONTAINS (
+                    @Destination_Country_Code,
+                    'Port Of Destination'[Port Of Destination Country Code]
+                )
+                    || ISBLANK ( @Destination_Country_Code )
+                    || LEN ( @Destination_Country_Code ) = 0
+            ),
+            FILTER (
+                VALUES ( 'Port Of Origin'[Port Of Origin Country Code] ),
+                PATHCONTAINS (
+                    @Origin_Country_Code,
+                    'Port Of Origin'[Port Of Origin Country Code]
+                )
+                    || ISBLANK ( @Origin_Country_Code )
+                    || LEN ( @Origin_Country_Code ) = 0
+            ),
+	        FILTER (
+	            VALUES ( 'Recognition Date'[Month Date] ),
+	            ('Recognition Date'[Month Date] = VALUE ( @Report_Month )  &amp;amp;&amp;amp; @Date_Type = "Recognition")
+	                || @Date_Type = "Post"
+	        ),
+	        FILTER (
+	            VALUES ( 'Post Date'[Month Date] ),
+	            ('Post Date'[Month Date] = VALUE ( @Report_Month ) &amp;amp;&amp;amp; @Date_Type = "Post")
+	                || @Date_Type = "Recognition"
+	        ),
+            FILTER (
+                VALUES ( 'Shipment'[__Is Shipping] ),
+                NOT ( ISBLANK ( 'Shipment'[__Is Shipping] ) )
+            ),
+            // filter only shipments            
+            "Job Profit", [Job Profit],
+            "Revenue&amp;amp;WIP", [Revenue] + [Work In Progress],
+            "Cost&amp;amp;Accrual", - ( [Cost] + [Accrual] ),
+            "JHCount", COUNTAX ( 'Job Header', 'Job Header'[Job Header Key] )
+        )
+EVALUATE
+SELECTCOLUMNS (
+    UNION (
+        ////////////////Profitable Local Agents///////////////////////////////////
+        TOPN (
+            20,
+            FILTER ( LocalAgentAgg, [Job Profit] &amp;gt; 0 ),
+            [Job Profit], 0
+        ),
+        ////////////////Loss Local Agents///////////////////////////////////   
+        TOPN (
+            5,
+            FILTER ( LocalAgentAgg, [Job Profit] &amp;lt;= 0 ),
+            - [Job Profit], 0
+        )
+    ),
+    "Local Agent", IF (
+        LEN ( 'Local Agent'[Local Agent] ) &amp;gt; 30,
+        LEFT ( 'Local Agent'[Local Agent], 28 ) &amp;amp; "...",
+        'Local Agent'[Local Agent]
+    ),
+    "Local Agent Actual", 'Local Agent'[Local Agent],
+    "Job Profit", IF ( ISBLANK ( [Job Profit] ), 0, [Job Profit] ),
+    "Revenue&amp;amp;WIP", IF ( ISBLANK ( [Revenue&amp;amp;WIP] ), 0, [Revenue&amp;amp;WIP] ),
+    "Cost&amp;amp;Accrual", IF ( ISBLANK ( [Cost&amp;amp;Accrual] ), 0, [Cost&amp;amp;Accrual] ),
+    "Job Profit Avg", IF ( ISBLANK ( [Job Profit] ), 0, [Job Profit] / [JHCount] ),
+    "Revenue Avg", IF ( ISBLANK ( [Revenue&amp;amp;WIP] ), 0, [Revenue&amp;amp;WIP] / [JHCount] ),
+    "Cost Avg", IF ( ISBLANK ( [Cost&amp;amp;Accrual] ), 0, [Cost&amp;amp;Accrual] / [JHCount] ),
+    "Colour_Code", RANKX ( ALLSELECTED ( 'Local Agent'[Local Agent] ), 'Local Agent'[Local Agent] )
+)&lt;/QueryText&gt;
+  &lt;DatabaseId /&gt;
+  &lt;MiningStructureId /&gt;
+  &lt;MiningModelId /&gt;
+  &lt;ColumnMappings /&gt;
+  &lt;GridRows /&gt;
+&lt;/DataminingQueryBuilderState&gt;</Data>
+          </QuerySpecification>
+          <Query>
+            <Statement>DEFINE
+    VAR LocalAgentAgg =
+        SUMMARIZECOLUMNS (
+            'Local Agent'[Local Agent],
+            FILTER (
+                'Company Branch',
+                (
+                    PATHCONTAINS ( @Branch_Key, 'Company Branch'[Branch Key] )
+                        &amp;&amp; @Analyse_Type = "Job"
+                )
+                    || @Analyse_Type = "Transaction"
+            ),
+            FILTER (
+                'Transaction Company Branch',
+                (
+                    PATHCONTAINS (
+                        @Branch_Key,
+                        'Transaction Company Branch'[Transaction Branch Key]
+                    )
+                        &amp;&amp; @Analyse_Type = "Transaction"
+                )
+                    || @Analyse_Type = "Job"
+            ),
+            FILTER (
+                'Department',
+                (
+                    PATHCONTAINS ( @Department_Key, 'Department'[Department Key] )
+                        &amp;&amp; @Analyse_Type = "Job"
+                )
+                    || @Analyse_Type = "Transaction"
+            ),
+            FILTER (
+                'Transaction Department',
+                (
+                    PATHCONTAINS (
+                        @Department_Key,
+                        'Transaction Department'[Transaction Department Key]
+                    )
+                        &amp;&amp; @Analyse_Type = "Transaction"
+                )
+                    || @Analyse_Type = "Job"
+            ),
+            FILTER (
+                VALUES ( 'Shipment'[Transport Mode] ),
+                PATHCONTAINS ( @Transport_Mode, 'Shipment'[Transport Mode] )
+                    || ISBLANK ( @Transport_Mode )
+                    || LEN ( @Transport_Mode ) = 0
+            ),
+            FILTER (
+                VALUES ( 'Shipment'[Container Mode] ),
+                PATHCONTAINS ( @Container_Mode, 'Shipment'[Container Mode] )
+                    || ISBLANK ( @Container_Mode )
+                    || LEN ( @Container_Mode ) = 0
+            ),
+            FILTER (
+                VALUES ( 'Port Of Destination'[Port Of Destination Country Code] ),
+                PATHCONTAINS (
+                    @Destination_Country_Code,
+                    'Port Of Destination'[Port Of Destination Country Code]
+                )
+                    || ISBLANK ( @Destination_Country_Code )
+                    || LEN ( @Destination_Country_Code ) = 0
+            ),
+            FILTER (
+                VALUES ( 'Port Of Origin'[Port Of Origin Country Code] ),
+                PATHCONTAINS (
+                    @Origin_Country_Code,
+                    'Port Of Origin'[Port Of Origin Country Code]
+                )
+                    || ISBLANK ( @Origin_Country_Code )
+                    || LEN ( @Origin_Country_Code ) = 0
+            ),
+	        FILTER (
+	            VALUES ( 'Recognition Date'[Month Date] ),
+	            ('Recognition Date'[Month Date] = VALUE ( @Report_Month )  &amp;&amp; @Date_Type = "Recognition")
+	                || @Date_Type = "Post"
+	        ),
+	        FILTER (
+	            VALUES ( 'Post Date'[Month Date] ),
+	            ('Post Date'[Month Date] = VALUE ( @Report_Month ) &amp;&amp; @Date_Type = "Post")
+	                || @Date_Type = "Recognition"
+	        ),
+            FILTER (
+                VALUES ( 'Shipment'[__Is Shipping] ),
+                NOT ( ISBLANK ( 'Shipment'[__Is Shipping] ) )
+            ),
+            // filter only shipments            
+            "Job Profit", [Job Profit],
+            "Revenue&amp;WIP", [Revenue] + [Work In Progress],
+            "Cost&amp;Accrual", - ( [Cost] + [Accrual] ),
+            "JHCount", COUNTAX ( 'Job Header', 'Job Header'[Job Header Key] )
+        )
+EVALUATE
+SELECTCOLUMNS (
+    UNION (
+        ////////////////Profitable Local Agents///////////////////////////////////
+        TOPN (
+            20,
+            FILTER ( LocalAgentAgg, [Job Profit] &gt; 0 ),
+            [Job Profit], 0
+        ),
+        ////////////////Loss Local Agents///////////////////////////////////   
+        TOPN (
+            5,
+            FILTER ( LocalAgentAgg, [Job Profit] &lt;= 0 ),
+            - [Job Profit], 0
+        )
+    ),
+    "Local Agent", IF (
+        LEN ( 'Local Agent'[Local Agent] ) &gt; 30,
+        LEFT ( 'Local Agent'[Local Agent], 28 ) &amp; "...",
+        'Local Agent'[Local Agent]
+    ),
+    "Local Agent Actual", 'Local Agent'[Local Agent],
+    "Job Profit", IF ( ISBLANK ( [Job Profit] ), 0, [Job Profit] ),
+    "Revenue&amp;WIP", IF ( ISBLANK ( [Revenue&amp;WIP] ), 0, [Revenue&amp;WIP] ),
+    "Cost&amp;Accrual", IF ( ISBLANK ( [Cost&amp;Accrual] ), 0, [Cost&amp;Accrual] ),
+    "Job Profit Avg", IF ( ISBLANK ( [Job Profit] ), 0, [Job Profit] / [JHCount] ),
+    "Revenue Avg", IF ( ISBLANK ( [Revenue&amp;WIP] ), 0, [Revenue&amp;WIP] / [JHCount] ),
+    "Cost Avg", IF ( ISBLANK ( [Cost&amp;Accrual] ), 0, [Cost&amp;Accrual] / [JHCount] ),
+    "Colour_Code", RANKX ( ALLSELECTED ( 'Local Agent'[Local Agent] ), 'Local Agent'[Local Agent] )
+)</Statement>
+            <ParameterDefinitions>
+              <ParameterDefinition>
+                <Name>Branch_Key</Name>
+                <DefaultValues>
+                  <DefaultValue>Branch_Key</DefaultValue>
+                </DefaultValues>
+                <Caption>Branch_Key</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Department_Key</Name>
+                <DefaultValues>
+                  <DefaultValue>Department_Key</DefaultValue>
+                </DefaultValues>
+                <Caption>Department_Key</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Report_Month</Name>
+                <DefaultValues>
+                  <DefaultValue>DATE(2015,10,1)</DefaultValue>
+                </DefaultValues>
+                <Caption>Report_Month</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Transport_Mode</Name>
+                <DefaultValues>
+                  <DefaultValue>(Null)</DefaultValue>
+                </DefaultValues>
+                <Caption>Transport_Mode</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Container_Mode</Name>
+                <DefaultValues>
+                  <DefaultValue>(Null)</DefaultValue>
+                </DefaultValues>
+                <Caption>Container_Mode</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Destination_Country_Code</Name>
+                <DefaultValues>
+                  <DefaultValue>(Null)</DefaultValue>
+                </DefaultValues>
+                <Caption>Destination_Country_Code</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Origin_Country_Code</Name>
+                <DefaultValues>
+                  <DefaultValue>(Null)</DefaultValue>
+                </DefaultValues>
+                <Caption>Origin_Country_Code</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Date_Type</Name>
+                <DefaultValues>
+                  <DefaultValue>Date_Type</DefaultValue>
+                </DefaultValues>
+                <Caption>Date_Type</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Analyse_Type</Name>
+                <DefaultValues>
+                  <DefaultValue>Analyse_Type</DefaultValue>
+                </DefaultValues>
+                <Caption>Analyse_Type</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+            </ParameterDefinitions>
+          </Query>
+        </QueryDefinition>
+      </rd:DesignerState>
+    </Query>
+    <Fields>
+      <Field Name="Local_Agent">
+        <DataField>[Local Agent]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Local_Agent_Actual">
+        <DataField>[Local Agent Actual]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Job_Profit">
+        <DataField>[Job Profit]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Revenue_WIP">
+        <DataField>[Revenue&amp;WIP]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cost_Accrual">
+        <DataField>[Cost&amp;Accrual]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Job_Profit_Avg">
+        <DataField>[Job Profit Avg]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Revenue_Avg">
+        <DataField>[Revenue Avg]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Cost_Avg">
+        <DataField>[Cost Avg]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Colour_Code">
+        <DataField>[Colour_Code]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

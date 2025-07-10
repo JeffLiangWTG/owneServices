@@ -1,0 +1,77 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <AssemblyName>CargoWise.Windows.UI</AssemblyName>
+    <RootNamespace>CargoWise.Windows.UI</RootNamespace>
+    <UseLegacyRsa>false</UseLegacyRsa>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+    <CWUsesDesignRef>true</CWUsesDesignRef>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>$(NoWarn);CS0067;CS0169;CS0414;CS0436;CS0649;CS8002</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>$(NoWarn);CS0067;CS0169;CS0414;CS0436;CS0649;CS8002</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="AutoList\**" />
+    <EmbeddedResource Remove="AutoList\**" />
+    <None Remove="AutoList\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="BindingSource\Internal\DesignTimeBindingSource.cs" />
+    <Compile Remove="ControlLabels\LabelCaptionPainter.cs" />
+    <Compile Remove="Controls\Design\ControlCodeDomSerializer_Ripped.cs" />
+    <Compile Remove="Controls\Design\ControlDpiScalingCodeDomSerializer.cs" />
+    <Compile Remove="Controls\Design\ControlMostDerivedTypeCodeDomSerializer.cs" />
+    <Compile Remove="Controls\Design\KSplitContainerSerializer.cs" />
+    <Compile Remove="Controls\ExtensionMethods\RichTextBoxExtensions.cs" />
+    <Compile Remove="Controls\Extensions\FormMovementExtensions.cs" />
+    <Compile Remove="Controls\Extensions\OnPaintEventExtension.cs" />
+    <Compile Remove="Controls\Internal\ControlInformationOverlayForm.cs" />
+    <Compile Remove="Controls\Internal\ControlTracker.cs" />
+    <Compile Remove="Controls\KChart.cs" />
+    <Compile Remove="Controls\KElementHost.cs" />
+    <Compile Remove="Controls\KProgressBar.cs" />
+    <Compile Remove="Controls\KSplitter.cs" />
+    <Compile Remove="Controls\KToolStrip.cs" />
+    <Compile Remove="DesignTimeUI.cs" />
+    <Compile Remove="ExternalAppDialogButtonClicker.cs" />
+    <Compile Remove="Interop\KNativeWindow.cs" />
+    <Compile Remove="Interop\LocalWindowsHook.cs" />
+    <Compile Remove="Interop\MouseHook.cs" />
+    <Compile Remove="Interop\MouseHookEventArgs.cs" />
+    <Compile Remove="ONativeWindow.cs" />
+    <Compile Remove="UIResources.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Internal\Notifications\Notifications.resources.resources" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Internal\Notifications\Notifications.resources.resources" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components" />
+    <PackageReference Include="System.CodeDom" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" />
+    <PackageReference Include="System.Resources.Extensions" />
+    <PackageReference Include="System.Collections.Immutable" />
+    <PackageReference Include="System.ServiceModel.Primitives" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="CargoWise.Interop" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Winzor\BArchitecture.GUI\WinzorFramework.csproj" />
+    <ProjectReference Include="..\..\..\Winzor\CargoWise.Interop.Winzor\CargoWise.Interop.Winzor.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="excubowebcompiler.json" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('wwwroot\css\_gen\default.css')">
+    <Content Include="wwwroot\css\_gen\default.css" />
+  </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="dotnet tool run webcompiler -- -r themes -o wwwroot/css/_gen -z disable -p disable -c excubowebcompiler.json" StandardOutputImportance="high" />
+  </Target>
+</Project>

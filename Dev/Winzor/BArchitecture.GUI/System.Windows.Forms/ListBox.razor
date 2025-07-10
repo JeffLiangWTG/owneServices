@@ -1,0 +1,36 @@
+@namespace System.Windows.Forms
+@inherits ListControl
+@using WinzorFramework
+
+<div class="listbox" style="@ControlStyleString @ListBoxStyleString" @attributes="DataAttributes" data-type="@GetType()" data-name="@(Name ?? string.Empty)" ondragover="event.preventDefault();" @ondrop=OnDropAsync @ondrop:stopPropagation @onwinzorfocusin="OnFocusInAsync" @onwinzorfocusin:stopPropagation @onwinzorfocusout="OnFocusOutAsync" @onwinzorfocusout:stopPropagation tabindex="-1">
+	<div class="listbox__wrapper">
+    @{
+        var listItems = ListBoxItemsData;
+        @if (listItems != null && listItems.Length > 0)
+        {
+            @for (var i = 0; i < listItems.Length; i++)
+            {
+                var itemIndex = i;
+                var item = listItems[itemIndex];
+                <div style="@item.StyleString" class="listbox__item @(item.IsSelected ? "listbox__item--selected" : string.Empty)" draggable="@(AllowDrop ? "true" : string.Empty)" allowdrop=@AllowDrop
+             @onmousedown=@(args => OnMouseDownAsync(args, itemIndex)) @onmousedown:stopPropagation @onmouseup="OnMouseUpAsync" @onmouseup:stopPropagation
+			 @onmouseover=@(async(arg) => await MouseOverAsync(arg, itemIndex)) @onmouseover:stopPropagation @onmouseover:preventDefault
+             @ondragstart="StartDrag" @ondragstart:stopPropagation ondragover="@DragOverHandler" ondragleave="@DragLeaveHandler" ondrop="@DragLeaveHandler"
+             @ondragenter=@(async(arg) => await OnDragEnterAsync(arg, itemIndex)) @ondragenter:stopPropagation
+             @onwinzordragend=@(async(arg) => await OnWinzorDragEndAsync(arg, itemIndex)) @onwinzordragend:stopPropagation>
+                    @item.DisplayText
+                </div>
+            }
+            <div class="listbox__item" allowdrop=@AllowDrop ondragover="@DragOverHandler" ondragleave="@DragLeaveHandler" ondrop="@DragLeaveHandler"
+             @ondragenter=@(async(arg) => await OnDragEnterAsync(arg, Items.Count)) @ondragenter:stopPropagation
+                     @onwinzordragend=@(async(arg) => await OnWinzorDragEndAsync(arg, Items.Count)) @onwinzordragend:stopPropagation>
+            </div>
+        }
+    }
+	</div>
+</div>
+
+@code {
+    string DragOverHandler => AllowDrop && !Sorted ? "this.classList.add('listbox__item--over')" : string.Empty;
+    string DragLeaveHandler => AllowDrop ? "this.classList.remove('listbox__item--over')" : string.Empty;
+}

@@ -1,0 +1,22 @@
+using Enterprise.Customs.EU.TemporaryStorage.GUI;
+using Enterprise.ZArchitecture.GUI;
+
+namespace Enterprise.Customs.IE.GUI
+{
+	public class UCC5TemporaryStorageLayoutProvider : ITemporaryStorageLayoutProvider
+	{
+		IPanelLayoutProvider ITemporaryStorageLayoutProvider.GetTemporaryStorageDetailsLayout() => new UCC5TemporaryStorageLayout();
+
+		IPanelLayoutWithGridProvider ITemporaryStorageLayoutProvider.GetTemporaryStorageBillWithGridLayout() => new UCC6TemporaryStorageBillWithGridLayout();
+
+		IPanelLayoutWithGridProvider ITemporaryStorageLayoutProvider.GetTemporaryStoragePackagesWithGridLayout() => new UCC6TemporaryStoragePackagesWithGridLayout();
+
+		IPanelLayoutWithGridProvider ITemporaryStorageLayoutProvider.GetTemporaryStoragePackedItemWithGridLayout() => new UCC6TemporaryStoragePackedItemWithGridLayout();
+
+		IPanelLayoutWithGridProvider ITemporaryStorageLayoutProvider.GetTemporaryStoragePreviousDocumentsDetailsLayoutWithGrid() => new UCC6TemporaryStoragePreviousDocumentsDetailsLayoutWithGrid();
+
+		ITemporaryStorageBillDetailTabLayoutProvider ITemporaryStorageLayoutProvider.GetTemporaryStorageBillDetailTabLayout() => new UCC6TemporaryStorageBillDetailTabLayout();
+
+		ITemporaryStorageGridColumnLayoutProviderFactory ITemporaryStorageLayoutProvider.GetTemporaryStorageGridColumnLayoutProviderFactory() => new UCC6TemporaryStorageGridColumnLayoutProviderFactory();
+	}
+}

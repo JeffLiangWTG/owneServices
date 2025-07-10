@@ -1,0 +1,33 @@
+meta {
+  name: Role is null for a rate party
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.RateParties = [
+       {Code: "ABCD", Role: null },
+       {Code: "EFGH", Role: "RAG"},
+   ];
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Role is Mandatory.", function() {
+    expect(res.body.ModelState['RateParties[0].Role'][0]).to.equal("Role is Mandatory.");
+  });
+}

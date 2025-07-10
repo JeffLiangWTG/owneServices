@@ -1,0 +1,143 @@
+<UserControl x:Class="CargoWise.Main.Navigation.SnapshotModuleAndLayout"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CargoWise.Main.Navigation"
+             xmlns:ui="clr-namespace:CargoWise.Main.Navigation.WPF;assembly=CargoWise.Main.Navigation"
+             xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+             mc:Ignorable="d" 
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             x:Name="Root"
+             Loaded="OnLoaded">
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="./Resources/SnapshotModuleAndLayoutResources.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+			<local:IsNotNullToBoolConverter x:Key="IsNotNullToBoolConverter"/>
+		</ResourceDictionary>
+	</UserControl.Resources>
+
+	<Border Style="{StaticResource ContainerStyle}" 
+            Padding="16,16,25,16">
+		<Grid Margin="0,8">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+
+			<!-- Module Selection Section -->
+			<StackPanel Grid.Row="0" 
+                        Style="{StaticResource InputGroup}"
+                        HorizontalAlignment="Stretch">
+				<ui:MultilingualTextLabel x:Name="ModuleLabel"
+                                          Style="{StaticResource BaseLabelWithAsterisk}"
+                                          MultilingualText="{Binding ModuleLabel}"
+                                          Content="{Binding ModuleLabel}"
+                                          HorizontalContentAlignment="Left"
+                                          HorizontalAlignment="Stretch"
+                                          IsTranslatable="False"/>
+				<ui:MultilingualTextLabel
+					IsTranslatable="False"
+					Style="{StaticResource BaseLabel}"
+					HorizontalContentAlignment="Left"
+					HorizontalAlignment="Stretch">
+					<Grid HorizontalAlignment="Stretch">
+						<ComboBox x:Name="CbModule"
+						      Width="{Binding ActualWidth, Source={x:Reference ModuleLabel}, Mode=OneWay}"
+                              ItemsSource="{Binding FilteredModules, ElementName=Root}"
+                              Text="{Binding SearchModuleText, ElementName=Root}"
+                              IsEditable="True"
+                              IsTextSearchEnabled="False"
+						      DisplayMemberPath="ModuleName"
+                              Style="{StaticResource SnapshotComboBoxStyle}"
+                              VerticalAlignment="Center"
+                              local:ComboBoxHelper.PlaceholderText="{Binding ModulePlaceholder}"
+                              local:ComboBoxHelper.EmptyPrompt="{Binding NoModulesFoundText}"/>
+					</Grid>
+				</ui:MultilingualTextLabel>
+			</StackPanel>
+
+			<!-- Layout Selection Section -->
+			<StackPanel Grid.Row="1" 
+                        Style="{StaticResource InputGroup}">
+				<ui:MultilingualTextLabel x:Name="LayoutLabel"
+                                          Style="{StaticResource BaseLabelWithAsterisk}"
+                                          MultilingualText="{Binding ModuleFilterLabel}"
+                                          Content="{Binding ModuleFilterLabel}"
+                                          HorizontalContentAlignment="Left"
+                                          HorizontalAlignment="Stretch"
+                                          IsTranslatable="False"
+                                          />
+
+				<ui:MultilingualTextLabel IsTranslatable="False"
+				                          Style="{StaticResource BaseLabel}"
+				                          HorizontalContentAlignment="Left"
+				                          HorizontalAlignment="Stretch">
+						<ComboBox x:Name="CbLayout"
+						      Width="{Binding ActualWidth, Source={x:Reference LayoutLabel}, Mode=OneWay}"
+						      ItemsSource="{Binding FilteredLayouts, ElementName=Root}"
+                              Text="{Binding SearchLayoutText, ElementName=Root}"
+                              IsEditable="True"
+                              IsTextSearchEnabled="False"
+                              DisplayMemberPath="ModuleFilterName"
+                              Style="{StaticResource SnapshotComboBoxStyle}"
+                              local:ComboBoxHelper.PlaceholderText="{Binding ModuleFilterPlaceholder}"
+                              local:ComboBoxHelper.EmptyPrompt="{Binding NoLayoutFiltersFoundText}"/>
+				</ui:MultilingualTextLabel>
+			</StackPanel>
+
+			<StackPanel Grid.Row="2"
+			            Orientation="Horizontal"
+			            HorizontalAlignment="Left"
+			            VerticalAlignment="Center"
+			            Margin="0,0,20,0"
+			            Visibility="{Binding Path=HasError, ElementName=Root}">
+				<ui:MultilingualTextLabel IsTranslatable="False"
+				                          Style="{StaticResource BaseLabel}"
+				                          HorizontalContentAlignment="Left"
+				                          HorizontalAlignment="Stretch">
+					<TextBlock Foreground="Red" Text="{Binding ErrorMessage, ElementName=Root}"/>
+				</ui:MultilingualTextLabel>
+			</StackPanel>
+			<!-- Action Buttons -->
+			<StackPanel Grid.Row="3"
+                       x:Name="Buttons"
+                       Orientation="Horizontal"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Margin="0,0,20,0">
+
+				<ui:MultilingualTextLabel MultilingualText="{Binding AddToText}"
+                                          Padding="0"
+                                          Margin="0,8,20,0"
+                                          IsTranslatable="False"
+                                          >
+					<Button x:Name="AddButton"
+                            MinWidth="80"
+                            Content="{Binding AddToText}"
+                            Style="{StaticResource AddButton}"
+                            Click="AddButton_OnClick"
+                            IsEnabled="{Binding SelectedItem, ElementName=CbLayout, Converter={StaticResource IsNotNullToBoolConverter}}"/>
+				</ui:MultilingualTextLabel>
+
+				<ui:MultilingualTextLabel MultilingualText="{Binding CancelText}"
+                                          Padding="0"
+                                          Margin="0,8,0,0"
+                                          IsTranslatable="False"
+                                          >
+					<Button x:Name="CancelButton"
+                            Style="{StaticResource CancelButton}"
+                            Content="{Binding CancelText}"
+                            Click="CancelButton_OnClick"/>
+				</ui:MultilingualTextLabel>
+			</StackPanel>
+
+			
+		</Grid>
+	</Border>
+</UserControl>

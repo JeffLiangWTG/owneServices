@@ -1,0 +1,15 @@
+CREATE VIEW RefCusCodeListAttributeTransportModeView_V1
+WITH SCHEMABINDING 
+AS
+SELECT ZZU_ZZE_Attribute,
+	SUM(CASE WHEN ZZU_TransportMode = 'AIR' THEN 1 ELSE 0 END) AS ZZE_IsAir,
+	SUM(CASE WHEN ZZU_TransportMode = 'SEA' THEN 1 ELSE 0 END) AS ZZE_IsSea,
+	SUM(CASE WHEN ZZU_TransportMode = 'FIX' THEN 1 ELSE 0 END) AS ZZE_IsFix,
+	SUM(CASE WHEN ZZU_TransportMode = 'RAI' THEN 1 ELSE 0 END) AS ZZE_IsRai,
+	SUM(CASE WHEN ZZU_TransportMode = 'ROA' THEN 1 ELSE 0 END) AS ZZE_IsRoa,
+	SUM(CASE WHEN ZZU_TransportMode = 'MAI' THEN 1 ELSE 0 END) AS ZZE_IsMai,
+	SUM(CASE WHEN ZZU_TransportMode = 'INW' THEN 1 ELSE 0 END) AS ZZE_IsInw,
+	COUNT_BIG(*) CNT
+FROM dbo.RefCusCodeOrAttributeTransportMode
+WHERE ZZU_ZZE_Attribute IS NOT NULL
+GROUP BY ZZU_ZZE_Attribute

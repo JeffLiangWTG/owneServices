@@ -1,0 +1,16 @@
+using System.Collections.Generic;
+using Enterprise.UniversalDataBuss.DataObjects.Core.Testing;
+using NUnit.Framework;
+
+namespace Enterprise.UniversalDataBuss.DataObjects.Universal.Customs.Testing
+{
+	[TestedType(typeof(EntryLine))]
+	class EntryLineTest : DataObjectTestCase<EntryLine>
+	{
+		protected override List<string> ExpectedAllowLineControlWhiteSpaceAttributePropertiesCore() => new List<string>()
+		{
+			nameof(EntryLine.Description)
+		};
+	}
+}
+

@@ -1,0 +1,67 @@
+@namespace System.Windows.Forms
+@using WinzorFramework
+@using WinzorFramework.Extensions
+@using System.Drawing
+@inherits ToolStripDropDownItem
+
+<div class="toolstrip-item toolstrip-item--splitbutton @StylingClasses() @(!Enabled ? "disabled": "")" style="@LayoutStyleString" @onmouseenter="OnMouseEnterAsync" @onmouseleave="OnMouseLeaveAsync">
+    <div class="splitbutton__button-wrapper">
+        <div class="toolstrip-item__visual-overlay"></div>
+        <button title="@ButtonTitle" class="splitbutton__button @ButtonImageTextClasses" style="@LookStyleString" @onclick="OnButtonClickAsync" @onclick:stopPropagation disabled="@(!Enabled)">
+            @if (Image is not null)
+            {
+                <img class="splitbutton__button__image" src="@Image.ToBase64DataUrl()" style="@this.ToolStripItemImageStyleString()" draggable="false" />
+            }
+            @if (!string.IsNullOrEmpty(Text))
+            {
+                <span class="splitbutton__button__text">@Text.ProcessMnemonicToHtml(true)</span>
+            }
+        </button>
+    </div>
+    <div class="splitbutton__dropdownbutton-wrapper">
+        <div class="toolstrip-item__visual-overlay"></div>
+        <button class="splitbutton__dropdownbutton" style="@LookStyleString --splitbutton-dropdownbutton-width: @DropDownButtonWidth" @onmousedown=OpenDropDownAsync @onmousedown:preventDefault @onmousedown:stopPropagation disabled="@(!Enabled)">arrow_drop_down</button>
+    </div>
+</div>
+
+@code {
+    async Task OpenDropDownAsync()
+    {
+        if (!Enabled)
+        {
+            return;
+        }
+        await InvokeWinzorDispatcherAsync(() =>
+        {
+            ShowDropDown();
+        });
+    }
+
+    string ButtonImageTextClasses
+    {
+        get
+        {
+            var styleString = "splitbutton__button";
+
+            if (Image is not null)
+            {
+                if (!string.IsNullOrEmpty(Text))
+                {
+                    styleString += "--with-image-and-text";
+                }
+                else
+                {
+                    styleString += "--with-image-only";
+                }
+            }
+            else
+            {
+                styleString += "--with-text-only";
+            }
+
+            return styleString;
+        }
+    }
+
+    string? ButtonTitle => Owner?.ShowItemToolTips ?? false ? ToolTipText : null;
+}

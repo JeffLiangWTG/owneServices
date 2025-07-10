@@ -1,0 +1,27 @@
+using System.Collections.Generic;
+using CargoWise.Customs.IL.MessageDefinitions.DEC.IMP;
+
+namespace Enterprise.Customs.IL.Business
+{
+	public class DeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityWrapper : IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodity
+	{
+		DeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityWrapper(JobComInvoiceLine invoiceLine)
+		{
+			this.invoiceLine = invoiceLine;
+		}
+
+		internal static IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodity NewOrNull(JobComInvoiceLine invoiceLine)
+			=> invoiceLine == null ? null : new DeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityWrapper(invoiceLine);
+
+		ICollection<IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityClassification> IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodity.Classification
+			=> new List<IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityClassification>() { DeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityClassificationWrapper.NewOrNull(invoiceLine) };
+
+		IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExt IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodity.DmExtensions => DeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExtensionsWrapper.NewOrNull(invoiceLine);
+
+		ICollection<IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDutyTaxFee> IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodity.DutyTaxFee => null;
+
+		ICollection<IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityGovernmentProcedure> IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodity.GovernmentProcedure => new List<IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityGovernmentProcedure>() { DeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityGovernmentProcedureWrapper.NewOrNull(invoiceLine) }.ToArray();
+
+		readonly JobComInvoiceLine invoiceLine;
+	}
+}

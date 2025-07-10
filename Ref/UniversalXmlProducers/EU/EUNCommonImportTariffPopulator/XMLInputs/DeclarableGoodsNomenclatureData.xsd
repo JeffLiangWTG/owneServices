@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.arcticgroup.se/tariff/arctictariff/export" elementFormDefault="qualified"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:at="http://www.arcticgroup.se/tariff/arctictariff/export">
+<!--
+	Representation of TARIC record 40000
+ -->
+    <xsd:simpleType name="goodsNomenclatureCode">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[0-9]{10}|[0-9]{8}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="changeType">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[U]|[D]" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="type">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[I]|[E]" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!--  Other element definitions  -->
+    <xsd:element name="queryDateStart" type="xsd:date"/>
+    <xsd:element name="queryDateEnd" type="xsd:date"/>
+    <xsd:element name="dateStart" type="xsd:date"/>
+    <xsd:element name="dateEnd" type="xsd:date"/>
+
+    <!-- ========================== -->
+    <!--  Definition of attributes  -->
+    <!-- ========================== -->
+    <xsd:attribute name="changeType" type="at:changeType"/>
+    <xsd:attribute name="dateStart" type="xsd:date"/>
+    <xsd:attribute name="dateEnd" type="xsd:date"/>
+    <xsd:attribute name="goodsNomenclatureCode" type="at:goodsNomenclatureCode"/>
+    <xsd:attribute name="type" type="at:type"/>
+
+	<xsd:element name="declarableGoodsNomenclature">
+        <xsd:complexType>
+            <!-- Goods nomenclature item id -->
+            <xsd:attribute ref="at:goodsNomenclatureCode"/>
+            <xsd:attribute ref="at:dateStart"/>
+            <!-- Validity end date of goods nomenclature item -->
+            <xsd:attribute ref="at:dateEnd"/>
+            <!-- Represent the type of update that has been performed for this element -->
+        	<xsd:attribute ref="at:changeType"/>
+        	<!-- Represent the type of the goods nomenclature, either a Import or an Export-->
+        	<xsd:attribute ref="at:type"/>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

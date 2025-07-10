@@ -1,0 +1,22 @@
+//--------------------------------------------------------------------------------------------------
+// <important>
+//
+//    DO NOT CHANGE THE NAME OF THIS CLASS OR THE CONSTRUCTOR'S SIGNATURE
+//    THIS CLASS SHOULD ALWAYS INHERIT FROM AutoDtbBookingConfirmationValidation
+//
+//    This class should be used for overriding validation in AutoDtbBookingConfirmationValidation.
+//
+// </important>
+//--------------------------------------------------------------------------------------------------
+
+namespace Enterprise.TransportCommon.Business.Common
+{
+	public class DtbBookingConfirmationValidation : AutoDtbBookingConfirmationValidation
+	{
+		internal DtbBookingConfirmationValidation(AutoDtbBookingConfirmation parent)
+			: base(parent)
+		{
+		}
+	}
+}
+

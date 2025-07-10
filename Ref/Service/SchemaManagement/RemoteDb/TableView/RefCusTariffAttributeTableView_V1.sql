@@ -1,0 +1,7 @@
+CREATE VIEW RefCusTariffAttributeTableView_V1 AS
+SELECT ZZ3_PK,
+ZZ3_ZZ1_Tariff,
+ZZ3_ZZW_TariffNationalCode,
+ZZ3_Name,
+ZZ3_Value
+FROM RefCusTariffAttribute

@@ -1,0 +1,8 @@
+CREATE TABLE [dbo].[RefAccessorial]
+(
+	[ASI_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_RefAccessorial_ASI_PK DEFAULT (NEWID()),
+	[ASI_Code] CHAR(3) NOT NULL CONSTRAINT DF_RefAccessorial_ASI_Code DEFAULT (''), 
+	[ASI_Description] VARCHAR(50) NOT NULL CONSTRAINT DF_RefAccessorial_ASI_Description DEFAULT (''), 
+	CONSTRAINT [PK_RefAccessorial] PRIMARY KEY CLUSTERED ([ASI_PK]),
+	CONSTRAINT [CK_RefAccessorial_ASI_Code] CHECK (LEN([ASI_Code])=(3))
+)

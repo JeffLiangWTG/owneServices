@@ -1,0 +1,62 @@
+using Enterprise.ZArchitecture.Core;
+
+namespace Enterprise.Customs.Common.AU
+{
+	public class AirCargoStatusList : CodeDescriptionPairList
+	{
+		public AirCargoStatusList()
+		{
+			Add(AirCargoStatus.NotSent);
+			Add(AirCargoStatus.WaitingForResponse);
+			Add(AirCargoStatus.MayBeDelivered);
+			Add(AirCargoStatus.ScreenFreeMayBeDelivered);
+			Add(AirCargoStatus.ScreenFreeSubjectToQuarantine);
+			Add(AirCargoStatus.ApprovedA100);
+			Add(AirCargoStatus.ApprovedA105);
+			Add(AirCargoStatus.ApprovedA120);
+			Add(AirCargoStatus.ApprovedA125);
+			Add(AirCargoStatus.ApprovedA140);
+			Add(AirCargoStatus.IncompleteHoldCargoHoldDocs);
+			Add(AirCargoStatus.IncompleteHoldCargoHoldDocsSubQuarantine);
+			Add(AirCargoStatus.AwaitingHoldCargoHoldDocs);
+			Add(AirCargoStatus.AwaitingSubQuarantine);
+			Add(AirCargoStatus.RevertToManualProcedures);
+			Add(AirCargoStatus.ManualNoHouseBills);
+			Add(AirCargoStatus.ManualDomesticCargo);
+			Add(AirCargoStatus.RevertToManualDocs);
+			Add(AirCargoStatus.PaperClearAWBPerforatedNotRequired);
+			Add(AirCargoStatus.PaperClearSubQuarantine);
+			Add(AirCargoStatus.TranshipmentCargo);
+			Add(AirCargoStatus.TranshipmentCargoSubQuarantine);
+			Add(AirCargoStatus.CustomsQuarPermissionToTranship);
+			Add(AirCargoStatus.MoveGoodsToQuarantine);
+			Add(AirCargoStatus.QuarantineHoldCargoHoldDocs);
+			Add(AirCargoStatus.MovementDeleted);
+			Add(AirCargoStatus.EstablishmentInMovement);
+			Add(AirCargoStatus.NotPermittedToMoveToThisPort);
+			Add(AirCargoStatus.RequestToMoveToThisEstablishmentRejected);
+			Add(AirCargoStatus.RequestPendingMoreThan28DaysAndRejected);
+			Add(AirCargoStatus.UBondMovementNotRequired);
+			Add(AirCargoStatus.IncompleteEntryRequired);
+			Add(AirCargoStatus.Incomplete);
+			Add(AirCargoStatus.ExaminationRequiredEntryRequired);
+			Add(AirCargoStatus.ExaminationRequired);
+			Add(AirCargoStatus.CustomsClearSubQuarantine);
+			Add(AirCargoStatus.EntryRequiredSubQuarantine);
+			Add(AirCargoStatus.ActionIncompleteSubQuarantine);
+			Add(AirCargoStatus.EntryAndExamRequiredSubQuarantine);
+			Add(AirCargoStatus.ExaminationRequiredSubQuarantine);
+			Add(AirCargoStatus.DocumentsToScreeners);
+			Add(AirCargoStatus.DeficientConsigneeName);
+			Add(AirCargoStatus.DeficientConsigneeAddress);
+			Add(AirCargoStatus.DeficientConsignorName);
+			Add(AirCargoStatus.DeficientConsignorAddress);
+			Add(AirCargoStatus.DeficientGoodsDescription);
+			Add(AirCargoStatus.IncorrectDestinationPort);
+			Add(AirCargoStatus.DeficientManyFields);
+			Add(AirCargoStatus.SeizedByCustoms);
+			Add(AirCargoStatus.SeizedByQuarantine);
+			Add(AirCargoStatus.ZeroLanded);
+		}
+	}
+}

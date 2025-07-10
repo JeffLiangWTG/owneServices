@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<RefStlScript>
+  <STL_ActiveOn>ALL</STL_ActiveOn>
+  <STL_AdditionalRefs />
+  <STL_BillingReference1>'MAWB: ' + cm.CM_MAWB</STL_BillingReference1>
+  <STL_BillingReference2>'HAWB: ' + cs.CS_HAWB</STL_BillingReference2>
+  <STL_BillingReference3 />
+  <STL_BillingReference4 />
+  <STL_BranchCode>gb.GB_Code</STL_BranchCode>
+  <STL_CollectionStartDateUtc>1753-01-01T00:00:00</STL_CollectionStartDateUtc>
+  <STL_CompanyCode>gc.GC_Code</STL_CompanyCode>
+  <STL_CreatingUserCode>cs.CS_SystemCreateUser</STL_CreatingUserCode>
+  <STL_DataGranularity>TRN</STL_DataGranularity>
+  <STL_DateType>DTE</STL_DateType>
+  <STL_FeatureCode>ACA</STL_FeatureCode>
+  <STL_FeatureName>Import Air Cargo Agent</STL_FeatureName>
+  <STL_FromClause>&#xD;
+				CusMawb cm&#xD;
+				INNER JOIN dbo.CusHawb cs on cs.CS_CM = cm.CM_PK&#xD;
+				INNER JOIN dbo.GlbBranch gb ON gb.GB_PK = cm.CM_GB&#xD;
+				INNER JOIN dbo.GlbCompany gc ON gc.GC_PK = gb.GB_GC&#xD;
+				LEFT JOIN (&#xD;
+					SELECT distinct CS_CM&#xD;
+					FROM dbo.CusHawb&#xD;
+					WHERE CS_CM is not null&#xD;
+					AND CS_IsMasterHouse = 0&#xD;
+				) cshouse ON cshouse.CS_CM = cm.CM_PK</STL_FromClause>
+  <STL_FunctionName>GB Customs</STL_FunctionName>
+  <STL_GuidReference>cs.CS_PK</STL_GuidReference>
+  <STL_MaxCW1Version />
+  <STL_MinCW1Version>22.12.6.388</STL_MinCW1Version>
+  <STL_ModuleName>ediCustomsExtensions</STL_ModuleName>
+  <STL_PreparationScript />
+  <STL_RoleName>Customs &amp; Country Specific Integrations</STL_RoleName>
+  <STL_TransactionCount>1</STL_TransactionCount>
+  <STL_TransactionDateUtc>cs.CS_SystemCreateTimeUtc</STL_TransactionDateUtc>
+  <STL_UsedInBilling>True</STL_UsedInBilling>
+  <STL_WhereClause>&#xD;
+				cm.CM_ApplicationCode = 'CUK'&#xD;
+				AND cm.CM_IsCtoMawb = 0&#xD;
+				AND gc.GC_RN_NKCountryCode = 'GB'&#xD;
+				AND cs.CS_FolioReference like 'CUKFFW98%'&#xD;
+				AND (cs.CS_IsMasterHouse = 0 OR cshouse.CS_CM is null)</STL_WhereClause>
+  <STL_WithOptionRecompile>False</STL_WithOptionRecompile>
+</RefStlScript>

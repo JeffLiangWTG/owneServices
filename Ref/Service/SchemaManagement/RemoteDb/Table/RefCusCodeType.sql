@@ -1,0 +1,19 @@
+CREATE TABLE RefCusCodeType
+(
+	ZZK_PK UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_RefCusCodeType_ZZK_PK DEFAULT (NEWID()),
+	ZZK_CodeType VARCHAR(10) NOT NULL,
+	ZZK_Description VARCHAR(500) NOT NULL,
+	ZZK_IsReadonly BIT NOT NULL CONSTRAINT DF_RefCusCodeType_ZZK_IsReadonly DEFAULT (1),
+	ZZK_MaxLength TINYINT NOT NULL CONSTRAINT DF_RefCusCodeType_ZZK_MaxLength DEFAULT (0),
+	ZZK_ZZZ_NKDataGrouping VARCHAR (3) NOT NULL,
+	ZZK_CodeTypeComputed AS ISNULL(CASE WHEN LEN(ZZK_CodeType) <= 5 THEN SUBSTRING(ZZK_CodeType, 1, 5) ELSE '' END, ''),
+	CONSTRAINT PK_RefCusCodeType PRIMARY KEY CLUSTERED (ZZK_PK ASC),
+	CONSTRAINT CK_RefCusCodeType_ZZK_CodeType CHECK (ZZK_CodeType <> ''),
+	CONSTRAINT CK_RefCusCodeType_ZZK_Description CHECK (ZZK_Description <> ''),
+	CONSTRAINT CK_RefCusCodeType_ZZK_MaxLength CHECK (ZZK_MaxLength >= 0 AND ZZK_MaxLength <= 35)
+)
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_RefCusCodeType_ZZK_ZZZ_NKDataGrouping_ZZK_CodeType ON RefCusCodeType (ZZK_ZZZ_NKDataGrouping ASC, ZZK_CodeType ASC)
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusCodeType_ZZK_ZZZ_NKDataGrouping_ZZK_CodeTypeComputed ON RefCusCodeType (ZZK_ZZZ_NKDataGrouping ASC, ZZK_CodeTypeComputed ASC)
+GO

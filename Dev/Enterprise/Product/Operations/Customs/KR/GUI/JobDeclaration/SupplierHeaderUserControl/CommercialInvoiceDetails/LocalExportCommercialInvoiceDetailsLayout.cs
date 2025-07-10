@@ -1,0 +1,37 @@
+using Enterprise.Customs.GUI;
+using Enterprise.Customs.KR.Business;
+using Enterprise.ZArchitecture.GUI;
+
+namespace Enterprise.Customs.KR.GUI
+{
+	public sealed class LocalExportCommercialInvoiceDetailsLayout : IPanelLayoutProvider
+	{
+		PanelLayout IPanelLayoutProvider.Layout => PanelLayout;
+
+		PanelLayout PanelLayout { get; } = CreatePanelLayout();
+
+		static PanelLayout CreatePanelLayout()
+		{
+			var builder = new CommercialInvoiceDetailsLayoutBuilder<JobComInvoiceHeader>();
+			var commonBag = builder.CommonBag;
+
+			var krBag = CommercialInvoiceDetailsControlBag.Instance;
+			builder.AddControlBag(krBag);
+
+			builder.AddColumn();
+			builder.Add(commonBag.InvoiceNumberTextBox, ControlWidthClass.Auto);
+			builder.Add(commonBag.InvoiceAmountConvertToLocalCurrencyControl, ControlWidthClass.Auto);
+			builder.Add(commonBag.InvoiceCurrExRateCalcEdit, ControlWidthClass.Auto);
+			builder.Add(krBag.IncoTermCodeDropEdit, ControlWidthClass.Auto);
+			builder.Add(commonBag.GrossWeightCalcDropEdit, ControlWidthClass.Auto);
+			builder.Add(commonBag.NetWeightCalcDropEdit, ControlWidthClass.Auto);
+			builder.Add(krBag.NoOfPacksCalcDropEdit, ControlWidthClass.Auto);
+			builder.Add(krBag.DRWApplicantDropEdit, ControlWidthClass.Auto);
+			builder.Add(krBag.SupportingDocumentTypeDropEdit, ControlWidthClass.Auto);
+			builder.Add(krBag.SupportingDocumentNoTextBox, ControlWidthClass.Auto);
+			builder.Add(krBag.InboundDateEdit, ControlWidthClass.Auto);
+
+			return builder.Build();
+		}
+	}
+}

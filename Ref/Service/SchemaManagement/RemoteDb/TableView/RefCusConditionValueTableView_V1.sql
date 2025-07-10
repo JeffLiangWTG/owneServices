@@ -1,0 +1,7 @@
+CREATE VIEW RefCusConditionValueTableView_V1 AS
+SELECT ZX3_PK,
+ZX3_ZX4_ValueType,
+ZX3_ZX1_Condition,
+ZX3_Value,
+ZX3_LogicalORWithinGroup
+FROM RefCusConditionValue

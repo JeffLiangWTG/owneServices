@@ -1,0 +1,24 @@
+**************************************************************************************************************************************************************************************************************************************
+To generate the Customs messages ; please ensure that each xsd in the version is updated.
+1- Open Command Prompt for Visual Studio as admin : %comspec% /k  ""C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"" x64 
+2- Change directory to: Enterprise\Product\Operations\Customs\AU\Declaration.Business\Data\XSD\NEXDOC
+3- Run GenerateMessages.bat
+
+**************************************************************************************************************************************************************************************************************************************
+*  Process explanation
+**************************************************************************************************************************************************************************************************************************************
+For messages production:
+	- GenerateMessages.bat launches xsd.exe commands with XSD file names in order of dependency
+	- Files are generated into thier own namespaces to prevent conflicts arising from having multiple 'helper' classes of the same name
+	- Project must be manually edited to get the classes to appear beneath their xsd file.
+
+For serialization/deserialization:
+
+	- We create manually a file <CLASS PRODUCED>.sgen.cs that contains:
+	A partial class to add the attribute [System.Xml.Serialization.XmlSerializerAssembly("<Namespace>.XmlSerializers")]
+
+	A <Namespace>.XmlSerializers.Dll entry is required in c:\dev\build.xml to Correspond with this attribute on every namespace.
+
+	- In the post build property of the project
+	$(TARGETDIR)\CargoWise.SGen.exe /force /typesWithAttributeOnly /assembly:$(TargetPath) /compiler:/keyfile:..\EDI-Release-private.snk /compiler:/reference:$(TargetDir)CargoWise.Types.dll /compiler:$(TARGETDIR)..\CommonAssemblyInfo.cs /compiler:/define:SGEN
+	is required

@@ -1,0 +1,6 @@
+CREATE VIEW RefCusPreferenceLanguageTableView_V1 AS
+SELECT ZX9_PK,
+ZX9_ZX6_NKLanguage,
+ZX9_ZZS_Preference,
+ZX9_Description
+FROM RefCusPreferenceLanguage

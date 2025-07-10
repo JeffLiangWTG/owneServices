@@ -1,0 +1,1259 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d"
+x:Name="windowAutomationManager"
+x:Class="CargoWise.Bi.Development.Automation.Manager.MainWindow"
+Title="CargoWise BI Automation Manager"
+Height="1000"
+Width="1200"
+WindowStyle="SingleBorderWindow"
+WindowState="Maximized"
+Loaded="Window_Loaded" MinWidth="1200" MinHeight="1000"
+Closing="windowAutomationManager_Closing"
+>
+	<DockPanel LastChildFill="True">
+		<Menu DockPanel.Dock="Top">
+			<MenuItem Header="Operations">
+				<MenuItem Header="Synchronize" Click="syncConfiguration_Click"/>
+				<MenuItem Header="Validate" Click="validateConfiguration_Click"/>
+				<MenuItem Header="Undo Checkouts" Click="undoCheckouts_Click"/>
+				<MenuItem Header="Build SSAS" Click="buildSsasProject_Click"/>
+				<MenuItem Header="Sort Cube File" Click="sortCubeFile_Click"/>
+				<MenuItem Header="Package Power BI Files" Click="packagePowerBiFiles_Click"/>
+			</MenuItem>
+			<MenuItem Header="View">
+				<MenuItem Header="Open Log File" Click="openLogFile_Click"/>
+				<MenuItem Header="Show Search Options" Click="showSearchOptions_Click"/>
+				<Separator />
+				<MenuItem Header="Settings" Click="showSettings_Click"/>
+			</MenuItem>
+		</Menu>
+		<StackPanel DockPanel.Dock="Bottom">
+			<StatusBar Height="25">
+				<StatusBarItem x:Name="configSavingStatus"
+HorizontalAlignment="Left"
+Width="200" />
+				<StatusBarItem x:Name="ProgressStatus"
+HorizontalAlignment="Center" />
+				<StatusBarItem x:Name="NoDecided3"
+HorizontalAlignment="Right"
+Width="200" />
+			</StatusBar>
+		</StackPanel>
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="420*" MinHeight="300"/>
+				<RowDefinition Height="150*" MinHeight="130"/>
+			</Grid.RowDefinitions>
+			<Grid Grid.Row="0" Grid.Column="0">
+				<Grid x:Name="allTabs" Grid.Row="0">
+					<TabControl SelectionChanged="TabControl_SelectionChanged" Grid.Column="0" Grid.Row="0">
+						<TabItem x:Name="configurationTab" Header="CDC and Model Configuration">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="1200" MinWidth="800" MaxWidth="2500"/>
+									<ColumnDefinition Width="1200*" MinWidth="800" />
+								</Grid.ColumnDefinitions>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="420*" MinHeight="300"/>
+								</Grid.RowDefinitions>
+								<Grid Margin="0,0,0,0" Grid.Row="0" Grid.Column="0">
+									<Grid.RowDefinitions>
+										<RowDefinition MinHeight="20"/>
+										<RowDefinition MinHeight="20"/>
+									</Grid.RowDefinitions>
+									<Grid Grid.Row="0">
+										<Grid.RowDefinitions>
+											<RowDefinition Height="30" x:Name="sourceTablesTitleRow"/>
+											<RowDefinition Height="20"/>
+											<RowDefinition Height="0" x:Name="tableSearchRow"/>
+											<RowDefinition />
+											<RowDefinition Height="30"/>
+										</Grid.RowDefinitions>
+										<TextBlock x:Name="SourceTablesTitle"
+Text=" Source Tables"
+Grid.Row="0"
+Background="DarkBlue"
+FontWeight="Bold" FontSize="16" 
+Foreground="White" />
+										<TextBlock x:Name="tableSummaryStatsText"
+Text="No details available"
+Height="20"
+Grid.Row="1"
+Grid.Column="0"
+VerticalAlignment="Top"
+HorizontalAlignment="Stretch"
+Background="CornflowerBlue"
+Foreground="White" Grid.ColumnSpan="2" />
+										<DataGrid x:Name="tableSearchGrid" ItemsSource="{Binding}" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" CanUserAddRows="True" RowHeight="23" CurrentCellChanged="tableSearchGrid_CurrentCellChanged" SelectionChanged="tableSearchGrid_SelectionChanged">
+											<DataGrid.Columns>
+												<DataGridComboBoxColumn Header="Search Field" Width="200" x:Name="TableSearchCategories" SelectedValueBinding="{Binding Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}"/>
+												<DataGridTemplateColumn Header="Value" Width="*">
+													<DataGridTemplateColumn.CellTemplate>
+														<DataTemplate>
+															<ComboBox IsEditable="True" ItemsSource="{Binding Options}" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}"/>
+														</DataTemplate>
+													</DataGridTemplateColumn.CellTemplate>
+												</DataGridTemplateColumn>
+												<DataGridTemplateColumn Width="100">
+													<DataGridTemplateColumn.CellTemplate>
+														<DataTemplate>
+															<Button Content="Delete" Tag="{Binding}" Click="RemoveTableSearchParameter_Click"  Width="80"/>
+														</DataTemplate>
+													</DataGridTemplateColumn.CellTemplate>
+												</DataGridTemplateColumn>
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+											</Grid.ColumnDefinitions>
+											<Button Click="ClearTableSearchParameter_Click" Grid.Column="0" Height="20" Width="100" HorizontalAlignment="Right" Content="Clear"/>
+											<Button Click="AddTableSearchParameter_Click" Grid.Column="1" Height="20" Width="100" HorizontalAlignment="Right" Content="Add Parameter"/>
+											<Button Click="TableSearch_Click" Grid.Column="2" Height="20" Width="100" HorizontalAlignment="Right" Content="Search"/>
+										</Grid>
+										<DataGrid x:Name="cdcTableConfigGrid"
+FrozenColumnCount="3"
+Grid.Row="3"
+Grid.ColumnSpan="2"
+SelectionChanged="cdcTableConfigGrid_SelectionChanged"
+HorizontalScrollBarVisibility="Auto">
+											<DataGrid.ContextMenu>
+												<ContextMenu>
+													<MenuItem Header="Add table to Audit" Click="AddTableToAuditMenuItem_Click" />
+													<MenuItem Header="Remove table from Audit" Click="RemoveTableFromAuditMenuItem_Click" />
+												</ContextMenu>
+											</DataGrid.ContextMenu>
+											<DataGrid.GroupStyle>
+												<GroupStyle >
+													<GroupStyle.HeaderTemplate>
+														<DataTemplate>
+															<TextBlock FontWeight="Bold" FontSize="15" Margin="5" Width="300" Text="{Binding Action}"/>
+														</DataTemplate>
+													</GroupStyle.HeaderTemplate>
+													<GroupStyle.ContainerStyle>
+														<Style TargetType="{x:Type GroupItem}">
+															<Setter Property="Template">
+																<Setter.Value>
+																	<ControlTemplate TargetType="{x:Type GroupItem}">
+																		<Expander>
+																			<Expander.Header>
+																				<StackPanel Orientation="Horizontal">
+																					<TextBlock Text="{Binding Action}" />
+																					<TextBlock Text="{Binding ItemCount}"/>
+																					<TextBlock Text="Items"/>
+																				</StackPanel>
+																			</Expander.Header>
+																			<ItemsPresenter />
+																		</Expander>
+																	</ControlTemplate>
+																</Setter.Value>
+															</Setter>
+														</Style>
+													</GroupStyle.ContainerStyle>
+												</GroupStyle>
+											</DataGrid.GroupStyle>
+											<DataGrid.RowStyle>
+												<Style TargetType="{x:Type DataGridRow}">
+													<Style.Triggers>
+														<Trigger Property="IsSelected" Value="True">
+															<Setter Property="FontWeight" Value="UltraBold"/>
+															<Setter Property="FontStyle"  Value="Oblique"/>
+														</Trigger>
+														<Trigger Property="IsSelected" Value="False">
+															<Setter Property="FontWeight" Value="Bold"/>
+															<Setter Property="FontStyle"  Value="Normal"/>
+														</Trigger>
+													</Style.Triggers>
+												</Style>
+											</DataGrid.RowStyle>
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Action" MinWidth="100" Width="100"
+Binding="{Binding Action, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridTextColumn Header="Source Schema" Width="100"
+Binding="{Binding SourceSchema, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridTextColumn Header="Source Table" Width="200"
+Binding="{Binding SourceTable, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridCheckBoxColumn Header="Is EDI Client" Width="200"
+Binding="{Binding IsEdiClient, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridCheckBoxColumn Header="Table in Audit" Width="100"
+Binding="{Binding TableInAudit, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridTextColumn Header="Audit Filter" Width="300"
+Binding="{Binding AuditFilter, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridCheckBoxColumn Header="Table in EDW" Width="100"
+Binding="{Binding TableInEdw, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridTextColumn Header="EDW Filter" Width="300"
+Binding="{Binding EdwFilter, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Indexed Column" Width="300"
+Binding="{Binding IndexedColumn, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="EDW Schema" Width="200"
+Binding="{Binding EdwSchema, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Message" Width="300"
+Binding="{Binding Message, Mode=OneWay}"
+IsReadOnly="True" />
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="160" />
+											</Grid.ColumnDefinitions>
+											<Button Click="copySourceTables_Click" Content="Copy To Clipboard" HorizontalAlignment="right" VerticalAlignment="Bottom" Width="150" Grid.Column="0" />
+										</Grid>
+									</Grid>
+									<GridSplitter Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="LightGray" Height="3" Grid.ColumnSpan="1" />
+									<Grid Grid.Row="1">
+										<Grid.RowDefinitions>
+											<RowDefinition Height="30" x:Name="sourceTableColumnsTitleRow"/>
+											<RowDefinition Height="20"/>
+											<RowDefinition Height="0" x:Name="columnSearchRow"/>
+											<RowDefinition />
+											<RowDefinition Height="30"/>
+										</Grid.RowDefinitions>
+										<TextBlock x:Name="SourceTableColumnsTitle"
+Text=" Source Table Columns"
+Grid.Row="0"
+Background="DarkBlue"
+FontWeight="Bold" FontSize="16" 
+Foreground="White" Grid.ColumnSpan="2" />
+										<TextBlock x:Name="columnSummaryStatsText"
+Text="No details available"
+Height="20"
+Grid.Row="1"
+VerticalAlignment="Top"
+HorizontalAlignment="Stretch"
+Background="CornflowerBlue"
+Foreground="White" Grid.ColumnSpan="2" />
+										<DataGrid x:Name="columnSearchGrid" ItemsSource="{Binding}" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" CanUserAddRows="True" RowHeight="23" CurrentCellChanged="columnSearchGrid_CurrentCellChanged" SelectionChanged="columnSearchGrid_SelectionChanged">
+											<DataGrid.Columns>
+												<DataGridComboBoxColumn Header="Search Field" Width="200" x:Name="ColumnSearchCategories" SelectedValueBinding="{Binding Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}"/>
+												<DataGridTemplateColumn Header="Value" Width="*">
+													<DataGridTemplateColumn.CellTemplate>
+														<DataTemplate>
+															<ComboBox IsEditable="True" ItemsSource="{Binding Options}" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}"/>
+														</DataTemplate>
+													</DataGridTemplateColumn.CellTemplate>
+												</DataGridTemplateColumn>
+												<DataGridTemplateColumn Width="100">
+													<DataGridTemplateColumn.CellTemplate>
+														<DataTemplate>
+															<Button Content="Delete" Tag="{Binding}" Click="RemoveColumnSearchParameter_Click"  Width="80"/>
+														</DataTemplate>
+													</DataGridTemplateColumn.CellTemplate>
+												</DataGridTemplateColumn>
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+											</Grid.ColumnDefinitions>
+											<Button Click="ClearColumnSearchParameter_Click" Grid.Column="0" Height="20" Width="100" HorizontalAlignment="Right" Content="Clear"/>
+											<Button Click="AddColumnSearchParameter_Click" Grid.Column="1" Height="20" Width="100" HorizontalAlignment="Right" Content="Add Parameter"/>
+											<Button Click="ColumnSearch_Click" Grid.Column="2" Height="20" Width="100" HorizontalAlignment="Right" Content="Search"/>
+										</Grid>
+										<DataGrid x:Name="cdcColumnConfigGrid"
+Grid.Row="3"
+FrozenColumnCount="8"
+Grid.ColumnSpan="2">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Action" Width="100"
+Binding="{Binding Action, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridTextColumn Header="Source Column" Width="200"
+Binding="{Binding SourceColumn, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridTextColumn Header="Data Type" Width="100"
+Binding="{Binding DataType, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridTextColumn Header="Max Length" Width="70"
+Binding="{Binding MaxLength, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridTextColumn Header="Precision" Width="70"
+Binding="{Binding Precision, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridTextColumn Header="Scale" Width="70"
+Binding="{Binding Scale, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridCheckBoxColumn Header="Nullable" Width="70"
+Binding="{Binding Nullable, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridCheckBoxColumn Header="Is Primary Key" Width="100"
+Binding="{Binding IsPrimaryKey, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Reference Schema"  Width="120"
+Binding="{Binding ReferenceSchema, Mode=OneWay}" IsReadOnly="True" />
+												<DataGridTextColumn Header="Reference Table"  Width="120"
+Binding="{Binding ReferenceTable, Mode=OneWay}" IsReadOnly="True" />
+												<DataGridCheckBoxColumn Header="CDC Enabled" Width="80"
+Binding="{Binding CdcEnabled, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridCheckBoxColumn Header="Column in Audit" Width="100"
+Binding="{Binding ColumnInAudit, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridCheckBoxColumn Header="Column in EDW" Width="100"
+Binding="{Binding ColumnInEdw, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridTextColumn Header="Model View Column"  Width="120"
+Binding="{Binding ModelViewColumn, Mode=OneWay}" IsReadOnly="True" />
+												<DataGridTextColumn Header="Message" Width="300"
+Binding="{Binding Message, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
+IsReadOnly="True" />
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="160" />
+											</Grid.ColumnDefinitions>
+											<Button Click="copySourceColumns_Click" Content="Copy To Clipboard" HorizontalAlignment="right" VerticalAlignment="Bottom" Width="150" Grid.Column="0" />
+										</Grid>
+									</Grid>
+								</Grid>
+
+								<GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Background="LightGray" Width="3" Grid.RowSpan="1" HorizontalAlignment="Left" />
+								<Grid Margin="3,0,0,0" Grid.Row="0" Grid.Column="1">
+									<Grid.RowDefinitions>
+										<RowDefinition MinHeight="50"/>
+										<RowDefinition MinHeight="50"/>
+									</Grid.RowDefinitions>
+									<Grid Grid.Row="0" Grid.RowSpan="1">
+										<Grid.RowDefinitions>
+											<RowDefinition Height="30" x:Name="baseTablesTitleRow"/>
+											<RowDefinition Height="0" />
+											<RowDefinition Height="0" x:Name="edwTableSearchRow"/>
+											<RowDefinition Height="200*" MinHeight="200"/>
+											<RowDefinition Height="30" MinHeight="30" x:Name="edwTableEditButtons"/>
+										</Grid.RowDefinitions>
+										<TextBlock x:Name="BaseTablesTitle"
+Text=" Base Tables"
+Grid.Row="0"
+FontWeight="Bold" FontSize="16" 
+Foreground="White" Grid.ColumnSpan="2" Background="DarkBlue" />
+										<DataGrid x:Name="edwTableSearchGrid" ItemsSource="{Binding}" Grid.Row="1" VerticalAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" CanUserAddRows="True" RowHeight="23" CurrentCellChanged="tableSearchGrid_CurrentCellChanged" SelectionChanged="tableSearchGrid_SelectionChanged" Grid.RowSpan="2">
+											<DataGrid.Columns>
+												<DataGridComboBoxColumn Header="Search Field" Width="200" x:Name="EdwTableSearchCategories" SelectedValueBinding="{Binding Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}"/>
+												<DataGridTemplateColumn Header="Value" Width="*">
+													<DataGridTemplateColumn.CellTemplate>
+														<DataTemplate>
+															<ComboBox IsEditable="True" ItemsSource="{Binding Options}" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}"/>
+														</DataTemplate>
+													</DataGridTemplateColumn.CellTemplate>
+												</DataGridTemplateColumn>
+												<DataGridTemplateColumn Width="100">
+													<DataGridTemplateColumn.CellTemplate>
+														<DataTemplate>
+															<Button Content="Delete" Tag="{Binding}" Click="RemoveTableSearchParameter_Click"  Width="80"/>
+														</DataTemplate>
+													</DataGridTemplateColumn.CellTemplate>
+												</DataGridTemplateColumn>
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="-335,-5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+											</Grid.ColumnDefinitions>
+											<Button Click="ClearTableSearchParameter_Click" Grid.Column="0" Height="20" Width="100" HorizontalAlignment="Right" Content="Clear"/>
+											<Button Click="AddTableSearchParameter_Click" Grid.Column="1" Height="20" Width="100" HorizontalAlignment="Right" Content="Add Parameter"/>
+											<Button Click="TableSearch_Click" Grid.Column="2" Height="20" Width="100" HorizontalAlignment="Right" Content="Search"/>
+										</Grid>
+										<DataGrid x:Name="edwTableConfigGrid"
+Grid.Row="3"
+SelectionChanged="edwTableConfigGrid_SelectionChanged" CellEditEnding="edwTableConfigGrid_CellEditEnding" BeginningEdit="edwTableConfigGrid_BeginningEdit" HorizontalScrollBarVisibility="Auto">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Schema" Width="150"
+Binding="{Binding Schema, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Model Table Name" Width="200"
+Binding="{Binding Name, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Dependency Order" Width="125"
+Binding="{Binding DependencyOrder, Mode=OneWay}" />
+												<DataGridTextColumn Header="Source Schema" Width="200"
+Binding="{Binding SourceSchema, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Staging Table" Width="200"
+Binding="{Binding StagingTable, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Transform ID" Width="125"
+Binding="{Binding TransformId, Mode=OneWay}" />
+												<DataGridTextColumn Header="Where" Width="250"
+Binding="{Binding WhereClause, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridCheckBoxColumn Header="Is Partitioned" Width="100"
+Binding="{Binding IsPartitioned, Mode=OneWay}" IsReadOnly="True" />
+												<DataGridTextColumn Header="Message" Width="300"
+Binding="{Binding Message, Mode=OneWay}"/>
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center" >
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+											</Grid.ColumnDefinitions>
+											<Button Click="cloneButton_Click" Grid.Column="0" Height="20" Width="100" HorizontalAlignment="Right" Content="Clone"/>
+											<Button Name="populateEdwColumnsButton" Click="populateEdwColumnsButton_Click" Grid.Column="1" Height="20" Width="150" HorizontalAlignment="Right" Content="Populate Columns"/>
+											<Button Click="testQueryForAllModelsButton_Click" Grid.Column="2" Height="20" Width="150" HorizontalAlignment="Right" Content="Test Query For All"/>
+											<Button Click="copyBaseTables_Click" Content="Copy To Clipboard" HorizontalAlignment="right" VerticalAlignment="Bottom" Width="150" Grid.Column="3" />
+											<Button Click="addEdwTableButton_Click" Grid.Column="4" Height="20" Width="100" HorizontalAlignment="Right" Content="Add New"/>
+											<Button Click="deleteEdwTableButton_Click" Grid.Column="5" Height="20" Width="100" HorizontalAlignment="Right" Content="Delete"/>
+										</Grid>
+									</Grid>
+									<GridSplitter Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="LightGray" Height="3" Grid.ColumnSpan="1" />
+									<Grid Grid.Row="1" Grid.RowSpan="1">
+										<Grid.RowDefinitions>
+											<RowDefinition Height="30" x:Name="baseTableColumnsTitleRow"/>
+											<RowDefinition Height="0"/>
+											<RowDefinition Height="0" x:Name="edwColumnSearchRow"/>
+											<RowDefinition Height="200*" MinHeight="200"/>
+											<RowDefinition Height="30" MinHeight="30" x:Name="edwColumnEditButtons"/>
+										</Grid.RowDefinitions>
+										<TextBlock x:Name="BaseTableColumnsTitle"
+Text=" Base Table Columns"
+Grid.Row="0"
+FontWeight="Bold" FontSize="16" 
+Foreground="White" Grid.ColumnSpan="2" Background="DarkBlue" />
+										<DataGrid x:Name="edwColumnSearchGrid" ItemsSource="{Binding}" Grid.Row="1" VerticalAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" CanUserAddRows="True" RowHeight="23" CurrentCellChanged="tableSearchGrid_CurrentCellChanged" SelectionChanged="tableSearchGrid_SelectionChanged">
+											<DataGrid.Columns>
+												<DataGridComboBoxColumn Header="Search Field" Width="200" x:Name="EdwColumnSearchCategories" SelectedValueBinding="{Binding Category, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}"/>
+												<DataGridTemplateColumn Header="Value" Width="*">
+													<DataGridTemplateColumn.CellTemplate>
+														<DataTemplate>
+															<ComboBox IsEditable="True" ItemsSource="{Binding Options}" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}"/>
+														</DataTemplate>
+													</DataGridTemplateColumn.CellTemplate>
+												</DataGridTemplateColumn>
+												<DataGridTemplateColumn Width="100">
+													<DataGridTemplateColumn.CellTemplate>
+														<DataTemplate>
+															<Button Content="Delete" Tag="{Binding}" Click="RemoveTableSearchParameter_Click"  Width="80"/>
+														</DataTemplate>
+													</DataGridTemplateColumn.CellTemplate>
+												</DataGridTemplateColumn>
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+											</Grid.ColumnDefinitions>
+											<Button Click="ClearTableSearchParameter_Click" Grid.Column="0" Height="20" Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Clear"/>
+											<Button Click="AddTableSearchParameter_Click" Grid.Column="1" Height="20" Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Add Parameter"/>
+											<Button Click="TableSearch_Click" Grid.Column="2" Height="20" Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Search"/>
+										</Grid>
+										<DataGrid x:Name="edwColumnConfigGrid"
+Grid.Row="3" CellEditEnding="edwColumnConfigGrid_CellEditEnding" BeginningEdit="edwColumnConfigGrid_BeginningEdit" HorizontalScrollBarVisibility="Auto" SelectionMode="Extended" SelectionUnit="CellOrRowHeader" >
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Model Column Name" Width="150"
+Binding="{Binding Name, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridComboBoxColumn Header="Data Type" x:Name="DataTypeList2" Width="100"
+SelectedValueBinding="{Binding DataType, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Max Length" Width="100"
+Binding="{Binding MaxLength, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Precision" Width="100"
+Binding="{Binding Precision, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Scale" Width="100"
+Binding="{Binding Scale, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Expression" Binding="{Binding Path=Expression, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" Width="250">
+													<DataGridTextColumn.ElementStyle>
+														<Style TargetType="TextBlock">
+															<Setter Property="TextWrapping" Value="Wrap" />
+														</Style>
+													</DataGridTextColumn.ElementStyle>
+													<DataGridTextColumn.EditingElementStyle>
+														<Style TargetType="TextBox">
+															<Setter Property="TextWrapping" Value="Wrap" />
+															<Setter Property="AcceptsReturn" Value="true" />
+														</Style>
+													</DataGridTextColumn.EditingElementStyle>
+												</DataGridTextColumn>
+												<DataGridCheckBoxColumn Header="Is Partition Key" Width="100"
+Binding="{Binding IsPartitionKey, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridCheckBoxColumn Header="Uses Function" Width="100"
+Binding="{Binding UsesFunction, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Parent Table" Width="150"
+Binding="{Binding ParentTable, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Parent Column" Width="150"
+Binding="{Binding ParentColumn, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Target Column" Width="150"
+Binding="{Binding TargetColumn, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Condition" Width="200"
+Binding="{Binding Condition, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Message" Width="300"
+Binding="{Binding Message, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridComboBoxColumn Header="Keep As" x:Name="KeepAsList" Width="100"
+SelectedValueBinding="{Binding KeepAs, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridCheckBoxColumn Header="Enable Index" Width="100"
+Binding="{Binding EnableIndex, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+											</Grid.ColumnDefinitions>
+											<Button Click="copyBaseTableColumns_Click" Content="Copy To Clipboard" HorizontalAlignment="right" VerticalAlignment="Bottom" Width="150" Grid.Column="0" />
+											<Button Name="addEdwColumnButton" Click="addEdwColumnButton_Click" Grid.Column="1" Height="20" Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Add New"/>
+											<Button Name="deleteEdwColumnButton" Click="deleteEdwColumnButton_Click" Grid.Column="2" Height="20" Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Delete"/>
+										</Grid>
+									</Grid>
+								</Grid>
+
+							</Grid>
+						</TabItem>
+						<TabItem x:Name="denormTableTab" Header="EDW Denormalized Model Tables">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="800" MinWidth="800" MaxWidth="2500"/>
+									<ColumnDefinition Width="900*" MinWidth="800" />
+								</Grid.ColumnDefinitions>
+								<Grid Margin="0,0,0,0" Grid.Row="0" Grid.Column="0">
+									<Grid.RowDefinitions>
+										<RowDefinition MinHeight="20"/>
+										<RowDefinition MinHeight="20"/>
+									</Grid.RowDefinitions>
+									<Grid Grid.Row="0">
+										<Grid.RowDefinitions>
+											<RowDefinition Height="30"/>
+											<RowDefinition Height="200*" MinHeight="200"/>
+										</Grid.RowDefinitions>
+										<TextBlock x:Name="BaseTablesTitle2"
+Text=" Base Tables"
+Grid.Row="0"
+FontWeight="Bold" FontSize="16" 
+Foreground="White" Grid.ColumnSpan="2" Background="DarkBlue" />
+										<DataGrid x:Name="edwModelTableConfigGrid"  Grid.Row="1"
+										  SelectionChanged="edwModelTableConfigGrid_SelectionChanged"
+										  CellEditEnding="edwTableConfigGrid_CellEditEnding" BeginningEdit="edwTableConfigGrid_BeginningEdit">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Schema" Width="300"
+Binding="{Binding Schema, Mode=TwoWay}" IsReadOnly="False"/>
+												<DataGridTextColumn Header="Model Table Name" Width="*"
+Binding="{Binding Name, Mode=TwoWay}" IsReadOnly="False"/>
+											</DataGrid.Columns>
+										</DataGrid>
+									</Grid>
+									<GridSplitter Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="LightGray" Height="3" Grid.ColumnSpan="1" />
+									<Grid Grid.Row="1">
+										<Grid.RowDefinitions>
+											<RowDefinition Height="30"/>
+											<RowDefinition Height="200*" MinHeight="200"/>
+										</Grid.RowDefinitions>
+										<TextBlock x:Name="BaseTableColumnsTitle2"
+Text=" Base Table Columns"
+HorizontalAlignment="Stretch"
+Grid.Row="0"
+FontWeight="Bold" FontSize="16" 
+Foreground="White" Grid.ColumnSpan="2" Background="DarkBlue" />
+										<DataGrid x:Name="edwModelColumnConfigGrid" Grid.Row="1">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Model Column Name" Width="*"
+Binding="{Binding Name, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridComboBoxColumn Header="Data Type" x:Name="DataTypeList3" Width="100"
+SelectedValueBinding="{Binding DataType, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Max Length" Width="100"
+Binding="{Binding MaxLength, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridTextColumn Header="Precision" Width="100"
+Binding="{Binding Precision, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridTextColumn Header="Scale" Width="100"
+Binding="{Binding Scale, Mode=TwoWay}" IsReadOnly="False" />
+											</DataGrid.Columns>
+										</DataGrid>
+									</Grid>
+								</Grid>
+								<GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Background="LightGray" Width="3" Grid.RowSpan="1" HorizontalAlignment="Left" />
+								<Grid Margin="3,0,0,0" Grid.Row="0" Grid.Column="1">
+									<Grid.RowDefinitions>
+										<RowDefinition MinHeight="50"/>
+										<RowDefinition MinHeight="50"/>
+									</Grid.RowDefinitions>
+									<Grid Grid.Row="0">
+										<Grid.RowDefinitions>
+											<RowDefinition Height="30"/>
+											<RowDefinition MinHeight="20"/>
+											<RowDefinition Height="30"/>
+										</Grid.RowDefinitions>
+										<TextBlock x:Name="AggregateTablesTitle"
+Text=" Aggregate Tables"
+FontWeight="Bold" FontSize="16" 
+HorizontalAlignment="Stretch"
+Grid.Row="0"
+Foreground="White" Grid.ColumnSpan="2" Background="DarkBlue" />
+										<DataGrid x:Name="denormTableConfigGrid" Grid.Row="1" SelectionChanged="denormTableConfigGrid_SelectionChanged"
+										  CellEditEnding="denormTableConfigGrid_CellEditEnding" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Schema" Width="200"
+Binding="{Binding Schema, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Denormalized Table Name" Width="300"
+Binding="{Binding Name, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Expression" Binding="{Binding Path=Expression}" Width="700">
+													<DataGridTextColumn.ElementStyle>
+														<Style TargetType="TextBlock">
+															<Setter Property="TextWrapping" Value="Wrap" />
+														</Style>
+													</DataGridTextColumn.ElementStyle>
+													<DataGridTextColumn.EditingElementStyle>
+														<Style TargetType="TextBox">
+															<Setter Property="TextWrapping" Value="Wrap" />
+															<Setter Property="AcceptsReturn" Value="true" />
+														</Style>
+													</DataGridTextColumn.EditingElementStyle>
+												</DataGridTextColumn>
+												<DataGridTextColumn Header="Dependency Order" Width="125"
+Binding="{Binding DependencyOrder, Mode=OneWay}" />
+												<DataGridTextColumn Header="Message" Width="500"
+Binding="{Binding Message, Mode=OneWay}"
+IsReadOnly="True" />
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="110" />
+											</Grid.ColumnDefinitions>
+											<Button Click="testQueryForAllModelsButton_Click" Grid.Column="2" Height="20" Width="150" HorizontalAlignment="Right" Content="Test Query For All"/>
+											<Button Click="copyDenormalizedTables_Click" Content="Copy To Clipboard" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="150" Grid.Column="3" />
+											<Button Click="deleteDenormalizedTableButton_Click" Grid.Column="4" Height="20" Width="100" HorizontalAlignment="Right" Content="Delete"/>
+										</Grid>
+									</Grid>
+									<GridSplitter Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="LightGray" Height="3" Grid.ColumnSpan="1" />
+									<Grid Grid.Row="1">
+										<Grid.RowDefinitions>
+											<RowDefinition Height="30"/>
+											<RowDefinition MinHeight="20"/>
+											<RowDefinition Height="30"/>
+										</Grid.RowDefinitions>
+										<TextBlock x:Name="AggregateTableColumnsTitle"
+Text=" Aggregate Table Columns"
+HorizontalAlignment="Stretch"
+Grid.Row="0"
+FontWeight="Bold" FontSize="16" 
+Foreground="White" Grid.ColumnSpan="2" Background="DarkBlue" />
+										<DataGrid x:Name="denormColumnConfigGrid" Grid.Row="1"
+										  SelectionChanged="denormColumnConfigGrid_SelectionChanged"
+										  CellEditEnding="denormColumnConfigGrid_CellEditEnding" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionMode="Extended" SelectionUnit="CellOrRowHeader">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Column Name" Width="300"
+Binding="{Binding Name, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Expression" Binding="{Binding Path=Expression}" Width="700">
+													<DataGridTextColumn.ElementStyle>
+														<Style TargetType="TextBlock">
+															<Setter Property="TextWrapping" Value="Wrap" />
+														</Style>
+													</DataGridTextColumn.ElementStyle>
+													<DataGridTextColumn.EditingElementStyle>
+														<Style TargetType="TextBox">
+															<Setter Property="TextWrapping" Value="Wrap" />
+															<Setter Property="AcceptsReturn" Value="true" />
+														</Style>
+													</DataGridTextColumn.EditingElementStyle>
+												</DataGridTextColumn>
+												<DataGridCheckBoxColumn Header="Is Partition Key" Width="100"
+Binding="{Binding IsPartitionKey, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridComboBoxColumn Header="Data Type" x:Name="DataTypeList4" Width="100"
+SelectedValueBinding="{Binding DataType, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Max Length" Width="100"
+Binding="{Binding MaxLength, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridTextColumn Header="Precision" Width="100"
+Binding="{Binding Precision, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridTextColumn Header="Scale" Width="100"
+Binding="{Binding Scale, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridTextColumn Header="Message" Width="300"
+Binding="{Binding Message, Mode=OneWay}"
+IsReadOnly="True" />
+												<DataGridCheckBoxColumn Header="Enable Index" Width="100"
+Binding="{Binding EnableIndex, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="110" />
+											</Grid.ColumnDefinitions>
+											<Button Click="copyDenormalizedTableColumns_Click" Content="Copy To Clipboard" HorizontalAlignment="right" VerticalAlignment="Bottom" Width="150" Grid.Column="1" />
+											<Button Click="deleteDenormalizedColumnButton_Click" Grid.Column="2" Height="20" Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Delete"/>
+										</Grid>
+									</Grid>
+								</Grid>
+
+							</Grid>
+						</TabItem>
+						<TabItem x:Name="customTableTab" Header="EDW Custom Tables">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="1000" MinWidth="1000" MaxWidth="2500"/>
+									<ColumnDefinition Width="*" MinWidth="800" />
+								</Grid.ColumnDefinitions>
+								<Grid Margin="3,0,0,0" Grid.Row="0" Grid.Column="0">
+									<Grid.RowDefinitions>
+										<RowDefinition MinHeight="50"/>
+										<RowDefinition MinHeight="50"/>
+									</Grid.RowDefinitions>
+									<Grid Grid.Row="0">
+										<Grid.RowDefinitions>
+											<RowDefinition Height="30"/>
+											<RowDefinition MinHeight="20"/>
+											<RowDefinition Height="30"/>
+										</Grid.RowDefinitions>
+										<TextBlock x:Name="CustomTablesTitle"
+Text=" Custom Tables"
+FontWeight="Bold" FontSize="16" 
+Grid.Row="0"
+Foreground="White" Grid.ColumnSpan="2" Background="DarkBlue" />
+										<DataGrid x:Name="customTableConfigGrid" Grid.Row="1" SelectionChanged="customTableConfigGrid_SelectionChanged"
+										  CellEditEnding="customTableConfigGrid_CellEditEnding" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Schema" Width="200"
+Binding="{Binding Schema, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Table Name" Width="300"
+Binding="{Binding Name, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridCheckBoxColumn Header="Run Before Transform" Width="200"
+Binding="{Binding RunBeforeTransform, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Dependency Order" Width="125"
+Binding="{Binding DependencyOrder, Mode=OneWay}" />
+												<DataGridTextColumn Header="Message" Width="500"
+Binding="{Binding Message, Mode=OneWay}"
+IsReadOnly="True" />
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+											</Grid.ColumnDefinitions>
+											<Button Click="copyCustomTables_Click" Content="Copy To Clipboard" HorizontalAlignment="right" VerticalAlignment="Bottom" Width="150" Grid.Column="0" />
+											<Button Click="addCustomTableButton_Click" Grid.Column="1" Height="20" Width="100" HorizontalAlignment="Right" Content="Add New"/>
+											<Button Click="deleteCustomTableButton_Click" Grid.Column="2" Height="20" Width="100" HorizontalAlignment="Right" Content="Delete"/>
+										</Grid>
+									</Grid>
+									<GridSplitter Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="LightGray" Height="3" Grid.ColumnSpan="1" />
+									<Grid Grid.Row="1">
+										<Grid.RowDefinitions>
+											<RowDefinition Height="30"/>
+											<RowDefinition MinHeight="20"/>
+											<RowDefinition Height="30"/>
+										</Grid.RowDefinitions>
+										<TextBlock x:Name="CustomTableColumnsTitle"
+Text=" Custom Table Columns"
+FontWeight="Bold" FontSize="16" 
+HorizontalAlignment="Stretch"
+Grid.Row="0"
+Foreground="White" Grid.ColumnSpan="2" Background="DarkBlue" />
+										<DataGrid x:Name="customColumnConfigGrid" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionMode="Extended" SelectionUnit="CellOrRowHeader">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Column Name" Width="300"
+Binding="{Binding Name, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridComboBoxColumn Header="Data Type" x:Name="DataTypeList7" Width="100"
+SelectedValueBinding="{Binding DataType, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Max Length" Width="100"
+Binding="{Binding MaxLength, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridTextColumn Header="Precision" Width="100"
+Binding="{Binding Precision, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridTextColumn Header="Scale" Width="100"
+Binding="{Binding Scale, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridTextColumn Header="Message" Width="300"
+Binding="{Binding Message, Mode=OneWay}"
+IsReadOnly="True" />
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+											</Grid.ColumnDefinitions>
+											<Button Click="copyCustomColumns_Click" Content="Copy To Clipboard" HorizontalAlignment="right" VerticalAlignment="Bottom" Width="150" Grid.Column="0" />
+											<Button Click="addCustomColumnButton_Click" Grid.Column="1" Height="20" Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Add New"/>
+											<Button Click="deleteCustomColumnButton_Click" Grid.Column="2" Height="20" Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Delete"/>
+										</Grid>
+									</Grid>
+								</Grid>
+								<GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Background="LightGray" Width="3" Grid.RowSpan="1" HorizontalAlignment="Left" />
+								<Grid Margin="3,0,0,0" Grid.Column="1">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="30"/>
+										<RowDefinition/>
+										<RowDefinition Height="50"/>
+									</Grid.RowDefinitions>
+									<TextBlock x:Name="CustomTableScriptDefinitionsTitle"
+Text=" Custom Table Script Definitions"
+FontWeight="Bold" FontSize="16" 
+HorizontalAlignment="Stretch"
+Grid.Row="0"
+Foreground="White" Grid.ColumnSpan="2" Background="DarkBlue" />
+									<TabControl SelectionChanged="EdwCustomTableQueryGrid_SelectionChanged" Grid.Row="1" Margin="10,10,10,5">
+										<TabItem x:Name="customTableViewTab" Header="Create View">
+											<TextBox Name="customTableViewTextBox" Grid.Row="0" Margin="5,5,5,5" TextWrapping="NoWrap" AcceptsTab="True" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextChanged="customTableViewTextBox_TextChanged"/>
+										</TabItem>
+										<TabItem x:Name="customTableInitialLoadTab" Header="Initial Load">
+											<TextBox Name="customTableInitialLoadTextBox" Grid.Row="0" Margin="5,5,5,5" TextWrapping="NoWrap" AcceptsTab="True" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextChanged="customTableInitialLoadTextBox_TextChanged"/>
+										</TabItem>
+										<TabItem x:Name="customTableIncrementalLoadTab" Header="Incremental Load">
+											<TextBox Name="customTableIncrementalLoadTextBox" Grid.Row="0" Margin="5,5,5,5" TextWrapping="NoWrap" AcceptsTab="True" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextChanged="customTableIncrementalLoadTextBox_TextChanged"/>
+										</TabItem>
+										<TabItem x:Name="customTableCustomIndexTab" Header="Custom Index">
+											<TextBox Name="customTableCustomIndexTextBox" Grid.Row="0" Margin="5,5,5,5" TextWrapping="NoWrap" AcceptsTab="True" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+										</TabItem>
+									</TabControl>
+									<Grid Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10,0,10,10">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="160" />
+											<ColumnDefinition Width="110" />
+											<ColumnDefinition Width="160" />
+											<ColumnDefinition Width="160" />
+										</Grid.ColumnDefinitions>
+										<Button x:Name="SaveCustomTableCustomIndexButton" Click="SaveCustomIndexForCustomTableButton_Click" Grid.Column="0" Height="20" Width="150" HorizontalAlignment="Right" Content="Save Custom Index"/>
+										<Button Name="TestCustomTableQueryButton" Click="TestCustomTableQueryButton_Click" Grid.Column="1" Height="20" Width="100" HorizontalAlignment="Right" Content="Test Query"/>
+										<Button Click="CopyCustomTableQueryToClipboard_Click" Grid.Column="2" Height="20" Width="150" HorizontalAlignment="Right" Content="Copy to Clipboard"/>
+										<Button Click="testQueryForAllModelsButton_Click" Grid.Column="3" Height="20" Width="150" HorizontalAlignment="Right" Content="Test Query For All"/>
+									</Grid>
+								</Grid>
+							</Grid>
+						</TabItem>
+						<TabItem x:Name="modelViewTab" Header="EDW Model Views">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="400" MinWidth="300" MaxWidth="2500"/>
+									<ColumnDefinition Width="400*" MinWidth="300" MaxWidth="2500"/>
+									<ColumnDefinition Width="1000*" MinWidth="300" />
+								</Grid.ColumnDefinitions>
+								<Grid Margin="0,0,0,0" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1">
+									<Grid.RowDefinitions>
+										<RowDefinition MinHeight="20"/>
+										<RowDefinition MinHeight="20"/>
+									</Grid.RowDefinitions>
+									<Grid Grid.Row="0">
+										<DataGrid x:Name="edwModelTableConfigGrid2"
+										  SelectionChanged="edwModelTableConfigGrid2_SelectionChanged"
+										  CellEditEnding="edwTableConfigGrid_CellEditEnding">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Schema" Width="200"
+Binding="{Binding Schema, Mode=TwoWay}" IsReadOnly="False"/>
+												<DataGridTextColumn Header="Model Table Name" Width="400"
+Binding="{Binding Name, Mode=TwoWay}" IsReadOnly="False"/>
+											</DataGrid.Columns>
+										</DataGrid>
+									</Grid>
+									<GridSplitter Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="LightGray" Height="3" Grid.ColumnSpan="1" />
+									<Grid Grid.Row="1">
+										<DataGrid x:Name="edwModelColumnConfigGrid2">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Model Column Name" Width="*"
+Binding="{Binding Name, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridComboBoxColumn Header="Data Type" x:Name="DataTypeList5" Width="100"
+SelectedValueBinding="{Binding DataType, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Max Length" Width="100"
+Binding="{Binding MaxLength, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridTextColumn Header="Precision" Width="100"
+Binding="{Binding Precision, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridTextColumn Header="Scale" Width="100"
+Binding="{Binding Scale, Mode=TwoWay}" IsReadOnly="False" />
+											</DataGrid.Columns>
+										</DataGrid>
+									</Grid>
+								</Grid>
+								<GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Background="LightGray" Width="3" Grid.RowSpan="1" HorizontalAlignment="Left" />
+								<Grid Margin="3,0,0,0" Grid.Row="0" Grid.Column="1">
+									<Grid.RowDefinitions>
+										<RowDefinition MinHeight="20"/>
+										<RowDefinition MinHeight="20"/>
+									</Grid.RowDefinitions>
+									<Grid Grid.Row="0">
+										<DataGrid x:Name="denormTableConfigGrid2"
+										  SelectionChanged="denormTableConfigGrid2_SelectionChanged"
+										  CellEditEnding="denormTableConfigGrid_CellEditEnding">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Schema" Width="300"
+Binding="{Binding Schema, Mode=TwoWay}" IsReadOnly="False"/>
+												<DataGridTextColumn Header="Denormalized Table Name" Width="400"
+Binding="{Binding Name, Mode=TwoWay}" IsReadOnly="False"/>
+											</DataGrid.Columns>
+										</DataGrid>
+									</Grid>
+									<GridSplitter Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="LightGray" Height="3" Grid.ColumnSpan="1" />
+									<Grid Grid.Row="1">
+										<DataGrid x:Name="denormColumnConfigGrid2">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Column Name" Width="*"
+Binding="{Binding Name, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridComboBoxColumn Header="Data Type" x:Name="DataTypeList6" Width="100"
+SelectedValueBinding="{Binding DataType, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Max Length" Width="100"
+Binding="{Binding MaxLength, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridTextColumn Header="Precision" Width="100"
+Binding="{Binding Precision, Mode=TwoWay}" IsReadOnly="False" />
+												<DataGridTextColumn Header="Scale" Width="100"
+Binding="{Binding Scale, Mode=TwoWay}" IsReadOnly="False" />
+											</DataGrid.Columns>
+										</DataGrid>
+									</Grid>
+								</Grid>
+								<GridSplitter Grid.Column="2" VerticalAlignment="Stretch" Background="LightGray" Width="3" Grid.RowSpan="1" HorizontalAlignment="Left" />
+								<Grid Margin="3,0,0,0" Grid.Row="0" Grid.Column="2">
+									<Grid.RowDefinitions>
+										<RowDefinition MinHeight="50"/>
+										<RowDefinition MinHeight="50"/>
+									</Grid.RowDefinitions>
+									<Grid Grid.Row="0">
+										<Grid.RowDefinitions>
+											<RowDefinition MinHeight="20"/>
+											<RowDefinition Height="30"/>
+										</Grid.RowDefinitions>
+										<DataGrid x:Name="modelViewTableConfigGrid" SelectionChanged="modelViewTableConfigGrid_SelectionChanged"
+										  CellEditEnding="modelViewTableConfigGrid_CellEditEnding" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Schema" Width="200"
+Binding="{Binding Schema, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Model View Name" Width="200"
+Binding="{Binding Name, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Expression" Binding="{Binding Path=Expression}" Width="600">
+													<DataGridTextColumn.ElementStyle>
+														<Style TargetType="TextBlock">
+															<Setter Property="TextWrapping" Value="Wrap" />
+														</Style>
+													</DataGridTextColumn.ElementStyle>
+													<DataGridTextColumn.EditingElementStyle>
+														<Style TargetType="TextBox">
+															<Setter Property="TextWrapping" Value="Wrap" />
+															<Setter Property="AcceptsReturn" Value="true" />
+														</Style>
+													</DataGridTextColumn.EditingElementStyle>
+												</DataGridTextColumn>
+												<DataGridTextColumn Header="Comment" Binding="{Binding Path=Comment}" Width="300">
+													<DataGridTextColumn.ElementStyle>
+														<Style TargetType="TextBlock">
+															<Setter Property="TextWrapping" Value="Wrap" />
+														</Style>
+													</DataGridTextColumn.ElementStyle>
+													<DataGridTextColumn.EditingElementStyle>
+														<Style TargetType="TextBox">
+															<Setter Property="TextWrapping" Value="Wrap" />
+															<Setter Property="AcceptsReturn" Value="true" />
+														</Style>
+													</DataGridTextColumn.EditingElementStyle>
+												</DataGridTextColumn>
+												<DataGridTextColumn Header="Message" Width="300"
+Binding="{Binding Message, Mode=OneWay}"
+IsReadOnly="True" />
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+											</Grid.ColumnDefinitions>
+											<Button Click="populateModelViewColumnsButton_Click" Grid.Column="0" Height="20" Width="150" HorizontalAlignment="Right" Content="Populate Columns"/>
+											<Button Click="testQueryForAllModelsButton_Click" Grid.Column="1" Height="20" Width="150" HorizontalAlignment="Right" Content="Test Query For All"/>
+											<Button Click="copyModelViews_Click" Content="Copy To Clipboard" HorizontalAlignment="right" VerticalAlignment="Bottom" Width="150" Grid.Column="2" />
+											<Button Click="addModelViewTableButton_Click" Grid.Column="3" Height="20" Width="100" HorizontalAlignment="Right" Content="Add New"/>
+											<Button Click="deleteModelViewTableButton_Click" Grid.Column="4" Height="20" Width="100" HorizontalAlignment="Right" Content="Delete"/>
+										</Grid>
+									</Grid>
+									<GridSplitter Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="LightGray" Height="3" Grid.ColumnSpan="1" />
+									<Grid Grid.Row="1">
+										<Grid.RowDefinitions>
+											<RowDefinition MinHeight="20"/>
+											<RowDefinition Height="30"/>
+										</Grid.RowDefinitions>
+										<DataGrid x:Name="modelViewColumnConfigGrid"
+										  SelectionChanged="modelViewColumnConfigGrid_SelectionChanged"
+										  CellEditEnding="modelViewColumnConfigGrid_CellEditEnding" ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectionMode="Extended" SelectionUnit="CellOrRowHeader">
+											<DataGrid.Columns>
+												<DataGridTextColumn Header="Column Name" Width="300"
+Binding="{Binding Name, Mode=TwoWay, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+												<DataGridTextColumn Header="Expression" Binding="{Binding Path=Expression}" Width="700">
+													<DataGridTextColumn.ElementStyle>
+														<Style TargetType="TextBlock">
+															<Setter Property="TextWrapping" Value="Wrap" />
+														</Style>
+													</DataGridTextColumn.ElementStyle>
+													<DataGridTextColumn.EditingElementStyle>
+														<Style TargetType="TextBox">
+															<Setter Property="TextWrapping" Value="Wrap" />
+															<Setter Property="AcceptsReturn" Value="true" />
+														</Style>
+													</DataGridTextColumn.EditingElementStyle>
+												</DataGridTextColumn>
+												<DataGridTextColumn Header="Comment" Binding="{Binding Path=Comment}" Width="300">
+													<DataGridTextColumn.ElementStyle>
+														<Style TargetType="TextBlock">
+															<Setter Property="TextWrapping" Value="Wrap" />
+														</Style>
+													</DataGridTextColumn.ElementStyle>
+													<DataGridTextColumn.EditingElementStyle>
+														<Style TargetType="TextBox">
+															<Setter Property="TextWrapping" Value="Wrap" />
+															<Setter Property="AcceptsReturn" Value="true" />
+														</Style>
+													</DataGridTextColumn.EditingElementStyle>
+												</DataGridTextColumn>
+												<DataGridTextColumn Header="Message" Width="300"
+Binding="{Binding Message, Mode=OneWay}"
+IsReadOnly="True" />
+											</DataGrid.Columns>
+										</DataGrid>
+										<Grid Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,5,5,5">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="160" />
+												<ColumnDefinition Width="110" />
+												<ColumnDefinition Width="110" />
+											</Grid.ColumnDefinitions>
+											<Button Click="copyModelViewColumns_Click" Content="Copy To Clipboard" HorizontalAlignment="right" VerticalAlignment="Bottom" Width="150" Grid.Column="0" />
+											<Button Click="addModelViewColumnButton_Click" Grid.Column="1" Height="20" Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Add New"/>
+											<Button Click="deleteModelViewColumnButton_Click" Grid.Column="2" Height="20" Width="100" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Delete"/>
+										</Grid>
+									</Grid>
+								</Grid>
+							</Grid>
+						</TabItem>
+						<TabItem x:Name="sourceAndModelViewMappingTab" Header="Source and Model View Mapping" HorizontalAlignment="Stretch">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*" MinWidth="500"/>
+									<ColumnDefinition MinWidth="500"/>
+								</Grid.ColumnDefinitions>
+								<Grid Grid.Column="0">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="*"/>
+										<RowDefinition Height="40"/>
+									</Grid.RowDefinitions>
+									<TextBox x:Name="mappingInputTextBox" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch"  TextWrapping="NoWrap" VerticalAlignment="Stretch" AcceptsReturn="True" Margin="10,10,10,10" FontSize="18" FontFamily="Consolas" Grid.Row="0"/>
+									<Button Click="findMapping_Click" Content="Refresh" HorizontalAlignment="right" VerticalAlignment="Bottom" Width="120" Margin="10,10,10,10" Grid.Row="1" />
+								</Grid>
+								<GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Background="LightGray" Width="3" Grid.RowSpan="1" HorizontalAlignment="Left" />
+								<Grid Grid.Column="1">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="*"/>
+										<RowDefinition Height="40"/>
+									</Grid.RowDefinitions>
+									<DataGrid x:Name="sourceModelViewMappingGrid" Grid.Row="0" VerticalAlignment="Stretch" Margin="10,10,10,10" ScrollViewer.HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch">
+										<DataGrid.Columns>
+											<DataGridTextColumn Header="Source Schema" Width="300"
+Binding="{Binding SourceSchema, Mode=OneWay}" IsReadOnly="True" />
+											<DataGridTextColumn Header="Source Table" Width="300"
+Binding="{Binding SourceTable, Mode=OneWay}" IsReadOnly="True" />
+											<DataGridTextColumn Header="Source Column" Width="300"
+Binding="{Binding SourceColumn, Mode=OneWay}" IsReadOnly="True" />
+											<DataGridCheckBoxColumn Header="Column in EDW" Width="150"
+Binding="{Binding ColumnInEdw, Mode=OneWay}" IsReadOnly="True"/>
+											<DataGridTextColumn Header="Model Schema" Width="300"
+Binding="{Binding ModelSchema, Mode=OneWay}" IsReadOnly="True" />
+											<DataGridTextColumn Header="Model View" Width="300"
+Binding="{Binding ModelView, Mode=OneWay}" IsReadOnly="True" />
+											<DataGridTextColumn Header="Model Column" Width="300"
+Binding="{Binding ModelColumn, Mode=OneWay}" IsReadOnly="True"/>
+										</DataGrid.Columns>
+									</DataGrid>
+									<Button Click="copyMapping_Click" Content="Copy To Clipboard" HorizontalAlignment="right" VerticalAlignment="Bottom" Width="150" Margin="10,10,10,10" Grid.Row="1" />
+								</Grid>
+							</Grid>
+						</TabItem>
+						<TabItem x:Name="reportMappingTab" Header="Report Mapping" HorizontalAlignment="Stretch"
+								 Loaded="reportMappingTab_Loaded">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition></ColumnDefinition>
+									<ColumnDefinition></ColumnDefinition>
+								</Grid.ColumnDefinitions>
+								<Grid Grid.Column="0" MinWidth="60">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="20"></RowDefinition>
+										<RowDefinition></RowDefinition>
+										<RowDefinition  Height="32"></RowDefinition>
+									</Grid.RowDefinitions>
+									<TextBlock 
+										Text="Reports"
+										Height="20" Margin="0,0,0,0"
+										Grid.Row="0"
+										VerticalAlignment="Top"
+										HorizontalAlignment="Stretch"
+										Background="CornflowerBlue" Foreground="White"/>
+									<DataGrid Grid.Row="1"
+										x:Name="reportGrid" Margin="0,0,0,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" RowHeight="23"
+											  ItemsSource="{Binding}" SelectionMode="Single"
+											  SelectionChanged="reportGird_SelectedChanged">
+										<DataGrid.Columns>
+											<DataGridTextColumn Header="Report Name" Width="200" x:Name="ReportSearchCategories"
+																Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}"/>
+										</DataGrid.Columns>
+									</DataGrid>
+									<StackPanel Orientation="Horizontal" Grid.Row="2" Margin="0,2,0,2">
+										<Button Margin="0,4,8,4" Content="Add New Report" Width="100"
+													Click="reportAddNew_Click"></Button>
+										<Button Margin="8,4,8,4" Content="Delete Report" Width="100"
+													Click="reportDelete_Click"></Button>
+									</StackPanel>
+								</Grid>
+								<DockPanel Grid.Column="1" Margin="10,0,0,0">
+									<Grid>
+										<Grid.RowDefinitions>
+											<RowDefinition MaxHeight="20" Height="20*"></RowDefinition>
+											<RowDefinition ></RowDefinition>
+										</Grid.RowDefinitions>
+										<TextBlock Grid.Row="0"
+Text="Staging tables"
+Height="20"
+VerticalAlignment="Center"
+Background="CornflowerBlue"
+Foreground="White" />
+										<DataGrid x:Name="reportStagingTableGrid"
+												  CanUserSortColumns="True"
+												  Margin="0,0,5,0" Grid.Row="1"
+												  SelectionUnit="FullRow">
+											<DataGrid.Columns>
+												<DataGridCheckBoxColumn Header="Mapped" Binding="{Binding Mapped, Mode=TwoWay, NotifyOnTargetUpdated=True, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True}" SortMemberPath="Mapped"></DataGridCheckBoxColumn>
+												<DataGridTextColumn Header="Source Schema" Width="200" SortMemberPath="StagingTable"
+																	Binding="{Binding SourceSchema, Mode=OneWay}">
+												</DataGridTextColumn>
+												<DataGridTextColumn Header="Staging Table" Width="200" SortMemberPath="StagingTable"
+																	Binding="{Binding StagingTable, Mode=OneWay}">
+												</DataGridTextColumn>
+											</DataGrid.Columns>
+										</DataGrid>
+									</Grid>
+								</DockPanel>
+							</Grid>
+						</TabItem>
+						<TabItem x:Name="ssasCubesTab" Header="Analysis Models" HorizontalAlignment="Stretch">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="800" MinWidth="1000" MaxWidth="1800"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Grid Margin="0,0,0,0" Grid.Row="0" Grid.Column="0">
+									<Grid.RowDefinitions>
+										<RowDefinition MinHeight="20"/>
+										<RowDefinition MinHeight="20"/>
+									</Grid.RowDefinitions>
+									<DataGrid x:Name="ssasCubesGrid" VerticalAlignment="Top" HorizontalAlignment="Left" SelectionChanged="ssasCubesGrid_SelectionChanged">
+										<DataGrid.Columns>
+											<DataGridTextColumn Header="File Name" Width="400"
+Binding="{Binding SsasModelFileName, Mode=OneWay}" IsReadOnly="True" />
+											<DataGridTextColumn Header="Logical Name" Width="400"
+Binding="{Binding SsasModelLogicalName, Mode=OneWay}" IsReadOnly="True" />
+											<DataGridCheckBoxColumn Header="Requires Data Warehouse" Width="*" Binding="{Binding RequiresDataWarehouse, Mode=TwoWay}"/>
+										</DataGrid.Columns>
+									</DataGrid>
+									<GridSplitter Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="LightGray" Height="3" Grid.ColumnSpan="1" />
+									<DataGrid x:Name="ssasTablesGrid" Grid.Row="1" SelectionChanged="ssasTablesGrid_SelectionChanged" Margin="0,0,0,0.333">
+										<DataGrid.Columns>
+											<DataGridTextColumn Header="Table Name" Width="*"
+Binding="{Binding TableName, Mode=OneWay}" IsReadOnly="True" />
+											<DataGridTextColumn Header="Partition Key Name" Width="150"
+Binding="{Binding PartitionKeyName, Mode=TwoWay}" IsReadOnly="False" />
+											<DataGridTextColumn Header="Message" Width="250"
+Binding="{Binding Message, Mode=OneWay}" IsReadOnly="True" />
+											<DataGridCheckBoxColumn Header="Is Calculated Table" Width="150"
+Binding="{Binding IsCalculated, Mode=OneWay}" IsReadOnly="True"/>
+										</DataGrid.Columns>
+									</DataGrid>
+								</Grid>
+								<GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Background="LightGray" Width="3" Grid.RowSpan="1" HorizontalAlignment="Left" />
+								<Grid Grid.Column="1">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="*"/>
+										<RowDefinition Height="40"/>
+									</Grid.RowDefinitions>
+									<TextBox Name="QueryTextBox" Margin="10,10,10,10" IsReadOnly="True" TextWrapping="NoWrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontSize="24" FontFamily="Consolas"/>
+									<Grid Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10,0,10,10">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="110" />
+											<ColumnDefinition Width="160" />
+											<ColumnDefinition Width="160" />
+										</Grid.ColumnDefinitions>
+										<Button Click="CopyQueryToClipboard_Click" Grid.Column="1" Height="20" Width="150" HorizontalAlignment="Right" Content="Copy to Clipboard"/>
+										<Button Click="testQueryForAllModelsButton_Click" Grid.Column="2" Height="20" Width="150" HorizontalAlignment="Right" Content="Test Query For All"/>
+									</Grid>
+								</Grid>
+							</Grid>
+						</TabItem>
+					</TabControl>
+				</Grid>
+			</Grid>
+			<GridSplitter Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="LightGray" Height="3"/>
+			<Grid Grid.Row="1" Grid.Column="0">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="700" MinWidth="700" MaxWidth="2000"/>
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+				<TextBlock x:Name="ConsoleTitle"
+Text=" Console"
+Margin="13,10,10,0"
+Grid.Row="0"
+FontWeight="Bold" FontSize="16" 
+Foreground="Black" />
+				<TextBox Name="LoggerTextBox" Grid.Column="0" Grid.Row="1" Margin="10,40,10,10" IsReadOnly="True" TextWrapping="NoWrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" TextChanged="LoggerTextBox_TextChanged"/>
+				<GridSplitter Name="LoggerGridSplitter" Grid.Column="1" Background="LightGray" Width="3" Grid.RowSpan="1" HorizontalAlignment="Left" />
+				<Grid x:Name="edwModelQueryGrid" Grid.Column="1">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="30"/>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="40"/>
+					</Grid.RowDefinitions>
+					<TextBlock x:Name="ScriptPreviewTitle"
+Text=" Script Preview"
+Margin="13,10,10,0"
+Grid.Row="0"
+FontWeight="Bold" FontSize="16" 
+Foreground="Black" />
+					<TabControl Grid.Row="1" SelectionChanged="EdwModelQueryGrid_SelectionChanged" Margin="10,10,10,5" >
+						<TabItem x:Name="createModelViewTab" Header="Create View" Visibility="Hidden">
+							<TextBox Name="createModelViewTextBox" Grid.Row="0" Margin="5,5,5,5" IsReadOnly="True" TextWrapping="NoWrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+						</TabItem>
+						<TabItem x:Name="createModelViewForDenormTab" Header="Create View" Visibility="Hidden">
+							<TextBox Name="createModelViewForDenormTextBox" Grid.Row="0" Margin="5,5,5,5" IsReadOnly="True" TextWrapping="NoWrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+						</TabItem>
+						<TabItem x:Name="initialLoadQueryForBaseTab" Header="Initial Load">
+							<TextBox Name="initialLoadQueryForBaseTextBox" Grid.Row="0" Margin="5,5,5,5" IsReadOnly="True" TextWrapping="NoWrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+						</TabItem>
+						<TabItem x:Name="initialLoadQueryForDenormTab" Header="Initial Load">
+							<TextBox Name="initialLoadQueryForDenormTextBox" Grid.Row="0" Margin="5,5,5,5" IsReadOnly="True" TextWrapping="NoWrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+						</TabItem>
+						<TabItem x:Name="insertQueryTab" Header="Insert">
+							<TextBox Name="insertQueryTextBox" Grid.Row="0" Margin="5,5,5,5" IsReadOnly="True" TextWrapping="NoWrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+						</TabItem>
+						<TabItem x:Name="deleteQueryTab" Header="Delete">
+							<TextBox Name="deleteQueryTextBox" Grid.Row="0" Margin="5,5,5,5" IsReadOnly="True" TextWrapping="NoWrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+						</TabItem>
+						<TabItem x:Name="incrementalLoadQueryTab" Header="Incremental Load">
+							<TextBox Name="incrementalLoadQueryForDenormTextBox" Grid.Row="0" Margin="5,5,5,5" IsReadOnly="True" TextWrapping="NoWrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+						</TabItem>
+						<TabItem x:Name="customIndexQueryForBaseTab" Header="Custom Index">
+							<TextBox Name="customIndexQueryForBaseTextBox" Grid.Row="0" Margin="5,5,5,5" IsReadOnly="False" TextWrapping="NoWrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+						</TabItem>
+						<TabItem x:Name="customIndexQueryForDenormTab" Header="Custom Index">
+							<TextBox Name="customIndexQueryForDenormTextBox" Grid.Row="0" Margin="5,5,5,5" IsReadOnly="False" TextWrapping="NoWrap" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+						</TabItem>
+					</TabControl>
+					<Grid Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5,0,10,10">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="160" />
+							<ColumnDefinition Width="110" />
+							<ColumnDefinition Width="160" />
+						</Grid.ColumnDefinitions>
+						<Button Name="SaveCustomIndexButton" Click="SaveCustomIndexButton_Click" Grid.Column="0" Height="20" Width="150" HorizontalAlignment="Right" Content="Save Custom Index"/>
+						<Button Name="QueryButton" Click="QueryButton_Click" Grid.Column="1" Height="20" Width="100" HorizontalAlignment="Right" Content="Test Query"/>
+						<Button Click="CopyToClipboard_Click" Grid.Column="2" Height="20" Width="150" HorizontalAlignment="Right" Content="Copy to Clipboard"/>
+					</Grid>
+				</Grid>
+			</Grid>
+		</Grid>
+	</DockPanel>
+</Window>

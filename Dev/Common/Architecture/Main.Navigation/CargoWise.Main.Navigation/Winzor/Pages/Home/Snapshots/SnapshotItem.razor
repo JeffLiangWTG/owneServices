@@ -1,0 +1,72 @@
+@using CargoWiseNext.Blazor.Components
+@using Microsoft.AspNetCore.Components.Web
+@namespace CargoWise.Main.Navigation.Pages
+
+@inherits CwnComponentBase
+
+<CwnCard Class="@Classname" draggable="@Draggable" @attributes="UserAttributes">
+    @if (IsLoading)
+    {
+        <CwnCardHeader Class="cwn-snapshot-item__header" ClassHeaderContent="cwn-snapshot-item__header-content">
+            <CardHeaderContent>
+                <CwnSkeletonPlaceholder Class="cwn-snapshot-item__skeleton-title"/>
+                <CwnSkeletonPlaceholder Class="cwn-snapshot-item__skeleton-subtitle"/>
+            </CardHeaderContent>
+        </CwnCardHeader>
+        <CwnCardContent Class="cwn-snapshot-item__content">
+            <CwnSkeletonPlaceholder Class="cwn-snapshot-item__skeleton-value"/>
+        </CwnCardContent>
+    }
+    else
+    {
+        <CwnCardHeader
+            Class="cwn-snapshot-item__header"
+            ClassHeaderContent="cwn-snapshot-item__header-content"
+            ClassHeaderActions="cwn-snapshot-item__header-actions">
+            <CardHeaderContent>
+                <CwnText Class="cwn-snapshot-item__text cwn-snapshot-item__title"
+                            title="@LayoutName">@LayoutName</CwnText>
+                <CwnText Class="cwn-snapshot-item__text cwn-snapshot-item__sub-title"
+                            title="@ModuleName">@ModuleName</CwnText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <CwnIconButton
+                    Class="cwn-snapshot-item__button"
+                    Icon="Icon.ArrowRight"
+                    Color="Color.Default"
+                    Size="Size.Large"
+                    Variant="Variant.Outlined"
+                    OnSingleClick="@HandleOpenModuleFilterClickAsync"
+                    data-testid="open-module-filter-button"/>
+            </CardHeaderActions>
+        </CwnCardHeader>
+        <CwnCardContent Class="cwn-snapshot-item__content">
+            @if(!HasError)
+            {
+                <CwnText HtmlTag="span" Class="cwn-snapshot-item__value">@Value</CwnText>
+            }
+            else
+            {
+                <CwnCallout
+                    Type="@(CalloutType.Error)"
+                    ClassContent="cwn-snapshot-item__error-content"
+                    title="@ErrorMessage">@ErrorMessage</CwnCallout>
+            }
+        </CwnCardContent>
+        @if (IsEditing)
+        {
+            <CwnCardActions Class="cwn-snapshot-item__actions--editing">
+                <CwnIconButton
+                    Icon="@Icon.Settings"
+                    ClassIcon="cwn-snapshot-item__icon-edit"
+                    OnSingleClick="@HandleEditClickAsync"
+                    data-testid="edit-item-btn"/>
+                <CwnIconButton
+                    Icon="@Icon.Delete"
+                    ClassIcon="cwn-snapshot-item__icon-delete"
+                    OnSingleClick="@HandleDeleteClickAsync"
+                    data-testid="delete-btn"/>
+            </CwnCardActions>
+        }
+    }
+</CwnCard>

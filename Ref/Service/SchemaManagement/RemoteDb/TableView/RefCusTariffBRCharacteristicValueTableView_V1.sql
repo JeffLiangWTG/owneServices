@@ -1,0 +1,6 @@
+CREATE VIEW RefCusTariffBRCharacteristicValueTableView_V1 AS
+SELECT ZB2_PK,
+ZB2_ZB1_Characteristic,
+ZB2_Value,
+ZB2_Description
+FROM RefCusTariffBRCharacteristicValue

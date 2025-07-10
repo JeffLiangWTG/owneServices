@@ -1,0 +1,24 @@
+CREATE TABLE RefCusVATApplicability (
+	ZX5_PK UNIQUEIDENTIFIER NOT NULL,
+	ZX5_ZZ1_Tariff UNIQUEIDENTIFIER NULL,
+	ZX5_ZZW_TariffNationalCode UNIQUEIDENTIFIER NULL,
+	ZX5_ZZF_NKTaxOrFeeCode VARCHAR(4) NOT NULL CONSTRAINT DF_RefCusVATApplicability_ZX5_ZZF_NKTaxOrFeeCode DEFAULT (''),
+	ZX5_StartDate SMALLDATETIME NOT NULL CONSTRAINT DF_RefCusVATApplicability_ZX5_StartDate DEFAULT ('1900-01-01'),
+	ZX5_EndDate SMALLDATETIME NOT NULL CONSTRAINT DF_RefCusVATApplicability_ZX5_EndDate DEFAULT ('2079-06-06 23:59'),
+	ZX5_AdditionalCode VARCHAR(15) NOT NULL CONSTRAINT DF_RefCusVATApplicability_ZX5_AdditionalCode DEFAULT (''),
+	ZX5_Description NVARCHAR(500) NOT NULL CONSTRAINT DF_RefCusVATApplicability_ZX5_Description DEFAULT (N''),
+	ZX5_ZZZ_NKDataGrouping VARCHAR(3) NOT NULL,
+	ZX5_ZZA_NKTradeGroup VARCHAR(35) NULL,
+	ZX5_ZZA_ZZZ_NKDataGrouping VARCHAR(3) NULL,
+	ZX5_VATCategory VARCHAR(4) NOT NULL CONSTRAINT [DF_RefCusVATApplicability_ZX5_VATCategory] DEFAULT (''),
+	CONSTRAINT PK_RefCusVATApplicability PRIMARY KEY CLUSTERED(ZX5_PK ASC),
+	CONSTRAINT FK_RefCusVATApplicability_RefCusTariff FOREIGN KEY (ZX5_ZZ1_Tariff) REFERENCES RefCusTariff(ZZ1_PK),
+	CONSTRAINT FK_RefCusVATApplicability_RefCusTariffNationalCode FOREIGN KEY (ZX5_ZZW_TariffNationalCode) REFERENCES RefCusTariffNationalCode(ZZW_PK),
+	CONSTRAINT CK_RefCusVATApplicability_ZX5_ZZ1_Tariff_ZX5_ZZW_TariffNationalCode CHECK((ZX5_ZZ1_Tariff IS NULL AND ZX5_ZZW_TariffNationalCode IS NOT NULL) OR (ZX5_ZZ1_Tariff IS NOT NULL AND ZX5_ZZW_TariffNationalCode IS NULL)),
+	CONSTRAINT CK_RefCusVATApplicability_ZX5_StartDate_ZX5_EndDate CHECK(ZX5_StartDate <= ZX5_EndDate),
+	CONSTRAINT CK_RefCusVATApplicability_ZX5_VATCategory CHECK(ZX5_VATCategory = '' OR ZX5_VATCategory LIKE '[A-Z][0-9][0-9][0-9]')
+)
+GO
+CREATE NONCLUSTERED INDEX [IX_RefCusVATApplicability_ZX5_ZZ1_Tariff] ON [RefCusVATApplicability] ([ZX5_ZZ1_Tariff])
+Go
+CREATE NONCLUSTERED INDEX [IX_RefCusVATApplicability_ZX5_ZZW_TariffNationalCode] ON [RefCusVATApplicability] ([ZX5_ZZW_TariffNationalCode])

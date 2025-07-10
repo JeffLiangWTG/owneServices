@@ -1,0 +1,149 @@
+@using WinzorFramework
+@using WinzorFramework.Extensions
+@using System.Drawing
+@using static System.Windows.Forms.ButtonInternal.ButtonBaseAdapter
+@namespace System.Windows.Forms
+@inherits ButtonBase
+
+@{
+    var layout = Adapter.CommonLayout().Layout();
+}
+<button
+	title="@ToolTipText"
+    @attributes="DataAttributes"
+	style="@OuterDivStyleString(FlatStyle)"
+	class="button @ButtonFlatStyleClass(FlatStyle)"
+	@onclick="OnClickAsync"
+	@onclick:stopPropagation
+	@onwinzorfocusin="OnFocusInAsync"
+	@onwinzorfocusin:stopPropagation
+	@ref="ElementReference"
+	@onwinzorfocusout="OnFocusOutAsync"
+	@onwinzorfocusout:stopPropagation
+	@oncontextmenu="OnContextMenuAsync"
+	@oncontextmenu:stopPropagation
+	@oncontextmenu:preventDefault
+	@onmouseenter="OnMouseEnterAsync"
+	@onmouseleave="OnMouseLeaveAsync"
+	@onmouseover=OnMouseOverAsync
+	@onmouseover:stopPropagation
+	@onmousedown="OnMouseDownAsync"
+	@onmousedown:stopPropagation
+	@onmousedown:preventDefault="PreventDefaultMouseDown"
+	tabindex="@this.TabIndexHtmlAttributeValue()"
+	disabled="@(!Enabled)">
+    <div style=@InnerDivControlStyleString(UseVisualStyleBackColor) class="@this.BackgroundImageLayoutClass() @this.TextImageRelationClass(TextImageRelation)">
+        @if (Image is not null)
+        {
+            <div class="button__image backgroundimage--center" style="@ImagePositionStyle(layout)" draggable="false">
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(Text))
+        {
+            <div class="button__text" style="@ButtonTextStyleString(layout)">@Text.ProcessMnemonicToHtml(UseMnemonic)</div>
+        }
+    </div>
+</button>
+
+@code {
+    ColorData colorData => new ColorOptions(ForeColor, BackColor, Enabled).Calculate();
+
+    string ColorStyleString => FlatStyle switch
+    {
+        FlatStyle.Standard when !Enabled => $"color:{colorData.buttonShadow.GetColorStyleValue()};",
+        _ => string.Empty
+    };
+
+    string ClippedTextStyleString(LayoutData layout)
+    {
+        var textBoundsWidth = layout.TextBounds.Width;
+        var textBoundsHeight = layout.TextBounds.Height;
+        if (Font.FontFamily.Name == "Tahoma" && textBoundsHeight < 15)
+        {
+            textBoundsHeight += 1;
+        }
+
+        (var overflowed, var maximumLineCount) = TextRenderer.MeasureMaximumLineCount(Text, Font, new Size(textBoundsWidth, textBoundsHeight), TextFormatFlags.WordBreak);
+
+        return overflowed ? $"max-height: {maximumLineCount * Font.GetFontHeight()}px;" : "";
+    }
+
+    string ButtonTextStyleString(LayoutData layout) => $"{Adapter.GetTextBoundsStyleString(layout)} {GetTextAlignmentStyleString()} {ClippedTextStyleString(layout)} {ColorStyleString}";
+
+    string InnerDivControlStyleString(bool useBackColor)
+    {
+        var styleString = Adapter.GetInnerDivControlStyleString();
+        if (useBackColor)
+        {
+            return styleString + this.BackgroundImageStyleString() + this.FontStyleString() + "overflow: hidden;";
+        }
+        return styleString + this.BackgroundImageStyleString() + this.BackgroundColorStyleString() + this.FontStyleString() + "overflow: hidden;";
+    }
+
+    string ButtonFlatStyleClass(FlatStyle style)
+    {
+        switch (style)
+        {
+            case FlatStyle.Flat:
+                return "button--flat";
+            case FlatStyle.Popup:
+                return "button--popup";
+            case FlatStyle.Standard:
+            case FlatStyle.System:
+                var retStyle = Enabled ? "button--standard" : "button--standard--disabled";
+                retStyle += Enabled && IsDefault ? " button--default" : string.Empty;
+                return retStyle;
+        }
+        return string.Empty;
+    }
+
+    string OuterDivStyleString(FlatStyle flatStyle)
+    {
+        var controlStyleString = this.LayoutStyle() + Cursor.CursorStyleVars() + ExtraStyleString + Adapter.GetOuterDivBoundsStyleString();
+        switch (flatStyle)
+        {
+            case FlatStyle.Flat:
+                return controlStyleString + this.BackgroundColorStyleString() + this.FlatButtonAppearanceStyleString(colorData.lowButtonFace);
+            case FlatStyle.Standard:
+            default:
+                return controlStyleString;
+        }
+    }
+
+    string TextImageRelationClass(TextImageRelation position)
+    {
+        switch (position)
+        {
+            case TextImageRelation.ImageAboveText:
+                return "button--imageabovetext";
+            case TextImageRelation.ImageBeforeText:
+                return "button--imagebeforetext";
+            case TextImageRelation.Overlay:
+                return "button--overlay";
+            case TextImageRelation.TextAboveImage:
+                return "button--textaboveimage";
+            case TextImageRelation.TextBeforeImage:
+                return "button--textbeforeimage";
+        }
+        return string.Empty;
+    }
+
+    string ImagePositionStyle(LayoutData layout)
+    {
+        var styleString = Adapter.GetImageBoundsStyleString(layout);
+        return styleString += $" background-image: url({Image!.ToBase64DataUrl()});";
+    }
+
+    string GetTextAlignmentStyleString()
+    {
+        var styleString = "";
+
+        if (Font.FontFamily.Name == "Segoe UI Symbol" && TextAlign == ContentAlignment.MiddleCenter)
+        {
+            styleString = "align-items: self-end; display: flex; justify-content: end;";
+        }
+
+        return styleString;
+    }
+
+}

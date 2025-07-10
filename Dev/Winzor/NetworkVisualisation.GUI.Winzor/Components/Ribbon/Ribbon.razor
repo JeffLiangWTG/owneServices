@@ -1,0 +1,28 @@
+@namespace CargoWise.NetworkVisualisation.GUI
+@using Microsoft.AspNetCore.Components
+
+@if (ViewModel is not null)
+{
+    <div class="ribbon" @ref=RibbonElementReference @oncontextmenu=OpenContextMenuAsync @oncontextmenu:stopPropagation @oncontextmenu:preventDefault>
+        <div class="ribbon__titlebar"></div>
+        <div class="ribbon__header">
+            <div class="ribbon__headertabs">
+                @{
+                    var i = 0;
+                }
+                @foreach (var tab in ViewModel.Tabs)
+                {
+                    var index = i++;
+                    <button class="ribbon__headerbutton @(tab == SelectedTab ? "ribbon__headerbutton--selected" : string.Empty)" @onclick=@((args) => OnRibbonTabClick(index, args)) @onclick:stopPropagation>
+                        <span>@tab.Header</span>
+                    </button>
+                }
+            </div>
+            <input type="text" class="ribbon__searchbox" align="left" placeholder=@SearchTextPlaceholder @bind=@SearchText @bind:after=UpdateSearchTermAsync @onkeyup=UpdateSearchAsync @ondblclick:stopPropagation
+                @ref=SearchBoxElementReference @oncontextmenu=OpenTextBoxContextMenuAsync @oncontextmenu:stopPropagation @oncontextmenu:preventDefault />
+        </div>
+        <div class="ribbon__content" style="@ToggleRibbonStyle">
+            <RibbonTab ViewModel="SelectedTab" />
+        </div>
+    </div>
+}

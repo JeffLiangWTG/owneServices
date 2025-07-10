@@ -1,0 +1,25 @@
+meta {
+  name: Provided Universal Value is 4 characters
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.CarrierServiceLevels = [{ Type: "UC", Value: "ABCD" }];
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="windows-1252" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:ct="http://agriculture.gov.au/nexdoc/common/CommonTypes_1.0"
+            xmlns:sf="http://agriculture.gov.au/nexdoc/common/rex/FishTypes_1.0"
+            targetNamespace="http://agriculture.gov.au/nexdoc/common/rex/FishTypes_1.0" elementFormDefault="qualified">
+  <xsd:import namespace="http://agriculture.gov.au/nexdoc/common/CommonTypes_1.0" schemaLocation="../CommonTypes.xsd"/>
+  <xsd:complexType name="FishEstablishmentType">
+    <xsd:annotation>
+      <xsd:documentation>This type specifies the different establishment types that are associated with a rex product line.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="freeTextEstablishment" type="sf:FreeTextEstablishmentType" minOccurs="0" maxOccurs="100"/>
+      <xsd:element name="harvestArea" type="sf:HarvestArea" minOccurs="0" maxOccurs="100"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="FishWaterIndicator">
+    <xsd:annotation>
+      <xsd:documentation>This type specifies the water indicators for fish. S stands for Salt water and F for Fresh water.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="F">
+        <xsd:annotation>
+          <xsd:documentation>Fresh water</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="S">
+        <xsd:annotation>
+          <xsd:documentation>Salt water</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:complexType name="FishProductLineDetails">
+    <xsd:annotation>
+      <xsd:documentation>This type specifies the additional details that can be specified for a fish rex product line.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="catchStartDate" type="xsd:date" minOccurs="0"/>
+      <xsd:element name="catchEndDate" type="xsd:date" minOccurs="0"/>
+      <xsd:element name="fishWaterIndicator" type="sf:FishWaterIndicator" minOccurs="0"/>
+      <xsd:element name="fishEstablishments" type="sf:FishEstablishmentType" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="FishExportDetails">
+    <xsd:annotation>
+      <xsd:documentation>This type specifies the additional details that can be specified for a fish rex (export details).
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="transportStorageMinimumTemperature" type="ct:TemperatureType" minOccurs="0"/>
+      <xsd:element name="catchingZones" minOccurs="0">
+        <xsd:complexType>
+          <xsd:sequence maxOccurs="3">
+            <xsd:element name="catchingZone" type="ct:AlphaNumeric35Type"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="FreeTextEstablishmentType">
+    <xsd:annotation>
+      <xsd:documentation>This type specifies the details pertaining to a free text establishment.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="startDate" type="xsd:date"/>
+      <xsd:element name="endDate" type="xsd:date"/>
+      <xsd:element name="establishmentIndicator" type="ct:ProcessingIndicatorType"/>
+      <xsd:element name="establishmentName" type="ct:AlphaNumeric50Type"/>
+      <xsd:element name="postCode" type="ct:RestrictedAlphaNumeric10TokenType"/>
+      <xsd:element name="partyIdentification" type="ct:AlphaNumeric200Type" minOccurs="0"/>
+      <xsd:element name="removeEntry" type="xsd:boolean" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Offshore">
+    <xsd:annotation>
+      <xsd:documentation>This type specifies the details of offshore harvest area.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="startDate" type="xsd:date"/>
+      <xsd:element name="endDate" type="xsd:date"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="HarvestAreaType">
+    <xsd:annotation>
+      <xsd:documentation>This type specifies the details of a harvest area establishment.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="harvestAreaDate" type="xsd:date"/>
+      <xsd:element name="harvestAreaName" type="ct:AlphaNumeric35Type"/>
+      <xsd:element name="leaseNumber" type="ct:AlphaNumeric35Type" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="HarvestArea">
+    <xsd:annotation>
+      <xsd:documentation>This type specifies the details of a harvest area.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:choice minOccurs="1">
+        <xsd:element name="harvestAreaDetails" type="sf:HarvestAreaType" minOccurs="0"/>
+        <xsd:element name="offshore" type="sf:Offshore" minOccurs="0"/>
+      </xsd:choice>
+      <xsd:element name="depuration" type="sf:Depuration" minOccurs="0"/>
+      <xsd:element name="removeEntry" type="xsd:boolean" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Depuration">
+    <xsd:annotation>
+      <xsd:documentation>This type specifies the details of depuration for the Harvest area.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="startDate" type="xsd:date"/>
+      <xsd:element name="establishmentNumber" type="ct:EstablishmentNumberType"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

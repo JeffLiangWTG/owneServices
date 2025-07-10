@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="IncompleteTransaction" targetNamespace="http://www.edi.com.au/EnterpriseService/" elementFormDefault="qualified" xmlns="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:include schemaLocation="Elements.xsd"/>
+	<xs:element name="IncompleteTransaction" type="IncompleteTransactionHeader"></xs:element>
+	<xs:complexType name="IncompleteTransactionHeader">
+		<xs:sequence>
+			<xs:element name="InvoiceNumber" type="xs:string"/>
+			<xs:element name="ExpectedTotal" type="FinancialValue"/>
+			<xs:element name="ExpectedExclTaxTotal" type="FinancialValue"/>
+			<xs:element name="ExpectedTaxTotal" type="FinancialValue"/>
+			<xs:element name="ValidateExpectedTotal" type="xs:boolean"/>
+			<xs:element name="ConsolCosts" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ConsolCost" type="ConsolCost" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="JobRelatedLines" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="JobRelatedLine" type="IncompleteTransactionLine" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="TaxTransactionsInfo" type="TaxTransactionsInfo" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ConsolCost">
+		<xs:sequence>
+			<xs:element name="ChargeCode">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="10" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ConsolId">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="20" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="FixedPlaceOfSupply">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="5" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="FixedPlaceOfSupplyType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SupplyType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OSCostAmount" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="TaxDate" type="xs:date" minOccurs="0" />
+			<xs:element name="TaxId">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="10" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxMessage" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="WHTTaxId">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="10" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CostTaxBranch">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="GovernmentReportingChargeCode">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SellGovernmentChargeCode ">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OSCostGstAmount" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="OSCostQstAmount" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="OSTotalTaxAmount" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="GstInclusiveAmount" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="ExchangeRate" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="PrepaidCollect" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="ApportionmentMethod">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="IsFinal" type="xs:boolean"/>
+			<xs:element name="DisplayRelatedShipments" type="xs:boolean"/>
+			<xs:element name="RelatedCostFromDatabase">
+				<xs:simpleType>
+					<xs:restriction base="Guid">
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ConsolCostCharges" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ConsolCostCharge" type="ConsolCostCharge" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ConsolCostCharge">
+		<xs:sequence>
+			<xs:element name="ConsolCostChargeID" type="xs:int" minOccurs="0" />
+			<xs:element name="JobNumber" type="xs:NMTOKEN" />
+			<xs:element name="Branch">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Department">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CostTaxBranch">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SellTaxBranch">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CostPlaceOfSupply">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="5" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CostPlaceOfSupplyType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CostSupplyType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="GovernmentReportingChargeCode">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SellGovernmentChargeCode ">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CostAmount" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="GstAmount" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="TotalAmount" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="LocalCostAmount" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="IsUse" type="xs:boolean"/>
+			<xs:element name="IsFinal" type="xs:boolean"/>
+			<xs:element name="SellAccount">
+				<xs:simpleType>
+					<xs:restriction base="Guid"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="InternalJobNumber" type="xs:NMTOKEN" minOccurs="0" />
+			<xs:element name="InternalBranch" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="InternalDepartment" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="RelatedApportionChargeFromDB">
+				<xs:simpleType>
+					<xs:restriction base="Guid">
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="WHTTaxId" type="xs:NMTOKEN" minOccurs="0" />
+			<xs:element name="OSCostWHTAmount" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="ComplianceDocumentInfo" type="ComplianceDocumentInfo" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IncompleteTransactionLine">
+		<xs:sequence>
+			<xs:element name="TransactionLineID" type="xs:int" minOccurs="0" />
+			<xs:element name="JobNumber" type="xs:NMTOKEN" />
+			<xs:element name="GenericChargeCode" type="xs:NMTOKEN" />
+			<xs:element name="TaxMessage" type="xs:NMTOKEN" minOccurs="0" />
+			<xs:element name="Description">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Branch">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Department">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxBranch">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Amount" type="FinancialValue" />
+			<xs:element name="TaxId" type="xs:NMTOKEN" minOccurs="0" />
+			<xs:element name="WHTTaxId" type="xs:NMTOKEN" minOccurs="0" />
+			<xs:element name="TaxAmount" type="FinancialValue" minOccurs="0" />
+			<xs:element name="GstAmount" type="FinancialValue" minOccurs="0" />
+			<xs:element name="GstInclusiveAmount" type="FinancialValue" minOccurs="0" />
+			<xs:element name="LocalAmount" type="FinancialValue" minOccurs="0" />
+			<xs:element name="LocalTaxAmount" type="FinancialValue" minOccurs="0" />
+			<xs:element name="LocalGstAmount" type="FinancialValue" minOccurs="0" />
+			<xs:element name="RecoverableGSTVATPercentage" minOccurs="0" type="xs:decimal" />
+			<xs:element name="IsFinal" type="xs:boolean" />
+			<xs:element name="ExchangeRate" type="xs:decimal" minOccurs="0" />
+			<xs:element name="GovernmentReportingChargeCode">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="FixedPlaceOfSupply">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="5" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="FixedPlaceOfSupplyType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OriginalJobCharge">
+				<xs:simpleType>
+					<xs:restriction base="Guid">
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SubAccount" minOccurs="0" type="SubAccount" />
+			<xs:element name="SubAccounts" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="SubAccount" type="SubAccount" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SupplyType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="UXMLLineIndex" type="xs:int" minOccurs="0" />
+			<xs:element name="ComplianceDocumentInfo" type="ComplianceDocumentInfo" minOccurs="0" />
+			<xs:element name="TaxDate" type="xs:date" minOccurs="0" />
+			<xs:element name="PeriodApportionmentMethod" minOccurs="0" >
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PeriodStartDate" type="xs:date" minOccurs="0" />
+			<xs:element name="PeriodEndDate" type="xs:date" minOccurs="0" />
+			<xs:element name="PeriodClearingGLAccountPK" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="Guid"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PeriodApportionmentLines" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ApportionmentLine" type="PeriodApportionmentLine" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PeriodApportionmentLine">
+		<xs:sequence>
+			<xs:element name="Period" type="xs:int" minOccurs="0" />
+			<xs:element name="OSAmount" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="LocalAmount" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="ExchangeRate" type="xs:decimal" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ComplianceDocumentInfo">
+		<xs:sequence>
+			<xs:element name="CreateComplianceDocumentRecordOnPosting" type="xs:boolean"/>
+			<xs:element name="ComplianceDocumentNumber" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="38" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ComplianceSubType" minOccurs="0" >
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ComplianceDocumentOrganization" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="Guid">
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ComplianceDocumentVATRegistrationNum" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ComplianceDocumentDate" type="xs:dateTime" minOccurs="0" />
+			<xs:element name="ComplianceDocumentReportingPeriod" type="xs:int" minOccurs="0" />
+			<xs:element name="ComplianceDocumentSupportingReason" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ComplianceSupportingDocumentType" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ComplianceSupportingDocumentNumber" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TaxTransactionsInfo">
+		<xs:sequence>
+			<xs:element name="IsTaxTransactionsCalculated" type="xs:boolean"/>
+			<xs:element name="TaxTransactions" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="TaxTransaction" type="TaxTransaction" maxOccurs="unbounded" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TaxTransaction">
+		<xs:sequence>
+			<xs:element name="TaxMessage" type="xs:NMTOKEN" minOccurs="0" />
+			<xs:element name="AffectsSourceTransactionTotal" type="xs:boolean" />
+			<xs:element name="LedgerControlAccountPK">
+				<xs:simpleType>
+					<xs:restriction base="Guid"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxControlAccountPK">
+				<xs:simpleType>
+					<xs:restriction base="Guid"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxExpenseAccountPK">
+				<xs:simpleType>
+					<xs:restriction base="Guid"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxPendingControlAccountPK">
+				<xs:simpleType>
+					<xs:restriction base="Guid"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxId" type="xs:NMTOKEN" />
+			<xs:element name="Basis">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxConfigurationPK">
+				<xs:simpleType>
+					<xs:restriction base="Guid"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OSTaxBaseAmount" type="FinancialValue" />
+			<xs:element name="OSTaxAmount" type="FinancialValue" />
+			<xs:element name="LocalTaxBaseAmount" type="FinancialValue" />
+			<xs:element name="LocalTaxAmount" type="FinancialValue" />
+			<xs:element name="BranchCode">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="DepartmentCode">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Ledger">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="2" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PostDate" type="xs:date" />
+			<xs:element name="RateNumerator" type="xs:int" />
+			<xs:element name="RateDenominator" type="xs:int" />
+			<xs:element name="RealisationDate" type="xs:date" />
+			<xs:element name="OSTaxCurrency">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxAuthorityServiceCode">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="20" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxAuthorityServiceCodeDescription" type="xs:string"/>
+			<xs:element name="TaxDate" type="xs:date" />
+			<xs:element name="TaxSuperType">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxSystemCode">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="20" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SystemCalculatedValuesInfo" type="SystemCalculatedValuesInfo"/>
+			<xs:element name="TransactionLineOrConsolCostChargeIDs">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="TransactionLineOrConsolCostChargeID" type="xs:int" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SystemCalculatedValuesInfo">
+		<xs:sequence>
+			<xs:element name="IsSystemCalculatedValuesDefined" type="xs:boolean" />
+			<xs:element name="SystemCalculatedValues" type="SystemCalculatedValues" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SystemCalculatedValues">
+		<xs:sequence>
+			<xs:element name="OSTaxBaseAmount" type="FinancialValue" />
+			<xs:element name="OSTaxAmount" type="FinancialValue" />
+			<xs:element name="RateNumerator" type="xs:int" />
+			<xs:element name="RateDenominator" type="xs:int" />
+			<xs:element name="TaxDate" type="xs:date" />
+			<xs:element name="TaxAuthorityServiceCode" >
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="20" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxAuthorityServiceCodeDescription" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

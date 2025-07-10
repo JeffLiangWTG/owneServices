@@ -1,0 +1,6 @@
+CREATE VIEW RefCusCodeListLanguageTableView_V1 AS
+SELECT ZXA_PK,
+ZXA_ZX6_NKLanguage,
+ZXA_ZZD_CodeList,
+ZXA_Description
+FROM RefCusCodeListLanguage

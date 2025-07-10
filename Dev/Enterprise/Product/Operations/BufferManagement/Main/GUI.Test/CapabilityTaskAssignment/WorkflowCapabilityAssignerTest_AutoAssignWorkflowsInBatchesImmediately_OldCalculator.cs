@@ -1,0 +1,6 @@
+namespace Enterprise.BufferManagement.GUI.Test
+{
+	class WorkflowCapabilityAssignerTest_AutoAssignWorkflowsInBatchesImmediately_OldCalculator : WorkflowCapabilityAssignerTestCase_AutoAssignWorkflowsInBatchesImmediately
+	{
+	}
+}

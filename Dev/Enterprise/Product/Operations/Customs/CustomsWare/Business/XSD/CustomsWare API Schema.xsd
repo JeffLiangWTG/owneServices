@@ -1,0 +1,2198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Created with Liquid XML Studio 6.1.15.0 - FREE Community Edition (http://www.liquid-technologies.com)-->
+<!-- CustomsWare schema  -->
+<xs:schema xmlns="http://www.customsware.com/schema/api" xmlns:cwapi="http://www.abmdata.com/attributes" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.customsware.com/schema/api" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="InputDocument">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Credentials" minOccurs="0"/>
+				<xs:element ref="Identity" minOccurs="0"/>
+				<xs:element ref="DeclarationList" minOccurs="0"/>
+				<xs:element ref="ConsignmentList" minOccurs="0"/>
+				<xs:element ref="CommercialDocumentList" minOccurs="0"/>
+				<xs:element ref="InventoryMovementList" minOccurs="0"/>
+				<xs:element ref="EventList" minOccurs="0"/>
+				<xs:element ref="PartList" minOccurs="0"/>
+				<xs:element ref="CCNList" minOccurs="0"/>
+				<xs:element ref="AttachmentList" minOccurs="0"/>
+				<xs:element ref="ReferenceDataList" minOccurs="0"/>
+				<xs:element ref="ConsolidationList" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="Version" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Credentials">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="UserID"/>
+				<xs:element ref="Password"/>
+				<xs:element ref="CompanyID"/>
+				<xs:element ref="LicenseCode" minOccurs="0"/>
+				<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Identity">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="IdentityMap" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="IdentityMap">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="IdentityCode"/>
+				<xs:element ref="IdentityValue" minOccurs="0"/>
+				<xs:element ref="IdentityQualifier" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="IdentityType" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="IdentityCode" type="xs:string"/>
+	<xs:element name="IdentityValue" type="xs:string"/>
+	<xs:element name="IdentityQualifier">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="IdentityQualifierCode"/>
+				<xs:element ref="IdentityQualifierValue" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="QualifierType" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="IdentityQualifierCode" type="xs:string"/>
+	<xs:element name="IdentityQualifierValue" type="xs:string"/>
+	<xs:element name="ReferenceDataList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ReferenceData" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ReferenceData">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ReferenceDataCode"/>
+				<xs:element ref="ReferenceDataValue" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="ListName" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ReferenceDataValue">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ValueText"/>
+			</xs:sequence>
+			<xs:attribute name="DataType" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ReferenceDataCode" type="xs:string"/>
+	<xs:element name="ValueText" type="Language"/>
+	<xs:complexType name="ApplicationLocation">
+		<xs:sequence>
+			<xs:element ref="LocationCode" minOccurs="0"/>
+			<xs:element ref="LocationName" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="LocationType" use="required"/>
+		<xs:attribute name="CodeType" default="NUM">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="ISO"/>
+					<xs:enumeration value="TXT"/>
+					<xs:enumeration value="NUM"/>
+					<xs:enumeration value="UNLOC"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:element name="LocationCode" type="xs:string"/>
+	<xs:element name="LocationName" type="xs:string"/>
+	<xs:element name="ElementGUID" type="xs:string"/>
+	<xs:element name="OwnerId" type="xs:string"/>
+	<xs:element name="Entity">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="EntityCode"/>
+				<xs:element ref="EntityValue" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="EntityType" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="EntityCode" type="xs:string"/>
+	<xs:element name="EntityValue" type="xs:string"/>
+	<xs:complexType name="ApplicationUnitsOfMeasure">
+		<xs:annotation>
+			<xs:documentation>
+				This type is used to generically describe any unit of measure.
+
+				UOMCode is the code of the unit of measure (e.g. Pallet, Catron etc)
+				UOMBase is an optional attribute to describe the unit type (kg, cm etc).
+				UOMValue is the actual unit value
+				UOMConfirmedValue is used to allow remote systems return a confirmed value for a given UOM.
+
+				The following UnitsOfMeasureTypes are supported by default.  Additional types
+				will not be rejected, but wil lneed to be added to the mapping documents.
+
+				DocumentPieces
+				DocumentPackages
+				DocumentNetWeight
+				DocumentGrossWeight
+				LinePieces
+				LinePackages
+				LineNetWeight
+				LineGrossWeight
+				LineSupplementaryQuantity
+				LineQuantity
+				DimLength
+				DimWidth
+				DimHeight
+				FreightPortion
+				FreightProrate
+				WeightProrate
+
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="UOMValue" minOccurs="0"/>
+			<xs:element ref="UOMConfirmedValue" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="UOMCode" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="DocumentPieces"/>
+					<xs:enumeration value="DocumentPackages"/>
+					<xs:enumeration value="DocumentNetWeight"/>
+					<xs:enumeration value="DocumentGrossWeight"/>
+					<xs:enumeration value="LinePieces"/>
+					<xs:enumeration value="LinePackages"/>
+					<xs:enumeration value="LineNetWeight"/>
+					<xs:enumeration value="LineGrossWeight"/>
+					<xs:enumeration value="LineSupplementaryQuantity"/>
+					<xs:enumeration value="LineQuantity"/>
+					<xs:enumeration value="DimLength"/>
+					<xs:enumeration value="DimWidth"/>
+					<xs:enumeration value="DimHeight"/>
+					<xs:enumeration value="FreightPortion"/>
+					<xs:enumeration value="FreightProrate"/>
+					<xs:enumeration value="WeightProrate"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="UOMBase" type="xs:string"/>
+	</xs:complexType>
+	<xs:element name="InventoryMovementList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="InventoryMovement" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InventoryMovement">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="InventoryHeader"/>
+				<xs:element ref="InventoryDetail" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Command" type="xs:string" default="Store"/>
+			<xs:attribute name="Version" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InventoryHeader">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="InventoryType"/>
+				<xs:element ref="InventoryOperator" minOccurs="0"/>
+				<xs:element ref="InventoryRef" minOccurs="0"/>
+				<xs:element ref="InventoryRefType" minOccurs="0"/>
+				<xs:element ref="InventorySubRef" minOccurs="0"/>
+				<xs:element ref="InventoryDates" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+				<xs:element ref="ConsignmentReference" minOccurs="0"/>
+				<xs:element ref="TransactionType" minOccurs="0"/>
+				<xs:element ref="SequenceNo" minOccurs="0"/>
+				<xs:element ref="AccountCode" minOccurs="0"/>
+				<xs:element ref="SiteID" minOccurs="0"/>
+				<xs:element ref="RequestID" minOccurs="0"/>
+				<xs:element ref="ConsignmentComplete" minOccurs="0"/>
+				<xs:element ref="Transport" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Measure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="GoodsDescription" minOccurs="0"/>
+				<xs:element ref="Location" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="WorkFlow" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="BarCode" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Command" type="xs:string" default="Store"/>
+			<xs:attribute name="Version" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InventoryType" type="xs:string"/>
+	<xs:element name="InventoryRef" type="xs:string"/>
+	<xs:element name="InventoryRefType" type="xs:string"/>
+	<xs:element name="InventorySubRef" type="xs:string"/>
+	<xs:element name="RequestID" type="xs:string"/>
+	<xs:element name="Measure" type="ApplicationUnitsOfMeasure"/>
+	<xs:element name="InventoryDates" type="ApplicationDates"/>
+	<xs:element name="InventoryDetail">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ItemNo"/>
+				<xs:element ref="TransactionType" minOccurs="0"/>
+				<xs:element ref="SequenceNo" minOccurs="0"/>
+				<xs:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="InventoryDates" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Transport" minOccurs="0"/>
+				<xs:element ref="Measure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="GoodsDescription" minOccurs="0"/>
+				<xs:element ref="Location" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="WorkFlow" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Command" type="xs:string" default="Store"/>
+			<xs:attribute name="Version" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Location" type="ApplicationLocation"/>
+	<xs:element name="SequenceNo" type="xs:string"/>
+	<xs:element name="InventoryOperator">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Port" minOccurs="0"/>
+				<xs:element ref="Badge" minOccurs="0"/>
+				<xs:element ref="InventoryUserID" minOccurs="0"/>
+				<xs:element ref="PassCode" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Badge" type="xs:string"/>
+	<xs:element name="InventoryUserID" type="xs:string"/>
+	<xs:element name="PassCode" type="xs:string"/>
+	<xs:complexType name="ApplicationDates">
+		<xs:sequence>
+			<xs:element ref="DateTime" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="DateType" type="xs:string" use="required"/>
+	</xs:complexType>
+	<xs:element name="Qualifier">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="QualifierCode" minOccurs="0"/>
+				<xs:element ref="QualifierValue" minOccurs="0"/>
+				<xs:element ref="QualifierAttribute" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="QualifierType" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="QualifierAttribute">
+		<xs:complexType mixed="true">
+			<xs:sequence>
+				<xs:element ref="Value" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="AttributeType" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TransactionType">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="TransactionCode"/>
+				<xs:element ref="TransactionValue" minOccurs="0"/>
+				<xs:element ref="Qualifier" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="Type" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TransactionCode" type="xs:string"/>
+	<xs:element name="TransactionValue" type="xs:string"/>
+	<xs:element name="QualifierCode" type="xs:string"/>
+	<xs:element name="QualifierValue" type="xs:string"/>
+	<xs:element name="UOMValue">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="UOMBase" type="xs:string" use="optional"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="UOMConfirmedValue">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="UOMBase" type="xs:string" use="optional"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="GPSEvent">
+		<xs:sequence>
+			<xs:element name="Longitude" type="xs:string" minOccurs="0"/>
+			<xs:element name="Latitude" type="xs:string" minOccurs="0"/>
+			<xs:element name="FullPosition" type="xs:string" minOccurs="0"/>
+			<xs:element name="PositionDateTime" type="xs:string" minOccurs="0"/>
+			<xs:element name="PositionNotes" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="GPSEventType" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="BarCodeType">
+		<xs:sequence>
+			<xs:element ref="BarCodeValue"/>
+			<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="WorkFlow" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="BarCodeType" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:element name="BarCodeValue">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="ScanStatus" type="xs:integer"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConsignmentList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Consignment" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Command" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Consignment">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ResponseCode" minOccurs="0"/>
+				<xs:element ref="ConsignmentHeader"/>
+				<xs:element ref="ConsignmentItem" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Error" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Command" type="xs:string" default="Store"/>
+			<xs:attribute name="Version" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConsignmentHeader">
+		<xs:annotation>
+			<xs:documentation>
+				As of v3.45 of the API:
+				UnitsOfMeasure is deprecated, and replaced with the generic ApplicationUnitsOfMeasure
+				JobDates is deprecated and replaced with the generic ConsignmentDate
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ConsignmentType" minOccurs="0"/>
+				<xs:element ref="ConsignmentReference" minOccurs="0"/>
+				<xs:element ref="ConsignmentSubReference" minOccurs="0"/>
+				<xs:element ref="SiteID" minOccurs="0"/>
+				<xs:element ref="ConsignmentComplete" minOccurs="0"/>
+				<xs:element ref="ConsignmentStatus" minOccurs="0"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+				<xs:element ref="AccountCode" minOccurs="0"/>
+				<xs:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Country" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Port" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Party" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="GoodsDescription" minOccurs="0"/>
+				<xs:element ref="FreeText" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Measure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ValueAmount" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ConsignmentDate" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ConsignmentBaseCurrency" minOccurs="0"/>
+				<xs:element ref="ServiceLevel" minOccurs="0"/>
+				<xs:element ref="BookIn" minOccurs="0"/>
+				<xs:element ref="PieceType" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="SourceUserId" minOccurs="0"/>
+				<xs:element ref="Container" minOccurs="0"/>
+				<xs:element ref="StopNumber" minOccurs="0"/>
+				<xs:element ref="Terms" minOccurs="0"/>
+				<xs:element ref="Transport" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Location" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="WorkFlow" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="BarCode" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConsignmentDate" type="ApplicationDates"/>
+	<xs:element name="ConsignmentCurrency" type="xs:string"/>
+	<xs:element name="ConsignmentBaseCurrency" type="xs:string"/>
+	<xs:element name="ConsignmentExchange" type="xs:double"/>
+	<xs:element name="ConsignmentReference" type="xs:string"/>
+	<xs:element name="ConsignmentSubReference" type="xs:string"/>
+	<xs:element name="ConsignmentStatus" type="xs:string"/>
+	<xs:element name="ConsignmentType" type="xs:string"/>
+	<xs:element name="ConsignmentValue" type="xs:double"/>
+	<xs:element name="ConsignmentItem">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ItemNo"/>
+				<xs:element ref="ConsignmentItemType" minOccurs="0"/>
+				<xs:element ref="ConsignmentItemStatus" minOccurs="0"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+				<xs:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Country" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Party" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="GoodsDescription" minOccurs="0"/>
+				<xs:element ref="FreeText" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Measure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ValueAmount" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ConsignmentDate" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ConsignmentBaseCurrency" minOccurs="0"/>
+				<xs:element ref="BookIn" minOccurs="0"/>
+				<xs:element ref="PieceType" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="StopNumber" minOccurs="0"/>
+				<xs:element ref="Hazardous" minOccurs="0"/>
+				<xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Location" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="WorkFlow" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="BarCode" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="WorkFlow">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="WorkFlowItem" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="Code" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="WorkFlowItem" type="xs:string"/>
+	<xs:element name="ConsignmentItemType" type="xs:string"/>
+	<xs:element name="ConsignmentItemStatus" type="xs:string"/>
+	<xs:element name="ServiceLevel" type="xs:string"/>
+	<xs:element name="PieceType">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PieceTypeCode" minOccurs="0"/>
+				<xs:element ref="Measure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="BarCode" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PieceTypeCode" type="xs:string"/>
+	<xs:element name="BarCode" type="BarCodeType"/>
+	<xs:element name="StopNumber" type="xs:string"/>
+	<xs:element name="BookIn">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="BookinType" minOccurs="0"/>
+				<xs:element ref="BookinDateTime" minOccurs="0"/>
+				<xs:element ref="BookinReference" minOccurs="0"/>
+				<xs:element ref="BookinNotes" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="BookinType" type="xs:string"/>
+	<xs:element name="BookinDateTime" type="xs:string"/>
+	<xs:element name="BookinReference" type="xs:string"/>
+	<xs:element name="BookinNotes" type="xs:string"/>
+	<xs:element name="Hazardous">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="HazUNCode" minOccurs="0"/>
+				<xs:element ref="HazUNClass" minOccurs="0"/>
+				<xs:element ref="Measure" minOccurs="0"/>
+				<xs:element ref="Qualifier" minOccurs="0"/>
+				<xs:element ref="FreeText" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="HazUNCode" type="xs:string"/>
+	<xs:element name="HazUNClass" type="xs:string"/>
+	<xs:element name="CommercialDocumentList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="CommercialDocument" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PartList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Part" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Part">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Party" minOccurs="0"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+				<xs:element ref="PartCode"/>
+				<xs:element ref="PartDescription" maxOccurs="unbounded"/>
+				<xs:element ref="Measure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="DetailPrice" minOccurs="0"/>
+				<xs:element ref="AlternativePartsList" minOccurs="0"/>
+				<xs:element ref="SupplierList" minOccurs="0"/>
+				<xs:element ref="SourceUserId" minOccurs="0"/>
+				<xs:element ref="Eccn" minOccurs="0"/>
+				<xs:element ref="PartType" minOccurs="0"/>
+				<xs:element ref="PartUsage" minOccurs="0"/>
+				<xs:element ref="TrackLevel" minOccurs="0"/>
+				<xs:element ref="PartDates" minOccurs="0"/>
+				<xs:element ref="CCNDetails" minOccurs="0"/>
+				<xs:element ref="PartDocs" minOccurs="0"/>
+				<xs:element ref="Preferences" minOccurs="0"/>
+				<xs:element ref="Procedure" minOccurs="0"/>
+				<xs:element ref="QuotaCode" minOccurs="0"/>
+				<xs:element ref="WorkFlow" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="BarCode" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Command" type="xs:string" default="Store"/>
+			<xs:attribute name="Version" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PartDocs">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PartDocType"/>
+				<xs:element ref="PartDocCode" minOccurs="0"/>
+				<xs:element ref="PartDocReference" minOccurs="0"/>
+				<xs:element ref="PartDocDateStart" minOccurs="0"/>
+				<xs:element ref="PartDocDateFinish" minOccurs="0"/>
+				<xs:element ref="PartDocMandatory" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Preferences">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PreferenceCode"/>
+				<xs:element ref="CCNTaxDetails" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="PreferenceDateStart" minOccurs="0"/>
+				<xs:element ref="PreferenceDateFinish" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PreferenceCode" type="xs:string"/>
+	<xs:element name="QuotaCode" type="xs:string"/>
+	<xs:element name="PreferenceDateStart" type="xs:date"/>
+	<xs:element name="PreferenceDateFinish" type="xs:date"/>
+	<xs:element name="PartDocType" type="xs:string"/>
+	<xs:element name="PartDocCode" type="xs:string"/>
+	<xs:element name="PartDocReference" type="xs:string"/>
+	<xs:element name="PartDocDateStart" type="xs:date"/>
+	<xs:element name="PartDocDateFinish" type="xs:date"/>
+	<xs:element name="PartDocMandatory" type="xs:string"/>
+	<xs:complexType name="Language">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="LangCode" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:element name="PartDates" type="ApplicationDates"/>
+	<xs:element name="TrackLevel" type="xs:string"/>
+	<xs:element name="PartType" type="xs:string"/>
+	<xs:element name="PartUsage" type="xs:string"/>
+	<xs:element name="Eccn" type="xs:string"/>
+	<xs:element name="AlternativePartsList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="AlternativePart"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="AlternativePart">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="AlternativePartCode"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="AlternativePartCode" type="xs:string"/>
+	<xs:element name="SupplierList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Party"/>
+				<xs:element ref="SupplierPartCode"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SupplierPartCode" type="xs:string"/>
+	<xs:element name="CommercialDocument">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ResponseCode" minOccurs="0"/>
+				<xs:element ref="CommercialDocumentHeader"/>
+				<xs:element ref="CommercialDocumentItem" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Error" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Command" type="xs:string" default="Store"/>
+			<xs:attribute name="Version" type="xs:string"/>
+			<xs:attribute name="Type" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PartDescription">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="DescriptionText"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DescriptionText" type="Language"/>
+	<xs:element name="CCNList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="CCNDetails" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CCNDetails">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="CCNBook" minOccurs="0"/>
+				<xs:element ref="Country" minOccurs="0" maxOccurs="3"/>
+				<xs:element ref="CommodityCode" minOccurs="0"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+				<xs:element ref="CCNDescription" minOccurs="0"/>
+				<xs:element ref="CCNTaxDetails" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Preferences" minOccurs="0"/>
+				<xs:element ref="QuotaCode" minOccurs="0"/>
+				<xs:element ref="Procedure" minOccurs="0"/>
+				<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CCNDescription">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="CCNDescriptionText"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CCNBook" type="xs:string"/>
+	<xs:element name="CCNDescriptionText" type="Language"/>
+	<xs:element name="CCNTaxDetails">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Country" minOccurs="0" maxOccurs="3"/>
+				<xs:element ref="CCNTaxCode"/>
+				<xs:element ref="CCNTaxType" minOccurs="0"/>
+				<xs:element ref="CCNTaxRateFull" minOccurs="0"/>
+				<xs:element ref="CCNTaxRatePref" minOccurs="0"/>
+				<xs:element ref="CCNTaxRatePer" minOccurs="0"/>
+				<xs:element ref="CCNTaxRateUOM" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CCNTaxCode" type="xs:string"/>
+	<xs:element name="CCNTaxType" type="xs:string"/>
+	<xs:element name="CCNTaxRateFull" type="xs:decimal"/>
+	<xs:element name="CCNTaxRatePref" type="xs:string"/>
+	<xs:element name="CCNTaxRatePer" type="xs:string"/>
+	<xs:element name="CCNTaxRateUOM" type="xs:string"/>
+	<xs:element name="AmountValue" type="xs:double"/>
+	<xs:element name="AmountItemNo" type="xs:string"/>
+	<xs:element name="AmountCode" type="xs:string"/>
+	<xs:element name="ValueAmount">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="AmountCode" minOccurs="0"/>
+				<xs:element ref="AmountValue" minOccurs="0"/>
+				<xs:element ref="Currency" minOccurs="0"/>
+				<xs:element ref="Exchange" minOccurs="0"/>
+				<xs:element ref="ExchangeDate" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="Type" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CommercialDocumentHeader">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="DocumentRef" minOccurs="0"/>
+				<xs:element ref="DocumentDate" minOccurs="0"/>
+				<xs:element ref="DocumentType" minOccurs="0"/>
+				<xs:element ref="DocumentSubType" minOccurs="0"/>
+				<xs:element ref="ConsignmentReference" minOccurs="0"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+				<xs:element ref="AccountCode" minOccurs="0"/>
+				<xs:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Country" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Party" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Measure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ValueAmount" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="SourceUserId" minOccurs="0"/>
+				<xs:element ref="Payment" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ValuationMethod" minOccurs="0"/>
+				<xs:element ref="Terms" minOccurs="0"/>
+				<xs:element ref="Transport" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="WorkFlow" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="BarCode" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CommercialDocumentItem">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ItemNo"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+				<xs:element ref="PartCode"/>
+				<xs:element ref="PartDescription" minOccurs="0"/>
+				<xs:element ref="ItemCCN" minOccurs="0"/>
+				<xs:element ref="ItemCondition" minOccurs="0"/>
+				<xs:element ref="Country" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="DetailPrice" minOccurs="0"/>
+				<xs:element ref="Measure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ValueAmount" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="VehicleIndicator" minOccurs="0"/>
+				<xs:element ref="PreviousDeclarationReference" minOccurs="0"/>
+				<xs:element ref="PreviousInvoiceNumber" minOccurs="0"/>
+				<xs:element ref="PreviousInvoiceTotalLines" minOccurs="0"/>
+				<xs:element ref="ExemptionType" minOccurs="0"/>
+				<xs:element ref="ExemptionReference" minOccurs="0"/>
+				<xs:element ref="Restriction" minOccurs="0"/>
+				<xs:element ref="Preference" minOccurs="0"/>
+				<xs:element ref="Procedure" minOccurs="0"/>
+				<xs:element ref="Quota" minOccurs="0"/>
+				<xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="WorkFlow" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="BarCode" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Permit" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Vehicle" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DocumentDate" type="xs:string"/>
+	<xs:element name="ItemCCN" type="xs:string"/>
+	<xs:element name="AttachmentList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Attachment" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Attachment">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="OwnerList"/>
+				<xs:element name="FileName" type="xs:string"/>
+				<xs:element name="AttachmentLocation" type="GPSEvent" minOccurs="0"/>
+				<xs:element ref="AttachmentStream" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="FileType" type="xs:string"/>
+			<xs:attribute name="Encoding" type="xs:string"/>
+			<xs:attribute name="OwnerType" type="xs:string"/>
+			<xs:attribute name="Command" type="xs:string" default="Store"/>
+			<xs:attribute name="Version" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="AttachmentStream" type="xs:string"/>
+	<xs:element name="OwnerList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="OwnerItem" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OwnerItem">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="DocumentRef" minOccurs="0"/>
+				<xs:element ref="DocumentSubRef" minOccurs="0"/>
+				<xs:element ref="OwnerId" minOccurs="0"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="EventList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Event" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DeclarationList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Declaration" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Declaration">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ResponseCode" minOccurs="0"/>
+				<xs:element ref="DeclarationHeader"/>
+				<xs:element ref="DeclarationDetail" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="DeclarationFooter" minOccurs="0"/>
+				<xs:element ref="DeclarationRouting" minOccurs="0"/>
+				<xs:element ref="Error" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Command" type="xs:string" default="Store"/>
+			<xs:attribute name="Version" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConsignmentComplete" type="xs:string"/>
+	<xs:element name="DeclarationConsignment" type="xs:string"/>
+	<xs:element name="AccountCode" type="xs:string"/>
+	<xs:element name="SiteID" type="xs:string"/>
+	<xs:element name="DeclarationHeader">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="DeclarationType"/>
+				<xs:element ref="DeclarationDestination" minOccurs="0"/>
+				<xs:element ref="DocumentRef" minOccurs="0"/>
+				<xs:element ref="DocumentSubRef" minOccurs="0"/>
+				<xs:element ref="ConsignmentReference" minOccurs="0"/>
+				<xs:element ref="SiteID" minOccurs="0"/>
+				<xs:element ref="ConsignmentComplete" minOccurs="0"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+				<xs:element ref="AccountCode" minOccurs="0"/>
+				<xs:element ref="HeaderControl" minOccurs="0"/>
+				<xs:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Country" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Port" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Party" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="DeclarationInfo" minOccurs="0"/>
+				<xs:element ref="LoadList" minOccurs="0"/>
+				<xs:element ref="TotalItems" minOccurs="0"/>
+				<xs:element ref="CAP" minOccurs="0"/>
+				<xs:element ref="Measure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ValueAmount" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="DeclarationDate" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="HeaderFlags" minOccurs="0"/>
+				<xs:element ref="ValueCode" minOccurs="0"/>
+				<xs:element ref="Container" minOccurs="0"/>
+				<xs:element ref="TransactionNature" minOccurs="0"/>
+				<xs:element ref="Terms" minOccurs="0"/>
+				<xs:element ref="Transport" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Update" minOccurs="0"/>
+				<xs:element ref="Postal" minOccurs="0"/>
+				<xs:element ref="Itinerary" minOccurs="0"/>
+				<xs:element ref="BusinessTypeCode" minOccurs="0"/>
+				<xs:element ref="CompanyTaxPayer" minOccurs="0"/>
+				<xs:element ref="EntryTan" minOccurs="0"/>
+				<xs:element ref="DispatchDate" minOccurs="0"/>
+				<xs:element ref="AAD" minOccurs="0"/>
+				<xs:element ref="Warehouse" minOccurs="0"/>
+				<xs:element ref="Office" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="TransportDocument" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="JobTypes" minOccurs="0"/>
+				<xs:element ref="System" minOccurs="0"/>
+				<xs:element ref="SourceUserId" minOccurs="0"/>
+				<xs:element ref="DeclarationSecurity" minOccurs="0"/>
+				<xs:element ref="Injunction" minOccurs="0"/>
+				<xs:element ref="ValidDuration" minOccurs="0"/>
+				<xs:element ref="LoadingState" minOccurs="0"/>
+				<xs:element ref="LoadingPlace" minOccurs="0"/>
+				<xs:element ref="UnloadingPlace" minOccurs="0"/>
+				<xs:element ref="CheckSum" minOccurs="0"/>
+				<xs:element ref="AdditionalDocument" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Seal" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Payment" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="PreviousEntry" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Mention" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Location" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="WorkFlow" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DeclarationDetail">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ItemNo" minOccurs="0"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+				<xs:element ref="DeclarationInfo" minOccurs="0"/>
+				<xs:element ref="MarksNumbers" minOccurs="0"/>
+				<xs:element ref="CommodityCode" minOccurs="0"/>
+				<xs:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Country" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Party" minOccurs="0" maxOccurs="10"/>
+				<xs:element ref="Preference" minOccurs="0"/>
+				<xs:element ref="Procedure" minOccurs="0"/>
+				<xs:element ref="Measure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ValueAmount" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="PreviousEntry" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="DetailPrice" minOccurs="0"/>
+				<xs:element ref="VMCode" minOccurs="0"/>
+				<xs:element ref="Adjustment" minOccurs="0"/>
+				<xs:element ref="LineStatValue" minOccurs="0"/>
+				<xs:element ref="LineStatCurrency" minOccurs="0"/>
+				<xs:element ref="QuantityDuty" minOccurs="0"/>
+				<xs:element ref="ExportValue" minOccurs="0"/>
+				<xs:element ref="NetDuty" minOccurs="0"/>
+				<xs:element ref="Quota1" minOccurs="0"/>
+				<xs:element ref="Quota2" minOccurs="0"/>
+				<xs:element ref="Quota3" minOccurs="0"/>
+				<xs:element ref="Container" minOccurs="0"/>
+				<xs:element ref="DGDetail" minOccurs="0"/>
+				<xs:element ref="StorageType" minOccurs="0"/>
+				<xs:element ref="PermitType" minOccurs="0"/>
+				<xs:element ref="Obligation" minOccurs="0"/>
+				<xs:element ref="ClearanceType" minOccurs="0"/>
+				<xs:element ref="CommercialGoods" minOccurs="0"/>
+				<xs:element ref="IsPreference" minOccurs="0"/>
+				<xs:element ref="Direction" minOccurs="0"/>
+				<xs:element ref="RefinementType" minOccurs="0"/>
+				<xs:element ref="ProcessType" minOccurs="0"/>
+				<xs:element ref="BillingType" minOccurs="0"/>
+				<xs:element ref="TemporaryAdmission" minOccurs="0"/>
+				<xs:element ref="PositionType" minOccurs="0"/>
+				<xs:element ref="RefundType" minOccurs="0"/>
+				<xs:element ref="VOC" minOccurs="0"/>
+				<xs:element ref="CheckSum" minOccurs="0"/>
+				<xs:element ref="Seal" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Payment" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Box44Code" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Mention" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Package" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ItemDetail" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Certificate" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ProducedDocument" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="TaxDetails" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="EDEBox21" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Permit" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="NonCustomsLaw" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Notification" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="AdditionalInformation" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Location" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="CommercialDocumentList" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DeclarationDate" type="ApplicationDates"/>
+	<xs:element name="Procedure">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ProcedureReq"/>
+				<xs:element ref="ProcedurePrev" minOccurs="0"/>
+				<xs:element ref="ProcedureCategory" minOccurs="0"/>
+				<xs:element ref="ProcedureIndicator" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DeclarationFooter">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Transit" minOccurs="0"/>
+				<xs:element ref="Signature" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DeclarationRouting">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="JobStatus" minOccurs="0"/>
+				<xs:element ref="RoutingType" minOccurs="0"/>
+				<xs:element ref="RoutingReference" minOccurs="0"/>
+				<xs:element ref="RoutingDate" minOccurs="0"/>
+				<xs:element ref="TaxDetails" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="JobStatus" type="xs:string"/>
+	<xs:element name="RoutingType" type="xs:string"/>
+	<xs:element name="RoutingReference" type="xs:string"/>
+	<xs:element name="RoutingDate" type="xs:string"/>
+	<xs:element name="ValidDuration" type="xs:string"/>
+	<xs:element name="LoadingState" type="xs:string"/>
+	<xs:element name="LoadingPlace" type="xs:string"/>
+	<xs:element name="UnloadingPlace" type="xs:string"/>
+	<xs:element name="CheckSum" type="xs:string"/>
+	<xs:element name="StorageType" type="xs:string"/>
+	<xs:element name="Obligation" type="xs:string"/>
+	<xs:element name="JobDates">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:annotation>
+					<xs:documentation>
+						As of v3.45 JobDates is deprecated, and the generic 'ApplicationDates' type should be used for all new date types
+						As of v3.63 JobDates has been remvoed from all document definitions.  Any further API work requiring dates shoul duse the generic type ApplicationDates.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ETD" type="xs:string"/>
+	<xs:element name="ATD" type="xs:string"/>
+	<xs:element name="ETA" type="xs:string"/>
+	<xs:element name="ATA" type="xs:string"/>
+	<xs:element name="LoadingStartDate" type="xs:string"/>
+	<xs:element name="LoadingFinishDate" type="xs:string"/>
+	<xs:element name="DateTime" type="xs:string"/>
+	<xs:element name="SensitiveDetail">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="SensitiveCode" minOccurs="0"/>
+				<xs:element ref="SensitiveQuantity" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DGDetail">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="SensitiveDetail" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="DGCode" minOccurs="0"/>
+				<xs:element ref="DGClass" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DGCode" type="xs:string"/>
+	<xs:element name="DGClass" type="xs:string"/>
+	<xs:element name="Itinerary">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Country" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="ItineraryType" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="JobTypes">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="JobTerms" minOccurs="0"/>
+				<xs:element ref="BillType" minOccurs="0"/>
+				<xs:element ref="DutyType" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="JobTerms" type="xs:string"/>
+	<xs:element name="BillType" type="xs:string"/>
+	<xs:element name="DutyType" type="xs:string"/>
+	<xs:element name="FreightTotal" type="xs:double"/>
+	<xs:element name="FreightBorderCommunity" type="xs:double"/>
+	<xs:element name="FreightBorderCommunityRate" type="xs:double"/>
+	<xs:element name="RoutingTax">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="RouteTaxType" minOccurs="0"/>
+				<xs:element ref="RouteTaxRegime" minOccurs="0"/>
+				<xs:element ref="RouteTaxBase" minOccurs="0"/>
+				<xs:element ref="RouteTaxBaseQuantity" minOccurs="0"/>
+				<xs:element ref="RouteTaxRate" minOccurs="0"/>
+				<xs:element ref="RouteTaxAmount" minOccurs="0"/>
+				<xs:element ref="RouteTaxAssessed" minOccurs="0"/>
+				<xs:element ref="RouteTaxQuantity" minOccurs="0"/>
+				<xs:element ref="RouteTaxMP" minOccurs="0"/>
+				<xs:element ref="RouteTaxMPReference" minOccurs="0"/>
+				<xs:element ref="RouteTaxCredit" minOccurs="0"/>
+				<xs:element ref="RouteTaxFlag" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RouteTaxType" type="xs:string"/>
+	<xs:element name="RouteTaxRegime" type="xs:string"/>
+	<xs:element name="RouteTaxBase" type="xs:double"/>
+	<xs:element name="RouteTaxBaseQuantity" type="xs:double"/>
+	<xs:element name="RouteTaxRate" type="xs:double"/>
+	<xs:element name="RouteTaxAmount" type="xs:double"/>
+	<xs:element name="RouteTaxAssessed" type="xs:double"/>
+	<xs:element name="RouteTaxQuantity" type="xs:double"/>
+	<xs:element name="RouteTaxMP" type="xs:string"/>
+	<xs:element name="RouteTaxMPReference" type="xs:string"/>
+	<xs:element name="RouteTaxCredit" type="xs:double"/>
+	<xs:element name="RouteTaxFlag" type="xs:string"/>
+	<xs:element name="UserID" type="xs:string"/>
+	<xs:element name="Password" type="xs:string"/>
+	<xs:element name="CompanyID" type="xs:string"/>
+	<xs:element name="LicenseCode" type="xs:string"/>
+	<xs:element name="DocumentType" type="xs:string"/>
+	<xs:element name="DocumentSubType" type="xs:string"/>
+	<xs:element name="DeclarationDestination" type="xs:string"/>
+	<xs:element name="DocumentRef" type="xs:string"/>
+	<xs:element name="DocumentSubRef" type="xs:string"/>
+	<xs:element name="TotalItems" type="xs:int"/>
+	<xs:element name="HeaderControl">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ControlResult" minOccurs="0"/>
+				<xs:element ref="DateLimit" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ControlResult" type="xs:string"/>
+	<xs:element name="DateLimit" type="xs:string"/>
+	<xs:element name="Party">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="NameAddress"/>
+				<xs:element name="AddressLocation" type="GPSEvent" minOccurs="0"/>
+				<xs:element name="AddressContact" type="Contact" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Relationship" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="PartyType" use="required"/>
+			<xs:attribute name="Command" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="NameAddress">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Name" type="xs:string" minOccurs="0"/>
+				<xs:element name="Name2" type="xs:string" minOccurs="0"/>
+				<xs:element name="Address1" type="xs:string" minOccurs="0"/>
+				<xs:element name="Address2" type="xs:string" minOccurs="0"/>
+				<xs:element name="Address3" type="xs:string" minOccurs="0"/>
+				<xs:element name="Address4" type="xs:string" minOccurs="0"/>
+				<xs:element name="StreetNumber" type="xs:string" minOccurs="0"/>
+				<xs:element name="PostCode" type="xs:string" minOccurs="0"/>
+				<xs:element ref="Country" minOccurs="0"/>
+				<xs:element name="VatNo" type="xs:string" minOccurs="0"/>
+				<xs:element name="Tan" type="xs:string" minOccurs="0"/>
+				<xs:element name="TanPassword" type="xs:string" minOccurs="0"/>
+				<xs:element name="Tin" type="xs:string" minOccurs="0"/>
+				<xs:element name="AddressID" type="xs:string" minOccurs="0"/>
+				<xs:element ref="AccountCode" minOccurs="0"/>
+				<xs:element name="Status" type="xs:string" minOccurs="0"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+				<xs:element ref="WorkFlow" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="Contact">
+		<xs:sequence>
+			<xs:element ref="ContactName" minOccurs="0"/>
+			<xs:element ref="ContactNumber" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="ContactType" type="xs:string"/>
+	</xs:complexType>
+	<xs:element name="ContactName" type="xs:string"/>
+	<xs:element name="ContactNumber" type="xs:string"/>
+	<xs:element name="Relationship" type="xs:string"/>
+	<xs:element name="DeclarationInfo">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="DeclarationType"/>
+				<xs:element ref="DeclarationRegime" minOccurs="0"/>
+				<xs:element ref="DeclarationTransit" minOccurs="0"/>
+				<xs:element ref="DeclarationSubType" minOccurs="0"/>
+				<xs:element ref="DeclarationReason" minOccurs="0"/>
+				<xs:element ref="DeclarationPurpose" minOccurs="0"/>
+				<xs:element ref="DeclarationGoodsType" minOccurs="0"/>
+				<xs:element ref="DeclarationTime" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DeclarationType" type="xs:string"/>
+	<xs:element name="DeclarationTime" type="xs:string"/>
+	<xs:element name="DeclarationSubType" type="xs:string"/>
+	<xs:element name="DeclarationTransit" type="xs:string"/>
+	<xs:element name="LoadList" type="xs:string"/>
+	<xs:element name="CAP" type="xs:string"/>
+	<xs:element name="UnitsOfMeasure">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="DocumentPieces" minOccurs="0"/>
+				<xs:element ref="DocumentPackages" minOccurs="0"/>
+				<xs:element ref="DocumentNetWeight" minOccurs="0"/>
+				<xs:element ref="DocumentNetWeightUnits" minOccurs="0"/>
+				<xs:element ref="DocumentGrossWeight" minOccurs="0"/>
+				<xs:element ref="DocumentGrossWeightUnits" minOccurs="0"/>
+				<xs:element ref="DocumentVol" minOccurs="0"/>
+				<xs:element ref="DocumentVolUnits" minOccurs="0"/>
+				<xs:element ref="LinePieces" minOccurs="0"/>
+				<xs:element ref="LinePackages" minOccurs="0"/>
+				<xs:element ref="LineNetWeight" minOccurs="0"/>
+				<xs:element ref="LineNetWeightUnits" minOccurs="0"/>
+				<xs:element ref="LineVol" minOccurs="0"/>
+				<xs:element ref="LineVolUnits" minOccurs="0"/>
+				<xs:element ref="LineGrossWeight" minOccurs="0"/>
+				<xs:element ref="LineGrossWeightUnits" minOccurs="0"/>
+				<xs:element ref="LineSupplementaryQuantity" minOccurs="0"/>
+				<xs:element ref="LineSupplementaryUnits" minOccurs="0"/>
+				<xs:element ref="LineQuantity" minOccurs="0"/>
+				<xs:element ref="LineQuantityUnits" minOccurs="0"/>
+				<xs:element ref="ExpectedTotalQuantity" minOccurs="0"/>
+				<xs:element ref="ActualTotalQuantity" minOccurs="0"/>
+				<xs:element ref="DimLength" minOccurs="0"/>
+				<xs:element ref="DimWidth" minOccurs="0"/>
+				<xs:element ref="DimHeight" minOccurs="0"/>
+				<xs:element ref="DocumentPiecesAllocated" minOccurs="0"/>
+				<xs:element ref="DocumentPackagesAllocated" minOccurs="0"/>
+				<xs:element ref="DocumentNetWeightAllocated" minOccurs="0"/>
+				<xs:element ref="DocumentNetWeightAllocatedUnits" minOccurs="0"/>
+				<xs:element ref="DocumentGrossWeightAllocated" minOccurs="0"/>
+				<xs:element ref="DocumentGrossWeightAllocatedUnits" minOccurs="0"/>
+				<xs:element ref="DocumentVolAllocated" minOccurs="0"/>
+				<xs:element ref="DocumentVolAllocatedUnits" minOccurs="0"/>
+				<xs:element ref="LinePiecesAllocated" minOccurs="0"/>
+				<xs:element ref="LinePackagesAllocated" minOccurs="0"/>
+				<xs:element ref="LineNetWeightAllocated" minOccurs="0"/>
+				<xs:element ref="LineNetWeightAllocatedUnits" minOccurs="0"/>
+				<xs:element ref="LineGrossWeightAllocated" minOccurs="0"/>
+				<xs:element ref="LineGrossWeightAllocatedUnits" minOccurs="0"/>
+				<xs:element ref="LineVolAllocated" minOccurs="0"/>
+				<xs:element ref="LineVolAllocatedUnits" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:attribute name="DimsType" type="xs:string"/>
+	<xs:element name="DocumentPieces" type="xs:int"/>
+	<xs:element name="DocumentPackages" type="xs:int"/>
+	<xs:element name="LinePieces" type="xs:int"/>
+	<xs:element name="DocumentNetWeight" type="xs:double"/>
+	<xs:element name="DocumentNetWeightUnits" type="xs:string"/>
+	<xs:element name="DocumentGrossWeight" type="xs:double"/>
+	<xs:element name="DocumentGrossWeightUnits" type="xs:string"/>
+	<xs:element name="DocumentVol" type="xs:double"/>
+	<xs:element name="DocumentVolUnits" type="xs:string"/>
+	<xs:element name="LineNetWeight" type="xs:double"/>
+	<xs:element name="LineNetWeightUnits" type="xs:string"/>
+	<xs:element name="LineGrossWeight" type="xs:double"/>
+	<xs:element name="LineGrossWeightUnits" type="xs:string"/>
+	<xs:element name="LineVol" type="xs:double"/>
+	<xs:element name="LineVolUnits" type="xs:string"/>
+	<xs:element name="DocumentPiecesAllocated" type="xs:int"/>
+	<xs:element name="DocumentPackagesAllocated" type="xs:int"/>
+	<xs:element name="LinePiecesAllocated" type="xs:int"/>
+	<xs:element name="LinePackagesAllocated" type="xs:int"/>
+	<xs:element name="DocumentNetWeightAllocated" type="xs:double"/>
+	<xs:element name="DocumentNetWeightAllocatedUnits" type="xs:string"/>
+	<xs:element name="DocumentGrossWeightAllocated" type="xs:double"/>
+	<xs:element name="DocumentGrossWeightAllocatedUnits" type="xs:double"/>
+	<xs:element name="DocumentVolAllocated" type="xs:double"/>
+	<xs:element name="DocumentVolAllocatedUnits" type="xs:string"/>
+	<xs:element name="LineNetWeightAllocated" type="xs:double"/>
+	<xs:element name="LineNetWeightAllocatedUnits" type="xs:string"/>
+	<xs:element name="LineGrossWeightAllocated" type="xs:double"/>
+	<xs:element name="LineGrossWeightAllocatedUnits" type="xs:string"/>
+	<xs:element name="LineVolAllocated" type="xs:double"/>
+	<xs:element name="LineVolAllocatedUnits" type="xs:string"/>
+	<xs:element name="LineSupplementaryQuantity" type="xs:decimal"/>
+	<xs:element name="LineSupplementaryUnits" type="xs:string"/>
+	<xs:element name="ExpectedTotalQuantity" type="xs:int"/>
+	<xs:element name="ActualTotalQuantity" type="xs:int"/>
+	<xs:element name="LineQuantity" type="xs:decimal"/>
+	<xs:element name="LineQuantityUnits" type="xs:string"/>
+	<xs:element name="DimLength">
+		<xs:complexType>
+			<xs:attribute name="Unit"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DimWidth">
+		<xs:complexType>
+			<xs:attribute name="Unit"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DimHeight">
+		<xs:complexType>
+			<xs:attribute name="Unit"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="LinePackages">
+		<xs:complexType>
+			<xs:attribute name="PackageType"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="AttributesDeprecated">
+		<xs:annotation>
+			<xs:documentation>As of 3.62 this element is deprecated.   Qualifiers should be used for any future requirement for generic values</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence/>
+			<xs:attribute name="AttributeCode" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="AttributeItemNo" type="xs:string"/>
+	<xs:element name="AttributeGroup" type="xs:string"/>
+	<xs:element name="AttributeValue1" type="xs:string"/>
+	<xs:element name="AttributeValue2" type="xs:string"/>
+	<xs:element name="AttributeValue3" type="xs:string"/>
+	<xs:element name="AttributeValue4" type="xs:string"/>
+	<xs:element name="AttributeValue5" type="xs:string"/>
+	<xs:element name="Reference">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="RefText" minOccurs="0"/>
+				<xs:element ref="RefQual1" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="RefCode" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="RefText" type="xs:string"/>
+	<xs:element name="RefQual1" type="xs:string"/>
+	<xs:element name="AttributeText" type="xs:string"/>
+	<xs:element name="HeaderFlags">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="LOIDeclaration" minOccurs="0"/>
+				<xs:element ref="Simplified" minOccurs="0"/>
+				<xs:element ref="MultipleDest" minOccurs="0"/>
+				<xs:element ref="SpecificCircumstance" minOccurs="0"/>
+				<xs:element ref="TransferToTransit" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="LOIDeclaration" type="xs:string"/>
+	<xs:element name="Simplified" type="xs:string"/>
+	<xs:element name="MultipleDest" type="xs:string"/>
+	<xs:element name="SpecificCircumstance" type="xs:string"/>
+	<xs:element name="TransferToTransit" type="xs:string"/>
+	<xs:element name="ValueCode" type="xs:string"/>
+	<xs:element name="Country">
+		<xs:complexType mixed="true">
+			<xs:attribute name="CodeType" default="NUM">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="ISO"/>
+						<xs:enumeration value="TXT"/>
+						<xs:enumeration value="NUM"/>
+						<xs:enumeration value="UNLOC"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="CountryType"/>
+			<xs:attribute name="Region"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Port">
+		<xs:complexType mixed="true">
+			<xs:attribute name="PortCountry">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="PortType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="CodeType" default="NUM">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="ISO"/>
+						<xs:enumeration value="TXT"/>
+						<xs:enumeration value="NUM"/>
+						<xs:enumeration value="UNLOC"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Container">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="InContainer" minOccurs="0"/>
+				<xs:element ref="ContainerItem" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InContainer" type="xs:string"/>
+	<xs:element name="ContainerItem">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ContainerType" type="xs:string" minOccurs="0"/>
+				<xs:element name="ContainerRef" type="xs:string"/>
+				<xs:element name="ContainerSize" type="xs:string" minOccurs="0"/>
+				<xs:element name="ContainerSealNumber" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Terms">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="TermsCode"/>
+				<xs:element ref="TermsPlace" minOccurs="0"/>
+				<xs:element ref="TermsQualifier" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TermsCode" type="xs:string"/>
+	<xs:element name="TermsPlace" type="xs:string"/>
+	<xs:element name="TermsQualifier" type="xs:string"/>
+	<xs:element name="ValuationMethod" type="xs:string"/>
+	<xs:element name="ItemCondition" type="xs:string"/>
+	<xs:element name="VehicleIndicator" type="xs:string"/>
+	<xs:element name="PreviousDeclarationReference" type="xs:string"/>
+	<xs:element name="PreviousInvoiceNumber" type="xs:string"/>
+	<xs:element name="PreviousInvoiceTotalLines" type="xs:int"/>
+	<xs:element name="ExemptionType" type="xs:string"/>
+	<xs:element name="ExemptionReference" type="xs:string"/>
+	<xs:element name="Restriction" type="xs:string"/>
+	<xs:element name="Currency">
+		<xs:complexType mixed="true">
+			<xs:attribute name="CodeType" default="NUM">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="ISO"/>
+						<xs:enumeration value="TXT"/>
+						<xs:enumeration value="NUM"/>
+						<xs:enumeration value="UNLOC"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="CurrencyType" type="xs:string" use="optional" default="Context"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Exchange">
+		<xs:complexType mixed="true">
+			<xs:attribute name="ExchangeType" type="xs:string" default="Context"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ExchangeDate" type="xs:string"/>
+	<xs:element name="TransactionNature" type="xs:int"/>
+	<xs:element name="Transport">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="TPIdentifier" minOccurs="0"/>
+				<xs:element ref="TPMode" minOccurs="0"/>
+				<xs:element ref="Characteristic" minOccurs="0"/>
+				<xs:element ref="Conveyance" minOccurs="0"/>
+				<xs:element ref="ConveyanceQualifier" minOccurs="0"/>
+				<xs:element ref="ConveyanceDate" minOccurs="0"/>
+				<xs:element ref="ConveyanceNat" minOccurs="0"/>
+				<xs:element ref="ConveyanceLeg" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="TransportType">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="Border"/>
+						<xs:enumeration value="Inland"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TPMode">
+		<xs:complexType mixed="true">
+			<xs:attribute name="CodeType" default="NUM">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="TXT"/>
+						<xs:enumeration value="NUM"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Characteristic" type="xs:string"/>
+	<xs:element name="Conveyance" type="xs:string"/>
+	<xs:element name="ConveyanceQualifier" type="xs:string"/>
+	<xs:element name="ConveyanceDate" type="xs:string"/>
+	<xs:element name="ConveyanceNat">
+		<xs:complexType mixed="true">
+			<xs:attribute name="CodeType" default="NUM">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="ISO"/>
+						<xs:enumeration value="TXT"/>
+						<xs:enumeration value="NUM"/>
+						<xs:enumeration value="UNLOC"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConveyanceLeg" type="xs:string"/>
+	<xs:element name="TPIdentifier" type="xs:string"/>
+	<xs:element name="PostalShipmentType" type="xs:string"/>
+	<xs:element name="InspectionCode" type="xs:string"/>
+	<xs:element name="ProcedureType" type="xs:string"/>
+	<xs:element name="Postal">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PostalShipmentType" minOccurs="0"/>
+				<xs:element ref="InspectionCode" minOccurs="0"/>
+				<xs:element ref="ProcedureType" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Update">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="UpdateReason" minOccurs="0"/>
+				<xs:element ref="UpdateReasonCode" minOccurs="0"/>
+				<xs:element ref="UpdateStatus" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="UpdateReason" type="xs:string"/>
+	<xs:element name="UpdateReasonCode" type="xs:string"/>
+	<xs:element name="UpdateStatus" type="xs:string"/>
+	<xs:element name="Cancel">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="CancelReason" minOccurs="0"/>
+				<xs:element ref="CancelStatus" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CancelReason" type="xs:string"/>
+	<xs:element name="CancelStatus" type="xs:string"/>
+	<xs:element name="ClearanceType" type="xs:string"/>
+	<xs:element name="CommercialGoods" type="xs:string"/>
+	<xs:element name="IsPreference" type="xs:string"/>
+	<xs:element name="Direction" type="xs:string"/>
+	<xs:element name="RefinementType" type="xs:string"/>
+	<xs:element name="ProcessType" type="xs:string"/>
+	<xs:element name="BillingType" type="xs:string"/>
+	<xs:element name="TemporaryAdmission" type="xs:string"/>
+	<xs:element name="PositionType" type="xs:string"/>
+	<xs:element name="RefundType" type="xs:string"/>
+	<xs:element name="VOC" type="xs:double"/>
+	<xs:element name="EntryTan" type="xs:string"/>
+	<xs:element name="WarehouseID" type="xs:string"/>
+	<xs:element name="WarehouseType" type="xs:string"/>
+	<xs:element name="DispatchDate" type="xs:string"/>
+	<xs:element name="AAD">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="AADNumbers" minOccurs="0"/>
+				<xs:element ref="AADWorksheet" minOccurs="0"/>
+				<xs:element ref="AADReason" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="AADStatus"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="AADNumbers">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="AADNumberRef" maxOccurs="3"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="AADNumberRef" type="xs:string"/>
+	<xs:element name="AADWorksheet" type="xs:string"/>
+	<xs:element name="AADReason" type="xs:string"/>
+	<xs:element name="TransportDocument">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Reference" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="SummaryDeclNo" minOccurs="0"/>
+				<xs:element ref="TPDocumentNo" minOccurs="0"/>
+				<xs:element ref="TPDocumentType" minOccurs="0"/>
+				<xs:element ref="TPDocumentDate" minOccurs="0"/>
+				<xs:element ref="Measure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Package" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Container" minOccurs="0"/>
+				<xs:element ref="Location" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Qualifier" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="DocumentType" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SummaryDeclNo" type="xs:string"/>
+	<xs:element name="TPDocumentNo" type="xs:string"/>
+	<xs:element name="TPDocumentType" type="xs:string"/>
+	<xs:element name="TPDocumentDate" type="ApplicationDates"/>
+	<xs:element name="ItemNo" type="xs:int"/>
+	<xs:element name="MarksNumbers">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Marks" minOccurs="0"/>
+				<xs:element ref="GoodsDescription" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Marks" type="xs:string"/>
+	<xs:element name="GoodsDescription" type="xs:string"/>
+	<xs:element name="FreeText">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Text" type="xs:string"/>
+			</xs:sequence>
+			<xs:attribute name="TextType" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Instructions" type="xs:string"/>
+	<xs:element name="SensitiveQuantity" type="xs:double"/>
+	<xs:element name="SensitiveCode" type="xs:string"/>
+	<xs:element name="CommodityCode">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Code1" minOccurs="0"/>
+				<xs:element ref="Code2" minOccurs="0"/>
+				<xs:element ref="Code3" minOccurs="0"/>
+				<xs:element ref="Code4" minOccurs="0"/>
+				<xs:element ref="Code5" minOccurs="0"/>
+				<xs:element ref="AdditionalCode1" minOccurs="0"/>
+				<xs:element ref="PartCode" minOccurs="0"/>
+				<xs:element ref="InvRef" minOccurs="0"/>
+				<xs:element ref="ClassificationCode" minOccurs="0"/>
+				<xs:element ref="CategoryNumber" minOccurs="0"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Code1" type="xs:string"/>
+	<xs:element name="Code2" type="xs:string"/>
+	<xs:element name="Code3" type="xs:string"/>
+	<xs:element name="Code4" type="xs:string"/>
+	<xs:element name="Code5" type="xs:string"/>
+	<xs:element name="AdditionalCode1" type="xs:string"/>
+	<xs:element name="ClassificationCode" type="xs:string"/>
+	<xs:element name="CategoryNumber" type="xs:string"/>
+	<xs:element name="PartCode" type="xs:string"/>
+	<xs:element name="PartClass" type="xs:string"/>
+	<xs:element name="PartGroup" type="xs:string"/>
+	<xs:element name="Analysis1" type="xs:string"/>
+	<xs:element name="Analysis2" type="xs:string"/>
+	<xs:element name="Analysis3" type="xs:string"/>
+	<xs:element name="InvRef" type="xs:string"/>
+	<xs:element name="Preference" type="xs:string"/>
+	<xs:element name="ProcedureReq" type="xs:string"/>
+	<xs:element name="ProcedurePrev" type="xs:string"/>
+	<xs:element name="ProcedureCategory" type="xs:string"/>
+	<xs:element name="ProcedureIndicator" type="xs:string"/>
+	<xs:element name="PreviousEntry">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PreviousDocType" minOccurs="0"/>
+				<xs:element ref="PreviousDocCode" minOccurs="0"/>
+				<xs:element ref="PreviousDocReference" minOccurs="0"/>
+				<xs:element ref="PreviousDocInformation" minOccurs="0"/>
+				<xs:element ref="PreviousDocLine" minOccurs="0"/>
+				<xs:element ref="LanguageCode" minOccurs="0"/>
+				<xs:element ref="Measure" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PreviousDocType" type="xs:string"/>
+	<xs:element name="PreviousDocCode" type="xs:string"/>
+	<xs:element name="PreviousDocReference" type="xs:string"/>
+	<xs:element name="PreviousDocInformation" type="xs:string"/>
+	<xs:element name="PreviousDocLine" type="xs:int"/>
+	<xs:element name="LanguageCode" type="xs:string"/>
+	<xs:element name="DetailPrice">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ValueAmount" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="PriceDateStart" minOccurs="0"/>
+				<xs:element ref="PriceDateFinish" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="VMCode" type="xs:string"/>
+	<xs:element name="PriceDateStart" type="xs:date"/>
+	<xs:element name="PriceDateFinish" type="xs:date"/>
+	<xs:element name="Box44Code">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Box44Identifier"/>
+				<xs:element ref="Box44IdentifierType" minOccurs="0"/>
+				<xs:element ref="Box44Qualifier" minOccurs="0"/>
+				<xs:element ref="Box44Status" minOccurs="0"/>
+				<xs:element ref="Box44AdditInfo" minOccurs="0"/>
+				<xs:element ref="Box44AdditInfoID" minOccurs="0"/>
+				<xs:element ref="Box44Level" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Box44Identifier" type="xs:string"/>
+	<xs:element name="Box44IdentifierType" type="xs:string"/>
+	<xs:element name="Box44Qualifier" type="xs:string"/>
+	<xs:element name="Box44Status" type="xs:string"/>
+	<xs:element name="Box44AdditInfo" type="xs:string"/>
+	<xs:element name="Box44AdditInfoID" type="xs:string"/>
+	<xs:element name="Box44Level" type="xs:string"/>
+	<xs:element name="Mention">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MentionCode"/>
+				<xs:element ref="MentionDetails" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MentionCode" type="xs:string"/>
+	<xs:element name="MentionDetails" type="xs:string"/>
+	<xs:element name="Package">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PackageCode" minOccurs="0"/>
+				<xs:element ref="PackageMarks" minOccurs="0"/>
+				<xs:element ref="PackageQuantity" minOccurs="0"/>
+				<xs:element ref="PackageContainer" minOccurs="0"/>
+				<xs:element ref="UniqueLPRef" minOccurs="0"/>
+				<xs:element ref="PackageInItem" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PackageCode" type="xs:string"/>
+	<xs:element name="PackageMarks" type="xs:string"/>
+	<xs:element name="PackageQuantity" type="xs:int"/>
+	<xs:element name="PackageContainer" type="xs:string"/>
+	<xs:element name="UniqueLPRef" type="xs:string"/>
+	<xs:element name="PackageInItem" type="xs:string"/>
+	<xs:element name="ProducedDocument">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ProducedDocumentType" minOccurs="0"/>
+				<xs:element ref="ProducedDocumentReference" minOccurs="0"/>
+				<xs:element ref="ProducedDocumentDate" minOccurs="0"/>
+				<xs:element ref="ProducedDocumentInformation" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProducedDocumentType" type="xs:string"/>
+	<xs:element name="ProducedDocumentReference" type="xs:string"/>
+	<xs:element name="ProducedDocumentDate" type="xs:date"/>
+	<xs:element name="ProducedDocumentInformation" type="xs:string"/>
+	<xs:element name="NonCustomsLaw" type="xs:string"/>
+	<xs:element name="Notification" type="xs:string"/>
+	<xs:element name="AdditionalInformation" type="xs:string"/>
+	<xs:element name="Fee">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="FeeType" minOccurs="0"/>
+				<xs:element ref="FeeQuantity" minOccurs="0"/>
+				<xs:element ref="FeeRate" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="FeeType" type="xs:string"/>
+	<xs:element name="FeeQuantity" type="xs:double"/>
+	<xs:element name="FeeRate" type="xs:double"/>
+	<xs:element name="Certificate">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="CertCode"/>
+				<xs:element ref="CertReference" minOccurs="0"/>
+				<xs:element ref="CertAdditInfo" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="CertCode" type="xs:string"/>
+	<xs:element name="CertReference" type="xs:string"/>
+	<xs:element name="CertAdditInfo" type="xs:string"/>
+	<xs:element name="Seal">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="SealReference"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SealReference" type="xs:string"/>
+	<xs:element name="Adjustment" type="xs:double"/>
+	<xs:element name="LineStatValue" type="xs:string"/>
+	<xs:element name="LineStatCurrency" type="xs:string"/>
+	<xs:element name="TaxDetails">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="TaxType" minOccurs="0"/>
+				<xs:element ref="TaxCode" minOccurs="0"/>
+				<xs:element ref="TaxRegime" minOccurs="0"/>
+				<xs:element ref="TaxBase" minOccurs="0"/>
+				<xs:element ref="TaxBaseQuantity" minOccurs="0"/>
+				<xs:element ref="TaxRate" minOccurs="0"/>
+				<xs:element ref="TaxAmount" minOccurs="0"/>
+				<xs:element ref="TaxAssessed" minOccurs="0"/>
+				<xs:element ref="TaxQuantity" minOccurs="0"/>
+				<xs:element ref="TaxMP" minOccurs="0"/>
+				<xs:element ref="TaxMPReference" minOccurs="0"/>
+				<xs:element ref="TaxCredit" minOccurs="0"/>
+				<xs:element ref="TaxFlag" minOccurs="0"/>
+				<xs:element ref="TaxLevel" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="TaxGroup">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="DeclaredTaxes"/>
+						<xs:enumeration value="ConfirmedTaxes"/>
+						<xs:enumeration value="AdditionalTaxes"/>
+						<xs:enumeration value="Fees"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="TaxPosition">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Header"/>
+						<xs:enumeration value="Line"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TaxType" type="xs:string"/>
+	<xs:element name="TaxCode" type="xs:string"/>
+	<xs:element name="TaxRegime" type="xs:string"/>
+	<xs:element name="TaxBase" type="xs:double"/>
+	<xs:element name="TaxBaseQuantity" type="xs:double"/>
+	<xs:element name="TaxRate" type="xs:double"/>
+	<xs:element name="TaxAmount" type="xs:double"/>
+	<xs:element name="TaxAssessed" type="xs:double"/>
+	<xs:element name="TaxQuantity" type="xs:double"/>
+	<xs:element name="TaxMP" type="xs:string"/>
+	<xs:element name="TaxMPReference" type="xs:string"/>
+	<xs:element name="TaxCalc" type="xs:double"/>
+	<xs:element name="TaxCredit" type="xs:double"/>
+	<xs:element name="TaxFlag" type="xs:string"/>
+	<xs:element name="TaxLevel" type="xs:double"/>
+	<xs:element name="VAT">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="VatCode" minOccurs="0"/>
+				<xs:element ref="VatRate" minOccurs="0"/>
+				<xs:element ref="VatAmount" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="VatCode" type="xs:string"/>
+	<xs:element name="VatRate" type="xs:double"/>
+	<xs:element name="VatAmount" type="xs:double"/>
+	<xs:element name="QuantityDuty" type="xs:double"/>
+	<xs:element name="ExportValue" type="xs:double"/>
+	<xs:element name="NetDuty" type="xs:double"/>
+	<xs:element name="EDEBox21">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="EDEBox21Code"/>
+				<xs:element ref="EDEBox21Ref" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="EDEBox21Code" type="xs:string"/>
+	<xs:element name="EDEBox21Ref" type="xs:string"/>
+	<xs:element name="Quota" type="xs:string"/>
+	<xs:element name="Quota1" type="xs:string"/>
+	<xs:element name="Quota2" type="xs:string"/>
+	<xs:element name="Quota3" type="xs:string"/>
+	<xs:element name="Transit">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Principal" minOccurs="0"/>
+				<xs:element ref="Office" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Country" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Guarantee" minOccurs="0" maxOccurs="10"/>
+				<xs:element ref="AuthConsigneeTIN" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Principal">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="NameAddress" minOccurs="0"/>
+				<xs:element ref="Representitive" minOccurs="0"/>
+				<xs:element ref="RepCapacity" minOccurs="0"/>
+				<xs:element ref="PlaceDeclaration" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Representitive" type="xs:string"/>
+	<xs:element name="RepCapacity" type="xs:string"/>
+	<xs:element name="PlaceDeclaration" type="xs:string"/>
+	<xs:element name="DateDeclaration" type="xs:string"/>
+	<xs:element name="Guarantee">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="GuaranteeType" minOccurs="0"/>
+				<xs:element ref="GuaranteeRef" minOccurs="0"/>
+				<xs:element ref="GuaranteeOtherRef" minOccurs="0"/>
+				<xs:element ref="GuaranteeAccess" minOccurs="0"/>
+				<xs:element ref="ValidEU" minOccurs="0"/>
+				<xs:element ref="NotValidCountry" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="GuaranteeType" type="xs:string"/>
+	<xs:element name="GuaranteeRef" type="xs:string"/>
+	<xs:element name="GuaranteeOtherRef" type="xs:string"/>
+	<xs:element name="GuaranteeAccess" type="xs:string"/>
+	<xs:element name="ValidEU" type="xs:string"/>
+	<xs:element name="NotValidCountry" type="xs:string"/>
+	<xs:element name="AuthConsigneeTIN" type="xs:string"/>
+	<xs:element name="Signature">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Place" minOccurs="0"/>
+				<xs:element ref="EntryDate" minOccurs="0"/>
+				<xs:element ref="EntryName" minOccurs="0"/>
+				<xs:element ref="EntryTelephone" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Place" type="xs:string"/>
+	<xs:element name="EntryDate" type="xs:string"/>
+	<xs:element name="EntryName" type="xs:string"/>
+	<xs:element name="EntryTelephone" type="xs:string"/>
+	<xs:element name="System" type="xs:string"/>
+	<xs:element name="SourceUserId" type="xs:string"/>
+	<xs:element name="BusinessTypeCode" type="xs:string"/>
+	<xs:element name="CompanyTaxPayer" type="xs:string"/>
+	<xs:element name="DeclarationSecurity" type="xs:string"/>
+	<xs:element name="Injunction" type="xs:string"/>
+	<xs:element name="Event">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="EventCode"/>
+				<xs:element ref="EventRef"/>
+				<xs:element ref="EventSubRef" minOccurs="0"/>
+				<xs:element ref="ElementGUID" minOccurs="0"/>
+				<xs:element ref="OwnerId" minOccurs="0"/>
+				<xs:element ref="EventDescription" minOccurs="0"/>
+				<xs:element ref="EventText" minOccurs="0"/>
+				<xs:element ref="EventInfo" minOccurs="0"/>
+				<xs:element ref="EventReason" minOccurs="0"/>
+				<xs:element ref="EventDateTime" minOccurs="0"/>
+				<xs:element ref="EventSchedDateTime" minOccurs="0"/>
+				<xs:element ref="EventCommDateTime" minOccurs="0"/>
+				<xs:element ref="EventPriority" minOccurs="0"/>
+				<xs:element ref="EventStatus" minOccurs="0"/>
+				<xs:element ref="EventLocation" minOccurs="0"/>
+				<xs:element ref="SourceUserId" minOccurs="0"/>
+				<xs:element ref="WorkFlow" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="EventType" type="xs:string"/>
+			<xs:attribute name="OwnerType" type="xs:string"/>
+			<xs:attribute name="Command" type="xs:string" default="Store"/>
+			<xs:attribute name="Version" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="EventCode" type="xs:string"/>
+	<xs:element name="EventRef" type="xs:string"/>
+	<xs:element name="EventSubRef" type="xs:string"/>
+	<xs:element name="EventDescription" type="xs:string"/>
+	<xs:element name="EventText" type="xs:string"/>
+	<xs:element name="EventInfo" type="xs:string"/>
+	<xs:element name="EventDateTime" type="xs:string"/>
+	<xs:element name="EventReason" type="xs:string"/>
+	<xs:element name="EventSchedDateTime" type="xs:string"/>
+	<xs:element name="EventCommDateTime" type="xs:string"/>
+	<xs:element name="EventPriority" type="xs:string"/>
+	<xs:element name="EventStatus" type="xs:string"/>
+	<xs:element name="EventLocation" type="GPSEvent"/>
+	<xs:element name="Consolidation">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ConsolidationReference"/>
+				<xs:element ref="ConsolidationDate" minOccurs="0"/>
+				<xs:element ref="ConsolidationStatus" minOccurs="0"/>
+				<xs:element ref="Transport" minOccurs="0"/>
+				<xs:element ref="Seal" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Location" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="WorkFlow" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConsolidationReference" type="xs:string"/>
+	<xs:element name="ConsolidationDate" type="xs:string"/>
+	<xs:element name="ConsolidationStatus" type="xs:string"/>
+	<xs:element name="ConsolidationList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Consolidation" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Warehouse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="WarehouseID" minOccurs="0"/>
+				<xs:element ref="WarehouseType" minOccurs="0"/>
+				<xs:element ref="Country" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="DeclarationRegime" type="xs:int"/>
+	<xs:element name="DeclarationPurpose" type="xs:int"/>
+	<xs:element name="DeclarationReason" type="xs:string"/>
+	<xs:element name="DeclarationGoodsType" type="xs:string"/>
+	<xs:element name="AdditionalDocumentType" type="xs:string"/>
+	<xs:element name="AdditionalDocumentStatus" type="xs:string"/>
+	<xs:element name="AdditionalDocumentReason" type="xs:string"/>
+	<xs:element name="AdditionalDocument">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="AdditionalDocumentType" minOccurs="0"/>
+				<xs:element ref="AdditionalDocumentStatus" minOccurs="0"/>
+				<xs:element ref="AdditionalDocumentReason" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PaymentMode" type="xs:string"/>
+	<xs:element name="PaymentReference" type="xs:string"/>
+	<xs:element name="PaymentSource" type="xs:string"/>
+	<xs:element name="Payment">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PaymentMode" minOccurs="0"/>
+				<xs:element ref="PaymentReference" minOccurs="0"/>
+				<xs:element ref="PaymentSource" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="PaymentType" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Declaration"/>
+						<xs:enumeration value="Transport"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Vehicle">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="VehicleChassisNumber" minOccurs="0"/>
+				<xs:element ref="VehicleBrand" minOccurs="0"/>
+				<xs:element ref="VehicleModel" minOccurs="0"/>
+				<xs:element ref="VehicleEngineNumber" minOccurs="0"/>
+				<xs:element ref="VehicleEngineCapacity" minOccurs="0"/>
+				<xs:element ref="VehiclePassengerCapacity" minOccurs="0"/>
+				<xs:element ref="VehicleCarriageCapacity" minOccurs="0"/>
+				<xs:element ref="VehicleYearOfBuilt" minOccurs="0"/>
+				<xs:element ref="VehicleColor" minOccurs="0"/>
+				<xs:element ref="VehicleCondition" minOccurs="0"/>
+				<xs:element ref="VehicleType" minOccurs="0"/>
+				<xs:element ref="VehicleDrive" minOccurs="0"/>
+				<xs:element ref="VehicleSpec" minOccurs="0"/>
+				<xs:element ref="VehicleClearanceCertificateNo" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="VehicleChassisNumber">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="25"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="VehicleBrand" type="xs:int"/>
+	<xs:element name="VehicleModel">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="70"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="VehicleEngineNumber">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="30"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="VehicleEngineCapacity" type="xs:double"/>
+	<xs:element name="VehiclePassengerCapacity" type="xs:int"/>
+	<xs:element name="VehicleCarriageCapacity" type="xs:double"/>
+	<xs:element name="VehicleYearOfBuilt">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="4"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="VehicleColor">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="30"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="VehicleCondition">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="15"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="VehicleType">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="3"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="VehicleDrive">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="15"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="VehicleSpec">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="100"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="VehicleClearanceCertificateNo">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:maxLength value="15"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="Permit">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PermitType" minOccurs="0"/>
+				<xs:element ref="PermitReference" minOccurs="0"/>
+				<xs:element ref="PermitIssuingAuthority" minOccurs="0"/>
+				<xs:element ref="PermitIssuingDate" minOccurs="0"/>
+				<xs:element ref="PermitTobacco" minOccurs="0"/>
+				<xs:element ref="PermitIndicator" minOccurs="0"/>
+				<xs:element ref="PermitInformations" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="PermitType" type="xs:string"/>
+	<xs:element name="PermitReference" type="xs:string"/>
+	<xs:element name="PermitIssuingAuthority" type="xs:string"/>
+	<xs:element name="PermitIssuingDate" type="xs:date"/>
+	<xs:element name="PermitIndicator" type="xs:string"/>
+	<xs:element name="PermitInformations" type="xs:string"/>
+	<xs:element name="PermitTobacco" type="xs:string"/>
+	<xs:element name="ItemDetail">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Name" minOccurs="0"/>
+				<xs:element ref="Value" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Name" type="xs:string"/>
+	<xs:element name="Value" type="xs:double"/>
+	<xs:element name="ResponseCode" type="xs:string"/>
+	<xs:element name="Office">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="OfficeCode" minOccurs="0"/>
+				<xs:element ref="OfficeArrivalTime" minOccurs="0"/>
+				<xs:element ref="OfficeRegNumber" minOccurs="0"/>
+				<xs:element ref="OfficeCountry" minOccurs="0"/>
+				<xs:element ref="OfficeAccount" minOccurs="0"/>
+				<xs:element ref="OfficeDutyAccount" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="OfficeType" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Import"/>
+						<xs:enumeration value="Export"/>
+						<xs:enumeration value="Exit"/>
+						<xs:enumeration value="Entry"/>
+						<xs:enumeration value="Excise"/>
+						<xs:enumeration value="Tax"/>
+						<xs:enumeration value="Transit"/>
+						<xs:enumeration value="Destination"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="OfficeCode" type="xs:string"/>
+	<xs:element name="OfficeArrivalTime" type="xs:string"/>
+	<xs:element name="OfficeRegNumber" type="xs:string"/>
+	<xs:element name="OfficeCountry" type="xs:string"/>
+	<xs:element name="OfficeAccount" type="xs:string"/>
+	<xs:element name="OfficeDutyAccount" type="xs:string"/>
+	<xs:element name="Error">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ErrorType" minOccurs="0"/>
+				<xs:element ref="ErrorCode" minOccurs="0"/>
+				<xs:element ref="ErrorDescription" minOccurs="0"/>
+				<xs:element ref="ErrorText" minOccurs="0"/>
+				<xs:element ref="ErrorIdentifier" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ErrorType" type="xs:string"/>
+	<xs:element name="ErrorCode" type="xs:string"/>
+	<xs:element name="ErrorDescription" type="Language"/>
+	<xs:element name="ErrorText" type="Language"/>
+	<xs:element name="ErrorIdentifier" type="xs:string"/>
+</xs:schema>

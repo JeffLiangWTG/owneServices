@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="Consol">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Top level element containing all relevant information about a  Consol and interested parties.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ConsolIdentifier" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="ConsolIdentifierType">
+									<xs:simpleType>
+										<xs:restriction base="xs:NMTOKEN">
+											<xs:enumeration value="MasterWaybill"/>
+											<xs:enumeration value="Other"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:attribute>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="ConsolType">
+					<xs:simpleType>
+						<xs:restriction base="xs:NMTOKEN">
+							<xs:enumeration value="Direct"/>
+							<xs:enumeration value="Co-Load"/>
+							<xs:enumeration value="Agent"/>
+							<xs:enumeration value="Charter"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:group ref="CommonElements"/>
+				<xs:element name="TransportMode">
+					<xs:simpleType>
+						<xs:restriction base="xs:NMTOKEN">
+							<xs:enumeration value="SEA"/>
+							<xs:enumeration value="AIR"/>
+							<xs:enumeration value="ROAD"/>
+							<xs:enumeration value="RAIL"/>
+							<xs:enumeration value="MAIL"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="Containers" type="Container" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="Carrier" type="Organisation" minOccurs="0"/>
+				<xs:element name="AgentReference" type="xs:normalizedString" minOccurs="0"/>
+				<xs:element name="ImportForwarder" type="Organisation" minOccurs="0"/>
+				<xs:element name="ExportForwarder" type="Organisation" minOccurs="0"/>
+				<xs:element name="OriginCTO" type="Organisation" minOccurs="0"/>
+				<xs:element name="DestinationCTO" type="Organisation" minOccurs="0"/>
+				<xs:element name="OriginDepot" type="Organisation" minOccurs="0"/>
+				<xs:element name="DestinationDepot" type="Organisation" minOccurs="0"/>
+				<xs:element name="Leg" type="Leg" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>A discrete part of the shipment's transfer from source to destination</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Shipments" minOccurs="0">
+					<xs:complexType>
+						<xs:choice>
+							<xs:element ref="HouseBill" maxOccurs="unbounded"/>
+							<xs:element name="ShipmentDetail" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:extension base="ShipmentDetail"/>
+									</xs:complexContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:choice>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="ImportOrExport">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="Import"/>
+						<xs:enumeration value="Export"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConsolReceipt">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ConsolIdentifier" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="ConsolIdentifierType" type="xs:NMTOKEN" use="required"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="ReceiptStatus" type="ReceiptStatus" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Shipment">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ConsolidationIdentifier" minOccurs="0">
+					<xs:complexType>
+						<xs:all>
+							<xs:element name="MasterWaybillNumber"/>
+							<xs:element name="BookingReference"/>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Leg" type="Leg"/>
+				<xs:element name="ShipmentDetail" type="ShipmentDetail"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ShipmentReceipt">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ShipmentIdentifier" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="ShipmentIdentifierType" type="xs:NMTOKEN" use="required"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:group ref="CommonElements"/>
+				<xs:element name="ReceiptStatus" type="ReceiptStatus" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="StatusResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="RespondingToType"/>
+				<xs:element name="ResponseIdentifier" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="ResponseIdentifierType" type="xs:NMTOKEN" use="required"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:group ref="CommonElements"/>
+				<xs:element name="ConsolCustomsInformation" type="CustomsResponse"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="Organisation">
+		<xs:sequence>
+			<xs:annotation>
+				<xs:documentation>The originator of the message must provide either the unique code for the organisation or sufficient detail for ediEnterprise for uniquely identfy a new or exsiting organisation in the designated role.</xs:documentation>
+			</xs:annotation>
+			<xs:element name="OrganisationDetails" type="OrganisationDetail" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="OrgCode" type="xs:NMTOKEN" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="Charge">
+		<xs:sequence>
+			<xs:element name="ChargeValue" type="FinancialValue"/>
+		</xs:sequence>
+		<xs:attribute name="ChargeType" type="xs:NMTOKEN" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="ShippingCharge">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element name="ChargeDetails" type="Charge">
+				<xs:annotation>
+					<xs:documentation>Details of any charges that have accrued for this shipment eg. freight, insurance, local transport etc </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Classification">
+		<xs:sequence>
+			<xs:element name="Tarriff" type="TarrifCode" minOccurs="0"/>
+			<xs:element name="OriginOfGoods" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TarrifCode">
+		<xs:simpleContent>
+			<xs:extension base="HSCode"/>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="InvoiceLine">
+		<xs:sequence>
+			<xs:element name="LineNumber" type="xs:positiveInteger"/>
+			<xs:element name="PartNumber" type="xs:string"/>
+			<xs:element name="Description" type="xs:string" minOccurs="0"/>
+			<xs:element name="InvoiceQty" type="xs:positiveInteger"/>
+			<xs:element name="LinePrice" type="FinancialValue"/>
+			<xs:element name="OrderNumber" type="xs:NMTOKEN"/>
+			<xs:element name="OrderLineNumber" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="ClassificationHint" type="Classification" minOccurs="0"/>
+			<xs:element name="Volume" type="xs:positiveInteger" minOccurs="0"/>
+			<xs:element name="Weight" type="xs:positiveInteger" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InvoiceHeader">
+		<xs:sequence>
+			<xs:element name="InvoiceNumber" type="xs:string"/>
+			<xs:element name="InvoiceAmount" type="FinancialValue"/>
+			<xs:element name="Commission" type="Commission" minOccurs="0"/>
+			<xs:element name="InvoiceDate" type="xs:date"/>
+			<xs:element name="InvoiceLine" type="InvoiceLine" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Commission">
+		<xs:sequence>
+			<xs:element name="CommissionValue" type="FinancialValue"/>
+		</xs:sequence>
+		<xs:attribute name="CommissionType" type="xs:NMTOKEN" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="FinancialValue">
+		<xs:simpleContent>
+			<xs:extension base="MonetaryAmount">
+				<xs:attribute name="CurrencyCode" type="xs:NMTOKEN" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="Container">
+		<xs:sequence>
+			<xs:element name="ContainerNumber" type="xs:NMTOKEN">
+				<xs:annotation>
+					<xs:documentation>Unique identifier for container.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ContainerType" type="xs:NMTOKEN">
+				<xs:annotation>
+					<xs:documentation>ISO Code for specification of type of container.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Seal" type="xs:NMTOKEN"/>
+			<xs:element name="PackingMode">
+				<xs:annotation>
+					<xs:documentation>FCL, LCL, Bulk, Breakbulk, ULD or Loose</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="FCL"/>
+						<xs:enumeration value="LCL"/>
+						<xs:enumeration value="Bulk"/>
+						<xs:enumeration value="Breakbulk"/>
+						<xs:enumeration value="ULD"/>
+						<xs:enumeration value="Loose"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Movement">
+		<xs:sequence>
+			<xs:element name="Port" type="UNLOCO"/>
+			<xs:element name="EstimatedDateTime" type="xs:dateTime"/>
+			<xs:element name="ActualDateTime" type="xs:dateTime"/>
+		</xs:sequence>
+		<xs:attribute name="MovementType" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="Destination"/>
+					<xs:enumeration value="Origin"/>
+					<xs:enumeration value="Load"/>
+					<xs:enumeration value="Discharge"/>
+					<xs:enumeration value="FirstPortInDestinationCountry"/>
+					<xs:enumeration value="LastForeignPort"/>
+					<xs:enumeration value="FirstForeignPort"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="Leg">
+		<xs:sequence>
+			<xs:choice>
+				<xs:annotation>
+					<xs:documentation>THe leg will have either Flight number/Arrival Date or Vessel/Voyage as a unique identifer.</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="FlightNumber" type="xs:NMTOKEN"/>
+					<xs:element name="FlightArrivalDate" type="xs:date"/>
+				</xs:sequence>
+				<xs:sequence>
+					<xs:element name="Vessel" type="xs:NMTOKEN">
+						<xs:annotation>
+							<xs:documentation>LLoyd's number of ship</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="VoyageNumber" type="xs:NMTOKEN"/>
+				</xs:sequence>
+			</xs:choice>
+			<xs:element name="PortDetails" type="Movement" minOccurs="2" maxOccurs="4">
+				<xs:annotation>
+					<xs:documentation>A port involved in the leg.  The involvement may be as commencement of leg, conclusion of leg, last foreign port before arriving in desitination coutnry or first port of arrival in destination country.  Source and Destination ports are mandatory</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ShipmentDetail">
+		<xs:sequence>
+			<xs:element name="ShipmentIdentifiier" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Unique identifier of the shipment</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="ShipmentIdentifierType" use="required">
+								<xs:simpleType>
+									<xs:restriction base="xs:NMTOKEN">
+										<xs:enumeration value="Housebill"/>
+										<xs:enumeration value="Other"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ShipmentStatus" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="PortOfOrigin" type="Movement">
+				<xs:annotation>
+					<xs:documentation> </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PortofDestination" type="Movement"/>
+			<xs:element name="Supplier" type="Organisation"/>
+			<xs:element name="NotifyParty" type="Organisation" minOccurs="0"/>
+			<xs:element name="Importer" type="Organisation"/>
+			<xs:element name="Incoterm" type="INCOTERM"/>
+			<xs:element name="ShippingCharge" type="ShippingCharge" minOccurs="0"/>
+			<xs:element name="PaymentTerms">
+				<xs:annotation>
+					<xs:documentation>Prepaid or Collect</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="Prepaid"/>
+						<xs:enumeration value="Collect"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OrderNumber" type="xs:NMTOKEN" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Container" type="Container" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="InvoiceHeader" type="InvoiceHeader" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Items" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ItemType" type="Package"/>
+						<xs:element name="GoodsValueOfItems" type="FinancialValue"/>
+						<xs:element name="NumberOfItemsOfThisType"/>
+						<xs:element name="FirstItemNumber" minOccurs="0"/>
+						<xs:element name="LastItemNumber" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OrganisationDetail">
+		<xs:sequence>
+			<xs:element name="Name">
+				<xs:simpleType>
+					<xs:restriction base="xs:normalizedString">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Location" type="UNLOCO"/>
+			<xs:element name="OrgAddress" type="Address"/>
+			<xs:element name="OrgTelephone" type="TelephoneNumber" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Email" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="WebAddress" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="BusinessRegistrationNumber" type="xs:NMTOKEN" minOccurs="0" maxOccurs="2"/>
+			<xs:element name="LocalAccountCode" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Address">
+		<xs:sequence>
+			<xs:element name="AddressLine1">
+				<xs:simpleType>
+					<xs:restriction base="xs:normalizedString">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="AddressLine2" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:normalizedString">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CitySuburb" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:normalizedString">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="StateOrProvince" minOccurs="0"/>
+			<xs:element name="PostCode" minOccurs="0"/>
+			<xs:element name="Country" type="xs:string" minOccurs="0"/>
+			<xs:element name="ISOCountryCode" type="xs:NMTOKEN" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TelephoneNumber">
+		<xs:simpleContent>
+			<xs:extension base="xs:NMTOKEN">
+				<xs:attribute name="NumberType" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:NMTOKEN">
+							<xs:enumeration value="Business"/>
+							<xs:enumeration value="Home"/>
+							<xs:enumeration value="Fax"/>
+							<xs:enumeration value="Mobile"/>
+							<xs:enumeration value="Other"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="Package">
+		<xs:sequence>
+			<xs:element name="PackType" type="xs:NMTOKEN"/>
+			<xs:element name="InnerPackage" type="Package" minOccurs="0"/>
+			<xs:element name="NumberOfInnerPacks" minOccurs="0"/>
+			<xs:element name="Weight" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="Length" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="Width" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="Height" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="Volume" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="GoodsValue" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="GoodsDescription" type="xs:string" minOccurs="0"/>
+			<xs:element name="SpecialInstructions" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="MarksAndNumbers" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DimensionValue">
+		<xs:simpleContent>
+			<xs:extension base="xs:decimal">
+				<xs:attribute name="DimensionType" type="xs:NMTOKEN" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="CustomsResponse">
+		<xs:sequence>
+			<xs:element name="ResponseCode" type="xs:NMTOKEN"/>
+			<xs:element name="ApprovalNumber" type="xs:string" minOccurs="0"/>
+			<xs:element name="ResponseMessage" type="xs:string" minOccurs="0"/>
+			<xs:element name="ResponseTimeStamp" type="xs:dateTime"/>
+			<xs:element name="FeeOrCharge" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="FinancialValue">
+							<xs:attribute name="FeeType" use="required">
+								<xs:simpleType>
+									<xs:restriction base="xs:NMTOKEN">
+										<xs:enumeration value="Duty"/>
+										<xs:enumeration value="Tax"/>
+										<xs:enumeration value="Surcharge"/>
+										<xs:enumeration value="Quarantine"/>
+										<xs:enumeration value="EntryFee"/>
+										<xs:enumeration value="Miscellaneous"/>
+										<xs:enumeration value="Other"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="MonetaryAmount">
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="UNLOCO">
+		<xs:restriction base="xs:NMTOKEN"/>
+	</xs:simpleType>
+	<xs:simpleType name="INCOTERM">
+		<xs:restriction base="xs:NMTOKEN"/>
+	</xs:simpleType>
+	<xs:simpleType name="AddInfo">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="HSCode">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d{4}\.\d{2}\.\d{2}.{9}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:group name="CommonElements">
+		<xs:annotation>
+			<xs:documentation>This is information about the message, rather than the content of the message.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MessageDate" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>DateTime when the message was sent</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MessageSource" type="Organisation">
+				<xs:annotation>
+					<xs:documentation>Organisation that intitiated the message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MessageTarget" type="Organisation"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:element name="MasterWaybillNumber" type="xs:NMTOKEN">
+		<xs:annotation>
+			<xs:documentation>Unique Identifier of the Consol.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="HouseBill" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Unique identifier of the shipment</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="ReceiptStatus">
+		<xs:sequence>
+			<xs:element name="StatusCode"/>
+			<xs:element name="StatusMessage"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,14 @@
+using Enterprise.ZArchitecture.Business.Testing;
+using NUnit.Framework;
+
+namespace Enterprise.MasterFiles.Business.Testing
+{
+	[TestedType(typeof(AccChargeCode))]
+	internal class AccChargeCodeAuditParentTest : AuditParentTest<AccChargeCode>
+	{
+		protected override AccChargeCode NewTestAuditParent()
+		{
+			return Factory.New<AccChargeCode>();
+		}
+	}
+}

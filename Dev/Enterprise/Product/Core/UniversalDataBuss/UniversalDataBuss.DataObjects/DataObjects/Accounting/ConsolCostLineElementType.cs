@@ -1,0 +1,29 @@
+namespace Enterprise.UniversalDataBuss.DataObjects.Accounting
+{
+	public enum ConsolCostLineElementType
+	{
+		ChargeCode,
+		ChargeCodeGroup,
+		CostOSCurrency,
+		CostOSAmount,
+		CostLocalAmount,
+		CostIsPosted,
+		CostAPInvoiceNumber,
+		CostInvoiceDate,
+		CostDueDate,
+		CostGSTVATID,
+		CostOSGSTVATAmount,
+		Creditor,
+		ExternalCreditorCode,
+		SupplierReference,
+		CostExchangeRate,
+		PrepaidCollectFilter,
+		ApportionmentMethod,
+		ApportionToSubShipments,
+		IncludeOnCollectInvoice,
+		GovernmentReportingSellChargeCode,
+		GovernmentReportingCostChargeCode,
+		RatingBehaviour,
+		SupplyType,
+	}
+}

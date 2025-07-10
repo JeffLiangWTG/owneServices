@@ -1,0 +1,124 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <!-- Our forms are designed for Windows 2000 style controls, which is subsystem version 4.0. If we change this, controls will have different size and appearance which makes forms look wrong. -->
+    <SubsystemVersion>4.00</SubsystemVersion>
+    <ApplicationIcon>..\..\..\..\..\Resources\ApplicationIcon.ico</ApplicationIcon>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Enterprise</RootNamespace>
+    <StartupObject>Enterprise.Startup.ApplicationStartupDirector</StartupObject>
+    <ApplicationManifest>Enterprise.exe.manifest</ApplicationManifest>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <WriteResourceStringFiles>false</WriteResourceStringFiles>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <BaseAddress>285212672</BaseAddress>
+    <FileAlignment>4096</FileAlignment>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AssemblyName>CargoWise.WindowsDesktop</AssemblyName>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>DO_NOT_SAVE_RESOURCE_STRINGS</DefineConstants>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DefineConstants>WHIDBEY;DO_NOT_SAVE_RESOURCE_STRINGS</DefineConstants>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="CargoWise.ApplicationManager.Common" />
+    <Reference Include="CargoWise.Async" />
+    <Reference Include="CargoWise.BrandManager" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.ComponentModel" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Database.Shared" />
+    <Reference Include="CargoWise.Definitions" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.Loader.Common" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.Windows.UI" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="Dat.Integration" />
+    <Reference Include="Enterprise.BlazorWinFormsInterop.Interfaces" />
+    <Reference Include="Enterprise.Environment" />
+    <Reference Include="Enterprise.Initialisation" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.Main.DiagnosticsAndTesting" />
+    <Reference Include="Enterprise.ResourceStrings.Maintenance.Test" />
+    <Reference Include="Enterprise.URLHandler" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Enterprise.ZArchitecture.GUI" />
+    <Reference Include="Enterprise.ZArchitecture.GUI.Test" />
+    <Reference Include="NUnitCore" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreWindowsTargetFramework)' == 'true'">
+    <!--
+      fix error message after db upgrade: CargoWise Next failed to start: ServiceController enables manipulating and accessing Windows services and it is not applicable for other operating systems. Exception details with be written to the Windows Event Log.
+      see: https://devops.wisetechglobal.com/wtg/eServices/_git/eServices?path=%2FXH%2FProducts%2FEServices%2FTemplate%2FIntegrationTest%2FXH.Products.EServices.Sample.IntegrationTest.csproj&version=GBmaster&line=26&lineEnd=27&lineStartColumn=1&lineEndColumn=1&lineStyle=plain&_a=contents
+    -->
+    <PackageReference Include="System.ServiceProcess.ServiceController" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="..\App.netcore.config">
+      <SubType>Designer</SubType>
+    </None>
+    <EmbeddedResource Include="..\..\..\..\..\ReleaseInfo.xml">
+      <Link>ReleaseInfo.xml</Link>
+    </EmbeddedResource>
+    <Content Include="..\..\..\..\..\Resources\ApplicationIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\EDI-Release-private.snk">
+      <Link>Properties\EDI-Release-private.snk</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WTG.AppDomainWrappers.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="applog.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CargoWise.Main\CargoWise.Main.csproj" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+
+  <Target Name="CopyNetCoreAppConfig" AfterTargets="build" Condition="'$(IsNetCoreWindowsTargetFramework)' == 'true'">
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\..\App.netcore.config" DestinationFiles="$(CWNetCoreOutputPath)$(AssemblyName).dll.config" />
+  </Target>
+</Project>

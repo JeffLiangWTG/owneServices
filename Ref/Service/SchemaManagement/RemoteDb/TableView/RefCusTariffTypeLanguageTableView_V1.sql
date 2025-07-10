@@ -1,0 +1,6 @@
+CREATE VIEW RefCusTariffTypeLanguageTableView_V1 AS
+SELECT ZXK_PK,
+ZXK_ZZI_TariffType,
+ZXK_ZX6_NKLanguage,
+ZXK_Description
+FROM RefCusTariffTypeLanguage

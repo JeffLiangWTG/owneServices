@@ -1,0 +1,8 @@
+﻿using CargoWise.Types;
+
+namespace Enterprise.Customs.EU.Business.CusTempStorage;
+
+public class PresentationNotificationMessageFunction : TemporaryStorageMessageFunction
+{
+	protected override ZString MessageTypeCore => TemporaryStorageMessageTypeList.Codes.PresentationNotification;
+}

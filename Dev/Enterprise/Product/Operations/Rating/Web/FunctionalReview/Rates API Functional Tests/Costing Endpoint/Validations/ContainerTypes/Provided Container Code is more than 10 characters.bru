@@ -1,0 +1,29 @@
+meta {
+  name: Provided Container Code is more than 10 characters
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.ContainerTypes = [{ Type: "CW", Value: "ABCDEFGHIJK" }];
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided CargoWise code ('ABCDEFGHIJK') is not valid. It can be a string of maximum 10 characters.", function() {
+    expect(res.body.ModelState['ContainerTypes[0].Value'][0]).to.equal("Provided CargoWise code ('ABCDEFGHIJK') is not valid. It can be a string of maximum 10 characters.");
+  });
+}

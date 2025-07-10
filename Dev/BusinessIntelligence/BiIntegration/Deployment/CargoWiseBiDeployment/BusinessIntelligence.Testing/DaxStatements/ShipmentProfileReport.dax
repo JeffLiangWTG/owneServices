@@ -1,0 +1,495 @@
+﻿DEFINE
+    MEASURE 'Consolidation Transport'[First Vessel] =
+        ( /* USER DAX BEGIN */
+        FIRSTNONBLANK ( 'Consolidation Transport'[Vessel], 1 ) )
+    MEASURE 'Consolidation Transport'[First Voyage Flight] =
+        (
+            /* USER DAX BEGIN */
+            FIRSTNONBLANK (
+                'Consolidation Transport'[Voyage Flight],
+                1
+            )
+        )
+    MEASURE 'Consolidation'[ETA Discharge] =
+        ( /* USER DAX BEGIN */
+        FIRSTNONBLANK ( 'Main Transport'[ETA], TRUE () ) )
+    MEASURE 'Consolidation'[ETD Load] =
+        ( /* USER DAX BEGIN */
+        FIRSTNONBLANK ( 'Main Transport'[ETD], TRUE () ) )
+    MEASURE 'Consolidation'[ETA Last Discharge] =
+        (
+            /* USER DAX BEGIN */
+            CALCULATE (
+                FIRSTNONBLANK ( 'Consolidation Transport'[ETA], TRUE () ),
+                TOPN (
+                    1,
+                    'Consolidation Transport',
+                    'Consolidation Transport'[Leg Order], DESC
+                )
+            )
+        )
+    MEASURE 'Consolidation'[ETD First Load] =
+        (
+            /* USER DAX BEGIN */
+            CALCULATE (
+                FIRSTNONBLANK ( 'Consolidation Transport'[Load Port Code], TRUE () ),
+                TOPN ( 1, 'Consolidation Transport', 'Consolidation Transport'[Leg Order], ASC )
+            )
+        )
+    MEASURE 'Consolidation'[First Load] =
+        (
+            /* USER DAX BEGIN */
+            CALCULATE (
+                FIRSTNONBLANK ( 'Load Port'[Load Port Code], TRUE () ),
+                TOPN ( 1, 'Consolidation Transport', 'Consolidation Transport'[Leg Order], ASC )
+            )
+        )
+    MEASURE 'Consolidation'[Last Discharge] =
+        (
+            /* USER DAX BEGIN */
+            CALCULATE (
+                FIRSTNONBLANK ( 'Consolidation Transport'[Discharge Port Code], TRUE () ),
+                TOPN (
+                    1,
+                    'Consolidation Transport',
+                    'Consolidation Transport'[Leg Order], DESC
+                )
+            )
+        )
+    MEASURE 'Consolidation'[Console ATA] =
+        ( /* USER DAX BEGIN */
+        FIRSTNONBLANK ( 'Main Transport'[ATA], TRUE () ) )
+    MEASURE 'Consolidation'[Console ATD] =
+        ( /* USER DAX BEGIN */
+        FIRSTNONBLANK ( 'Main Transport'[ATD], TRUE () ) )
+    MEASURE 'Consolidation'[Contract Number] =
+        ( /* USER DAX BEGIN */
+        FIRSTNONBLANK ( Consolidation[Contract No], TRUE () ) )
+    MEASURE 'Shipment'[Shipment Customs Info] =
+        (
+            /* USER DAX BEGIN */
+            CONCATENATEX (
+                DISTINCT ( 'Shipment Customs Info' ),
+                'Shipment Customs Info'[Customs Info],
+                ","
+            )
+        )
+    MEASURE 'Shipment'[GL Branch] =
+        ( /* USER DAX BEGIN */
+        FIRSTNONBLANK ( 'GL Transaction'[Branch], TRUE () ) )
+    MEASURE 'Shipment'[GL Department] =
+        ( /* USER DAX BEGIN */
+        FIRSTNONBLANK ( 'GL Transaction'[Department], TRUE () ) )
+    MEASURE 'Shipment'[GL Local Agent] =
+        ( /* USER DAX BEGIN */
+        FIRSTNONBLANK ( 'GL Transaction'[Local Agent], TRUE () ) )
+    MEASURE 'Shipment'[GL Representative Operator] =
+        (
+            /* USER DAX BEGIN */
+            FIRSTNONBLANK (
+                'GL Transaction'[Representative Operator],
+                TRUE ()
+            )
+        )
+    MEASURE 'Shipment'[GL Overseas Agent Code] =
+        (
+            /* USER DAX BEGIN */
+            FIRSTNONBLANK (
+                'GL Transaction'[Overseas Agent Code],
+                TRUE ()
+            )
+        )
+    MEASURE 'Shipment'[GL Overseas Agent Name] =
+        (
+            /* USER DAX BEGIN */
+            FIRSTNONBLANK (
+                'GL Transaction'[Overseas Agent Name],
+                TRUE ()
+            )
+        )
+    MEASURE 'Shipment'[GL Representative Sales] =
+        (
+            /* USER DAX BEGIN */
+            FIRSTNONBLANK (
+                'GL Transaction'[Representative Sales],
+                TRUE ()
+            )
+        )
+    MEASURE 'Shipment'[GL Status] =
+        ( /* USER DAX BEGIN */
+        FIRSTNONBLANK ( 'GL Transaction'[Status], TRUE () ) )
+    MEASURE 'Shipment'[GL Create Date] =
+        (
+            /* USER DAX BEGIN */
+            FIRSTNONBLANK (
+                'GL Transaction'[Job Header Create Date Utc],
+                TRUE ()
+            )
+        )
+    MEASURE 'Shipment'[GL Revenue Recognition Date] =
+        (
+            /* USER DAX BEGIN */
+            IF (
+                COUNTROWS ( 'GL Transaction' ) > 0,
+                FIRSTNONBLANK ( 'Revenue Recognition'[Recognition Date], TRUE () )
+            )
+        )
+    MEASURE 'Local Agent AR Settlement'[Local Client AR Settlement Group] =
+        (
+            /* USER DAX BEGIN */
+            IF (
+                COUNTROWS ( 'GL Transaction' ) > 0,
+                FIRSTNONBLANK (
+                    'Local Agent AR Settlement'[Local Agent AR Settlement Related Party],
+                    TRUE ()
+                )
+            )
+        )
+    MEASURE 'Overseas Agent AR Settlement'[Overseas Agent AR Settlement Group] =
+        (
+            /* USER DAX BEGIN */
+            IF (
+                COUNTROWS ( 'GL Transaction' ) > 0,
+                FIRSTNONBLANK (
+                    'Overseas Agent AR Settlement'[Overseas Agent AR Settlement Related Party],
+                    TRUE ()
+                )
+            )
+        )
+    MEASURE 'Main Consol Shipment'[Freight Direction] =
+        (
+            /* USER DAX BEGIN */
+            FIRSTNONBLANK ( 'Main Consol Shipment'[Direction], TRUE () )
+        )
+    VAR minDate =
+        CALCULATE (
+            VALUES ( 'Shipment'[Shipment Create Date] ),
+            KEEPFILTERS (
+                FILTER ( ALL ( 'Shipment'[Job Number] ), 'Shipment'[Job Number] = "S00001000" )
+            )
+        )
+    VAR maxDate =
+        CALCULATE ( DATE ( YEAR ( minDate ) + 2, MONTH ( minDate ), DAY ( minDate ) ) )
+    VAR __DS0FilterTable =
+        CALCULATETABLE (
+            VALUES ( 'Shipment'[Shipment Create Date] ),
+            KEEPFILTERS (
+                FILTER (
+                    ALL ( 'Shipment'[Shipment Create Date] ),
+                    'Shipment'[Shipment Create Date] >= minDate
+                        && 'Shipment'[Shipment Create Date] <= maxDate
+                )
+            )
+        )
+    VAR __DS0FilterTable2 =
+        FILTER (
+            KEEPFILTERS ( VALUES ( 'Shipment Coload Type'[Coload Type] ) ),
+            'Shipment Coload Type'[Coload Type] = "All Shipments"
+        )
+    VAR __DS0FilterTable3 =
+        FILTER (
+            KEEPFILTERS ( VALUES ( 'Shipment'[Is Active] ) ),
+            'Shipment'[Is Active] = TRUE
+        )
+    VAR __DS0FilterTable4 =
+        FILTER (
+            KEEPFILTERS ( VALUES ( 'Company Branch'[Company Code] ) ),
+            'Company Branch'[Company Code] = "EDI"
+        )
+    VAR __DS0FilterTable5 =
+        FILTER (
+            KEEPFILTERS ( VALUES ( 'Company Branch Helper'[Company Code] ) ),
+            'Company Branch Helper'[Company Code] = "EDI"
+        )
+    VAR __DS0FilterTable6 =
+        FILTER (
+            KEEPFILTERS ( VALUES ( 'Shipment'[Job Number] ) ),
+            ISONORAFTER ( 'Shipment'[Job Number], "S00001000", ASC )
+        )
+    VAR __DS0FilterTable7 =
+        FILTER (
+            KEEPFILTERS ( VALUES ( 'Company Country'[Country Code] ) ),
+            'Company Country'[Country Code] = "AU"
+        )
+EVALUATE
+TOPN (
+    500,
+    SUMMARIZECOLUMNS (
+        'Shipment'[Job Number],
+        'Shipment'[Transport Mode],
+        'Shipment'[Container Mode],
+        'Port Of Origin'[Port Of Origin Code],
+        'Port Of Origin'[Port Of Origin Country Code],
+        'Port Of Destination'[Port Of Destination Code],
+        'Port Of Destination'[Port Of Destination Country Code],
+        'Shipment'[Way Bill Number],
+        'Shipment'[Shipment Inco Term],
+        'Shipment'[Additional Terms],
+        'Shipment'[Shipment PPD CCX Term],
+        'Shipment'[Goods Description],
+        'Shipment'[Weight Unit],
+        'Shipment'[Volume Unit],
+        'Shipment'[Total No Of Packs Package Type],
+        'Shipment'[Outer Packs Package Type],
+        'Shipment'[Shipment Create Date],
+        'Import Broker'[Import Broker],
+        'Export Broker'[Export Broker],
+        'Shipment'[Shipment Status],
+        'Consolidation'[Job No.],
+        'Consolidation'[Master Bill No.],
+        'Service Level'[Service Level],
+        'Shipment'[Interim Receipt Number],
+        'Shipment'[Booking Confirmation Reference],
+        'Shipment'[House Bill Type],
+        'Shipment'[Is Transport Job],
+        'Shipment'[Estimated Pickup],
+        'Shipment'[Pickup Required By],
+        'Shipment'[Delivery Cartage Completed],
+        'Shipment'[Delivery Required By],
+        'Shipment'[FCL Delivery Equipment Needed],
+        'Shipment'[Estimated Delivery],
+        'Shipment'[Pickup Cartage Completed],
+        'Shipment'[FCL Pickup Equipment Needed],
+        'Shipment'[Pickup Cartage Advised],
+        'Shipment'[Chargeable Unit],
+        'Shipment'[Is Master / Lead],
+        'Shipment'[Is Brokerage],
+        'Shipment'[Coload Master],
+        'Shipment'[Container 20F],
+        'Shipment'[Container 20H],
+        'Shipment'[Container 20R],
+        'Shipment'[Container 40F],
+        'Shipment'[Container 40H],
+        'Shipment'[Container 40R],
+        'Shipment'[Container 45F],
+        'Shipment'[Container GEN],
+        'Shipment'[Container Other],
+        'Discharge Port'[Discharge Port Code],
+        'Load Port'[Load Port Code],
+        'Shipment'[Is Active],
+        'Consolidation'[Coload],
+        'Consignor Address'[Consignor City],
+        'Consignor Address'[Consignor State],
+        'Consignor Address'[Consignor Post Code],
+        'Consignee Address'[Consignee City],
+        'Consignee Address'[Consignee State],
+        'Consignee Address'[Consignee Post Code],
+        'Shipment'[Received Date],
+        'Shipment'[Delivery Cartage Advised],
+        'Shipment'[Loading Meters],
+        'Consignor Address'[Consignor],
+        'Consignee Address'[Consignee],
+        'Controlling Customer Address'[Controlling Customer],
+        'Controlling Agent Address'[Controlling Agent],
+        'Shipment'[Arrival Date],
+        'Shipment'[Departure Date],
+        'Sending Agent Address'[Sending Agent],
+        'Receiving Agent Address'[Receiving Agent],
+        'Carrier Address'[Carrier],
+        'Shipment'[Container TEU],
+        'Shipment'[Container Count],
+        __DS0FilterTable,
+        __DS0FilterTable2,
+        __DS0FilterTable3,
+        __DS0FilterTable4,
+        __DS0FilterTable5,
+        __DS0FilterTable6,
+        __DS0FilterTable7,
+        "Shipment_Weight", 'Shipment'[Shipment Weight],
+        "Shipment_Volume", 'Shipment'[Shipment Volume],
+        "Actual_Chargeable", 'Shipment'[Actual Chargeable],
+        "Total_No__Of_Packs", 'Shipment'[Total No. Of Packs],
+        "Shipment_Outer_Packs", 'Shipment'[Shipment Outer Packs],
+        "First Vessel", 'Consolidation Transport'[First Vessel],
+        "First Voyage Flight", 'Consolidation Transport'[First Voyage Flight],
+        "ETA Discharge", 'Consolidation'[ETA Discharge],
+        "ETD Load", 'Consolidation'[ETD Load],
+        "ETA Last Discharge", 'Consolidation'[ETA Last Discharge],
+        "ETD First Load", 'Consolidation'[ETD First Load],
+        "First Load", 'Consolidation'[First Load],
+        "Last Discharge", 'Consolidation'[Last Discharge],
+        "Console ATA", 'Consolidation'[Console ATA],
+        "Console ATD", 'Consolidation'[Console ATD],
+        "Shipment Customs Info", 'Shipment'[Shipment Customs Info],
+        "Local Client AR Settlement Group", 'Local Agent AR Settlement'[Local Client AR Settlement Group],
+        "Overseas Agent AR Settlement Group", 'Overseas Agent AR Settlement'[Overseas Agent AR Settlement Group],
+        "Contract Number", 'Consolidation'[Contract Number],
+        "Freight Direction", 'Main Consol Shipment'[Freight Direction],
+        "GL Branch", 'Shipment'[GL Branch],
+        "GL Department", 'Shipment'[GL Department],
+        "GL Local Agent", 'Shipment'[GL Local Agent],
+        "GL Representative Operator", 'Shipment'[GL Representative Operator],
+        "GL Overseas Agent Code", 'Shipment'[GL Overseas Agent Code],
+        "GL Overseas Agent Name", 'Shipment'[GL Overseas Agent Name],
+        "GL Representative Sales", 'Shipment'[GL Representative Sales],
+        "Sum_of_Revenue", 'GL Transaction'[Sum of Revenue],
+        "Sum_of_Cost", 'GL Transaction'[Sum of Cost],
+        "Sum_of_Job_Profit", 'GL Transaction'[Sum of Job Profit],
+        "Sum_of_Accrual", 'GL Transaction'[Sum of Accrual],
+        "Sum_of_Unrecognised_Cost", 'GL Transaction'[Sum of Unrecognised Cost],
+        "Sum_of_Unrecognised_Revenue", 'GL Transaction'[Sum of Unrecognised Revenue],
+        "Sum_Total_of_Cost", 'GL Transaction'[Sum Total of Cost],
+        "Sum_of_Recognised_Expense", 'GL Transaction'[Sum of Recognised Expense],
+        "Sum_of_Unrecognised_Income", 'GL Transaction'[Sum of Unrecognised Income],
+        "Sum_Total_of_Income", 'GL Transaction'[Sum Total of Income],
+        "Sum_Total_of_Expense", 'GL Transaction'[Sum Total of Expense],
+        "Sum_Total_of_Accrual", 'GL Transaction'[Sum Total of Accrual],
+        "Sum_of_Recognised_Income", 'GL Transaction'[Sum of Recognised Income],
+        "Sum_of_Unrecognised_Expense", 'GL Transaction'[Sum of Unrecognised Expense],
+        "Sum_Total_of_WIP", 'GL Transaction'[Sum Total of WIP],
+        "GL Status", 'Shipment'[GL Status],
+        "GL Create Date", 'Shipment'[GL Create Date],
+        "Sum_Total_of_Revenue", 'GL Transaction'[Sum Total of Revenue],
+        "GL Revenue Recognition Date", 'Shipment'[GL Revenue Recognition Date],
+        "Sum_of_Unrecognised_WIP", 'GL Transaction'[Sum of Unrecognised WIP],
+        "Sum_of_WIP", 'GL Transaction'[Sum of WIP],
+        "Sum_of_Unrecognised_Accrual", 'GL Transaction'[Sum of Unrecognised Accrual]
+    ),
+    'Shipment'[Job Number], 1,
+    'Shipment'[Transport Mode], 1,
+    'Shipment'[Container Mode], 1,
+    'Port Of Origin'[Port Of Origin Code], 1,
+    'Port Of Origin'[Port Of Origin Country Code], 1,
+    'Port Of Destination'[Port Of Destination Code], 1,
+    'Port Of Destination'[Port Of Destination Country Code], 1,
+    'Shipment'[Way Bill Number], 1,
+    'Shipment'[Shipment Inco Term], 1,
+    'Shipment'[Additional Terms], 1,
+    'Shipment'[Shipment PPD CCX Term], 1,
+    'Shipment'[Goods Description], 1,
+    'Shipment'[Weight Unit], 1,
+    'Shipment'[Volume Unit], 1,
+    'Shipment'[Total No Of Packs Package Type], 1,
+    'Shipment'[Outer Packs Package Type], 1,
+    'Shipment'[Shipment Create Date], 1,
+    'Import Broker'[Import Broker], 1,
+    'Export Broker'[Export Broker], 1,
+    'Shipment'[Shipment Status], 1,
+    'Consolidation'[Job No.], 1,
+    'Consolidation'[Master Bill No.], 1,
+    'Service Level'[Service Level], 1,
+    'Shipment'[Interim Receipt Number], 1,
+    'Shipment'[Booking Confirmation Reference], 1,
+    'Shipment'[House Bill Type], 1,
+    'Shipment'[Is Transport Job], 1,
+    'Shipment'[Estimated Pickup], 1,
+    'Shipment'[Pickup Required By], 1,
+    'Shipment'[Delivery Cartage Completed], 1,
+    'Shipment'[Delivery Required By], 1,
+    'Shipment'[FCL Delivery Equipment Needed], 1,
+    'Shipment'[Estimated Delivery], 1,
+    'Shipment'[Pickup Cartage Completed], 1,
+    'Shipment'[FCL Pickup Equipment Needed], 1,
+    'Shipment'[Pickup Cartage Advised], 1,
+    'Shipment'[Chargeable Unit], 1,
+    'Shipment'[Is Master / Lead], 1,
+    'Shipment'[Is Brokerage], 1,
+    'Shipment'[Coload Master], 1,
+    'Shipment'[Container 20F], 1,
+    'Shipment'[Container 20H], 1,
+    'Shipment'[Container 20R], 1,
+    'Shipment'[Container 40F], 1,
+    'Shipment'[Container 40H], 1,
+    'Shipment'[Container 40R], 1,
+    'Shipment'[Container 45F], 1,
+    'Shipment'[Container GEN], 1,
+    'Shipment'[Container Other], 1,
+    'Discharge Port'[Discharge Port Code], 1,
+    'Load Port'[Load Port Code], 1,
+    'Shipment'[Is Active], 1,
+    'Consolidation'[Coload], 1,
+    'Consignor Address'[Consignor City], 1,
+    'Consignor Address'[Consignor State], 1,
+    'Consignor Address'[Consignor Post Code], 1,
+    'Consignee Address'[Consignee City], 1,
+    'Consignee Address'[Consignee State], 1,
+    'Consignee Address'[Consignee Post Code], 1,
+    'Shipment'[Received Date], 1,
+    'Shipment'[Delivery Cartage Advised], 1,
+    'Shipment'[Loading Meters], 1,
+    'Consignor Address'[Consignor], 1,
+    'Consignee Address'[Consignee], 1,
+    'Controlling Customer Address'[Controlling Customer], 1,
+    'Controlling Agent Address'[Controlling Agent], 1,
+    'Shipment'[Arrival Date], 1,
+    'Shipment'[Departure Date], 1,
+    'Sending Agent Address'[Sending Agent], 1,
+    'Receiving Agent Address'[Receiving Agent], 1,
+    'Carrier Address'[Carrier], 1,
+    'Shipment'[Container TEU], 1,
+    'Shipment'[Container Count], 1
+)
+ORDER BY
+    'Shipment'[Job Number],
+    'Shipment'[Transport Mode],
+    'Shipment'[Container Mode],
+    'Port Of Origin'[Port Of Origin Code],
+    'Port Of Origin'[Port Of Origin Country Code],
+    'Port Of Destination'[Port Of Destination Code],
+    'Port Of Destination'[Port Of Destination Country Code],
+    'Shipment'[Way Bill Number],
+    'Shipment'[Shipment Inco Term],
+    'Shipment'[Additional Terms],
+    'Shipment'[Shipment PPD CCX Term],
+    'Shipment'[Goods Description],
+    'Shipment'[Weight Unit],
+    'Shipment'[Volume Unit],
+    'Shipment'[Total No Of Packs Package Type],
+    'Shipment'[Outer Packs Package Type],
+    'Shipment'[Shipment Create Date],
+    'Import Broker'[Import Broker],
+    'Export Broker'[Export Broker],
+    'Shipment'[Shipment Status],
+    'Consolidation'[Job No.],
+    'Consolidation'[Master Bill No.],
+    'Service Level'[Service Level],
+    'Shipment'[Interim Receipt Number],
+    'Shipment'[Booking Confirmation Reference],
+    'Shipment'[House Bill Type],
+    'Shipment'[Is Transport Job],
+    'Shipment'[Estimated Pickup],
+    'Shipment'[Pickup Required By],
+    'Shipment'[Delivery Cartage Completed],
+    'Shipment'[Delivery Required By],
+    'Shipment'[FCL Delivery Equipment Needed],
+    'Shipment'[Estimated Delivery],
+    'Shipment'[Pickup Cartage Completed],
+    'Shipment'[FCL Pickup Equipment Needed],
+    'Shipment'[Pickup Cartage Advised],
+    'Shipment'[Chargeable Unit],
+    'Shipment'[Is Master / Lead],
+    'Shipment'[Is Brokerage],
+    'Shipment'[Coload Master],
+    'Shipment'[Container 20F],
+    'Shipment'[Container 20H],
+    'Shipment'[Container 20R],
+    'Shipment'[Container 40F],
+    'Shipment'[Container 40H],
+    'Shipment'[Container 40R],
+    'Shipment'[Container 45F],
+    'Shipment'[Container GEN],
+    'Shipment'[Container Other],
+    'Discharge Port'[Discharge Port Code],
+    'Load Port'[Load Port Code],
+    'Shipment'[Is Active],
+    'Consolidation'[Coload],
+    'Consignor Address'[Consignor City],
+    'Consignor Address'[Consignor State],
+    'Consignor Address'[Consignor Post Code],
+    'Consignee Address'[Consignee City],
+    'Consignee Address'[Consignee State],
+    'Consignee Address'[Consignee Post Code],
+    'Shipment'[Received Date],
+    'Shipment'[Delivery Cartage Advised],
+    'Shipment'[Loading Meters],
+    'Consignor Address'[Consignor],
+    'Consignee Address'[Consignee],
+    'Controlling Customer Address'[Controlling Customer],
+    'Controlling Agent Address'[Controlling Agent],
+    'Shipment'[Arrival Date],
+    'Shipment'[Departure Date],
+    'Sending Agent Address'[Sending Agent],
+    'Receiving Agent Address'[Receiving Agent],
+    'Carrier Address'[Carrier],
+    'Shipment'[Container TEU],
+    'Shipment'[Container Count]

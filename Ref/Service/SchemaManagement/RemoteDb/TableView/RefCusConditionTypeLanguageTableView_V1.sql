@@ -1,0 +1,6 @@
+CREATE VIEW RefCusConditionTypeLanguageTableView_V1 AS
+SELECT ZXW_PK,
+ZXW_ZX2_ConditionType,
+ZXW_ZX6_NKLanguage,
+ZXW_Description
+FROM RefCusConditionTypeLanguage

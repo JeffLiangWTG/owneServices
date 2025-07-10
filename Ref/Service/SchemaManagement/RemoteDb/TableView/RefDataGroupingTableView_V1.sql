@@ -1,0 +1,6 @@
+CREATE VIEW RefDataGroupingTableView_V1 AS
+SELECT ZZZ_PK,
+ZZZ_DataGrouping,
+ZZZ_Description,
+ZZZ_ZZZ_Grouping
+FROM RefDataGrouping

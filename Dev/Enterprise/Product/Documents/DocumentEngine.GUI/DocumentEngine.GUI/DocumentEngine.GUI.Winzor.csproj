@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <AssemblyName>Enterprise.DocumentEngine.GUI</AssemblyName>
+    <RootNamespace>Enterprise.DocumentEngine.GUI</RootNamespace>
+    <UseLegacyRsa>false</UseLegacyRsa>
+    <CWUsesDesignRef>true</CWUsesDesignRef>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Core\ZScrollablePictureBox.cs" />
+    <Compile Remove="Core\ZScrollablePictureBox.Designer.cs" />
+    <Compile Remove="DeliveryMethods\FlexCelPreviewWithCulture\FlexCelPreviewWithCulture.cs" />
+    <Compile Remove="DocumentMenu\ExcelManager.cs" />
+    <Compile Remove="DocumentMenu\RemoteExcelManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="Core\ZScrollablePictureBox.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" />
+    <PackageReference Include="System.Formats.Asn1" />
+    <PackageReference Include="System.Resources.Extensions" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <EmbeddedResource Include="Testing\DocumentsSaveAsTif.tif" />
+    <EmbeddedResource Include="Testing\TooLongFormulaForXls.xlsx" />
+    <EmbeddedResource Include="Testing\TooManyRowsForXls.xlsx" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DocBuilder\Preview.xls" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="excubowebcompiler.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Winzor\BArchitecture.GUI\WinzorFramework.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('wwwroot\css\_gen\default.css')">
+    <Content Include="wwwroot\css\_gen\default.css" />
+  </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="dotnet tool run webcompiler -- -r themes\default.scss -o wwwroot/css/_gen -z disable -p disable -c excubowebcompiler.json" StandardOutputImportance="high" />
+  </Target>
+</Project>

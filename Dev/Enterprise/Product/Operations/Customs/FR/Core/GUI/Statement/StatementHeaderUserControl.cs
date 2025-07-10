@@ -1,0 +1,12 @@
+using Enterprise.ZArchitecture.GUI;
+
+namespace Enterprise.Customs.FR.GUI
+{
+	public partial class StatementHeaderUserControl : ZUserControl
+	{
+		public StatementHeaderUserControl()
+		{
+			InitializeComponent();
+		}
+	}
+}

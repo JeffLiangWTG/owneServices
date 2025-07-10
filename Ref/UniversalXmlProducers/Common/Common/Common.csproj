@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>CargoWise.RefDbRepo.XmlProducer.Common</AssemblyName>
+    <RootNamespace>CargoWise.RefDbRepo.XmlProducer.Common</RootNamespace>
+    <OutputPath>..\..\..\Bin\UniversalXMLProducers\</OutputPath>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Configurations>Debug;Release;UAT</Configurations>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\CommonAssemblyInfo.cs" Link="CommonAssemblyInfo.cs" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /r /y &quot;$(TargetPath)&quot; &quot;$(TargetDir)..\..\Staging\net8.0\&quot;&#xD;&#xA;xcopy /r /y &quot;$(TargetPath)&quot; &quot;$(TargetDir)..\..\Tools\net8.0\&quot;&#xD;&#xA;if not $(Configuration) == Release (&#xD;&#xA;xcopy /r /y &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(TargetDir)..\..\Staging\net8.0\&quot;&#xD;&#xA;xcopy /r /y &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(TargetDir)..\..\Tools\net8.0\&quot;&#xD;&#xA;)" />
+  </Target>
+</Project>

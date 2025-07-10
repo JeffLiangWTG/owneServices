@@ -1,0 +1,18 @@
+@using CargoWise.NetworkVisualisation.GUI.Models;
+@typeparam TModel where TModel : NetworkNodeModel
+@typeparam TComponent where TComponent : NetworkNode<TModel>
+@inherits NetworkNodeBase<TModel>
+
+<div class="networknode--indiagram_wrapper" style=@networkNodeWrapperStyle>
+    <DeleteIcon Visible=@DeleteIconVisible QuickHide=@QuickHideDeleteIcon ImagePath=@Resources.DeleteNode Tooltip="@Node.DeleteTooltip" DeleteCallback=@DeleteNode @key=Node />
+    <div class="networknode--indiagram @(ClassName)--indiagram" style=@networkNodeStyle data-selected="@(Node.Selected || Node.IsSelected)" @onmouseenter=OnMouseEnter @onmouseleave=OnMouseLeave
+    @oncontextmenu=OpenContextMenuAsync @oncontextmenu:preventDefault @oncontextmenu:stopPropagation @ondblclick=OnDoubleClickAsync @ondblclick:stopPropagation title="Node: @Node.DiagramName">
+    @RenderNode()
+    @foreach (var port in Node.Ports.Cast<NetworkPortModel>())
+    {
+        <Blazor.Diagrams.Components.Renderers.PortRenderer Port=@port Class=@("node__port")>
+            <NetworkPort Port=@port />
+        </Blazor.Diagrams.Components.Renderers.PortRenderer>
+    }
+    </div>
+</div>

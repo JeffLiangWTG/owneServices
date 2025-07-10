@@ -1,0 +1,3 @@
+namespace Enterprise.Customs.CH.NCTS;
+
+public class CommonPreviousDocumentArrivalValidationDecider : CommonPreviousDocumentValidationDecider, EU.NCTS.Business.ICommonPreviousDocumentArrivalValidationDecider;

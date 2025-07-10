@@ -1,0 +1,150 @@
+<UserControl
+	x:Class="CargoWise.NetworkVisualisation.GUI.EntityDetails"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:local="clr-namespace:CargoWise.NetworkVisualisation.GUI"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:UI="clr-namespace:CargoWise.Main.Navigation.WPF;assembly=CargoWise.Main.Navigation"
+	xmlns:networkModel="clr-namespace:CargoWise.NetworkVisualisation.Business;assembly=CargoWise.NetworkVisualisation.Business"
+	d:DesignHeight="300"
+	d:DesignWidth="300"
+	mc:Ignorable="d">
+
+    <UserControl.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\SharedVisualTemplates.xaml" />
+				<ResourceDictionary Source="/CargoWise.Main.Navigation;component/WPF/MultilingualTextLabelResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+			<local:FontWeightConverter x:Key="FontWeightConverter" />
+			<local:TextAlignmentConverter x:Key="TextAlignmentConverter" />
+		</ResourceDictionary>
+    </UserControl.Resources>
+
+    <StackPanel
+		Focusable="False"
+		Orientation="Vertical">
+
+        <Grid>
+            <TextBox
+                x:Name="HeadingTextBox"
+			    BorderThickness="0"
+			    FontSize="{Binding HeadingFontSize,
+		                                RelativeSource={RelativeSource Mode=FindAncestor,
+		                                                               AncestorType={x:Type UserControl}}}"
+			    FontWeight="{Binding HeadingFontWeight,
+		                                  Converter={StaticResource FontWeightConverter},
+		                                  RelativeSource={RelativeSource Mode=FindAncestor,
+		                                                                 AncestorType={x:Type UserControl}}}"
+				Foreground="{Binding ForegroundColor, Converter={StaticResource colorToBrushConverter}}"
+			    MaxLength="256"
+                Text="{Binding DiagramName}"
+			    TextAlignment="{Binding TextAlignment,
+		                                     Converter={StaticResource TextAlignmentConverter},
+		                                     RelativeSource={RelativeSource Mode=FindAncestor,
+		                                                                    AncestorType={x:Type UserControl}}}"
+                TextWrapping="Wrap">
+
+                <TextBox.Background>
+                    <SolidColorBrush
+					    Color="Transparent" />
+                </TextBox.Background>
+            </TextBox>
+
+            <TextBox
+                x:Name="NonScheduledHeadingTextBox"
+                BorderThickness="0"
+                FontSize="{Binding HeadingFontSize,
+		                                RelativeSource={RelativeSource Mode=FindAncestor,
+		                                                               AncestorType={x:Type UserControl}}}"
+                Foreground="{Binding ForegroundColor, Converter={StaticResource colorToBrushConverter}}"
+                MaxLength="256"
+                IsReadOnly="True"
+                Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:EntityDetails}}, Path=NonScheduledHeadingText, Mode=OneWay}"
+                TextAlignment="{Binding TextAlignment, Converter={StaticResource TextAlignmentConverter},
+		                                     RelativeSource={RelativeSource Mode=FindAncestor,
+		                                                                    AncestorType={x:Type UserControl}}}">
+                <TextBox.Background>
+                    <SolidColorBrush
+                        Color="Transparent" />
+                </TextBox.Background>
+            </TextBox>
+        </Grid>
+
+        <StackPanel
+			Margin="0 5 0 0"
+			Orientation="Horizontal"
+            Visibility="{Binding ShowJobDetails,
+		                                 Converter={StaticResource booleanToVisibilityConverter},
+		                                 RelativeSource={RelativeSource Mode=FindAncestor,
+		                                                                AncestorType={x:Type UserControl}}}">
+
+            <UI:MultilingualTextLabel IsTranslatable="False">
+                <TextBlock
+				Margin="0 0 10 0"
+				Background="Transparent"
+				FontSize="{Binding JobDetailsFontSize,
+			                              RelativeSource={RelativeSource Mode=FindAncestor,
+			                                                             AncestorType={x:Type UserControl}}}"
+				FontWeight="Bold"
+				Foreground="{Binding ForegroundColor, Converter={StaticResource colorToBrushConverter}}"
+				Text="{Binding JobNumber}"
+				TextAlignment="{Binding TextAlignment, Converter={StaticResource TextAlignmentConverter},
+			                                   RelativeSource={RelativeSource Mode=FindAncestor,
+			                                                                  AncestorType={x:Type UserControl}}}"
+				Visibility="{Binding ShowJobDetails,
+			                                Converter={StaticResource booleanToVisibilityConverter},
+			                                RelativeSource={RelativeSource Mode=FindAncestor,
+			                                                               AncestorType={x:Type UserControl}}}" />
+
+            </UI:MultilingualTextLabel>
+            <TextBox
+				BorderThickness="0"
+				FontSize="{Binding JobDetailsFontSize,
+			                            RelativeSource={RelativeSource Mode=FindAncestor,
+			                                                           AncestorType={x:Type UserControl}}}"
+				Foreground="{Binding ForegroundColor, Converter={StaticResource colorToBrushConverter}}"
+				IsEnabled="{Binding JobNameEnabled}"
+                IsReadOnly="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:EntityDetails}}, Path=IsNonScheduled}"
+				Text="{Binding JobName}"
+				TextAlignment="{Binding TextAlignment, Converter={StaticResource TextAlignmentConverter},
+			                                 RelativeSource={RelativeSource Mode=FindAncestor,
+			                                                                AncestorType={x:Type UserControl}}}"
+				Visibility="{Binding ShowJobDetails,
+			                              Converter={StaticResource booleanToVisibilityConverter},
+			                              RelativeSource={RelativeSource Mode=FindAncestor,
+			                                                             AncestorType={x:Type UserControl}}}">
+                        <TextBox.Background>
+                            <SolidColorBrush
+						Color="Transparent" />
+                        </TextBox.Background>
+                    </TextBox>
+        </StackPanel>
+
+        <local:TextBoxWithPlaceholder
+			x:Name="CompletionCriteriaTextBox"
+			Margin="0 5 0 0"
+			AcceptsReturn="True"
+			BorderThickness="0"
+			FontSize="{Binding CompletionCriteriaFontSize,
+			                            RelativeSource={RelativeSource Mode=FindAncestor,
+			                                                           AncestorType={x:Type UserControl}}}"
+			FontStyle="Italic"
+			Foreground="{Binding CompletionCriteriaTextColor, Converter={StaticResource colorToBrushConverter}}"
+            IsReadOnly="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:EntityDetails}}, Path=IsNonScheduled}"
+			PlaceholderText="{Binding CompletionCriteriaPlaceholder}"
+			Text="{Binding CompletionCriteria}"
+            TextWrapping="Wrap"
+			Visibility="{Binding IsCompletionCriteriaVisible,
+		                                                   Converter={StaticResource booleanToVisibilityConverter}}">
+            <local:TextBoxWithPlaceholder.Background>
+                <SolidColorBrush
+					Color="Transparent" />
+            </local:TextBoxWithPlaceholder.Background>
+        </local:TextBoxWithPlaceholder>
+
+    </StackPanel>
+</UserControl>

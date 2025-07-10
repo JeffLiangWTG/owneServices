@@ -1,0 +1,99 @@
+@namespace Enterprise.Client.EDI.IncidentManager.GUI
+@using CargoWise.Integration;
+@using CargoWise.Workflow;
+@using Enterprise.Client.EDI.IncidentManager.Module;
+@using Enterprise.MasterFiles.Business.CustomValues;
+@using Enterprise.ProcessManagement.Business;
+@using Enterprise.ZArchitecture.Core;
+@using Enterprise.ZArchitecture.GUI;
+@inherits ZChildForm
+
+<h3 class="heading-primary">Create Rotation Work Items</h3>
+<div class="scrollable-div">
+<CreateWorkItemsFormTemplate Context="workItem" WorkItemCreator=@WorkItemCreator WinzorDispatcher=@WinzorDispatcher Service=@Service WorkItemDistinctBySelector="@WorkItemDistinctBySelector" WorkItemDuplicateWarning="@WorkItemDuplicateWarning">
+    <TableHeader>
+        <th><div style="float: right; margin-top: 3px; margin-bottom: -3px; border: 0; height: 16px; width: 16px;"></div></th>
+        <th><label for="start_date">Start Date</label></th>
+        <th><label for="staff_code">Staff Code</label></th>
+        <th><label for="product">Product</label></th>
+        <th><label for="product_area">Product Area</label></th>
+        <th><label for="module">Module</label></th>
+        <th><label for="change_type">Change Type</label></th>
+        <th><label for="priority">Priority</label></th>
+        <th><label for="location_code">Location Code</label></th>
+        <th><label for="rotation_one">Rotation 1 Team</label></th>
+        <th><label for="rotation_manager">Rotation Manager Staff Code</label></th>
+        <th><label for="rotation_weeks">Weeks per rotation</label></th>
+        <th><label for="core_skills_weeks">Weeks in Core Skills Training</label></th>
+        <th><label for="core_skills_training">Core Skills Training</label></th>
+        <th><label for="developer">Developer</label></th>
+        <th><label>Work item created</label></th>
+    </TableHeader>
+    <RowTemplate>
+        <td></td>
+        <td class="data-grid__cell"><input id="start_date" class="form__input" disabled=@workItem.WorkItemCreated @bind-Value="@workItem.StartDate" @bind-Value:event="oninput" @bind-Value:format="yyyy-MM-dd" onclick="this.showPicker()" type="date" /></td>
+        <td class="data-grid__cell"><input id="staff_code" class="form__input" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.StaffCode type="text" maxlength="3" required /></td>
+        <td class="data-grid__cell">
+            <input id="product" class="form__input" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.Type type="text" maxlength="3" list="types" pattern=@RegexPatternForHtmlSelect(WorkItemTypes) required />
+            <datalist id="types">
+                @foreach (var option in WorkItemTypes)
+                {
+                    <option value=@option.Code>@option.Description</option>
+                }
+            </datalist>
+        </td>
+        <td class="data-grid__cell">
+            <input id="product_area" class="form__input" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.Area type="text" maxlength="3" list="areas" pattern=@RegexPatternForHtmlSelect(WorkItemAreas) required />
+            <datalist id="areas">
+                @foreach (var option in WorkItemAreas)
+                {
+                    <option value=@option.Code>@option.Description</option>
+                }
+            </datalist>
+        </td>
+        <td class="data-grid__cell">
+            <input id="module" class="form__input" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.ActivityType type="text" maxlength="3" list="activityTypes" pattern=@RegexPatternForHtmlSelect(WorkItemActivityTypes) required />
+            <datalist id="activityTypes">
+                @foreach (var option in WorkItemActivityTypes)
+                {
+                    <option value=@option.Code>@option.Description</option>
+                }
+            </datalist>
+        </td>
+        <td class="data-grid__cell">
+            <input id="change_type" class="form__input" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.ActivitySubType type="text" maxlength="3" list="activitySubTypes" pattern=@RegexPatternForHtmlSelect(WorkItemActivitySubTypes) required />
+            <datalist id="activitySubTypes">
+                @foreach (var option in WorkItemActivitySubTypes)
+                {
+                    <option value=@option.Code>@option.Description</option>
+                }
+            </datalist>
+        </td>
+        <td class="data-grid__cell">
+            <input id="priority" class="form__input" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.Priority type="text" maxlength="3" list="priorities" pattern=@RegexPatternForHtmlSelect(WorkItemPriorities) required />
+            <datalist id="priorities">
+                @foreach (var option in WorkItemPriorities)
+                {
+                    <option value=@option.Code>@option.Description</option>
+                }
+            </datalist>
+        </td>
+        <td class="data-grid__cell"><input id="location_code" class="form__input" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.LocationCode type="text" maxlength="5" /></td>
+        <td class="data-grid__cell"><input id="rotation_one" class="form__input" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.Rotation1Team type="text" /></td>
+        <td class="data-grid__cell">
+            <input id="rotation_manager" class="form__input" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.RotationManager type="text" maxlength="3" list="rotationManagers" pattern=@RegexPatternForHtmlSelect(RotationManagerOptions) />
+            <datalist id="rotationManagers">
+                @foreach (var option in RotationManagerOptions)
+                {
+                    <option value=@option.Code>@option.Description</option>
+                }
+            </datalist>
+        </td>
+        <td class="data-grid__cell"><input id="rotation_weeks" class="form__input" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.WeeksPerRotation type="number" min=1 max=17></td>
+        <td class="data-grid__cell"><input id="core_skills_weeks" class="form__input" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.WeeksInCoreSkillsTraining type="number" min=@MinWeeksInCoreSkillsTraining max=6></td>
+        <td class="data-grid__cell"><input id="core_skills_training" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.IsCoreSkillsTraining @bind-Value:after="@(() => OnCoreSkillsTrainingChanged(workItem))" type="checkbox" checked="@workItem.IsCoreSkillsTraining" /></td>
+        <td class="data-grid__cell"><input id="developer" disabled=@workItem.WorkItemCreated @bind-Value:event="oninput" @bind-Value=@workItem.IsDeveloper type="checkbox" checked="@workItem.IsDeveloper" /></td>
+        <td class="work-item__created" data-test="work-item-created">@($"{(workItem.WorkItemCreated ? "Yes" : "No")}")</td>
+    </RowTemplate>
+</CreateWorkItemsFormTemplate>
+</div>

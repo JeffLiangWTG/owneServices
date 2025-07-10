@@ -1,0 +1,26 @@
+meta {
+  name: Call endpoint using ServiceLevels
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/companytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetRateQueryWithMandatoryFieldsForProvidedVariables(false);
+   query.ServiceLevels = RatesAPIsHelper.GetServiceLevels();
+   
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

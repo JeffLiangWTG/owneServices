@@ -1,0 +1,59 @@
+@namespace System.Windows.Forms
+@using WinzorFramework
+@using WebDragEventArgs = Microsoft.AspNetCore.Components.Web.DragEventArgs
+@inherits DataGridRow
+
+@{
+	var currentCell = DataGrid.CurrentCell;
+	var columns = ColumnsToRender.ToArray();
+	var isRowReadonly = columns.All(c => c.isCellReadOnly);
+	var isGridReadOnly = DataGrid.ReadOnly || dgTable.ReadOnly;
+	var isRowEditing = currentCell.RowNumber == RowNumber;
+	var isEditColumnReadOnly = currentCell.ColumnNumber >= 0 && currentCell.ColumnNumber < columns.Length && columns[currentCell.ColumnNumber].ColumnStyle.ReadOnly;
+
+	string? CalculateTabIndex(bool isEditing, bool isCellReadOnly)
+	{
+		if (DataGrid.WholeRowSelectedOnClick)
+		{
+			return null;
+		}
+		else if (dgTable.ReadOnly || isRowReadonly)
+		{
+			return isEditing ? "-1" : "0";
+		}
+		else
+		{
+			return isEditing || isCellReadOnly ? "-1" : "0";
+		}
+	}
+}
+
+<tr class="@RowCss(Selected, isRowEditing && !isGridReadOnly && !isEditColumnReadOnly)" @key="@WinzorControlId" style="@GetStyleString()" data-row-number="@RowNumber" @onwinzordrop="HandleItemDropAsync" @ondrop:stopPropagation>
+	<DataGridRowHeader RowIndicator="@(DataGrid.IsEditing ? "border_color" : "arrow_right")" ShowRowIndicator="isRowEditing" MouseDown="RowHeaderMouseDownAsync" MouseUp="RowHeaderMouseUpAsync" ContextMenu="RowHeaderContextMenuAsync" NotificationIcon=notificationIcon />
+	@foreach (var (columnStyle, columnIndex, cellData, isCellReadOnly) in columns)
+	{
+		Control? editControl = null;
+		var isEditing = isRowEditing && currentCell.ColumnNumber == columnIndex && (editControl = DataGrid.FindEditControl()) is not null;
+		var tabIndex = CalculateTabIndex(isEditing, isCellReadOnly);
+
+		<td class="@NotificationCss(cellData.Notification?.NotificationType) @(isEditing ? "datagrid__cell--edit" : string.Empty)" style="@cellData.StyleString"
+		    @onmousedown=cellData.MouseDown @onmousedown:stopPropagation @onmouseup=cellData.MouseUp @onmouseup:stopPropagation
+		    @oncontextmenu=cellData.ContextMenu @oncontextmenu:stopPropagation @oncontextmenu:preventDefault
+		    tabindex=@tabIndex @onwinzorfocusin=cellData.FocusIn @onwinzorfocusin:stopPropagation>
+			@if (cellData.Notification is not null)
+			{
+				<ControlProxyComponent Control=cellData.Notification @key=cellData.Notification.WinzorControlGuid />
+			}
+			@if (isEditing && editControl is not null)
+			{
+				<div class="datagrid__control--edit">
+					<ControlProxyComponent Control="editControl" @key=editControl.WinzorControlGuid Style="@cellData.EditControlStyleString" />
+				</div>
+			}
+			else
+			{
+				@cellData.Html
+			}
+		</td>
+	}
+</tr>

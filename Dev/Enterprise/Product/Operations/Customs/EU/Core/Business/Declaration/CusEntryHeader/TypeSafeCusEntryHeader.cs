@@ -1,0 +1,80 @@
+using System.Data;
+using CargoWise.EntityFramework;
+
+namespace Enterprise.Customs.EU.Business.Declaration
+{
+	public abstract class TypeSafeCusEntryHeader : AutoCusEntryHeader
+	{
+		#region Constructor
+
+		protected TypeSafeCusEntryHeader(BusinessObjectFactory factory, DataRow row)
+			: base(factory, row)
+		{
+		}
+
+		#endregion
+
+		#region New'd objects for type safety (typeDeciders/concrete classes must take care of instantiation
+
+		public new JobDeclaration Declaration
+		{
+			get { return (JobDeclaration)base.Declaration; }
+		}
+
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Business Object requirement")]
+		public new JobComInvoiceHeader[] InvoiceHeaders
+		{
+			get { return (JobComInvoiceHeader[])base.InvoiceHeaders; }
+		}
+
+		public new Customs.Business.ICusEntryLineCollection<CusEntryLine> MergedLines
+		{
+			get { return (Customs.Business.ICusEntryLineCollection<CusEntryLine>)base.MergedLines; }
+		}
+
+		[ChildEditable(true)]
+		public new Customs.Business.IAllCusEntryLineCollection<CusEntryLine> AllEntryLines => (Customs.Business.IAllCusEntryLineCollection<CusEntryLine>)base.AllEntryLines;
+
+		public new CusEntryHeaderLookups Lookups
+		{
+			get { return (CusEntryHeaderLookups)base.Lookups; }
+		}
+
+		public new CusEntryHeaderValidation Validation
+		{
+			get { return (CusEntryHeaderValidation)base.Validation; }
+		}
+
+		#endregion
+
+		#region Implementation
+
+		CusEntryHeader EntryHeader
+		{
+			get { return (CusEntryHeader)this; }
+		}
+
+		#region Overridden 'CreateNew' methods
+
+		protected override Customs.Business.ICusEntryLineCollection<Customs.Business.CusEntryLine> GetMergedLineCollection()
+		{
+			return new Customs.Business.CusEntryLineCollection<CusEntryLine>(this);
+		}
+
+		protected override Customs.Business.IAllCusEntryLineCollection<Customs.Business.CusEntryLine> GetAllEntryLinesCollection() => new Customs.Business.AllCusEntryLineCollection<CusEntryLine>(this);
+
+		protected override Customs.Business.CusEntryHeaderLookups GetNewLookups()
+		{
+			return new CusEntryHeaderLookups(EntryHeader);
+		}
+
+		protected override Customs.Business.CusEntryHeaderValidation GetNewValidation()
+		{
+			return Declaration != null ? Declaration.GetCusEntryHeaderValidation(EntryHeader) : new CusEntryHeaderValidation(EntryHeader);
+		}
+
+		#endregion
+
+		#endregion
+	}
+}

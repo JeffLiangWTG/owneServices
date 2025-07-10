@@ -1,0 +1,29 @@
+meta {
+  name: Provided Contianer ISO Code not exists in CW1 DB
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.ContainerTypes = [{ Type: "ISO", Value: "ABCD" }];
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("Logs should contain: Provided Container Type with ISO Type 'ABCD' does not exists in CargoWise.", function() {
+    expect(res.body.Warnings).to.include("Provided Container Type with ISO Type 'ABCD' does not exists in CargoWise.");
+  });
+}

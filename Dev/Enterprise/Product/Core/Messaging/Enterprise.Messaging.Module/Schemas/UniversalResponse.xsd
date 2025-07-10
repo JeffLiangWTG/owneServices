@@ -1,0 +1,84 @@
+<xs:schema targetNamespace="http://www.cargowise.com/Schemas/Universal/2011/11" version="1.1" elementFormDefault="qualified" xmlns="http://www.cargowise.com/Schemas/Universal/2011/11" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="UniversalResponse" type="UniversalResponseData" />
+	<xs:complexType name="UniversalResponseData">
+		<xs:all>
+			<xs:element name="ValidationRuleCollection" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name ="ValidationRule" minOccurs="0" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Code" type="xs:string"/>
+									<xs:element name="Sequence" type="xs:integer"/>
+									<xs:element name="MessageLog" type="xs:string"/>
+									<xs:element name="Result" type="xs:string"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Status" minOccurs="1">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Data">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:any minOccurs="0" maxOccurs="1" processContents="skip" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MessageNumberCollections" minOccurs="0" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="MessageNumberCollection" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="MessageNumber" minOccurs="0" maxOccurs="unbounded" >
+										<xs:complexType>
+											<xs:simpleContent>
+												<xs:extension base="xs:string">
+													<xs:attribute name="Type" type="MessageNumberType" />
+												</xs:extension>
+											</xs:simpleContent>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MessageNumberCollection" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="MessageNumber" minOccurs="0" maxOccurs="unbounded" >
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string">
+										<xs:attribute name="Type" type="MessageNumberType" />
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ProcessingLog" minOccurs="0" type="xs:string" />
+		</xs:all>
+		<xs:attribute name="version" type="xs:token" />
+	</xs:complexType>
+
+	<xs:simpleType name="MessageNumberType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="TrackingID" />
+			<xs:enumeration value="InterchangeNumber" />
+			<xs:enumeration value="MessageNumber" />
+			<xs:enumeration value="External" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

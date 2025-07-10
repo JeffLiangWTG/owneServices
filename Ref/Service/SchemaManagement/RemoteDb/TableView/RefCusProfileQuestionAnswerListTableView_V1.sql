@@ -1,0 +1,6 @@
+CREATE VIEW RefCusProfileQuestionAnswerListTableView_V1 AS
+SELECT XQ4_PK,
+XQ4_XQ2_Question,
+XQ4_Value,
+XQ4_Description
+FROM RefCusProfileQuestionAnswerList

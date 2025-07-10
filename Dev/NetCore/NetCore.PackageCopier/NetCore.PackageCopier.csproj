@@ -1,0 +1,18 @@
+﻿<!--
+  This project will copy all packages listed in Directory.Package.props that apply to NetCore projects into shared TargetFramework output directory.
+  This is required because all other NetCore projects have UseCommonOutputDirectory=true and only output their own dlls without package references.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>$(CWNetCoreTargetFramework)</TargetFramework>
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <!-- Import NetCoreCommon.props here to override UseCommonOutputDirectory -->
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Data.SqlClient.SNI.runtime\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll" DestinationFolder="$(OutputPath)" />
+  </ItemGroup>
+  <Import Project="NetCore.PackageCopier.Common.props" />
+</Project>

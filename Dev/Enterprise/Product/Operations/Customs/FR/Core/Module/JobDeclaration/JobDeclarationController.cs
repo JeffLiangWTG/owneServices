@@ -1,0 +1,24 @@
+using System;
+using CargoWise.EntityFramework;
+using Enterprise.Customs.FR.Business.Declaration;
+using Enterprise.Customs.FR.GUI;
+using Enterprise.Customs.FR.GUI.PlugIn;
+using Enterprise.Freight.Forwarding.Business;
+
+namespace Enterprise.Customs.FR.Module
+{
+	public class JobDeclarationController : EU.Module.JobDeclarationController
+	{
+		public override Type TypeOfTopLevelBusinessObject => typeof(JobDeclaration);
+
+		protected override ZArchitecture.PlugIn.ZPlugIn GetPlugIn(IBusiness businessEntity)
+		{
+			return new BrokeragePlugIn((ForwardingShipment)businessEntity);
+		}
+
+		protected override ZArchitecture.GUI.IZForm GetFormCore(IBusiness businessEntity)
+		{
+			return new JobDeclarationForm((JobDeclaration)businessEntity);
+		}
+	}
+}

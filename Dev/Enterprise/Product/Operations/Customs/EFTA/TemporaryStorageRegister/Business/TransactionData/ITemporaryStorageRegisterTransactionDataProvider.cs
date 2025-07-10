@@ -1,0 +1,6 @@
+namespace Enterprise.Customs.EFTA.TemporaryStorageRegister.Business;
+
+public interface ITemporaryStorageRegisterTransactionDataProvider
+{
+	IEnumerable<TemporaryStorageRegisterTransactionData> GetTemporaryStorageRegisterTransactionData();
+}

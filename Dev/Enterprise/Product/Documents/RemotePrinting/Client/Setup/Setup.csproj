@@ -1,0 +1,82 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreTargetFramework)</TargetFrameworks>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Enterprise.RemotePrinting.Client.Setup</RootNamespace>
+    <AssemblyName>RemotePrinting.Client.Setup</AssemblyName>
+    <StartupObject>Enterprise.RemotePrinting.Client.Setup.Custom.Program</StartupObject>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ApplicationManifest>..\app.manifest</ApplicationManifest>
+    <PostBuildEvent Condition="'$(TargetFramework)' == 'net48'">..\Enterprise\Product\Documents\RemotePrinting\Client\Setup\Build.bat</PostBuildEvent>
+    <DefineConstants>WixCustomAction</DefineConstants>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.ServiceProcess" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="System.ServiceProcess.ServiceController" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Client\Constants.cs">
+      <Link>LinkedFiles\Constants.cs</Link>
+    </Compile>
+    <Compile Include="..\Client\IServiceController.cs">
+      <Link>LinkedFiles\IServiceController.cs</Link>
+    </Compile>
+    <Compile Include="..\Client\IWindowsServicesHelper.cs">
+      <Link>LinkedFiles\IWindowsServicesHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Client\PrintServiceController.cs">
+      <Link>LinkedFiles\PrintServiceController.cs</Link>
+    </Compile>
+    <Compile Include="..\Client\RegistryHelper.cs">
+      <Link>LinkedFiles\RegistryHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Client\WindowsServicesHelper.cs">
+      <Link>LinkedFiles\WindowsServicesHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Client\CommandLineHelper.cs">
+      <Link>LinkedFiles\CommandLineHelper.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Binary\WixUI_Bmp_Banner.bmp" />
+    <Content Include="Binary\WixUI_Bmp_Dialog.bmp" />
+    <None Include="..\App.config">
+      <Link>App.config</Link>
+    </None>
+    <None Include="..\app.manifest">
+      <Link>app.manifest</Link>
+    </None>
+    <Content Include="..\..\..\..\..\..\Resources\ApplicationIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CargoWiseOneWebPrintClient.Content" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <Target Name="CopyCargoWiseOneWebPrintClientIntSetupFromNuGet" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <SetupFiles Include="$(PkgCargoWiseOneWebPrintClient_Content)\content\CargoWiseOneWebPrintClientIntSetup.msi" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SetupFiles)" DestinationFolder="$(ProjectDir)PrebuiltInstallerFiles\VersionWithSystemInfo\" SkipUnchangedFiles="true" />
+    <Message Text="Copied CargoWiseOneWebPrintClientIntSetup.msi from NuGet package to VersionWithSystemInfo folder" />
+  </Target>
+</Project>

@@ -1,0 +1,102 @@
+@using CargoWiseNext.Blazor.Components
+@using Microsoft.AspNetCore.Components.Web
+@namespace CargoWise.Main.Navigation.Pages
+
+@inherits CwnComponentBase
+
+<div class="@Classname">
+    <div class="cwn-snapshots__header">
+        <CwnText HtmlTag="span" Class="cwn-snapshots__title">@Service?.Title</CwnText>
+        <div class="cwn-snapshots__commands">
+        @if (IsEditing)
+        {
+            <CwnButton Class="cwn-snapshots__button"
+                        Variant="Variant.Text"
+                        OnClick="@HandleCancelClickAsync"
+                        data-testid="cancel-btn">@Service?.CancelText</CwnButton>
+            <CwnButton Class="cwn-snapshots__button"
+                        Variant="Variant.Filled"
+                        OnClick="@HandleSaveChangesClickAsync"
+                        Color="Color.Brand"
+                        data-testid="save-btn">@Service?.SaveChangesText</CwnButton>
+        }
+        else
+        {
+            <CwnButton Class="cwn-snapshots__button"
+                        Variant="Variant.Filled"
+                        OnClick="@HandleEditClickAsync"
+                        Color="Color.Default"
+                        data-testid="edit-btn">@Service?.EditText</CwnButton>
+        }
+        </div>
+    </div>
+    <div class="@ClassnameContent">
+        @if (IsEmpty)
+        {
+            <div class="cwn-snapshots__empty-dialog">
+                <CwnImage Src="/_content/CargoWise.Main.Navigation/images/snapshot-frames.svg" Width="91" Height="58" />
+                <div class="cwn-snapshots__empty-dialog-content">
+                    <CwnText Class="cwn-snapshots__empty-hint">@Service?.SnapshotsHint</CwnText>
+                    <CwnButton Class="cwn-snapshots__button"
+                               ClassCaption="cwn-snapshots__button-caption"
+                               Variant="Variant.Filled"
+                               Color="Color.Default"
+                               StartIcon="Icon.Plus"
+                               EndIcon="Icon.Switch"
+                               OnClick="HandleAddSnapshotClickAsync"
+                               title="@Service?.AddText"
+                               data-testid="add-btn">
+                        @Service?.AddText
+                    </CwnButton>
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var (snapshot, index) in SnapshotsList.Select((s, i) => (s, i)))
+            {
+                <SnapshotItem Class="@ClassnameSnapshotItem"
+                    IsEditing="@IsEditing"
+                    IsLoading="@IsLoading(snapshot)"
+                    IsDraggable="@IsEditing"
+                    Snapshot="@snapshot"
+                    OnEditClick="@HandleEditItemClickAsync"
+                    OnDeleteClick="@HandleDeleteItemClick"
+                    data-index="@index"/>
+            }
+
+            @if (ShowAddSnapshotItem)
+            {
+                <div class="cwn-snapshots__item cwn-snapshots__add-item">
+                    <CwnButton
+                        Class="cwn-snapshots__button"
+                        ClassCaption="cwn-snapshots__button-caption"
+                        Variant="Variant.Filled"
+                        Color="Color.Default"
+                        StartIcon="Icon.Plus"
+                        EndIcon="Icon.Switch"
+                        OnClick="HandleAddSnapshotClickAsync"
+                        title="@Service?.AddText"
+                        data-testid="add-btn">
+                            @Service?.AddText
+                    </CwnButton>
+                </div>
+            }
+
+            @for(var i = SnapshotsList.Count + 1; i < MaxSnapshots; i++)
+            {
+                <div class="cwn-snapshots__item" data-testid="placeholder" />
+            }
+        }
+
+        <SnapshotDialog
+	        @ref="SnapshotDialog"
+            ClassContent="cwn-snapshots__dialog"
+            OkButtonText="@SnapshotDialogOkButtonText"
+            CancelButtonText="@SnapshotDialogCancelButtonText"
+            SelectedModuleName="@SnapshotToEdit?.ModuleFilter?.ModuleName"
+            SelectedModuleFilterName="@SnapshotToEdit?.ModuleFilter.ModuleFilterName"
+            OnAddSnapshotClick="@HandleSnapshotDialogAddSnapshotClickAsync"
+            OnCancelClick="@HandleSnapshotDialogCancelClick" />
+    </div>
+</div>

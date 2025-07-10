@@ -1,0 +1,31 @@
+meta {
+  name: PlannedDischarge can not be provided when querying Costing
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.PlannedDischarge = {};
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: PlannedDischarge can not be provided when querying Costing.", function() {
+    expect(res.body.ModelState['PlannedDischarge'][0]).to.equal("PlannedDischarge cannot be provided when querying Costing.");
+  });
+  
+}

@@ -1,0 +1,8 @@
+CREATE VIEW RefCusAUNexdocECMCodeTableView_V1 AS
+SELECT ZY5_PK,
+ZY5_CommodityCode,
+ZY5_PreservationCode,
+ZY5_ProductTypeCode,
+ZY5_PackTypeCode,
+ZY5_SupplementaryCode
+FROM RefCusAUNexdocECMCode

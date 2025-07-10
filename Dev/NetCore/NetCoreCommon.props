@@ -1,0 +1,127 @@
+﻿<Project>
+  <PropertyGroup>
+    <IsNetCoreCommonPropsImported>true</IsNetCoreCommonPropsImported>
+    <HasNetCoreTargetError Condition="'$(TargetFramework)' == '' And '$(TargetFrameworks)' == ''">true</HasNetCoreTargetError>
+
+    <!--
+        also defined in Directory.Build.targets for all non-net core projects.
+        needs to be defined here for when multi-targeted csproj files need to refer to it
+    -->
+    <IsNetFrameworkTargetFramework Condition="$(TargetFramework.StartsWith('net4'))">true</IsNetFrameworkTargetFramework>
+    <IsNetStandardTargetFramework Condition="$(TargetFramework.StartsWith('netstandard'))">true</IsNetStandardTargetFramework>
+    <IsNetCoreTargetFramework Condition="$(TargetFramework.StartsWith('net7')) Or $(TargetFramework.StartsWith('net8'))">true</IsNetCoreTargetFramework>
+    <IsNetCoreWindowsTargetFramework Condition="'$(IsNetCoreTargetFramework)' == 'true' and $(TargetFramework.EndsWith('-windows'))">true</IsNetCoreWindowsTargetFramework>
+
+    <!--
+        used to determine which net8 projects to add test discovery for
+    -->
+    <IsGUIProject Condition="$(AssemblyName.ToLowerInvariant().Contains('gui')) Or $(MSBuildProjectName.ToLowerInvariant().Contains('gui'))">true</IsGUIProject>
+    <IsModuleProject Condition="$(AssemblyName.ToLowerInvariant().Contains('module')) Or $(MSBuildProjectName.ToLowerInvariant().Contains('module'))">true</IsModuleProject>
+  </PropertyGroup>
+
+  <Target Name="CheckTargetFrameworkForNetCore" BeforeTargets="Restore">
+    <Error
+      Condition="'$(HasNetCoreTargetError)' == 'true'"
+      Text="TargetFramework(s) must be set before NetCoreCommon.props Import. Please place the import after that variable declaration."
+    />
+  </Target>
+
+  <!--
+    configuration common to all .NET Core compilations, including .NET Core Windows
+  -->
+  <PropertyGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <QglSkipBuild Condition="'$(CW_BUILD_FLAG_DISABLE_NET_CORE)' == 'true'">true</QglSkipBuild>
+    <!-- Using OutDir because it sets path forcefully and not affected by AppendTargetFrameworkToOutputPath -->
+    <OutDir>$(CWNetCoreOutputPath)</OutDir>
+    <!-- Place this to true to have different paths inside obj dir used during build -->
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+
+    <!--
+      neither of these are suitable for CargoWise projects yet. separate efforts will need to be taken to enable them.
+      this does not stop us moving to .net8 now however, so leave them disabled for now.
+    -->
+    <ImplicitUsings Condition="'$(ImplicitUsings)' == ''">disable</ImplicitUsings>
+    <Nullable Condition="'$(Nullable)' == ''">disable</Nullable>
+
+    <!--
+      MSB3277: Found conflicts between different versions of <assembly name>
+      NU1702: ProjectReference 'C:\Code\Project2.csproj' was resolved using '.NETFramework' instead of the project target framework '.NETCore'
+    -->
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277;NU1702</MSBuildWarningsAsMessages>
+
+    <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
+    <!-- TODO remove once BinaryFormatter is not in use -->
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+    <GenerateResourceWarnOnBinaryFormatterUse>false</GenerateResourceWarnOnBinaryFormatterUse>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsNetCoreTargetFramework)' == 'true' and '$(IsCwTestProject)' == 'true'">
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true' and '$(IsCwTestProject)' != 'true' and ('$(OutputType)' == 'Exe' or '$(OutputType)' == 'WinExe')">
+    <None Include="$(WTGBranchRoot)main.manifest" Link="main.manifest" />
+    <Compile Include="$(WTGBranchRoot)NetCore\NetCoreAssemblyResolver.cs" Link="NetCoreAssemblyResolver.cs" />
+  </ItemGroup>
+
+  <!--
+    configuration specific to .NET Core Windows, ie multi-targeted CargoWise WinForms projects
+  -->
+  <PropertyGroup Condition="'$(IsNetCoreWindowsTargetFramework)' == 'true'">
+    <!--
+      todo: investigate if we need this simulated?
+        it imports a targets file: C:\Program Files\dotnet\sdk\7.0.119\Sdks\Microsoft.NET.Sdk.WindowsDesktop\targets\Microsoft.NET.Sdk.WindowsDesktop.targets
+      does this targets file do anything that we will need or find useful?
+    -->
+    <ImportWindowsDesktopTargets />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsNetCoreTargetFramework)' == 'true' and '$(UseWindowsForms)' == 'true'">
+    <!-- When:
+        1. Using NET Core and depending on a NET8 WPF enabled assembly,
+        2. Using NET Core and depending on a NET FWK assembly (TBC),
+        two different versions of WindowsBase.dll might be imported (one for each framework), which might result in a conflict.
+
+        Here we are forcing all WindowsForm projects to also have WPF so that MSBuild can solve the conflict by itself.
+    -->
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <!-- Does this project use windows forms? -->
+  <ItemGroup Condition="'$(IsNetCoreWindowsTargetFramework)' == 'true' and '$(UseWindowsForms)' == 'true'">
+    <!-- then supply our own System.Windows.Forms implementation -->
+    <PackageReference Include="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true' and '$(IsCwTestProject)' == 'true' and '$(CWUsesSqlClient)' != 'true'">
+    <!--
+      Required for tests so they can check db schema version, it picks a wrong runtime version of System.Data.SqlClient otherwise:
+        An exception occurred while invoking executor 'executor://cw_netcore_testexecutor/': System.Data.SqlClient is not supported on this platform.
+    -->
+    <PackageReference Include="System.Data.SqlClient" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+  </ItemGroup>
+
+  <!-- Only enabling for non-windows netcore projects for now, windows ones should also be included here when ready -->
+  <PropertyGroup>
+    <CWAddNetCoreTestPackages Condition="
+          '$(IsCwTestProject)' == 'true'
+      and '$(IsDebugBuild)' == 'true'
+      and '$(IsNetCoreTargetFramework)' == 'true'
+      and '$(CWDisableNetCoreTestDiscovery)' != 'true'
+      and (
+          '$(IsNetCoreWindowsTargetFramework)' != 'true'
+          or ('$(IsGUIProject)' != 'true'
+              and '$(IsModuleProject)' != 'true')
+      )"
+    >true</CWAddNetCoreTestPackages>
+    <!-- Temporarily disable checking for duplicate package references until this PR is merged to prevent build failures in DAT when combined with new multi-targeted projects -->
+    <DisableCheckingDuplicateNuGetItems Condition="'$(CWAddNetCoreTestPackages)' == 'true'">true</DisableCheckingDuplicateNuGetItems>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(CWAddNetCoreTestPackages)' == 'true'">
+    <!-- Force include 'Microsoft.NET.Test.Sdk' to prevent cases where test methods are not discovered when the package references is forgotten -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+  </ItemGroup>
+</Project>

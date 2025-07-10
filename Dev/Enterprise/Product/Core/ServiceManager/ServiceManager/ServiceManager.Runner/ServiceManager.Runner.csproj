@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(CWNetCoreTargetFramework);net48</TargetFrameworks>
+    <RootNamespace>Enterprise.ServiceManager.Runner</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <PropertyGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <!-- The below package is needed to handle TimeChanged in .NET
+    Without this the runner will crash if exited after a
+    long time of being idle, e.g. after two hours -->
+    <PackageReference Include="Microsoft.Win32.SystemEvents" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Diagnostics.DiagnosticSource" />
+    <Reference Include="System.Threading.Channels" />
+    <Reference Include="System.Threading.Tasks.Extensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.Logging" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="Google.Protobuf" />
+    <Reference Include="Grpc.Core" />
+    <Reference Include="Grpc.Core.Api" />
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <Reference Include="WTG.ApplicationLogging.Abstractions" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ServiceManager.Common.Abstractions\ServiceManager.Common.Abstractions.csproj" />
+    <ProjectReference Include="..\ServiceManager.Logging.Abstractions\ServiceManager.Logging.Abstractions.csproj" />
+    <ProjectReference Include="..\ServiceManager.Runner.Abstractions\ServiceManager.Runner.Abstractions.csproj" />
+    <ProjectReference Include="..\ServiceManager.Shared.Abstractions\ServiceManager.Shared.Abstractions.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Runner.ico" />
+  </ItemGroup>
+</Project>

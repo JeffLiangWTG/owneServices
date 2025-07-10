@@ -1,0 +1,18 @@
+using NUnit.Framework;
+
+namespace Enterprise.Customs.PL.NCTS.Business.Testing;
+
+public sealed class CommonPreviousDocumentArrivalValidationDeciderTest : TestCase
+{
+	public void TestIsRuleG0321Active() => AssertEquals(true, validationDecider.IsRuleG0321Active);
+	public void TestIsRuleE1301Active() => AssertEquals(true, validationDecider.IsRuleE1301Active);
+
+	public void TestIsRuleTR0030_1Active() => AssertEquals(false, validationDecider.IsRuleTR0030_1Active);
+
+	protected override void SetUp()
+	{
+		validationDecider = new();
+	}
+
+	CommonPreviousDocumentArrivalValidationDecider validationDecider;
+}

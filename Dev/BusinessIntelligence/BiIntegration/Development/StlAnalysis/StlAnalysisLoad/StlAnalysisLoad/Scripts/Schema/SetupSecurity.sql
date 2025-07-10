@@ -1,0 +1,16 @@
+﻿USE [master];
+GO
+
+CREATE LOGIN [StlAnalysis] WITH PASSWORD=N'drefAnaJ56eP', DEFAULT_DATABASE=[master], DEFAULT_LANGUAGE=[us_english], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF;
+CREATE LOGIN [CORPORATE\AlwaysOn.Dev] FROM WINDOWS;
+GO
+
+USE [StlAnalysis];
+GO
+
+CREATE USER [StlAnalysis] FOR LOGIN [StlAnalysis] WITH DEFAULT_SCHEMA=[dbo];
+ALTER ROLE [db_datareader] ADD MEMBER [StlAnalysis];
+ALTER ROLE [db_datawriter] ADD MEMBER [StlAnalysis];
+CREATE USER [CORPORATE\AlwaysOn.Dev] FOR LOGIN [CORPORATE\AlwaysOn.Dev] WITH DEFAULT_SCHEMA=[dbo];
+ALTER ROLE [db_datareader] ADD MEMBER [CORPORATE\AlwaysOn.Dev];
+GO

@@ -1,0 +1,30 @@
+using System.Collections.ObjectModel;
+using CargoWise.Customs.FR.MessageDefinitions.DeltaG2.Send.Import;
+using CargoWise.Types;
+using Enterprise.Customs.EU.Business;
+using Enterprise.Customs.FR.Messaging.Interfaces;
+using Enterprise.Customs.FR.Messaging.Interfaces.Common;
+
+namespace Enterprise.Customs.FR.Messaging.MessageBuilders.DeltaD
+{
+	public class DDVAASendImpMessageBuilder : DDSendImpMessageBaseBuilder
+	{
+		public DDVAASendImpMessageBuilder(IDeclarationImportExport declarationImport
+			, ErrorCollector errorCollectorObject
+			, TransactionTypes transactionType
+			, int newSequenceNumeric)
+			: base(declarationImport, errorCollectorObject, transactionType, newSequenceNumeric)
+		{
+		}
+
+		protected override TGenDsi PopulateProcedure() => null;
+
+		protected override TPreval PopulatePreval(ICusProcedure cusProcedure) => null;
+
+		protected override Collection<TArticleDsi> PopulateArticlesImport() => null;
+
+		protected override ZString PopulateDeclEmergencyProcDate(ICusProcedure cusProcedure) => null;
+
+		protected override TMotivation PopulateMotivation(IHeader motivationHeader) => null;
+	}
+}

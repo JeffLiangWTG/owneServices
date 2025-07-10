@@ -1,0 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CargoWiseOne", "EDI003:Business Object Property Max Length Validation", Justification = "Baseline WI00752625", Scope = "member", Target = "~M:Enterprise.Recruiter.Module.HREmailsModule.SetEmailAddressAndDisplayName(Enterprise.MailManager.Business.MailItem)")] // Enterprise/Product/Operations/Recruiter/Recruiter.Module/HREmails/HREmailsModule.cs:390,21
+[assembly: SuppressMessage("CargoWiseOne", "EDI003:Business Object Property Max Length Validation", Justification = "Baseline WI00752625", Scope = "member", Target = "~M:Enterprise.Recruiter.Module.HREmailsModule.SetEmailAddressAndDisplayName(Enterprise.MailManager.Business.MailItem)")] // Enterprise/Product/Operations/Recruiter/Recruiter.Module/HREmails/HREmailsModule.cs:390,21

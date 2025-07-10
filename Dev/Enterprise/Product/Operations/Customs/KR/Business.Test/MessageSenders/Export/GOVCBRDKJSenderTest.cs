@@ -1,0 +1,81 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using CargoWise.EntityFramework;
+using CargoWise.EntityFramework.Testing;
+using CargoWise.Types;
+using Enterprise.Customs.KR.Messaging;
+
+namespace Enterprise.Customs.KR.Business.Testing
+{
+	sealed class GOVCBRDKJSenderTest : TestCaseWithFactory
+	{
+		IEnumerable<JobDeclarationMiscMessageSendingObject> GetMessageParents() => MessageSendingObjects;
+
+		MessageSender GetMessageSender() => IsExceptionTest ? new GOVCBRDKJSenderForTest(MessageSendingObjects, Factory) : new GOVCBRDKJSender(MessageSendingObjects, Factory);
+
+		IEnumerable<JobDeclarationMiscMessageSendingObject> Parents => parents ?? (parents = GetMessageParents());
+		IEnumerable<JobDeclarationMiscMessageSendingObject> parents;
+
+		IEnumerable<JobDeclarationMiscMessageSendingObject> MessageSendingObjects
+		{
+			get
+			{
+				if (messageSendingObjects == null)
+				{
+					var entry = new TestDataSetupHelper(Factory).GetEntryHas830Snapshot();
+					entry.Messages.AddNew().EM_MessageType = ElectronicDocumentTypeList.Codes._830;
+					var sendingObjectParent = new JobDeclarationMiscMessageSendingObjectParent(entry.Declaration, MessageType, MessageFunctions.MessageFunctionCode.Cancellation);
+					messageSendingObjects = sendingObjectParent.SendingObjectsCollection.Cast<JobDeclarationMiscMessageSendingObject>();
+				}
+				return messageSendingObjects;
+			}
+		}
+
+		ZString MessageType => ElectronicDocumentTypeList.Codes._DKJ;
+
+		IEnumerable<JobDeclarationMiscMessageSendingObject> messageSendingObjects;
+
+		public void TestCancelSendMessage()
+		{
+			var sendingObject = Parents.Single();
+			GetMessageSender().Send();
+
+			var entry = sendingObject.Header;
+			var messages = entry.Messages.Cast<EDIMessage>().Where(x => x.EM_MessageType == MessageType);
+			var message = messages.LastOrDefault();
+			AssertEquals(_5ASAmendmentType.Codes.Cancellation, message.EM_MessageSubType);
+			AssertEquals("1", message.EM_ApplicationReference);
+		}
+
+		public void TestStatusIsUpdated()
+		{
+			GetMessageSender().Send();
+			foreach (JobDeclarationMiscMessageSendingObjectCore parent in Parents)
+			{
+				AssertEquals(CustomsMessageStatusTypeList.Codes.CancellationSent, GetStatusField(parent.Header));
+			}
+		}
+
+		public void TestSendException()
+		{
+			IsExceptionTest = ZBool.True;
+			var messages = Parents.Single().Header.Messages;
+			AssertEquals("One message exits before sending a message.", 1, messages.Count);
+			AssertExceptionThrown<Exception>(() => GetMessageSender().Send());
+			AssertEquals("Exception occurred when sending a message, and no new message has been created.", 1, messages.Count);
+		}
+		public ZBool IsExceptionTest;
+
+		ZString GetStatusField(CusEntryHeader entry) => entry.CH_Status;
+
+		class GOVCBRDKJSenderForTest : GOVCBRDKJSender
+		{
+			public GOVCBRDKJSenderForTest(IEnumerable<JobDeclarationMiscMessageSendingObject> sendingObjects, BusinessObjectFactory factory) : base(sendingObjects, factory)
+			{
+			}
+
+			protected override ExportCancellationHeader GetMessageDataProvider(CusEntryHeader parent, ZString messageID) => throw new Exception();
+		}
+	}
+}

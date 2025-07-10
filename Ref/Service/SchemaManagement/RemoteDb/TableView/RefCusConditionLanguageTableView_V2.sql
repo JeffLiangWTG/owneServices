@@ -1,0 +1,8 @@
+CREATE VIEW RefCusConditionLanguageTableView_V2 AS
+SELECT ZXJ_PK,
+ZXJ_ZX6_NKLanguage,
+ZXJ_Comment,
+ZXJ_Source,
+ZXJ_ZX1_Condition,
+ZXJ_AdditionalComment
+FROM RefCusConditionLanguage

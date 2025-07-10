@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cs="http://agriculture.gov.au/nexdoc/GenericCodeSetSoap_1.0" xmlns:et="http://agriculture.gov.au/nexdoc/common/EnumTypes_1.0" targetNamespace="http://agriculture.gov.au/nexdoc/GenericCodeSetSoap_1.0" elementFormDefault="qualified">
+  <xsd:import namespace="http://agriculture.gov.au/nexdoc/common/EnumTypes_1.0" schemaLocation="common/EnumTypes.xsd" />
+  <xsd:simpleType name="CodeSetName">
+    <xsd:restriction base="xsd:string" />
+  </xsd:simpleType>
+  <xsd:simpleType name="CodeSetDescription">
+    <xsd:restriction base="xsd:string" />
+  </xsd:simpleType>
+  <xsd:simpleType name="CodeSetValue">
+    <xsd:restriction base="xsd:string" />
+  </xsd:simpleType>
+  <xsd:complexType name="CodeSetUpdateRangeDate">
+    <xsd:sequence>
+      <xsd:element name="codeSetUpdateTimestampStart" type="xsd:dateTime" maxOccurs="1" minOccurs="1" nillable="false" />
+      <xsd:element name="codeSetUpdateTimestampEnd" type="xsd:dateTime" maxOccurs="1" minOccurs="0" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="ItemCodeSet">
+    <xsd:sequence>
+      <xsd:element name="key" type="xsd:string" />
+      <xsd:element name="value" type="xsd:string" maxOccurs="1" minOccurs="0" />
+      <xsd:element name="type" type="et:CodeValueType" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="ListCodeSet">
+    <xsd:sequence>
+      <xsd:element name="listPosition" type="xsd:int" />
+      <xsd:element name="listItemCodeSet" type="cs:ItemCodeSet" maxOccurs="unbounded" minOccurs="0" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="GenericCodeSetResp">
+    <xsd:sequence>
+      <xsd:element name="specialMessage" type="xsd:string" maxOccurs="1" minOccurs="0" />
+      <xsd:element name="codeSetName" type="et:CodeSetName" />
+      <xsd:element name="listCodeSet" type="cs:ListCodeSet" maxOccurs="unbounded" minOccurs="0" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="GenericCodeSet">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="codeSetName" type="cs:CodeSetName" maxOccurs="1" minOccurs="1" />
+        <xsd:element name="codeSetDescription" type="cs:CodeSetDescription" maxOccurs="1" minOccurs="0" />
+        <xsd:element name="codeSetValue" type="cs:CodeSetValue" maxOccurs="1" minOccurs="0" />
+        <xsd:element name="codeSetUpdateRangeDate" type="cs:CodeSetUpdateRangeDate" maxOccurs="1" minOccurs="0" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="GenericCodeSetResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="genericCodeSetResponse" type="cs:GenericCodeSetResp" maxOccurs="1" minOccurs="0" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

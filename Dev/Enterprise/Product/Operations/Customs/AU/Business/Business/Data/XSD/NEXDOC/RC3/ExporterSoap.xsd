@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://agriculture.gov.au/nexdoc/ExporterSoap_1.0" elementFormDefault="qualified"
+            xmlns:this="http://agriculture.gov.au/nexdoc/ExporterSoap_1.0"
+            xmlns:ct="http://agriculture.gov.au/nexdoc/common/CommonTypes_1.0"
+            xmlns:et="http://agriculture.gov.au/nexdoc/common/EnumTypes_1.0">
+
+    <xsd:import namespace="http://agriculture.gov.au/nexdoc/common/CommonTypes_1.0"
+                schemaLocation="common/CommonTypes.xsd"/>
+    <xsd:import namespace="http://agriculture.gov.au/nexdoc/common/EnumTypes_1.0"
+                schemaLocation="common/EnumTypes.xsd"/>
+
+    <!-- Read Exporter -->
+    <xsd:element name="ReadExporterDetails">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="identifier" type="ct:LegacyUserIdType" maxOccurs="1" minOccurs="1"/>
+                <xsd:element name="identifierType" type="et:ExternalDetailIdType" maxOccurs="1" minOccurs="1"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="ExporterDetailsResponse">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="exporterDetailsResponse" type="this:ContactFormatType" maxOccurs="1"
+                             minOccurs="1"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+
+
+    <!-- Request Exporter -->
+    <xsd:element name="RequestExporter">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="exporterName" type="this:ExporterNameType" maxOccurs="1" minOccurs="1"/>
+                <xsd:element name="exporterAddress" type="this:ExporterAddressType" maxOccurs="1" minOccurs="1"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="RequestExporterResponse">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="exporterResponse" type="this:ExporterResponseType" maxOccurs="1"
+                             minOccurs="0"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+
+
+    <!-- Register new Client in a Client Group -->
+    <xsd:element name="RequestRegisterClient">
+        <xsd:complexType>
+            <xsd:sequence>
+                <!--<xsd:element name="tokens" type="this:NewClientInCLientGroupTokensType" maxOccurs="1" minOccurs="1"/>-->
+                <xsd:element name="newClientDetails" type="this:NewClientInClientGroupType" maxOccurs="1" minOccurs="1"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="RequestRegisterClientResponse">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="exporterResponse" type="this:NewClientInCLientGroupResponseType" maxOccurs="1"
+                             minOccurs="0"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <!-- ============================== -->
+    <!-- Exporter Service complex types -->
+    <!-- ============================== -->
+    <xsd:complexType name="ExporterNameType">
+        <xsd:annotation>
+            <xsd:documentation>This type contains the related elements which constitute the exporter name.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="name" type="ct:AlphaNumeric254Type"/>
+            <xsd:element name="email" type="ct:EmailAddressType"/>
+            <xsd:element name="phone" type="ct:AlphaNumeric17Type" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="ExporterResponseType">
+        <xsd:annotation>
+            <xsd:documentation>This type contains the related elements which constitute the exporter response.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="idType" type="et:RequestExporterResponseIdType" />
+            <xsd:element name="valueId" type="xsd:string" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="ContactFormatType">
+        <xsd:annotation>
+            <xsd:documentation>This type contains the related elements which constitute an address.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="exporterId" type="ct:ExporterNumberType"/>
+            <xsd:element name="exporterName" type="ct:AlphaNumeric254Type" minOccurs="0"/>
+            <xsd:element name="streetAddress" type="ct:StreetAddressType" minOccurs="1"/>
+            <xsd:element name="city" type="ct:AlphaNumeric254Type" minOccurs="0"/>
+            <xsd:element name="suburb" type="ct:AlphaNumeric254Type" minOccurs="0"/>
+            <xsd:element name="state" type="ct:StateType" minOccurs="0"/>
+            <xsd:element name="country" type="ct:CountryType" minOccurs="0"/>
+            <xsd:element name="postalCode" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="ExporterAddressType">
+        <xsd:annotation>
+            <xsd:documentation>This type contains the related elements which constitute an address.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="streetLines" type="xsd:string"  minOccurs="1" maxOccurs="3"/>
+            <xsd:element name="suburb" type="ct:AlphaNumeric254Type" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="city" type="ct:AlphaNumeric254Type" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="state" type="ct:StateType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="country" type="ct:CountryType" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="postalCode" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+    <!-- Types for Client in Client Group -->
+    <xsd:complexType name="HeaderDataType">
+        <xsd:sequence>
+            <xsd:element name="installationId" type="ct:AlphaNumeric254Type" minOccurs="0"/>
+            <xsd:element name="vendorToken" type="ct:AlphaNumeric254Type"/>
+            <xsd:element name="installationToken" type="this:InstalationToken" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="NewClientInClientGroupType">
+        <xsd:annotation>
+            <xsd:documentation>This type contains the related elements which constitute the new client data.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="firstName" type="ct:AlphaNumeric254Type"/>
+            <xsd:element name="lastName" type="ct:AlphaNumeric254Type"/>
+            <xsd:element name="email" type="ct:EmailAddressType"/>
+            <xsd:element name="description" type="ct:AlphaNumeric254Type" minOccurs="0"/>
+            <xsd:element name="clientGroupAdminEmail" type="ct:EmailAddressType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="InstalationToken">
+        <xsd:sequence>
+            <xsd:element name="user" type="ct:AlphaNumeric254Type"/>
+            <xsd:element name="password" type="ct:AlphaNumeric254Type"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="NewClientInCLientGroupResponseType">
+        <xsd:annotation>
+            <xsd:documentation>This type contains the related elements which constitute the client token response.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="clientToken" type="xsd:token" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

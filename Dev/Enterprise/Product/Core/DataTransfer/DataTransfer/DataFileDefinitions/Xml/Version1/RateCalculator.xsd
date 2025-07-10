@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.edi.com.au/EnterpriseService/" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:include schemaLocation="Elements.xsd"/>
+  <xs:complexType name="RateCalculator"/>
+  <xs:simpleType name="RateCalculatorType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="AGY"/>
+      <xs:enumeration value="CMB"/>
+      <xs:enumeration value="CST"/>
+      <xs:enumeration value="CTB"/>
+      <xs:enumeration value="CTG"/>
+      <xs:enumeration value="CTZ"/>
+      <xs:enumeration value="DIN"/>
+      <xs:enumeration value="EQH"/>
+      <xs:enumeration value="EXL"/>
+      <xs:enumeration value="FLT"/>
+      <xs:enumeration value="FPA"/>
+      <xs:enumeration value="FPU"/>
+      <xs:enumeration value="FRT"/>
+      <xs:enumeration value="HCC"/>
+      <xs:enumeration value="HRC"/>
+      <xs:enumeration value="HRT"/>
+      <xs:enumeration value="IAT"/>
+      <xs:enumeration value="IXC"/>
+      <xs:enumeration value="MIN"/>
+      <xs:enumeration value="MPU"/>
+      <xs:enumeration value="NTE"/>
+      <xs:enumeration value="PEB"/>
+      <xs:enumeration value="PER"/>
+      <xs:enumeration value="PSR"/>
+      <xs:enumeration value="SMB"/>
+      <xs:enumeration value="TME"/>
+      <xs:enumeration value="UNT"/>
+      <xs:enumeration value="VED"/>
+      <xs:enumeration value="WLT"/>
+      <xs:enumeration value="WPK"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="CMBCalculator">
+    <xs:complexContent>
+      <xs:extension base="BaseCMBCalculator">
+        <xs:sequence>
+          <xs:element name="Accumulation" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="HigherWeightOrUnitLowerRate" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="InclusiveBreaks" type="TrueFalse" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>  
+  <xs:complexType name="CBICalculator">
+    <xs:complexContent>
+      <xs:extension base="BaseCMBCalculator">
+        <xs:sequence>
+          <xs:element name="Accumulation" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="HigherWeightOrUnitLowerRate" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="InclusiveBreaks" type="TrueFalse" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UNTCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="PerUnitPrice" type="xs:decimal" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CSTCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="Percent" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="Type" type="xs:string" minOccurs="0"/>
+          <xs:element name="Style" type="xs:string" minOccurs="0"/>
+          <xs:element name="CalculationOrder" type="xs:string" minOccurs="0"/>
+          <xs:element name="EquipmentType" type="xs:string" minOccurs="0"/>
+          <xs:element name="SimpleRate" type="CalculatorSimpleRate"/>
+          <xs:element name="RateItems" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithOperatorAndBreak" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FLTCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="BasePrice" type="xs:decimal" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MINCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="MinimumValue" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="IsJobMinimum" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="IsChargeCodeMinimum" type="TrueFalse" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FPUCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="BasePrice" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="PerUnitPrice" type="xs:decimal" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="IXCCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="ApplyTo" type="xs:string" minOccurs="0"/>
+          <xs:element name="RateItems" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithOperatorAndBreak" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="SimpleRate" type="CalculatorSimpleRate"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SMBCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="RateItems" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithOperatorAndBreak" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="SimpleRate" type="CalculatorSimpleRate"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TMECalculator">
+    <xs:complexContent>
+      <xs:extension base="BaseCMBCalculator">
+        <xs:sequence>
+          <xs:element name="ExcludeDays" type="xs:string" minOccurs="0"/>
+          <xs:element name="UseAccumulation" type="TrueFalse" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CTBCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="Percent" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="Type" type="xs:string" minOccurs="0"/>
+          <xs:element name="Style" type="xs:string" minOccurs="0"/>
+          <xs:element name="CalculationOrder" type="xs:string" minOccurs="0"/>
+          <xs:element name="EquipmentType" type="xs:string" minOccurs="0"/>
+          <xs:element name="SimpleRate" type="CalculatorSimpleRate"/>
+          <xs:element name="RateItems" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithOperatorAndBreak" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FPACalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="FirstItemPrice" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="AddlItemPrice" type="xs:decimal" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HRCCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="RateItems">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithOperatorAndBreak" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MPUCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="Minimum" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="PerUnitPrice" type="xs:decimal" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NTECalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="RateItems">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithDescAmtOrRate" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FRTCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HRTCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="RateItems">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithDescAmtOrRate" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DINCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="Uplift" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="AdjustmentDays" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="ApplyTo" type="xs:string" minOccurs="0"/>
+          <xs:element name="ApplyToOutstandingDaysOnly" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="RateItems" minOccurs="1">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="DINRateItem" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="WPKCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="RateItems">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithDescAmtOrRate" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="WLTCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="RateItems">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithDescAmtOrRate" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CTGCalculator">
+    <xs:complexContent>
+      <xs:extension base="BaseCMBCalculator">
+        <xs:sequence>
+          <xs:element name="Equipment" type="xs:string" minOccurs="0"/>
+          <xs:element name="ConversionFactor" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="ConversionFactorNumeratorUnit" type="xs:string" minOccurs="0" />
+          <xs:element name="ConversionFactorDenominatorUnit" type="xs:string" minOccurs="0"  />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HCCCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="RateItems" minOccurs="1">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="HCCRateItem" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PERCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="Minimum" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="Percentage" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="BasePrice" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="Maximum" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="TakeHighestCharge" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="ExcludeGST" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="RateItems" minOccurs="1">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="PERRateItem" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="PartThereOf" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Rate" type="xs:decimal" minOccurs="0"/>
+                <xs:element name="ValueOrPartThereOf" type="xs:decimal" minOccurs="0"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PEBCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="Minimum" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="Maximum" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="BasePrice" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="BreaksBasedOnValues" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="RateItems" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithOperatorAndBreakAndPercent" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="ApplyToRateItems">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="PERRateItem" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PSRCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="Minimum" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="Percentage" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="BasePrice" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="Maximum" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="ZeroWhenLoss" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="RateItems" minOccurs="1">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="PERRateItem" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AGYCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="FeeType" type="xs:string"/>
+          <xs:element name="LineType" type="xs:string"/>
+          <xs:element name="HideFeeAndLineTypeOnQuotation" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="Type" type="xs:string" minOccurs="0"/>
+          <xs:element name="Style" type="xs:string" minOccurs="0"/>
+          <xs:element name="HideTypeAndStyleOnQuotation" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="Rate" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="RatePerAddl" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="IncludedLines" type="xs:int" minOccurs="0"/>
+          <xs:element name="RatePerAddLine" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="MaximumLines" type="xs:int" minOccurs="0"/>
+          <xs:element name="Maximum" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="IncludedHeaders" type="xs:int" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CTZCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="Zones" type="CTZZones"/>
+          <xs:element name="ConversionFactor" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="ConversionFactorNumeratorUnit" type="xs:string" minOccurs="0" />
+          <xs:element name="ConversionFactorDenominatorUnit" type="xs:string" minOccurs="0"  />
+          <xs:element name="Equipment" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EQHCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="RateItems">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithDescAmtOrRate" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EXLCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="VEDCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="InclusiveBreaks" type="TrueFalse" minOccurs="0"/>
+          <xs:element name="RateItems" minOccurs="1">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithOperatorAndBreak" maxOccurs="2"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="IATCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="BaseCharge" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="RatePerKG" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="FirstPackage" type="xs:decimal" minOccurs="0"/>
+          <xs:element name="AdditionalPackage" type="xs:decimal" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HCCRateItem">
+    <xs:sequence>
+      <xs:element name="Chrg" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PERRateItem">
+    <xs:sequence>
+      <xs:element name="Type" type="xs:string"/>
+      <xs:element name="ApplyTo" type="xs:string" minOccurs="0"/>
+      <xs:element name="Chrg" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DINRateItem">
+    <xs:sequence>
+      <xs:element name="Type" type="xs:string"/>
+      <xs:element name="ApplyTo" type="xs:string" minOccurs="0"/>
+      <xs:element name="Chrg" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CTZZone">
+    <xs:sequence>
+      <xs:element name="RateItems" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RateItem" type="RateItemWithOperatorAndBreak" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Code" type="xs:string"/>
+      <xs:element name="SimpleRate" type="CalculatorSimpleRate"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CTZZones">
+    <xs:sequence>
+      <xs:element name="Zone" type="CTZZone" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RateItemWithDescAmtOrRate">
+    <xs:sequence>
+      <xs:element name="Code" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="3"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="Description" type="xs:string" minOccurs="0"/>
+      <xs:element name="Amount" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="Rate" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="Units" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RateItemWithOperatorAndBreakAndPercent">
+    <xs:complexContent>
+      <xs:extension base="RateItemWithOperatorAndBreak">
+        <xs:sequence>
+          <xs:element name="Percent" type="xs:decimal" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RateItemWithOperatorAndBreak">
+    <xs:sequence>
+      <xs:element name="Operator" type="xs:string"/>
+      <xs:element name="BreakAmount" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="PerUnit" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="FlatAmount" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="Units" type="xs:string" minOccurs="0"/>
+      <xs:element name="BreakMinimum" type="xs:decimal" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RateCalculatorChoice">
+    <xs:choice minOccurs="0">
+      <xs:element name="AGYCalculator" type="AGYCalculator"/>
+      <xs:element name="CMBCalculator" type="CMBCalculator"/>
+      <xs:element name="CSTCalculator" type="CSTCalculator"/>
+      <xs:element name="CTBCalculator" type="CTBCalculator"/>
+      <xs:element name="CTGCalculator" type="CTGCalculator"/>
+      <xs:element name="CTZCalculator" type="CTZCalculator"/>
+      <xs:element name="DINCalculator" type="DINCalculator"/>
+      <xs:element name="EQHCalculator" type="EQHCalculator"/>
+      <xs:element name="EXLCalculator" type="EXLCalculator"/>
+      <xs:element name="FLTCalculator" type="FLTCalculator"/>
+      <xs:element name="FPACalculator" type="FPACalculator"/>
+      <xs:element name="FPUCalculator" type="FPUCalculator"/>
+      <xs:element name="FRTCalculator" type="FRTCalculator"/>
+      <xs:element name="HCCCalculator" type="HCCCalculator"/>
+      <xs:element name="HRCCalculator" type="HRCCalculator"/>
+      <xs:element name="HRTCalculator" type="HRTCalculator"/>
+      <xs:element name="IATCalculator" type="IATCalculator"/>
+      <xs:element name="IXCCalculator" type="IXCCalculator"/>
+      <xs:element name="MINCalculator" type="MINCalculator"/>
+      <xs:element name="MPUCalculator" type="MPUCalculator"/>
+      <xs:element name="NTECalculator" type="NTECalculator"/>
+      <xs:element name="PEBCalculator" type="PEBCalculator"/>
+      <xs:element name="PERCalculator" type="PERCalculator"/>
+      <xs:element name="PSRCalculator" type="PSRCalculator"/>
+      <xs:element name="SMBCalculator" type="SMBCalculator"/>
+      <xs:element name="TMECalculator" type="TMECalculator"/>
+      <xs:element name="UNTCalculator" type="UNTCalculator"/>
+      <xs:element name="VEDCalculator" type="VEDCalculator"/>
+      <xs:element name="WLTCalculator" type="WLTCalculator"/>
+      <xs:element name="WPKCalculator" type="WPKCalculator"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="CalculatorSimpleRate">
+    <xs:sequence>
+      <xs:element name="BaseRate" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="Minimum" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="Maximum" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="PerUnit" type="xs:decimal" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BaseCMBCalculator">
+    <xs:complexContent>
+      <xs:extension base="RateCalculator">
+        <xs:sequence>
+          <xs:element name="RateItems" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="RateItem" type="RateItemWithOperatorAndBreak" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="SimpleRate" type="CalculatorSimpleRate" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,10 @@
+CREATE TABLE [RefAirlineProductCode]
+(
+	[RAR_PK] UNIQUEIDENTIFIER NOT NULL,
+	[RAR_AirlineID] VARCHAR(3) NOT NULL CONSTRAINT [DF_RefAirlineProductCode_RAR_AirlineID] DEFAULT '',
+	[RAR_Code] VARCHAR(20) NOT NULL CONSTRAINT [DF_RefAirlineProductCode_RAR_Code] DEFAULT '',
+	[RAR_Description] NVARCHAR(MAX) NOT NULL CONSTRAINT [DF_RefAirlineProductCode_RAR_Description] DEFAULT '',
+	
+	CONSTRAINT [PK_RefAirlineProductCode] PRIMARY KEY NONCLUSTERED ([RAR_PK] ASC),
+)
+GO

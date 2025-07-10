@@ -1,0 +1,229 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <RootNamespace>Enterprise.Accounting.ElectronicMessaging</RootNamespace>
+    <AssemblyName>Enterprise.Accounting.ElectronicMessaging</AssemblyName>
+    <Configurations>Debug;Release;DEBUGFAST</Configurations>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+    <CWGenerateXmlSerializationAssemblies>true</CWGenerateXmlSerializationAssemblies>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DEBUGFAST|AnyCPU'">
+    <CWGenerateXmlSerializationAssemblies>false</CWGenerateXmlSerializationAssemblies>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.ServiceModel" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="System.DirectoryServices" />
+    <PackageReference Include="Microsoft.Win32.SystemEvents" />
+    <PackageReference Include="System.Windows.Extensions" />
+    <PackageReference Include="System.ServiceModel.Primitives" />
+    <PackageReference Include="System.ServiceModel.Http" />
+    <Reference Include="System.Drawing.Common" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.Common.JSON" />
+    <Reference Include="CargoWise.ComponentModel" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Database.Shared" />
+    <Reference Include="CargoWise.Definitions" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.EventReference" />
+    <Reference Include="CargoWise.FeatureControl.Abstractions" />
+    <Reference Include="CargoWise.Integration" />
+    <Reference Include="CargoWise.IO" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="CargoWise.Schema" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="Enterprise.Accounting.Business" />
+    <Reference Include="Enterprise.Accounting.CountryCompliance.Interfaces" />
+    <Reference Include="Enterprise.Accounting.DataTransfer" />
+    <Reference Include="Enterprise.Accounting.Export" />
+    <Reference Include="Enterprise.Accounting.Integration" />
+    <Reference Include="Enterprise.Accounting.TaxFramework.Business" />
+    <Reference Include="Enterprise.Billing.Integration" />
+    <Reference Include="Enterprise.ComplianceRisk.Integration" />
+    <Reference Include="Enterprise.Customs.Business" />
+    <Reference Include="Enterprise.Customs.Common" />
+    <Reference Include="Enterprise.DocumentEngine" />
+    <Reference Include="Enterprise.DocumentEngineCore" />
+    <Reference Include="Enterprise.DocumentScanning.Business" />
+    <Reference Include="Enterprise.eHubMessaging.Business" />
+    <Reference Include="Enterprise.Environment" />
+    <Reference Include="Enterprise.Freight" />
+    <Reference Include="Enterprise.Freight.Common.Business" />
+    <Reference Include="Enterprise.Freight.Forwarding.Business" />
+    <Reference Include="Enterprise.Freight.Integration" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.MasterData.Common" />
+    <Reference Include="Enterprise.MasterFiles.Business" />
+    <Reference Include="Enterprise.MasterFiles.Integration" />
+    <Reference Include="Enterprise.Messaging.Business" />
+    <Reference Include="Enterprise.Messaging.Integration" />
+    <Reference Include="Enterprise.Registry.Business" />
+    <Reference Include="Enterprise.Security.Core" />
+    <Reference Include="Enterprise.ServiceManager.Shared" />
+    <Reference Include="Enterprise.TransportBookings.Shared" />
+    <Reference Include="Enterprise.UniversalDataBuss.DataObjects" />
+    <Reference Include="Enterprise.UniversalDataBuss.Integration" />
+    <Reference Include="Enterprise.UniversalDataBuss.Management" />
+    <Reference Include="Enterprise.Workflow.Integration" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Enterprise.ZArchitecture.Modules" />
+    <Reference Include="CargoWise.Odyssey.Schema" />
+    <Reference Include="JsonPointer.Net" />
+    <Reference Include="JsonSchema.Net" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="Newtonsoft.Json.Schema" />
+    <Reference Include="Resources" />
+    <Reference Include="System.Collections.Immutable" />
+    <Reference Include="System.Memory" />
+    <Reference Include="System.Text.Json" />
+    <Reference Include="System.Threading.Tasks.Extensions" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+    <Reference Include="ServiceManager.Integration.Abstractions" />
+    <Reference Include="ServiceManager.Integration.ServiceTasks.CW" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Common\GlobalElectronicInvoice\GlobalElectronicInvoice.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GlobalElectronicInvoice.xsd</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Italy\FatturaElettronicaXmlWriter\xmldsig-core-schema.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Italy\FatturaElettronicaXmlWriter\FatturaPA_versione_1.2.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Common\GlobalElectronicInvoice\GlobalElectronicInvoice.xsd">
+      <SubType>Designer</SubType>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>GlobalElectronicInvoice.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TaxCore\EInvoice\TaxCoreEInvoiceSchema.json" />
+    <EmbeddedResource Include="India\EInvoiceResponse\IndiaEInvoiceResponseSchema.json" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\tdCFDI.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Uruguay\ElectronicInvoiceXmlWriter\Xsd\CAE.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Uruguay\ElectronicInvoiceXmlWriter\Xsd\CFEDGI.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Uruguay\ElectronicInvoiceXmlWriter\Xsd\CFEType.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Uruguay\ElectronicInvoiceXmlWriter\Xsd\DGITypes.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Uruguay\ElectronicInvoiceXmlWriter\Xsd\xenc-schema.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Uruguay\ElectronicInvoiceXmlWriter\Xsd\xmldsig-core-schema.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Common\DataValidation\TestData\XMLSchemaForTest.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Italy\FatturaElettronicaXmlWriter\FatturaPA_versione_1.2.1.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Vietnam\EInvoice\SendInvoice\VietnamEInvoiceSchema.json" />
+    <EmbeddedResource Include="Vietnam\EInvoice\CancelInvoice\VietnamEInvoiceCancellationSchema.json" />
+    <EmbeddedResource Include="Vietnam\EInvoice\RequestDocument\VietnamEInvoiceDocumentSchema.json" />
+    <EmbeddedResource Include="Vietnam\EInvoice\AdjustInvoice\VietnamEInvoiceAdjustmentSchema.json" />
+    <EmbeddedResource Include="Vietnam\EInvoice\ApproveInvoice\VietnamEInvoiceApproveSchema.json" />
+    <EmbeddedResource Include="Vietnam\EInvoice\CancelCircularInvoice\VietnamEInvoiceCancellationCircularSchema.json" />
+    <EmbeddedResource Include="KoreaSouth\Xsd\CodeListSchemaModule_1.0.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="KoreaSouth\Xsd\QualifiedDataTypesSchemaModule_1.0.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="KoreaSouth\Xsd\TaxInvoiceSchemaModule_1.0.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="KoreaSouth\Xsd\UNECE_MeasurementUnitCommonCode_5.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="KoreaSouth\Xsd\ISO_ISO3AlphaCurrencyCode_20081112.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="China\EInvoice\SendInvoice\ChinaEInvoiceSchema.json" />
+    <EmbeddedResource Include="Common\DataValidation\TestData\JsonSchemaForTest.json" />
+    <EmbeddedResource Include="China\EInvoice\SearchInvoice\ChinaSearchEInvoiceSchema.json" />
+    <EmbeddedResource Include="KoreaSouth\Xsd\CustomizedSchema_1.0.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\catCFDI.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\cfdv40.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\utilerias.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\aerolineas.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\certificadodedestruccion.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\cfdiregistrofiscal.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\ComercioExterior11.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\consumodecombustibles.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\consumodeCombustibles11.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\detallista.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\divisas.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\donat11.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\ecc11.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\ecc12.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\GastosHidrocarburos10.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\iedu.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\implocal.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\ine11.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\IngresosHidrocarburos.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\leyendasFisc.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\nomina12.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\notariospublicos.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\obrasarteantiguedades.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\pagoenespecie.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\pfic.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\renovacionysustitucionvehiculos.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\servicioparcialconstruccion.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\terceros11.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\TuristaPasajeroExtranjero.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\valesdedespensa.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\vehiculousado.xslt" />
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\ventavehiculos11.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\cadenaoriginal_4_0.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\CartaPorte20.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mexico\CFDiXmlWriter\Transformation\Pagos20.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="KoreaSouth\Xsd\ReusableAggregateBusinessInformationEntitySchemaModule_1.0.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

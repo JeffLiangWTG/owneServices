@@ -1,0 +1,111 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <RootNamespace>Enterprise.MailManager</RootNamespace>
+    <SuppressObsoleteWarnings>SYSLIB0014;SYSLIB0051</SuppressObsoleteWarnings>
+    <CWGenerateXmlSerializationAssemblies>true</CWGenerateXmlSerializationAssemblies>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Remote Batchprocessor|AnyCPU' ">
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Azure.Core" />
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="CargoWise.BrandManager" />
+    <Reference Include="CargoWise.Database.Shared" />
+    <Reference Include="CargoWise.Definitions" />
+    <Reference Include="CargoWise.Integration" />
+    <Reference Include="CargoWise.IO" />
+    <Reference Include="CargoWise.Schema" />
+    <Reference Include="CargoWise.ComponentModel" />
+    <Reference Include="CargoWise.Services.Calendar" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="Enterprise.DocumentEngineCore" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.MasterFiles.Integration" />
+    <Reference Include="Enterprise.Registry.Business" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="Enterprise.ServiceManager.Shared" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="CryptoUtilities" />
+    <Reference Include="Enterprise.Environment" />
+    <Reference Include="Enterprise.MasterData.Common" />
+    <Reference Include="Enterprise.MasterFiles.Business" />
+    <Reference Include="MailKit" />
+    <Reference Include="Microsoft.Graph" />
+    <Reference Include="Microsoft.Graph.Core" />
+    <Reference Include="Microsoft.Identity.Client" />
+    <Reference Include="MimeKit" />
+    <Reference Include="MsgReader" />
+    <Reference Include="OpenMcdf" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="WTG.SecurityRights" />
+    <Reference Include="Enterprise.Security.Core" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Odyssey.Schema" />
+    <Reference Include="Enterprise.ZArchitecture.Modules" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="Resources" />
+    <Reference Include="Rnwood.SmtpServer" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+    <Reference Include="System.Text.Json" />
+    <Reference Update="System.Xml.Linq" />
+    <Reference Include="ServiceManager.Integration.Abstractions">
+      <HintPath>..\..\..\..\..\Bin\ServiceManager.Integration.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceManager.Integration.ServiceTasks.CW">
+      <HintPath>..\..\..\..\..\Bin\ServiceManager.Integration.ServiceTasks.CW.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Business\MailItem\DirectionList.cs">
+      <DependentUpon>DirectionList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Business\MailItem\HelperClasses\AutoMailItemCopySender.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoMailItemCopySender.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Business\MailItem\StatusCodeList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>StatusCodeList.xml</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Business\MailItemTemplate\MailDBItemTemplateResourceStrings.xml" />
+    <None Update="Business\MailItem\DirectionList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>DirectionList.cs</LastGenOutput>
+      <CustomToolNamespace>MailManager</CustomToolNamespace>
+    </None>
+    <None Update="Business\MailItem\HelperClasses\AutoMailItemCopySender.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoMailItemCopySender.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.MailManager.Business</CustomToolNamespace>
+    </None>
+    <None Update="Business\MailItem\StatusCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>StatusCodeList.cs</LastGenOutput>
+      <CustomToolNamespace>MailManager</CustomToolNamespace>
+    </None>
+    <EmbeddedResource Include="Business\MailAttachment\MailDBAttachmentsResourceStrings.xml" />
+    <EmbeddedResource Include="Business\MailRecipient\MailDBRecipientsResourceStrings.xml" />
+    <EmbeddedResource Include="Business\MailItem\MailDBItemsResourceStrings.xml" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\MailManager.Integration\MailManager.Integration.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Design" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+</Project>

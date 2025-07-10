@@ -1,0 +1,17 @@
+CREATE TABLE RefCusNomenclatureLanguage(
+	[ZX8_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefCusNomenclatureLanguage_ZX8_PK] DEFAULT(NEWID()),
+	[ZX8_ZX6_NKLanguage] VARCHAR(3) NOT NULL,
+	[ZX8_ZZ5_NomenclatureGroup] UNIQUEIDENTIFIER NOT NULL,
+	[ZX8_Description] NVARCHAR(MAX) NOT NULL CONSTRAINT [DF_RefCusNomenclatureLanguage_ZX8_Description] DEFAULT(''),
+	[ZX8_SysStartTime] DATETIME2 GENERATED ALWAYS AS ROW START NOT NULL CONSTRAINT [DF_ZX8_SysStartTime] DEFAULT CONVERT(DATETIME2, '1900-01-01 0:0:0.0000000'),
+	[ZX8_SysEndTime] DATETIME2 GENERATED ALWAYS AS ROW END NOT NULL CONSTRAINT [DF_ZX8_SysEndTime] DEFAULT CONVERT(DATETIME2, '9999-12-31 23:59:59.9999999'),
+	PERIOD FOR SYSTEM_TIME ([ZX8_SysStartTime], [ZX8_SysEndTime]),
+	CONSTRAINT PK_RefCusNomenclatureLanguage PRIMARY KEY CLUSTERED (ZX8_PK ASC),
+	CONSTRAINT FK_RefCusNomenclatureLanguage_RefLanguageType FOREIGN KEY(ZX8_ZX6_NKLanguage) REFERENCES RefLanguageType (ZX6_Language),
+	CONSTRAINT FK_RefCusNomenclatureLanguage_RefCusNomenclatureGroup FOREIGN KEY(ZX8_ZZ5_NomenclatureGroup) REFERENCES RefCusNomenclatureGroup (ZZ5_PK)
+)
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.RefCusNomenclatureLanguageHistory))
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_RefCusNomenclatureLanguage_ZX8_ZX6_NKLanguage_ZX8_ZZ5_NomenclatureGroup ON RefCusNomenclatureLanguage (ZX8_ZX6_NKLanguage, ZX8_ZZ5_NomenclatureGroup)
+GO
+ALTER TABLE RefCusNomenclatureLanguage SET (LOCK_ESCALATION = DISABLE);

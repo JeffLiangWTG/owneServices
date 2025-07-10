@@ -1,0 +1,35 @@
+meta {
+  name: NamedAccounts contains empty objects
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.NamedAccounts = [{}];
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Type is Mandatory.", function() {
+    expect(res.body.ModelState['NamedAccounts[0].Type'][0]).to.equal("Type is Mandatory.");
+  });
+  
+  test("Should return: Value is Mandatory.", function() {
+    expect(res.body.ModelState['NamedAccounts[0].Value'][0]).to.equal("Value is Mandatory.");
+  });
+  
+  
+}

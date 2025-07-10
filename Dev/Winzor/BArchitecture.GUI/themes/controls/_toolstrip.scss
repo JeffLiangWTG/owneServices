@@ -1,0 +1,174 @@
+@import "variables";
+
+.toolstrip-item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	&:not(.disabled):hover .toolstrip-item__visual-overlay {
+		background-color: $toolstrip-button-hover-background-color;
+		background-clip: content-box;
+		border: 0.5px solid $toolstrip-button-hover-border-color;
+	}
+
+	&.disabled img {
+		opacity: 0.3;
+	}
+}
+
+.toolstrip-item__visual-overlay {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+}
+
+@mixin toolstrip-item__button {
+	position: relative;
+	border: 0.5px solid transparent;
+	border-radius: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding-left: 0;
+	padding-right: 0;
+
+	&:focus {
+		outline: none;
+	}
+
+	&--with-image-and-text {
+		img {
+			margin-right: 3px;
+		}
+	}
+}
+
+.toolstrip-item--button {
+	.button__button {
+		@include toolstrip-item__button;
+		padding: 1px;
+	}
+
+	&:not(.disabled) .button__button:active .button__button__image {
+		margin-left: 1px;
+	}
+
+	&.disabled .button__button {
+		color: $microsoft-color-Gray;
+	}
+
+	&:is([checked]) .toolstrip-item__visual-overlay {
+		background-color: $toolstrip-button-active-background-color;
+		border: 1px solid $toolstrip-button-active-border-color;
+	}
+}
+
+.toolstrip-item--splitbutton {
+	.splitbutton__button-wrapper,
+	.splitbutton__dropdownbutton-wrapper {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		height: 100%;
+	}
+
+	.splitbutton__button-wrapper {
+		flex-grow: 1;
+	}
+
+	.splitbutton__dropdownbutton-wrapper {
+		padding-left: 1px;
+	}
+
+	&:not(.disabled):hover
+		.splitbutton__dropdownbutton-wrapper
+		.toolstrip-item__visual-overlay {
+		border-left: none;
+	}
+
+	.splitbutton__button,
+	.splitbutton__dropdownbutton {
+		@include toolstrip-item__button;
+		padding: 0px;
+		background-color: inherit !important;
+	}
+
+	.splitbutton__dropdownbutton {
+		font-family: "Material Symbols Outlined" !important;
+		width: var(--splitbutton-dropdownbutton-width);
+		height: 100%;
+	}
+}
+
+.toolstrip-item--dropdownbutton {
+	.dropdownbutton__button {
+		@include toolstrip-item__button;
+		padding: 0px;
+
+		&__arrow {
+			font-family: "Material Symbols Outlined" !important;
+			width: var(--splitbutton-dropdownbutton-width);
+			height: 100%;
+		}
+	}
+}
+
+.dropdownbutton__button__text {
+	white-space: nowrap;
+}
+
+.toolstrip__separator {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.toolstrip__separator > div {
+	width: 1px;
+	height: calc(100% - 10px);
+	border-left: 0.5px #abadb1 solid;
+	border-right: 0.5px white solid;
+}
+
+.splitbutton__dropdown {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	display: flex;
+	flex-direction: column;
+	width: fit-content;
+	border: outset 2px;
+
+	&__image {
+		margin-left: 1px;
+	}
+}
+
+.toolstrip__menuitem {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 0;
+	white-space: nowrap;
+	height: var(--toolstrip-menuitem-height);
+	padding: 0 var(--toolstrip-menuitem-height);
+
+	&:not([disabled]):hover {
+		background-color: $toolstripmenuitem-hover-background-color !important;
+		color: $toolstripmenuitem-hover-text-color;
+	}
+
+	&:focus {
+		outline: none;
+	}
+}
+
+.toolstrip__menuitem-text {
+	position: absolute;
+}
+
+.toolstrip__menuitem-image-container {
+	position: absolute;
+}

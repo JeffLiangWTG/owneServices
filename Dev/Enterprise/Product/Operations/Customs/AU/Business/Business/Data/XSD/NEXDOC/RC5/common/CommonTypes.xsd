@@ -1,0 +1,882 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://agriculture.gov.au/nexdoc/common/CommonTypes_1.0" elementFormDefault="qualified" version="1.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ct="http://agriculture.gov.au/nexdoc/common/CommonTypes_1.0" xmlns:et="http://agriculture.gov.au/nexdoc/common/EnumTypes_1.0">
+
+	<xsd:import namespace="http://agriculture.gov.au/nexdoc/common/EnumTypes_1.0" schemaLocation="EnumTypes.xsd"/>
+
+	<xsd:complexType name="ProposedUserType">
+		<xsd:sequence>
+			<xsd:element name="proposedUserId" type="ct:UserIdType"/>
+			<xsd:element name="forward" type="ct:UserIdType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="IdentificationType">
+		<xsd:annotation>
+			<xsd:documentation>This type contains the Rex number which is used to uniquely relate to a created Rex
+				record.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="rexNumber" type="ct:RexNumberType" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ValidationsNoticeType">
+		<xsd:sequence>
+			<xsd:element name="noticeId" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="noticeType" type="et:NoticeType"/>
+			<xsd:element name="noticeMessage" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ConsigneeType">
+		<xsd:annotation>
+			<xsd:documentation>Contains the name and address elements relating to the consignee information for a Rex
+				record or
+				related certificate.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="consigneeName" type="ct:RestrictedAlphaNumeric70Type" minOccurs="0"/>
+			<xsd:element name="consigneeAddress" type="ct:AddressType" minOccurs="0"/>
+			<xsd:element name="consigneePhoneNumber" type="ct:AlphaNumeric20Type" minOccurs="0"/>
+			<xsd:element name="consigneeRepresentative" type="ct:AlphaNumeric254Type" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="AddressType">
+		<xsd:annotation>
+			<xsd:documentation>This type contains the related elements which constitute an address.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element minOccurs="0" name="streetAddress" type="ct:StreetAddressType"/>
+			<xsd:element minOccurs="0" name="city" type="ct:RestrictedAlphaNumeric35TokenType"/>
+			<xsd:element minOccurs="0" name="state" type="ct:StateType"/>
+			<xsd:element minOccurs="0" name="country" type="ct:CountryType"/>
+			<xsd:element minOccurs="0" name="postalCode" type="ct:RestrictedAlphaNumeric10TokenType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="StreetAddressType">
+		<xsd:sequence maxOccurs="2" minOccurs="0">
+			<xsd:element name="streetLine" type="ct:RestrictedAlphaNumeric35TokenType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ExporterStreetAddressType">
+		<xsd:sequence maxOccurs="3" minOccurs="0">
+			<xsd:element name="streetLine" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CustomsAgentType">
+		<xsd:simpleContent>
+			<xsd:extension base="et:YesNoType"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="WeightType">
+		<xsd:simpleContent>
+			<xsd:extension base="ct:WeightValueType">
+				<xsd:attribute name="unit" type="ct:WeightUnitType"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="PackageUnitAmountType">
+		<xsd:simpleContent>
+			<xsd:extension base="ct:PackageUnitValueType">
+				<xsd:attribute name="unit" type="ct:UnitOfMeasurementType"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="CurrencyType">
+		<xsd:simpleContent>
+			<xsd:extension base="ct:CurrencyValueType">
+				<xsd:attribute name="unit" type="ct:CurrencyUnitType"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="TelephoneNumberType">
+		<xsd:simpleContent>
+			<xsd:extension base="ct:AlphaNumeric20Type">
+				<xsd:attribute name="type" type="et:TelephoneType"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="TemperatureType">
+		<xsd:simpleContent>
+			<xsd:extension base="ct:TemperatureValueType">
+				<xsd:attribute name="unit" type="ct:AlphaNumeric3Type"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="CountryGroupSpecies">
+		<xsd:sequence>
+			<xsd:element name="speciesCode" type="xsd:string"/>
+			<xsd:element name="countryGroupCode" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ProductTypeCodeSetItem">
+		<xsd:complexContent>
+			<xsd:extension base="ct:BaseCodeSetItem">
+				<xsd:sequence>
+					<xsd:element name="type" type="xsd:token"/>
+					<xsd:element name="description" type="xsd:string"/>
+					<xsd:element name="scientificName" type="xsd:string"/>
+					<xsd:element name="speciesGroup" type="xsd:string"/>
+					<xsd:element name="productGroup" type="xsd:string"/>
+					<xsd:element name="countryGroupSpeciesSet">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="countryGroupSpecies" type="ct:CountryGroupSpecies" maxOccurs="unbounded"/>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="epn" type="xsd:boolean"/>
+					<xsd:element name="halalRequired" type="xsd:boolean"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+
+	<xsd:complexType name="ValidationNoticesType">
+		<xsd:sequence>
+			<xsd:element name="notice" type="ct:ValidationsNoticeType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="GenericCodeSetItem">
+		<xsd:complexContent>
+			<xsd:extension base="ct:BaseCodeSetItem">
+				<xsd:sequence>
+					<xsd:element name="code" type="xsd:token"/>
+					<xsd:element name="name" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="BaseCodeSetItem">
+		<xsd:sequence>
+			<xsd:element name="startDate" type="xsd:date"/>
+			<xsd:element name="endDate" type="xsd:date"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="MessageAcknowledgements">
+		<xsd:choice>
+			<xsd:sequence maxOccurs="1">
+				<xsd:element name="removeExistingSet" type="xsd:boolean" default="false"/>
+			</xsd:sequence>
+			<xsd:sequence>
+				<xsd:element name="messageId" type="ct:MessageId" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:choice>
+	</xsd:complexType>
+
+	<!-- Simple Types -->
+	<xsd:simpleType name="PackageType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_PACKAGE_TYPE code table.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+        
+       <!--For eggs it is a 3 digit value, keeping length 10 to accommodate values for other commodities that may be more than 3 chars-->
+	<xsd:simpleType name="FarmCodeType">
+		<xsd:annotation>
+			<xsd:documentation>User is required to enter 3 digit value which gets prefixed by 'DB FARM CODE AU CEW' when saved in database.
+				for e.g. if 457 is entered by user 'DB FARM CODE AU CEW457' will be saved and appear on certificate.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="10"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<!-- For eggs it is either Free Range or Non-free Range, keeping length 50 to accommodate bigger string values for other commodities-->
+	<xsd:simpleType name="FarmType">
+		<xsd:annotation>
+			<xsd:documentation>For eggs, the value can be either Free range or Non-free range.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="50"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="ProductType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_PRODUCT_TYPE code table.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="ProductCategoryType">
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="6"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="CutType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_CUT_TYPE code table.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="5"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="SuppCodeType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_SUPPLEMENTARY_CODE code table.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="WeightUnitType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_UNIT_OF_MEASUREMENT code table.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="UnitOfMeasurementType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_UNIT_OF_MEASUREMENT code table.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="CurrencyUnitType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_CURRENCY code table.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="ExporterDeclarationType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="700"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="ExportPermitNumberType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="9"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="ExporterNumberType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="10"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="PortType">
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="5"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="CityType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="50"/>
+			<xsd:pattern value="[a-zA-Z0-9'/\(\)\-\.,#!&amp;%: ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="Priority">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:totalDigits value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="IdentifierType">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:totalDigits value="7"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="RexNumberType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="13"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="CertificateNumberType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="12"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="SealNumberType">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="15"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="ContainerNumberType">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="15"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="ImportPermitNumberType">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="35"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="TreatmentInformationType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="280"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="RestrictedAlphaNumericType">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[a-zA-Z0-9'/\(\)\-\.,#!&amp;%:$%^&amp;&lt;>\[\]_|\*@&quot;\+\{\};\?=~\n ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AlphaNumeric1Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	
+	<xsd:simpleType name="AlphaNumeric2Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AlphaNumeric8Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="8"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AlphaNumeric10Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="10"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RestrictedAlphaNumeric10Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="10"/>
+			<xsd:pattern value="[a-zA-Z0-9'/\(\)\-\.,#!&amp;%:$%^&amp;&lt;>\[\]_|\*@&quot;\+\{\};\?=~ ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RestrictedAlphaNumeric10TokenType">
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="10"/>
+			<xsd:pattern value="[a-zA-Z0-9'/\(\)\-\.,#!&amp;%:$%^&amp;&lt;>\[\]_|\*@&quot;\+\{\};\?=~ ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AlphaNumeric254Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="254"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RestrictedAlphaNumeric254Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="254"/>
+			<xsd:pattern value="[a-zA-Z0-9'/\(\)\-\.,#!&amp;%:$%^&amp;&lt;>\[\]_|\*@&quot;\+\{\};\?=~\n ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AlphaNumeric35Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="35"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RestrictedAlphaNumeric35Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="35"/>
+			<xsd:pattern value="[a-zA-Z0-9'/\(\)\-\.,#!&amp;%:$%^&amp;&lt;>\[\]_|\*@&quot;\+\{\};\?=~\n ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RestrictedEnglishOnlyAlphaNumeric35Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="35"/>
+			<xsd:pattern value="[a-zA-Z0-9'\(\)\-\., ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ecm-6240 New type to add ampersand for SEW consignee name. -->
+	<xsd:simpleType name="RestrictedEnglishOnlyAlphaNumericAmpersand35Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="35"/>
+			<xsd:pattern value="[a-zA-Z0-9'\(\)\-\., &amp;]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="RestrictedAlphaNumeric35TokenType">
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="35"/>
+			<xsd:pattern value="[a-zA-Z0-9'/\(\)\-\.,#!&amp;%:$%^&amp;&lt;>\[\]_|\*@&quot;\+\{\};\?=~ ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AlphaNumeric7Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="7"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AlphaNumeric9Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="9"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AlphaNumeric17Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="17"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AlphaNumeric20Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="20"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RestrictedEnglishOnlyAlphaNumeric20Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="20"/>
+			<xsd:pattern value="[a-zA-Z0-9'\(\)\-\., ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric25Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="25"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric15Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="15"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric6Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="6"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric5Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="5"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric3Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric30Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="30"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric40Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="40"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RestrictedEnglishOnlyAlphaNumeric40Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="40"/>
+			<xsd:pattern value="[a-zA-Z0-9'\(\)\-\., ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AlphaNumeric50Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="50"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AlphaNumeric70Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="70"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RestrictedAlphaNumeric70Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="70"/>
+			<xsd:pattern value="^$|[a-zA-Z0-9'/\(\)\-\.,#!&amp;%:$%^&amp;&lt;>\[\]_|\*@&quot;\+\{\};\?=~\n ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="AlphaNumeric80Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="80"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric100Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="100"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric200Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="200"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric210Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="210"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric255Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="255"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric350Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="350"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumeric500Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="500"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RestrictedEnglishOnlyAlphaNumeric500Type">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="500"/>
+			<xsd:pattern value="[a-zA-Z0-9'\(\)\-\., ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Number2Digits">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:totalDigits value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Number4Digits">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:totalDigits value="4"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Number5Digits">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:totalDigits value="5"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Number6Digits">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:totalDigits value="6"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+        <xsd:simpleType name="Number6DigitsIncluZero">
+		<xsd:restriction base="xsd:nonNegativeInteger">
+			<xsd:totalDigits value="6"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Number7Digits">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:totalDigits value="7"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Number10Digits">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:totalDigits value="10"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="WeightValueType">
+		<xsd:restriction base="xsd:decimal">
+			<xsd:minExclusive value="0"/>
+			<xsd:maxInclusive value="9999999.999"/>
+			<xsd:totalDigits value="10"/>
+			<xsd:fractionDigits value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="TemperatureValueType">
+		<xsd:restriction base="xsd:decimal">
+			<xsd:totalDigits value="5"/>
+			<xsd:fractionDigits value="2"/>
+			<xsd:minInclusive value="-999.99"/>
+			<xsd:maxInclusive value="999.99"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PackageUnitValueType">
+		<xsd:restriction base="xsd:decimal">
+			<xsd:minExclusive value="0"/>
+			<xsd:maxInclusive value="9999.999"/>
+			<xsd:totalDigits value="7"/>
+			<xsd:fractionDigits value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CurrencyValueType">
+		<xsd:restriction base="xsd:decimal">
+			<xsd:minExclusive value="0"/>
+			<xsd:maxInclusive value="9999999999999.99"/>
+			<xsd:totalDigits value="15"/>
+			<xsd:fractionDigits value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RegionCodeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PartyExternalIdType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="20"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PartyInternalIdType">
+		<xsd:restriction base="xsd:long">
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="UserIdType">
+		<xsd:restriction base="xsd:int">
+			<xsd:minInclusive value="0"/>
+			<xsd:totalDigits value="8"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="LegacyUserIdType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="12"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="EstablishmentNumberType">
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="7"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="TreatmentCodeType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_TREATMENT code table.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="6"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CountryType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_COUNTRY code table.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ShippingMarksType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="20"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CertificateTemplateType">
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="11"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CertificateEndorsementType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="11"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CommodityType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_COMMODITY_TYPE code table.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="StateType">
+		<xsd:annotation>
+			<xsd:documentation>The state/province of an address.  For overseas state/provinces use the full description - not the code</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="20"/>
+			<xsd:pattern value="[a-zA-Z0-9'/\(\)\-\.,#!&amp;%:$%^&amp;&lt;>\[\]_|\*@&quot;\+\{\};\?=~ ]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    <xsd:simpleType name="AustralianStateType">
+		<xsd:annotation>
+			<xsd:documentation>Corresponds to a state code in the ECM_STATE codeset.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+    <!-- Added for ecm-6218 -->
+    <xsd:complexType name="ProductSourceStateType">
+        <xsd:annotation>
+            <xsd:documentation>AustralianStateType extended to include the code for "foreign".
+                Corresponds to a state code in the ECM_PRODUCT_SOURCE_STATE codeset.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:simpleContent>
+            <xsd:extension base="ct:AustralianStateType"/>
+        </xsd:simpleContent>
+    </xsd:complexType>
+	<xsd:simpleType name="ProcessType">
+		<xsd:annotation>
+			<xsd:documentation>A two alpha character code identifying a process type for the enclosing production
+				process. For
+				example inspection or packaging.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="ProcessingIndicatorType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_ESTABLISHMENT_INDICATOR code table.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="MessageId">
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="PreservationType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_PRESERVATION_TYPE code table.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+
+
+	<xsd:simpleType name="AheccCodeType">
+		<xsd:annotation>
+			<xsd:documentation>Code which correlates to the Australian Harmonized Export Commodity Classification.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="12"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="CNCodeType">
+		<xsd:annotation>
+			<xsd:documentation>The Combined Nomenclature (CN) is the EU's eight-digit coding system.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="8"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="TokenType">
+		<xsd:annotation>
+			<xsd:documentation>A unique token presented as a UUID.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="40"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+
+	<xsd:simpleType name="EmailAddressType">
+		<xsd:annotation>
+			<xsd:documentation>email address with a max length of 250 chars.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[^@]+@[^\.]+\..+"/>
+			<xsd:maxLength value="250"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="NatureOfCommodityType">
+		<xsd:annotation>
+			<xsd:documentation>Value is restricted to code values from the ECM_NATURE_OF_COMMODITY code table.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="15"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+
+	<!-- ################# -->
+	<!-- SOAP Fault types -->
+	<!-- ################# -->
+
+	<!-- SOAP Fault -->
+	<xsd:complexType name="NexdocSoapFaultItem">
+		<xsd:sequence>
+			<xsd:element name="FaultCode" type="xsd:string" maxOccurs="1" minOccurs="0"/>
+			<xsd:element name="FaultReason" type="xsd:string" maxOccurs="1" minOccurs="0" nillable="false"/>
+			<xsd:element name="FaultMessage" type="xsd:string" maxOccurs="1" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+	<xsd:element name="NexdocSoapFault">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="FaultTimestamp" type="xsd:dateTime" maxOccurs="1" minOccurs="0" nillable="false"/>
+				<xsd:element name="NexdocSoapFaultItem" type="ct:NexdocSoapFaultItem" maxOccurs="unbounded" minOccurs="0" nillable="false"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="AttachmentsType">
+		<xsd:sequence>
+			<xsd:element name="attachment" type="ct:AttachmentType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+	<xsd:complexType name="AttachmentType">
+
+		<xsd:sequence>
+			<xsd:element name="name" type="ct:AlphaNumeric200Type"/>
+			<xsd:choice>
+				<xsd:sequence maxOccurs="1" minOccurs="0">
+					<xsd:element name="removeEntry" type="xsd:boolean" default="false" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:sequence maxOccurs="1" minOccurs="0">
+					<xsd:element name="attachmentType" type="ct:AlphaNumeric6Type" minOccurs="0"/>
+					<xsd:element name="description" type="ct:AlphaNumeric200Type"/>
+					<xsd:element name="mimeType" type="ct:AlphaNumeric100Type"/>
+					<xsd:element name="data" type="xsd:base64Binary" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+
+</xsd:schema>

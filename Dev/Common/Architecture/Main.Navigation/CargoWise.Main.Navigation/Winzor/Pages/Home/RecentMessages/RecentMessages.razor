@@ -1,0 +1,52 @@
+@using CargoWiseNext.Blazor.Components
+@using Microsoft.AspNetCore.Components.Web
+@using CargoWise.Main.Navigation
+@using CargoWise.Main.Navigation.ViewModels
+@namespace CargoWise.Main.Navigation.Pages
+
+@inherits CwnComponentBase
+
+<CwnCard Class="@Classname">
+    <CwnCardHeader>
+        <CardHeaderContent>
+            <span>
+                @Service?.Title
+            </span>
+            <CwnIconButton
+                Icon="@Icon.Refresh"
+                OnSingleClick="async () => await RefreshAsync()"
+                title="@Service?.RefreshLabel"
+                Variant="@(Variant.Text)"
+                Color="@(Color.Default)"
+                Class="cwn-recent-messages__refresh-btn" />
+        </CardHeaderContent>
+    </CwnCardHeader>
+    <CwnCardContent style="width: 100%;">
+        <ul class="cwn-recent-messages__list">
+            @if (HasRecentMessages)
+            {
+                @foreach (var msg in Messages)
+                {
+                    <li class="cwn-recent-messages__item" @onclick="async () => await OpenJobAsync(msg)">
+                        <div class="cwn-recent-messages__header">
+                            <div class="cwn-recent-messages__senderblock">
+                                <span class="cwn-recent-messages__sender">@msg.SenderName</span>
+                                <span class="cwn-recent-messages__sendercompany">@msg.SenderCompanyName</span>
+                            </div>
+                            <div class="cwn-recent-messages__jobblock">
+                                <div class="cwn-recent-messages__link">@msg.JobCode</div>
+                                <span class="cwn-recent-messages__timestamp">@msg.PostedTimeAgo</span>
+                            </div>
+                        </div>
+                        <span class="cwn-recent-messages__text">@msg.Body</span>
+                    </li>
+                    <hr class="cwn-recent-messages__seperator">
+                }
+            }
+            else
+            {
+                <div class="cwn-recent-messages__empty">@Service?.NoRecentMessagesLabel</div>
+            }
+        </ul>
+    </CwnCardContent>
+</CwnCard>

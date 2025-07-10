@@ -1,0 +1,25 @@
+meta {
+  name: Call endpoint using All Carriers
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetRateQueryWithMandatoryFieldsForProvidedVariables();
+   query.Carriers = RatesAPIsHelper.GetAllCarriers();
+   
+   
+   req.setBody(query);
+}
+
+tests {
+  
+}

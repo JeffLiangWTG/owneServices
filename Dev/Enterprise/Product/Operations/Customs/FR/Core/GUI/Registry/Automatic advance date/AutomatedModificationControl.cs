@@ -1,0 +1,26 @@
+using CargoWise.Windows.UI;
+using Enterprise.Registry.GUI;
+
+namespace Enterprise.Customs.FR.GUI.Registry
+{
+	public partial class AutomatedModificationControl : RegistryZUserControl
+	{
+		public AutomatedModificationControl()
+		{
+			InitializeComponent();
+		}
+		protected override void SetControlOrBusinessEntityReadOnly(bool readOnly)
+		{
+			base.SetControlOrBusinessEntityReadOnly(readOnly);
+			zAutomatedModificationGroupbox.SetReadOnly(readOnly);
+		}
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing && (components != null))
+			{
+				components.Dispose();
+			}
+			base.Dispose(disposing);
+		}
+	}
+}

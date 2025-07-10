@@ -1,0 +1,71 @@
+// Copyright 2019 The gRPC Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
+package ServiceManagerProto;
+
+service ServiceRunner {
+	rpc RunServiceTaskAsync (stream ServiceTaskRunRequest) returns (stream ServiceTaskRunResponse);
+}
+
+// The request message containing the user's name.
+message ServiceTaskRunRequest {
+	RequestCommandType Command = 1;
+	string AssemblyName = 2;
+	string Code = 3;
+	optional string GuidId = 4;
+	optional string ConfigString = 5;
+	optional google.protobuf.Timestamp ExpectedNextRunTime = 6;
+	optional google.protobuf.Timestamp NextRunTime = 7;
+}
+
+message ServiceTaskRunResponse {
+	Status Status = 1;
+	optional ResponseCommandType Command = 2;
+	optional string TaskCode = 3;
+	optional string TaskId = 4;
+	optional google.protobuf.Timestamp NextRunTime = 5;
+	optional FailureReasonType FailureReason = 6;
+}
+
+enum FailureReasonType {
+	RunnerCouldNotObtainLockForSingleInstanceTaskDueToServiceTaskLock = 0;
+	RunnerCouldNotObtainLockForSingleInstanceTaskDueToMutualGroupLock = 1;
+	RunnerWasCancelled = 2;
+	RunnerCouldNotReleaseSqlLock = 3;
+}
+
+enum RequestCommandType {
+	Initialize = 0 [deprecated=true];
+	DirectRun = 1;
+	ScheduledRun = 2;
+	Stop = 3;
+}
+
+enum ResponseCommandType {
+	Idle = 0;
+	Reenqueue = 1;
+	ScheduleNextRunTime = 2;
+	RecordServiceTaskError = 3;
+}
+
+enum Status
+{
+	Queued = 0; // The request has been recieved & has been added to the queue for processing. This will signify that the service task host can move on to the next bit.
+	ProcessStarted = 1; // The service task has been dequeued & is starting to run
+	ProcessFinished = 2; // The Service task has successfully ran to completion
+	RunnerExiting = 3; // The Runner is exiting and notifying the host to close the stream
+}

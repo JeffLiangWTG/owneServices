@@ -1,0 +1,4 @@
+CREATE VIEW RefMessagingBussPackageInfoTableView_V1 AS
+SELECT ZMP_PK,
+ZMP_PackageName
+FROM RefMessagingBussPackageInfo

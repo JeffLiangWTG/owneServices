@@ -1,0 +1,309 @@
+@namespace CargoWise.GUI.TileBar
+@using WinzorFramework;
+@using WinzorFramework.Extensions;
+@using CargoWise.Main.Navigation
+@using System.Windows.Forms
+@using CargoWise.GUI.TileBar.JSInterop
+@using CargoWise.Blazor.Controls
+@using WebMouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs
+@inherits System.Windows.Forms.UserControl
+
+@inject NavigationManager navigationManager
+
+@if (DataContext is not null)
+{
+    <div class="tilebarcontrol" style="@TileBarControlStyleString">
+        <div class="tilebarcontrol__tabnavigation">
+            @foreach (var category in DataContext.Categories.ToList())
+            {
+                <button class="tilebarcontrol__tabnavigationitem @(category == DataContext.SelectedCategory ? "tilebarcontrol__tabnavigationitem--selected" : string.Empty)" @onclick="async () => await InvokeWinzorDispatcherAsync(() => DataContext.SelectedCategory = category)" @onclick:stopPropagation>
+                    @category.MultilingualText
+                </button>
+            }
+        </div>
+        @if (DataContext.SelectedCategory is not null)
+        {
+            TabContent();
+        }
+    </div>
+
+    void TabContent()
+    {
+        <div class="tilebarcontrol__tabcontent">
+            @if (DataContext.SelectedCategory.ShowSearch)
+            {
+                <div class="tilebarcontrol__search @(DataContext.IsInSearchMode ? "tilebarcontrol__search--active" : string.Empty)">
+                    <div class="tilebarcontrol__searchbar">
+                        @if (DataContext.IsInSearchMode)
+                        {
+                            <input class="tilebarcontrol__searchinput" @bind="inputSearchValue" @bind:event="oninput" @bind:after="OnSearchInputAsync" @onkeydown="OnSearchKeyDownAsync" @ref=SearchInput @oncontextmenu="TileBarInputContextMenu" @oncontextmenu:stopPropagation @oncontextmenu:preventDefault />
+                        }
+                        <button class="tilebarcontrol__searchbutton" @onclick="OnSearchButtonClickedAsync" @onclick:stopPropagation title="@DataContext.SearchHint">
+                            <img class="tilebarcontrol__searchbuttonimage" src="_content/CargoWise.GUI.TileBar/images/@(DataContext.IsInSearchMode ? "close" : "search").png">
+                        </button>
+                    </div>
+                    @if (DataContext.IsInSearchMode)
+                    {
+                        <div class="tilebarcontrol__searchhint">@DataContext.SearchHeaderHint</div>
+                    }
+                </div>
+            }
+            @if (!DataContext.IsInSearchMode)
+            {
+                @foreach (var menuSection in DataContext.SelectedCategory.Buttons.OfType<MenuSection>().ToList())
+                {
+                    switch (menuSection.Type)
+                    {
+                        case SectionType.RecentItem:
+                        case SectionType.RecentModule:
+                            {
+                                <div class="tilebarcontrol__section">
+                                    <Button CssClass="tilebarcontrol__sectionheader" Text="@menuSection.MultilingualText" OnClick="async args => await OnSectionHeaderClickedAsync(args, menuSection)" />
+                                    @if (menuSection.Items.Count > 0)
+                                    {
+                                        <ul class="tilebarcontrol__sectionitems">
+                                            @foreach (var item in menuSection.Items.ToList())
+                                            {
+                                                var favoriteCssClasses = "tilebarcontrol__sectionitemfavourite button--star-inactive";
+                                                var text = item.AddToFavoriteTooltip;
+                                                <li class="tilebarcontrol__sectionitem">
+                                                    <Button CssClass="@favoriteCssClasses" Description="@text" OnClick="async args => await OnFavoriteClickAsync(args, item)" />
+                                                    <Button CssClass="tilebarcontrol__sectionitemlink" Description="@item.MultilingualText" Text="@item.MultilingualText" OnClick="async args => await OnLinkClickAsync(args, item, true)" OnFocusIn="async _ => await OnFocusInAsync(new WinzorFocusInEventArgs())" />
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                                break;
+                            }
+                        case SectionType.Favorite:
+                            {
+                                <div class="tilebarcontrol__section tilebarcontrol__sectionfavorite">
+                                    <Button CssClass="tilebarcontrol__sectionheader" Text="@menuSection.MultilingualText" OnClick="async args => await OnSectionHeaderClickedAsync(args, menuSection)" />
+                                    @if (menuSection.Items.Count > 0)
+                                    {
+                                        <ul class="tilebarcontrol__sectionitems">
+                                            <li class="tilebarcontrol__sectionreorderingdivider tilebarcontrol__sectionreorderingdivider--hidden">
+                                                <img src="_content/CargoWise.GUI.TileBar/images/reordering-divider.png" />
+                                            </li>
+                                            @foreach (var item in menuSection.Items.ToList())
+                                            {
+                                                var favoriteCssClasses = "tilebarcontrol__sectionitemfavourite button--star-active";
+                                                var text = item.RemoveFromFavoritesTooltip;
+                                                <li class="tilebarcontrol__sectionitem" draggable="true" @ondragstart="async args => await DragStartAsync(args, menuSection, item)" @ondragstart:stopPropagation @onwinzordragend="async args => await DragEndAsync(args, menuSection)" @onwinzordragend:stopPropagation @ondragenter="async args => await DragEnterAsync(args, item)" @ondragenter:stopPropagation @ondragover="DragOverAsync" @ondragover:stopPropagation>
+                                                    <Button CssClass="@favoriteCssClasses" Description="@text" OnClick="async args => await OnFavoriteClickAsync(args, item)" />
+                                                    <Button CssClass="tilebarcontrol__sectionitemlink" Description="@item.MultilingualText" Text="@item.MultilingualText" OnClick="async args => await OnLinkClickAsync(args, item, true)" OnFocusIn="async _ => await OnFocusInAsync(new WinzorFocusInEventArgs())" />
+                                                    <div class="tilebarcontrol__sectionitemindex" title="@item.MultilingualText">@item.Index</div>
+                                                </li>
+                                                <li class="tilebarcontrol__sectionreorderingdivider tilebarcontrol__sectionreorderingdivider--hidden">
+                                                    <img src="_content/CargoWise.GUI.TileBar/images/reordering-divider.png" />
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                                break;
+                            }
+                        case SectionType.Subcategory:
+                            {
+                                <button class="tilebarcontrol__subcategory @(menuSection.IsSelected ? "tilebarcontrol__subcategory--selected" : string.Empty)" @onclick="async () => await MenuSectionClick(menuSection)" @onclick:stopPropagation>
+                                    <div class="tilebarcontrol__subcategoryletter">@menuSection.Letter</div>
+                                    <div class="tilebarcontrol__subcategorytext">@menuSection.MultilingualText</div>
+                                </button>
+                                @if (menuSection.IsSelected)
+                                {
+                                    var subSections = menuSection.Subsections.OfType<MenuSection>();
+                                    var includeHeaders = subSections.Count() > 1;
+                                    <div class="tilebarcontrol__subcategoryitems">
+                                        @foreach (var itemGroup in subSections.ToList())
+                                        {
+                                            <div class="tilebarcontrol__subcategorysection">
+                                                @if (includeHeaders)
+                                                {
+                                                    <div class="tilebarcontrol__subcategorysectionheader">
+                                                        @itemGroup.MultilingualText.ToString().ProcessMnemonicToHtml(true)
+                                                    </div>
+                                                }
+                                                <ul class="tilebarcontrol__subcategorysectionitems">
+                                                    @foreach (var item in itemGroup.Items.ToList())
+                                                    {
+                                                        <li class="tilebarcontrol__subcategorysectionitem">
+                                                            <Button CssClass="tilebarcontrol__subcategorysectionitemlink" Description="@item.MultilingualText" Text="@item.MultilingualText" OnClick="async args => await OnLinkClickAsync(args, item)" OnFocusIn="async _ => await OnFocusInAsync(new WinzorFocusInEventArgs())" />
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                break;
+                            }
+                        default:
+                            {
+                                <div>@menuSection.MultilingualText</div>
+                                break;
+                            }
+                    }
+                }
+            }
+            else
+            {
+                <div class="tilebarcontrol__searchresults">
+                    @foreach (var searchSection in DataContext.SearchViewModel.SearchResults.ToList())
+                    {
+						if (searchSection.Items.Count == 0) continue;
+                        <div class="tilebarcontrol__searchresultsection">
+                            <div class="tilebarcontrol__searchresultsectionheader"><div class="tilebarcontrol__searchresultsectionheadertext">@searchSection.DisplayName</div></div>
+                            <ul class="tilebarcontrol__searchresultsectionitems">
+                                @foreach (var resultItem in searchSection.Items.ToList())
+                                {
+                                    <li class="tilebarcontrol__searchresultitem">
+                                        <Button CssClass="tilebarcontrol__sectionitemlink" Description="@resultItem.MultilingualText" Text="@resultItem.MultilingualText" OnClick="async args => await OnLinkClickAsync(args, resultItem, true)" OnFocusIn="async _ => await OnFocusInAsync(new WinzorFocusInEventArgs())" />
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+}
+
+@code {
+	ElementReference SearchInput;
+	string inputSearchValue = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		GetJSInterop<ITileBarJSInterop>()?.PreloadInterop();
+	}
+
+    async Task OnFavoriteClickAsync(WebMouseEventArgs args, CargoWise.Main.Navigation.MenuItem item)
+	{
+        SetMouseData(args);
+        if (args.GetMouseButtons() == MouseButtons.Left)
+        {
+            await InvokeWinzorDispatcherAsync(() =>
+            {
+                item.FavoriteAction?.Execute(null);
+            });
+        }
+    }
+
+    async Task MenuSectionClick(MenuSection menuSection)
+    {
+        await InvokeWinzorDispatcherAsync(() => DataContext.SelectedCategory.SelectedItem = menuSection);
+    }
+
+    async Task OnLinkClickAsync(WebMouseEventArgs args, CargoWise.Main.Navigation.MenuItem item, bool hideNewView = false)
+    {
+        SetMouseData(args);
+        await InvokeWinzorDispatcherAsync(() =>
+        {
+            if (args.GetMouseButtons() == MouseButtons.Right)
+            {
+                item.LinkRightClickAction?.Execute(null);
+            }
+            else
+            {
+                item.LinkAction?.Execute(null);
+            }
+        });
+    }
+
+    async Task OnSectionHeaderClickedAsync(WebMouseEventArgs args, MenuSection menuSection)
+    {
+        SetMouseData(args);
+        if (args.GetMouseButtons() == MouseButtons.Right)
+        {
+            await InvokeWinzorDispatcherAsync(() =>
+            {
+                var contextMenu = new ContextMenuStrip();
+                contextMenu.Items.Add(menuSection.RemoveAllLinksText, null, (sender, args) => menuSection.RemoveAllLinksAction?.Execute(null));
+                contextMenu.Show(this, MousePosition);
+            });
+        }
+    }
+
+    async Task OnSearchButtonClickedAsync(WebMouseEventArgs args)
+    {
+        SetMouseData(args);
+        if (args.GetMouseButtons() == MouseButtons.Left)
+        {
+            await InvokeWinzorDispatcherAsync(() =>
+            {
+                DataContext.IsInSearchMode = true;
+            });
+            if (DataContext.IsInSearchMode)
+            {
+                await SearchInput.FocusAsync();
+            }
+        }
+    }
+
+    async Task OnSearchInputAsync()
+    {
+        await InvokeWinzorDispatcherAsync(() =>
+        {
+            DataContext.SearchViewModel.SearchValue = inputSearchValue ?? string.Empty;
+        });
+    }
+
+    async Task OnSearchKeyDownAsync(KeyboardEventArgs args)
+    {
+        var key = args.GetKey();
+        if (key == Keys.Escape)
+        {
+            await InvokeWinzorDispatcherAsync(() =>
+            {
+                DataContext.ClearSearch?.Execute(null);
+            });
+        }
+        if (key == Keys.Enter)
+        {
+            await InvokeWinzorDispatcherAsync(() =>
+            {
+                DataContext.RunFirstSearchResult?.Execute(null);
+            });
+        }
+    }
+
+    CargoWise.Main.Navigation.MenuItem selectedItem;
+
+    int dropIndex = -1;
+
+    async Task DragStartAsync(WebDragEventArgs args, MenuSection menuSection, CargoWise.Main.Navigation.MenuItem menuItem)
+    {
+        await InvokeWinzorDispatcherAsync(() =>
+        {
+            selectedItem = menuItem;
+            dropIndex = menuItem.Index - 1;
+        });
+    }
+
+    async Task DragEndAsync(WinzorDragEndEventArgs args, MenuSection menuSection)
+    {
+        await InvokeWinzorDispatcherAsync(async () =>
+        {
+            await HandleDragEndAsync(args, menuSection);
+        });
+    }
+
+    async Task DragEnterAsync(WebDragEventArgs args, CargoWise.Main.Navigation.MenuItem menuItem)
+    {
+        await InvokeWinzorDispatcherAsync(() =>
+        {
+            dropIndex = menuItem.Index - 1;
+        });
+    }
+
+    async Task DragOverAsync(WebDragEventArgs args)
+    {
+        await InvokeWinzorDispatcherAsync(async () =>
+        {
+            await HandleDragOverAsync(args);
+        });
+    }
+}

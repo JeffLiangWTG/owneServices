@@ -1,0 +1,45 @@
+<NativeSchemaSet Name="Order" Root="JobOrderHeader">
+  <Entities>
+    <Entity Name="JobOrderHeader"/>
+    <Entity Name="JobOrderContainer" />
+    <Entity Name="JobOrderLine" />
+    <Entity Name="JobOrderLineDelivery" />
+    <Entity Name="JobOrderLineDeliverContainer" />
+    <Entity Name="LandedCostHeader" />
+    <Entity Name="LandCostInput" />
+    <Entity Name="LandedCostHistory" />
+    <Entity Name="OrgHeader" EntityName="Supplier"/>
+    <Entity Name="OrgHeader" EntityName="Buyer" />
+    <Entity Name="OrgAddress" EntityName="SupplierAddress">
+      <ExcludedProperty Name="OA_GeoLocation" />
+      <ExcludedProperty Name="OA_GeofencePolygon" />
+      <ExcludedProperty Name="OA_ValidationStatus" />
+    </Entity>
+    <Entity Name="OrgContact" EntityName="SupplierContact"/>
+    <Entity Name="OrgAddress" EntityName="BuyerAddress">
+      <ExcludedProperty Name="OA_GeoLocation" />
+      <ExcludedProperty Name="OA_GeofencePolygon" />
+      <ExcludedProperty Name="OA_ValidationStatus" />
+    </Entity>
+    <Entity Name="OrgContact" EntityName="BuyerContact"/>
+    <Entity Name="OrgSupplierPart" External="true">
+      <IncludedProperty Name="PartNum" />
+    </Entity>
+  </Entities>
+  <Associations>
+    <Association From="LandedCostHistory" To="OrgSupplierPart" Key="LH_OP" External="true"/>
+    <Association From="JobOrderContainer" To="JobOrderHeader" Key="J1_ParentID"/>
+    <Association From="JobOrderLine" To="JobOrderHeader" Key="JO_JD"/>
+    <Association From="JobOrderLineDelivery" To="JobOrderLine" Key="J4_JO"/>
+    <Association From="JobOrderLineDeliverContainer" To="JobOrderLineDelivery" Key="J5_J4"/>
+    <Association From="LandedCostHeader" To="JobOrderHeader" Key="LT_ParentID"/>
+    <Association From="LandCostInput" To="LandedCostHeader" Key="LI_LT"/>
+    <Association From="LandedCostHistory" To="LandedCostHeader" Key="LH_LT"/>
+    <Association From="JobOrderHeader" To="SupplierAddress" Key="JD_OA_SupplierAddress" />
+    <Association From="JobOrderHeader" To="SupplierContact" Key="JD_OC_SupplierContact" />
+    <Association From="JobOrderHeader" To="BuyerAddress" Key="JD_OA_BuyerAddress" />
+    <Association From="JobOrderHeader" To="BuyerContact" Key="JD_OC_BuyerContact" />
+    <Association From="SupplierAddress" To="Supplier" Key="OA_OH" />
+    <Association From="BuyerAddress" To="Buyer" Key="OA_OH" />
+  </Associations>
+</NativeSchemaSet>

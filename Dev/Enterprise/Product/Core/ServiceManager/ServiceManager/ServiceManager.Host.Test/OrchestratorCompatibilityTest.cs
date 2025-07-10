@@ -1,0 +1,73 @@
+using System.Linq;
+using CargoWise.DbUpgrader.Scripts.Definitions;
+using CargoWise.Licensing.Registration;
+using Enterprise.DbUpgrader.Resource;
+using NUnit.Framework;
+using ServiceManager.Integration.ServiceHostClient;
+
+namespace Enterprise.ServiceManager.Host.Testing
+{
+	class OrchestratorCompatibilityTest : TransactionedTestCase
+	{
+		[ExpectNoExceptions]
+		public void TestTablesAreCompatibleWithOrchestrator()
+		{
+			// Arrange
+			var script = new ScriptManager().MaindDbSchemaScript;
+
+			// Act
+			// Assert
+			NUnit.Framework.Assert.Multiple(() =>
+			{
+				foreach (var (_, expectedTableScript) in SharedDatabaseScripts.TableScripts)
+				{
+					NUnit.Framework.Assert.That(script, Does.Contain(expectedTableScript).IgnoreCase);
+				}
+			});
+		}
+
+		[ExpectNoExceptions]
+		public void TestStoredProceduresAreCompatibleWithOrchestrator()
+		{
+			// Arrange
+
+			// Act
+			// Assert
+			NUnit.Framework.Assert.Multiple(() =>
+			{
+				var lookup = CoreScriptIndex.GetScripts().ToDictionary(x => x.Name);
+
+				foreach (var (name, expectedScript) in SharedDatabaseScripts.FunctionScripts)
+				{
+					var text = lookup.TryGetValue(name, out var script) ? script.Text : null;
+
+					NUnit.Framework.Assert.That(text, Is.EqualTo(expectedScript));
+				}
+			});
+		}
+
+		[ExpectNoExceptions]
+		public void TestLicenseDecryptionIsCompatibleWithWiseCloudOrchestrator()
+		{
+			// Arrange
+			const string encryptedDbKey = "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";
+
+			// Act
+			var result = RegistrationKeyUtility.GetRegistrationKeyXmlPair(encryptedDbKey).Key;
+
+			// Assert
+			NUnit.Framework.Assert.Multiple(() =>
+			{
+				NUnit.Framework.Assert.That(result.EnterpriseCode, Is.EqualTo("HYE"));
+				NUnit.Framework.Assert.That(result.ServerCode, Is.EqualTo("IM1"));
+				NUnit.Framework.Assert.That(result.DbUniqueKey.DatabaseName, Is.EqualTo("Odyssey"));
+			});
+		}
+
+		[ExpectNoExceptions]
+		public void TestDbUpgradeLockIsCompatibleWithWiseCloudOrchestrator()
+		{
+			NUnit.Framework.Assert.That(SharedDatabaseScripts.DbUpgradeLock, Is.EqualTo(Enterprise.Core.Constants.SystemUpgrade.DbUpgradeLock));
+		}
+	}
+}

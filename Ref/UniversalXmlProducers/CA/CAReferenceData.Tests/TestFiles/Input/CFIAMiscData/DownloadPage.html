@@ -1,0 +1,3172 @@
+<!DOCTYPE html>
+<!-- saved from url=(0150)https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962 -->
+<html class="js backgroundsize borderimage csstransitions fontface svg details progressbar meter no-mathml cors wb-enable xlargeview" lang="en" dir="ltr"><!--<![endif]--><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <!-- Web Experience Toolkit (WET) / Boîte à outils de l'expérience Web (BOEW)
+            wet-boew.github.io/wet-boew/License-en.html / wet-boew.github.io/wet-boew/Licence-fr.html -->
+    <title>
+        AIRS miscellaneous codes - Canadian Food Inspection Agency
+    </title>
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    
+    <meta property="dcterms:service" content="CFIA-ACIA">
+<meta property="dcterms:accessRights" content="2">
+<script src="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/en.min.js.download"></script><script src="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/jquery.magnific-popup.min.js.download"></script><script src="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/launch-e34f760eaec8.js.download"></script><script src="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/AppMeasurement.js.download" async=""></script><script src="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/AppMeasurement_Module_ActivityMap.js.download" async=""></script><script>
+/*
+* Find most common Personal Identifiable Information (PII) in a string and return either the cleaned string either true/false
+* @param {string} str
+* @param {boolean} toClean
+* @return {string | true | false}
+* @example
+* findPotentialPII( "email:test@test.com, phone:123 123 1234", true )
+* returns "email:, phone:",
+* findPotentialPII( "email:test@test.com, phone:123 123 1234", false )
+* returns true
+*/
+findPotentialPII = function( str, toClean, bMarker ) {
+
+	if ( typeof str  !== "string" ) {
+		return false;
+	}
+	var regEx = [
+			[ /\d(?:[\s\-\\.\\/]?\d){8,}(?!\d)/ig, "[REDACTED/CAVIARDÉ]" ], //9digits or more pattern
+			[ /\b[A-Za-z]{2}[\s\\.-]*?\d{6}\b/ig, "[REDACTED/CAVIARDÉ]" ], //canadian nr passport pattern
+			[ /\b(?:[a-zA-Z0-9_\-\\.]+)(?:@|%40)(?:[a-zA-Z0-9_\-\\.]+)\.(?:[a-zA-Z]{2,5})\b/ig, "[REDACTED/CAVIARDÉ]" ], //email pattern
+			[ /\b[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d\b/ig, "[REDACTED/CAVIARDÉ]" ], //postal code pattern
+			[ /\b(?:(username|user)[:=][a-zA-Z0-9_\-\\.]+)\b/ig, "[REDACTED/CAVIARDÉ]" ],
+			[ /\b(?:(password|pass)[:=][^\s#&]+)\b/ig, "[REDACTED/CAVIARDÉ]" ]
+		],
+		isFound = false;
+
+	for ( var arr in regEx ) {
+		if ( str.match( regEx[ arr ][ 0 ] ) ) {
+			isFound = true;
+			if ( toClean ) {
+				str = str.replaceAll( regEx[ arr ] [ 0 ], ( bMarker === true ? regEx[ arr ][ 1 ] : "" ) );
+			}
+		}
+	}
+
+	return toClean && isFound ? str : isFound;
+};
+
+// scrub only email/user/pass 
+// slash repaced with hyphen due to folder count in url
+urlPotentialPII = function( str, toClean, bMarker ) {
+
+	if ( typeof str  !== "string" ) {
+		return false;
+	}
+	var regEx = [
+			[ /\b(?:[a-zA-Z0-9_\-\\.]+)(?:@|%40)(?:[a-zA-Z0-9_\-\\.]+)\.(?:[a-zA-Z]{2,5})\b/ig, "[REDACTED-CAVIARDÉ]" ], //email pattern
+           	[ /\b(?:(username|user)[:=][a-zA-Z0-9_\-\\.]+)\b/ig, "[REDACTED-CAVIARDÉ]" ],
+			[ /\b(?:(password|pass)[:=][^\s#&]+)\b/ig, "[REDACTED-CAVIARDÉ]" ]
+		],
+		isFound = false;
+
+	for ( var arr in regEx ) {
+		if ( str.match( regEx[ arr ][ 0 ] ) ) {
+			isFound = true;
+			if ( toClean ) {
+				str = str.replaceAll( regEx[ arr ] [ 0 ], ( bMarker === true ? regEx[ arr ][ 1 ] : "" ) );
+			}
+		}
+	}
+
+	return toClean && isFound ? str : isFound;
+};
+</script><script>
+/*jshint maxerr: 100000, laxcomma: true */
+// whitelist/blacklist 
+
+/*
+ * Domain Whitelist and domain specific settings
+*/
+
+//make sure to update thisDomain with nulls!!!
+_satellite.gcCustom = {
+    domain_blacklist: ['/analytique-analytics/',
+            'checkingvisa.com',
+            '/naics/2017/v3/',
+  			'/gol-ged/awsc/amss/browser/check',
+  			'/gol-ged/awsc/amss/enrol/loginCheck',
+  			'/gol-ged/awsc/amss/enrol/logincheck',
+  			'beta.buyandsell.gc.ca/standing-offers-and-supply-arrangements-application/my-workspace/user-management/',
+  			'beta.achatsetventes.gc.ca/application-d-offres-a-commandes-et-d-arrangements-en-matiere-d-approvisionnement/mon-espace-travail/gestion-des-utilisateurs/',
+  			'gol-ecas-dev.ca.gc.ca/ecas/viewcasehistory.do',
+  			'services3.cic.gc.ca/ecas/viewcasehistory.do',
+  			'buyandsell.gc.ca/standing-offers-and-supply-arrangements-application/my-workspace/user-management/',
+  			'achatsetventes.gc.ca/application-d-offres-a-commandes-et-d-arrangements-en-matiere-d-approvisionnement/mon-espace-travail/gestion-des-utilisateurs/',
+            'buyandsell.gc.ca/procurement-data/search/manage-subscriptions',
+            'achatsetventes.gc.ca/donnees-sur-l-approvisionnement/search/gerez-le-service-d-avis',
+            'buyandsell.gc.ca/procurement-data/search/edit-tender-subscription',
+            'achatsetventes.gc.ca/donnees-sur-l-approvisionnement/search/modifier-les-abonnements-aux-appels-d-offres'
+],
+    protocol_blacklist: ['javascript:', 'mailto:', 'tel:', 'blob:', 'data:'],
+
+    /*Follow this syntax for adding items to the whitelist
+    Double check and confirm you are adding to the STAGE or LIVE whitelist
+    Double check spelling and syntax for errors
+    */
+    thisDomain: { AppName: null, LoginStatus: null },
+    domain_whitelist: {
+        stage: {
+          // '...' : {AppName : null, LoginStatus : null} /// adding a comment
+          // --- all items MUST inlcude a comma in order to append the next line item, except the last item does not require a comma
+          //Testing
+            'noc.esdc.gc.ca': { AppName: null, LoginStatus: null }, //testing
+          //Canada
+            'www.canada.ca': { AppName: null, LoginStatus: null }, //testing
+          //Health Canada
+            'food-guide-stage.hpfb-dgpsa.ca': { AppName: null, LoginStatus: null },
+            'guide-alimentaire-stage.hpfb-dgpsa.ca': { AppName: null, LoginStatus: null },
+            'prci-dev.jack.hc-sc.gc.ca': { AppName: null, LoginStatus: null },
+          //Canadian Space Agency
+            'devcorpo': { AppName: null, LoginStatus: null },
+            'appsqa.asc-csa.gc.ca': { AppName: null, LoginStatus: null },
+            'datatest.asc-csa.gc.ca': { AppName: null, LoginStatus: null },
+          //Public Safety Canada
+            'beta.infomedia.gc.ca': { AppName: null, LoginStatus: null },
+            'infomediadev': { AppName: null, LoginStatus: null },
+          //Women and Gender Equality Canada 
+            'intranettest': { AppName: null, LoginStatus: null },
+            'canada': { AppName: null, LoginStatus: null },
+            'dev1': { AppName: null, LoginStatus: null },
+          //Treasury Board Secretariat	        
+            'staging.atip-aiprp.tbs-sct.gc.ca': { AppName: null, LoginStatus: null },
+            'uat1.atip-aiprp.tbs-sct.gc.ca': { AppName: null, LoginStatus: null },
+            'uat.tbs-sct.gc.ca': { AppName: null, LoginStatus: null },
+          //Public Services procurement Canada
+            'test.publications.gc.ca': { AppName: null, LoginStatus: null },
+            'test.buyandsell.gc.ca': { AppName: null, LoginStatus: null },
+            'test.achatsetventes.gc.ca': { AppName: null, LoginStatus: null },
+            'beta.buyandsell.gc.ca': { AppName: null, LoginStatus: null },
+            'beta.achatsetventes.gc.ca': { AppName: null, LoginStatus: null },
+            'webdev01.tpsgc-pwgsc.gc.ca': { AppName: null, LoginStatus: null },
+            'webdev02.tpsgc-pwgsc.gc.ca': { AppName: null, LoginStatus: null },
+            'webdev08.tpsgc-pwgsc.gc.ca': { AppName: null, LoginStatus: null },
+            'test-psjobs-emploisfp.psc-cfp.gc.ca': { AppName: null, LoginStatus: null },
+            'masource-mysource.shp.dev.global.gc.ca': { AppName: null, LoginStatus: null },
+          // Library Archives Canada
+			'dev-www.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+			'cipbookentry-d.dev.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+			'financement-funding.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+			'v41extcapps01-d.dev.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+			'tdg-grt.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+			'tdg-grt-d.dev.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+			'event.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+			'event-d.dev.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+			'canadiana-d.dev.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+			'sigles-symbols.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+			'sigles-symbols-d.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+			'webdev-srv.dev.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+			'webqa-srv01.qa.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+          //Employment Social Development Canada
+			'esin-sandbox.powerappsportals.com': { AppName: null, LoginStatus: null },
+			'srv2140-i2.services.gc.qat': { AppName: null, LoginStatus: null },
+			'srv2140-s.services.gc.qat': { AppName: null, LoginStatus: null },
+			'eservice-uat.powerappsportals.com': { AppName: null, LoginStatus: null },
+			'iidus-stdei-dev.powerappsportals.com': { AppName: null, LoginStatus: null },
+		 	'srv241-s2.lab.hrdc-drhc.gc.ca': { AppName: null, LoginStatus: null },
+            'www.uat.youth-digital-gateway.dev': { AppName: null, LoginStatus: null },
+            'www.youth-digital-gateway.dev': { AppName: null, LoginStatus: null },
+            'uat12-ssl.services.gc.qat': { AppName: null, LoginStatus: null },
+            'virtualassistant-main.bdm-dev.dts-stn.com': { AppName: null, LoginStatus: null }, 
+            'intradev16-i.intra.dev': { AppName: null, LoginStatus: null }, 
+          //Elections Canada
+			'ispdevwww.elections.ca': { AppName: null, LoginStatus: null },
+			'ec9wbedtpfpked': { AppName: null, LoginStatus: null },
+			'www.test.elections.ca': { AppName: null, LoginStatus: null },
+			'ecdevmaint-pesc.ecade.elections.ca': { AppName: null, LoginStatus: null },
+            'ec9wbeddpfpisp.elections.ca': { AppName: null, LoginStatus: null },
+            'visdev.elections.ca': { AppName: null, LoginStatus: null },
+            'enr-uat.elections.ca': { AppName: null, LoginStatus: null },
+            'rspispweb01-ste-demo1.elections.ca': { AppName: null, LoginStatus: null },
+          //Superintendent of Financial Institutions Canada
+			'uatirppub.osfi-bsif.gc.ca': { AppName: null, LoginStatus: null },
+			'uatirppub.devosfi.ca': { AppName: null, LoginStatus: null },
+          //Agriculture and Agri-Food Canada 
+			//'canadabrandgocaccess.agr.gc.ca': { AppName: null, LoginStatus: null },
+			//'marquecanadabrand.agr.gc.ca': { AppName: null, LoginStatus: null },
+			//'brandcanada.agr.gc.ca': { AppName: null, LoginStatus: null },
+          //Canadian Food Inspection Agency
+			'inspection.gc.ca': { AppName: null, LoginStatus: null },
+			'merlin.cfia-acia.inspection.gc.ca': { AppName: null, LoginStatus: null },
+			'inspection.canada.ca': { AppName: null, LoginStatus: null },
+          //Canada Revenue Agency
+			'cp-ut.isvcs.net': { AppName: null, LoginStatus: null },
+			'apps-ut.isvcs.net': { AppName: null, LoginStatus: null },
+          //Immigration, Refugees and Citizenship Canada 
+			'eservices5.ci.gc.ca': { AppName: null, LoginStatus: null },
+            'eservices1.ci.gc.ca': { AppName: null, LoginStatus: null },
+            'njes1s6362.apps.ci.gc.ca': { AppName: null, LoginStatus: null },
+            'web.passport-online-staging.apps.cic.gc.ca': { AppName: null, LoginStatus: null }, //testing
+            'web.passeport-enligne-staging.apps.cic.gc.ca': { AppName: null, LoginStatus: null },
+            'web.passport-online-development.apps.cic.gc.ca': { AppName: null, LoginStatus: null },
+            'web.passeport-enligne-developmente.apps.cic.gc.ca': { AppName: null, LoginStatus: null },
+          //Global Affairs Canada
+			'www.educanada.ca': { AppName: null, LoginStatus: null },
+			'www.international.gc.ca': { AppName: null, LoginStatus: null },
+			'international.gc.ca': { AppName: null, LoginStatus: null },
+			'www.tradecommissioner.gc.ca': { AppName: null, LoginStatus: null },
+			'tradecommissioner.gc.ca': { AppName: null, LoginStatus: null },
+			'www.deleguescommerciaux.gc.ca': { AppName: null, LoginStatus: null },
+			'deleguescommerciaux.gc.ca': { AppName: null, LoginStatus: null },
+			'core-ombuds.canada.ca': { AppName: null, LoginStatus: null },
+			'www.travel.gc.ca': { AppName: null, LoginStatus: null },
+			'travel.gc.ca': { AppName: null, LoginStatus: null },
+			'www.voyage.gc.ca': { AppName: null, LoginStatus: null },
+			'voyage.gc.ca': { AppName: null, LoginStatus: null },
+          //Justice Canada
+            'www-uat.victimsweek.gc.ca': { AppName: null, LoginStatus: null },
+            'www-uat.semainedesvictimes.gc.ca': { AppName: null, LoginStatus: null },
+            'jusnet-uat.justice.gc.ca': { AppName: null, LoginStatus: null }, 
+            'www-uat.justice.gc.ca': { AppName: null, LoginStatus: null },
+            'dmteam-uat.justice.gc.ca': { AppName: null, LoginStatus: null },
+            'equipesm-uat.justice.gc.ca': { AppName: null, LoginStatus: null },
+            'limsdev.justice.gc.ca': { AppName: null, LoginStatus: null },
+            'www-uat.victimsfirst.gc.ca': { AppName: null, LoginStatus: null },
+            'www-uat.victimesdabord.gc.ca': { AppName: null, LoginStatus: null },
+          //Infrastructure Canada
+            'internet-dev.ad.infrastructure.gc.ca': { AppName: null, LoginStatus: null },
+            'infranet-dev.ad.infrastructure.gc.ca': { AppName: null, LoginStatus: null },
+          //Office of the Procurement Ombudsman 
+            'xterra3w2k16.dev.ad.itsso-ospti.gc.ca': { AppName: null, LoginStatus: null },
+            'dev.boa-opo.gc.ca': { AppName: null, LoginStatus: null },
+            'www.dev.boa-opo.gc.ca': { AppName: null, LoginStatus: null },
+          
+        },
+        live: {
+        //'...' : {AppName : null, LoginStatus : null}
+          //Employment Social Development Canada
+			//'sin-nas.canada.ca': { AppName: null, LoginStatus: null },
+            'srv136.services.gc.ca': { AppName: null, LoginStatus: null },
+            'www.noc.esdc.gc.ca': { AppName: null, LoginStatus: null },
+            'noc.esdc.gc.ca': { AppName: null, LoginStatus: null },
+            'youth-jeunesse.service.canada.ca': { AppName: null, LoginStatus: null },
+            'www.youth-jeunesse.service.canada.ca': { AppName: null, LoginStatus: null },
+            'jeunesse.service.canada.ca': { AppName: null, LoginStatus: null },
+            'www.jeunesse.service.canada.ca': { AppName: null, LoginStatus: null },
+          //Canadian Space Agency
+			'asc-csa.gc.ca': { AppName: null, LoginStatus: null },
+			'www.asc-csa.gc.ca': { AppName: null, LoginStatus: null },
+			'csa-asc.gc.ca': { AppName: null, LoginStatus: null },
+			'www.csa-asc.gc.ca': { AppName: null, LoginStatus: null },
+            'www4.asc-csa.gc.ca': { AppName: null, LoginStatus: null },
+            'donnees-data.asc-csa.gc.ca': { AppName: null, LoginStatus: null },
+          //Agriculture and Agri-Food Canada 
+			//'www.canadabrand.agr.gc.ca': { AppName: null, LoginStatus: null },
+			//'canadabrand.agr.gc.ca': { AppName: null, LoginStatus: null },
+			//'www.marquecanadabrand.agr.gc.ca': { AppName: null, LoginStatus: null },
+			//'marquecanadabrand.agr.gc.ca': { AppName: null, LoginStatus: null },
+			//'www.brandcanada.agr.gc.ca': { AppName: null, LoginStatus: null },
+			//'brandcanada.agr.gc.ca': { AppName: null, LoginStatus: null },
+          //Treasury Board Secretariat	        
+			'www.tbs-sct.gc.ca': { AppName: null, LoginStatus: null },
+			'atip-aiprp.tbs-sct.gc.ca': { AppName: null, LoginStatus: null },
+          //Global Affairs Canada
+            'www.educanada.ca': { AppName: null, LoginStatus: null },
+            'educanada.ca': { AppName: null, LoginStatus: null },
+            'www.tradecommissioner.gc.ca': { AppName: null, LoginStatus: null },
+            'tradecommissioner.gc.ca': { AppName: null, LoginStatus: null },
+            'www.deleguescommerciaux.gc.ca': { AppName: null, LoginStatus: null },
+            'deleguescommerciaux.gc.ca': { AppName: null, LoginStatus: null },
+            'www.international.gc.ca': { AppName: null, LoginStatus: null },
+            'international.gc.ca': { AppName: null, LoginStatus: null },
+            'www.travel.gc.ca': { AppName: null, LoginStatus: null },
+            'travel.gc.ca': { AppName: null, LoginStatus: null },
+            'www.voyage.gc.ca': { AppName: null, LoginStatus: null },
+            'voyage.gc.ca': { AppName: null, LoginStatus: null },
+            'www.core-ombuds.canada.ca': { AppName: null, LoginStatus: null },
+            'core-ombuds.canada.ca': { AppName: null, LoginStatus: null },
+          // Library Archives Canada
+            'www.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+            'bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+            'www.lac-bac.gc.ca': { AppName: null, LoginStatus: null },
+            'lac-bac.gc.ca': { AppName: null, LoginStatus: null },
+            'www.cipbookentry.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+            'cipbookentry.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+            'www.sigles-symbols.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+            'sigles-symbols.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+            'www.event.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+            'event.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+            'www.marc21.ca': { AppName: null, LoginStatus: null },
+            'www.financement-funding.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+            'financement-funding.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+            'www.tdg-grt.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+            'tdg-grt.bac-lac.gc.ca': { AppName: null, LoginStatus: null },
+          //Elections Canada
+			'www.elections.ca': { AppName: null, LoginStatus: null },
+			'elections.ca': { AppName: null, LoginStatus: null },
+            'secure.elections.ca': { AppName: null, LoginStatus: null },
+            'enr.elections.ca': { AppName: null, LoginStatus: null },
+            'www.cef-cce.ca': { AppName: null, LoginStatus: null },
+            'cef-cce.ca': { AppName: null, LoginStatus: null },
+            'ereg.elections.ca': { AppName: null, LoginStatus: null },
+            'csep-pesc.elections.ca': { AppName: null, LoginStatus: null },
+            'www.redecoupage-redistribution-2022.ca': { AppName: null, LoginStatus: null },
+            'redecoupage-redistribution-2022.ca': { AppName: null, LoginStatus: null },
+          //Public Services procurement Canada                    
+			'www.tpsgc-pwgsc.gc.ca': { AppName: null, LoginStatus: null },
+			'www.publications.gc.ca': { AppName: null, LoginStatus: null },
+			'publications.gc.ca': { AppName: null, LoginStatus: null },
+			'buyandsell.gc.ca': { AppName: null, LoginStatus: null },
+			'achatsetventes.gc.ca': { AppName: null, LoginStatus: null },
+            'intranet.tpsgc-pwgsc.gc.ca': { AppName: null, LoginStatus: null },
+            'masource-mysource.spac-pspc.gc.ca': { AppName: null, LoginStatus: null },
+            'gcintranet.tpsgc-pwgsc.gc.ca': { AppName: null, LoginStatus: null },
+          //Public Service Commission of Canada
+			//'emploisfp-psjobs.cfp-psc.gc.ca': { AppName: null, LoginStatus: null },
+          //Superintendent of Financial Institutions Canada
+            'www.osfi-bsif.gc.ca': { AppName: null, LoginStatus: null },
+          //Health Canada
+            'food-guide.canada.ca': { AppName: null, LoginStatus: null },
+            'guide-alimentaire.canada.ca': { AppName: null, LoginStatus: null },
+            'clinical-information.canada.ca': { AppName: null, LoginStatus: null },
+            'renseignements-cliniques.canada.ca': { AppName: null, LoginStatus: null },
+          //Women and Gender Equality Canada 
+            'femmes-egalite-genres.canada.ca': { AppName: null, LoginStatus: null },
+            'women-gender-equality.canada.ca': { AppName: null, LoginStatus: null },
+            'intranet.fegc-wage.gc.ca': { AppName: null, LoginStatus: null },
+          //Justice Canada 
+            'justice.gc.ca': { AppName: null, LoginStatus: null },  
+            'www.justice.gc.ca': { AppName: null, LoginStatus: null },
+            'dmteam.justice.gc.ca': { AppName: null, LoginStatus: null },
+            'laws.justice.gc.ca': { AppName: null, LoginStatus: null },
+            'lois.justice.gc.ca': { AppName: null, LoginStatus: null },
+            'laws-lois.justice.gc.ca': { AppName: null, LoginStatus: null },
+            'lois-laws.justice.gc.ca': { AppName: null, LoginStatus: null },
+            'jusnet.justice.gc.ca': { AppName: null, LoginStatus: null },
+            'victimsweek.gc.ca': { AppName: null, LoginStatus: null },
+            'semainesdesvictimes.gc.ca': { AppName: null, LoginStatus: null },
+            'www.victimsweek.gc.ca': { AppName: null, LoginStatus: null },
+            'www.semainesdesvictimes.gc.ca': { AppName: null, LoginStatus: null },
+            'www.victimsfirst.gc.ca': { AppName: null, LoginStatus: null },
+            'www.victimesdabord.gc.ca': { AppName: null, LoginStatus: null },
+            'victimsfirst.gc.ca': { AppName: null, LoginStatus: null },
+            'victimesdabord.gc.ca': { AppName: null, LoginStatus: null },
+            'equipesm.justice.gc.ca': { AppName: null, LoginStatus: null },
+          //Immigration, Refugees and Citizenship Canada 
+            'atip-aiprp.apps.gc.ca': { AppName: null, LoginStatus: null },
+          //Canadian Food Inspection Canada
+            'inspection.canada.ca': { AppName: null, LoginStatus: null },
+            'inspection.gc.ca': { AppName: null, LoginStatus: null },
+            'merlin.cfia-acia.inspection.gc.ca': { AppName: null, LoginStatus: null },
+          //Infrastructure Canada
+            'www.infrastructure.gc.ca': { AppName: null, LoginStatus: null },
+            'infranet.ad.infrastructure.gc.ca': { AppName: null, LoginStatus: null },
+
+        },
+
+  },
+ internal_filters : [
+ //this is used for outbound link tracking
+    //CANADA.CA (AEM)	
+		,'iv.apps.canada.ca' // Booking Tool Prod
+		,'v.apps.canada.ca' // Booking Tool Prod
+		,'gcbooking.adobecqms.net' //Booking Tool
+		,'universallabs.org' 
+		,'dev1.canada.ca'
+		,'dev3.canada.ca'
+		,'www1.canada.ca' 
+		,'canada.ca' 
+		,'www.canada.ca' 
+		,'canada-aem-s3-stage.adobecqms.net'
+		,'staging-recherche.gc.ca' // Search
+		,'recherche.gc.ca' 
+		,'recherche-search.gc.ca' 
+		,'search.gc.ca' 
+		,'search-recherche.gc.ca'
+		,'www.recherche.gc.ca' 
+		,'www.recherche-search.gc.ca' 
+		,'www.search.gc.ca' 
+		,'www.search-recherche.gc.ca' 
+		,'canada-service-corps.canada.ca' // PM Service Corps
+		,'service-jeunesse.canada.ca' 
+	// Library and Archives
+		,'bac-lac.gc.ca'
+		,'lac-bac.gc.ca'
+		,'www.bac-lac.gc.ca'
+		,'www.lac-bac.gc.ca'
+		,'canadiana-qa.dev.bac-lac.gc.ca'
+		,'central.bac-lac.gc.ca'
+		,'central-d.dev.bac-lac.gc.ca'
+		,'webdev-srv.dev.bac-lac.gc.ca'
+		,'webqa-srv01.qa.bac-lac.gc.ca'
+		,'ucc-qa'
+		,'v41extweb01-d.services.bac-lac.gc.ca'
+		,'canadiana.bac-lac.gc.ca'
+		,'www.canadiana.bac-lac.gc.ca' 
+		,'cipbookentry.bac-lac.gc.ca' 
+		,'cipbookentry-qa.dev.bac-lac.gc.ca'
+		,'www.cipbookentry.bac-lac.gc.ca' 
+		,'co-lab.bac-lac.gc.ca' 
+		,'www.co-lab.bac-lac.gc.ca' 
+		,'sigles-symbols-qa.bac-lac.gc.ca'
+		,'sigles-symbols.bac-lac.gc.ca' 
+		,'www.sigles-symbols.bac-lac.gc.ca' 
+		,'event-qa'
+		,'event.bac-lac.gc.ca' 
+		,'www.event.bac-lac.gc.ca' 
+		,'nouvelle-france.org' 
+		,'www.collectionscanada.gc.ca'
+		,'cipbookentry-d.dev.bac-lac.gc.ca'
+		,'v41extcapps01-d.dev.bac-lac.gc.ca'
+		,'tdg-grt-d.dev.bac-lac.gc.ca'
+		,'event-d.dev.bac-lac.gc.ca'
+		,'canadiana-d.dev.bac-lac.gc.ca'
+		,'sigles-symbols-d.bac-lac.gc.ca'
+		,'dev-www.bac-lac.gc.ca'
+		,'financement-funding.bac-lac.gc.ca'
+		,'tdg-grt.bac-lac.gc.ca'
+		,'event.bac-lac.gc.ca'
+		,'sigles-symbols.bac-lac.gc.ca'
+		,'webdev-srv.dev.bac-lac.gc.ca'
+		,'webqa-srv01.qa.bac-lac.gc.ca'
+		,'cipbookentry.bac-lac.gc.ca'
+		,'www.marc21.ca'
+	// Impact Assessment Agency of Canada
+		,'acee.gc.ca' // Old domain (CEAA)	
+		,'acee-ceaa.gc.ca' 
+		,'www.acee.gc.ca' 
+		,'www.acee-ceaa.gc.ca' 
+		,'ceaa.dev.ec.gc.ca' 
+		,'ceaa.gc.ca' 
+		,'ceaa-acee.gc.ca' 
+		,'www.ceaa.gc.ca' 
+		,'www.ceaa-acee.gc.ca' 
+		,'ceaa.qa.ncr.ec.gc.ca'
+		,'www.iaac-acei.gc.ca' // New domain (IAAC)
+		,'iaac-acei.gc.ca'
+		,'www.acei-iaac.gc.ca'
+		,'acei-iaac.gc.ca'
+		,'www.iaac.gc.ca'
+		,'iaac.gc.ca'
+		,'www.acei.gc.ca'
+		,'acei.gc.ca'
+		,'www.iaac-aeic.gc.ca'
+		,'iaac-aeic.gc.ca'
+		,'www.aeic-iaac.gc.ca'
+		,'aeic-iaac.gc.ca'
+		,'www.aeic.gc.ca'
+		,'aeic.gc.ca'
+		,'elearning.iaac-aeic.gc.ca'
+		,'apprentissage-en-ligne.aeic-iaac.gc.ca'
+    // Agriculture and Agri-Food Canada
+		,'www.agr.gc.ca' 
+		,'agr.gc.ca' 
+		,'www-dev.agr.gc.ca' 
+		,'intranet.agr.gc.ca'
+		,'www-tst.agr.gc.ca'
+		//,'canadabrandgocaccess.agr.gc.ca'
+		//,'canadabrandgocaccess.agr.gc.ca'	
+		//,'www.canadabrand.agr.gc.ca'	
+		//,'canadabrand.agr.gc.ca'	
+		//,'brandcanada.agr.gc.ca'	
+		//,'www.brandcanada.agr.gc.ca'	
+		//,'marquecanadabrand.agr.gc.ca'	
+		//,'www.marquecanadabrand.agr.gc.ca'
+		,'agriculture.agr.gc.ca'
+		,'agriculture.canada.ca'
+		,'www.agriculture.canada.ca'
+    // Treasury Board Secretariat	
+		,'atip-aiprp.tbs-sct.gc.ca' 
+		,'uat.atip-aiprp.tbs-sct.gc.ca' 
+		,'pre-prod.atip-aiprp.tbs-sct.gc.ca' 
+		,'authoring.publiservice.tbs-sct.gc.ca' 
+		,'authoring.www.tbs-sct.gc.ca'
+		,'staging.open.canada.ca'
+		,'search-staging.open.canada.ca'
+		,'open.canada.ca'
+		,'search.open.canada.ca'
+		,'ouvert.canada.ca'
+		,'rechercher.ouvert.canada.ca'
+		,'staging.atip-aiprp.tbs-sct.gc.ca'
+		,'uat1.atip-aiprp.tbs-sct.gc.ca'
+		,'uat.tbs-sct.gc.ca'
+		,'www.tbs-sct.gc.ca'
+		,'dev.tbs-sct.gc.ca'
+    // Statistics Canada
+		,'statistics.canada.ca'
+		,'statistique.canada.ca'	
+		,'www.statcan.gc.ca'
+		,'www5.statcan.gc.ca'
+		,'www12.statcan.gc.ca'
+		,'www23.statcan.gc.ca'
+		,'www35.statcan.gc.ca'
+		,'www65.statcan.gc.ca'
+		,'www66.statcan.gc.ca'
+		,'www76.statcan.gc.ca'
+		,'www120.statcan.gc.ca'
+		,'www144.statcan.gc.ca'
+		,'www150.statcan.gc.ca'
+		,'information-energie.canada.ca'
+		,'information-energie.statcan.gc.ca'
+		,'energy-information.canada.ca'
+		,'census.gc.ca'
+		,'recensement.gc.ca'
+		,'geosuite.statcan.gc.ca'
+		,'geoprod.statcan.gc.ca'
+		,'wpaz-ofm12c-ssl-i.services.gc.qat'
+		,'www5testb.statcan.gc.ca'
+		,'srv113-i.lab.hrdc-drhc.gc.ca'
+		,'src-dev13.wcms.statcan.ca'
+		,'codweb1.stcpaz.statcan.gc.ca'
+		,'codweb2.stcpaz.statcan.gc.ca'
+		,'stc-ndm-qa-pc2.statcan.gc.ca'
+		,'stc-ndm-qa-pc2.statcan.gc.ca'
+		,'prod-p-es-fusion01.stcpaz.statcan.gc.ca'
+		,'census-qa.statcan.gc.ca'
+		,'recensement-qa.statcan.gc.ca'
+		,'qa-p-es-ui01.stcpaz.statcan.gc.ca'
+		,'dv-vd-sprint1.test.cloud.statcan.ca'
+		,'www.dv-vd-sprint1.test.cloud.statcan.ca'
+		,'wwwqa.statcan.gc.ca'
+		,'www76qa.statcan.gc.ca'
+		,'geodepot.statcan.gc.ca'
+		,'geodepot.statcan.ca'
+		,'portal.covid.cloud.statcan.ca'          
+		,'analytics-platform.statcan.gc.ca'   
+		,'oc-dev.covid.cloud.statcan.ca'   
+		,'web2-test1.wcms.statcan.ca'
+ 		,'daaas-dev.covid.cloud.statcan.ca'
+		,'oc-dev.covid.cloud.statcan.ca'
+	// Employment Social Developmet Canada
+		,'disclosure.esdc.gc.ca' 
+		,'disclosure.servicecanada.gc.ca' 
+		,'www.canadabenefits.gc.ca' 
+		,'www.canadabenefits.gc.ca' 
+		,'wpaz-ofm12c-ssl-i.services.gc.qat' 
+		,'wpaz-ofm-i.sade-edap.prv' 
+		,'wpaz-ofm-i-e-esdc.services.gc.qat' 
+		,'prestationsducanada.gc.ca' 
+		,'www.prestationsducanada.gc.ca' 
+		,'negotech.labour.gc.ca'
+		,'negotheque.travail.gc.ca'
+		,'mlapesd3963v-s2tst-negotech.intra.dev'
+		,'cv19benefits-appservice-staging.azurewebsites.net'
+		,'cv19benefits-appservice-dev.azurewebsites.net'
+		,'covid-benefits.alpha.canada.ca'
+		,'covid-prestations.alpha.canada.ca'
+		,'woodpecker.eastus.cloudapp.azure.com'
+		,'multi-benefits.servicecanada.gc.ca' //CERB DFO
+		,'multi-benefices.servicecanada.gc.ca' //CERB DFO
+		,'pesdc.prv'
+		,'esin-sandbox.powerappsportals.com'	
+		,'srv2140-i2.services.gc.qat'	
+		,'srv2140-s.services.gc.qat'
+		,'sin-nas.canada.ca'
+		,'eservice-uat.powerappsportals.com'
+		,'iidus-stdei-dev.powerappsportals.com'
+		,'srv241-s2.lab.hrdc-drhc.gc.ca'
+		,'srv136.services.gc.ca'
+		,'alphasite.dts-stn.com'
+		,'vc-frontend-static-juane.netlify.app'
+		,'www.uat.youth-digital-gateway.dev'
+		,'www.youth-digital-gateway.dev'
+		,'www.youth.service.canada.ca'
+		,'uat12-ssl.services.gc.qat'
+        ,'virtualassistant-main.bdm-dev.dts-stn.com'
+        ,'www.noc.esdc.gc.ca'
+        ,'noc.esdc.gc.ca'
+        ,'youth-jeunesse.service.canada.ca'
+        ,'www.youth-jeunesse.service.canada.ca'
+        ,'jeunesse.service.canada.ca'
+        ,'www.jeunesse.service.canada.ca'
+        ,'intradev16-i.intra.dev'
+	// Elections
+		,'ec9wbstepfpkedu' 
+		,'elections.ca' 
+		,'www.elections.ca' 
+		,'enr.elections.ca' 
+		,'www.test.elections.ca'
+		,'enr.uat.elections.ca'		
+		,'enr.test.elections.ca'
+		,'ereg.elections.ca' 
+		,'www.ereg.elections.ca' 
+		,'ispdevwww.elections.ca' 
+		,'secure.elections.ca' 
+		,'secure.test.elections.ca' 
+		,'rspispweb01-ste-demo1.elections.ca'
+		,'ereg.test.elections.ca'
+		,'ereg.elections.ca'
+		,'www.ereg.elections.ca'
+		,'ecdev_maint-pesc.ecade.elections.ca'
+		,'www.ecdev_maint-pesc.ecade.elections.ca'
+		,'cef-cce.ca'
+		,'www.cef-cce.ca'
+		,'ispdevwww.elections.ca'
+		,'ec9wbedtpfpked'
+		,'ecdevmaint-pesc.ecade.elections.ca'
+		,'ec9wbeddpfpisp.elections.ca'
+		,'visdev.elections.ca'
+		,'enr-dev.elections.ca'
+		,'rspispweb01-ste-demo1.elections.ca'
+        ,'csep-pesc.elections.ca'
+        ,'redecoupage-redistribution-2022.ca'
+        ,'www.redecoupage-redistribution-2022.ca'
+	// Natural Resources Canada
+		,'equalby30.org' 
+		,'www.equalby30.org' 
+		,'nrcan.gc.ca' 
+		,'www.nrcan.gc.ca' 
+		,'rncan.gc.ca' 
+		,'www.rncan.gc.ca' 
+		,'rncanengagenrcan.ca' 
+		,'www.rncanengagenrcan.ca' 
+		,'www.rncanengagenrcan.ca' 
+		,'test.nrcan.gc.ca' 
+		,'test.rncan.gc.ca' 
+		,'www.test.nrcan.gc.ca' 
+		,'www.test.rncan.gc.ca' 
+		,'minescanada.ca'
+		,'www.minescanada.ca'
+		,'globe-cem-mi.yourballistic.com'
+		,'esrfunds.org'
+		,'www.esrfunds.org'
+		,'www.fondsee.org'
+		,'fondsee.org'	
+		,'www.npa.gc.ca'	
+		,'npa.gc.ca'	
+		,'www.apn.gc.ca'	
+		,'www.mpmo.gc.ca'	
+		,'www.bggp.gc.ca'	
+		,'www.apap.gc.ca'	
+		,'www.paap.gc.ca'
+		,'cem-mi-vancouver2019.ca'
+		,'www.cem-mi-vancouver2019.ca'
+		,'cmep-mi-vancouver2019.ca'
+		,'apap.gc.ca'
+		,'paap.gc.ca'
+		,'www.esrfunds.org'
+		,'www.fondsee.org'
+		,'mpmo.gc.ca'
+		,'bggp.gc.ca'
+		,'npa.gc.ca'
+		,'apn.gc.ca'
+		,'natural-resources.canada.ca' //new canada.ca subdomainsdomain
+		,'ressources-naturelles.canada.ca' //new canada.ca subdomain
+		,'nrcan.canada.ca' //new canada.ca subdomain
+		,'rncan.canada.ca' //new canada.ca subdomain
+		,'nrcan-rncan.canada.ca' //new canada.ca subdomain
+		,'rncan-nrcan.canada.ca' //new canada.ca subdomain
+		,'osdp-cumulative-effects-stage.canada.ca'
+		,'psdo-effets-cumulatifs-stage.canada.ca'
+		,'qa.dev.osdp.aws.nrcan-rncan.cloud'
+		,'osdp-cumulative-effects.canada.ca'
+		,'psdo-effets-cumulatifs.canada.ca'
+		,'www.dev.nrcan.gc.ca'
+		,'dev.nrcan.gc.ca'
+		,'www.dev.rncan.gc.ca'
+		,'dev.rncan.gc.ca' 
+		,'dev.npa.gc.ca'
+		,'dev.esrfunds.org'
+		,'dev.mpmo.gc.ca'
+		,'dev.apn.gc.ca'
+		,'dev.fondsee.org'
+		,'dev.bggp.gc.ca'
+		,'osdp-psdo.canada.ca'
+		,'stg-osdp-psdo.canada.ca'
+		,'uat-osdp-psdo.canada.ca'
+		,'qa.pst.osdp.aws.nrcan-rncan.cloud'
+	// Office of the procurement ombudsman
+		,'opo-boa.gc.ca' 
+		,'dev.boa-opo.gc.ca'
+        ,'www.dev.boa-opo.gc.ca'
+		,'xterra3w2k16.ncr.pwgsc.gc.ca'
+		,'secure.opo-boa.gc.ca'
+        ,'xterra3w2k16.dev.ad.itsso-ospti.gc.ca'
+	// MSCA-MEIIO
+		,'srv113-i.lab.hrdc-drhc.gc.ca' 
+		,'srv113-u.lab.hrdc-drhc.gc.ca' 
+		,'srv136.services.gc.ca' 
+		,'srv2140-u.services.gc.qat' 
+		,'srv241-s2.lab.hrdc-drhc.gc.ca' 
+	// Transport Canada
+		,'transport-dev' 
+	// Health Canada
+		,'a8047055' 
+		,'cfgtest.canadacentral.cloudapp.azure.com' //food guide
+		,'vmportaltest.canadacentral.cloudapp.azure.com'
+		,'prcitestfr.canadacentral.cloudapp.azure.com'
+		,'food-guide.canada.ca'
+		,'www.food-guide.canada.ca'
+		,'www.guide-alimentaire.canada.ca'
+		,'guide-alimentaire.canada.ca'
+		,'clinical-information.canada.ca'
+		,'renseignements-cliniques.canada.ca'
+		,'cfg-qa.hres.ca'
+		,'cfg-stage.hres.ca'
+		,'food-guide-stage.hpfb-dgpsa.ca'
+		,'guide-alimentaire-stage.hpfb-dgpsa.ca'
+		,'prci-dev.jack.hc-sc.gc.ca'
+	// Immigration Refugee Canada
+		,'www.cic.gc.ca'
+		,'cic.gc.ca'
+		,'eservices1.ci.gc.ca'
+		,'gol-ecas-dev.ci.gc.ca'
+		,'www-dev.ic.gc.ca'
+		,'eservices.cic.gc.ca'
+		,'services3.cic.gc.ca'
+		,'eservices5.ci.gc.ca'
+        ,'eservices1.ci.gc.ca'
+        ,'web.passport-online-staging.apps.cic.gc.ca'
+        ,'web.passeport-enligne-staging.apps.cic.gc.ca'
+        ,'web.passport-online-development.apps.cic.gc.ca'
+        ,'web.passeport-enligne-developmente.apps.cic.gc.ca'
+        ,'njes1s6362.apps.ci.gc.ca'
+        ,'atip-aiprp.apps.gc.ca'
+		,'ircc.canada.ca'
+	// Canada Revenue Agency
+		,'cra-arc.gc.ca'
+		,'arc-cra.gc.ca'
+		,'cra.gc.ca'
+		,'arc.gc.ca'
+		,'www.cra-arc.gc.ca'
+		,'www.arc-cra.gc.ca'
+		,'www.cra.gc.ca'
+		,'www.arc.gc.ca'
+		,'apps.cra-arc.gc.ca'
+		//CRA UT
+		,'cp-ut.isvcs.net'
+		,'rp-ut.isvcs.net'
+		,'cp-ut2.isvcs.net'
+		,'rp-ut2.isvcs.net'
+		//CRA SI
+		,'ams-sga-si.cra-arc.gc.ca'
+		,'cms-sgj-si.cra-arc.gc.ca'
+		,'ams-sga-si2.cra-arc.gc.ca'
+		,'cms-sgj-si2.cra-arc.gc.ca'
+		//CRA UA
+		,'ams-sga-ua.cra-arc.gc.ca'
+		,'cms-sgj-ua.cra-arc.gc.ca'
+		,'ams-sga-ua2.cra-arc.gc.ca'
+		,'cms-sgj-ua2.cra-arc.gc.ca'
+		//CRA OT	
+		,'apps1.ams-sga-ot.cra-arc.gc.ca'
+		,'apps2.ams-sga-ot.cra-arc.gc.ca'
+		,'apps3.ams-sga-ot.cra-arc.gc.ca'
+		,'apps4.ams-sga-ot.cra-arc.gc.ca'
+		,'apps5.ams-sga-ot.cra-arc.gc.ca'
+		,'apps6.ams-sga-ot.cra-arc.gc.ca'
+		,'apps7.ams-sga-ot.cra-arc.gc.ca'
+		,'apps8.ams-sga-ot.cra-arc.gc.ca'
+		,'cms-sgj-ot.cra-arc.gc.ca'
+		,'apps1.ams-sga-ot2.cra-arc.gc.ca'
+		,'apps2.ams-sga-ot2.cra-arc.gc.ca'
+		,'apps3.ams-sga-ot2.cra-arc.gc.ca'
+		,'apps4.ams-sga-ot2.cra-arc.gc.ca'
+		,'apps5.ams-sga-ot2.cra-arc.gc.ca'
+		,'apps6.ams-sga-ot2.cra-arc.gc.ca'
+		,'apps7.ams-sga-ot2.cra-arc.gc.ca'
+		,'apps8.ams-sga-ot2.cra-arc.gc.ca'
+		,'cms-sgj-ot2.cra-arc.gc.ca'
+		,'ams-sga.cra-arc.gc.ca'
+		,'cms-sgj.cra-arc.gc.ca'
+		,'apps1.ams-sga.cra-arc.gc.ca'
+		,'apps2.ams-sga.cra-arc.gc.ca'
+		,'apps3.ams-sga.cra-arc.gc.ca'
+		,'apps4.ams-sga.cra-arc.gc.ca'
+		,'apps5.ams-sga.cra-arc.gc.ca'
+		,'apps6.ams-sga.cra-arc.gc.ca'
+		,'apps7.ams-sga.cra-arc.gc.ca'
+		,'apps8.ams-sga.cra-arc.gc.ca'
+		,'www.ams-sga.cra-arc.gc.ca'
+		,'www.cms-sgj.cra-arc.gc.ca'
+		,'www.apps1.ams-sga.cra-arc.gc.ca'
+		,'www.apps2.ams-sga.cra-arc.gc.ca'
+		,'www.apps3.ams-sga.cra-arc.gc.ca'
+		,'www.apps4.ams-sga.cra-arc.gc.ca'
+		,'www.apps5.ams-sga.cra-arc.gc.ca'
+		,'www.apps6.ams-sga.cra-arc.gc.ca'
+		,'www.apps7.ams-sga.cra-arc.gc.ca'
+		,'www.apps8.ams-sga.cra-arc.gc.ca'
+		,'apps-ut.cra-arc.gc.ca'
+		,'apps-ua.cra-arc.gc.ca' 
+		,'apps-ut.isvcs.net'
+		,'apps-ua.isvcs.net'
+		,'apps-ut2.cra-arc.gc.ca'
+		,'apps-ua2.cra-arc.gc.ca'
+		,'apps-ut2.isvcs.net'
+		,'apps-ua2.isvcs.net'
+		,'performance.alpha.canada.ca'
+		,'cp-ut.isvcs.net'
+		,'apps-ut.isvcs.net'
+		,'xterra3w2k16.dev.ad.itsso-ospti.gc.ca'
+	// Public Services procurement Canada
+		,'test.publications.gc.ca'
+		,'publications.gc.ca'
+		,'www.publications.gc.ca'
+		,'content.buyandsell.gc.ca'
+		,'beta.buyandsell.gc.ca'
+		,'beta.achatsetventes.gc.ca'
+		,'test.buyandsell.gc.ca'	
+		,'test.achatsetventes.gc.ca'
+		,'webdev02.tpsgc-pwgsc.gc.ca'
+		,'www.tpsgc-pwgsc.gc.ca'
+		,'buyandsell.gc.ca'
+		,'achatsetventes.gc.ca'
+		,'staging.achatscanadabuys.ca'
+		,'m8-test.achatscanadabuys.ca'
+		,'m8-test.achatscanadabuys.ca'
+		,'m8-dev-collab.achatscanadabuys.ca'
+		,'webdev01.tpsgc-pwgsc.gc.ca'
+		,'webdev02.tpsgc-pwgsc.gc.ca'
+		,'webdev08.tpsgc-pwgsc.gc.ca'
+		,'m8-uat.achatscanadabuys.ca'
+		,'masource-mysource.shp.dev.global.gc.ca'
+		,'intranet.tpsgc-pwgsc.gc.ca'
+		,'masource-mysource.spac-pspc.gc.ca'
+		,'gcintranet.tpsgc-pwgsc.gc.ca'
+	// Global Affiars Canada
+		,'www.international.gc.ca'
+		,'international.gc.ca'
+		,'www.tradecommissioner.gc.ca'
+		,'tradecommissioner.gc.ca'
+		,'www.deleguescommerciaux.gc.ca'
+		,'deleguescommerciaux.gc.ca'
+		,'travel-ace-m2'
+		,'voyage-ace-m2' 
+		,'www.travel.gc.ca'
+		,'travel.gc.ca'
+		,'www.voyage.gc.ca' 
+		,'voyage.gc.ca' 
+		,'www.core-ombuds.canada.ca'
+		,'core-ombuds.canada.ca'
+		,'www.educanada.ca'
+		,'deleguescommerciaux.gc.ca'
+		,'educanada.ca'
+		,'www.educanada.ca'
+	// Justice Canada
+		,'www-uat.justice.gc.ca'
+		,'limsdev.justice.gc.ca'
+		,'dmteam-uat.justice.gc.ca'
+		,'equipesm-uat.justice.gc.ca'
+		,'www-uat.victimsfirst.gc.ca'
+		,'www-uat.victimesdabord.gc.ca'
+		,'jusnet-uat.justice.gc.ca'
+		,'www-uat.victimsweek.gc.ca'
+		,'www-uat.semainedesvictimes.gc.ca'
+		,'www.justice.gc.ca'
+		,'justice.gc.ca'
+		,'dmteam.justice.gc.ca'
+		,'equipesm.justice.gc.ca'
+		,'www.laws-lois.justice.gc.ca'
+		,'laws-lois.justice.gc.ca'
+		,'lois-laws.justice.gc.ca'
+		,'www.lois-laws.justice.gc.ca'
+		,'laws.justice.gc.ca'	
+		,'lois.justice.gc.ca'		
+		,'www.ppsc.gc.ca'
+		,'ppsc.gc.ca'
+		,'www.victimsweek.gc.ca'
+		,'www.semainedesvictimes.gc.ca'
+		,'victimsweek.gc.ca'
+		,'semainedesvictimes.gc.ca'
+		,'jusnet.justice.gc.ca'
+        ,'www.victimsfirst.gc.ca'
+        ,'www.victimesdabord.gc.ca'
+        ,'victimsfirst.gc.ca'
+        ,'victimesdabord.gc.ca'
+	// Canadian Food Inspection Agency
+		,'inspection.gc.ca'
+		,'www.inspection.gc.ca'
+		,'inspection.canada.ca'
+		,'www.inspection.canada.ca'
+		,'active.inspection.gc.ca'
+		,'www.active.inspection.gc.ca'
+		,'merlin.cfia-acia.inspection.gc.ca'
+		,'apps.merlin.cfia-acia.inspection.gc.ca'
+		,'www.apps.merlin.cfia-acia.inspection.gc.ca'
+		,'inspection.canada.ca'
+	// Public Safety Canada
+		,'infomediadev'
+		,'infomedia.gc.ca'
+		,'www.infomedia.gc.ca'
+		,'beta.infomedia.gc.ca'
+		,'api.infomedia.gc.ca'
+		,'icdev'
+		,'psdev'
+		,'gpdev'
+		,'psdev'
+		,'gpdev'
+		,'ecdev'
+		,'icdev'
+		,'publicsafety.gc.ca'
+		,'www.publicsafety.gc.ca'
+		,'securitepublique.gc.ca'
+		,'www.securitepublique.gc.ca'
+		,'getprepared.gc.ca'
+		,'www.getprepared.gc.ca'
+		,'preparez-vous.gc.ca'
+		,'www.preparez-vous.gc.ca'
+		,'erc-cee.gc.ca'
+		,'www.erc-cee.gc.ca'
+		,'infocentral'
+		,'infocentrale'
+		,'infocentral'
+	// RCMP External Review Committee
+		,'ercdev'
+	// Open Government
+		,'staging.open.canada.ca'
+		,'stadification.ouvert.canada.ca'
+		,'open.canada.ca'
+		,'ouvert.canada.ca'
+		,'search.open.canada.ca'
+		,'rechercher.ouvert.canada.ca'
+	// Correctional Investigator Canada
+		,'www.oci-bec.gc.ca'
+		,'oci-bec.gc.ca'
+	//Public Service Commission
+		,'intracom'
+		,'intradev'
+		,'intracom.psc-cfp.gc.ca'
+		,'extranet.psc-cfp.gc.ca'
+		,'devextranet.psc-cfp.gc.ca'
+		,'test-psjobs-emploisfp.psc-cfp.gc.ca'
+		,'emploisfp-psjobs.cfp-psc.gc.ca'
+	//Superintendent of Financial Institutions Canada (Office of the)
+		,'devirppub.devosfi.ca'
+		,'uatirppub.devosfi.ca'
+		,'uatirppub.osfi-bsif.gc.ca'	
+		,'uatirppub.devosfi.ca'	
+		,'www.osfi-bsif.gc.ca'
+	//Women and Gender Equality Canada	
+		,'canada'	
+		,'intranettest'	
+		,'intranet'	
+		,'femmes-egalite-genres.canada.ca'
+		,'women-gender-equality.canada.ca'
+		,'intranet.fegc-wage.gc.ca'
+	//Canadian Space Agency
+		,'devcorpo'
+		,'asc-csa.gc.ca'
+		,'www.asc-csa.gc.ca'
+		,'csa-asc.gc.ca'
+		,'www.csa-asc.gc.ca'
+		,'appsqa.asc-csa.gc.ca'
+		,'www4.asc-csa.gc.ca'
+		,'datatest.asc-csa.gc.ca'
+		,'donnees-data.asc-csa.gc.ca'
+   //Infrastructure Canada
+        ,'internet-dev.ad.infrastructure.gc.ca'
+        ,'infranet-dev.ad.infrastructure.gc.ca'
+        ,'www.infrastructure.gc.ca'
+        ,'infranet.ad.infrastructure.gc.ca'
+
+	
+
+ ]
+};
+
+
+
+
+
+
+
+/* ===== Set data elements that rely on whitelist ===== */
+
+/*jsAbort START*/
+var dirs;
+var list;
+var h = document.location.hostname.toLowerCase(); //host
+var j = document.location.pathname.toLowerCase(); //path
+
+if (_satellite.buildInfo.environment == "production") {
+    list = _satellite.gcCustom.domain_whitelist.live;
+}
+else {
+    list = _satellite.gcCustom.domain_whitelist.stage;
+    //list = _satellite.gcCustom.domain_whitelist.live; //FOR TESTING ON LIVE ONLY! REMOVE
+
+}
+
+//directories to exclude
+///Input list. Each item must be inputed with its own quotation marks and be separted using a comma
+/// excl list cannot be empty
+excl = ['/analytique-analytics/',
+            'checkingvisa.com',
+            '/naics/2017/v3/',
+  			'/gol-ged/awsc/amss/browser/check',
+  			'/gol-ged/awsc/amss/enrol/loginCheck',
+  			'/gol-ged/awsc/amss/enrol/logincheck',
+  			'beta.buyandsell.gc.ca/standing-offers-and-supply-arrangements-application/my-workspace/user-management/',
+  			'beta.achatsetventes.gc.ca/application-d-offres-a-commandes-et-d-arrangements-en-matiere-d-approvisionnement/mon-espace-travail/gestion-des-utilisateurs/',
+  			'gol-ecas-dev.ca.gc.ca/ecas/viewcasehistory.do',
+  			'services3.cic.gc.ca/ecas/viewcasehistory.do',
+  			'buyandsell.gc.ca/standing-offers-and-supply-arrangements-application/my-workspace/user-management/',
+  			'achatsetventes.gc.ca/application-d-offres-a-commandes-et-d-arrangements-en-matiere-d-approvisionnement/mon-espace-travail/gestion-des-utilisateurs/',
+            'buyandsell.gc.ca/procurement-data/search/manage-subscriptions',
+            'achatsetventes.gc.ca/donnees-sur-l-approvisionnement/search/gerez-le-service-d-avis',
+            'buyandsell.gc.ca/procurement-data/search/edit-tender-subscription',
+            'achatsetventes.gc.ca/donnees-sur-l-approvisionnement/search/modifier-les-abonnements-aux-appels-d-offres'
+
+]
+
+var j = document.location.host + document.location.pathname.toLowerCase(); //path
+var toExcl = false; //set to false by default
+for (var i in excl) {
+    if (j.indexOf(excl[i]) > -1) {
+        toExcl = true;
+    }
+}
+//end directory exclusions
+
+//sets the data element
+if (typeof list[h] === 'undefined' || toExcl === true) {
+    //_satellite.logger.warn("+++++SETTING JSABORT TRUE+++++");
+    //_satellite.logger.warn("+++++typeof list[h]+++++ --> " + typeof list[h]);
+    //_satellite.logger.warn("+++++toExcl+++++ --> " + toExcl);
+    _satellite.setVar('jsAbort', 'true'); //set to true
+    //_satellite.cookie.set('blackList', 'yes'); //set blackList cookie so previous values are not set on next page
+    window.blackList = 'yes';
+    //s.getPreviousValue(s.pageName, 'gpv_pt'); //prev page title
+    //_satellite.cookie.set('gpv_pt', 'blank page title');
+    //_satellite.cookie.set('gpv_pthl', 'blank theme');
+    //_satellite.cookie.set('gpv_pc', 'blank page creator');
+    //_satellite.cookie.set('gpv_pqs', 'blank query string');
+    _satellite.cookie.set('prev_page_blackList', 'yes')
+}
+else if (toExcl === false) {
+    _satellite.setVar('jsAbort', 'false');
+    window.blackList = 'no';
+}
+else {
+    _satellite.gcCustom.thisDomain = list[h];
+    //_satellite.logger.warn("+++++SETTING JSABORT FALSE+++++");
+    _satellite.setVar('jsAbort', 'false'); //set to false
+    //_satellite.cookie.set('blackList', 'no') //set blacklist cookie to no to allow previous values to be set on next page
+    window.blackList = 'no';
+
+}
+/*jsAbort END*/
+
+</script>
+
+    <meta name="dcterms.title" content="AIRS miscellaneous codes">
+<meta name="description" content="AIRS miscellaneous codes">
+<meta name="dcterms.description" content="AIRS miscellaneous codes">
+<meta name="keywords" content="Automated Import Reference System, AIRS, code, commodity details, Canada Border Services Agency, CBSA, Electronic Commerce Client Requirements Document, ECCRD">
+<meta name="dcterms.subject" content="electronic commerce,electronic documents,imports,agri-food industry,electronic information,agri-food products" title="gccore">
+<meta name="dcterms.creator" content="Government of Canada,Canadian Food Inspection Agency,Vice President, Operations">
+<meta name="dcterms.language" content="eng" title="ISO639-2">
+<meta name="dcterms.issued" content="2017-05-24" title="W3CDTF">
+<meta name="dcterms.modified" content="2022-05-16" title="W3CDTF">
+<meta name="dcterms.type" content="reference material" title="gctype">
+<meta name="dcterms.audience" content="business,government" title="gcaudience">
+
+    <!--[if gte IE 9 | !IE ]><!-->
+    <link rel="apple-touch-icon" sizes="57x57 72x72 114x114 144x144 150x150" class="wb-favicon" href="https://inspection.canada.ca/WET/9-1-0/GCWeb/assets/favicon-mobile.png"><link href="https://inspection.canada.ca/WET/9-1-0/GCWeb/assets/favicon.ico" rel="icon" type="image/x-icon" class="wb-init wb-favicon-inited">
+    <link rel="stylesheet" href="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/theme.min.css">
+    <!--<![endif]-->
+    <!--[if lt IE 9]>
+            <link href="/WET/9-1-0/GCWeb/assets/favicon.ico" rel="shortcut icon" />
+
+            <link rel="stylesheet" href="/WET/9-1-0/GCWeb/css/ie8-theme.min.css" />
+            <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+            <script src="/WET/9-1-0/wet-boew/js/ie8-wet-boew.min.js"></script>
+            <![endif]-->
+    <!--[if lte IE 9]>
+
+
+            <![endif]-->
+    <noscript><link rel="stylesheet" href="/WET/9-1-0/wet-boew/css/noscript.min.css" /></noscript>
+
+	<link rel="stylesheet" href="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/Overlay.css">
+	
+    <!-- WCMS:CUSTOMCODE -->
+
+</head>
+<body vocab="http://schema.org/" typeof="WebPage">
+    <nav>
+        <ul id="wb-tphp" class="wb-init wb-disable-inited">
+            <!-- NOTICE -->
+            <!-- <li class="wb-slc"><a class="wb-sl" href="#site-msg">Skip to maintenance notice</a></li> -->
+            <!-- NOTICE -->
+
+            <li class="wb-slc">
+                <a class="wb-sl" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#wb-cont">Skip to main content</a>
+            </li>
+            <li class="wb-slc">
+                <a class="wb-sl" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#wb-info">Skip to "About government"</a>
+            </li>
+        <li class="wb-slc"><a class="wb-sl" rel="alternate" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962?wbdisable=true">Switch to basic HTML version</a></li></ul>
+    </nav>
+    <header>
+        <div id="wb-bnr" class="container">
+            <div class="row">
+                <section id="wb-lng" class="col-xs-3 col-sm-12 pull-right text-right">
+                    <h2 class="wb-inv">Language selection</h2>
+                    <ul class="list-inline mrgn-bttm-0">
+                        <li>
+                            <a lang="fr" hreflang="fr" href="https://inspection.canada.ca/importation-d-aliments-de-vegetaux-ou-d-animaux/importations-de-vegetaux-et-de-produits-vegetaux/sari/codes-divers/fra/1494618949803/1494618982962">
+                                <span class="hidden-xs">Français</span>
+                                <abbr title="Français" class="visible-xs h3 mrgn-tp-sm mrgn-bttm-0 text-uppercase">fr</abbr>
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+                <div class="brand col-xs-9 col-sm-5 col-md-4" property="publisher" typeof="GovernmentOrganization">
+                    <a href="https://www.canada.ca/en.html" property="URL"><img src="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/sig-blk-en.svg" alt="Government of Canada" property="logo"><span class="wb-inv" property="name"> / <span lang="fr">Gouvernement du Canada</span></span></a>
+                    <meta property="name" content="Government of Canada">
+                    <meta property="areaServed" typeof="Country" content="Canada">
+                    <link property="logo" href="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/wmms-blk.svg">
+                </div>
+                <section id="wb-srch" class="col-lg-offset-4 col-md-offset-4 col-sm-offset-2 col-xs-12 col-sm-5 col-md-4">
+                    <h2>Search</h2>
+                    <form action="https://www.canada.ca/en/food-inspection-agency/search.html#wb-land" method="get" name="cse-search-box" role="search">
+                        <div class="form-group wb-srch-qry">
+                            <label for="wb-srch-q" class="wb-inv">Search Inspection.canada.ca</label>
+
+                            <input name="cdn" value="aciacfia" type="hidden">
+                            <input name="st" value="s" type="hidden">
+                            <input name="num" value="10" type="hidden">
+                            <input name="langs" value="eng" type="hidden">
+                            <input name="st1rt" value="0" type="hidden">
+                            <input name="s5bm3ts21rch" value="x" type="hidden">
+
+                            <input id="wb-srch-q" list="wb-srch-q-ac" class="wb-srch-q form-control" name="q" type="search" value="" size="34" maxlength="170" placeholder="Search Inspection.canada.ca">
+                            <datalist id="wb-srch-q-ac"></datalist>
+                        </div>
+                        <div class="form-group submit">
+                            <button type="submit" id="wb-srch-sub" class="btn btn-primary btn-small" name="wb-srch-sub"><span class="glyphicon-search glyphicon"></span><span class="wb-inv">Search</span></button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+        <nav class="gcweb-menu wb-init gcweb-menu-inited" typeof="SiteNavigationElement" id="wb-auto-2">
+            <div class="container">
+                <h2 class="wb-inv">Menu</h2>
+                <button type="button" aria-haspopup="true" aria-expanded="false" aria-label="Press the SPACEBAR to expand or the escape key to collapse this menu. Use the Up and Down arrow keys to choose a submenu item. Press the Enter or Right arrow key to expand it, or the Left arrow or Escape key to collapse it. Use the Up and Down arrow keys to choose an item on that level and the Enter key to access it."><span class="wb-inv">Main </span>Menu <span class="expicon glyphicon glyphicon-chevron-down"></span></button>
+                <ul role="menu" aria-orientation="vertical" data-ajax-replace="/WET/9-1-0/ajax/sitemenu-v5-en.html" class="wb-init wb-data-ajax-replace-inited" id="wb-auto-3">
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-jobs" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Jobs and the workplace</a>
+  <ul id="gc-mnu-jobs" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/jobs.html">Jobs<span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/jobs/opportunities.html">Find a job</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/jobs/training.html">Training</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/business-management">Hiring and managing employees</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/start-business">Starting a business</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/jobs/workplace.html">Workplace standards</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/finance/pensions.html">Pensions and retirement</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/benefits/ei.html">Employment Insurance benefits and leave</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-jobs-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-jobs-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/employment-social-development/programs/ei/ei-list/ei-roe/access-roe.html">View your Records of Employment</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/employment-social-development/services/sin.html">Apply for a Social Insurance Number (SIN)</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/employment-social-development/services/foreign-workers.html">Hire a temporary foreign worker</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry.html">Immigrate as a skilled worker</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-cit" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Immigration and citizenship</a>
+  <ul id="gc-mnu-cit" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/immigration-citizenship.html">Immigration<span class="hidden-xs hidden-sm"> and citizenship</span><span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/application.html">My application</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada.html">Visit</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada.html">Immigrate</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/work-canada.html">Work</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada.html">Study</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-citizenship.html">Citizenship</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants.html">New immigrants</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/canadians.html">Canadians</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/refugees.html">Refugees and asylum</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/immigration-citizenship/enforcement-violations.html">Enforcement and violations</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-cit-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-cit-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/application/account.html">Sign in or create an account to apply online</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/application/check-status.html">Check your application status</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/application/check-processing-times.html">Check application processing times</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/application/application-forms-guides.html">Find an application form</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.cic.gc.ca/english/information/fees/index.asp">Pay your fees</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.cic.gc.ca/english/visit/visas.asp">Find out if you need an eTA or a visa to visit Canada</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.cic.gc.ca/english/helpcentre/index-featured-can.asp">Have questions? Find answers in the Help Centre</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-travel" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Travel and tourism</a>
+  <ul id="gc-mnu-travel" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://travel.gc.ca/">Travel<span class="hidden-xs hidden-sm"> and tourism</span><span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/travelling/advisories">Travel advice and advisories</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/travel-covid">COVID-19: Travel, quarantine and borders</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/visit">Visit Canada</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/travelling">Travel abroad</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/air">Air travel</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/returning">Return to Canada</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports.html">Canadian passports</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/canadian-tourism">Canadian attractions, events and experiences</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/assistance/ask-travel">Ask travel</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/assistance">Assistance abroad</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/stay-connected">Stay connected</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-travel-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-travel-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/travelling/children/consent-letter">Consent letter for children travelling abroad</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.cbsa-asfc.gc.ca/bwt-taf/menu-eng.html">Canada - U.S. border wait times</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/travelling/registration">Register as a Canadian abroad</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.cbsa-asfc.gc.ca/prog/nexus/application-demande-eng.html">Apply for NEXUS</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/returning/customs/what-you-can-bring-home-to-canada">What you can bring home to Canada</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/assistance/embassies-consulates">Contact an embassy or consulate</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/travelling/cannabis-and-international-travel">Cannabis and international travel</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-biz" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Business and industry</a>
+  <ul id="gc-mnu-biz" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business.html">Business<span class="hidden-xs hidden-sm"> and industry</span><span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/start.html">Starting a business</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/grants.html">Business grants and financing</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/taxes.html">Business taxes</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/federal-corporations.html">Federal corporations</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/hire.html">Hiring and managing employees</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/trade.html">International trade and investment</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/permits.html">Permits, licences and regulations</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/doing-business.html">Doing business with government</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/science/innovation.html">R&amp;D and innovation</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/research.html">Research and business intelligence</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/ip.html">Intellectual property and copyright</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/maintaingrowimprovebusiness.html">Maintaining your business</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/protecting.html">Protecting your business</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/bankruptcy.html">Insolvency for business</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-biz-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-biz-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.ic.gc.ca/app/scr/cc/CorporationsCanada/fdrlCrpSrch.html?locale=en_CA">Find a corporation</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.cbsa-asfc.gc.ca/prog/manif/portal-portail-eng.html">Report your imported goods</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.ic.gc.ca/app/opic-cipo/trdmrks/srch/home?lang=eng">Search for trademarks</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.cbsa-asfc.gc.ca/trade-commerce/tariff-tarif/2018/html/tblmod-1-eng.html">Review custom tariffs for importing goods</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.ic.gc.ca/opic-cipo/cpd/eng/introduction.html">Find a patent</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.cbsa-asfc.gc.ca/comm-eng.html">Import and export from Canada</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://ic.gc.ca/eic/site/cd-dgc.nsf/eng/h_cs03922.html">Name a business</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.ic.gc.ca/app/scr/cc/CorporationsCanada/hm.html?locale=en_CA">Make changes to your corporation (Online Filing Centre)</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-benny" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Benefits</a>
+  <ul id="gc-mnu-benny" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/benefits.html">Benefits<span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.canada.ca/en/services/benefits/covid19-emergency-benefits.html">COVID-19 � Benefits and services </a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/benefits/ei.html">Employment Insurance benefits and leave</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/benefits/family.html">Family and caregiving benefits</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/benefits/publicpensions.html">Public pensions</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/benefits/education.html">Student aid and education planning</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/benefits/housing.html">Housing benefits</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/benefits/disability.html">Disability benefits</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.canada.ca/en/services/benefits/audience.html">Benefits by audience</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/benefits/calendar.html">Benefits payment dates</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://benefitsfinder.services.gc.ca/hm?GoCTemplateCulture=en-CA">Benefits finder</a></li>
+
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-benny-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-benny-sub" role="menu" aria-orientation="vertical">
+
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/benefits/ei/ei-regular-benefit.html">Apply for Employment Insurance</a></li>
+
+       <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/benefits/education/student-aid/grants-loans.html">Apply for student loans and grants</a></li>
+       <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/government/sign-in-online-account.html">Sign in to a Government of Canada online account</a></li>
+
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.tpsgc-pwgsc.gc.ca/recgen/txt/depot-deposit-eng.html">Sign up for direct deposit</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/benefits/ei/ei-internet-reporting.html">Submit your EI report</a></li>
+
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.cra-arc.gc.ca/bnfts/clcltr/cfbc-eng.html">Child and family benefits calculators</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-health" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Health</a>
+  <ul id="gc-mnu-health" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/health.html">Health<span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/health/food-nutrition.html">Food and nutrition</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/public-health/services/diseases.html">Diseases and conditions</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/public-health/topics/immunization-vaccines.html">Vaccines and immunization</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/health/drug-health-products.html">Drug and health products</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/health/product-safety.html">Product safety</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/health/health-risks-safety.html">Health risks and safety</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/health/healthy-living.html">Healthy living</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/health/aboriginal-health.html">Indigenous health</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/health/health-system-services.html">Health system and services</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/health/science-research-data.html">Science, research and data</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-health-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-health-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/health-canada/services/drugs-medication/cannabis/industry-licensees-applicants/licensed-cultivators-processors-sellers.html">Licensed cultivators, processors and seller of cannabis</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://healthycanadians.gc.ca/recall-alert-rappel-avis/index-eng.php">Food and product recalls and safety alerts</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/health-canada/services/canada-food-guides.html">Canada's food guide</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-taxes" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Taxes</a>
+  <ul id="gc-mnu-taxes" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/taxes.html">Taxes<span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/taxes/income-tax.html">Income tax</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses.html">GST/HST</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll.html">Payroll</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/taxes/business-number.html">Business number</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/taxes/savings-and-pension-plans.html">Savings and pension plans</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/taxes/child-and-family-benefits.html">Child and family benefits</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/taxes/excise-taxes-duties-and-levies.html">Excise taxes, duties, and levies</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/taxes/charities.html">Charities and giving</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-taxes-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-taxes-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/revenue-agency/services/e-services/e-services-individuals/account-individuals.html">My Account</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/revenue-agency/services/e-services/e-services-businesses/business-account.html">My Business Account</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/revenue-agency/services/e-services/represent-a-client.html">Represent a Client</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/revenue-agency/services/e-services/e-services-businesses/gst-hst-netfile.html">File a GST/HST return (NETFILE)</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/revenue-agency/services/make-a-payment-canada-revenue-agency.html">Make a payment to the Canada Revenue Agency</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/revenue-agency/services/child-family-benefits/benefit-payment-dates.html">Find the next benefit payment date</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-enviro" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Environment and natural resources</a>
+  <ul id="gc-mnu-enviro" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/environment.html">Environment<span class="hidden-xs hidden-sm"> and natural resources</span><span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/environment/weather.html">Weather, climate and hazards</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/environment/energy.html">Energy</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/environment/natural-resources.html">Natural resources</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.agr.gc.ca/eng/agriculture-and-the-environment/?id=1580153237101">Agriculture and the environment</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/environment/fisheries.html">Fisheries</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/environment/wildlife-plants-species.html">Wildlife, plants and species</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/environment/pollution-waste-management.html">Pollution and waste management</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/environment/conservation.html">Environmental conservation and protection</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-enviro-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-enviro-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://weather.gc.ca/canada_e.html">Local weather forecast</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.nrcan.gc.ca/energy/efficiency/transportation/20996">Fuel-efficient vehicles</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.nrcan.gc.ca/homes">Home energy efficiency</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/environment-climate-change/services/species-risk-public-registry.html">Species at risk</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/environment-climate-change/services/seasonal-weather-hazards.html">Prepare for severe weather</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-defence" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">National security and defence</a>
+  <ul id="gc-mnu-defence" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/defence.html"><span class="hidden-xs hidden-sm">National security and defence</span><span class="visible-xs-inline visible-sm-inline">Defence: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/defence/nationalsecurity.html">National security</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/defence/caf.html">Canadian Armed Forces</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/defence/defence-equipment-purchases-upgrades.html">Defence equipment purchases and upgrades</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.tc.gc.ca/en/services/transportation-security.html">Transportation security</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/defence/securingborder.html">Securing the border</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/defence/cybersecurity.html">Cyber security</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/defence/jobs.html">Jobs in national security and defence</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/government/publicservice/benefitsmilitary.html">Services and benefits for the military</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-defence-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-defence-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://forces.ca/en/careers/">Jobs in the Canadian Armed Forces</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/department-national-defence/services/military-history/history-heritage/insignia-flags/ranks/rank-appointment-insignia.html">Military ranks</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/defence/caf/equipment.html">Defence equipment</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.publicsafety.gc.ca/cnt/ntnl-scrt/cntr-trrrsm/lstd-ntts/crrnt-lstd-ntts-en.aspx">Current list of terrorist entities</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.cadets.ca/en/join/cadets.page">Join the Cadets</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://dgpaapp.forces.gc.ca/en/canada-defence-policy/index.asp">Canada's Defence policy</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-culture" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Culture, history and sport</a>
+  <ul id="gc-mnu-culture" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/culture.html">Culture<span class="hidden-xs hidden-sm">, history and sport</span><span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/canadian-heritage/services/funding.html">Funding - Culture, history and sport</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/culture/events-celebrations-commemorations.html">Events, celebrations and commemorations</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/culture/cultural-attractions.html">Cultural landmarks and attractions</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/culture/canadian-identity-society.html">Canadian identity and society</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/culture/sport.html">Sport</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/culture/history-heritage.html">History and heritage</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/culture/arts-media.html">Arts and media</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/culture/cultural-youth-programs.html">Cultural youth programs</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/culture/cultural-trade-investment.html">Cultural trade and investment</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-culture-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-culture-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.veterans.gc.ca/eng/remembrance/memorials/canadian-virtual-war-memorial">Visit the Canadian Virtual War Memorial</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/culture/canadian-identity-society/anthems-symbols.html">Anthems and symbols of Canada</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://crtc.gc.ca/eng/8045/d2018.htm">Find a CRTC decision</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.bac-lac.gc.ca/eng/search/Pages/ancestors-search.aspx">Research your family history</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.bac-lac.gc.ca/eng/census/Pages/census.aspx">Search census records</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/culture/cultural-attractions/attractions-canada-capital.html">Landmarks and attractions in Canada's capital</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-policing" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Policing, justice and emergencies</a>
+  <ul id="gc-mnu-policing" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/policing.html">Policing<span class="hidden-xs hidden-sm">, justice and emergencies</span><span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/policing/police/index.html">Policing</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/policing/justice.html">Justice</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/policing/emergencies.html">Emergencies</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/policing/corrections.html">Corrections</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/policing/parole.html">Parole, record suspension, expungement and clemency</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/policing/victims.html">Victims of crime</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-policing-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-policing-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.rcmp-grc.gc.ca/cfp-pcaf/online_en-ligne/index-eng.htm">Apply/Renew a firearms licence</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.rcmp-grc.gc.ca/en/criminal-record-checks">Get a criminal records check</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/parole-board/services/record-suspensions/official-pbc-application-guide-and-forms.html">Apply for a criminal record suspension</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.getprepared.gc.ca/cnt/hzd/drng-en.aspx">What to do during an emergency</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/policing/police/community-safety-policing/impaired-driving.html">Know the law on impaired driving</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/policing/police/help-solve-crime.html">Help solve a crime</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-trans" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Transport and infrastructure</a>
+  <ul id="gc-mnu-trans" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/transport.html">Transport<span class="hidden-xs hidden-sm"> and infrastructure</span><span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.tc.gc.ca/en/services/aviation.html">Aviation</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.tc.gc.ca/en/services/marine.html">Marine transportation</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.tc.gc.ca/en/services/road.html">Road transportation</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.tc.gc.ca/en/services/rail.html">Rail transportation</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.tc.gc.ca/en/services/dangerous-goods.html">Dangerous goods</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.tc.gc.ca/en/services/infrastructure.html">Infrastructure</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-trans-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-trans-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.tc.gc.ca/en/services/aviation/drone-safety.html">Drone safety</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://tc.canada.ca/en/aviation/aviation-security/what-not-bring-plane">What you can't bring on an airplane</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.tc.gc.ca/eng/marinesafety/oep-vesselreg-menu-728.htm">Register your vessel</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.tc.gc.ca/en/services/road/child-car-seat-safety.html">Child car seat safety</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.tc.gc.ca/eng/tdg/clear-tofc-211.htm">Transporting dangerous goods - Regulations</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.tc.gc.ca/eng/acts-regulations/regulations-sor96-433.htm">Canadian Aviation Regulations</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-canworld" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Canada and the world</a>
+  <ul id="gc-mnu-canworld" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="http://international.gc.ca/world-monde/index.aspx?lang=eng">Canada and the world<span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://international.gc.ca/world-monde/offices-bureaux/index.aspx?lang=eng">International offices and emergency contacts</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://international.gc.ca/world-monde/study_work_travel-etude_travail_voyage/index.aspx?lang=eng">Study, work and travel worldwide</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://international.gc.ca/world-monde/country-pays/index.aspx?lang=eng">Information by countries and territories</a></li> 
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://international.gc.ca/world-monde/stories-histoires/index.aspx?lang=eng">Stories</a></li>  
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://international.gc.ca/world-monde/international_relations-relations_internationales/index.aspx?lang=eng">International relations</a></li> 
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://international.gc.ca/world-monde/issues_development-enjeux_developpement/index.aspx?lang=eng">Global issues and international assistance</a></li>  
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://international.gc.ca/world-monde/funding-financement/index.aspx?lang=eng">Funding for international initiatives</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="http://www.canada.ca/en/services/business/trade/index.html">International trade and investment</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-canworld-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-canworld-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.international.gc.ca/world-monde/covid-19/index.aspx?lang=eng">COVID-19: Trade, foreign affairs, international trade and development</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://scholarships-bourses.gc.ca/scholarships-bourses/non_can/opportunities-opportunites.aspx?lang=eng">Find a Canadian scholarship as an international student</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://treaty-accord.gc.ca/index.aspx">International treaties signed by Canada</a></li>  
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://educanada.ca/index.aspx?lang=eng">Find international study or research opportunities in Canada</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://travel.gc.ca/assistance/embassies-consulates">Contact an embassy or consulate</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://international.gc.ca/protocol-protocole/reps.aspx?lang=eng">Contact a foreign representative in Canada</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.international.gc.ca/gac-amc/about-a_propos/services/authentication-authentification/step-etape-1.aspx?lang=eng">Authenticate a document</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-money" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Money and finances</a>
+  <ul id="gc-mnu-money" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/finance.html"><span class="hidden-xs hidden-sm">Money and finances</span><span class="visible-xs-inline visible-sm-inline">Finance: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/finance/manage.html">Managing your money</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/finance/debt.html">Debt and borrowing</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/finance/savings.html">Savings and investments</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/finance/educationfunding.html">Education funding</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/finance/pensions.html">Pensions and retirement</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/finance/fraud.html">Protection from frauds and scams</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/finance/tools.html">Financial tools and calculators</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/financial-consumer-agency/services/financial-literacy-programs.html">Financial literacy programs</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/finance/consumer-affairs.html">Consumer affairs</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/finance/bankruptcy.html">Insolvency</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/taxes.html">Taxes</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/government/system/finances.html">Government finances</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/grants.html">Business grants and financing</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/permits/federallyregulatedindustrysectors/financialservicesregulation.html">Financial and money services regulation</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-money-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-money-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.ic.gc.ca/app/scr/bsf-osb/ins/login.html?lang=eng">Find a bankruptcy or insolvency record</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/jobs/education/student-financial-aid/student-loan.html">Student loans</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.tpsgc-pwgsc.gc.ca/recgen/txt/depot-deposit-eng.html">Set up direct deposit</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/financial-consumer-agency/services/mortgages.html">Mortgages</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/financial-consumer-agency/services/credit-reports-score.html">Credit report and scores</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://itools-ioutils.fcac-acfc.gc.ca/BC-CB/NetInc-RevNet-eng.aspx">Make a budget</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/revenue-agency/services/tax/registered-plans-administrators/pspa/mp-rrsp-dpsp-tfsa-limits-ympe.html">Rates and contribution limits</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li role="presentation"> <a role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-science" aria-expanded="false" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#">Science and innovation</a>
+  <ul id="gc-mnu-science" role="menu" aria-orientation="vertical">
+    <li role="presentation"> <a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/science.html">Science<span class="hidden-xs hidden-sm"> and innovation</span><span class="visible-xs-inline visible-sm-inline">: home</span></a> </li>
+    <li role="separator"></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/science/researchfunding.html">Research funding and awards</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/science/sciencesubjects.html">Science subjects</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/science/open-data.html">Open data, statistics and archives</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/science/institutes.html">Research institutes and facilities</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/science/innovation.html">R&amp;D and innovation</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/business/ip.html">Intellectual property and copyright</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/science/scientistsdirectory.html">Directory of scientists and research professionals</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.canada.ca/en/services/science/educationalresources.html">Science education resources</a></li>
+    <li role="separator" aria-orientation="vertical"></li>
+    <li role="presentation"> <a data-keep-expanded="md-min" href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#" role="menuitem" tabindex="-1" aria-haspopup="true" aria-controls="gc-mnu-science-sub" aria-expanded="true">Most requested</a>
+      <ul id="gc-mnu-science-sub" role="menu" aria-orientation="vertical">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.nrc-cnrc.gc.ca/eng/publications/codes_centre/2015_national_building_code.html">National building codes</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.nrc-cnrc.gc.ca/eng/services/time/web_clock.html#tzpanel-4">Official time across Canada</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.nrc-cnrc.gc.ca/eng/services/sunrise/index.html">Check sunrise and sunset times</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://www.nrc-cnrc.gc.ca/eng/irap/services/financial_assistance.html">Grants for technological innovation (IRAP)</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="https://science-libraries.canada.ca/eng/home/">Federal Science Library</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="http://asc-csa.gc.ca/eng/astronomy/auroramax/hd-480.asp">Live view of northern lights cam</a></li>
+      </ul>
+    </li>
+  </ul>
+</li>
+</ul>
+            </div>
+        </nav>
+        <nav id="wb-bc" property="breadcrumb">
+            <h2>You are here:</h2>
+            <div class="container">
+
+                <!-- WCMS:BREADCRUMB BEGIN -->
+<ol class="breadcrumb">
+    <li><a href="https://www.canada.ca/en.html">Canada.ca</a></li>
+    <!-- WCMS:BREADCRUMB-ITEM BEGIN -->
+<li><a href="https://inspection.canada.ca/eng/1297964599443/1297965645317">Canadian Food Inspection Agency</a></li>
+<!-- WCMS:BREADCRUMB-ITEM END --><!-- WCMS:BREADCRUMB-ITEM BEGIN -->
+<li><a href="https://inspection.canada.ca/importing-food-plants-or-animals/eng/1573836795867/1573836899201">Importing food, plants or animals</a></li>
+<!-- WCMS:BREADCRUMB-ITEM END --><!-- WCMS:BREADCRUMB-ITEM BEGIN -->
+<li><a href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/eng/1299168480001/1299168593866">Plant and plant product imports</a></li>
+<!-- WCMS:BREADCRUMB-ITEM END --><!-- WCMS:BREADCRUMB-ITEM BEGIN -->
+<li><a href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/eng/1300127512994/1300127627409">AIRS</a></li>
+<!-- WCMS:BREADCRUMB-ITEM END --><!-- WCMS:BREADCRUMB-ITEMS -->
+</ol>
+<!-- WCMS:BREADCRUMB END -->
+
+            </div>
+        </nav>
+    </header>
+    <main property="mainContentOfPage" class="container" typeof="WebPageElement">
+
+        <!-- NOTICE -->
+            <!-- <section role="complementary" class="alert alert-warning mrgn-bttm-md mrgn-tp-md" aria-labelledby="site-msg"> -->
+				<!-- <h2 id="site-msg" class="mrgn-tp-0">Service interruption</h2> -->
+				<!-- <p>Due to system maintenance, the <abbr title="Canadian Food Inspection Agency">CFIA</abbr> website will be unavailable from <span class="nowrap">7&nbsp;am to 7&nbsp;pm (EST)</span> on <span class="nowrap">Saturday, October 16, 2021</span>. We apologize for any inconvenience this may cause.</p> -->
+            <!-- </section> -->
+        <!-- NOTICE -->
+        
+        <h1 id="wb-cont" property="name">AIRS miscellaneous codes</h1>
+<!-- WMCS:GDR-NOTICE --><!-- WCMS:NOTICE --><div data-ajax-replace="navi/eng/1627657762236" class="wb-init wb-data-ajax-replace-inited" id="wb-auto-4"><section class="alert alert-info">
+<h2 class="h3">Changes to common names for European gypsy moth and Asian gypsy moth</h2>
+<p>The common names for the European gypsy moth (EGM) and the Asian gypsy moth (AGM), and other similarly named insects, are currently under review internationally and within Canada, including by the Canadian Food Inspection Agency (CFIA). For now, the CFIA will refer to the EGM as the LDD moth or by its scientific name, <i lang="la">Lymantria dispar dispar</i>. The group of moths making up the AGM complex will be referred to by their scientific names, <i lang="la">Lymantria dispar asiatica</i>, <i lang="la">Lymantria dispar japonica</i>, <i lang="la">Lymantria umbrosa</i>, <i lang="la">Lymantria postalba</i> and <i lang="la">Lymantria albescens</i>, or the short form AGM moth until a final decision on a new common name is made.</p>
+</section>
+
+<div class="mrgn-bttm-lg"></div></div>
+
+<p>(Modified: <span class="nowrap">May 4, 2022</span>)</p>
+<p class="text-right"><a href="https://inspection.canada.ca/DAM/DAM-aboutcfia-sujetacia/STAGING/text-texte/airs_miscellaneous_codes_1494610954514_eng.pdf"><abbr title="Automated import Reference System (AIRS) miscellaneous code in Portable Document Format">PDF</abbr> (105&nbsp;<abbr title="kilobytes">kb</abbr>)</a></p>
+<p>Automated import Reference System (AIRS) miscellaneous code must be submitted in the commodity details section of the declaration as per the rules in the Canada Border Services Agency (CBSA) Electronic Commerce Client Requirements Document (ECCRD), the CFIA appendix, and <abbr title="Automated import Reference System">AIRS</abbr>.</p>
+<table class="table table-bordered">
+<caption class="text-left">
+<abbr title="Automated import Reference System">AIRS</abbr> Miscellaneous Code and Descriptions
+</caption>
+<thead>
+<tr class="active">
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>001</td>
+<td>Without soil or growing media (bare roots), in transit through <abbr title="British Columbia">BC</abbr>, <abbr title="Alberta">AB</abbr> or <abbr title="Saskatchewan">SK</abbr>.</td>
+</tr>
+<tr>
+<td>01</td>
+<td>From Great Britain</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Unstamped</td>
+</tr>
+<tr>
+<td>002</td>
+<td>Without soil or growing media (bare roots), not in transit through <abbr title="British Columbia">BC</abbr>, <abbr title="Alberta">AB</abbr> or <abbr title="Saskatchewan">SK</abbr></td>
+</tr>
+<tr>
+<td>02</td>
+<td>From Northern Ireland</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Prepackaged, metal</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Prepackaged, other</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2 or less, accompanied</td>
+</tr>
+<tr>
+<td>5</td>
+<td>More than 2</td>
+</tr>
+<tr>
+<td>6</td>
+<td>2 or less, unaccompanied</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Bulk shipments</td>
+</tr>
+<tr>
+<td>09</td>
+<td>Accompanied</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Field-grown tubers</td>
+</tr>
+<tr>
+<td>011</td>
+<td>Avian origin</td>
+</tr>
+<tr>
+<td>012</td>
+<td>other than avian origin</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Bears</td>
+</tr>
+<tr>
+<td>014</td>
+<td>arriving by airplane</td>
+</tr>
+<tr>
+<td>015</td>
+<td>arriving by land</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Without Soil</td>
+</tr>
+<tr>
+<td>016</td>
+<td>From a <abbr title="Vesicular Stomatitis">VS</abbr> affected county</td>
+</tr>
+<tr>
+<td>017</td>
+<td>Not from a <abbr title="Vesicular Stomatitis">VS</abbr> affected county</td>
+</tr>
+<tr>
+<td>17</td>
+<td>In capsules</td>
+</tr>
+<tr>
+<td>019</td>
+<td>Container weighing less than 200&nbsp;<abbr title="kilograms">kg</abbr>, in transit through British Columbia</td>
+</tr>
+<tr>
+<td>020</td>
+<td>Container weighing more than 200&nbsp;<abbr title="kilograms">kg</abbr>, in transit through British Columbia</td>
+</tr>
+<tr>
+<td>021</td>
+<td>Container weighing less than 200&nbsp;<abbr title="kilograms">kg</abbr>, not in transit through British Columbia</td>
+</tr>
+<tr>
+<td>22</td>
+<td>With bark</td>
+</tr>
+<tr>
+<td>022</td>
+<td>Container weighing more than 200&nbsp;<abbr title="kilograms">kg</abbr>, not in transit through British Columbia</td>
+</tr>
+<tr>
+<td>23</td>
+<td>Without bark</td>
+</tr>
+<tr>
+<td>023</td>
+<td>Container weighing less than 50&nbsp;<abbr title="kilograms">kg</abbr>, in transit through British Columbia</td>
+</tr>
+<tr>
+<td>024</td>
+<td>Container weighing more than 50&nbsp;<abbr title="kilograms">kg</abbr>, in transit through British Columbia</td>
+</tr>
+<tr>
+<td>025</td>
+<td>Container weighing less than 50&nbsp;<abbr title="kilograms">kg</abbr>, not in transit through British Columbia</td>
+</tr>
+<tr>
+<td>026</td>
+<td>Container weighing more than 50&nbsp;<abbr title="kilograms">kg</abbr>, not in transit through British Columbia</td>
+</tr>
+<tr>
+<td>27</td>
+<td>Without plant, above water level of sea</td>
+</tr>
+<tr>
+<td>027</td>
+<td>Born after <span class="nowrap">January 1, 1999</span></td>
+</tr>
+<tr>
+<td>28</td>
+<td>With soil or related matter (including growing media not approved under the <abbr title="Canadian Growing Media Program">CGMP</abbr>)</td>
+</tr>
+<tr>
+<td>028</td>
+<td>Born before <span class="nowrap">January 1, 1999</span></td>
+</tr>
+<tr>
+<td>29</td>
+<td>Without soil, or in peat, perlite or vermiculite</td>
+</tr>
+<tr>
+<td>30</td>
+<td>To a regulated area of the province for LDD moth and/or <abbr title="Pine Shoot Beetle">PSB</abbr></td>
+</tr>
+<tr>
+<td>31</td>
+<td>To a non-regulated area of the province for LDD moth and/or <abbr title="Pine Shoot Beetle">PSB</abbr></td>
+</tr>
+<tr>
+<td>33</td>
+<td>Unmarked</td>
+</tr>
+<tr>
+<td>34</td>
+<td>Fully marked</td>
+</tr>
+<tr>
+<td>034</td>
+<td>Without soil, related matter or growing media (bare root)</td>
+</tr>
+<tr>
+<td>035</td>
+<td>Container &lt; 200&nbsp;<abbr title="kilograms">kg</abbr>, entering Canada through <abbr title="British Columbia">B.C.</abbr> or has an end destination of <abbr title="British Columbia">B.C.</abbr></td>
+</tr>
+<tr>
+<td>036</td>
+<td>Container &gt; 200&nbsp;<abbr title="kilograms">kg</abbr>, entering Canada through <abbr title="British Columbia">B.C.</abbr> or has an end destination of <abbr title="British Columbia">B.C.</abbr></td>
+</tr>
+<tr>
+<td>037</td>
+<td>Container &lt; 50&nbsp;<abbr title="kilograms">kg</abbr>, entering Canada through <abbr title="British Columbia">B.C.</abbr> or has an end destination of <abbr title="British Columbia">B.C.</abbr></td>
+</tr>
+<tr>
+<td>038</td>
+<td>Container &gt; 50&nbsp;<abbr title="kilograms">kg</abbr>, entering Canada through <abbr title="British Columbia">B.C.</abbr> or has an end destination of <abbr title="British Columbia">B.C.</abbr></td>
+</tr>
+<tr>
+<td>039</td>
+<td>Entering Canada through <abbr title="British Columbia">B.C.</abbr> or has an end destination of <abbr title="British Columbia">B.C.</abbr></td>
+</tr>
+<tr>
+<td>040</td>
+<td>Not entering Canada through British Columbia</td>
+</tr>
+<tr>
+<td>041</td>
+<td>Without soil/ &gt;50&nbsp;<abbr title="kilograms">kg</abbr>, entering Canada through <abbr title="British Columbia">BC</abbr> or end destination of <abbr title="British Columbia">BC</abbr></td>
+</tr>
+<tr>
+<td>042</td>
+<td>Without soil/ &lt; 50&nbsp;<abbr title="kilograms">kg</abbr>, entering Canada through <abbr title="British Columbia">B.C.</abbr> or end destination of <abbr title="British Columbia">B.C.</abbr></td>
+</tr>
+<tr>
+<td>043</td>
+<td>With soil/ &gt;50&nbsp;<abbr title="kilograms">kg</abbr>, entering Canada through <abbr title="British Columbia">BC</abbr> or end destination of <abbr title="British Columbia">BC</abbr></td>
+</tr>
+<tr>
+<td>44</td>
+<td>Not more than 30 dozen eggs</td>
+</tr>
+<tr>
+<td>044</td>
+<td>With soil/ &lt;50&nbsp;<abbr title="kilograms">kg</abbr>, entering Canada through <abbr title="British Columbia">B.C.</abbr> or end destination of <abbr title="British Columbia">B.C.</abbr></td>
+</tr>
+<tr>
+<td>45</td>
+<td>Not more than 20&nbsp;<abbr title="kilograms">kg</abbr> - processed egg products</td>
+</tr>
+<tr>
+<td>045</td>
+<td>Without soil/ &gt;50&nbsp;<abbr title="kilograms">kg</abbr>, not entering Canada through</td>
+</tr>
+<tr>
+<td>46</td>
+<td>Entering Canada through British Columbia</td>
+</tr>
+<tr>
+<td>046</td>
+<td>Without soil/ &lt; 50&nbsp;<abbr title="kilograms">kg</abbr>, not entering Canada through <abbr title="British Columbia">B.C.</abbr></td>
+</tr>
+<tr>
+<td>47</td>
+<td>More than 30 dozen eggs</td>
+</tr>
+<tr>
+<td>048</td>
+<td>With soil/ &lt;50&nbsp;<abbr title="kilograms">kg</abbr>, not entering Canada through <abbr title="British Columbia">B.C.</abbr></td>
+</tr>
+<tr>
+<td>49</td>
+<td>From below water level of a sea</td>
+</tr>
+<tr>
+<td>049</td>
+<td>Grade (<abbr title="Nitrogen-Phosphorus-Potassium">N-P-K</abbr>): % <abbr title="Nitrogen">N</abbr> + % <abbr title="Phosphorus">P</abbr> + % <abbr title="Potassium">K</abbr> &lt;18% (<abbr title="for example">e.g.</abbr>, 5-5-5 = 15%)</td>
+</tr>
+<tr>
+<td>050</td>
+<td>Grade (<abbr title="Nitrogen-Phosphorus-Potassium">N-P-K</abbr>): % <abbr title="Nitrogen">N</abbr> + % <abbr title="Phosphorus">P</abbr> + % <abbr title="Potassium">K</abbr> &gt;18% (<abbr title="for example">e.g.</abbr>, 6-6-6 = 18%)</td>
+</tr>
+<tr>
+<td>53</td>
+<td>&lt;100&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>59</td>
+<td>Used and not contaminated with soil or plant debris</td>
+</tr>
+<tr>
+<td>61</td>
+<td>More than 20&nbsp;<abbr title="kilograms">kg</abbr> - processed egg products</td>
+</tr>
+<tr>
+<td>63</td>
+<td>With bark - going to provincial infested areas</td>
+</tr>
+<tr>
+<td>64</td>
+<td>With bark - going to provincial non infested areas</td>
+</tr>
+<tr>
+<td>67</td>
+<td>Commercial shipments</td>
+</tr>
+<tr>
+<td>68</td>
+<td>Commercially packed</td>
+</tr>
+<tr>
+<td>69</td>
+<td>From Curry County</td>
+</tr>
+<tr>
+<td>70</td>
+<td>From Other than Curry County</td>
+</tr>
+<tr>
+<td>73</td>
+<td>Untreated</td>
+</tr>
+<tr>
+<td>74</td>
+<td>Treated</td>
+</tr>
+<tr>
+<td>75</td>
+<td>Processed</td>
+</tr>
+<tr>
+<td>77</td>
+<td>Processed or treated</td>
+</tr>
+<tr>
+<td>79</td>
+<td>Unprocessed or untreated</td>
+</tr>
+<tr>
+<td>82</td>
+<td>Container weighing more than 50&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>83</td>
+<td>Container weighing more than 200&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>84</td>
+<td>Prepackaged, glass</td>
+</tr>
+<tr>
+<td>85</td>
+<td>Container weighing less than 50&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>86</td>
+<td>Container weighing less than 200&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>87</td>
+<td>Prepackaged, plastic</td>
+</tr>
+<tr>
+<td>89</td>
+<td>Quarantined in Niue</td>
+</tr>
+<tr>
+<td>95</td>
+<td>Stay in <abbr title="United States of America">USA</abbr> 30&nbsp;days or less</td>
+</tr>
+<tr>
+<td>96</td>
+<td>Stay in <abbr title="United States of America">USA</abbr> more than 30 but less than 60&nbsp;days</td>
+</tr>
+<tr>
+<td>97</td>
+<td>Small "lots" </td>
+</tr>
+<tr>
+<td>98</td>
+<td>Other than small "lots"</td>
+</tr>
+<tr>
+<td>99</td>
+<td>Quarantined in Miquelon</td>
+</tr>
+<tr>
+<td>106</td>
+<td>Australia - Other than Tasmania - Bluetongue-free zone</td>
+</tr>
+<tr>
+<td>112</td>
+<td>Elephant</td>
+</tr>
+<tr>
+<td>113</td>
+<td>Other zoo animals</td>
+</tr>
+<tr>
+<td>118</td>
+<td>Regulated areas for LDD moth</td>
+</tr>
+<tr>
+<td>119</td>
+<td>Non-regulated areas for LDD moth</td>
+</tr>
+<tr>
+<td>122</td>
+<td>To a non-regulated area of the province for <abbr title="Pine Shoot Beetle">PSB</abbr></td>
+</tr>
+<tr>
+<td>123</td>
+<td>To a regulated area of the province for <abbr title="Pine Shoot Beetle">PSB</abbr></td>
+</tr>
+<tr>
+<td>124</td>
+<td>From a regulated <abbr title="United States">US</abbr> county for LDD moth and/or <abbr title="Pine Shoot Beetle">PSB</abbr></td>
+</tr>
+<tr>
+<td>125</td>
+<td>From a non-regulated <abbr title="United States">US</abbr> county for LDD moth and/or <abbr title="Pine Shoot Beetle">PSB</abbr></td>
+</tr>
+<tr>
+<td>127</td>
+<td>Up to 15 <abbr title="packages">pkgs</abbr> with combined weight of up to 250&nbsp;<abbr title="kilograms">kg</abbr>/Treated</td>
+</tr>
+<tr>
+<td>128</td>
+<td>Up to 15 <abbr title="packages">pkgs</abbr> with combined weight of up to 250&nbsp;<abbr title="kilograms">kg</abbr>/Untreated</td>
+</tr>
+<tr>
+<td>370</td>
+<td>Other than small "lots" / Non-authorized importer</td>
+</tr>
+<tr>
+<td>371</td>
+<td>Other than small "lots"/ Authorized importer</td>
+</tr>
+<tr>
+<td>378</td>
+<td>With soil / container weighing more than 50&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>379</td>
+<td>With soil / container weighing less than 50&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>380</td>
+<td>Small "lots" / Commercially packed</td>
+</tr>
+<tr>
+<td>382</td>
+<td>Other than small "lots" / commercially packed / authorized importer</td>
+</tr>
+<tr>
+<td>383</td>
+<td>Other than small "lots" / commercially packed / non-authorized importer</td>
+</tr>
+<tr>
+<td>384</td>
+<td>Without soil / container weighing less than 50&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>385</td>
+<td>Without soil / container weighing more than 50&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>415</td>
+<td>With soil / Prepackaged, metal</td>
+</tr>
+<tr>
+<td>419</td>
+<td>With soil / Prepackaged, other</td>
+</tr>
+<tr>
+<td>427</td>
+<td>With soil / Prepackaged, glass</td>
+</tr>
+<tr>
+<td>431</td>
+<td>With soil / Prepackaged, plastic</td>
+</tr>
+<tr>
+<td>435</td>
+<td>Without soil / Prepackaged, metal</td>
+</tr>
+<tr>
+<td>439</td>
+<td>Without soil / Prepackaged, other</td>
+</tr>
+<tr>
+<td>447</td>
+<td>Without soil / Prepackaged, glass</td>
+</tr>
+<tr>
+<td>451</td>
+<td>Without soil / Prepackaged, plastic</td>
+</tr>
+<tr>
+<td>499</td>
+<td>&lt; 20&nbsp;<abbr title="kilograms">kg</abbr> per person </td>
+</tr>
+<tr>
+<td>500</td>
+<td>&gt; 20&nbsp;<abbr title="kilograms">kg</abbr> per person</td>
+</tr>
+<tr>
+<td>503</td>
+<td>Waiver</td>
+</tr>
+<tr>
+<td>504</td>
+<td>Non-compliant product: applicable requirements of the <i>Processed Products Regulations</i></td>
+</tr>
+<tr>
+<td>506</td>
+<td>Other than waiver</td>
+</tr>
+<tr>
+<td>507</td>
+<td>France - excluding the <span lang="fr">Bas Rhin</span> and <span lang="fr">Moselle</span> Departments</td>
+</tr>
+<tr>
+<td>508</td>
+<td>Other</td>
+</tr>
+<tr>
+<td>511</td>
+<td>England - Norfolk, Suffolk, Essex Counties</td>
+</tr>
+<tr>
+<td>518</td>
+<td><abbr title="Category">Cat.</abbr> C - Low risk establishments</td>
+</tr>
+<tr>
+<td>519</td>
+<td><abbr title="Category">Cat.</abbr> B - Medium risk establishments</td>
+</tr>
+<tr>
+<td>521</td>
+<td>Medium risk uncategorized plants</td>
+</tr>
+<tr>
+<td>601</td>
+<td><abbr title="Ontario">ON</abbr> - East of Thunder Bay</td>
+</tr>
+<tr>
+<td>602</td>
+<td><abbr title="Ontario">ON</abbr> - Thunder Bay and West</td>
+</tr>
+<tr>
+<td>604</td>
+<td>Regional District of Central Kootenay</td>
+</tr>
+<tr>
+<td>605</td>
+<td>North Okanagan/Columbia Shuswap West of Monashee Mountain Range</td>
+</tr>
+<tr>
+<td>606</td>
+<td>Other than <abbr title="Regional">Reg.</abbr> District Central Kootenay and <abbr title="North">N.</abbr> Okanagan/Columbia Shuswap West Monashee <abbr title="Mountain">Mt.</abbr> Range</td>
+</tr>
+<tr>
+<td>608</td>
+<td>Other destinations than Ontario or British Columbia</td>
+</tr>
+<tr>
+<td>609</td>
+<td>Other than small "lots"/ Authorized importer - East of Thunder Bay</td>
+</tr>
+<tr>
+<td>610</td>
+<td>Other than small "lots"/ Authorized importer - Regional Districts of Central Kootenay</td>
+</tr>
+<tr>
+<td>611</td>
+<td>Other than small "lots"/ Authorized importer - <abbr title="North">N.</abbr> Okanagan/<abbr title="Columbia">Col.</abbr> Shuswap West of Monashee <abbr title="Mountain">Mt.</abbr> Range</td>
+</tr>
+<tr>
+<td>612</td>
+<td>Other than small "lots"/ Non-authorized importer - East of Thunder Bay</td>
+</tr>
+<tr>
+<td>613</td>
+<td>Other than small "lots"/ Non-authorized importer - Regional Districts of Central Kootenay</td>
+</tr>
+<tr>
+<td>614</td>
+<td>Other than small "lots"/ Non-authorized importer - <abbr title="North">N</abbr> Okanagan/<abbr title="Columbia">Col</abbr> Shuswap West of Monashee <abbr title="Mountain">Mt.</abbr> Range</td>
+</tr>
+<tr>
+<td>615</td>
+<td>Other than small "lots"/ Authorized importer - West of Thunder Bay</td>
+</tr>
+<tr>
+<td>616</td>
+<td>Other than small lots/ <abbr title="Authorized">Auth.</abbr> importer-<abbr title="Regional District">R.D.</abbr> Central Kootenay/<abbr title="North">N. </abbr>Okanagan/<abbr title="Columbia">Col.</abbr> Shuswap <abbr title="West">W.</abbr> Monashee <abbr title="Mountain">Mt.</abbr> Range</td>
+</tr>
+<tr>
+<td>618</td>
+<td>Other than small "lots"/ Non-authorized importer - West of Thunder Bay</td>
+</tr>
+<tr>
+<td>619</td>
+<td>Other than small lots/ Non-auth.importer-<abbr title="Regional District">R.D.</abbr> Central Kootenay/<abbr title="North">N.</abbr> Okanagan/<abbr title="Columbia">Col.</abbr> Shuswap <abbr title="West">W.</abbr> Monashee </td>
+</tr>
+<tr>
+<td>624</td>
+<td>Small "lots" - East of Thunder Bay</td>
+</tr>
+<tr>
+<td>625</td>
+<td>Small "lots" / destined for Regional Districts of Central Kootenay</td>
+</tr>
+<tr>
+<td>626</td>
+<td>Small "lots" - North Okanagan/Columbia Shuswap West of Monashee Mountain Range</td>
+</tr>
+<tr>
+<td>627</td>
+<td>Small "lots" - West of Thunder Bay</td>
+</tr>
+<tr>
+<td>628</td>
+<td>Small "lots"-Other than <abbr title="Regional District">Reg Dist</abbr> Central Kootenay and <abbr title="North">N.</abbr> Okenagan/<abbr title="Columbia">Col.</abbr> Shuswap <abbr title="West">W.</abbr> Monashee <abbr title="Mountain">Mt.</abbr> Range</td>
+</tr>
+<tr>
+<td>632</td>
+<td>With bark - from infested <abbr title="United States of America">U.S.A.</abbr> counties</td>
+</tr>
+<tr>
+<td>633</td>
+<td>With bark - from non-infested <abbr title="United States of America">U.S.A.</abbr> counties</td>
+</tr>
+<tr>
+<td>637</td>
+<td>Without soil , or in peat, perlite or vermiculite and pre-packaged for travellers</td>
+</tr>
+<tr>
+<td>638</td>
+<td>With bark - for counties of Hancock, Kennebec, Knox, Lincoln, Sagadahoc, Waldo, Washington</td>
+</tr>
+<tr>
+<td>639</td>
+<td>November&nbsp;1<sup>st</sup> to January&nbsp;31</td>
+</tr>
+<tr>
+<td>640</td>
+<td>February&nbsp;1<sup>st</sup> to October&nbsp;31</td>
+</tr>
+<tr>
+<td>652</td>
+<td>Container weighing more than 50&nbsp;<abbr title="kilograms">kg</abbr> / Other Chinese provinces</td>
+</tr>
+<tr>
+<td>664</td>
+<td>Container weighing less than 50&nbsp;<abbr title="kilograms">kg</abbr> / treated</td>
+</tr>
+<tr>
+<td>665</td>
+<td>Container weighing less than 50&nbsp;<abbr title="kilograms">kg</abbr> / untreated</td>
+</tr>
+<tr>
+<td>666</td>
+<td>Container weighing more than 50&nbsp;<abbr title="kilograms">kg</abbr> / treated</td>
+</tr>
+<tr>
+<td>667</td>
+<td>Container weighing more than 50&nbsp;<abbr title="kilograms">kg</abbr> / untreated</td>
+</tr>
+<tr>
+<td>672</td>
+<td>Without soil or growing media (bare root)</td>
+</tr>
+<tr>
+<td>673</td>
+<td>With growing media that is free of soil and related matter (<abbr title="Canadian Growing Media Program">CGMP</abbr>)</td>
+</tr>
+<tr>
+<td>674</td>
+<td>Without soil or related matter</td>
+</tr>
+<tr>
+<td>675</td>
+<td>From non-infested counties</td>
+</tr>
+<tr>
+<td>676</td>
+<td>From infested counties</td>
+</tr>
+<tr>
+<td>677</td>
+<td>From Curry County - <abbr title="February">Feb.</abbr>&nbsp;1 - <abbr title="October">Oct.</abbr>&nbsp;31 - with bark</td>
+</tr>
+<tr>
+<td>678</td>
+<td>From Curry County - <abbr title="November">Nov.</abbr>&nbsp;1 - <abbr title="January">Jan.</abbr>&nbsp;31 - with bark</td>
+</tr>
+<tr>
+<td>679</td>
+<td>From Other than Curry County - <abbr title="February">Feb.</abbr>&nbsp;1 - <abbr title="October">Oct.</abbr>&nbsp;31 - with bark</td>
+</tr>
+<tr>
+<td>680</td>
+<td>From Other than Curry County - <abbr title="November">Nov.</abbr>&nbsp;1 - <abbr title="January">Jan.</abbr>&nbsp;31 - with bark</td>
+</tr>
+<tr>
+<td>681</td>
+<td>From Curry County - with bark</td>
+</tr>
+<tr>
+<td>682</td>
+<td>From Other than Curry County - with bark</td>
+</tr>
+<tr>
+<td>683</td>
+<td>&lt;5&nbsp;<abbr title="kilograms">kg</abbr> per person</td>
+</tr>
+<tr>
+<td>685</td>
+<td>Regulated areas of <abbr title="Pine Shoot Beetle">PSB</abbr> with bark</td>
+</tr>
+<tr>
+<td>688</td>
+<td>Non-regulated areas of <abbr title="Pine Shoot Beetle">PSB</abbr> with bark</td>
+</tr>
+<tr>
+<td>694</td>
+<td>Container weighing less than 200&nbsp;<abbr title="kilograms">kg</abbr> / Shandong Province</td>
+</tr>
+<tr>
+<td>695</td>
+<td>Container weighing more than 200&nbsp;<abbr title="kilograms">kg</abbr> / Shandong Province</td>
+</tr>
+<tr>
+<td>696</td>
+<td>Container weighing less than 200&nbsp;<abbr title="kilograms">kg</abbr> / Shaanxi province</td>
+</tr>
+<tr>
+<td>697</td>
+<td>Container weighing more than 200&nbsp;<abbr title="kilograms">kg</abbr> / Shaanxi province</td>
+</tr>
+<tr>
+<td>698</td>
+<td>Container weighing less than 200&nbsp;<abbr title="kilograms">kg</abbr> / Other Chinese provinces</td>
+</tr>
+<tr>
+<td>699</td>
+<td>Container weighing more than 200&nbsp;<abbr title="kilograms">kg</abbr> / Other Chinese provinces</td>
+</tr>
+<tr>
+<td>701</td>
+<td>Less than three (3) months of age</td>
+</tr>
+<tr>
+<td>702</td>
+<td>Over three (3) months of age</td>
+</tr>
+<tr>
+<td>703</td>
+<td>multi-level trailers</td>
+</tr>
+<tr>
+<td>704</td>
+<td>Single level trailer</td>
+</tr>
+<tr>
+<td>705</td>
+<td>Commercially packaged, small packets (equal to or less than 500&nbsp;<abbr title="grams">g</abbr>) of corn as vegetable seed</td>
+</tr>
+<tr>
+<td>710</td>
+<td>Without further processing</td>
+</tr>
+<tr>
+<td>713</td>
+<td>Plants accompanying Importer at time of entry into Canada</td>
+</tr>
+<tr>
+<td>714</td>
+<td>Plants not accompanying Importer at time of entry into Canada </td>
+</tr>
+<tr>
+<td>718</td>
+<td>Plants (with soil) not accompanying Importer at time of entry into Canada </td>
+</tr>
+<tr>
+<td>719</td>
+<td>Plants (without soil) accompanying Importer at time of entry into Canada</td>
+</tr>
+<tr>
+<td>720</td>
+<td>Plants (without soil) not accompanying Importer at time of entry into Canada </td>
+</tr>
+<tr>
+<td>721</td>
+<td>Not commercially packed</td>
+</tr>
+<tr>
+<td>724</td>
+<td>Canadian cattle returning less than 30&nbsp;days</td>
+</tr>
+<tr>
+<td>725</td>
+<td>American cattle for immediate slaughter</td>
+</tr>
+<tr>
+<td>726</td>
+<td>Container weighing more than 200&nbsp;<abbr title="kilograms">kg</abbr> / Hebei Province</td>
+</tr>
+<tr>
+<td>727</td>
+<td>Container weighing less than 200&nbsp;<abbr title="kilograms">kg</abbr> / Hebei Province</td>
+</tr>
+<tr>
+<td>728</td>
+<td>Container weighing more than 200&nbsp;<abbr title="kilograms">kg</abbr> / Xinjlang Province</td>
+</tr>
+<tr>
+<td>729</td>
+<td>Container weighing less than 200&nbsp;<abbr title="kilograms">kg</abbr> / Xinjlang Province</td>
+</tr>
+<tr>
+<td>730</td>
+<td>In transit through Canada</td>
+</tr>
+<tr>
+<td>732</td>
+<td>To or from Alaska through Beaver Creek Border,Yukon./Alcan, <abbr title="Alaska">AK</abbr></td>
+</tr>
+<tr>
+<td>733</td>
+<td>To or from Alaska through another <abbr title="United States">US</abbr>/<abbr title="Canadian">CDN</abbr> border</td>
+</tr>
+<tr>
+<td>735</td>
+<td>Container weighing more than 50&nbsp;<abbr title="kilograms">kg</abbr> - with a grade declared</td>
+</tr>
+<tr>
+<td>736</td>
+<td>Container weighing more than 50&nbsp;<abbr title="kilograms">kg</abbr> - without a grade declared</td>
+</tr>
+<tr>
+<td>737</td>
+<td>With bark - From regulated <abbr title="United States">US</abbr> areas to regulated areas of the province for LDD moth</td>
+</tr>
+<tr>
+<td>738</td>
+<td>With bark - From regulated <abbr title="United States">US</abbr> areas to non-regulated areas of the province for LDD moth</td>
+</tr>
+<tr>
+<td>739</td>
+<td>To a regulated area of the province for LDD moth</td>
+</tr>
+<tr>
+<td>740</td>
+<td>To non-regulated area of the province for LDD moth</td>
+</tr>
+<tr>
+<td>741</td>
+<td>From regulated <abbr title="United States">US</abbr> areas for LDD moth</td>
+</tr>
+<tr>
+<td>742</td>
+<td>From a non-regulated <abbr title="United States">US</abbr> area for LDD moth</td>
+</tr>
+<tr>
+<td>746</td>
+<td>With soil, entering Canada through <abbr title="British Columbia">BC</abbr> or end destination of <abbr title="British Columbia">BC</abbr></td>
+</tr>
+<tr>
+<td>747</td>
+<td>With soil, not entering Canada through <abbr title="British Columbia">BC</abbr></td>
+</tr>
+<tr>
+<td>748</td>
+<td>Without soil, entering Canada through <abbr title="British Columbia">BC</abbr> or end destination of <abbr title="British Columbia">BC</abbr></td>
+</tr>
+<tr>
+<td>749</td>
+<td>Without soil, not entering Canada through <abbr title="British Columbia">BC</abbr></td>
+</tr>
+<tr>
+<td>754</td>
+<td>Personal use - Canadian travellers</td>
+</tr>
+<tr>
+<td>755</td>
+<td>4.5&nbsp;<abbr title="kilograms">kg</abbr> or less, not commercially packaged</td>
+</tr>
+<tr>
+<td>756</td>
+<td>4.5&nbsp;<abbr title="kilograms">kg</abbr> or less, commercially packaged</td>
+</tr>
+<tr>
+<td>759</td>
+<td>Other than small "lots"/authorized importer/destined for regional district of <abbr title="North">N.</abbr> Okanagan</td>
+</tr>
+<tr>
+<td>760</td>
+<td>Other than small "lots"/authorized importer/to <abbr title="Regional District">reg. dist.</abbr> Columbia Shuswap <abbr title="West">W.</abbr> of Monashee <abbr title="Mountain">Mt.</abbr> Range</td>
+</tr>
+<tr>
+<td>761</td>
+<td>Other than small "lots"/non-authorized importer/destined for <abbr title="Regional District">reg. dist.</abbr> of <abbr title="Columbia">C.</abbr> Kootenay</td>
+</tr>
+<tr>
+<td>762</td>
+<td>Other than small "lots"/non-authorized importer/destined for <abbr title="Regional District">reg. dist.</abbr> of North Okanagan</td>
+</tr>
+<tr>
+<td>763</td>
+<td>Other than small "lots"/non-auth importer/to <abbr title="Regional District">reg. dist.</abbr> Columbia Shuswap <abbr title="West">W.</abbr> Monashee <abbr title="Mountain">Mt.</abbr> Range</td>
+</tr>
+<tr>
+<td>764</td>
+<td>Small "lots" / destined for regional district of North Okanagan</td>
+</tr>
+<tr>
+<td>765</td>
+<td>Small "lots" / destined for regional district of Columbia Shuswap West of Monashee Mountain Range</td>
+</tr>
+<tr>
+<td>766</td>
+<td>Small "lots" / destined for other districts of British Columbia</td>
+</tr>
+<tr>
+<td>767</td>
+<td>Other than small "lots" / authorized importer/destined for other districts of British Columbia</td>
+</tr>
+<tr>
+<td>768</td>
+<td>Other than small "lots" / non-authorized importer / destined for other districts of British Columbia</td>
+</tr>
+<tr>
+<td>769</td>
+<td>Non-processed</td>
+</tr>
+<tr>
+<td>770</td>
+<td>With growing media that is free of soil and related matter, previously approved by the CFIA</td>
+</tr>
+<tr>
+<td>771</td>
+<td>With soil or related matter, or with growing media not been previously approved by the CFIA</td>
+</tr>
+<tr>
+<td>773</td>
+<td>Less than three (3)&nbsp;days old</td>
+</tr>
+<tr>
+<td>774</td>
+<td>Over three (3)&nbsp;days old</td>
+</tr>
+<tr>
+<td>775</td>
+<td>Inoculated with pathogens</td>
+</tr>
+<tr>
+<td>776</td>
+<td>Not inoculated with pathogens</td>
+</tr>
+<tr>
+<td>777</td>
+<td>Dogs 6 to 8 weeks of age</td>
+</tr>
+<tr>
+<td>778</td>
+<td>Dogs over 8 weeks of age but less than 8 months</td>
+</tr>
+<tr>
+<td>779</td>
+<td>Dogs eight months of age or older</td>
+</tr>
+<tr>
+<td>780</td>
+<td>Dogs less than eight months of age</td>
+</tr>
+<tr>
+<td>781</td>
+<td>Container weighing less than 200&nbsp;<abbr title="kilograms">kg</abbr> / Shanxi Province</td>
+</tr>
+<tr>
+<td>782</td>
+<td>Container weighing more than 200&nbsp;<abbr title="kilograms">kg</abbr> / Shanxi Province</td>
+</tr>
+<tr>
+<td>793</td>
+<td>From non-regulated <abbr title="United States">US</abbr> areas to non-regulated areas of the province for LDD moth</td>
+</tr>
+<tr>
+<td>794</td>
+<td>From non-regulated <abbr title="United States">US</abbr> areas to regulated areas of the province for LDD moth</td>
+</tr>
+<tr>
+<td>795</td>
+<td>From a regulated <abbr title="United States">US</abbr> area to a non-regulated area for LDD moth</td>
+</tr>
+<tr>
+<td>796</td>
+<td>From a regulated <abbr title="United States">US</abbr> area to a regulated area for LDD moth</td>
+</tr>
+<tr>
+<td>797</td>
+<td>From Hebei Province</td>
+</tr>
+<tr>
+<td>798</td>
+<td>From Shandong Province</td>
+</tr>
+<tr>
+<td>799</td>
+<td>From Xinjlang Province</td>
+</tr>
+<tr>
+<td>800</td>
+<td>Other Chinese provinces</td>
+</tr>
+<tr>
+<td>803</td>
+<td>Completely finished articles (<abbr title="for example">e.g.</abbr> lacquered, painted, <abbr title="et cetera">etc.</abbr>), without bark</td>
+</tr>
+<tr>
+<td>804</td>
+<td>With bark or not completely finished articles (<abbr title="for example">e.g.</abbr> not lacquered, not painted, <abbr title="et cetera">etc.</abbr>)</td>
+</tr>
+<tr>
+<td>805</td>
+<td>Not for propagation</td>
+</tr>
+<tr>
+<td>806</td>
+<td>&lt;1 liter</td>
+</tr>
+<tr>
+<td>807</td>
+<td>One (1) litre or more</td>
+</tr>
+<tr>
+<td>808</td>
+<td>Container weighing less than 200&nbsp;<abbr title="kilograms">kg</abbr> / Liaoning Province</td>
+</tr>
+<tr>
+<td>809</td>
+<td>Container weighing more than 200&nbsp;<abbr title="kilograms">kg</abbr> / Liaoning Province</td>
+</tr>
+<tr>
+<td>810</td>
+<td>More than 4&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>812</td>
+<td>Without soil, related matter or growing media - pre-cleared</td>
+</tr>
+<tr>
+<td>813</td>
+<td>Without soil, related matter or growing media - not pre-cleared</td>
+</tr>
+<tr>
+<td>814</td>
+<td>From an <abbr title="Asian Long-horned Beetle">ALHB</abbr> regulated area (as per <abbr title="United States">US</abbr> Federal regulations 7 <abbr title="Code of Federal Regulations">CFR</abbr> 301.51)</td>
+</tr>
+<tr>
+<td>815</td>
+<td>From an <abbr title="Asian Long-horned Beetle">ALHB</abbr> non-regulated area (as per <abbr title="United States">US</abbr> Federal regulations 7 <abbr title="Code of Federal Regulations">CFR</abbr> 301.51)</td>
+</tr>
+<tr>
+<td>816</td>
+<td>From an <abbr title="Asian Long-horned Beetle">ALHB</abbr> non-regulated area (as per <abbr title="United States">US</abbr> Federal regulations 7 <abbr title="Code of Federal Regulations">CFR</abbr> 301.51) to a LDD moth regulated area</td>
+</tr>
+<tr>
+<td>826</td>
+<td>From non-regulated areas for <abbr title="Potato Cyst Nematode">PCN</abbr></td>
+</tr>
+<tr>
+<td>829</td>
+<td>Container weighing less than 22.7&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>830</td>
+<td>Container weighing more than 22.7&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>831</td>
+<td>Rooted, grown in soil-free media - Container weighing less than 50&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>832</td>
+<td>Rooted, grown in soil-free media - Container weighing more than 50&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>833</td>
+<td>Rooted, grown in soil-free media</td>
+</tr>
+<tr>
+<td>834</td>
+<td>Were in China, Japan, Korea or Russia, arriving between March&nbsp;1 and October&nbsp;15</td>
+</tr>
+<tr>
+<td>835</td>
+<td>Were in China, Japan, Korea or Russia, arriving between October&nbsp;16 and February&nbsp;28 (29)</td>
+</tr>
+<tr>
+<td>836</td>
+<td>Were not in China, Japan, Korea or Russia</td>
+</tr>
+<tr>
+<td>837</td>
+<td>Diameter equal to or less than 10&nbsp;<abbr title="millimetres">mm</abbr>, with soil or related matter</td>
+</tr>
+<tr>
+<td>838</td>
+<td>Diameter equal to or less than 10&nbsp;<abbr title="millimetres">mm</abbr>, without soil or related matter (bare root)</td>
+</tr>
+<tr>
+<td>839</td>
+<td>Diameter greater than 10&nbsp;<abbr title="millimetres">mm</abbr>, with soil or related matter </td>
+</tr>
+<tr>
+<td>840</td>
+<td>Diameter greater than 10&nbsp;<abbr title="millimetres">mm</abbr>, without soil or related matter (bare root)</td>
+</tr>
+<tr>
+<td>841</td>
+<td>Destined to an area regulated for LDD moth</td>
+</tr>
+<tr>
+<td>842</td>
+<td>Destined to an area not regulated for LDD moth</td>
+</tr>
+<tr>
+<td>843</td>
+<td>From an area regulated for European Larch Canker</td>
+</tr>
+<tr>
+<td>844</td>
+<td>From an area not regulated for European Larch Canker but regulated for LDD moth</td>
+</tr>
+<tr>
+<td>845</td>
+<td>From an area not regulated for European Larch Canker or LDD moth</td>
+</tr>
+<tr>
+<td>846</td>
+<td>From an area not regulated for European Larch Canker to an area regulated for LDD moth</td>
+</tr>
+<tr>
+<td>847</td>
+<td>From an area not regulated for European Larch Canker to an area not regulated for LDD moth</td>
+</tr>
+<tr>
+<td>848</td>
+<td>From an area regulated for European Larch Canker to an area not regulated for <abbr title="European Larch Canker">ELC</abbr></td>
+</tr>
+<tr>
+<td>849</td>
+<td>Destined to an area regulated for European Larch Canker and LDD moth</td>
+</tr>
+<tr>
+<td>850</td>
+<td>Destined to an area regulated for European Larch Canker but not LDD moth</td>
+</tr>
+<tr>
+<td>855</td>
+<td>Destined to an area regulated for Pine Shoot Beetle</td>
+</tr>
+<tr>
+<td>856</td>
+<td>Destined to an area not regulated for Pine Shoot Beetle</td>
+</tr>
+<tr>
+<td>857</td>
+<td>Destined to an area regulated for Pine Shoot Beetle and LDD moth</td>
+</tr>
+<tr>
+<td>858</td>
+<td>Destined to an area regulated for Pine Shoot Beetle but not LDD moth</td>
+</tr>
+<tr>
+<td>859</td>
+<td>Destined to an area regulated for LDD moth but not Pine Shoot Beetle</td>
+</tr>
+<tr>
+<td>860</td>
+<td>Destined to an area not regulated for Pine Shoot Beetle or LDD moth</td>
+</tr>
+<tr>
+<td>861</td>
+<td>From an area regulated for Asian Long-horned Beetle</td>
+</tr>
+<tr>
+<td>862</td>
+<td>From an area not regulated for Asian Long-horned Beetle</td>
+</tr>
+<tr>
+<td>863</td>
+<td>From an area not regulated for Asian Long-horned Beetle or LDD moth</td>
+</tr>
+<tr>
+<td>864</td>
+<td>From an area regulated for LDD moth but not Asian Long-horned Beetle</td>
+</tr>
+<tr>
+<td>865</td>
+<td>From an area not regulated for Asian Long-horned Beetle to an area regulated for LDD moth</td>
+</tr>
+<tr>
+<td>866</td>
+<td>From an area not regulated for Asian Long-horned Beetle to an area not regulated for LDD moth</td>
+</tr>
+<tr>
+<td>867</td>
+<td>From an area regulated for Asian Long-horned Beetle to an area regulated for LDD moth</td>
+</tr>
+<tr>
+<td>868</td>
+<td>From an area regulated for Asian Long-horned Beetle to an area not regulated for LDD moth</td>
+</tr>
+<tr>
+<td>870</td>
+<td>From an area regulated for European Larch Canker to an area regulated for <abbr title="European Larch Canker">ELC</abbr></td>
+</tr>
+<tr>
+<td>873</td>
+<td>From non-regulated areas for <abbr title="Potato Cyst Nematode">PCN</abbr> in containers weighing more than 50&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>874</td>
+<td>From non-regulated areas for <abbr title="Potato Cyst Nematode">PCN</abbr> in containers weighing less than 50&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>875</td>
+<td>From Liaoning Province</td>
+</tr>
+<tr>
+<td>876</td>
+<td>From Shaanxi province</td>
+</tr>
+<tr>
+<td>881</td>
+<td>Transhipment through the <abbr title="United States">US</abbr></td>
+</tr>
+<tr>
+<td>882</td>
+<td>Direct shipment from the country of origin to Canada</td>
+</tr>
+<tr>
+<td>883</td>
+<td>Completely sealed with paint or thick coatings of varnish or other sealants</td>
+</tr>
+<tr>
+<td>892</td>
+<td>Oak cubes (less than 1.5&nbsp;<abbr title="centimetres">cm</abbr> in thickness), oak wood shavings and chips as part of wine kits or oak cubes in wine barrels specifically for the purpose of flavouring.</td>
+</tr>
+<tr>
+<td>893</td>
+<td>Pure mushroom spawn with carrier material</td>
+</tr>
+<tr>
+<td>894</td>
+<td>Mushroom spawn with growing media (coffee grounds)</td>
+</tr>
+<tr>
+<td>895</td>
+<td>Mushroom spawn with growing media (processed barley, oat, rye, triticale or wheat straw)</td>
+</tr>
+<tr>
+<td>896</td>
+<td>Mushroom spawn with growing media (sawdust, wood shavings)</td>
+</tr>
+<tr>
+<td>897</td>
+<td>Mushroom spawn with growing media (red alder chips, with bark)</td>
+</tr>
+<tr>
+<td>898</td>
+<td>Mushroom spawn with growing media (red alder chips, without bark)</td>
+</tr>
+<tr>
+<td>899</td>
+<td>Mushroom spawn with growing media (other)</td>
+</tr>
+<tr>
+<td>900</td>
+<td>Mushroom spawn on wood piece (birch, without bark)</td>
+</tr>
+<tr>
+<td>901</td>
+<td>Mushroom spawn on wood piece (other)</td>
+</tr>
+<tr>
+<td>902</td>
+<td>From a regulated area for light brown apple moth and <i lang="la"><abbr title="Phytophthora">P.</abbr>&nbsp;ramorum</i></td>
+</tr>
+<tr>
+<td>903</td>
+<td>From a regulated area for <i lang="la"><abbr title="Phytophthora">P.</abbr>&nbsp;ramorum</i> but not for light brown apple moth</td>
+</tr>
+<tr>
+<td>904</td>
+<td>From a regulated area for light brown apple moth but not for <i lang="la"><abbr title="Phytophthora">P.</abbr>&nbsp;ramorum</i></td>
+</tr>
+<tr>
+<td>905</td>
+<td>From a non-regulated area for light brown apple moth or <i lang="la"><abbr title="Phytophthora">P.</abbr>&nbsp;ramorum</i></td>
+</tr>
+<tr>
+<td>906</td>
+<td>Mushroom spawn on wood piece</td>
+</tr>
+<tr>
+<td>907</td>
+<td>Whole, uneviscerated (head on or head off)</td>
+</tr>
+<tr>
+<td>908</td>
+<td>Eviscerated (head on or head off)</td>
+</tr>
+<tr>
+<td>909</td>
+<td>Permanent stay in Canada</td>
+</tr>
+<tr>
+<td>910</td>
+<td>Temporary stay in Canada</td>
+</tr>
+<tr>
+<td>911</td>
+<td>Shipment 20&nbsp;<abbr title="kilograms">kg</abbr> or less</td>
+</tr>
+<tr>
+<td>912</td>
+<td>Shipment of more than 20&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>915</td>
+<td>Eviscerated (Head on)</td>
+</tr>
+<tr>
+<td>916</td>
+<td>Eviscerated (Head off ) </td>
+</tr>
+<tr>
+<td>917</td>
+<td>Preserved in formaldehyde or other preserving solution,</td>
+</tr>
+<tr>
+<td>918</td>
+<td>Unpreserved</td>
+</tr>
+<tr>
+<td>919</td>
+<td>From regulated areas for <abbr title="Potato Cyst Nematode">PCN</abbr> in containers weighing less than 22.7&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>920</td>
+<td>From regulated areas for <abbr title="Potato Cyst Nematode">PCN</abbr> in containers weighing more than 22.7&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>921</td>
+<td>From non-regulated areas for <abbr title="Potato Cyst Nematode">PCN</abbr> in containers weighing more than 22.7&nbsp;<abbr title="kilograms">kg</abbr></td>
+</tr>
+<tr>
+<td>922</td>
+<td>From Henan Province</td>
+</tr>
+<tr>
+<td>923</td>
+<td>Container weighing less than 200&nbsp;<abbr title="kilograms">kg</abbr> / Henan Province</td>
+</tr>
+<tr>
+<td>924</td>
+<td>Container weighing more than 200&nbsp;<abbr title="kilograms">kg</abbr> / Henan Province</td>
+</tr>
+<tr>
+<td>925</td>
+<td>Dried and ground</td>
+</tr>
+<tr>
+<td>926</td>
+<td>Other processes</td>
+</tr>
+<tr>
+<td>927</td>
+<td>From a regulated area for light brown apple moth </td>
+</tr>
+<tr>
+<td>928</td>
+<td>From a non-regulated area for light brown apple moth </td>
+</tr>
+<tr>
+<td>929</td>
+<td>With soil or growing media, in transit through <abbr title="British Columbia">BC</abbr>, <abbr title="Alberta">AB</abbr> or <abbr title="Saskatchewan">SK</abbr></td>
+</tr>
+<tr>
+<td>930</td>
+<td>With soil or growing media, not in transit through <abbr title="British Columbia">BC</abbr>, <abbr title="Alberta">AB</abbr> or <abbr title="Saskatchewan">SK</abbr></td>
+</tr>
+<tr>
+<td>931</td>
+<td>Giant Panda</td>
+</tr>
+<tr>
+<td>932</td>
+<td>Oak cubes equal or greater than 1.5&nbsp;<abbr title="centimetres">cm</abbr> in thickness</td>
+</tr>
+<tr>
+<td>933</td>
+<td>Live</td>
+</tr>
+<tr>
+<td>934</td>
+<td>Dead</td>
+</tr>
+<tr>
+<td>935</td>
+<td>Dried</td>
+</tr>
+<tr>
+<td>936</td>
+<td>Not dried</td>
+</tr>
+<tr>
+<td>945</td>
+<td>With bark - from an area not regulated for Asian long-horned beetle</td>
+</tr>
+<tr>
+<td>946</td>
+<td>Without bark - from an area not regulated for Asian long-horned beetle</td>
+</tr>
+<tr>
+<td>947</td>
+<td>Mushroom spawn on wood piece (beech, without bark)</td>
+</tr>
+<tr>
+<td>948</td>
+<td>Small "lots" / From non-infested counties</td>
+</tr>
+<tr>
+<td>949</td>
+<td>Other than small "lots"/ Authorized importer/From non-infested counties</td>
+</tr>
+<tr>
+<td>950</td>
+<td>Other than small "lots" / Non-authorized importer/From non-infested counties</td>
+</tr>
+<tr>
+<td>951</td>
+<td>wild marine origin </td>
+</tr>
+<tr>
+<td>952</td>
+<td>cultured marine or cultured freshwater or wild freshwater origin</td>
+</tr>
+<tr>
+<td>953</td>
+<td>whole, uneviscerated (head on or head off) / wild marine origin </td>
+</tr>
+<tr>
+<td>954</td>
+<td>whole, uneviscerated (head on or head off) / cultured marine or cultured freshwater or wild freshwater origin</td>
+</tr>
+<tr>
+<td>961</td>
+<td>During Sukkot Holiday travel period </td>
+</tr>
+<tr>
+<td>962</td>
+<td>Other than Sukkot Holiday travel period</td>
+</tr>
+<tr>
+<td>963</td>
+<td>Consignment requires certification</td>
+</tr>
+<tr>
+<td>964</td>
+<td>Consignment destined to an approved facility by the Office of Biohazard Containment and Safety</td>
+</tr>
+<tr>
+<td>965</td>
+<td>Consignment destined to a CFIA approved quarantine unit</td>
+</tr>
+<tr>
+<td>966</td>
+<td>Mushroom spawn with growing media (steam-sterilized millet and/or sorghum)</td>
+</tr>
+<tr>
+<td>967</td>
+<td>From Shanxi Province</td>
+</tr>
+<tr>
+<td>970</td>
+<td>Mushroom spawn with growing media (wheat middlings and wood shavings)</td>
+</tr>
+<tr>
+<td>971</td>
+<td>Dried and ground or composted</td>
+</tr>
+<tr>
+<td>972</td>
+<td>Consignment requires certification and is a food product and is &gt;100kg</td>
+</tr>
+<tr>
+<td>973</td>
+<td>Consignment destined to an approved facility by the Office of Biohazard Containment and Safety and is a food product and is &gt;100kg</td>
+</tr>
+<tr>
+<td>974</td>
+<td>Consignment destined to a CFIA approved quarantine unit and is a food product and is &gt;100kg</td>
+</tr>
+<tr>
+<td>975</td>
+<td>Host species of light brown apple moth (<i lang="la">Epiphyas postvittana</i>)</td>
+</tr>
+<tr>
+<td>976</td>
+<td>Non-hosts species of light brown apple moth (<i lang="la">Epiphyas postvittana</i>)</td>
+</tr>
+<tr>
+<td>977</td>
+<td>Destined to an area regulated for the European Larch Canker</td>
+</tr>
+<tr>
+<td>978</td>
+<td>From an area not regulated for the European Larch Canker</td>
+</tr>
+</tbody>
+</table><!-- WCMS:CONTENT -->
+        
+
+
+        <div class="pagedetails container">
+            <div class="row">
+                <div class="col-sm-6 col-md-5 col-lg-4">
+                    <a href="https://www.canada.ca/en/report-problem.html" class="btn btn-default">Report a problem on this page</a>
+                </div>
+                <div class="col-sm-4 col-md-3 col-sm-offset-2 col-md-offset-4 col-lg-offset-5">
+                    <div class="wb-share wb-init wb-share-inited" data-wb-share="{&quot;lnkClass&quot;: &quot;btn btn-default btn-block&quot;}" id="wb-auto-5"><section id="shr-pg0" class="shr-pg mfp-hide modal-dialog modal-content overlay-def"><header class="modal-header"><h2 class="modal-title">Share this page</h2></header><div class="modal-body"><ul class="list-unstyled colcount-xs-2"><li><a href="https://www.blogger.com/blog_this.pyra?t=&amp;u=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962&amp;n=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency" class="shr-lnk blogger btn btn-default" target="_blank" rel="noreferrer noopener">Blogger</a></li><li><a href="https://www.diigo.com/post?url=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962&amp;title=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency" class="shr-lnk diigo btn btn-default" target="_blank" rel="noreferrer noopener">Diigo</a></li><li><a href="mailto:?to=&amp;subject=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency&amp;body=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962%0A" class="shr-lnk email btn btn-default" target="_blank" rel="noreferrer noopener">Email</a></li><li><a href="https://www.facebook.com/sharer.php?u=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962&amp;t=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency" class="shr-lnk facebook btn btn-default" target="_blank" rel="noreferrer noopener">Facebook</a></li><li><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;tf=1&amp;to=&amp;su=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency&amp;body=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962%0A" class="shr-lnk gmail btn btn-default" target="_blank" rel="noreferrer noopener">Gmail</a></li><li><a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962&amp;title=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency&amp;ro=false&amp;summary=&amp;source=" class="shr-lnk linkedin btn btn-default" target="_blank" rel="noreferrer noopener">LinkedIn®</a></li><li><a href="https://www.myspace.com/Modules/PostTo/Pages/?u=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962&amp;t=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency" class="shr-lnk myspace btn btn-default" target="_blank" rel="noreferrer noopener">MySpace</a></li><li><a href="https://www.pinterest.com/pin/create/button/?url=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962&amp;media=&amp;description=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency" class="shr-lnk pinterest btn btn-default" target="_blank" rel="noreferrer noopener">Pinterest</a></li><li><a href="https://reddit.com/submit?url=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962&amp;title=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency" class="shr-lnk reddit btn btn-default" target="_blank" rel="noreferrer noopener">reddit</a></li><li><a href="https://tinyurl.com/create.php?url=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962" class="shr-lnk tinyurl btn btn-default" target="_blank" rel="noreferrer noopener">TinyURL</a></li><li><a href="https://www.tumblr.com/share/link?url=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962&amp;name=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency&amp;description=" class="shr-lnk tumblr btn btn-default" target="_blank" rel="noreferrer noopener">tumblr</a></li><li><a href="https://twitter.com/intent/tweet?text=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency&amp;url=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962" class="shr-lnk twitter btn btn-default" target="_blank" rel="noreferrer noopener">Twitter</a></li><li><a href="https://api.whatsapp.com/send?text=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency%0A%0Ahttps%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962" class="shr-lnk whatsapp btn btn-default" target="_blank" rel="noreferrer noopener">Whatsapp</a></li><li><a href="https://compose.mail.yahoo.com/?to=&amp;subject=AIRS%20miscellaneous%20codes%20-%20Canadian%20Food%20Inspection%20Agency&amp;body=https%3A%2F%2Finspection.canada.ca%2Fimporting-food-plants-or-animals%2Fplant-and-plant-product-imports%2Fairs%2Fmiscellaneous-codes%2Feng%2F1494618949803%2F1494618982962%0A" class="shr-lnk yahoomail btn btn-default" target="_blank" rel="noreferrer noopener">Yahoo! Mail</a></li></ul><p class="col-sm-12 shr-dscl">No endorsement of any products or services is expressed or implied.</p><div class="clearfix"></div></div></section><a href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#shr-pg0" aria-controls="shr-pg0" class="shr-opn wb-lbx btn btn-default btn-block wb-lbx-inited wb-init" id="wb-auto-6"><span class="glyphicon glyphicon-share"></span>Share this page</a></div>
+                </div>
+            </div>
+            <!-- WCMS:DATEMODIFIED START -->
+            <dl id="wb-dtmd">
+                <dt>Date modified: </dt>
+                <dd><time property="dateModified">2022-05-16</time></dd>
+            </dl>
+            <!-- WCMS:DATEMODIFIED END -->
+        </div>
+
+    </main>
+    <footer id="wb-info">
+        <div class="landscape">
+            <nav class="container wb-navcurr">
+                <h2 class="wb-inv">About government</h2>
+                <ul class="list-unstyled colcount-sm-2 colcount-md-3">
+                    <li><a href="https://inspection.canada.ca/about-cfia/contact-us/eng/1546627816321/1546627838025">Contact us</a></li>
+                    <li><a href="https://www.canada.ca/en/government/dept.html">Departments and agencies</a></li>
+                    <li><a href="https://www.canada.ca/en/government/publicservice.html">Public service and military</a></li>
+                    <li><a href="https://www.canada.ca/en/news.html">News</a></li>
+                    <li><a href="https://www.canada.ca/en/government/system/laws.html">Treaties, laws and regulations</a></li>
+                    <li><a href="https://www.canada.ca/en/transparency/reporting.html">Government-wide reporting</a></li>
+                    <li><a href="https://pm.gc.ca/eng">Prime Minister</a></li>
+                    <li><a href="https://www.canada.ca/en/government/system.html">How government works</a></li>
+                    <li><a href="https://open.canada.ca/en/">Open government</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="brand">
+            <div class="container">
+                <div class="row">
+                    <nav class="col-md-9 col-lg-10 ftr-urlt-lnk">
+                        <h2 class="wb-inv">About this site</h2>
+                        <ul>
+                            <li><a href="https://www.canada.ca/en/social.html">Social media</a></li>
+                            <li><a href="https://www.canada.ca/en/mobile.html">Mobile applications</a></li>
+                            <li><a href="https://www1.canada.ca/en/newsite.html">About Canada.ca</a></li>
+                            <li><a href="https://www.canada.ca/en/transparency/terms.html">Terms and conditions</a></li>
+                            <li><a href="https://www.canada.ca/en/transparency/privacy.html">Privacy</a></li>
+                        </ul>
+                    </nav>
+                    <div class="col-xs-6 visible-sm visible-xs tofpg">
+                        <a href="https://inspection.canada.ca/importing-food-plants-or-animals/plant-and-plant-product-imports/airs/miscellaneous-codes/eng/1494618949803/1494618982962#wb-cont">Top of Page <span class="glyphicon glyphicon-chevron-up"></span></a>
+                    </div>
+                    <div class="col-xs-6 col-md-3 col-lg-2 text-right">
+                        <img src="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/wmms-blk.svg" alt="Symbol of the Government of Canada">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!--[if gte IE 9 | !IE ]><!-->
+    <script src="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/jquery.js.download"></script>
+    <script src="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/wet-boew.min.js.download"></script><span id="wb-rsz" class="wb-init">&nbsp;</span>
+    <!--<![endif]-->
+    <!--[if lt IE 9]>
+            <script src="/WET/9-1-0/wet-boew/js/ie8-wet-boew2.min.js"></script>
+
+            <![endif]-->
+    <script src="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/theme.min.js.download"></script>
+
+    <script type="text/javascript">_satellite.pageBottom();</script><script>
+_satellite.track('pageReset');
+</script>
+	
+	<script src="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/Overlay.js.download"></script>
+    <script src="./AIRS miscellaneous codes - Canadian Food Inspection Agency_files/InvitationManager.js.download"></script>
+	
+    <!-- WCMS:CUSTOMSCRIPT -->
+
+</body></html>

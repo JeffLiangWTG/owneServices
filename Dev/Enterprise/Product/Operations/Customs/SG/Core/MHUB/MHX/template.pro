@@ -1,0 +1,27 @@
+#USERPROFILE
+#Thu Mar 31 12:14:11 BST 2016
+WorkingDir=<<TEMPPATH>>
+Trace=true
+Password=<<PASSWORD>>
+AutoConnect=false
+HostPort=
+RecoveryFile=sessionid.txt
+ResponsePath=<<TEMPPATH>>\\Output_<<USERID>>_<<RANDOMSUFFIX>>.txt
+trustStorePath=<<TRUSTSTOREPATH>>
+StatusPath=<<TEMPPATH>>\\StatusLog_<<USERID>>_<<RANDOMSUFFIX>>.txt
+AppId=CargoWise
+ScriptType=MHAccess
+InputScriptPath=<<TEMPPATH>>\\Input_<<USERID>>_<<RANDOMSUFFIX>>.txt
+HostIP=
+LogPath=<<TEMPPATH>>\\TraceLog_<<USERID>>_<<RANDOMSUFFIX>>.txt
+Verbose=false
+Recovery=false
+HistoryPath=<<TEMPPATH>>\\History_<<USERID>>_<<RANDOMSUFFIX>>.txt
+proxyPort=<<PROXYPORT>>
+TransportDriver=com.sns.mhx.util.JSFTPTransporter
+UserID=<<USERID>>
+KeyFile=key.txt
+proxyHost=<<PROXYHOST>>
+ProxyConnect=<<PROXYON>>
+SecuredURL=https
+ServerIP=<<SERVERIP>>

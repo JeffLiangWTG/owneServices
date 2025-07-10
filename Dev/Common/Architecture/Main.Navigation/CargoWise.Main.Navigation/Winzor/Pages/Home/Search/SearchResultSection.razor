@@ -1,0 +1,22 @@
+@using CargoWise.Main.Navigation
+@using CargoWiseNext.Blazor.Components
+
+@namespace CargoWise.Main.Navigation.Pages
+
+<div class="cwn-quick-search__result-section">
+    <CwnText HtmlTag="div" Class="cwn-quick-search__result-title">@Title <CwnText HtmlTag="span" Class="cwn-quick-search__result-amount">(@Items?.Count())</CwnText></CwnText>
+
+    @foreach (var item in Items ?? Enumerable.Empty<MenuItem>())
+    {
+        <CwnElement Class="cwn-quick-search__result-item" TabIndex="0"
+            OnSingleClick="async(e) => await OnClickAsync(item)"
+            OnContextMenu="async(e) => await OnRightClickAsync(e, item)"
+            HtmlTag="div">
+            <CwnIcon Class="cwn-quick-search__result-icon" Icon="GetStartIcon()" Color="@Color.Default" />
+			<p class="cwn-quick-search__result-item-text">@item.Name</p>
+            <CwnSearchShortcut>
+                <CwnIcon Icon="Icon.Enter" Size="Size.Small" Color="@Color.Default" />
+            </CwnSearchShortcut>
+        </CwnElement>
+    }
+</div>

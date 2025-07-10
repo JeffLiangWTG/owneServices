@@ -1,0 +1,33 @@
+//--------------------------------------------------------------------------------------------------
+// <important>
+//
+//    DO NOT CHANGE THE NAME OF THIS CLASS OR THE CONSTRUCTOR'S SIGNATURE
+//    THIS CLASS SHOULD ALWAYS INHERIT FROM AutoJobCartageRunSheetLookups
+//
+//    This class should be used for overriding collections in AutoJobCartageRunSheetLookups
+//    (for example to add filtering), or for adding your own lookup collections.
+//
+//    ALL FINDBOXES SHOULD BIND TO THESE COLLECTIONS (and you will get automatic list validation!)
+//
+// </important>
+//--------------------------------------------------------------------------------------------------
+
+namespace Enterprise.Freight.Common.Business
+{
+	public class JobCartageRunSheetLookups : AutoJobCartageRunSheetLookups
+	{
+		public JobCartageRunSheetLookups(AutoJobCartageRunSheet parent)
+			: base(parent)
+		{
+		}
+
+		#region CartageBindingLists
+
+		public BindToLists BindToLists
+		{
+			get { return BindToLists.GetCachedLists(Factory); }
+		}
+
+		#endregion
+	}
+}

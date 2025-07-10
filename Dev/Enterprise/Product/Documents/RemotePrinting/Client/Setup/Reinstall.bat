@@ -1,0 +1,1 @@
+msiexec /i C:\Enterprise\bin\CargoWiseOneWebPrintClientSetup.msi REINSTALL=ALL REINSTALLMODE=vamus

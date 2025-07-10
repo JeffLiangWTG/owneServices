@@ -1,0 +1,345 @@
+using System.IO;
+using System.Xml;
+using CargoWise.EntityFramework.Testing;
+using CargoWise.Types;
+
+namespace Enterprise.Customs.MX.Manifest.Business.Testing
+{
+	sealed class MXMessageFormattingTest : TestCaseWithFactory
+	{
+		[NUnit.Framework.DatCapabilityRequirement("SOURCE_CODE")]
+		public void TestMessageFormatXML()
+		{
+			var messageText = GetExpectedMessageXML(Path.Combine(BaseSourcePath, MXMessagingConstants.SeaAcceptedFinalResponse));
+			var expectedresult = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<Parametros xmlns=""http://www.ventanillaunica.gob.mx/ManifiestoMaritimo355SO"">
+  <Encabezado>
+    <TipoEmi>3</TipoEmi>
+    <FchEnvio>2017-09-25T13:11:04.888Z</FchEnvio>
+  </Encabezado>
+  <ISA>
+    <ISA01>00</ISA01>
+    <ISA02>Isa02Isa02</ISA02>
+    <ISA03>00</ISA03>
+    <ISA04>Isa04Isa04</ISA04>
+    <ISA05>ZZ</ISA05>
+    <ISA06>9992</ISA06>
+    <ISA07>ZZ</ISA07>
+    <ISA08>CUSTOMS</ISA08>
+    <ISA09>170925</ISA09>
+    <ISA10>1655</ISA10>
+    <ISA11>U</ISA11>
+    <ISA12>00605</ISA12>
+    <ISA13>000000001</ISA13>
+    <ISA14>0</ISA14>
+    <ISA15>P</ISA15>
+    <ISA16>:</ISA16>
+  </ISA>
+  <GS>
+    <GS01>SO</GS01>
+    <GS02>9992</GS02>
+    <GS03>CUSTOMS</GS03>
+    <GS04>20170925</GS04>
+    <GS05>1655</GS05>
+    <GS06>000000035</GS06>
+    <GS07>X</GS07>
+    <GS08>006050</GS08>
+  </GS>
+  <ST>
+    <ST01>309</ST01>
+    <ST02>000000035</ST02>
+  </ST>
+  <M10>
+    <M1001>1245</M1001>
+    <M1002>O</M1002>
+    <M1003>MX</M1003>
+    <M1004>VCODE</M1004>
+    <M1005>VESSELNUMBER</M1005>
+    <M1006>VOYAGE</M1006>
+    <M1007 />
+    <M1008 />
+    <M1009>W</M1009>
+    <M1010>L</M1010>
+    <M1011 />
+    <M1012>MANIFESTNUMBER</M1012>
+    <M1013 />
+    <M1014>SI</M1014>
+    <M1015 />
+    <M1016 />
+    <M1017 />
+  </M10>
+  <AP4>
+    <ALX>
+      <LX>
+        <LX01>1</LX01>
+      </LX>
+      <M11>
+        <M1101>HOUSELIGADAMASTER0001</M1101>
+        <M1102>35701</M1102>
+        <M1103>400</M1103>
+        <M1104>PCS</M1104>
+        <M1105>20</M1105>
+        <M1106>K</M1106>
+        <M1107>25</M1107>
+        <M1108>C</M1108>
+        <M1109>30</M1109>
+        <M1110 />
+        <M1111 />
+        <M1112>9992</M1112>
+        <M1113 />
+        <M1114 />
+        <M1115 />
+        <M1116 />
+        <M1117 />
+        <M1118 />
+        <M1119 />
+        <M1120>22581</M1120>
+        <M1121>22581</M1121>
+        <M1122 />
+        <M1123 />
+        <M1124 />
+        <M1125 />
+        <M1126 />
+        <M1127 />
+        <M1128 />
+      </M11>
+      <N9>
+        <N901>MXI</N901>
+        <N902>0801</N902>
+        <N903 />
+        <N904 />
+        <N905 />
+        <N906 />
+        <N907 />
+        <C04001 />
+        <C04002 />
+        <C04003 />
+        <C04004 />
+        <C04005 />
+        <C04006 />
+      </N9>
+      <N9>
+        <N901>HO</N901>
+        <N902>HOUSELIGADAMASTER0001</N902>
+        <N903 />
+        <N904 />
+        <N905 />
+        <N906 />
+        <N907 />
+        <C04001 />
+        <C04002 />
+        <C04003 />
+        <C04004 />
+        <C04005 />
+        <C04006 />
+      </N9>
+      <AN1408>
+        <N1>
+          <N101>CN</N101>
+          <N102>MADERA SA de CV</N102>
+          <N103 />
+          <N104>NNN891228BE2</N104>
+          <N105 />
+          <N106 />
+        </N1>
+        <N3>
+          <N301>AV REMEDIOS</N301>
+          <N302>ARTEGA Y TINOCO</N302>
+        </N3>
+        <N4>
+          <N401>CIUDAD DE MEXICO</N401>
+          <N402>CMX</N402>
+          <N403>06700</N403>
+          <N404>MX</N404>
+          <N405 />
+          <N406 />
+          <N407 />
+          <N408 />
+        </N4>
+        <PER>
+          <PER01>IC</PER01>
+          <PER02>MADERA SA de CV</PER02>
+          <PER03>EM</PER03>
+          <PER04>TANIA@GMAIL.COM</PER04>
+          <PER05>WP</PER05>
+          <PER06>5542763477</PER06>
+          <PER07 />
+          <PER08 />
+          <PER09 />
+        </PER>
+      </AN1408>
+      <AN1408>
+        <N1>
+          <N101>SH</N101>
+          <N102>LALA</N102>
+          <N103 />
+          <N104>NNN8912251</N104>
+          <N105 />
+          <N106 />
+        </N1>
+        <N3>
+          <N301>AV PLAZA</N301>
+          <N302>ARTEGA Y MEXICO</N302>
+        </N3>
+        <N4>
+          <N401>CIUDAD DE MEXICO</N401>
+          <N402>CMX</N402>
+          <N403>06700</N403>
+          <N404>MX</N404>
+          <N405 />
+          <N406 />
+          <N407 />
+          <N408 />
+        </N4>
+        <PER>
+          <PER01>IC</PER01>
+          <PER02>LALA</PER02>
+          <PER03>EM</PER03>
+          <PER04>LALA@GMAIL.COM</PER04>
+          <PER05>WP</PER05>
+          <PER06>4442763477</PER06>
+          <PER07 />
+          <PER08 />
+          <PER09 />
+        </PER>
+      </AN1408>
+      <AN1408>
+        <N1>
+          <N101>N1</N101>
+          <N102>LORENA</N102>
+          <N103 />
+          <N104>NNN89122</N104>
+          <N105 />
+          <N106 />
+        </N1>
+        <N3>
+          <N301>AV ARTEAGA</N301>
+          <N302>PLAZA Y TINOCO</N302>
+        </N3>
+        <N4>
+          <N401>CIUDAD DE MEXICO</N401>
+          <N402>CMX</N402>
+          <N403>06700</N403>
+          <N404>MX</N404>
+          <N405 />
+          <N406 />
+          <N407 />
+          <N408 />
+        </N4>
+        <PER>
+          <PER01>IC</PER01>
+          <PER02>LORENA</PER02>
+          <PER03>EM</PER03>
+          <PER04>LORENA@GMAIL.COM</PER04>
+          <PER05>WP</PER05>
+          <PER06>55427634</PER06>
+          <PER07 />
+          <PER08 />
+          <PER09 />
+        </PER>
+      </AN1408>
+      <AVID>
+        <VID>
+          <VID01>30</VID01>
+          <VID02 />
+          <VID03>9594601</VID03>
+          <VID04>AAA12345678</VID04>
+          <VID05>BB987456321</VID05>
+          <VID06>1200</VID06>
+          <VID07>4000</VID07>
+          <VID08>6000</VID08>
+          <VID09 />
+          <VID10>L</VID10>
+          <VID11 />
+          <VID12 />
+          <VID13 />
+          <VID14 />
+          <VID15 />
+          <VID16 />
+          <VID17 />
+          <VID18 />
+          <VID19 />
+          <VID20 />
+        </VID>
+        <AN1>
+          <N10>
+            <N10>
+              <N1001>400</N1001>
+              <N1002>PERCHEROS</N1002>
+              <N1003>MADERA</N1003>
+              <N1004>J</N1004>
+              <N1005>940350</N1005>
+              <N1006>700</N1006>
+              <N1007>K</N1007>
+              <N1008>4000</N1008>
+              <N1009 />
+              <N1010>BOX</N1010>
+              <N1011>US</N1011>
+              <N1012 />
+              <N1013 />
+            </N10>
+            <AH1>
+              <H1>
+                <H101>1008</H101>
+                <H102>2.3</H102>
+                <H103>U</H103>
+                <H104>DESCRIPTION</H104>
+                <H105 />
+                <H106 />
+                <H107>7.8</H107>
+                <H108>CE</H108>
+                <H109 />
+              </H1>
+            </AH1>
+          </N10>
+        </AN1>
+      </AVID>
+    </ALX>
+  </AP4>
+  <K3>
+    <K301>0</K301>
+    <K302 />
+    <K303 />
+    <C00101 />
+    <C00102 />
+    <C00103 />
+    <C00104 />
+    <C00105 />
+    <C00106 />
+    <C00107 />
+    <C00108 />
+    <C00109 />
+    <C00110 />
+    <C00111 />
+    <C00112 />
+    <C00113 />
+    <C00114 />
+    <C00115 />
+  </K3>
+  <SE>
+    <SE01>1</SE01>
+    <SE02>000000035</SE02>
+  </SE>
+  <GE>
+    <GE01>1</GE01>
+    <GE02>000000035</GE02>
+  </GE>
+  <IEA>
+    <IEA01>1</IEA01>
+    <IEA02>000000035</IEA02>
+  </IEA>
+</Parametros>
+";
+
+			AssertMultilineASCIIEquals("Text from MX Messages should be formatted like an xml message", expectedresult.Trim(), MXMessageFormatting.FormatWithXMLRepresentation(messageText));
+		}
+
+		public static ZString GetExpectedMessageXML(ZString path)
+		{
+			var doc = new XmlDocument();
+			doc.Load(path);
+
+			return doc.OuterXml;
+		}
+	}
+}

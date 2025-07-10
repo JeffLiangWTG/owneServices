@@ -1,0 +1,38 @@
+using System.Globalization;
+using CargoWise.Data;
+using CargoWise.DbUpgrader.Scripts.Definitions.BusinessIntelligence.EDW.Model.@@SCHEMA;
+using NUnit.Framework;
+
+namespace Enterprise.Build.Database.Script.Public.BusinessIntelligence.EDW.Model.@@SCHEMA.Testing
+{
+	internal class @@OBJNAMETest : BiCreateScriptTest<@@OBJNAME>
+	{
+		/// <summary>
+		/// Basic auto-generated test.
+		/// Please replace it with more elaborated tests.
+		/// </summary>
+
+		[RequiresSoftware(RequiredSoftware.Sql2016OrLater)]
+		[ExpectNoExceptions]
+		public void TestRun()
+		{
+			Execute();
+		}
+
+		protected override string ScriptDbName
+		{
+			get { return Db.EdwDatabaseName; }
+		}
+
+		void Execute()
+		{
+			string sqlText = string.Format(CultureInfo.InvariantCulture,
+				"SELECT * FROM [{0}].[{1}].[{2}]",
+				ScriptDbName,
+				ScriptToTest.SchemaName,
+				ScriptToTest.Name
+			);
+			TestConnection.ExecuteNonQuery(sqlText);
+		}
+	}
+}

@@ -1,0 +1,6 @@
+CREATE VIEW RefCusNomenclatureLanguageTableView_V1 AS
+SELECT ZX8_PK,
+ZX8_ZX6_NKLanguage,
+ZX8_ZZ5_NomenclatureGroup,
+ZX8_Description
+FROM RefCusNomenclatureLanguage

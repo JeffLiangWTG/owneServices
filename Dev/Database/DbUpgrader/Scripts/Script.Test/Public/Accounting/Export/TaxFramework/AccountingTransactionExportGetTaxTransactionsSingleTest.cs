@@ -1,0 +1,22 @@
+using System;
+using CargoWise.Data;
+using CargoWise.DbUpgrader.Scripts.Definitions.Accounting.Export.TaxFramework;
+using NUnit.Framework;
+
+namespace Enterprise.Build.Database.Script.Public.Accounting.Export.TaxFramework.Testing
+{
+	[TestedType(typeof(AccountingTransactionExportGetTaxTransactionsSingle))]
+	class AccountingTransactionExportGetTaxTransactionsSingleTest : DbCreateScriptTest
+	{
+		public void TestResultColumnsAreIdenticalToBatchVersion()
+		{
+			var singleResult = DataUtils.GetDataTableFromQuery(TestConnection, $"EXEC AccountingTransactionExportGetTaxTransactionsSingle '{Guid.NewGuid()}'");
+			var batchResult = DataUtils.GetDataTableFromQuery(TestConnection, $"EXEC AccountingTransactionExportGetTaxTransactions 'EDI', -1");
+			AssertSameSchema("Result schemas from batch and single export stored procs must be identical in column order, column name and column type. When making changes to one, you must make identical changes for the other.",
+				batchResult,
+				singleResult
+			);
+		}
+	}
+}
+

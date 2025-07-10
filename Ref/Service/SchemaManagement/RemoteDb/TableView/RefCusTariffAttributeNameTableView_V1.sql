@@ -1,0 +1,8 @@
+CREATE VIEW RefCusTariffAttributeNameTableView_V1 AS
+SELECT ZY6_PK,
+ZY6_Name,
+ZY6_Description,
+ZY6_ZZI_NKTariffType,
+ZY6_ZZZ_NKDataGrouping,
+ZY6_ColumnCaption
+FROM RefCusTariffAttributeName

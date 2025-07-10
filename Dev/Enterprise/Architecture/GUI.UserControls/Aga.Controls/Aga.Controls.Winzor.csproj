@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <AssemblyName>Aga.Controls</AssemblyName>
+    <RootNamespace>Aga.Controls</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseLegacyRsa>false</UseLegacyRsa>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>$(NoWarn);CS0067;CS0414;CS0649;CS0168;CS0169;SYSLIB0006</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>$(NoWarn);CS0067;CS0414;CS0649;CS0168;CS0169;SYSLIB0006</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="BitmapHelper.cs" />
+    <Compile Remove="StringCollectionEditor.cs" />
+    <Compile Remove="Tree\TreeViewAdv.Designer.cs" />
+    <Compile Remove="Tree\TreeViewAdv.Draw.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" />
+    <PackageReference Include="System.Drawing.Common" />
+    <PackageReference Include="System.Resources.Extensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Winzor\BArchitecture.GUI\WinzorFramework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Aga.Business">
+      <CopyLocal>False</CopyLocal>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="excubowebcompiler.json" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('wwwroot\css\_gen\default.css')">
+    <Content Include="wwwroot\css\_gen\default.css" />
+  </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="dotnet tool run webcompiler -- -r themes -o wwwroot/css/_gen -z disable -p disable -c excubowebcompiler.json" StandardOutputImportance="high" />
+  </Target>
+</Project>

@@ -1,0 +1,32 @@
+meta {
+  name: Origin is null
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.Origin = null;
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Origin is Mandatory.", function() {
+    expect(res.body.ModelState['Origin'][0]).to.equal("Origin is Mandatory.");
+  });
+  
+  
+  
+}

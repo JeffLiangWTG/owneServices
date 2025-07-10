@@ -1,0 +1,142 @@
+<UserControl x:Class="CargoWise.Main.Startup.Login.NextLoginLocationUserControl"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:ui="clr-namespace:CargoWise.Main.Navigation.WPF;assembly=CargoWise.Main.Navigation"
+			 xmlns:local="clr-namespace:CargoWise.Main.Startup.Login"
+			 mc:Ignorable="d"
+			 d:DesignHeight="450" d:DesignWidth="800"
+			 Loaded="UserControl_Loaded">
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="./Resources/LoginStyles.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
+	<UserControl.CommandBindings>
+		<CommandBinding Command="{x:Static local:NextLoginLocationUserControl.HandleCompanyComboBoxKeyDownCommand}" Executed="CompanyComboBox_KeyDown" />
+		<CommandBinding Command="{x:Static local:NextLoginLocationUserControl.HandleBranchComboBoxKeyDownCommand}" Executed="BranchComboBox_KeyDown" />
+		<CommandBinding Command="{x:Static local:NextLoginLocationUserControl.HandleDepartmentComboBoxKeyDownCommand}" Executed="DepartmentComboBox_KeyDown" />
+	</UserControl.CommandBindings>
+	<Grid Background="{StaticResource PrimaryColor}">
+		<Image VerticalAlignment="Bottom" Source="{StaticResource CWNextLoginIllustrationImage}" />
+		<StackPanel Orientation="Vertical" VerticalAlignment="Center" Width="364">
+			<Image Margin="30" Source="{StaticResource CWNextLogoImage}" />
+			<Border CornerRadius="8" BorderThickness="1" BorderBrush="{StaticResource PrimaryColor}" Background="{StaticResource NeutralColor}" Padding="32">
+				<StackPanel>
+					<ui:MultilingualTextLabel x:Name="Title" Style="{StaticResource LongTitleLabel}" MultilingualText="{Binding Title}" Content="{Binding Title}" />
+					<StackPanel Style="{StaticResource InputGroup}">
+						<ui:MultilingualTextLabel x:Name="CompanyLabel" Style="{StaticResource BaseLabel}" MultilingualText="{Binding CompanyLabel}" Content="{Binding CompanyLabel}" />
+						<ui:MultilingualTextLabel IsTranslatable="False" HorizontalContentAlignment="Stretch" Padding="0">
+							<ComboBox x:Name="CompanyComboBox"
+									  Style="{StaticResource ComboBoxFlatStyle}"
+									  ItemsSource ="{Binding Companies}"
+									  IsEditable="True"
+									  IsTextSearchEnabled="True"
+									  TextSearch.TextPath="GC_Code"
+									  Tag="{Binding SelectedItem.CompanyName, RelativeSource={RelativeSource Self}}"
+									  SelectedValue="{Binding Company, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+								<ComboBox.InputBindings>
+									<KeyBinding Key="Enter" Command="{x:Static local:NextLoginLocationUserControl.HandleCompanyComboBoxKeyDownCommand}" />
+								</ComboBox.InputBindings>
+								<ComboBox.ItemTemplate>
+									<DataTemplate>
+										<StackPanel Orientation="Horizontal">
+											<TextBlock Text="{Binding GC_Code}" MinWidth="35" />
+											<TextBlock Text="{Binding CompanyName}" />
+										</StackPanel>
+									</DataTemplate>
+								</ComboBox.ItemTemplate>
+							</ComboBox>
+						</ui:MultilingualTextLabel>
+					</StackPanel>
+					<StackPanel Style="{StaticResource InputGroup}">
+						<ui:MultilingualTextLabel x:Name="BranchLabel" Style="{StaticResource BaseLabel}" MultilingualText="{Binding BranchLabel}" Content="{Binding BranchLabel}" />
+						<ui:MultilingualTextLabel IsTranslatable="False" HorizontalContentAlignment="Stretch" Padding="0">
+							<ComboBox x:Name="BranchComboBox"
+										  Style="{StaticResource ComboBoxFlatStyle}"
+										  ItemsSource ="{Binding Branches}"
+										  IsEditable="True"
+										  IsTextSearchEnabled="True"
+										  TextSearch.TextPath="GB_Code"
+										  Tag="{Binding SelectedItem.GB_BranchName, RelativeSource={RelativeSource Self}}"
+										  SelectedValue="{Binding Branch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+								<ComboBox.InputBindings>
+									<KeyBinding Key="Enter" Command="{x:Static local:NextLoginLocationUserControl.HandleBranchComboBoxKeyDownCommand}" />
+								</ComboBox.InputBindings>
+								<ComboBox.ItemTemplate>
+									<DataTemplate>
+										<StackPanel Orientation="Horizontal">
+											<TextBlock Text="{Binding GB_Code}" MinWidth="35" />
+											<TextBlock Text="{Binding GB_BranchName}" />
+										</StackPanel>
+									</DataTemplate>
+								</ComboBox.ItemTemplate>
+							</ComboBox>
+						</ui:MultilingualTextLabel>
+					</StackPanel>
+					<StackPanel Style="{StaticResource InputGroup}">
+						<ui:MultilingualTextLabel x:Name="DepartmentLabel" Style="{StaticResource BaseLabel}" MultilingualText="{Binding DepartmentLabel}" Content="{Binding DepartmentLabel}" />
+						<ui:MultilingualTextLabel IsTranslatable="False" HorizontalContentAlignment="Stretch" Padding="0">
+							<ComboBox x:Name="DepartmentComboBox"
+									  Style="{StaticResource ComboBoxFlatStyle}"
+									  ItemsSource ="{Binding Departments}"
+									  IsEditable="True"
+									  IsTextSearchEnabled="True"
+									  TextSearch.TextPath="GE_Code"
+									  Tag="{Binding SelectedItem.GE_Desc, RelativeSource={RelativeSource Self}}"
+									  SelectedValue="{Binding Department, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+								<ComboBox.InputBindings>
+									<KeyBinding Key="Enter" Command="{x:Static local:NextLoginLocationUserControl.HandleDepartmentComboBoxKeyDownCommand}" />
+								</ComboBox.InputBindings>
+								<ComboBox.ItemTemplate>
+									<DataTemplate>
+										<StackPanel Orientation="Horizontal">
+											<TextBlock Text="{Binding GE_Code}" MinWidth="35" />
+											<TextBlock Text="{Binding GE_Desc}" />
+										</StackPanel>
+									</DataTemplate>
+								</ComboBox.ItemTemplate>
+							</ComboBox>
+						</ui:MultilingualTextLabel>
+					</StackPanel>
+					<Border Grid.Row="5"
+						x:Name="ErrorCallout"
+						Margin="0,0,0,12"
+						Style="{StaticResource ErrorCallout}"
+						Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}">
+						<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+							<Image Margin="0,0,8,0" Source="{StaticResource CWNextStatusCriticalImage}" />
+							<ui:MultilingualTextLabel Width="255" IsTranslatable="False" Style="{StaticResource CalloutLabel}">
+								<TextBlock x:Name="ErrorTextBlock"
+										TextWrapping="Wrap"
+										HorizontalAlignment="Stretch"
+										Text="{Binding ErrorMessage}" />
+							</ui:MultilingualTextLabel>
+						</StackPanel>
+					</Border>
+					<Grid x:Name="Buttons">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<ui:MultilingualTextLabel
+							Grid.Column="0"
+							MultilingualText="{Binding LoginButtonCaption}"
+							Padding="0" Margin="0,8,0,0" HorizontalContentAlignment="Stretch">
+							<Button x:Name="BackButton" MinWidth="80" Style="{StaticResource NeutralButton}" Content="{Binding BackButtonCaption}" Click="BackButton_Click" />
+						</ui:MultilingualTextLabel>
+						<ui:MultilingualTextLabel
+							Grid.Column="1"
+							MultilingualText="{Binding LoginButtonCaption}"
+							Padding="0" Margin="0,8,0,0" HorizontalContentAlignment="Stretch">
+							<Button x:Name="LoginButton" Style="{StaticResource PrimaryButton}" Content="{Binding LoginButtonCaption}" Click="LoginButton_Click" />
+						</ui:MultilingualTextLabel>
+					</Grid>
+				</StackPanel>
+			</Border>
+		</StackPanel>
+	</Grid>
+</UserControl>

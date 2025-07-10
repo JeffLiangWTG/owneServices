@@ -1,0 +1,75 @@
+namespace CargoWise.RefDbRepo.GBReferenceData.Business.GBHarmonisedDeclarationCode
+{
+	public class GBHDCStatic
+	{
+		public static string[] ValidStatusCodes
+		{
+			/*
+			 * Codes defined at https://www.gov.uk/government/publications/uk-trade-tariff-document-status-codes-for-harmonised-declarations/uk-trade-tariff-document-status-codes-for-harmonised-declarations
+			 * 
+
+			AC	Document attached for certification by customs
+			AE	Document attached – exhausted by (or only applies to) this entry (document returned to the trader)
+			AF	Document attached – exhausted by (or only applies to) this entry (document returned to the relevant Department)
+			AG	Document attached – exhausted by (or only applies to) this entry (document retained)
+			AP	Document attached – part use (applies to this and other entries) (document returned to the trader)
+			AS	Document attached – surrendered (document returned to the trader)
+			AT	Document attached – surrendered (document returned to the relevant department)
+			EA	Electronic details on Customs Handling of Import and Export Freight (CHIEF) – already attributed on simplified declaration
+			EE	Electronic details on CHIEF – exhausted
+			EL	Electronic details on CHIEF – ‘Late’ declaration after licence completed
+			EP	Electronic details on CHIEF – part use (applies to this and other entries)
+			ES	Electronic details on CHIEF – surrendered
+			FP	Facsimile attached – part use (applies to this and other entries)
+			GE	Document with the goods – exhausted by (or only applies to) this entry
+			GP	Document with the goods – part use (applies to this and other entries)
+			HP	Facsimile with the goods – part use (applies to this and other entries)
+			IA	Details held by issuing authority – already attributed on simplified declaration
+			IE	Details held by issuing authority – exhausted by (or only applies to) this entry
+			IP	Details held by issuing authority – part use (applies to this and other entries)
+			IS	Details held by issuing authority – surrendered
+			JA	Document held by authorised trader – already attributed on simplified declaration
+			JE	Document held by authorised trader – exhausted by (or only applies to) this entry
+			JP	Evidence required is available from trader – part use (applies to this and other entries)
+			JS	Document held by authorised trader – surrendered
+			LE	Lodged previously – exhausted by (or only applies to) this entry
+			LP	Lodged previously – part use (applies to this and other entries)
+			SP	Special authorisation for attached facsimile (paper held by trader) – part use (applies to this and other entries)
+			TP	Special authorisation for facsimile with the goods (paper held by trader) – part use (applies to this and other entries)
+			UA	Paper (held by trader) unavailable – already attributed on simplified declaration
+			UE	Paper (held by trader) unavailable – exhausted by (or only applies to) this entry
+			UP	Evidence required is unavailable – part use (applies to this and other entries)
+			US	Paper (held by trader) unavailable – surrendered
+			XA	Electronic or paper document to be advised
+			XB	Document not required – quantity below ‘de minimus’
+			XF	Document not required – goods not going into free circulation
+			XU	Unknown, specific document cannot be identified – security and/or undertaking may be required as detailed for the document or CPC
+			XW	Waiver claimed
+			XX	Ex-heading goods for which the document does not apply
+
+			*/
+
+			get
+			{
+				return validStatusCodes ?? (validStatusCodes = new string[] {
+						"AC", "AE", "AF", "AG", "AP", "AS", "AT",
+						"EA", "EE", "EL", "EP", "ES", "FP", "GE", "GP",
+						"HP", "IA", "IE", "IP", "IS", "JA", "JE", "JP", "JS",
+						"LE", "LP", "SP", "TP", "UA", "UE", "UP", "US",
+						"XA", "XB", "XF", "XU", "XW", "XX"
+					});
+			}
+		}
+		static string[] validStatusCodes = null;
+		public static string[] InvalidStatusCodes
+		{
+			get
+			{
+				return invalidStatusCodes ?? (invalidStatusCodes = new string[] {
+						"AI", "EU", "UK"
+					});
+			}
+		}
+		static string[] invalidStatusCodes = null;
+	}
+}

@@ -1,0 +1,6 @@
+CREATE VIEW RefCusPreferenceTableView_V1 AS
+SELECT ZZS_PK,
+ZZS_Preference,
+ZZS_Description,
+ZZS_ZZZ_NKDataGrouping
+FROM RefCusPreference

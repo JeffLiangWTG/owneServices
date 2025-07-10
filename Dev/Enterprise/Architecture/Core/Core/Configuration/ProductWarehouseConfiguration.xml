@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<objects xmlns="http://www.springframework.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cargowise="http://www.cargowise.com/2008/spring-extensions" xsi:schemaLocation="http://www.springframework.net http://www.springframework.net/xsd/spring-objects.xsd" default-lazy-init="true">
+  <!-- Avoid using use singleton=true as this causes Spring to cache the object without the developer understanding the effects of this -->
+  <!-- The xmlns:cargowise namespace works in conjunction with LazyConfiguredApplicationContext to prevent types being loaded unnecessarily on startup -->
+  <!-- Warehouse.Transactions -->
+  <object id="WhsNotificationSubscriberGuiHelper" type="Enterprise.MasterFiles.GUI.NotificationSubscriberGuiHelper, Enterprise.MasterFiles.GUI" singleton="false" />
+  <object id="WhsDocketMessageAction" type="Enterprise.Warehouse.Transactions.DataTransfer.WhsDocketMessageAction, Enterprise.Warehouse.Transactions.DataTransfer" singleton="false" />
+  <object id="ProductValueObjectImportList" type="CargoWise.Application.ListObject, CargoWise.ApplicationContext">
+    <property name="SourceList">
+      <list>
+        <ref object="IValueObjectImport_WarehouseProduct" />
+      </list>
+    </property>
+  </object>
+  <object id="IValueObjectImport_WarehouseProduct" type="Enterprise.Warehouse.Transactions.DataTransfer.WhsProductXMLProcessor, Enterprise.Warehouse.Transactions.DataTransfer" singleton="false" />
+  <object id="ProductValueObjectExportList" type="CargoWise.Application.ListObject, CargoWise.ApplicationContext">
+    <property name="SourceList">
+      <list>
+        <ref object="IValueObjectExport_WarehouseProduct" />
+      </list>
+    </property>
+  </object>
+  <object id="IAllocatePicksAwaitingReplenishmentWithExistingInventoryProcessingManager" type="Enterprise.Warehouse.Transactions.ServiceTasks.AllocatePicksAwaitingReplenishmentWithExistingInventoryProcessingManager, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="false">
+    <constructor-arg index="0" ref="IPartiallyReplenishedPickSplitter" />
+  </object>
+  <object id="IValueObjectExport_WarehouseProduct" type="Enterprise.Warehouse.Transactions.DataTransfer.WhsProductXMLProcessor, Enterprise.Warehouse.Transactions.DataTransfer" singleton="false" />
+  <object id="IBondedWarehouseLink" type="Enterprise.Warehouse.Transactions.Business.Bonded.BondedWarehouseLink, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IChildWhsOrderCollection" type="Enterprise.Warehouse.Transactions.Business.ChildWhsOrderCollection, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IOutboundDockDoorTransferCreator" type="Enterprise.Warehouse.Transactions.Business.OutboundDockDoorTransferCreator, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IPickFaceCreateTransfers" type="Enterprise.Warehouse.Transactions.Business.PickFaceCreateTransfers, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWarehouseDocketLinker" type="Enterprise.Warehouse.Transactions.DataTransfer.Universal.WarehouseDocketLinker, Enterprise.Warehouse.Transactions.DataTransfer" singleton="false" />
+  <object id="IWhsABCCategory" type="Enterprise.Warehouse.Transactions.Business.WhsABCCategory, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="WhsAdHocServiceJob" type="Enterprise.Warehouse.Transactions.Business.WhsAdHocServiceJob, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsAdHocServiceJob" type="Enterprise.Warehouse.Transactions.Business.WhsAdHocServiceJob, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsAdjustment" type="Enterprise.Warehouse.Transactions.Business.WhsAdjustment, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsAdjustmentProcessTask" type="Enterprise.Warehouse.Transactions.Business.WhsAdjustmentProcessTasks, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsAutoInventoryAccuracyManager" type="Enterprise.Warehouse.Transactions.Business.WhsAutoInventoryAccuracyManager, Enterprise.Warehouse.Transactions.Business" singleton="false">
+    <constructor-arg index="0" ref="IWhsAutoCycleCountTaskCreator" />
+    <constructor-arg index="1" ref="IWhsAutoStocktakeTaskCreator" />
+  </object>
+  <object id="IWhsAutoCycleCountTaskCreator" type="Enterprise.Warehouse.Transactions.Business.WhsAutoCycleCountTaskCreator, Enterprise.Warehouse.Transactions.Business" singleton="false">
+    <constructor-arg index="0" ref="IWhsCycleCountLocationCreator" />
+  </object>
+  <object id="IWhsAsnLine" type="Enterprise.Warehouse.Transactions.Business.WhsAsnLine, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsAutoStocktakeTaskCreator" type="Enterprise.Warehouse.Transactions.Business.WhsAutoStocktakeTaskCreator, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsBOMInventoryPivot" type="Enterprise.Warehouse.Transactions.Business.WhsBOMInventoryPivot, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsBondedWarehouseLink" type="Enterprise.Warehouse.Transactions.Business.Bonded.WhsBondedWarehouseLink, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsBondedWarehouseTransactionLine" type="Enterprise.Warehouse.Transactions.Business.Bonded.WhsBondedWarehouseTransactionLine, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsBondedWarehouseTransactionLineCollection" type="Enterprise.Warehouse.Transactions.Business.Bonded.WhsBondedWarehouseTransactionLineCollection, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsCycleCountLocationService" type="Enterprise.Warehouse.Transactions.Business.WhsCycleCountLocationService, Enterprise.Warehouse.Transactions.Business" singleton="false" cargowise:lazy-configure="true"/>
+  <object id="IWhsCycleCountLocationPreventCreateIfLocationHasOpenVarianceDeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCycleCountLocationPreventCreateIfLocationHasOpenVarianceDeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCycleCountLocationVarianceHasSameStatusDeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCycleCountLocationVarianceHasSameStatusDeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCycleCountLocationCreator" type="Enterprise.Warehouse.Transactions.Business.WhsCycleCountLocationCreator, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsDocket" type="Enterprise.Warehouse.Transactions.Business.WhsDocket,Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsDocketJobPivot" type="Enterprise.Warehouse.Transactions.Business.WhsDocketJobPivot, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsDocketLine" type="Enterprise.Warehouse.Transactions.Business.WhsDocketLine, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsReceiveLine" type="Enterprise.Warehouse.Transactions.Business.WhsReceiveLine, Enterprise.Warehouse.Transactions.Business" singleton="false" cargowise:lazy-configure="true"/>
+  <object id="IWhsOrderLine" type="Enterprise.Warehouse.Transactions.Business.WhsOrderLine, Enterprise.Warehouse.Transactions.Business" singleton="false" cargowise:lazy-configure="true"/>
+  <object id="IWhsDocketProcessTask" type="Enterprise.Warehouse.Transactions.Business.WhsDocketProcessTasks, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsWarehouseJobTypeWithSubTypeCodeDescriptionPairProvider" type="Enterprise.Warehouse.Transactions.Business.WhsWarehouseJobTypeWithSubTypeCodeDescriptionPairProvider, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsAdjustmentReasonCodeDescriptionPairProvider" type="Enterprise.Warehouse.Transactions.Business.WhsAdjustmentReasonCodeDescriptionPairProvider, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsBondedWarehouseAttribute" type="Enterprise.Warehouse.Transactions.Business.WhsBondedWarehouseAttribute, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsInventoryView" type="Enterprise.Warehouse.Transactions.Business.WhsInventoryView, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsInvoice" type="Enterprise.Warehouse.Transactions.Invoicing.WhsInvoice, Enterprise.Warehouse.Transactions.Invoicing" singleton="false" />
+  <object id="WhsLoad" type="Enterprise.Warehouse.Transactions.Business.WhsLoad, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="WhsLoadPkgPackagePivot" type="Enterprise.Warehouse.Transactions.Business.WhsLoadPkgPackagePivot, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsOrder" type="Enterprise.Warehouse.Transactions.Business.WhsOrder, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsOrderCollection" type="Enterprise.Warehouse.Transactions.Business.WhsOrderCollectionForAttaching, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsOrderProcessTask" type="Enterprise.Warehouse.Transactions.Business.WhsOrderProcessTasks, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsPickOnSalesOrderDetector" type="Enterprise.Warehouse.Transactions.Business.WhsPickOnSalesOrderDetector, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsPick" type="Enterprise.Warehouse.Transactions.Business.WhsPick, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsDockDoorAssignment" type="Enterprise.Warehouse.Transactions.Business.WhsDockDoorAssignment, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IPackingStationIsSetCorrectlyDeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.PackingStationIsSetCorrectlyDeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsPackageAudit" type="Enterprise.Warehouse.Transactions.Business.WhsPackageAudit, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsPackageAuditLineFailure" type="Enterprise.Warehouse.Transactions.Business.WhsPackageAuditLineFailure, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsPickLine" type="Enterprise.Warehouse.Transactions.Business.WhsPickLine, Enterprise.Warehouse.Transactions.Business" singleton="false" cargowise:lazy-configure="true"/>
+  <object id="IWhsPickShortLine" type="Enterprise.Warehouse.Transactions.Business.WhsPickShortLine, Enterprise.Warehouse.Transactions.Business" singleton="false" cargowise:lazy-configure="true"/>
+  <object id="IOverCommitPickLinesDeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.OverCommitPickLinesDeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IPartiallyReplenishedPickSplitter" type="Enterprise.Warehouse.Transactions.Business.PartiallyReplenishedPickSplitter, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="WhsPickByLabelJob" type="Enterprise.Warehouse.Transactions.PickByLabel.WhsPickByLabelJob, Enterprise.Warehouse.Transactions.PickByLabel" singleton="false" />
+  <object id="IWhsPickByLabelJob" type="Enterprise.Warehouse.Transactions.PickByLabel.WhsPickByLabelJob, Enterprise.Warehouse.Transactions.PickByLabel" singleton="false" />
+  <object id="IWhsPickByLabelLabel" type="Enterprise.Warehouse.Transactions.PickByLabel.WhsPickByLabelLabel, Enterprise.Warehouse.Transactions.PickByLabel" singleton="false" />
+  <object id="IWhsPickByLabelPickStrategy" type="Enterprise.Warehouse.Transactions.PickByLabel.WhsPickByLabelPickStrategy, Enterprise.Warehouse.Transactions.PickByLabel" singleton="false" />
+  <object id="IWhsPickByTrolleyPickStrategy" type="Enterprise.Warehouse.Transactions.TrolleyPicking.WhsPickByTrolleyPickStrategy, Enterprise.Warehouse.Transactions.TrolleyPicking" singleton="false" />
+  <object id="IWhsPickTrolleyJob" type="Enterprise.Warehouse.Transactions.TrolleyPicking.WhsPickTrolleyJob, Enterprise.Warehouse.Transactions.TrolleyPicking" singleton="false" />
+  <object id="IWhsPickTrolleySlot" type="Enterprise.Warehouse.Transactions.TrolleyPicking.WhsPickTrolleySlot, Enterprise.Warehouse.Transactions.TrolleyPicking" singleton="false" />
+  <object id="IWhsProduct" type="Enterprise.Warehouse.Transactions.Business.WhsProduct, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsProductParamsByWhsAndClient" type="Enterprise.Warehouse.Transactions.Business.WhsProductParamsByWhsAndClient, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsProductParamsByWhsAndClientCollection" type="Enterprise.Warehouse.Transactions.Business.WhsProductParamsByWhsAndClientCollection, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsProductParamsByWhsAndClientValidationHelper" type="Enterprise.Warehouse.Transactions.Business.WhsProductParamsByWhsAndClientValidationHelper, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsPutawayJob" type="Enterprise.Warehouse.Transactions.Business.WhsPutawayJob, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsPutawayLine" type="Enterprise.Warehouse.Transactions.Business.WhsPutawayLine, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsCheckPreventFinalizeIfLinesAreUnfinalized_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckPreventFinalizeIfLinesAreUnfinalized_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckDocketStatusDepartedOnPickFinalisation_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckDocketStatusDepartedOnPickFinalisation_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckFinalisedPickWithUnPickedPicklines_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckFinalisedPickWithUnPickedPicklines_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckInterWhsTransfersAreInSync_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckInterWhsTransfersAreInSync_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckDocketStatusAndDateWithLines_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckDocketStatusAndDateWithLines_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckLinesDoNotExceedLocationCapacity_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckLinesDoNotExceedLocationCapacity_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckFinalisedJobsWithUnPickedPickLines_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckFinalisedJobsWithUnPickedPickLines_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckFinalisedDocketLineWithUnPickedPicklines_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckFinalisedDocketLineWithUnPickedPicklines_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckTotalUnits_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckTotalUnits_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckTransactionAndPickQtyIsCorrectOnUpdateWE_TransactionQuantity_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckTransactionAndPickQtyIsCorrectOnUpdateWE_TransactionQuantity_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckTransactionAndPickQtyIsCorrectOnUpdateWE_TransactionQuantityWhsAdjustmentLine_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckTransactionAndPickQtyIsCorrectOnUpdateWE_TransactionQuantityWhsAdjustmentLine_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckTransactionAndPickQtyIsCorrectForWhsTransferLine_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckTransactionAndPickQtyIsCorrectForWhsTransferLine_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckTransactionAndPickQtyIsCorrect_Insert_WhsAdjustmentLine_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckTransactionAndPickQtyIsCorrect_Insert_WhsAdjustmentLine_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckTransactionAndPickQtyIsCorrect_Insert_WhsTransferLine_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckTransactionAndPickQtyIsCorrect_Insert_WhsTransferLine_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckTransactionAndPickQtyIsCorrectForWhsPickLine_OnUpdateConditionStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckTransactionAndPickQtyIsCorrectForWhsPickLine_OnUpdateConditionStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsReceive" type="Enterprise.Warehouse.Transactions.Business.WhsReceive, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsReceiveProcessTask" type="Enterprise.Warehouse.Transactions.Business.WhsReceiveProcessTasks, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IPalletIDGenerator" type="Enterprise.Warehouse.Transactions.Business.PalletIDGenerator, Enterprise.Warehouse.Transactions.Business" singleton="false">
+    <constructor-arg index="0" ref="IPalletIDFromSSCCGenerator" />
+    <constructor-arg index="1" ref="IPalletIDFromDocketIDGenerator" />
+    <constructor-arg index="2" ref="ISSCCPrefixFinder" />
+  </object>
+  <object id="ISSCCPrefixFinder" type="Enterprise.Warehouse.Transactions.Business.SSCCPrefixFinder, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IPalletIDFromDocketIDGenerator" type="Enterprise.Warehouse.Transactions.Business.PalletIDFromDocketIDGenerator, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IPalletIDFromSSCCGenerator" type="Enterprise.Warehouse.Transactions.Business.PalletIDFromSSCCGenerator, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="WhsCycleCountWave" type="Enterprise.Warehouse.Transactions.Business.WhsCycleCountWave, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="WhsCycleCountLocation" type="Enterprise.Warehouse.Transactions.Business.WhsCycleCountLocation, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="WhsCycleCountLocationVariance" type="Enterprise.Warehouse.Transactions.Business.WhsCycleCountLocationVariance, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="WhsDockDoorAssignment" type="Enterprise.Warehouse.Transactions.Business.WhsDockDoorAssignment, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsStocktake" type="Enterprise.Warehouse.Transactions.Business.WhsStocktake, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWarehousePackingJobParentEventContextValueProvider" type="Enterprise.Warehouse.Transactions.DataTransfer.Universal.WarehousePackingJobParentEventContextValuesProvider, Enterprise.Warehouse.Transactions.DataTransfer" singleton="false" />
+  <object id="IWhsWarehouseTransactionLineCollection" type="Enterprise.Warehouse.Transactions.Business.WhsWarehouseTransactionLineCollection, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IInventoryFilterUserControl" type="Enterprise.Warehouse.Transactions.Module.InventoryFilterUserControl, Enterprise.Warehouse.Transactions.Module" singleton="false" />
+  <object id="IWhsOrderAutoPackProcessorCreator" type="Enterprise.Warehouse.Transactions.Business.WhsOrderAutoPackProcessorCreator, Enterprise.Warehouse.Transactions.DataTransfer" singleton="false" cargowise:lazy-configure="true"/>
+  <object id="IPickedStockAdjustersFactory" type="Enterprise.Warehouse.Transactions.Business.PickedStockAdjustersFactory, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsReceiveCustomsAmendmentChecker" type="Enterprise.Warehouse.Transactions.DataTransfer.Universal.WhsReceiveCustomsAmendmentChecker, Enterprise.Warehouse.Transactions.DataTransfer" singleton="false" />
+  <object id="IWhsReceiveLineMatcher" type="Enterprise.Warehouse.Transactions.DataTransfer.Universal.WhsReceiveLineMatcher, Enterprise.Warehouse.Transactions.DataTransfer" singleton="false" />
+  <object id="IWhsOrderCustomsAmendmentChecker" type="Enterprise.Warehouse.Transactions.DataTransfer.Universal.WhsOrderCustomsAmendmentChecker, Enterprise.Warehouse.Transactions.DataTransfer" singleton="false" />
+  <object id="IWhsOrderLineMatcher" type="Enterprise.Warehouse.Transactions.DataTransfer.Universal.WhsOrderLineMatcher, Enterprise.Warehouse.Transactions.DataTransfer" singleton="false" />
+  <object id="IWhsNonExposedFeature" type="Enterprise.Warehouse.Transactions.Business.WhsNonExposedFeature, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="WhsInventoryHeldCode" type="Enterprise.Warehouse.Transactions.Business.WhsInventoryHeldCode, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="WhsInventoryHoldChangeLog" type="Enterprise.Warehouse.Transactions.Business.WhsInventoryHoldChangeLog, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="WhsStocktakeProductFilter" type="Enterprise.Warehouse.Transactions.Business.WhsStocktakeProductFilter, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsOrgSupplierPartCollection" type="Enterprise.Warehouse.Transactions.Business.WhsOrgSupplierPartCollection, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IFTZWhsOrderLinesDataProvider" type="Enterprise.Warehouse.Transactions.Business.FTZWhsOrderLinesDataProvider, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsCarrierLabelsBatchPrintingSubscriber" type="Enterprise.Warehouse.Transactions.DataTransfer.Universal.WhsCarrierLabelsBatchPrintingSubscriber, Enterprise.Warehouse.Transactions.DataTransfer" factory-method="GetSubscriber" singleton="false" />
+  <object id="WhsSerialNumber" type="Enterprise.Warehouse.Transactions.Business.WhsSerialNumber, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="WhsSerialNumberPivot" type="Enterprise.Warehouse.Transactions.Business.WhsSerialNumberPivot, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="WhsPickByLabelPackageStrategy" type="Enterprise.Warehouse.Transactions.PickByLabel.WhsPickByLabelPackageStrategy, Enterprise.Warehouse.Transactions.PickByLabel" singleton="false" />
+  <object id="WhsPickByTrolleyPackageStrategy" type="Enterprise.Warehouse.Transactions.TrolleyPicking.WhsPickByTrolleyPackageStrategy, Enterprise.Warehouse.Transactions.TrolleyPicking" singleton="false" />
+  <object id="WhsTotePackageStrategy" type="Enterprise.Warehouse.Transactions.TrolleyPicking.WhsTotePackageStrategy, Enterprise.Warehouse.Transactions.TrolleyPicking" singleton="false" />
+  <object id="WhsOrderPackageStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsOrderPackageStrategy, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="WhsPackageStrategyList" type="CargoWise.Application.ListObject, CargoWise.ApplicationContext">
+    <property name="SourceList">
+      <list>
+        <ref object="WhsPickByLabelPackageStrategy" />
+        <ref object="WhsPickByTrolleyPackageStrategy" />
+        <ref object="WhsTotePackageStrategy" />
+        <ref object="WhsOrderPackageStrategy" />
+      </list>
+    </property>
+  </object>
+  <object id="IWhsPutawayLocationCacheManager" type="Enterprise.Warehouse.Transactions.Business.WhsPutawayLocationCacheManager, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IStalePutawayLocationCacheFinder" type="Enterprise.Warehouse.Transactions.Business.StalePutawayLocationCacheFinder, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IPutawayLocationFactLoader" type="Enterprise.Warehouse.Transactions.Business.PutawayLocationFactLoader, Enterprise.Warehouse.Transactions.Business" singleton="true">
+    <constructor-arg index="0" ref="IWhsPutawayLocationCacheManager" />
+  </object>
+  <object id="IPutawayEngineManagerForReceive" type="Enterprise.Warehouse.Transactions.Business.PutawayEngineManagerForReceive, Enterprise.Warehouse.Transactions.Business" singleton="true">
+    <constructor-arg index="0" ref="IUserHaltableProductionRulesEngineService" />
+    <constructor-arg index="1" ref="ICrossDockManager" />
+    <constructor-arg index="2" ref="IPutawayExistingPalletManager" />
+    <constructor-arg index="3" ref="IPutawayLocationFactLoader" />
+    <constructor-arg index="4" ref="IPutawayLocationCacheUpdater" />
+  </object>
+  <object id="IPutawayEngineManagerForVASTransferLine" type="Enterprise.Warehouse.Transactions.Business.PutawayEngineManagerForVASTransferLine, Enterprise.Warehouse.Transactions.Business" singleton="true">
+    <constructor-arg index="0" ref="IUserHaltableProductionRulesEngineService" />
+    <constructor-arg index="1" ref="IPutawayLocationFactLoader" />
+    <constructor-arg index="2" ref="IPutawayLocationCacheUpdater" />
+  </object>
+  <object id="IAllocationResultProcessor" type="Enterprise.Warehouse.Transactions.Business.AllocationResultProcessor, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IAvailableInventoryFactManagerFactory" type="Enterprise.Warehouse.Transactions.Business.AvailableInventoryFactManagerFactory, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IAllocationFactLoader" type="Enterprise.Warehouse.Transactions.Business.AllocationFactLoader, Enterprise.Warehouse.Transactions.Business" singleton="true">
+    <constructor-arg index="0" ref="IAvailableInventoryFactManagerFactory" />
+  </object>
+  <object id="IAllocationEngineManager" type="Enterprise.Warehouse.Transactions.Business.AllocationEngineManager, Enterprise.Warehouse.Transactions.Business" singleton="true">
+    <constructor-arg index="0" ref="IUserHaltableProductionRulesEngineService" />
+    <constructor-arg index="1" ref="IAllocationFactLoader" />
+    <constructor-arg index="2" ref="IAllocationResultProcessor" />
+  </object>
+  <object id="IWhsCheckStockOnHandIsBalancedStrategy_InventoryLineInsert_AdjustmentLine" type="Enterprise.Warehouse.Transactions.Business.WhsCheckStockOnHandIsBalancedStrategy_InventoryLineInsert_AdjustmentLine, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckStockOnHandIsBalancedStrategy_InventoryLineInsert_ReceiveLine" type="Enterprise.Warehouse.Transactions.Business.WhsCheckStockOnHandIsBalancedStrategy_InventoryLineInsert_ReceiveLine, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckStockOnHandIsBalancedStrategy_InventoryLineInsert_TransferLine" type="Enterprise.Warehouse.Transactions.Business.WhsCheckStockOnHandIsBalancedStrategy_InventoryLineInsert_TransferLine, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckStockOnHandIsBalancedStrategy_InventoryLineInsert_ForParent" type="Enterprise.Warehouse.Transactions.Business.WhsCheckStockOnHandIsBalancedStrategy_InventoryLineInsert_ForParent, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckStockOnHandIsBalancedStrategy_InventoryLineUpdate_Parent" type="Enterprise.Warehouse.Transactions.Business.WhsCheckStockOnHandIsBalancedStrategy_InventoryLineUpdate_Parent, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckStockOnHandIsBalancedStrategy_InventoryLineUpdate_AdjustmentLine" type="Enterprise.Warehouse.Transactions.Business.WhsCheckStockOnHandIsBalancedStrategy_InventoryLineUpdate_AdjustmentLine, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckStockOnHandIsBalancedStrategy_InventoryLineUpdate_ReceiveLine" type="Enterprise.Warehouse.Transactions.Business.WhsCheckStockOnHandIsBalancedStrategy_InventoryLineUpdate_ReceiveLine, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckStockOnHandIsBalancedStrategy_InventoryLineUpdate_TransferLine" type="Enterprise.Warehouse.Transactions.Business.WhsCheckStockOnHandIsBalancedStrategy_InventoryLineUpdate_TransferLine, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckStockOnHandIsBalancedStrategy_PickLineInsertUpdate" type="Enterprise.Warehouse.Transactions.Business.WhsCheckStockOnHandIsBalancedStrategy_PickLineInsertUpdate, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckOrderDockDoorLocationIsMatchWithPick_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckOrderDockDoorLocationIsMatchWithPick_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckTotalUnitsStrategy_BOMKitReceiveLineUpdate" type="Enterprise.Warehouse.Transactions.Business.WhsCheckTotalUnitsStrategy_BOMKitReceiveLineUpdate, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCustomCanChangeCriticalFieldsOnPickedOrderWhenImportingOrderLine" type="Enterprise.Warehouse.Transactions.Business.WhsCustomCanChangeCriticalFieldsOnPickedOrderWhenImportingOrderLine, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="ICrossDockManager" type="Enterprise.Warehouse.Transactions.Business.CrossDockManager, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IPutawayExistingPalletManager" type="Enterprise.Warehouse.Transactions.Business.PutawayExistingPalletManager, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsInventoryHeldCode" type="Enterprise.Warehouse.Transactions.Business.WhsInventoryHeldCode, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsInventoryHeldCodeCollection" type="Enterprise.Warehouse.Transactions.Business.WhsInventoryHeldCodeCollection, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsVASOrder" type="Enterprise.Warehouse.Transactions.Business.WhsVASOrder, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IPutawayLocationCacheUpdater" type="Enterprise.Warehouse.Transactions.GUI.PutawayLocationCacheUpdater, Enterprise.Warehouse.Transactions.GUI" singleton="true">
+    <constructor-arg index="0" ref="IStalePutawayLocationCacheFinder" />
+    <constructor-arg index="1" ref="IWhsPutawayLocationCacheManager" />
+  </object>
+  <object id="IWhsInvoiceHelper" type="Enterprise.Warehouse.Transactions.Invoicing.WhsInvoiceHelper, Enterprise.Warehouse.Transactions.Invoicing" singleton="false" />
+  <object id="IWhsAutoRateQueuedInvoicesProcessSynchronously" type="Enterprise.Warehouse.Transactions.ServiceTasks.WhsAutoRateQueuedInvoicesProcessSynchronously, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="false">
+    <constructor-arg index="0" ref="IWhsInvoiceHelper" />
+  </object>
+  <object id="ISupportObjectPickPriorityComparer" type="Enterprise.Warehouse.Transactions.Business.SupportObjectPickPriorityComparer, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsPackingConsolidationService" type="Enterprise.Warehouse.Transactions.Business.WhsPackingConsolidationService, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsPickDockDoorAssignmentService" type="Enterprise.Warehouse.Transactions.Business.WhsPickDockDoorAssignmentService, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsGlowServicesModuleService" type="Enterprise.Warehouse.Transactions.Business.WhsGlowServicesModuleService, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsCheckSerialNumberMatchWithDocketLineQuantity_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckSerialNumberMatchWithDocketLineQuantity_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckSerialNumberQuantityMatchWithAsnLine_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckSerialNumberQuantityMatchWithAsnLine_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckSerialNumberMatchWithPickLineUnits_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckSerialNumberMatchWithPickLineUnits_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckTransferSerialNumberMatchWithnventory_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckTransferSerialNumberMatchWithnventory_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IUNDGThresholdLimitNotificationProcessor" type="Enterprise.Warehouse.Transactions.ServiceTasks.UNDGThresholdLimitNotificationProcessor, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="false" >
+    <constructor-arg index="0" ref="IWhsUNDGLimitValidationHelperFactory" />
+  </object>
+  <object id="IUNDGThresholdLimitWarehouseFinder" type="Enterprise.Warehouse.Transactions.ServiceTasks.UNDGThresholdLimitWarehouseFinder, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="false" />  
+  <object id="IWhsCheckForUnreferencedWhsDockDoorAssignment_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckForUnreferencedWhsDockDoorAssignment_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsCheckForUnreferencedWhsDockDoorAssignment_WhsPick_DeferTriggerStrategy" type="Enterprise.Warehouse.Transactions.Business.WhsCheckForUnreferencedWhsDockDoorAssignment_WhsPick_DeferTriggerStrategy, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="ICycleCountLocationTaskCreationFactLoader" type="Enterprise.Warehouse.Transactions.Business.CycleCountLocationTaskCreationFactLoader, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="ICycleCountLocationTaskBreakdownFactLoader" type="Enterprise.Warehouse.Transactions.Business.CycleCountLocationTaskBreakdownFactLoader, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsTaskManagementService" type="Enterprise.Warehouse.Transactions.Business.WhsTaskManagementService, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="ICreatePutawayTransferHelper" type="Enterprise.Warehouse.Transactions.Business.CreatePutawayTransferHelper, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="IWhsLuceneTaskSearch" type="Enterprise.Warehouse.Transactions.Business.WhsLuceneTaskSearch, Enterprise.Warehouse.Transactions.Business" singleton="true" >
+    <constructor-arg index="0" ref="IGlowIndexQueryEngine" />
+  </object>
+  <object id="WhsReadyForPlanningJobsView" type="Enterprise.Warehouse.Transactions.Business.WhsReadyForPlanningJobsView, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsTaskFactory" type="Enterprise.Warehouse.Transactions.Business.WhsTaskFactory, Enterprise.Warehouse.Transactions.Business" singleton="true" >
+    <constructor-arg index="0" ref="IProcessHeaderUniqueCompletionStatementGenerator" />
+  </object>
+  <object id="ITaskCreationJobStrategyFactory" type="Enterprise.Warehouse.Transactions.ServiceTasks.TaskCreationJobStrategyFactory, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="true" />
+  <object id="IReadyForPlanningJobLoader" type="Enterprise.Warehouse.Transactions.ServiceTasks.ReadyForPlanningJobLoader, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="true" />
+  <object id="IWhsTaskCreationProcessor" type="Enterprise.Warehouse.Transactions.ServiceTasks.WhsTaskCreationProcessor, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="true">
+    <constructor-arg index="0" ref="IReadyForPlanningJobLoader" />
+    <constructor-arg index="1" ref="ITaskCreationJobStrategyFactory" />
+    <constructor-arg index="2" ref="IWhsTaskFactory" />
+  </object>
+  <object id="WarehouseTaskCreationStrategies" type="CargoWise.Application.KeyObjectHandleDictionaryObject, CargoWise.ApplicationContext" singleton="true">
+    <property name="SourceDictionary">
+      <dictionary>
+        <entry>
+          <key>
+            <value>INW</value>
+          </key>
+          <value>UnloadBreakdownStrategy</value>
+        </entry>
+        <entry>
+          <key>
+            <value>LOA</value>
+          </key>
+          <value>LoadBreakdownStrategy</value>
+        </entry>
+        <entry>
+          <key>
+            <value>CCL</value>
+          </key>
+          <value>CycleCountBreakdownStrategy</value>
+        </entry>
+        <entry>
+          <key>
+            <value>TFR</value>
+          </key>
+          <value>TransferBreakdownStrategy</value>
+        </entry>
+        <entry>
+          <key>
+            <value>ACR</value>
+          </key>
+          <value>ReplenishmentBreakdownStrategy</value>
+        </entry>
+        <entry>
+          <key>
+            <value>PIC</value>
+          </key>
+          <value>PickBreakdownStrategy</value>
+        </entry>
+      </dictionary>
+    </property>
+  </object>
+  <object id="UnloadBreakdownStrategy" type="Enterprise.Warehouse.Transactions.ServiceTasks.UnloadBreakdownStrategy, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="true" />
+  <object id="LoadBreakdownStrategy" type="Enterprise.Warehouse.Transactions.ServiceTasks.LoadBreakdownStrategy, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="true" />
+  <object id="CycleCountBreakdownStrategy" type="Enterprise.Warehouse.Transactions.ServiceTasks.CycleCountBreakdownStrategy, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="true">
+    <constructor-arg index="0" ref="ICycleCountLocationTaskBreakdownFactLoader" />
+  </object>
+  <object id="TransferBreakdownStrategy" type="Enterprise.Warehouse.Transactions.ServiceTasks.TransferBreakdownStrategy, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="true" />
+  <object id="ReplenishmentBreakdownStrategy" type="Enterprise.Warehouse.Transactions.ServiceTasks.ReplenishmentBreakdownStrategy, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="true" />
+  <object id="PickBreakdownStrategy" type="Enterprise.Warehouse.Transactions.ServiceTasks.PickBreakdownStrategy, Enterprise.Warehouse.Transactions.ServiceTasks" singleton="true" />
+  <!-- Warehouse.Environment -->
+  <object id="IAreaTypes" type="Enterprise.Warehouse.Environment.CodeLists.AreaTypes, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="ILocationStatus" type="Enterprise.Warehouse.Environment.CodeLists.LocationStatus, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsArea" type="Enterprise.Warehouse.Environment.Business.WhsArea, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsAreaCollection" type="Enterprise.Warehouse.Environment.Business.WhsAreaCollection, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsDynamicAreaCollection" type="Enterprise.Warehouse.Environment.Business.WhsDynamicAreaCollection, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsLocationCollection" type="Enterprise.Warehouse.Environment.Business.WhsLocationCollection, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsLocationDataHelper" type="Enterprise.Warehouse.Environment.Business.WhsLocationDataHelper, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsRowCollection" type="Enterprise.Warehouse.Environment.Business.WhsRowCollection, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsAreaCollectionBuilder" type="Enterprise.Warehouse.Environment.Business.WhsAreaCollectionBuilder, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsClientParameterByWarehouse" type="Enterprise.Warehouse.Environment.Business.WhsClientParameterByWarehouse, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsLocation" type="Enterprise.Warehouse.Environment.Business.WhsLocation, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsPickFace" type="Enterprise.Warehouse.Environment.Business.WhsPickFace, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsPickCollection" type="Enterprise.Warehouse.Transactions.Business.WhsPickCollection, Enterprise.Warehouse.Transactions.Business" singleton="false" />
+  <object id="IWhsPutawayGroup" type="Enterprise.Warehouse.Environment.Business.WhsPutawayGroup, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsPutawayGroupCollection" type="Enterprise.Warehouse.Environment.Business.WhsPutawayGroupCollection, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsSalesChannelCollection" type="Enterprise.Warehouse.Environment.Business.WhsSalesChannelCollection, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="WhsRFRegistry" type="Enterprise.Warehouse.Environment.Business.WhsRFRegistry, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsRFRegistry" type="Enterprise.Warehouse.Environment.Business.WhsRFRegistry, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWarehouseDataRegistry" type="Enterprise.Registry.Business.Warehouse.WarehouseDataRegistry, Enterprise.Registry.Business" singleton="false" />
+  <object id="WhsUNDGLimit" type="Enterprise.Warehouse.Environment.Business.WhsUNDGLimit, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsUNDGLimit" type="Enterprise.Warehouse.Environment.Business.WhsUNDGLimit, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsRow" type="Enterprise.Warehouse.Environment.Business.WhsRow, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsWarehouse" type="Enterprise.Warehouse.Environment.Business.WhsWarehouse, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsWarehouseCollection" type="Enterprise.Warehouse.Environment.Business.WhsWarehouseCollection, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsWarehouseCollectionWithSecurityCheck" type="Enterprise.Warehouse.Environment.Business.WhsWarehouseCollectionWithSecurityCheck, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsCartonGroup" type="Enterprise.Warehouse.Environment.Business.WhsCartonGroup, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsCartonGroupCollection" type="Enterprise.Warehouse.Environment.Business.WhsCartonGroupCollection, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsLocationDocumentEngineHelper" type="Enterprise.Warehouse.Environment.Business.WhsLocationDocumentEngineHelper, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsLocationTypeCollection" type="Enterprise.Warehouse.Environment.Business.WhsLocationTypeCollection, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsLocationType" type="Enterprise.Warehouse.Environment.Business.WhsLocationType, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="WhsCartonGroupSizeLink" type="Enterprise.Warehouse.Environment.Business.WhsCartonGroupSizeLink, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IFTZWarehouseDataProvider" type="Enterprise.Warehouse.Environment.Business.FTZWarehouseDataProvider, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsRFRegistryDocumentEngineHelper" type="Enterprise.Warehouse.Environment.Business.WhsRFRegistryDocumentEngineHelper, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsSalesChannel" type="Enterprise.Warehouse.Environment.Business.WhsSalesChannel, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsDefaultPrinterHelper" type="Enterprise.Warehouse.Environment.Business.WhsDefaultPrinterHelper, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsProductStyle" type="Enterprise.Warehouse.Environment.Business.WhsProductStyle, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsProductStyleSize" type="Enterprise.Warehouse.Environment.Business.WhsProductStyleSize, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsProductStyleColour" type="Enterprise.Warehouse.Environment.Business.WhsProductStyleColour, Enterprise.Warehouse.Environment.Business" singleton="false" />
+  <object id="IWhsProductStyleClassification" type="Enterprise.Warehouse.Environment.Business.WhsProductStyleClassification, Enterprise.Warehouse.Environment.Business" singleton="false" />
+
+  <!-- Others -->
+  <object id="ISecuritySOAPHeader" type="Enterprise.Warehouse.Web.WebService.SecuritySOAPHeader, Enterprise.Warehouse.Web" singleton="false" />
+  <object id="ICartonisationDiagnosticForm" type="Enterprise.Warehouse.Cartonisation.Diagnostic.CartonisationDiagnosticForm, Enterprise.Warehouse.Cartonisation.Diagnostic" singleton="false" />
+  <object id="IWhsSecureService" type="Enterprise.Warehouse.Web.WebService.WhsSecureService, Enterprise.Warehouse.Web" singleton="false" />
+  <object id="ICartonisation" type="Enterprise.Warehouse.Cartonisation.Business.CartonisationAlgorithm, Enterprise.Warehouse.Cartonisation.Business" singleton="false" />
+  <object id="IRFVersionSupporter" type="Enterprise.Warehouse.Web.WebService.Common.RFVersionSupporter, Enterprise.Warehouse.Web" singleton="false" />
+  <object id="IProcessTasksSyncUserProcessorFactory" type="Enterprise.Warehouse.Transactions.Business.ProcessTasksSyncUserProcessorFactory, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="ProcessTaskSyncUserProcessors" type="CargoWise.Application.KeyObjectHandleDictionaryObject, CargoWise.ApplicationContext" singleton="true">
+    <property name="SourceDictionary">
+      <dictionary>
+        <entry>
+          <key>
+            <value>WPT</value>
+          </key>
+          <value>WhsPutawayTaskSyncUserProcessor</value>
+        </entry>
+        <entry>
+          <key>
+            <value>WPK</value>
+          </key>
+          <value>WhsPickTaskSyncUserProcessor</value>
+        </entry>
+        <entry>
+          <key>
+            <value>WDP</value>
+          </key>
+          <value>WhsDirectedPackingTaskSyncUserProcessor</value>
+        </entry>
+        <entry>
+          <key>
+            <value>WTR</value>
+          </key>
+          <value>WhsTransferTaskSyncUserProcessor</value>
+        </entry>
+        <entry>
+          <key>
+            <value>WRP</value>
+          </key>
+          <value>WhsReplenishmentTaskSyncUserProcessor</value>
+        </entry>
+        <entry>
+          <key>
+            <value>WCC</value>
+          </key>
+          <value>WhsCycleCountTaskSyncUserProcessor</value>
+        </entry>
+      </dictionary>
+    </property>
+  </object>
+  <object id="WhsPutawayTaskSyncUserProcessor" type="Enterprise.Warehouse.Transactions.Business.WhsPutawayTaskSyncUserProcessor, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="WhsPickTaskSyncUserProcessor" type="Enterprise.Warehouse.Transactions.Business.WhsPickTaskSyncUserProcessor, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="WhsDirectedPackingTaskSyncUserProcessor" type="Enterprise.Warehouse.Transactions.Business.WhsDirectedPackingTaskSyncUserProcessor, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="WhsTransferTaskSyncUserProcessor" type="Enterprise.Warehouse.Transactions.Business.WhsTransferTaskSyncUserProcessor, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="WhsReplenishmentTaskSyncUserProcessor" type="Enterprise.Warehouse.Transactions.Business.WhsReplenishmentTaskSyncUserProcessor, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+  <object id="WhsCycleCountTaskSyncUserProcessor" type="Enterprise.Warehouse.Transactions.Business.WhsCycleCountTaskSyncUserProcessor, Enterprise.Warehouse.Transactions.Business" singleton="true" />
+</objects>

@@ -1,0 +1,32 @@
+meta {
+  name: Costing Endpint - Type is NOT valid
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.Origin = { Type: "ABC", Value: "AUSYD" };
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided Type ('ABC') is not valid. It can only be one of these values: 'COUNTRY', 'UNLOCO', 'POSTCODE', 'ZONE'.", function() {
+    expect(res.body.ModelState['Origin.Type'][0]).to.equal("Provided Type ('ABC') is not valid. It can only be one of these values: 'COUNTRY', 'UNLOCO', 'POSTCODE', 'ZONE'.");
+  });
+  
+  
+  
+}

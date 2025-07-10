@@ -1,0 +1,13 @@
+CREATE VIEW RefCusApplicabilityTableView_V3 AS
+SELECT ZZT_PK,
+ZZT_ZZ2_Rate,
+ZZT_ZX1_Conditions,
+ZZT_ZY2_AdditionalCode,
+ZZT_ZZH_TariffRelationship,
+ZZT_StartDate,
+ZZT_EndDate,
+ZZT_ZZA_TradeGroup,
+ZZT_AdditionalCode,
+ZZT_OrderNumber,
+ZZT_ZZA_SecondTradeGroup
+FROM RefCusApplicability

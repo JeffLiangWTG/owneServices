@@ -1,0 +1,26 @@
+@namespace System.Windows.Forms.DataVisualization.Charting
+@inherits Control
+
+@if(Series[0].ChartType == System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Pie)
+{
+    <div class="chart" style="width: @(Size.Width)px; height: @(Size.Height)px;" @attributes="DataAttributes">
+        <div class="chart__cylinder" style="@PieChartLayoutStyleString">
+            <div class="chart__cylinder-top" style="background: @ConicGradientOfPieChart; height: @(ChartTopHeight)px"></div>
+            <div class="chart__cylinder-side"></div>
+        </div>
+        <div class="chart__legend" style="width: @((Legends[0].Position.Width*Size.Width)/100)px; height: @((Legends[0].Position.Height*Size.Height)/100)px;">
+            <ul class="chart__legend-items">
+                @if (Series.Count > 0 && Series[0].Points.Count > 0)
+                {
+                    @foreach (DataPoint dataPoint in Series[0].Points)
+                    {
+                        <li class="chart__legend-item">
+                            <span class="chart__legend-color" style="background-color: @GetRgbFromColor(dataPoint.Color)"> </span>
+                            <span class="chart__legend-label">@dataPoint.LegendText</span>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+}

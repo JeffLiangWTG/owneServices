@@ -1,0 +1,6 @@
+CREATE VIEW RefMessagingBussCarrierInfoAttributeTableView_V1 AS
+SELECT ZCA_PK,
+ZCA_ZMC_CarrierInfo,
+ZCA_ZAI_AttributeInfo,
+ZCA_AttributeValue
+FROM RefMessagingBussCarrierInfoAttribute

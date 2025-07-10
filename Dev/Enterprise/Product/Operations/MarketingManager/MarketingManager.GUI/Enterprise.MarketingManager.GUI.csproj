@@ -1,0 +1,92 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+    <TransformXamlResourceStrings>true</TransformXamlResourceStrings>
+    <SuppressObsoleteWarnings>SYSLIB0014</SuppressObsoleteWarnings>
+  </PropertyGroup>
+  <!-- This PropertyGroup with false condition is to make TransformXamlResourceStrings work -->
+  <PropertyGroup Condition="'true' == 'false'">
+    <OutputPath>$(OutputPath)</OutputPath>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.Main.Navigation" />
+    <Reference Include="Enterprise.DocumentEngineCore.Test" />
+    <Reference Include="Enterprise.RemoteDesktopServices.Server" />
+    <Reference Include="Enterprise.TimeEngineScheduler.Integration" />
+    <Reference Include="Enterprise.ZArchitecture.Business.Test" Condition="'$(Configuration)' == 'Debug'" />
+    <Reference Include="HtmlAgilityPack" />
+    <Reference Include="MailManager" />
+    <Reference Include="OxyPlot.WindowsForms" />
+    <Reference Include="ServiceManager.Integration.Abstractions" />
+    <Reference Include="ServiceManager.Integration.ServiceTasks.CW" />
+    <Reference Include="System.Resources.Extensions" />
+    <Reference Include="WTG.SecurityRights" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Collections.Immutable" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Memory" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Rating\AutoGenerateQuoteSettings.cs">
+      <DependentUpon>AutoGenerateQuoteSettings.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Rating\AutoQuoteSelectionItem.cs">
+      <DependentUpon>AutoQuoteSelectionItem.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Sales\AutoTradeDetailSelectionItem.cs">
+      <DependentUpon>AutoTradeDetailSelectionItem.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Rating\AutoGenerateQuoteSettings.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoGenerateQuoteSettings.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.MarketingManager.GUI</CustomToolNamespace>
+    </None>
+    <None Update="Rating\AutoQuoteSelectionItem.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoQuoteSelectionItem.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.MarketingManager.GUI</CustomToolNamespace>
+    </None>
+    <None Update="Sales\AutoTradeDetailSelectionItem.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoTradeDetailSelectionItem.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.MarketingManager.GUI</CustomToolNamespace>
+    </None>
+    <Content Include="Testing\TestTextFile.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Winzor\ClickSummaryChartControl.cs" />
+    <Compile Remove="Winzor\ClickTimeLineChartControl.cs" />
+    <Compile Remove="Winzor\ColorCollection.cs" />
+    <Compile Remove="Winzor\ContentDesignerControl.cs" />
+    <Compile Remove="Winzor\Legend.cs" />
+    <Compile Remove="Winzor\OpportunityCreationChartLegend.cs" />
+    <Compile Remove="Winzor\OpportunityCreationPieChartLayout.cs" />
+    <Compile Remove="Winzor\OpportunityCreationUserControl.cs" />
+    <Compile Remove="Winzor\PieChartLayout.cs" />
+    <Compile Remove="Winzor\PlotView.cs" />
+    <Compile Remove="Winzor\SalesAnalysisTimeLineChartControl.cs" />
+    <Compile Remove="Winzor\TouchSummary.cs" />
+    <Compile Remove="Winzor\TrackingStatusUserControl.cs" />
+    <Compile Remove="Winzor\TransitionProgressChartControl.cs" />
+    <EmbeddedResource Remove="SalesHeader\TradeLaneAndDetailsMenuItemsBuilder.resx" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

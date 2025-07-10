@@ -1,0 +1,13 @@
+using CargoWise.EntityFramework;
+using Enterprise.Customs.Business;
+using NUnit.Framework;
+
+namespace Enterprise.Customs.CH.Business.Testing;
+
+[TestedType(typeof(InvoiceLineCompleteCollection))]
+class InvoiceLineCompleteCollectionTest : Customs.Business.Testing.InvoiceLineCompleteCollectionTest
+{
+	protected override BusinessObjectCollection GetCollectionToTest() => new InvoiceLineCompleteCollection(Declaration as JobDeclaration);
+
+	protected override BaseJobDeclaration GetMeANewJobDeclaration() => Factory.New<JobDeclaration>();
+}

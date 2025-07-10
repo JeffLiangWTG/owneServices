@@ -1,0 +1,213 @@
+using System.Reflection;
+using CargoWise.EntityFramework;
+using CargoWise.Types;
+using Enterprise.Customs.Business;
+using Enterprise.Customs.EU.Business.Testing;
+using Enterprise.MasterFiles.Business;
+using NUnit.Framework;
+using Resources;
+
+namespace Enterprise.Customs.EU.Business.Declaration.Testing
+{
+	[TestedType(typeof(CusContainer))]
+	class CusContainerBaseOnlyTest : CusContainerTest
+	{
+		public void TestCO_ContainerNumber_PackageDefault()
+		{
+			var declaration = Factory.New<JobDeclaration>();
+			declaration.JE_MessageType = MessageTypeList.Codes.Export;
+			using (ConfigurationTestHelper.TemporarilyClearDeclarationConfigurationAndSetIsUCC6Configuration(declaration, true))
+			{
+				var container1 = declaration.CusContainers.AddNew();
+
+				var bill1 = declaration.Bills.AddNew();
+				bill1.CU_BillType = BillTypeList.Codes.HouseBill;
+				bill1.CU_BillNum = "HB123";
+				var packingGroup = bill1.PackingGroups[0];
+				var package1 = packingGroup.Packages[0];
+				var package2 = packingGroup.Packages.AddNew();
+
+				container1.CO_ContainerNumber = "C001";
+				AssertEquals("One container only - package 1", "C001", package1.CW_ContainerNoOrEquipmentNo);
+				AssertEquals("One container only - package 2", "C001", package2.CW_ContainerNoOrEquipmentNo);
+
+				package1.CW_ContainerNoOrEquipmentNo = string.Empty;
+				var equipment = declaration.Equipments.AddNew();
+				equipment.CEQ_IdentificationNumber = "EQ001";
+				container1.CO_ContainerNumber = "C000";
+				AssertEquals("One container and one equipment - package 1 not set", string.Empty, package1.CW_ContainerNoOrEquipmentNo);
+				AssertEquals("One container and one equipment - package 2 udpated", "C000", package2.CW_ContainerNoOrEquipmentNo);
+
+				package1.CW_ContainerNoOrEquipmentNo = string.Empty;
+				equipment.Delete();
+				container1 = declaration.CusContainers.AddNew();
+				var container2 = declaration.CusContainers.AddNew();
+				container1.CO_ContainerNumber = "C002";
+				container2.CO_ContainerNumber = "C003";
+				AssertEquals("Two containers - package 1 not set", string.Empty, package1.CW_ContainerNoOrEquipmentNo);
+				AssertEquals("Two containers - package 2 not udpated", "C000", package2.CW_ContainerNoOrEquipmentNo);
+			}
+
+			declaration = Factory.New<JobDeclaration>();
+			using (ConfigurationTestHelper.TemporarilyClearDeclarationConfigurationAndSetIsUCC6Configuration(declaration, false))
+			{
+				var container = declaration.CusContainers.AddNew();
+				var equipment = declaration.Equipments.AddNew();
+				equipment.CEQ_IdentificationNumber = "EQ001";
+				var bill1 = declaration.Bills.AddNew();
+				bill1.CU_BillType = BillTypeList.Codes.HouseBill;
+				bill1.CU_BillNum = "HB123";
+				var packingGroup = bill1.PackingGroups[0];
+				var package = packingGroup.Packages[0];
+				container.CO_ContainerNumber = "C001";
+				AssertEquals("Equipments not required. Pack set regardless of equipment", "C001", package.CW_ContainerNoOrEquipmentNo);
+			}
+		}
+
+		public void TestAdditionalSeals()
+		{
+			var container = (CusContainer)GetNewBusinessObject();
+			AssertType<CusSealCollection>(container.AdditionalSeals);
+		}
+
+		public void TestDelete_AdditionalSeals()
+		{
+			var container = (CusContainer)GetNewBusinessObjectForDeleteTest(Factory);
+			var seal1 = container.AdditionalSeals.AddNew();
+			var seal2 = container.AdditionalSeals.AddNew();
+			container.Delete();
+			AssertEquals("seal1.IsDeleted", true, seal1.IsDeleted);
+			AssertEquals("seal2.IsDeleted", true, seal2.IsDeleted);
+		}
+
+		public void TestAdditionalSeals_ReadOnly()
+		{
+			var container = (CusContainer)GetNewBusinessObject();
+			AssertEquals("ReadOnly if CO_Seal and CO_SecondSeal are empty.", true, container.AdditionalSeals.ReadOnly);
+			container.CO_Seal = "s1";
+			AssertEquals("ReadOnly if only CO_SecondSeal is empty.", true, container.AdditionalSeals.ReadOnly);
+			container.CO_SecondSeal = "s2";
+			AssertEquals("ReadOnly if CO_Seal and CO_SecondSeal are not empty.", false, container.AdditionalSeals.ReadOnly);
+			container.CO_Seal = ZString.Empty;
+			AssertEquals("ReadOnly if only CO_Seal is empty.", true, container.AdditionalSeals.ReadOnly);
+		}
+
+		public void TestShortSequenceNumberGenerator()
+		{
+			var container = (CusContainer)GetNewBusinessObject();
+
+			AssertType<ShortSequenceNumberGenerator>("CusContainer should have a ShortSequenceNumberGenerator", container.SealsSequenceNumberGenerator);
+			var seal1 = container.AdditionalSeals.AddNew();
+			var seal2 = container.AdditionalSeals.AddNew();
+
+			AssertEquals("Should have set the correct BK_SequenceNumber.", (short)1, seal1.BK_SequenceNumber);
+			AssertEquals("Should have set the correct BK_SequenceNumber.", (short)2, seal2.BK_SequenceNumber);
+		}
+
+		public void TestAddInfo_IsConnectedtoAutoClass()
+		{
+			AssertEquals(true, typeof(CusContainer).IsSubclassOf(typeof(AutoCusContainer)));
+		}
+
+		public void TestAddInfo_IsAutoGenerated()
+		{
+			AssertNotNull(typeof(AutoCusContainer).GetCustomAttribute<AutoGeneratedSourceCodeAttribute>(inherit: false));
+		}
+
+		public void TestAddInfo_HasUseAddInfoPropertyDescriptorsTrue()
+		{
+			AssertNotNull(typeof(AutoCusContainer).GetCustomAttribute<PropertyDescriptorCollectionAttribute>(inherit: false));
+		}
+
+		public void TestAddInfoType()
+		{
+			AssertEquals(typeof(AddInfoCusContainer), CusContainer.AddInfoType);
+		}
+
+		public void TestZG_IsControl()
+		{
+			var container = (CusContainer)GetNewBusinessObject();
+			CombineAssertions(() =>
+			{
+				AssertEquals("Caption", "Control", DataBoundResourceStrings.GetDataForProperty(container.ZG_IsControlInfo).Caption);
+				AssertEquals("ReadOnly", true, container.ZG_IsControlInfo.ReadOnly);
+			});
+		}
+
+		public void TestZG_IsUnloaded()
+		{
+			var container = (CusContainer)GetNewBusinessObject();
+			CombineAssertions(() =>
+			{
+				AssertEquals("Caption", "Unloaded", DataBoundResourceStrings.GetDataForProperty(container.ZG_IsUnloadedInfo).Caption);
+				AssertEquals("ReadOnly", true, container.ZG_IsUnloadedInfo.ReadOnly);
+			});
+		}
+	}
+
+	[TestedType(typeof(CusContainer))]
+	public abstract class CusContainerTest : Customs.Business.Testing.BaseCusContainerTest<CusContainer, JobDeclaration>
+	{
+		public void TestCO_MessageStatusExplanation()
+		{
+			var declaration = (JobDeclaration)GetJobDeclaration();
+			var container = declaration.CusContainers.AddNew();
+			container.CO_MessageStatus = ContainerStatusCodesList.Codes.Released;
+			AssertContains("Released", container.CO_MessageStatusExplanation);
+			container.CO_MessageStatus = ContainerStatusCodesList.Codes.HoldIsAdded;
+			AssertContains("Hold", container.CO_MessageStatusExplanation);
+			container.CO_MessageStatus = ContainerStatusCodesList.Codes.AtLeastOneHoldRemovedOthersOrNoneMayRemain;
+			AssertContains("hold removed", container.CO_MessageStatusExplanation);
+			container.CO_MessageStatus = ContainerStatusCodesList.Codes.NoInformation;
+			AssertEquals("No information", container.CO_MessageStatusExplanation);
+			container.CO_MessageStatus = ContainerStatusCodesList.Codes.UcnClaimed;
+			AssertEquals("UCN Claimed", container.CO_MessageStatusExplanation);
+			container.CO_MessageStatus = ContainerStatusCodesList.Codes.UcnClaimedByAmalgamation;
+			AssertEquals("UCN Claimed by Amalgamation", container.CO_MessageStatusExplanation);
+		}
+
+		public void TestTypeDecider()
+		{
+			Assert
+			(
+				"Update BaseCusContainerTypeDecider to include a decider for this class",
+				Factory.New(typeof(BaseCusContainer)).GetType() == GetExpectedBusinessObjectType()
+			);
+		}
+
+		public void TestDeclaration()
+		{
+			var declaration = (JobDeclaration)GetJobDeclaration();
+			var container = declaration.CusContainers.AddNew();
+
+			AssertEquals(declaration, container.Declaration);
+		}
+
+		public void TestLookupsCachesInstance()
+		{
+			var container = (CusContainer)GetNewBusinessObject();
+			var lookup1 = container.Lookups;
+			var lookup2 = container.Lookups;
+
+			AssertEquals(lookup2, lookup1);
+		}
+
+		public void TestCusSealType()
+		{
+			var container = (CusContainer)GetNewBusinessObject();
+			AssertType(((ICusSealTypeSupporter)container).CusSealType, container.AdditionalSeals.AddNew());
+		}
+
+		#region Implementation
+
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0001:Simplify Names", Justification = "Simplification hides desired base class")]
+		protected override ICustomLabelsProvider GetNewCustomLabelsProvider(BusinessObject businessObject)
+		{
+			ICustomLabelsProvider result = new CusContainer.CustomLabelsProvider(((CusContainer)businessObject).Declaration);
+
+			return result;
+		}
+
+		#endregion
+	}
+}

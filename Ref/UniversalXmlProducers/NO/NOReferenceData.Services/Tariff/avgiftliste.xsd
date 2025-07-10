@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="varer" type="AvgiftListe"/>
+
+  <xs:complexType name="AvgiftListe">
+    <xs:complexContent>
+      <xs:extension base="norskDataset">
+        <xs:sequence>
+          <xs:element name="vare" type="Vare" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="norskDataset" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="dataset">
+        <xs:sequence>
+          <xs:element name="versjon" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="dataset" abstract="true">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="Vare">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="avgiftsatser" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="avgiftsats" type="AvgiftSats" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AvgiftSats">
+    <xs:sequence>
+      <xs:element name="landgruppe" type="xs:string" minOccurs="0"/>
+      <xs:element name="landgruppenavn" type="xs:string" minOccurs="0"/>
+      <xs:element name="avgiftstyper" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="avgiftstype" type="AvgiftType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AvgiftType">
+    <xs:sequence>
+      <xs:element name="avgiftstype" type="xs:string" minOccurs="0"/>
+      <xs:element name="avgiftstypebeskrivelse" type="xs:string" minOccurs="0"/>
+      <xs:element name="avgiftsgrupper" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="avgiftsgruppe" type="AvgiftsGruppe" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AvgiftsGruppe">
+    <xs:sequence>
+      <xs:element name="avgiftsgruppe" type="xs:short" minOccurs="0"/>
+      <xs:element name="avgiftsgruppebeskrivelse" type="xs:string" minOccurs="0"/>
+      <xs:element name="sats" type="xs:string" minOccurs="0"/>
+      <xs:element name="oresats" type="xs:string" minOccurs="0"/>
+      <xs:element name="enhet" type="xs:string" minOccurs="0"/>
+      <xs:element name="enhetbeskrivelse" type="xs:string" minOccurs="0"/>
+      <xs:element name="fomdato" type="xs:string" minOccurs="0"/>
+      <xs:element name="tomdato" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

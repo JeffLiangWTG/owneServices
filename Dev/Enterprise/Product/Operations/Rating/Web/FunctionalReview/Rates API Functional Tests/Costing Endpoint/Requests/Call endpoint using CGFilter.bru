@@ -1,0 +1,25 @@
+meta {
+  name: Call endpoint using CGFilter
+  type: http
+  seq: 22
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetRateQueryWithMandatoryFieldsForProvidedVariables();
+   
+   query.CGFilter = RatesAPIsHelper.GetCGFilter();
+   
+   req.setBody(query);
+}
+
+tests {
+  
+}

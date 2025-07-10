@@ -1,0 +1,6 @@
+CREATE VIEW RefCusProfileQuestionAttributeTableView_V1 AS
+SELECT XQ3_PK,
+XQ3_XQ2_Question,
+XQ3_Name,
+XQ3_Value
+FROM RefCusProfileQuestionAttribute

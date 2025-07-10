@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+	**********************************************************************
+	** NOTE:                                                            **
+	** THIS FILE IS ALSO USED BY SOME ZARCHITECTURE SOLUTION TEST CASES **
+	** ANY CHANGES IN ITS FORMAT MIGHT BREAK THOSE TESTS                **
+	**********************************************************************
+-->
+<root>
+  <dummybizo>
+    CREATE TABLE {0}DummyBizo (
+    Z0_PK uniqueidentifier NOT NULL,
+    Z0_FK_Code char(5) DEFAULT '',
+    Z0_Guid uniqueidentifier NULL,
+    Z0_NVarChar nvarchar(20) DEFAULT '' NOT NULL,
+    Z0_IsValid char(1) DEFAULT 'N' NOT NULL,
+    Z0_Description varchar(100) DEFAULT '' NOT NULL,
+    Z0_Number int DEFAULT 0 NOT NULL,
+    Z0_Date datetime NULL,
+    Z0_Code char(5) DEFAULT '',
+    Z0_AnotherDate datetime NULL,
+    Z0_Decimal decimal(18,0) DEFAULT 0 NOT NULL,
+    Z0_AnotherDecimal decimal(18,3) DEFAULT 0 NOT NULL,
+    Z0_AnotherNumber int DEFAULT 0 NOT NULL,
+    Z0_BitFalse bit NOT NULL Default 0,
+    Z0_BitTrue bit NOT NULL Default 1,
+    Z0_Bool char(1) DEFAULT 'N' NOT NULL,
+    Z0_Byte tinyint DEFAULT 0 NOT NULL,
+    Z0_Money money DEFAULT 0 NOT NULL,
+    Z0_Short smallint DEFAULT 0 NOT NULL,
+    Z0_SmallDateTime smalldatetime NULL,
+    Z0_VarCharMax varchar(MAX) DEFAULT '' NOT NULL,
+    Z0_NVarCharMax nvarchar(MAX) DEFAULT '' NOT NULL,
+    Z0_VarBinaryMax varbinary(MAX),
+    Z0_Xml XML,
+    Z0_BitFiltered bit NOT NULL Default 0,
+    Z0_DateTimeOffset datetimeoffset NULL,
+    Z0_Time time NULL,
+    Z0_Geography GEOGRAPHY NOT NULL DEFAULT CONVERT(GEOGRAPHY,'POINT EMPTY'),
+    Z0_DateOnly date NULL,
+    Z0_IsSystem bit NOT NULL Default 1,
+    Z0_Long bigint DEFAULT 0 NOT NULL,
+    Z0_SparseBit bit SPARSE NULL,
+    Z0_SparseByte tinyint SPARSE NULL,
+    Z0_SparseShort smallint SPARSE NULL,
+    Z0_SparseNumber int SPARSE NULL,
+    Z0_SparseLong bigint SPARSE NULL,
+    Z0_SparseDecimal decimal(18, 3) SPARSE NULL,
+    Z0_SparseMoney money SPARSE NULL,
+    Z0_SparseDateTime datetime SPARSE NULL,
+    Z0_SparseDate date SPARSE NULL,
+    Z0_SparseDateTimeOffset datetimeoffset SPARSE NULL,
+    Z0_SparseSmallDateTime smalldatetime SPARSE NULL,
+    Z0_SparseChar char(5) SPARSE NULL,
+    Z0_SparseVarChar varchar(20) SPARSE NULL,
+    Z0_SparseNVarChar nvarchar(20) SPARSE NULL,
+    Z0_SparseGuid uniqueidentifier SPARSE NULL,
+    Z0_SparseVarBinaryMax varbinary(MAX) SPARSE NULL,
+    Z0_SparseXml XML SPARSE NULL,
+    Z0_SparseTime time SPARSE NULL,
+    Z0_AutoVersion SMALLINT NOT NULL DEFAULT 0,
+    Z0_AddInfo VARCHAR(4096) NOT NULL DEFAULT '',
+    Z0_NAddInfo NVARCHAR(4000) NOT NULL DEFAULT '',
+    Z0_ComputedBit AS Z0_BitTrue,
+    Z0_ComputedByte AS Z0_Byte,
+    Z0_ComputedChar AS Z0_Code,
+    Z0_ComputedDate AS Z0_Date,
+    Z0_ComputedDateTime AS Z0_AnotherDate,
+    Z0_ComputedDateTimeOffset AS Z0_DateTimeOffset,
+    Z0_ComputedDecimal AS Z0_Decimal,
+    Z0_ComputedGuid AS Z0_Guid,
+    Z0_ComputedLong AS Z0_Long,
+    Z0_ComputedMoney AS Z0_Money,
+    Z0_ComputedNumber AS Z0_Number,
+    Z0_ComputedNVarChar AS Z0_NVarChar,
+    Z0_ComputedShort AS Z0_Short,
+    Z0_ComputedSmallDateTime AS Z0_SmallDateTime,
+    Z0_ComputedTime AS Z0_Time,
+    Z0_ComputedVarBinaryMax AS Z0_VarBinaryMax,
+    Z0_ComputedVarChar AS Z0_Description,
+    Z0_ComputedXml AS Z0_Xml,
+    CONSTRAINT PK_UX__Z0_PK PRIMARY KEY NONCLUSTERED (Z0_PK),
+    CONSTRAINT Constraint_Z0_Geography CHECK (Z0_Geography.STIsValid() = 1 and (Z0_Geography.STIsEmpty() = 1 or Z0_Geography.STGeometryType() in ('Point', 'Polygon')))
+    )
+  </dummybizo>
+  <dummybizofk>
+    --ALTER TABLE DummyBizo ADD
+    --  CONSTRAINT DummyBizo_Z0_OA_AnAddress_FK2_OrgAddress_RRR_120N
+    --  FOREIGN KEY (Z0_OA_AnAddress) REFERENCES OrgAddress (OA_PK)
+  </dummybizofk>
+  <DummyBizoIndexes>
+    CREATE NONCLUSTERED INDEX NR_RX__Z0_BitFiltered ON DummyBizo (Z0_BitFiltered) WHERE (Z0_BitFiltered = 1);
+  </DummyBizoIndexes>
+  <dummydependentbizo>
+    CREATE TABLE DummyDependentBizo (
+    ZD1_PK uniqueidentifier NOT NULL,
+    ZD1_Number int default 0 NOT NULL,
+    ZD1_Z0 uniqueidentifier,
+    ZD1_Z0_NKCode char(5) NOT NULL DEFAULT '',
+    ZD1_Code varchar(5) DEFAULT '' NOT NULL,
+    ZD1_NumberUnit uniqueidentifier,
+    ZD1_NumberUnitCode varchar(3),
+    ZD1_AutoVersion SMALLINT NOT NULL DEFAULT 0,
+    CONSTRAINT PK_UX__ZD1_PK PRIMARY KEY NONCLUSTERED (ZD1_PK),
+    CONSTRAINT DummyDependentBizo_ZD1_Z0_FK2_DummyBizo_RRR_120N FOREIGN KEY (ZD1_Z0) REFERENCES DummyBizo (Z0_PK)
+    )
+  </dummydependentbizo>
+  <dummypivot>
+    CREATE TABLE DummyPivot (
+    ZDP_PK uniqueidentifier,
+    ZDP_AddInfo varchar(100) DEFAULT '' NOT NULL,
+    ZDP_ZD1 uniqueidentifier,
+    ZDP_Z0 uniqueidentifier,
+    ZDP_AutoVersion SMALLINT NOT NULL DEFAULT 0,
+    CONSTRAINT PK_UX__ZDP_PK PRIMARY KEY NONCLUSTERED (ZDP_PK)
+    )
+  </dummypivot>
+  <dummylogged>
+    CREATE TABLE DummyLogged (
+    ZL2_PK uniqueidentifier,
+    ZL2_Description varchar(100) DEFAULT '' NOT NULL,
+    ZL2_DescriptionNVarCharMax NVarChar(MAX) DEFAULT('') NOT NULL,
+    ZL2_IsValid char(1) DEFAULT 'N' NOT NULL,
+    ZL2_VarBinaryMax varbinary(MAX),
+    ZL2_SystemCreateTimeUtc smalldatetime,
+    ZL2_SystemCreateUser varchar(3) DEFAULT '' NOT NULL,
+    ZL2_SystemCreateBranch varchar(3) DEFAULT '' NOT NULL,
+    ZL2_SystemCreateDepartment varchar(3) DEFAULT '' NOT NULL,
+    ZL2_SystemLastEditTimeUtc smalldatetime,
+    ZL2_SystemLastEditUser varchar(3) DEFAULT '' NOT NULL,
+    CONSTRAINT PK_UX__ZL2_PK PRIMARY KEY NONCLUSTERED (ZL2_PK)
+    )
+  </dummylogged>
+  <dummydatachangestestlistenerrowcount>
+    CREATE TABLE DummyDataChangesTestListenerRowcount (
+    Z9_ID int,
+    Z9_NumOfRows int,
+    CONSTRAINT PK_UX__Z9_ID PRIMARY KEY NONCLUSTERED (Z9_ID)
+    )
+  </dummydatachangestestlistenerrowcount>
+</root>

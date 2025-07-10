@@ -1,0 +1,1 @@
+<%@ Language=C# %><HTML><head><meta http-equiv='refresh' content='0; URL=Default.aspx' /></head><body></body></HTML>

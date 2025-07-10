@@ -1,0 +1,41 @@
+﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)..\..\'))" />
+  <PropertyGroup>
+    <CodeAnalysisEnabled>true</CodeAnalysisEnabled>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WTGIsTestProject Condition="'$(WTGIsTestProject)' == ''">false</WTGIsTestProject>
+    <WTGIsTestProject Condition="$(MSBuildProjectFile.Contains('.Test.'))">true</WTGIsTestProject>
+	<IsReleaseBuild Condition="'$(Configuration)' == 'Release'">true</IsReleaseBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!--
+      To get build time property/item values in log set property TaskDiagOutputEnabled: true in any .csproj
+      or here to cover all projects. Note: DAT/QGL set log verbosity minimal for dotnet builds. See TaskDiagnostics.targets
+      -->
+    <TaskDiagOutputEnabled>false</TaskDiagOutputEnabled>
+    <TaskDiagOutputPropertiesMessageImportance>normal</TaskDiagOutputPropertiesMessageImportance>
+    <TaskDiagOutputReferencesMessageImportance>low</TaskDiagOutputReferencesMessageImportance>
+    <TaskDiagOutputCsprojMessageImportance>low</TaskDiagOutputCsprojMessageImportance>
+    <!-- log level override for GetBuildInfo and WtgConvert targets -->
+    <WtgGetBuildInfoMessageImportance>high</WtgGetBuildInfoMessageImportance>
+    <WtgConvertGetBuildInfoMessageImportance>high</WtgConvertGetBuildInfoMessageImportance>
+  </PropertyGroup>
+  <PropertyGroup>
+    <WTGBinPath>$(MSBuildThisFileDirectory)..\..\bin\</WTGBinPath>
+    <BaseArtifactsPath>$(WTGBinPath)</BaseArtifactsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(WTGIsTestProject)' == 'true'">
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <DisableWtgBlazorTooling>true</DisableWtgBlazorTooling>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(WTGIsTestProject)' == 'true'">
+    <Compile Include="$(MSBuildThisFileDirectory)TestSuppressions.cs">
+      <Link>TestSuppressions.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>

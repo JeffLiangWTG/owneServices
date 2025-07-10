@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="Enterprise.MasterData.Common" />
+    <Reference Include="WTG.SecurityRights" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Design" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Agency.GUI\Enterprise.Freight.Agency.GUI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="EIDO\EIDOFilterList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EIDOFilterList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="ImportReleaseOrder\ImportReleaseOrderFilterList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ImportReleaseOrderFilterList.xml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="EIDO\EIDOFilterList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>EIDOFilterList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Freight.Agency.Module</CustomToolNamespace>
+    </None>
+    <None Update="ImportReleaseOrder\ImportReleaseOrderFilterList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ImportReleaseOrderFilterList.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

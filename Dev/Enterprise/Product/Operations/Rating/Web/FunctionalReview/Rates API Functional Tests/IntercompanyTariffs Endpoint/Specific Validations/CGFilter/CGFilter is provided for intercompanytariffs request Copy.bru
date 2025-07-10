@@ -1,0 +1,32 @@
+meta {
+  name: CGFilter is provided for intercompanytariffs request Copy
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/intercompanytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForIntercompanyTariffs();
+   query.TransportMode = "AIR";
+   query.ContainerMode = "LSE";
+   query.CGFilter = { Vias: ["A", "ABC", "210938190238"] }
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: CGFilter can only be provided when querying Costings or calculating charges. Otherwise it should be null.", function() {
+    expect(res.body.ModelState['CGFilter'][0]).to.equal("CGFilter can only be provided when querying Costings or calculating charges. Otherwise it should be null.");
+  });
+}

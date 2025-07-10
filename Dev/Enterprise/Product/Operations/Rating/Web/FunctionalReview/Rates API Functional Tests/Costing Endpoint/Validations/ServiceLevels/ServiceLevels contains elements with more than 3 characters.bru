@@ -1,0 +1,31 @@
+meta {
+  name: ServiceLevels contains elements with more than 3 characters
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.ServiceLevels = ["ABCD", "EFG"];
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided ServiceLevels ('ABCD') is not valid. It can be a string of maximum 3 characters.", function() {
+    expect(res.body.ModelState['ServiceLevels[0]'][0]).to.equal("Provided ServiceLevels ('ABCD') is not valid. It can be a string of maximum 3 characters.");
+  });
+  
+  
+}

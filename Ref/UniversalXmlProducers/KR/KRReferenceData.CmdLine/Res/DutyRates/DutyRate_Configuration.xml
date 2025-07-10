@@ -1,0 +1,116 @@
+<EntityConfiguration>
+  <DataFileExtensions>xls, xlsx</DataFileExtensions>
+  <EntityTypes>
+    <EntityType Name="RefCusTariff">
+      <Key>
+        <PropertyRef Name="ZZ1_TariffCode" />
+        <PropertyRef Name="ZZ1_ZZI_NKTariffType" />
+        <PropertyRef Name="ZZ1_ZZI_ZZZ_NKDataGrouping" />
+        <PropertyRef Name="ZZ1_ZZZ_NKDataGrouping" />
+      </Key>
+      <Properties>
+        <Property Name="RefCusRate" Type="RefCusRate" />
+        <Property Name="ZZ1_TariffCode" Type="varchar" MaxLength="35" />
+        <Property Name="ZZ1_ZZI_NKTariffType" Type="varchar" MaxLength="5" ConstantValue="HSN" />
+        <Property Name="ZZ1_ZZI_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+        <Property Name="ZZ1_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+      </Properties>
+    </EntityType>
+    <EntityType Name="RefCusRate" Data="true">
+      <Key>
+        <PropertyRef Name="ZZ2_ZY1_NKRateCode" />
+        <PropertyRef Name="ZZ2_ZY1_ZZR_NKRateType" />
+        <PropertyRef Name="ZZ2_ZY1_ZZR_ZZZ_NKDataGrouping" />
+        <PropertyRef Name="ZZ2_ZZS_NKPreference" />
+        <PropertyRef Name="ZZ2_ZZS_ZZZ_NKDataGrouping" />
+        <PropertyRef Name="ZZ2_ZZZ_NKDataGrouping" />
+      </Key>
+      <Properties>
+        <Property Name="RefCusApplicability" Type="RefCusApplicability" />
+        <Property Name="ZZ2_EndDate" Type="datetime" />
+        <Property Name="ZZ2_RateFormula" Type="varchar" MaxLength="500" />
+        <Property Name="ZZ2_RateFormulaDerivedFrom" Type="nvarchar" MaxLength="1000" />
+        <Property Name="ZZ2_StartDate" Type="datetime" />
+        <Property Name="ZZ2_ZY1_NKRateCode" Type="varchar" MaxLength="5" />
+        <Property Name="ZZ2_ZY1_ZZR_NKRateType" Type="varchar" MaxLength="3" ConstantValue="DTY" />
+        <Property Name="ZZ2_ZY1_ZZR_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+        <Property Name="ZZ2_ZZS_NKPreference" Type="varchar" MaxLength="10" />
+        <Property Name="ZZ2_ZZS_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+        <Property Name="ZZ2_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+      </Properties>
+    </EntityType>
+    <EntityType Name="RefCusApplicability" Data="true">
+      <Key>
+        <PropertyRef Name="ZZT_AdditionalCode" />
+        <PropertyRef Name="ZZT_ZZA_ZZZ_NKDataGrouping" />
+      </Key>
+      <Properties>
+        <Property Name="ZZT_AdditionalCode" Type="varchar" MaxLength="5" DefaultValue="" />
+        <Property Name="ZZT_EndDate" Type="datetime" />
+        <Property Name="ZZT_StartDate" Type="datetime" />
+        <Property Name="ZZT_ZZA_NKTradeGroup" Type="varchar" MaxLength="5" />
+        <Property Name="ZZT_ZZA_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+      </Properties>
+    </EntityType>
+  </EntityTypes>
+  <EntityTypeExcelColumnMapping>
+    <SheetIndex>0</SheetIndex>
+    <StartRow>1</StartRow>
+    <EntityTypes>
+      <MappingEntityType Name="RefCusTariff">
+        <Properties>
+          <Property Name="ZZ1_TariffCode"  Type="varchar" ExcelColumn="0" />
+        </Properties>
+      </MappingEntityType>
+      <MappingEntityType Name="RefCusRate">
+        <Properties>
+          <Property Name="TariffRate" IsNonPersistent="true" ExcelColumn="2" />
+          <Property Name="TariffAmountPerUnit" IsNonPersistent="true" ExcelColumn="3" />
+          <Property Name="BasePrice" IsNonPersistent="true" ExcelColumn="4" />
+          <Property Name="ZZ2_StartDate" Type="datetime" ExcelColumn="7" DateTimeFormat ="yyyyMMdd" />
+          <Property Name="ZZ2_EndDate" Type="datetime" ExcelColumn="8" IsEndDate ="true" DateTimeFormat ="yyyyMMdd" />
+          <Property Name="ZZ2_ZZS_NKPreference" ExcelColumn="1" />
+        </Properties>
+      </MappingEntityType>
+    </EntityTypes>
+  </EntityTypeExcelColumnMapping>
+  <Rules>
+    <Rule Name="HS UOM CU3" Relationship="OR">
+      <RuleValues>
+        <RuleValue Value="8523292231"/>
+      </RuleValues>
+    </Rule>
+    <Rule Name="HS UOM CU1" Relationship="OR">
+      <RuleValues>
+        <RuleValue Value="3706"/>
+      </RuleValues>
+    </Rule>
+    <Rule>
+      <RuleValues Name="Preferences having MIN of two rates" Relationship="AND" >
+        <RuleValue Value="FSG1" />
+      </RuleValues>
+    </Rule>
+    <Rule>
+      <RuleValues Name="HS Codes having MIN of two rates" Relationship="AND" >
+      </RuleValues>
+    </Rule>
+    <Rule Name="Preferences having users select MIN or MAX" Relationship="OR" >
+      <RuleValues>
+        <RuleValue Value="C2" />
+        <RuleValue Value="C2A1" />
+        <RuleValue Value="C2A2" />
+        <RuleValue Value="C2A3" />
+        <RuleValue Value="C2A4" />
+        <RuleValue Value="C2A5" />
+        <RuleValue Value="C2A6" />
+        <RuleValue Value="C2A7" />
+        <RuleValue Value="C2A8" />
+        <RuleValue Value="C2A9" />
+        <RuleValue Value="E1B1" />
+        <RuleValue Value="E1B2" />
+        <RuleValue Value="E1B3" />
+        <RuleValue Value="E1B4" />
+      </RuleValues>  
+    </Rule>
+  </Rules>
+</EntityConfiguration>

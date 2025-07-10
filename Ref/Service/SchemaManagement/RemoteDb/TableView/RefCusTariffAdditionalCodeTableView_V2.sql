@@ -1,0 +1,12 @@
+CREATE VIEW RefCusTariffAdditionalCodeTableView_V2 AS
+SELECT ZY2_PK,
+ZY2_ZZ1_Tariff,
+ZY2_ZZW_NationalCode,
+ZY2_AdditionalCode,
+ZY2_Description,
+ZY2_ZY3_NKCategory,
+ZY2_ParentAdditionalCode,
+ZY2_ZY3_NKParentCategory,
+ZY2_IsMandatory,
+ZY2_ZZZ_NKDataGrouping
+FROM RefCusTariffAdditionalCode

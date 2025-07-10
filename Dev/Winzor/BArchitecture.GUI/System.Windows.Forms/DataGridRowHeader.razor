@@ -1,0 +1,39 @@
+@namespace System.Windows.Forms
+@using WebMouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs
+@inherits ComponentBase
+
+<td class="@IndicatorClass()" @onmousedown="MouseDown" @onmousedown:stopPropagation @onmouseup="MouseUp" @onmouseup:stopPropagation
+    @oncontextmenu="ContextMenu" @oncontextmenu:stopPropagation @oncontextmenu:preventDefault>
+    @if (ShowRowIndicator)
+    {
+        @RowIndicator
+    }
+    @if (NotificationIcon is not null)
+    {
+        <ControlProxyComponent Control=NotificationIcon @key=NotificationIcon.WinzorControlGuid />
+    }
+</td>
+
+@code {
+	[Parameter] public string RowIndicator { get; set; } = string.Empty;
+
+	[Parameter] public bool ShowRowIndicator { get; set; } = false;
+
+	[Parameter] public EventCallback<WebMouseEventArgs> MouseDown { get; set; }
+
+	[Parameter] public EventCallback<WebMouseEventArgs> MouseUp { get; set; }
+
+	[Parameter] public EventCallback<WebMouseEventArgs> ContextMenu { get; set; }
+
+	[Parameter] public Control? NotificationIcon { get; set; }
+
+	string IndicatorClass()
+	{
+		if (RowIndicator == "border_color")
+		{
+			return "datagrid__indicator_small";
+		}
+
+		return string.Empty;
+	}
+}

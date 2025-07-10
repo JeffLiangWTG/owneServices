@@ -1,0 +1,72 @@
+@namespace Enterprise.Client.EDI.IncidentManager.GUI
+@using Enterprise.Client.EDI.IncidentManager.Module;
+@using Enterprise.ZArchitecture.GUI
+@using Microsoft.AspNetCore.Components.Web
+
+@typeparam TWorkItemDistinctByKey
+
+<div class="button-container">
+    <button class="button-container__button button--standard button--center" disabled="@(!IsCreateRotationWorkitemEnabled)" @onclick=OnClickCreateAsync data-test="create-items">Create Work Items</button>
+    <button class="button-container__button button--standard button--center" @onclick=AddItem data-test="add-item">Add Row</button>
+    <button class="button-container__button button--standard button--center" @onclick=RemoveItem>Remove last row</button>
+    <button class="button-container__button button--standard button--center" @onclick=CopyLastRow data-test="copy-last-row">Copy Last Row</button>
+</div>
+
+<div class="form">
+    <table class="datagrid data-grid">
+		<thead>
+        <tr>@TableHeader</tr>
+		</thead>
+		<tbody>
+		@foreach(var workItem in workItems)
+		{
+			if (RowTemplate is not null)
+			{
+				<tr @key=workItem>@RowTemplate(workItem)</tr>
+			}
+		}
+		</tbody>
+	</table>
+
+
+
+    @if (CreatedItemNames.Count() > 0)
+    {
+        <h3>Work items created:</h3>
+        @foreach (var name in CreatedItemNames)
+        {
+           <p>@name</p>
+        }
+        <br />
+
+        if(Emails.Length > 0)
+        {
+           <span class="email-title">Email addresses</span>
+           <button class="copy-button" @onclick=CopyEmail data-test="copy-email"><img class ="email-icon" src="@ImageUrl" /></button>
+           <p data-test="email-addresses">@Emails</p>
+        }
+    }
+
+    @if (warnings.Count() > 0)
+    {
+        <h3>Warnings:</h3>
+        @foreach (var warning in warnings)
+        {
+            <p class="warning">@warning</p>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment TableHeader { get; set; }
+
+    [Parameter]
+    public RenderFragment<WorkItemDTO> RowTemplate { get; set; }
+
+    [Parameter]
+    public Func<WorkItemDTO, TWorkItemDistinctByKey> WorkItemDistinctBySelector { get; set; }
+
+    [Parameter]
+    public Func<WorkItemDTO, string> WorkItemDuplicateWarning { get; set; }
+}

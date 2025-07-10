@@ -1,0 +1,44 @@
+@using CargoWise.Main.Navigation.ViewModels
+@using CargoWise.Main.Navigation
+@using CargoWiseNext.Blazor.Components
+@using Microsoft.AspNetCore.Components.Web
+
+@namespace CargoWise.Main.Navigation.Pages
+@inherits CwnComponentBase
+
+<CwnCard Class="@Classname">
+    <CwnCardHeader>
+        <CardHeaderContent>
+            @Data.DisplayName
+        </CardHeaderContent>
+    </CwnCardHeader>
+    <CwnCardContent>
+        @if (Data.Items.Count > 0)
+        {
+            <CwnList>
+                @foreach (var item in Data.Items)
+                {
+                    <CwnListItem
+                            @key=item.Key
+                            Class="cwn-recent-modules__item"
+                            OnClick="@(() => OnClickAsync(item))"
+                            OnRightClick="@((MouseEventArgs e) => OnRightClickAsync(e, item))">
+                        <div style="flex: 1;" title="@item.Name">
+                            @item.Name
+                        </div>
+                        <CwnIconButton Class="cwn-recent-modules__fav-button"
+                            Icon="@(Icon.StarEmpty)"
+                            HoverIcon="@(Icon.StarFilled)"
+                            Variant="@(Variant.Text)"
+                            Color="@(Color.Default)"
+                            OnSingleClick="@(() => OnFavoriteClickAsync(item))" />
+                    </CwnListItem>
+                }
+            </CwnList>
+        }
+        else
+        {
+            <p>@Data.NoItemsMessage</p>
+        }
+    </CwnCardContent>
+</CwnCard>

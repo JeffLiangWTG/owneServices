@@ -1,0 +1,58 @@
+@namespace WinzorFramework
+@using System.Threading
+@using WinzorFramework.JSInterop;
+@using Microsoft.JSInterop;
+@inherits ComponentBase
+@inject IOverlayJSInterop Interop
+
+<div class="overlay--container" @ref="overlayContainer">
+    @if (visibleCount > 0)
+    {
+        <div class="overlay--notresponding" />
+    }
+</div>
+
+@code {
+	public async Task<IAsyncDisposable> SetVisibleAsync()
+	{
+		if (Interlocked.Increment(ref visibleCount) == 1)
+		{
+			await InvokeAsync(StateHasChanged).ConfigureAwait(false);
+		}
+		return new UnsetVisble(this);
+	}
+
+	protected int visibleCount;
+
+	sealed class UnsetVisble : IAsyncDisposable
+	{
+		public UnsetVisble(NotRespondingOverlayComponent component)
+		{
+			this.component = component;
+		}
+
+		public async ValueTask DisposeAsync()
+		{
+			if (Interlocked.Decrement(ref component.visibleCount) == 0)
+			{
+				await component.InvokeAsync(component.StateHasChanged).ConfigureAwait(false);
+			}
+		}
+
+		NotRespondingOverlayComponent component;
+	}
+
+	ElementReference overlayContainer;
+
+	protected override void OnInitialized()
+	{
+		Interop.PreloadInterop();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+        await base.OnAfterRenderAsync(firstRender);
+
+        await Interop.ForceCursorUpdateAsync(overlayContainer);
+    }
+}

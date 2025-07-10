@@ -1,0 +1,13 @@
+
+using Enterprise.MasterFiles.Business;
+namespace Enterprise.Customs.CN.Module
+{
+	public class OrgSupplierPartModule : Customs.Module.OrgSupplierPartModule
+	{
+		protected override ZArchitecture.Business.FilterBusinessObject GetNewFilterBusinessObject() => new OrgSupplierPartFilterStripBusinessObject();
+
+		protected override ZArchitecture.GUI.IFilterControl GetNewFilterControl() => new OrgSupplierPartFilterStripControl(GridCollection, (OrgSupplierPartFilterStripBusinessObject)FilterBusinessObject);
+
+		public override string WorkflowType => WorkflowDescriptors.OrgSupplierPartWorkflowDescriptorCode;
+	}
+}

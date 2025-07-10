@@ -1,0 +1,331 @@
+﻿package utils;
+
+import car.CarXml;
+import car.XmlCar;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.URL;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.text.Document;
+
+public class CarXmlConverter
+  extends JPanel
+  implements ActionListener
+{
+  private static final String newline = "\n";
+  JButton openButton;
+  JButton checkButton;
+  JButton xml2carButton;
+  JButton car2xmlButton;
+  JTextArea log;
+  JTextArea log2;
+  JFileChooser fc;
+  PropertyFileReader PFR = new PropertyFileReader();
+  public String record = null;
+  
+  public CarXmlConverter()
+  {
+    super(new BorderLayout());
+    
+
+
+    this.log = new JTextArea(10, 40);
+    this.log.setMargin(new Insets(5, 5, 5, 5));
+    this.log.setEditable(false);
+    JScrollPane localJScrollPane = new JScrollPane(this.log);
+    add(localJScrollPane, "Center");
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+    this.openButton = new JButton("Open  Log file", createImageIcon("images/log_button.gif"));
+    
+    this.openButton.addActionListener(this);
+    this.openButton.setToolTipText("Open a log File");
+    
+
+
+    this.checkButton = new JButton("Check Xml File", createImageIcon("images/check_button.gif"));
+    
+    this.checkButton.addActionListener(this);
+    
+
+
+    this.xml2carButton = new JButton("Xml  -->  Car", createImageIcon("images/xml_button.gif"));
+    
+
+    this.xml2carButton.addActionListener(this);
+    this.xml2carButton.setToolTipText("Convert .xml to .car");
+    
+
+
+    this.car2xmlButton = new JButton("Car  -->  Xml", createImageIcon("images/car_button.gif"));
+    
+    this.car2xmlButton.addActionListener(this);
+    this.car2xmlButton.setToolTipText("Convert .car to .xml");
+    
+
+    JPanel localJPanel = new JPanel();
+    localJPanel.add(this.openButton);
+    localJPanel.add(this.checkButton);
+    localJPanel.add(this.car2xmlButton);
+    localJPanel.add(this.xml2carButton);
+    
+
+
+
+    add(localJPanel, "First");
+    add(localJScrollPane, "Center");
+  }
+  
+  public void actionPerformed(ActionEvent paramActionEvent)
+  {
+    String str1;
+    File localFile1;
+    final File localFile2;
+    if (paramActionEvent.getSource() == this.openButton)
+    {
+      this.fc = new JFileChooser();
+      
+      str1 = this.PFR.readParaFile("LOGDESTIN");
+      localFile1 = new File(str1);
+      this.fc.setCurrentDirectory(localFile1);
+      if ((str1 != null) && (localFile1.exists())) {
+        String str2 = str1;
+      } else {
+        JOptionPane.showMessageDialog(null, "Log destination path : " + str1 + " Does not Exist.\n" + "Opening a Deault Location ..........");
+      }
+      this.fc.addChoosableFileFilter(new LogFilter());
+      this.fc.setAcceptAllFileFilterUsed(false);
+      int i = this.fc.showOpenDialog(this);
+      if (i == 0)
+      {
+        localFile2 = this.fc.getSelectedFile();
+        
+        this.log.append("Opening log : " + localFile2.getName() + "." + "\n");
+        SwingUtilities.invokeLater(new Runnable()
+        {
+          public void run()
+          {
+            UIManager.put("swing.boldMetal", Boolean.FALSE);
+            CarXmlConverter.this.createAndShowGUI2(localFile2);
+          }
+        });
+      }
+      else
+      {
+        this.log.append("Open command cancelled by user.\n");
+      }
+      this.log.setCaretPosition(this.log.getDocument().getLength());
+    }
+    else
+    {
+      Object localObject;
+      if (paramActionEvent.getSource() == this.checkButton)
+      {
+        this.fc = new JFileChooser();
+        str1 = this.PFR.readParaFile("CARXMLSOURCE");
+        localFile1 = new File(str1);
+        this.fc.setCurrentDirectory(localFile1);
+        if ((str1 != null) && (localFile1.exists())) {
+          String str3 = str1;
+        } else {
+          JOptionPane.showMessageDialog(null, "Xml source path : " + str1 + " Does not Exist.\n" + "Opening a Deault Location ..........");
+        }
+        this.fc.addChoosableFileFilter(new xmlFilter());
+        this.fc.setAcceptAllFileFilterUsed(false);
+        
+        int j = this.fc.showOpenDialog(this);
+        if (j == 0)
+        {
+          localFile2 = this.fc.getSelectedFile();
+          
+          this.log.append("Checking: " + localFile2.getName() + "......");
+          localObject = new XmlCar();
+          ((XmlCar)localObject).XmlCarCheck(localFile2);
+          if (((XmlCar)localObject).Validxml == true) {
+            this.log.append("Success !! \n");
+          } else {
+            this.log.append("Failed !! Please check log\n");
+          }
+        }
+        else
+        {
+          this.log.append("Ckeck command cancelled by user.\n");
+        }
+        this.log.setCaretPosition(this.log.getDocument().getLength());
+      }
+      else if (paramActionEvent.getSource() == this.xml2carButton)
+      {
+        this.fc = new JFileChooser();
+        str1 = this.PFR.readParaFile("CARXMLSOURCE");
+        localFile1 = new File(str1);
+        this.fc.setCurrentDirectory(localFile1);
+        if ((str1 != null) && (localFile1.exists())) {
+          String str4 = str1;
+        } else {
+          JOptionPane.showMessageDialog(null, "Xml source path : " + str1 + " Does not Exist.\n" + "Opening a Deault Location ..........");
+        }
+        this.fc.addChoosableFileFilter(new xmlFilter());
+        this.fc.setAcceptAllFileFilterUsed(false);
+        
+        int k = this.fc.showDialog(this, "Convert Xml 2 Car");
+        if (k == 0)
+        {
+          localFile2 = this.fc.getSelectedFile();
+          
+          this.log.append("Checking : " + localFile2.getName() + "......");
+          localObject = new XmlCar();
+          ((XmlCar)localObject).XmlCarCheck(localFile2);
+          if (((XmlCar)localObject).Validxml == true)
+          {
+            this.log.append("Success !! \n");
+            this.log.append("Converting Xml to Car : " + localFile2.getPath() + ".....");
+            ((XmlCar)localObject).Xml2Car(localFile2);
+            this.log.append("File Created at : " + ((XmlCar)localObject).ss + "\n");
+          }
+          else
+          {
+            this.log.append("Failed !! Please check the log\n");
+          }
+        }
+        else
+        {
+          this.log.append("Convert command cancelled by user.\n");
+        }
+        this.log.setCaretPosition(this.log.getDocument().getLength());
+      }
+      else if (paramActionEvent.getSource() == this.car2xmlButton)
+      {
+        this.fc = new JFileChooser();
+        str1 = this.PFR.readParaFile("CARSOURCE");
+        localFile1 = new File(str1);
+        this.fc.setCurrentDirectory(localFile1);
+        if ((str1 != null) && (localFile1.exists())) {
+          String str5 = str1;
+        } else {
+          JOptionPane.showMessageDialog(null, "Car source path : " + str1 + " Does not Exist.\n" + "Opening a Deault Location ..........");
+        }
+        this.fc.addChoosableFileFilter(new CarFilter());
+        this.fc.setAcceptAllFileFilterUsed(false);
+        int m = this.fc.showDialog(this, "Convert Car 2 Xml");
+        if (m == 0)
+        {
+          localFile2 = this.fc.getSelectedFile();
+          
+          localObject = new CarXml();
+          ((CarXml)localObject).Car2Xml(localFile2);
+          this.log.append("Converting Car to Xml : " + localFile2.getPath() + "." + "\n");
+          this.log.append("File Created at : " + ((CarXml)localObject).ss + "\n");
+        }
+        else
+        {
+          this.log.append("Convert command cancelled by user.\n");
+        }
+        this.log.setCaretPosition(this.log.getDocument().getLength());
+      }
+    }
+  }
+  
+  protected static ImageIcon createImageIcon(String paramString)
+  {
+    URL localURL = CarXmlConverter.class.getResource(paramString);
+    if (localURL != null) {
+      return new ImageIcon(localURL);
+    }
+    System.err.println("Couldn't find file: " + paramString);
+    return null;
+  }
+  
+  private static void createAndShowGUI()
+  {
+    JFrame localJFrame = new JFrame("ASYCUDA  Xml <-> Car  Coverter (b1)");
+    localJFrame.setBounds(200, 200, 0, 0);
+    
+    localJFrame.setDefaultCloseOperation(3);
+    
+
+
+    localJFrame.getContentPane().add(new CarXmlConverter());
+    
+
+    localJFrame.pack();
+    localJFrame.setVisible(true);
+  }
+  
+  private void createAndShowGUI2(File paramFile)
+  {
+    this.log2 = new JTextArea(40, 50);
+    this.log2.setMargin(new Insets(5, 5, 5, 5));
+    this.log2.setEditable(false);
+    JScrollPane localJScrollPane = new JScrollPane(this.log2);
+    add(localJScrollPane, "Center");
+    try
+    {
+      FileReader localFileReader = new FileReader(paramFile);
+      BufferedReader localBufferedReader = new BufferedReader(localFileReader);
+      this.record = new String();
+      while ((this.record = localBufferedReader.readLine()) != null)
+      {
+        this.log2.append(this.record);
+        this.log2.append("\n");
+      }
+    }
+    catch (IOException localIOException)
+    {
+      System.out.println(localIOException);
+      this.log2.append("Error..: " + localIOException);
+      JOptionPane.showMessageDialog(null, "IO Error :" + localIOException);
+    }
+    JFrame localJFrame = new JFrame("Car - Xml Converter Log");
+    localJFrame.setBounds(30, 30, 0, 0);
+    
+    localJFrame.setDefaultCloseOperation(1);
+    
+
+    localJFrame.getContentPane().add(localJScrollPane);
+    
+
+    localJFrame.pack();
+    localJFrame.setVisible(true);
+  }
+  
+  public static void main(String[] paramArrayOfString)
+  {
+    SwingUtilities.invokeLater(new Runnable()
+    {
+      public void run()
+      {
+        UIManager.put("swing.boldMetal", Boolean.FALSE);
+        CarXmlConverter.access$100();
+      }
+    });
+  }
+}

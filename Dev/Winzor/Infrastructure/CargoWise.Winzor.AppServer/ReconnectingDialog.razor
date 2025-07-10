@@ -1,0 +1,93 @@
+<div class="connection-lost-overlay" id="components-reconnect-modal" data-confirm="">
+    <div class="connection-lost-dialog">
+        <div class="connection-lost-dialog__header">
+            <div class="connection-lost-dialog--reconnecting connection-lost-dialog__header--warning">
+                @WarningIcon
+                <span>Connection lost</span>
+            </div>
+
+            <div class="connection-lost-dialog--confirmation connection-lost-dialog__header--warning">
+                @WarningIcon
+                <span>Disconnect session</span>
+            </div>
+
+            <div class="connection-lost-dialog--disconnected connection-lost-dialog__header--critical">
+                @CriticalIcon
+                <span>Reconnection failed</span>
+            </div>
+        </div>
+        <div class="connection-lost-dialog__body">
+            <div class="connection-lost-dialog__content">
+                <div class="connection-lost-dialog--reconnecting">
+                    <p><strong>Attempting to reconnect to your session.</strong></p>
+                    <p>Please check your network connection.</p>
+                    <p><strong>If you decide to disconnect all unsaved changes will be lost.</strong></p>
+                    <p class="connection-lost-dialog__progresstext"><span id="components-reconnect-current-attempt"></span> out of <span id="components-reconnect-max-retries"></span> attempts</p>
+                </div>
+
+                <div class="connection-lost-dialog--confirmation">
+                    <p><strong>If you decide to disconnect all unsaved changes will be lost.</strong></p>
+                </div>
+
+                <div class="connection-lost-dialog--disconnected">
+                    <p><strong>Could not reconnect to your session.</strong></p>
+                    <p>You can restart the application.</p>
+                    <p>Your windows will re-open but <strong>all unsaved changes have been lost.</strong></p>
+                </div>
+            </div>
+
+            <hr class="connection-lost-dialog__separator" />
+
+            <div class="connection-lost-dialog__buttons">
+                <div class="connection-lost-dialog--reconnecting">
+                    <button class="connection-lost-dialog__button connection-lost-dialog__button--secondary"
+                            onclick="document.getElementById('components-reconnect-modal').dataset.confirm = 'exit'">
+                        Exit
+                    </button>
+                    <button class="connection-lost-dialog__button connection-lost-dialog__button--primary"
+                            onclick="document.getElementById('components-reconnect-modal').dataset.confirm = 'restart'">
+                        Restart
+                    </button>
+                </div>
+
+                <div class="connection-lost-dialog--confirmation">
+                    <button class="connection-lost-dialog__button connection-lost-dialog__button--secondary"
+                        onclick="document.getElementById('components-reconnect-modal').dataset.confirm = ''">
+                        Continue to wait
+                    </button>
+                    <button class="connection-lost-dialog__button connection-lost-dialog--confirmation-exit connection-lost-dialog__button--primary"
+                        onclick="window.exit()">
+                        Exit
+                    </button>
+                    <button class="connection-lost-dialog__button connection-lost-dialog--confirmation-restart connection-lost-dialog__button--primary"
+                            onclick="window.restart()">
+                        Exit and restart
+                    </button>
+                </div>
+
+                <div class="connection-lost-dialog--disconnected">
+                    <button class="connection-lost-dialog__button connection-lost-dialog__button--secondary"
+                            onclick="window.exit()">
+                        Exit
+                    </button>
+                    <button class="connection-lost-dialog__button connection-lost-dialog__button--critical"
+                            onclick="window.restart()">
+                        Restart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    RenderFragment WarningIcon =>
+    @<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.76879 3.83399C9.42614 3.89705 9.1197 4.0943 8.9244 4.37747C8.8706 4.45548 3.6759 14.0265 3.52822 14.3197C3.44359 14.4877 3.39863 14.7221 3.41026 14.9345C3.42884 15.2737 3.55918 15.5705 3.79158 15.8029C3.95359 15.9649 4.17214 16.0897 4.39979 16.1501L4.51879 16.1817H9.99979H15.4808L15.5998 16.1501C15.9037 16.0694 16.1914 15.8707 16.3568 15.6273C16.4382 15.5073 16.519 15.3315 16.5522 15.2017C16.5896 15.0553 16.6031 14.809 16.5806 14.6825C16.5597 14.5648 16.504 14.3837 16.4649 14.3066C16.3151 14.0105 11.1268 4.45282 11.075 4.37747C10.8958 4.11691 10.5937 3.91223 10.2913 3.84643C10.1454 3.81466 9.90493 3.80893 9.76879 3.83399ZM9.86089 4.85314C9.82684 4.87055 9.78187 4.9066 9.76095 4.93325C9.73039 4.97218 4.62729 14.38 4.46065 14.7047C4.36638 14.8883 4.41986 15.0759 4.58879 15.1541C4.64299 15.1792 4.81699 15.1801 9.99979 15.1801C15.1826 15.1801 15.3566 15.1792 15.4108 15.1541C15.5734 15.0788 15.6327 14.8884 15.5462 14.7187C15.4002 14.4323 10.2689 4.97182 10.2386 4.93325C10.1841 4.86379 10.0937 4.82147 9.99979 4.82147C9.94741 4.82147 9.90301 4.83159 9.86089 4.85314ZM9.8728 7.48494C9.72723 7.52621 9.60642 7.63068 9.53968 7.77301L9.50279 7.85169V9.79769V11.7437L9.54003 11.8231C9.59218 11.9344 9.67821 12.0222 9.78778 12.0762C9.87018 12.1168 9.89317 12.1217 9.99979 12.1217C10.1064 12.1217 10.1294 12.1168 10.2118 12.0762C10.3214 12.0222 10.4074 11.9344 10.4596 11.8231L10.4968 11.7437V9.79739V7.8511L10.4513 7.75867C10.3683 7.59007 10.2137 7.48479 10.0319 7.47297C9.97668 7.46939 9.90994 7.47441 9.8728 7.48494ZM9.84668 12.7665C9.5275 12.8357 9.29915 13.1211 9.30013 13.4497C9.30079 13.6652 9.35297 13.7918 9.5044 13.9452C9.67165 14.1146 9.87176 14.1827 10.1037 14.1493C10.2597 14.1268 10.3754 14.0665 10.4952 13.9452C10.6466 13.7918 10.6988 13.6652 10.6995 13.4497C10.7005 13.1165 10.4711 12.8347 10.1422 12.765C10.0279 12.7408 9.9637 12.7411 9.84668 12.7665Z" />
+    </svg>;
+
+    RenderFragment CriticalIcon =>
+    @<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.7172 3.43596C9.6501 3.45057 9.5619 3.47335 9.5212 3.48657C9.41077 3.52246 9.21599 3.62599 9.10838 3.70602C8.9819 3.80007 3.79528 8.98725 3.70087 9.11411C3.60045 9.24905 3.49682 9.46495 3.45224 9.63211C3.41896 9.7569 3.41492 9.79719 3.41492 10.0031C3.41492 10.209 3.41896 10.2493 3.45224 10.3741C3.49683 10.5413 3.60046 10.7572 3.70088 10.8921C3.79689 11.0211 8.98223 16.2064 9.11121 16.3024C9.24638 16.403 9.46227 16.5066 9.62921 16.5509C9.75371 16.5839 9.79477 16.588 10.0002 16.588C10.2056 16.588 10.2467 16.5839 10.3712 16.5509C10.5382 16.5066 10.7541 16.403 10.8892 16.3024C11.0183 16.2063 16.2037 11.0209 16.2996 10.8921C16.4002 10.7569 16.5037 10.541 16.548 10.3741C16.581 10.2496 16.5851 10.2085 16.5851 10.0031C16.5851 9.79767 16.581 9.75661 16.548 9.63211C16.5037 9.4652 16.4002 9.24929 16.2996 9.11411C16.2037 8.98528 11.0183 3.79994 10.8892 3.70382C10.753 3.60239 10.5372 3.49922 10.3712 3.45616C10.1787 3.40621 9.89416 3.39742 9.7172 3.43596ZM9.86153 4.43252C9.8353 4.44051 9.78175 4.468 9.74253 4.4936C9.70229 4.51988 8.53857 5.67414 7.07228 7.14214C4.57094 9.64639 4.47222 9.74714 4.44378 9.82514C4.4043 9.93332 4.4043 10.0728 4.44374 10.1811C4.47218 10.2591 4.57032 10.3592 7.10023 12.8901C9.2887 15.0795 9.7389 15.5235 9.79721 15.5501C9.89961 15.5969 10.1036 15.5962 10.2032 15.5488C10.2602 15.5216 10.7618 15.0271 12.8942 12.8958C15.0774 10.7137 15.5205 10.2644 15.5472 10.2061C15.5932 10.1055 15.5932 9.90075 15.5472 9.80011C15.5205 9.74178 15.0779 9.29314 12.8942 7.11124C10.7644 4.98315 10.2601 4.48613 10.2033 4.45905C10.1241 4.42131 9.94426 4.40735 9.86153 4.43252ZM9.86721 6.27008C9.72472 6.31133 9.60716 6.41341 9.54242 6.55211L9.50321 6.63611V8.78511V10.9341L9.54045 11.0136C9.59242 11.1244 9.67867 11.2127 9.78719 11.2661C9.86883 11.3063 9.89157 11.3111 10.0002 11.3111C10.1088 11.3111 10.1316 11.3063 10.2132 11.2661C10.3217 11.2127 10.408 11.1244 10.46 11.0136L10.4972 10.9341V8.78511V6.63611L10.4577 6.55057C10.3536 6.32535 10.0971 6.20351 9.86721 6.27008ZM9.85335 11.9516C9.65497 11.9894 9.45455 12.151 9.36051 12.3491C9.31259 12.45 9.3084 12.4692 9.30304 12.613C9.29808 12.7454 9.30172 12.7814 9.32782 12.8591C9.36879 12.9811 9.4253 13.0663 9.52865 13.162C9.68633 13.308 9.88934 13.3707 10.1042 13.3397C10.2598 13.3173 10.3757 13.2569 10.496 13.1356C10.6565 12.9738 10.7087 12.8325 10.6971 12.5917C10.6882 12.4066 10.6304 12.2809 10.4915 12.1444C10.3145 11.9706 10.0975 11.905 9.85335 11.9516Z" />
+    </svg>;
+}

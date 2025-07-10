@@ -1,0 +1,29 @@
+meta {
+  name: Call endpoint using only RateDestination
+  type: http
+  seq: 28
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/clientrates/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+  
+   var query = RatesAPIsHelper.GetClientRateQueryWithMandatoryFieldsForProvidedVariables();
+   query.RateDestination = 
+       {
+           Type: bru.getEnvVar("RateDestinationType"),
+           Value: bru.getEnvVar("RateDestinationValue")
+       };
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

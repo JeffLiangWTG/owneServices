@@ -1,0 +1,6 @@
+CREATE VIEW RefCusCodeOrAttributeTransportModeTableView_V1 AS
+SELECT ZZU_PK,
+ZZU_TransportMode,
+ZZU_ZZD_CodeList,
+ZZU_ZZE_Attribute
+FROM RefCusCodeOrAttributeTransportMode

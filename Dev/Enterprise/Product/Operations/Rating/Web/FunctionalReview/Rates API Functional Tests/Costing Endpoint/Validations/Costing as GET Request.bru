@@ -1,0 +1,30 @@
+meta {
+  name: Costing as GET Request
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   req.setBody(null);
+}
+
+tests {
+  test("Should return status code 405", function() {
+    expect(res.status).to.equal(405)
+  });
+  
+  test("Should return: The requested resource does not support http method 'GET'.", function() {
+    expect(res.body.Message).to.equal("The requested resource does not support http method 'GET'.");
+  });
+  
+  
+  
+}

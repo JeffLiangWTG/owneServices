@@ -1,0 +1,66 @@
+@namespace CargoWiseNext.Blazor.Components
+@inherits CwnComponentBase
+
+<div @attributes="UserAttributes" class="@TabsClassnames" style="@Style">
+	<CascadingValue Value="this" IsFixed="true">
+		<div class="@TabBarClassnames">
+			@if (HeaderPosition == TabHeaderPosition.Before && Header != null)
+			{
+				<div class="cwn-tabs__header cwn-tabs__header--before">
+					@Header(this)
+				</div>
+			}
+			<div class="cwn-tabs__content">
+				@foreach (CwnTabPanel panel in _panels)
+				{
+					<div class="cwn-tab-wrapper" @key="@panel">
+						@if (panel.TabWrapperContent == null)
+						{
+							@RenderTab(panel)
+						}
+						else
+						{
+							@panel.TabWrapperContent(RenderTab(panel))
+						}
+					</div>
+				}
+			</div>
+			@if (HeaderPosition == TabHeaderPosition.After && Header != null)
+			{
+				<div class="cwn-tabs__header cwn-tabs__header--after">
+					@Header(this)
+				</div>
+			}
+		</div>
+		<div class="@PanelsClassnames">
+			@ChildContent
+		</div>
+	</CascadingValue>
+</div>
+
+@code {
+#nullable enable
+	RenderFragment RenderTab(CwnTabPanel panel) => @<CwnElement Ref="panel.PanelRef" Class="@GetTabClass(panel)" Style="@GetTabStyle(panel)" OnSingleClick=@( e => ActivatePanel(panel, e, false) ) HtmlTag="div">
+		@if (TabPanelHeaderPosition == TabHeaderPosition.Before && TabPanelHeader != null)
+	{
+		<div class="cwn-tabs__panel-header cwn-tabs__panel-header--before">
+			@TabPanelHeader(panel)
+		</div>
+	}
+		@if (panel.TabContent != null)
+	{
+		@panel.TabContent
+	}
+	else if (!String.IsNullOrEmpty(panel.Text))
+	{
+		@panel.Text
+	}
+
+		@if (TabPanelHeaderPosition == TabHeaderPosition.After && TabPanelHeader != null)
+	{
+		<div class="cwn-tabs__panel-header cwn-tabs__panel-header--after">
+			@TabPanelHeader(panel)
+		</div>
+	}
+	</CwnElement>;
+}

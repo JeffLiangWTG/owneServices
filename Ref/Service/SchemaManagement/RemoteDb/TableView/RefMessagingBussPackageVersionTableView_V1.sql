@@ -1,0 +1,5 @@
+CREATE VIEW RefMessagingBussPackageVersionTableView_V1 AS
+SELECT ZMV_PK,
+ZMV_ZMP_PackageInfo,
+ZMV_Version
+FROM RefMessagingBussPackageVersion

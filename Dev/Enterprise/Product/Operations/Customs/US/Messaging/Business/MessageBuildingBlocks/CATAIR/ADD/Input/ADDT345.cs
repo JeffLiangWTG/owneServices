@@ -1,0 +1,1 @@
+// typo in the document, it should be Output instead of Input

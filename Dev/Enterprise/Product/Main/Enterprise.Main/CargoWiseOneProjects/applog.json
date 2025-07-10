@@ -1,0 +1,54 @@
+{
+  "nlog": {
+    "autoReload": true,
+    "targets": {
+			"logfile": {
+				"type": "File",
+				"fileName": "${specialfolder:folder=CommonApplicationData}\\WiseTech Global\\ApplicationLogging\\${var:al.product.name}\\${var:al.product.environment}-${date:universalTime=true:format=yyyyMMdd}.log",
+				"layout": {
+					"type": "JsonLayout",
+					"includeEventProperties": true,
+					"includeScopeProperties": true,
+					"IncludeGdc": true,
+					"MaxRecursionLimit": 3,
+					"attributes": [
+						{
+							"name": "eventTime",
+							"layout": "${date:universalTime=true:format=yyyy-MM-dd\\THH\\:mm\\:ss.fffK}"
+						},
+						{
+							"name": "sequenceId",
+							"layout": "${sequenceId}"
+						},
+						{
+							"name": "level",
+							"layout": "${level}"
+						},
+						{
+							"name": "message",
+							"layout": "${message}"
+						},
+						{
+							"name": "exception",
+							"layout": "${exception:format=ToString}"
+						}
+					]
+				},
+				"keepFileOpen": true,
+				"openFileCacheTimeout": 5,
+				"openFileCacheSize": 1,
+				"concurrentWrites": true,
+				"concurrentWriteAttemptDelay": 15,
+				"networkWrites": false,
+				"maxArchiveFiles": 15
+			}
+    },
+    "rules": [
+			{
+				"logger": "*",
+				"minLevel": "Information",
+				"writeTo": "logfile"
+			}
+    ]
+  }
+}

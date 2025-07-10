@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <RootNamespace>Enterprise.TransportBookings.Module</RootNamespace>
+    <AssemblyName>Enterprise.TransportBookings.Module</AssemblyName>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <ProjectReference Include="..\TransportBooking.GUI\TransportBookings.GUI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise.Freight.Common.Business" />
+    <Reference Include="System.Resources.Extensions" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Design" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="DtbBooking\DataImport\AutoDtbBookingFlattened.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoDtbBookingFlattened.xml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="DtbBooking\DataImport\AutoDtbBookingFlattened.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoDtbBookingFlattened.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.TransportBookings.Module</CustomToolNamespace>
+    </None>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

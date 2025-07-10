@@ -1,0 +1,14 @@
+CREATE VIEW RefCusConfigurationTableView_V1 AS
+SELECT ZZJ_PK
+,ZZJ_RN_NKCustomsCountry
+,ZZJ_TariffDataSource
+,ZZJ_IsGenericCountry
+,ZZJ_AllowRiskManagement
+,ZZJ_IsTransitDeclarationCounty
+,ZZJ_TurnOnASYDCUDAManifest
+,ZZJ_TurnOnASYCUDACustoms
+,ZZJ_ZZZ_NKDefaultDataGrouping
+,ZZJ_ZZZ_NKAlternateTariffOnlyDataGrouping
+,ZZJ_StartDate
+,ZZJ_EndDate
+FROM RefCusConfiguration

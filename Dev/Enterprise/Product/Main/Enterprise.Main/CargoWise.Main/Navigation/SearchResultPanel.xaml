@@ -1,0 +1,134 @@
+<UserControl x:Class="CargoWise.Main.Navigation.SearchResultPanel"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:local="clr-namespace:CargoWise.Main.Navigation"
+			 xmlns:ui="clr-namespace:CargoWise.Main.Navigation.WPF;assembly=CargoWise.Main.Navigation"
+			 xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+			 mc:Ignorable="d">
+	<UserControl.Resources>
+		<ResourceDictionary >
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="NextHomeResources.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+			<local:MenuTextConverter x:Key="MenuTextConverter" />
+		</ResourceDictionary>
+	</UserControl.Resources>
+	<!-- #region Search Panel -->
+	<Border x:Name="RootBorder"
+			MinWidth="450" MaxWidth="950"
+			Canvas.Top ="-1000"
+			Background="Transparent" >
+		<behaviors:Interaction.Triggers>
+			<behaviors:EventTrigger EventName="PreviewMouseLeftButtonDown" SourceName="RootBorder">
+				<behaviors:InvokeCommandAction Command="{x:Static local:NextAppBar.CloseSearchWindowCommand}" />
+			</behaviors:EventTrigger>
+		</behaviors:Interaction.Triggers>
+		<Border.Style>
+			<Style TargetType="Border">
+				<Style.Triggers>
+					<DataTrigger Binding="{Binding IsInSearchMode}" Value="true">
+						<Setter Property="Canvas.Top" Value="0" />
+					</DataTrigger>
+				</Style.Triggers>
+			</Style>
+		</Border.Style>
+		
+		<Border Style="{StaticResource SearchWindowBorderStyle}" x:Name="InnerBorder" Margin="0,0,0,0" VerticalAlignment="Top">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+				<local:SearchFilter x:Name="SearchFilter" DataContext="{Binding SearchViewModel}" Grid.Row="0"/>
+				<Border Grid.Row="1" VerticalAlignment="Stretch" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="10 5" >
+					<ScrollViewer
+					x:Name="SearchResultsViewer"	
+					CanContentScroll="True"
+					Margin="0 10 0 0"
+					Focusable="False">
+						<ScrollViewer.Style>
+							<Style TargetType="ScrollViewer" BasedOn="{StaticResource DefaultScrollViewerStyle}">
+								<Setter Property="MinHeight" Value="400" />
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding SearchViewModel.ShouldShowNoResultsMessage}" Value="True">
+										<Setter Property="MinHeight" Value="100" />
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</ScrollViewer.Style>
+						<ScrollViewer.Resources>
+							<Style TargetType="ScrollBar" BasedOn="{StaticResource CustomScrollBar}" />
+						</ScrollViewer.Resources>
+						<Grid>
+							<ItemsControl
+							x:Name="SearchResultsItemsControl"
+							Focusable="True"
+							FocusVisualStyle="{x:Null}"
+							ItemTemplateSelector="{StaticResource SearchResultDetailsTemplateSelector}"
+							ItemsSource="{Binding SearchViewModel.SearchResults, IsAsync=True}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<StackPanel />
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.InputBindings>
+									<KeyBinding Key="Escape" Command="{x:Static local:NextAppBar.CloseSearchWindowCommand}" />
+								</ItemsControl.InputBindings>
+							</ItemsControl>
+							<StackPanel
+							VerticalAlignment="Top" 
+							HorizontalAlignment="Center"
+							Visibility="{Binding SearchViewModel.ShouldShowNoResultsMessage, Converter={StaticResource BooleanToVisibilityConverter}}">
+								<ui:MultilingualTextLabel HorizontalAlignment="Center" IsTranslatable="True" MultilingualText="{Binding NoResultsText}">
+									<TextBlock Text="{Binding NoResultsText}" Style="{StaticResource NoResultsText}"></TextBlock>
+								</ui:MultilingualTextLabel>
+								<ui:MultilingualTextLabel HorizontalAlignment="Center" IsTranslatable="True" MultilingualText="{Binding TryAnotherTermText}">
+									<TextBlock Text="{Binding TryAnotherTermText}" Style="{StaticResource TryAnotherSearchTermText}"></TextBlock>
+								</ui:MultilingualTextLabel>
+							</StackPanel>
+						</Grid>
+					</ScrollViewer>
+				</Border>
+				<StackPanel
+				x:Name="SearchBottomPanel"
+				Visibility="{Binding SearchViewModel.ShouldHideShortcuts, Converter={StaticResource BooleanToVisibilityConverter}}"
+				Grid.Row="2"
+				Orientation="Horizontal"
+				VerticalAlignment="Center"
+				Margin="10 15">
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<Border Style="{StaticResource SearchShortcutBorderStyle}">
+							<Image Height="8" HorizontalAlignment="Left" Stretch="Uniform" VerticalAlignment="Center" Source="{StaticResource ArrowUpIconDrawingImage}" />
+						</Border>
+						<Border Margin="4 0 8 0" Style="{StaticResource SearchShortcutBorderStyle}">
+							<Image Height="8" HorizontalAlignment="Left" Stretch="Uniform" VerticalAlignment="Center" Source="{StaticResource ArrowDownIconDrawingImage}" />
+						</Border>
+						<ui:MultilingualTextLabel IsTranslatable="False" Margin="0 0 15 0" Padding="0">
+							<TextBlock FontSize="13" Foreground="{StaticResource DefaultTextBrush}" Text="{Binding NavigateHint}" />
+						</ui:MultilingualTextLabel>
+					</StackPanel>
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<Border Margin="8 0" Padding="0 4"  Style="{StaticResource SearchShortcutBorderStyle}">
+							<Image Margin="4 0" Height="8" HorizontalAlignment="Left" Stretch="Uniform" VerticalAlignment="Center" Source="{StaticResource ReturnIconDrawingImage}" />
+						</Border>
+						<ui:MultilingualTextLabel IsTranslatable="False" Margin="0 0 15 0" Padding="0">
+							<TextBlock FontSize="13" Foreground="{StaticResource DefaultTextBrush}" Text="{Binding OpenHint}" />
+						</ui:MultilingualTextLabel>
+					</StackPanel>
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<Border Margin="8 0" Padding="0 4" Style="{StaticResource SearchShortcutBorderStyle}">
+							<Image Margin="4 0" Width="12" HorizontalAlignment="Left" Stretch="Uniform" VerticalAlignment="Center" Source="{StaticResource EscapeIconDrawingImage}" />
+						</Border>
+						<ui:MultilingualTextLabel IsTranslatable="False" Margin="0" Padding="0">
+							<TextBlock  FontSize="13" Foreground="{StaticResource DefaultTextBrush}" Text="{Binding CloseHint}" />
+						</ui:MultilingualTextLabel>
+					</StackPanel>
+				</StackPanel>
+			</Grid>
+		</Border>
+	</Border>
+	<!-- #endregion Search Panel -->
+</UserControl>

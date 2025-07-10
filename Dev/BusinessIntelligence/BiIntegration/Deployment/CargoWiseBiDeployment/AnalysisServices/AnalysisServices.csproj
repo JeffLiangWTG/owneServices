@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <RootNamespace>CargoWise.Bi.Deployment.AnalysisServices</RootNamespace>
+    <AssemblyName>CargoWise.Bi.Deployment.AnalysisServices</AssemblyName>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+    <NoWarn>$(NoWarn);SYSLIB0051</NoWarn>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="CargoWise.Bi.Common" />
+    <Reference Include="CargoWise.Bi.ConfigLoader" />
+    <Reference Include="CargoWise.Bi.Configuration" />
+    <Reference Include="CargoWise.Bi.Development.Common" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Database.Abstractions" />
+    <Reference Include="CargoWise.Database.Shared" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Microsoft.AnalysisServices" />
+    <Reference Include="Microsoft.AnalysisServices.AdomdClient" />
+    <Reference Include="Microsoft.AnalysisServices.Core" />
+    <Reference Include="Microsoft.AnalysisServices.Tabular" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Registration\Registration.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Reports\DataSets\UseCaseConfigDataSet.cs">
+      <DependentUpon>UseCaseConfigDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="Reports\DataSets\UseCaseConfigDataSet.Designer.cs">
+      <DependentUpon>UseCaseConfigDataSet.xsd</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Reports\DataSets\UseCaseConfigDataSet.xsc">
+      <DependentUpon>UseCaseConfigDataSet.xsd</DependentUpon>
+    </None>
+    <None Update="Reports\DataSets\UseCaseConfigDataSet.xsd">
+      <SubType>Designer</SubType>
+      <LastGenOutput>UseCaseConfigDataSet.Designer.cs</LastGenOutput>
+      <Generator>MSDataSetGenerator</Generator>
+    </None>
+    <None Update="Reports\DataSets\UseCaseConfigDataSet.xss">
+      <DependentUpon>UseCaseConfigDataSet.xsd</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="System.DirectoryServices" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

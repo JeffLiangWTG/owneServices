@@ -1,0 +1,29 @@
+using System.Collections.Generic;
+using CargoWise.Customs.IL.MessageDefinitions.Common;
+using CargoWise.Customs.IL.MessageDefinitions.DEC.IMP;
+
+namespace Enterprise.Customs.IL.Business
+{
+	public class DeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExtensionsWrapper : IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExt
+	{
+		DeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExtensionsWrapper(JobComInvoiceLine invoiceLine)
+		{
+			this.invoiceLine = invoiceLine;
+		}
+
+		internal static IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExt NewOrNull(JobComInvoiceLine invoiceLine)
+			=> invoiceLine == null ? null : new DeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExtensionsWrapper(invoiceLine);
+
+		ICodeType IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExt.DutyRegimeCode => CodeTypeWrapper.NewOrNull(invoiceLine.JI_PrimaryPreference);
+
+		ICollection<IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExtProductIdentification> IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExt.ProductIdentification => null;
+
+		ICollection<IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExtProductName> IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExt.ProductName => null;
+
+		ICollection<IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExtSerialNumbers> IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExt.SerialNumbers => null;
+
+		ICollection<IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExtTradeLevyAndExampt> IDeclarationGoodsShipmentGovernmentAgencyGoodsItemCommodityDmExt.TradeLevyAndExampt => null;
+
+		readonly JobComInvoiceLine invoiceLine;
+	}
+}

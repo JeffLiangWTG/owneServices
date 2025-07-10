@@ -1,0 +1,105 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using CargoWise.Data;
+using CargoWise.DbUpgrader.Scripts.Definitions.HRM;
+using Enterprise.ZArchitecture.Schema;
+using NUnit.Framework;
+
+namespace Enterprise.Build.Database.Script.Public.HRM
+{
+	[TestedType(typeof(GlbEmployingBranchDepartment_WithManaged))]
+	class GlbEmployingBranchDepartment_WithManagedTest : ManagedTypeTest<GlbEmployingBranchDepartmentSchema>
+	{
+		protected override string StaffFKColumnName => "GHB_GS_Staff";
+
+		public void TestExecute()
+		{
+			var company = Guid.NewGuid();
+			var branch = Guid.NewGuid();
+
+			var staff0 = Guid.NewGuid();
+			var staff1 = Guid.NewGuid();
+			var staff2 = Guid.NewGuid();
+			var staff3 = Guid.NewGuid();
+
+			TestConnection.ExecuteNonQuery(@"
+INSERT INTO dbo.GlbCompany (GC_PK, GC_Code, GC_Name, GC_RN_NKCountryCode, GC_RX_NKLocalCurrency)
+VALUES
+	(@company, 'DAN', 'AU company', 'AU', 'AUD');
+
+INSERT INTO dbo.GlbBranch (GB_PK, GB_GC, GB_IsActive, GB_Code, GB_BranchName)
+VALUES
+	(@branch, @company, 1, 'BR1', 'Branch1');
+
+INSERT INTO dbo.GlbStaff (GS_PK, GS_Code, GS_LoginName, GS_SystemCreateTimeUtc, GS_SystemCreateUser, GS_SystemLastEditTimeUtc, GS_SystemLastEditUser)
+VALUES
+	(@staff0, 'S00', 'Staff00', GETUTCDATE(), 'E', GETUTCDATE(), 'E'),
+	(@staff1, 'S01', 'Staff01', GETUTCDATE(), 'E', GETUTCDATE(), 'E'),
+	(@staff2, 'S02', 'Staff02', GETUTCDATE(), 'E', GETUTCDATE(), 'E'),
+	(@staff3, 'S03', 'Staff03', GETUTCDATE(), 'E', GETUTCDATE(), 'E');
+
+INSERT INTO dbo.GlbStaffManager
+	(GSM_PK, GSM_ManagerType, GSM_GS_Manager, GSM_GS_Staff, GSM_EffectiveDate, GSM_EndDate, GSM_SystemCreateTimeUtc, GSM_SystemLastEditTimeUtc, GSM_SystemCreateUser, GSM_SystemLastEditUser)
+VALUES
+	(NEWID(), 'PPL', @staff0, @staff1, '2021-07-28', null, GETDATE(), GETDATE(), 'E', 'E'),
+	(NEWID(), 'HRM', @staff0, @staff2, '2021-07-28', null, GETDATE(), GETDATE(), 'E', 'E'),
+	(NEWID(), 'DRM', @staff0, @staff3, '2021-07-28', null, GETDATE(), GETDATE(), 'E', 'E');
+
+INSERT INTO dbo.GlbEmployingBranchDepartment
+	(GHB_PK, GHB_GS_Staff, GHB_EffectiveDate, GHB_GE_Department, GHB_GB_Branch, GHB_SystemCreateTimeUtc, GHB_SystemCreateUser, GHB_SystemLastEditTimeUtc, GHB_SystemLastEditUser, GHB_AutoEffectiveEndDate)
+VALUES
+	(NEWID(), @staff0, '2021-09-03 00:00:00', NULL, @branch, GETDATE(), 'E', GETDATE(), 'E', NULL),
+	(NEWID(), @staff1, '2021-03-18 00:00:00', NULL, @branch, GETDATE(), 'E', GETDATE(), 'E', NULL),
+	(NEWID(), @staff2, '2021-06-24 00:00:00', NULL, @branch, GETDATE(), 'E', GETDATE(), 'E', NULL),
+	(NEWID(), @staff3, '2021-02-08 00:00:00', NULL, @branch, GETDATE(), 'E', GETDATE(), 'E', NULL);
+",
+		p =>
+		{
+			p.AddParameter("@company", SqlDbType.UniqueIdentifier, company);
+			p.AddParameter("@branch", SqlDbType.UniqueIdentifier, branch);
+			p.AddParameter("@staff0", SqlDbType.UniqueIdentifier, staff0);
+			p.AddParameter("@staff1", SqlDbType.UniqueIdentifier, staff1);
+			p.AddParameter("@staff2", SqlDbType.UniqueIdentifier, staff2);
+			p.AddParameter("@staff3", SqlDbType.UniqueIdentifier, staff3);
+		});
+
+			var results = Execute(staff0, "HRM,PPL,DRM", DateTimeOffset.Now);
+			var dataRows = results.Select();
+
+			DataTable originalDataTable;
+			using (var command = TestConnection.Command($"SELECT * FROM {Schema.SqlSchemaName}.{Schema.TableName}"))
+			{
+				originalDataTable = DataUtils.GetDataTableFromCommand(command);
+			}
+
+			var tableColumns = Schema.All.Select(c => c.Name).ToList();
+			var expectedColumns = new List<string>();
+			expectedColumns.AddRange(tableColumns);
+			expectedColumns.AddRange(["GHB_AutoVersion", "IsSelf", "IsManaged1", "IsManaged2", "IsManaged3"]);
+
+			AssertEquals(expectedColumns.Count, results.Columns.Count);
+			foreach (var colName in expectedColumns)
+			{
+				Assert(results.Columns.Contains(colName));
+			}
+			AssertEquals(originalDataTable.Rows.Count, dataRows.Length);
+
+			for (var i = 0; i < originalDataTable.Rows.Count; i++)
+			{
+				AssertRowValues(originalDataTable.Rows[i], dataRows[i], tableColumns);
+
+				var expectedIsSelf = (Guid)dataRows[i][StaffFKColumnName] == staff0;
+				var expectedIsManaged1 = (Guid)dataRows[i][StaffFKColumnName] == staff2;
+				var expectedIsManaged2 = (Guid)dataRows[i][StaffFKColumnName] == staff1;
+				var expectedIsManaged3 = (Guid)dataRows[i][StaffFKColumnName] == staff3;
+
+				AssertEquals(expectedIsSelf, dataRows[i]["IsSelf"]);
+				AssertEquals(expectedIsManaged1, dataRows[i]["IsManaged1"]);
+				AssertEquals(expectedIsManaged2, dataRows[i]["IsManaged2"]);
+				AssertEquals(expectedIsManaged3, dataRows[i]["IsManaged3"]);
+			}
+		}
+	}
+}

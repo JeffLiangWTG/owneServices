@@ -1,0 +1,15 @@
+using Enterprise.Customs.Business;
+using NUnit.Framework;
+
+namespace Enterprise.Customs.FR.Business.Declaration.Testing
+{
+	[TestedType(typeof(SupportingDocumentCollection))]
+	class SupportingDocumentCollectionTest : EU.Business.Declaration.MultiLineAddInfos.Testing.SupportingDocumentCollectionTest
+	{
+		protected override CusSupportingInfoCollection<EU.Business.Declaration.MultiLineAddInfos.SupportingDocument> GetCusSupportingInfoCollection()
+		{
+			var declaration = Factory.New<JobDeclaration>();
+			return declaration.SupportingDocuments;
+		}
+	}
+}

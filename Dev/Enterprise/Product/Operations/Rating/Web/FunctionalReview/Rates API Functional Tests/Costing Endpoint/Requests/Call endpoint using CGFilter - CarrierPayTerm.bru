@@ -1,0 +1,25 @@
+meta {
+  name: Call endpoint using CGFilter - CarrierPayTerm
+  type: http
+  seq: 23
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetRateQueryWithMandatoryFieldsForProvidedVariables();
+   query.CGFilter = RatesAPIsHelper.GetCGFilter();
+   query.CarrierPayTerm = RatesAPIsHelper.GetCarrierPayTerm();
+   
+   req.setBody(query);
+}
+
+tests {
+  
+}

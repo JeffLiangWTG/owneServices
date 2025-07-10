@@ -1,0 +1,98 @@
+@using CargoWise.Main.Navigation
+@using System.Collections.ObjectModel
+@using Enterprise.ZArchitecture.Core
+@using CargoWise.Main.Navigation.ViewModels
+@using Microsoft.AspNetCore.Components.Web
+@using CargoWiseNext.Blazor.Components
+
+@namespace CargoWise.Main.Navigation.Pages
+
+@inherits CwnComponentBase
+
+<CwnCard Class="cwn-home__favorites">
+    <CwnCardHeader>
+        <CardHeaderContent>
+            <div class="cwn-favorites__header">
+                <span class="cwn-favorites__title">
+                    @Service?.DisplayName
+                </span>
+                <CwnIconButton Icon="@(isCompressView ? Icon.DensityRelaxed : Icon.DensityTight)"
+                               OnSingleClick="async () => await ToggleView()"
+                               title="@(Service?.SwitchViewText)"
+                               Color="@(Color.Default)"
+                               Class="cwn-favorites__toggle" />
+            </div>
+        </CardHeaderContent>
+    </CwnCardHeader>
+    <CwnCardContent>
+        <CwnList Class="cwn-favorites__content" Style="@(isCompressView ? "gap: 0px" : "gap: 4px")">
+            @if (IsAnyItems)
+            {
+                var itemsArray = Service!.Items!.ToArray();
+                @foreach (var (index, item) in itemsArray.Select((value, i) => (index: i + 1, item: value)))
+                {
+                    <CwnListItem @key=item.Key Style="padding: 0px; margin: 1px 0px;">
+                        <div class="cwn-favorites__item"
+                             Style="@(isCompressView ? "gap: 2px; padding: 1px" : "gap: 4px; padding: 8px 8px 8px 2px")"
+                             @ondrop="async (e) => await OnDropAsync(e, item)" @ondrop:stopPropagation @ondragover:preventDefault>
+
+                            <div title="@Service.DragToReorderText" class="cwn-favorites__item_drag_container" draggable="true"
+                                 @ondragstart="(e) => OnDragStart(e, item)" @ondragstart:stopPropagation>
+                                <CwnIconButton Icon="@Icon.Drag"
+                                               Color="@(Color.Default)"
+                                               Class="cwn-favorites__item_drag" />
+                                <CwnIconButton AccessKey="@((index).ToString())" Class="cwn-favorites__item_index">@(index)</CwnIconButton>
+                            </div>
+
+                            @if (isCompressView)
+                            {
+                                <CwnElement Class="cwn-favorites__item_name_box_compressed"
+                                            OnSingleClick="@((e) => Service.PerformClickAsync(item))"
+                                            OnContextMenu="@((MouseEventArgs e) => Service.PerformRightClickAsync(e, item))"
+                                            HtmlTag="div">
+                                    <div class="cwn-favorites__item_name_compressed">@item.Name</div>
+                                    <div class="cwn-favorites__item_id_compressed">@item.ID</div>
+                                </CwnElement>
+                            }
+                            else
+                            {
+                                <CwnElement Class="cwn-favorites__item_name_box"
+                                            OnSingleClick="@((e) => Service.PerformClickAsync(item))"
+                                            OnContextMenu="@((MouseEventArgs e) => Service.PerformRightClickAsync(e, item))"
+                                            HtmlTag="div">
+                                    <div class="cwn-favorites__item_id">@item.ID</div>
+                                    <div class="cwn-favorites__item_name">@item.Name</div>
+                                </CwnElement>
+                            }
+
+                            <CwnIconButton Icon="@Icon.StarFilled"
+                                HoverIcon="@Icon.StarEmpty"
+                                OnSingleClick="@(async () => await Service.PerformFavoriteClickAsync(item))"
+                                title="@(item.RemoveFromFavoritesTooltip)"
+                                Variant="@(Variant.Text)"
+                                Color="@(Color.Default)"
+                                Class="cwn-favorites__item_star" />
+
+                            <div class="cwn-favorites__item_tooltip">
+                                @if (index < 13)
+                                {             
+                                    <kbd>CTRL</kbd> <kbd>F@{@index}</kbd> 
+                                }
+                                <span> Open @item.Name</span>
+                            </div>
+                        </div>
+                    </CwnListItem>
+
+                    @if (index < itemsArray.Length && !isCompressView)
+                    {
+                        <hr class="cwn-favorites__seperator">
+                    }
+                }
+            }
+            else
+            {
+                <div class="cwn-favorites__empty">@(Service?.NoItemsLabelText)</div>
+            }
+        </CwnList>
+    </CwnCardContent>
+</CwnCard>

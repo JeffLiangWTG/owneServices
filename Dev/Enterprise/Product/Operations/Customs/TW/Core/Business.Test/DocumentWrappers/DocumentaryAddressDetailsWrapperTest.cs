@@ -1,0 +1,125 @@
+using CargoWise.EntityFramework.Testing;
+using CargoWise.Types;
+using Enterprise.MasterFiles.Business;
+using NUnit.Framework;
+using WTG.NUnit;
+
+namespace Enterprise.Customs.TW.Business.Testing
+{
+	sealed class DocumentaryAddressDetailsWrapperTest : TestCaseWithFactory
+	{
+		[ExpectNoExceptions]
+		public void TestDocumentaryAddressDetails()
+		{
+			var declaration = Factory.NewWithValidTestData<JobDeclaration>();
+			var org = Factory.New<OrgHeader>();
+			org.OH_Code = "org01";
+			org.OH_RL_NKClosestPort = "TWKEL";
+			var mainAddress = org.Addresses.MainAddress;
+			mainAddress.CompanyName = "Main CompanyName";
+			mainAddress.Address1 = "Main Address1";
+			mainAddress.Address2 = "Main Address2";
+			mainAddress.City = "Main City";
+			mainAddress.State = "Main State";
+			mainAddress.Postcode = "123";
+			mainAddress.Language = "EN-GB";
+			var enTransAddress = mainAddress.TranslatedAddresses.AddNew();
+			enTransAddress.CompanyName = "Trans CompanyName1";
+			enTransAddress.Address1 = "Trans Address11";
+			enTransAddress.Address2 = "Trans Address21";
+			enTransAddress.City = "Trans City1";
+			enTransAddress.State = "Trans State1";
+			enTransAddress.Postcode = "456";
+			enTransAddress.Language = "EN";
+			var enUSTransAddress = mainAddress.TranslatedAddresses.AddNew();
+			enUSTransAddress.CompanyName = "Trans CompanyName2";
+			enUSTransAddress.Address1 = "Trans Address12";
+			enUSTransAddress.Address2 = "Trans Address22";
+			enUSTransAddress.City = "Trans City2";
+			enUSTransAddress.State = "Trans State2";
+			enUSTransAddress.Postcode = "789";
+			enUSTransAddress.Language = "EN-US";
+			declaration.JE_OH_Importer = org.PK;
+			Factory.Save();
+			var wrapper = new DocumentaryAddressDetailsWrapper(declaration.Importer, declaration.ImporterDocumentaryAddress);
+			NUnit.Framework.Assert.That(wrapper.Address, NUnit.Framework.Is.EqualTo("MAIN ADDRESS1 MAIN ADDRESS2 MAIN CITY 123 TAIWAN").Using(CustomComparers.TypeComparison));
+			NUnit.Framework.Assert.That(wrapper.CompanyName, NUnit.Framework.Is.EqualTo("Main CompanyName").Using(CustomComparers.TypeComparison));
+			mainAddress.Language = "ZH-TW";
+			wrapper = new DocumentaryAddressDetailsWrapper(declaration.Importer, declaration.ImporterDocumentaryAddress);
+			NUnit.Framework.Assert.That(wrapper.Address, NUnit.Framework.Is.EqualTo("TRANS ADDRESS11 TRANS ADDRESS21 TRANS CITY1 456 TAIWAN").Using(CustomComparers.TypeComparison));
+			NUnit.Framework.Assert.That(wrapper.CompanyName, NUnit.Framework.Is.EqualTo("Trans CompanyName1").Using(CustomComparers.TypeComparison));
+			enTransAddress.Language = "EN-GB";
+			wrapper = new DocumentaryAddressDetailsWrapper(declaration.Importer, declaration.ImporterDocumentaryAddress);
+			NUnit.Framework.Assert.That(wrapper.Address, NUnit.Framework.Is.EqualTo("TRANS ADDRESS12 TRANS ADDRESS22 TRANS CITY2 789 TAIWAN").Using(CustomComparers.TypeComparison));
+			NUnit.Framework.Assert.That(wrapper.CompanyName, NUnit.Framework.Is.EqualTo("Trans CompanyName2").Using(CustomComparers.TypeComparison));
+			var documentaryAddress = declaration.ImporterDocumentaryAddress;
+			documentaryAddress.E2_AddressOverride = true;
+			documentaryAddress.E2_CompanyName = "XO001";
+			documentaryAddress.E2_Address1 = "A1";
+			documentaryAddress.E2_Address2 = "A2";
+			documentaryAddress.E2_City = "TPE";
+			documentaryAddress.E2_State = "TPE";
+			documentaryAddress.E2_RN_NKCountryCode = "TW";
+			documentaryAddress.E2_Postcode = "105";
+			wrapper = new DocumentaryAddressDetailsWrapper(declaration.Importer, declaration.ImporterDocumentaryAddress);
+			NUnit.Framework.Assert.That(wrapper.CompanyName, NUnit.Framework.Is.EqualTo("XO001").Using(CustomComparers.TypeComparison));
+			NUnit.Framework.Assert.That(wrapper.Address, NUnit.Framework.Is.EqualTo("A1 A2 TPE 105 TAIWAN").Using(CustomComparers.TypeComparison));
+			documentaryAddress.E2_CompanyName = ZString.Empty;
+			documentaryAddress.E2_Address1 = ZString.Empty;
+			documentaryAddress.E2_Address2 = ZString.Empty;
+			documentaryAddress.E2_City = ZString.Empty;
+			documentaryAddress.E2_State = ZString.Empty;
+			documentaryAddress.E2_RN_NKCountryCode = ZString.Empty;
+			documentaryAddress.E2_Postcode = ZString.Empty;
+			wrapper = new DocumentaryAddressDetailsWrapper(declaration.Importer, declaration.ImporterDocumentaryAddress);
+			NUnit.Framework.Assert.That(wrapper.CompanyName, NUnit.Framework.Is.EqualTo(ZString.Empty));
+			NUnit.Framework.Assert.That(wrapper.Address, NUnit.Framework.Is.EqualTo(ZString.Empty));
+			documentaryAddress.E2_AddressOverride = false;
+			var enAddress = org.Addresses.AddNew();
+			enAddress.OA_RN_NKCountryCode = "TW";
+			enAddress.OA_CompanyNameOverride = "Importer company name e2.";
+			enAddress.OA_Language = Core.SharedConstants.Languages.English;
+			enAddress.OA_Address1 = "ADDRESS 11";
+			enAddress.OA_Address2 = "ADDRESS 22";
+			enAddress.OA_PostCode = "106";
+			var chineseTraditionalAddress = enAddress.TranslatedAddresses.AddNew();
+			chineseTraditionalAddress.OTA_Language = Core.SharedConstants.Languages.ChineseTraditional;
+			chineseTraditionalAddress.Address1 = "忠孝東路1";
+			chineseTraditionalAddress.Address2 = "三段232號1";
+			chineseTraditionalAddress.CompanyName = "公司名稱X12(OTA)";
+			var englishAddress = enAddress.TranslatedAddresses.AddNew();
+			englishAddress.OTA_Language = Core.SharedConstants.Languages.English;
+			englishAddress.Address1 = "No. 232, Sec. 5, ZhongXiao N. Rd.,";
+			englishAddress.Address2 = "Zhongshan Dist., Taipei City 106, Taiwan (R.O.C.)";
+			englishAddress.CompanyName = "Importer2 company name(OTA).";
+			var cnAddress = org.Addresses.AddNew();
+			cnAddress.OA_RN_NKCountryCode = "TW";
+			cnAddress.OA_CompanyNameOverride = "Importer company name e3.";
+			cnAddress.OA_Language = Core.SharedConstants.Languages.ChineseSimplified;
+			cnAddress.OA_Address1 = "地址1";
+			cnAddress.OA_Address2 = "地址2";
+			cnAddress.OA_PostCode = "108";
+			chineseTraditionalAddress = cnAddress.TranslatedAddresses.AddNew();
+			chineseTraditionalAddress.OTA_Language = Core.SharedConstants.Languages.ChineseTraditional;
+			chineseTraditionalAddress.Address1 = "忠孝東路1";
+			chineseTraditionalAddress.Address2 = "三段232號1";
+			chineseTraditionalAddress.CompanyName = "公司名稱X12 (OTA)";
+			englishAddress = cnAddress.TranslatedAddresses.AddNew();
+			englishAddress.OTA_Language = Core.SharedConstants.Languages.English;
+			englishAddress.Address1 = "No. 232, Sec. 8, ZhongXiao N. Rd.,";
+			englishAddress.Address2 = "Zhongshan Dist., Taipei City 109, Taiwan (R.O.C.)";
+			englishAddress.CompanyName = "Importer3 company name(OTA).";
+			englishAddress.OTA_PostCode = "65";
+			documentaryAddress.E2_OA_Address = enAddress.PK;
+			Factory.Save();
+			wrapper = new DocumentaryAddressDetailsWrapper(declaration.Importer, declaration.ImporterDocumentaryAddress);
+			NUnit.Framework.Assert.That(wrapper.CompanyName, NUnit.Framework.Is.EqualTo("Importer company name e2.").Using(CustomComparers.TypeComparison));
+			NUnit.Framework.Assert.That(wrapper.Address, NUnit.Framework.Is.EqualTo("ADDRESS 11 ADDRESS 22 106 TAIWAN").Using(CustomComparers.TypeComparison));
+			documentaryAddress.E2_OA_Address = cnAddress.PK;
+			Factory.Save();
+			wrapper = new DocumentaryAddressDetailsWrapper(declaration.Importer, declaration.ImporterDocumentaryAddress);
+			NUnit.Framework.Assert.That(wrapper.CompanyName, NUnit.Framework.Is.EqualTo("Importer3 company name(OTA).").Using(CustomComparers.TypeComparison));
+			NUnit.Framework.Assert.That(wrapper.Address, NUnit.Framework.Is.EqualTo("NO. 232, SEC. 8, ZHONGXIAO N. RD., ZHONGSHAN DIST., TAIPEI CITY 109, TAIWAN (R.O.C.) 65 TAIWAN").Using(CustomComparers.TypeComparison));
+		}
+	}
+}

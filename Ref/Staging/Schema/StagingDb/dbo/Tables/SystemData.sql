@@ -1,0 +1,7 @@
+CREATE TABLE SystemData
+(
+	SD_PK uniqueidentifier NOT NULL CONSTRAINT DF_SystemData_SD_PK DEFAULT NEWID(),
+	SD_Name varchar(50) NOT NULL CONSTRAINT DF_SD_SystemData_Name DEFAULT '',
+	SD_Value varchar(max) NOT NULL CONSTRAINT DF_SD_SystemData_Value DEFAULT '',
+	CONSTRAINT PK_SystemData PRIMARY KEY CLUSTERED (SD_PK)
+)

@@ -1,0 +1,20 @@
+meta {
+  name: DeliveryOrg not supplied
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.DeliveryAddrCode = "ADDR"
+   
+   req.setBody(query);
+}

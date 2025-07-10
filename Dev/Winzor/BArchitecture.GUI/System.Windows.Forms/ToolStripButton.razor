@@ -1,0 +1,55 @@
+@using WinzorFramework
+@using WinzorFramework.Extensions
+@namespace System.Windows.Forms
+@inherits ToolStripItem
+
+<div class="toolstrip-item toolstrip-item--button @(!Enabled ? "disabled": "") @StylingClassesForButton()" style="@LayoutStyleString" checked="@Checked" @attributes="DataAttributes">
+    <div class="toolstrip-item__visual-overlay"></div>
+    <button title="@ButtonTitle"
+        class="button__button @ButtonImageTextClasses" style="@LookStyleString"
+        tabindex="@this.TabIndexHtmlAttributeValue(c => (c.Parent?.TabStop ?? true) && c.Enabled && c.TabStop)"
+        @onclick="OnClickAsync" @onclick:stopPropagation
+        @oncontextmenu="OnContextMenuAsync" @oncontextmenu:stopPropagation @oncontextmenu:preventDefault
+        @onmouseenter="OnMouseEnterAsync" @onmouseleave="OnMouseLeaveAsync"
+        @onwinzorfocusin:stopPropagation>
+        @if (ShowImage)
+        {
+            <img class="button__button__image" src="@Image?.ToBase64DataUrl()" style="@ToolStripButtonImageStyling" draggable="false" />
+        }
+        @if (!string.IsNullOrEmpty(Text))
+        {
+            <span class="button__button__text">@Text.ProcessMnemonicToHtml(true)</span>
+        }
+    </button>
+</div>
+
+@code{
+    string ToolStripButtonImageStyling => $"width:{buttonImageWidth}px;height:{buttonImageHeight}px;";
+
+    string ButtonImageTextClasses
+    {
+        get
+        {
+            var styleString = "button__button";
+
+            if (Image is not null)
+            {
+                if (!string.IsNullOrEmpty(Text))
+                {
+                    styleString += "--with-image-and-text";
+                }
+                else
+                {
+                    styleString += "--with-image-only";
+                }
+            } else
+            {
+                styleString += "--with-text-only";
+            }
+
+            return styleString;
+        }
+    }
+
+    string? ButtonTitle => Owner?.ShowItemToolTips ?? false ? ToolTipText : null;
+}

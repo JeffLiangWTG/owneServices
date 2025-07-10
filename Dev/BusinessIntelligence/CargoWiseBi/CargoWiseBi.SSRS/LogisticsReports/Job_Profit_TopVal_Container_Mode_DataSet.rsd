@@ -1,0 +1,396 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <Description />
+  <DataSet Name="Top1Transport_Mode">
+    <Query>
+      <DataSourceReference>LogisticsModel</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="Branch_Key">
+          <DefaultValue>0</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Int32</rd:DbType>
+          <rd:IsMultiValued>true</rd:IsMultiValued>
+        </DataSetParameter>
+        <DataSetParameter Name="Department_Key">
+          <DefaultValue>0</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Int32</rd:DbType>
+          <rd:IsMultiValued>true</rd:IsMultiValued>
+        </DataSetParameter>
+        <DataSetParameter Name="Report_Month">
+          <DefaultValue>DATE(2015,10,1)</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>DateTime</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Date_Type">
+          <DefaultValue>Date_Type</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Analyse_Type">
+          <DefaultValue>Analyse_Type</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>EVALUATE
+UNION(
+SELECTCOLUMNS (
+    TOPN (
+        2,
+        FILTER (
+            SUMMARIZECOLUMNS (
+                'Shipment'[Container Mode],
+                FILTER (
+                    VALUES ( 'Shipment'[Container Mode] ),
+                    ISBLANK ( 'Shipment'[Container Mode] ) = FALSE
+                        &amp;&amp; LEN ( 'Shipment'[Container Mode] ) &gt; 0
+                ),
+                FILTER (
+                    'Company Branch',
+                    (
+                        PATHCONTAINS ( @Branch_Key, 'Company Branch'[Branch Key] )
+                            &amp;&amp; @Analyse_Type = "Job"
+                    )
+                        || @Analyse_Type = "Transaction"
+                ),
+                FILTER (
+                    'Transaction Company Branch',
+                    (
+                        PATHCONTAINS (
+                            @Branch_Key,
+                            'Transaction Company Branch'[Transaction Branch Key]
+                        )
+                            &amp;&amp; @Analyse_Type = "Transaction"
+                    )
+                        || @Analyse_Type = "Job"
+                ),
+                FILTER (
+                    'Department',
+                    (
+                        PATHCONTAINS ( @Department_Key, 'Department'[Department Key] )
+                            &amp;&amp; @Analyse_Type = "Job"
+                    ) || @Department_Key = "-1"
+                        || @Analyse_Type = "Transaction"
+                ),
+                FILTER (
+                    'Transaction Department',
+                    (
+                        PATHCONTAINS (
+                            @Department_Key,
+                            'Transaction Department'[Transaction Department Key]
+                        ) || @Department_Key = "-1"
+                            &amp;&amp; @Analyse_Type = "Transaction"
+                    )
+                        || @Analyse_Type = "Job"
+                ),
+                FILTER (
+                    VALUES ( 'Recognition Date'[Month Date] ),
+                    (
+                        'Recognition Date'[Month Date] = VALUE ( @Report_Month )
+                            &amp;&amp; @Date_Type = "Recognition"
+                    )
+                        || @Date_Type = "Post"
+                ),
+                FILTER (
+                    VALUES ( 'Post Date'[Month Date] ),
+                    (
+                        'Post Date'[Month Date] = VALUE ( @Report_Month )
+                            &amp;&amp; @Date_Type = "Post"
+                    )
+                        || @Date_Type = "Recognition"
+                ),
+                FILTER (
+                    VALUES ( 'Shipment'[__Is Shipping] ),
+                    NOT ( ISBLANK ( 'Shipment'[__Is Shipping] ) )
+                ),
+                // filter only shipments
+                "Job Profit", 'GL Transaction'[Job Profit]
+            ),
+            NOT ( ISBLANK ( [Job Profit] ) )
+        ),
+        ROUND ( [Job Profit], 0 ) + RAND (), DESC
+    ),
+    "Container Mode", [Container Mode]
+)
+,
+DATATABLE (
+		"Container Mode", STRING, 
+		{ 
+			{"Other"} 
+		} 
+	)
+)</CommandText>
+      <rd:DesignerState>
+        <QueryDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/AnalysisServices/QueryDefinition">
+          <CommandType>DMX</CommandType>
+          <Type>Query</Type>
+          <QuerySpecification xsi:type="DMXQuerySpecification">
+            <Select>
+              <Items>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[Container Mode]</ColumnName>
+                  </ID>
+                  <ItemCaption>[Container Mode]</ItemCaption>
+                </Item>
+              </Items>
+            </Select>
+            <AutoExecute>false</AutoExecute>
+            <Data>&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;DataminingQueryBuilderState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;SelectTablesControlState&gt;
+    &lt;Tables /&gt;
+  &lt;/SelectTablesControlState&gt;
+  &lt;IsSingletonQuery&gt;false&lt;/IsSingletonQuery&gt;
+  &lt;View&gt;Text&lt;/View&gt;
+  &lt;QueryText&gt;EVALUATE
+SELECTCOLUMNS (
+    TOPN (
+        2,
+        FILTER (
+            SUMMARIZECOLUMNS (
+                'Shipment'[Container Mode],
+                FILTER (
+                    VALUES ( 'Shipment'[Container Mode] ),
+                    ISBLANK ( 'Shipment'[Container Mode] ) = FALSE
+                        &amp;amp;&amp;amp; LEN ( 'Shipment'[Container Mode] ) &amp;gt; 0
+                ),
+                FILTER (
+                    'Company Branch',
+                    (
+                        PATHCONTAINS ( @Branch_Key, 'Company Branch'[Branch Key] )
+                            &amp;amp;&amp;amp; @Analyse_Type = "Job"
+                    )
+                        || @Analyse_Type = "Transaction"
+                ),
+                FILTER (
+                    'Transaction Company Branch',
+                    (
+                        PATHCONTAINS (
+                            @Branch_Key,
+                            'Transaction Company Branch'[Transaction Branch Key]
+                        )
+                            &amp;amp;&amp;amp; @Analyse_Type = "Transaction"
+                    )
+                        || @Analyse_Type = "Job"
+                ),
+                FILTER (
+                    'Department',
+                    (
+                        PATHCONTAINS ( @Department_Key, 'Department'[Department Key] )
+                            &amp;amp;&amp;amp; @Analyse_Type = "Job"
+                    )
+                        || @Analyse_Type = "Transaction"
+                ),
+                FILTER (
+                    'Transaction Department',
+                    (
+                        PATHCONTAINS (
+                            @Department_Key,
+                            'Transaction Department'[Transaction Department Key]
+                        )
+                            &amp;amp;&amp;amp; @Analyse_Type = "Transaction"
+                    )
+                        || @Analyse_Type = "Job"
+                ),
+                FILTER (
+                    VALUES ( 'Recognition Date'[Month Date] ),
+                    (
+                        'Recognition Date'[Month Date] = VALUE ( @Report_Month )
+                            &amp;amp;&amp;amp; @Date_Type = "Recognition"
+                    )
+                        || @Date_Type = "Post"
+                ),
+                FILTER (
+                    VALUES ( 'Post Date'[Month Date] ),
+                    (
+                        'Post Date'[Month Date] = VALUE ( @Report_Month )
+                            &amp;amp;&amp;amp; @Date_Type = "Post"
+                    )
+                        || @Date_Type = "Recognition"
+                ),
+                FILTER (
+                    VALUES ( 'Shipment'[__Is Shipping] ),
+                    NOT ( ISBLANK ( 'Shipment'[__Is Shipping] ) )
+                ),
+                // filter only shipments
+                "Job Profit", 'GL Transaction'[Job Profit]
+            ),
+            NOT ( ISBLANK ( [Job Profit] ) )
+        ),
+        ROUND ( [Job Profit], 0 ) + RAND (), DESC
+    ),
+    "Container Mode", [Container Mode]
+)&lt;/QueryText&gt;
+  &lt;DatabaseId /&gt;
+  &lt;MiningStructureId /&gt;
+  &lt;MiningModelId /&gt;
+  &lt;ColumnMappings /&gt;
+  &lt;GridRows /&gt;
+&lt;/DataminingQueryBuilderState&gt;</Data>
+          </QuerySpecification>
+          <Query>
+            <Statement>EVALUATE
+SELECTCOLUMNS (
+    TOPN (
+        2,
+        FILTER (
+            SUMMARIZECOLUMNS (
+                'Shipment'[Container Mode],
+                FILTER (
+                    VALUES ( 'Shipment'[Container Mode] ),
+                    ISBLANK ( 'Shipment'[Container Mode] ) = FALSE
+                        &amp;&amp; LEN ( 'Shipment'[Container Mode] ) &gt; 0
+                ),
+                FILTER (
+                    'Company Branch',
+                    (
+                        PATHCONTAINS ( @Branch_Key, 'Company Branch'[Branch Key] )
+                            &amp;&amp; @Analyse_Type = "Job"
+                    )
+                        || @Analyse_Type = "Transaction"
+                ),
+                FILTER (
+                    'Transaction Company Branch',
+                    (
+                        PATHCONTAINS (
+                            @Branch_Key,
+                            'Transaction Company Branch'[Transaction Branch Key]
+                        )
+                            &amp;&amp; @Analyse_Type = "Transaction"
+                    )
+                        || @Analyse_Type = "Job"
+                ),
+                FILTER (
+                    'Department',
+                    (
+                        PATHCONTAINS ( @Department_Key, 'Department'[Department Key] )
+                            &amp;&amp; @Analyse_Type = "Job"
+                    )
+                        || @Analyse_Type = "Transaction"
+                ),
+                FILTER (
+                    'Transaction Department',
+                    (
+                        PATHCONTAINS (
+                            @Department_Key,
+                            'Transaction Department'[Transaction Department Key]
+                        )
+                            &amp;&amp; @Analyse_Type = "Transaction"
+                    )
+                        || @Analyse_Type = "Job"
+                ),
+                FILTER (
+                    VALUES ( 'Recognition Date'[Month Date] ),
+                    (
+                        'Recognition Date'[Month Date] = VALUE ( @Report_Month )
+                            &amp;&amp; @Date_Type = "Recognition"
+                    )
+                        || @Date_Type = "Post"
+                ),
+                FILTER (
+                    VALUES ( 'Post Date'[Month Date] ),
+                    (
+                        'Post Date'[Month Date] = VALUE ( @Report_Month )
+                            &amp;&amp; @Date_Type = "Post"
+                    )
+                        || @Date_Type = "Recognition"
+                ),
+                FILTER (
+                    VALUES ( 'Shipment'[__Is Shipping] ),
+                    NOT ( ISBLANK ( 'Shipment'[__Is Shipping] ) )
+                ),
+                // filter only shipments
+                "Job Profit", 'GL Transaction'[Job Profit]
+            ),
+            NOT ( ISBLANK ( [Job Profit] ) )
+        ),
+        ROUND ( [Job Profit], 0 ) + RAND (), DESC
+    ),
+    "Container Mode", [Container Mode]
+)</Statement>
+            <ParameterDefinitions>
+              <ParameterDefinition>
+                <Name>Branch_Key</Name>
+                <DefaultValues>
+                  <DefaultValue>0</DefaultValue>
+                </DefaultValues>
+                <Caption>Branch_Key</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Department_Key</Name>
+                <DefaultValues>
+                  <DefaultValue>0</DefaultValue>
+                </DefaultValues>
+                <Caption>Department_Key</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Report_Month</Name>
+                <DefaultValues>
+                  <DefaultValue>DATE(2015,10,1)</DefaultValue>
+                </DefaultValues>
+                <Caption>Report_Month</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Date_Type</Name>
+                <DefaultValues>
+                  <DefaultValue>Date_Type</DefaultValue>
+                </DefaultValues>
+                <Caption>Date_Type</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Analyse_Type</Name>
+                <DefaultValues>
+                  <DefaultValue>Analyse_Type</DefaultValue>
+                </DefaultValues>
+                <Caption>Analyse_Type</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+            </ParameterDefinitions>
+          </Query>
+        </QueryDefinition>
+      </rd:DesignerState>
+    </Query>
+    <Fields>
+      <Field Name="Container_Mode">
+        <DataField>[Container Mode]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

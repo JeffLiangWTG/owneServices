@@ -1,0 +1,263 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:ui="clr-namespace:CargoWise.Main.Navigation.WPF;assembly=CargoWise.Main.Navigation"
+                    xmlns:local="clr-namespace:CargoWise.Main.Navigation"
+                    mc:Ignorable="d">
+
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary Source="../NextHomeResources.xaml"/>
+		<ResourceDictionary Source="../../Startup/Login/Resources/LoginStyles.xaml"/>
+	</ResourceDictionary.MergedDictionaries>
+
+	<!-- Disabled State Brushes -->
+	<SolidColorBrush x:Key="DisabledBorderBrush" Color="#FFCCCCCC"/>
+	<SolidColorBrush x:Key="DisabledBackgroundBrush" Color="#FFF0F0F0"/>
+	<SolidColorBrush x:Key="DisabledForegroundBrush" Color="Gray"/>
+
+	<!-- Container Style -->
+	<Style x:Key="ContainerStyle" TargetType="Border">
+		<Setter Property="Padding" Value="16,16,3,16"/>
+		<Setter Property="Background" Value="{StaticResource CategoryBackgroundBrush}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+		<Setter Property="CornerRadius" Value="8"/>
+	</Style>
+
+	<!-- Label Style with Asterisk -->
+	<Style x:Key="BaseLabelWithAsterisk" 
+           TargetType="ui:MultilingualTextLabel"
+           BasedOn="{StaticResource BaseLabel}">
+		<Setter Property="TextBlock.FontSize" Value="13"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="ui:MultilingualTextLabel">
+					<StackPanel Orientation="Horizontal">
+						<ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+
+						<ui:MultilingualTextLabel IsTranslatable="False"><TextBlock Text="*" 
+								                                                Foreground="Red"
+								                                                Margin="2,0,0,0"/>
+						</ui:MultilingualTextLabel>
+					</StackPanel>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<!-- ComboBox Components -->
+	<DrawingGroup x:Key="SearchIconGroup">
+		<DrawingGroup.ClipGeometry>
+			<RectangleGeometry Rect="0.0,0.0,20.0,20.0"/>
+		</DrawingGroup.ClipGeometry>
+		<DrawingGroup>
+			<GeometryDrawing Brush="#ff474746" Geometry="{StaticResource EmptyStarGeometry}"/>
+		</DrawingGroup>
+	</DrawingGroup>
+
+	<DrawingImage x:Key="SearchIconImage" Drawing="{StaticResource SearchIconGroup}"/>
+
+	<Style x:Key="ComboboxButtonStyle" TargetType="{x:Type ToggleButton}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type ToggleButton}">
+					<Border Background="White" 
+                            x:Name="border" 
+                            CornerRadius="0,5,5,0" 
+                            BorderThickness="0,1,1,1"  
+                            BorderBrush="{StaticResource BorderBrush}">
+						<ContentPresenter/>
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="ComboboxTextBoxStyle" TargetType="{x:Type TextBox}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type TextBox}">
+					<Grid>
+						<Border CornerRadius="5,0,0,5" 
+                                BorderThickness="1,1,0,1"  
+                                Background="{TemplateBinding Background}"  
+                                BorderBrush="{StaticResource BorderBrush}">
+							<ScrollViewer x:Name="PART_ContentHost"
+                                         FontSize="{TemplateBinding FontSize}"
+                                         Foreground="{TemplateBinding Foreground}"
+                                         VerticalAlignment="Center"
+                                         HorizontalAlignment="Stretch"/>
+						</Border>
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<!-- Main ComboBox Style -->
+	<Style x:Key="SnapshotComboBoxStyle" TargetType="{x:Type ComboBox}">
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="Height" Value="32"/>
+		<Setter Property="FontSize" Value="13"/>
+		<Setter Property="Foreground" Value="{StaticResource NeutralTextColor}"/>
+		<Setter Property="Background" Value="{StaticResource NeutralColor}"/>
+		<Setter Property="BorderBrush" Value="{StaticResource CategoryBackgroundBrush}"/>
+		<Setter Property="HorizontalContentAlignment" Value="Left"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type ComboBox}">
+					<Grid HorizontalAlignment="Stretch">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="25"/>
+						</Grid.ColumnDefinitions>
+
+						<!-- Editable TextBox -->
+						<TextBox Name="PART_EditableTextBox"  
+                                 Style="{StaticResource ComboboxTextBoxStyle}"  
+                                 Padding="0,0,0,0"
+                                 HorizontalAlignment="Stretch"
+                                 HorizontalContentAlignment="Stretch"
+                                 Height="{TemplateBinding Height}"
+                                 Background="{TemplateBinding Background}"
+                                 BorderBrush="{TemplateBinding BorderBrush}"/>
+
+						<!-- Dropdown Toggle Button -->
+						<ToggleButton Grid.Column="1"
+                                      x:Name="ToggleButton"
+                                      Height="{TemplateBinding Height}"  
+                                      Style="{StaticResource ComboboxButtonStyle}"  
+                                      Focusable="False"  
+                                      IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"  
+                                      ClickMode="Press"
+                                      Background="{TemplateBinding Background}"  
+                                      BorderBrush="{TemplateBinding BorderBrush}">
+							<Path HorizontalAlignment="Center"  
+                                  VerticalAlignment="Center"  
+                                  Data="M8.41784 3.41567C7.1931 3.50708 5.97291 4.0464 5.10021 4.88207C3.96936 5.96493 3.36879 7.41252 3.41055 8.95484C3.41536 9.13317 3.42862 9.35468 3.43999 9.44708C3.62973 10.9896 4.44985 12.3614 5.70884 13.2422C6.49874 13.7948 7.33485 14.1022 8.31984 14.2022C8.58251 14.2288 9.16516 14.2253 9.41184 14.1956C9.77068 14.1524 10.1216 14.0774 10.4408 13.9757C11.0552 13.78 11.7626 13.4029 12.1956 13.0403L12.2704 12.9777L14.0296 14.7355C14.9972 15.7023 15.814 16.5087 15.8448 16.5275C15.9699 16.6041 16.1621 16.6132 16.3018 16.5492C16.3978 16.5052 16.505 16.3981 16.5489 16.3021C16.6129 16.1623 16.6038 15.9702 16.5273 15.8451C16.5084 15.8143 15.7019 14.9973 14.735 14.0296L12.977 12.2702L13.0537 12.1746C13.5556 11.5495 13.9257 10.7739 14.0946 9.9929C14.1871 9.56496 14.2203 9.24523 14.2196 8.78908C14.219 8.41891 14.2051 8.24357 14.1501 7.91408C13.9641 6.79932 13.4013 5.72494 12.5961 4.94783C11.5451 3.93339 10.2131 3.39684 8.77484 3.40857C8.61314 3.40989 8.45249 3.4131 8.41784 3.41567ZM8.57179 4.41593C7.48045 4.46683 6.37085 4.97932 5.62588 5.77656C4.92525 6.52635 4.52531 7.40702 4.42835 8.41352C4.39487 8.76098 4.41447 9.24631 4.47574 9.58708C4.59156 10.2313 4.87997 10.9037 5.26541 11.4281C5.7889 12.1403 6.5628 12.7061 7.39696 12.9866C8.16554 13.245 9.00131 13.2901 9.78118 13.1152C10.3345 12.9911 10.9161 12.7297 11.388 12.3931C11.7662 12.1234 12.1453 11.7373 12.4319 11.3301C13.2033 10.2338 13.4261 8.79162 13.0223 7.50808C12.8462 6.94833 12.5513 6.40833 12.1851 5.97539C11.2895 4.91629 9.97813 4.35033 8.57179 4.41593Z"  
+                                  Fill="#8D8C88"/>
+						</ToggleButton>
+
+						<!-- Content Presenter -->
+						<ContentPresenter Name="ContentSite"  
+                                          Content="{TemplateBinding SelectionBoxItem}"  
+                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"  
+                                          ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"  
+                                          VerticalAlignment="Center"  
+                                          HorizontalAlignment="Left"  
+                                          Margin="5,0,0,0"/>
+
+						<!-- Dropdown Popup -->
+						<Popup Name="Popup" 
+                               Placement="Bottom"  
+                               IsOpen="{TemplateBinding IsDropDownOpen}"  
+                               PopupAnimation="Slide">
+							<Grid Name="DropDown" 
+                                  SnapsToDevicePixels="True"          
+                                  Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                  MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                  Background="White"
+                                  MinHeight="50">
+								<Border x:Name="DropDownBorder"  
+                                        BorderThickness="1"  
+                                        CornerRadius="5"  
+                                        BorderBrush="{StaticResource BorderBrush}"/>
+								<ScrollViewer Style="{StaticResource DefaultScrollViewerStyle}"
+                                              FontSize="{TemplateBinding FontSize}"
+                                              Foreground="{TemplateBinding Foreground}"
+                                              Margin="4,6,4,6" 
+                                              SnapsToDevicePixels="True">
+									<StackPanel IsItemsHost="True" 
+                                                KeyboardNavigation.DirectionalNavigation="Contained"
+                                                x:Name="ItemsPresenter"/>
+								</ScrollViewer>
+								<TextBlock x:Name="EmptyPrompt"
+                                           Text="{Binding Path=(local:ComboBoxHelper.EmptyPrompt), 
+                                           RelativeSource={RelativeSource TemplatedParent}}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Foreground="{StaticResource NoModulesTextBrush}"
+                                           Visibility="Collapsed"/>
+							</Grid>
+						</Popup>
+					</Grid>
+
+					<ControlTemplate.Triggers>
+						<DataTrigger Binding="{Binding ItemsSource.Count, RelativeSource={RelativeSource Self}}" Value="0">
+							<Setter TargetName="EmptyPrompt" Property="Visibility" Value="Visible"/>
+							<Setter TargetName="ItemsPresenter" Property="Visibility" Value="Collapsed"/>
+						</DataTrigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+
+		<Style.Triggers>
+			<Trigger Property="IsEnabled" Value="False">
+				<Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}"/>
+				<Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}"/>
+				<Setter Property="BorderBrush" Value="{StaticResource DisabledBorderBrush}"/>
+			</Trigger>
+		</Style.Triggers>
+	</Style>
+
+	<!-- Add Button Style -->
+	<Style x:Key="AddButton" TargetType="{x:Type Button}" BasedOn="{StaticResource BaseButton}">
+		<Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+		<Setter Property="Foreground" Value="{StaticResource PrimaryTextColor}"/>
+		<Setter Property="BorderBrush" Value="{StaticResource PrimaryColor}"/>
+		<Setter Property="FontSize" Value="13"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="Button">
+					<Border x:Name="border" 
+                            CornerRadius="4"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+							Padding="6,1,6,1"
+                            SnapsToDevicePixels="True">
+						<ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True"/>
+					</Border>
+
+					<ControlTemplate.Triggers>
+						<Trigger Property="IsEnabled" Value="False">
+							<Setter TargetName="border" Property="Background" Value="{StaticResource DisabledBackgroundBrush}"/>
+							<Setter TargetName="border" Property="BorderBrush" Value="{StaticResource DisabledBorderBrush}"/>
+							<Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}"/>
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="CancelButton" TargetType="{x:Type Button}" BasedOn="{StaticResource BaseButton}">
+		<Setter Property="Foreground" Value="{StaticResource NeutralTextColor}"/>
+		<Setter Property="FontSize" Value="13"/>
+		<Setter Property="Cursor" Value="Hand"/>
+
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="Button">
+					<ContentPresenter HorizontalAlignment="Center"
+					                  VerticalAlignment="Center"
+					                  RecognizesAccessKey="True"/>
+					<ControlTemplate.Triggers>
+						<Trigger Property="IsMouseOver" Value="True">
+							<Setter Property="Background" Value="{StaticResource NeutralColor}"/>
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+</ResourceDictionary>

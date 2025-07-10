@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="varer" type="vareListe"/>
+
+  <xs:complexType name="vareListe">
+    <xs:complexContent>
+      <xs:extension base="norskDataset">
+        <xs:sequence>
+          <xs:element name="vare" type="AvtaleSats" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="norskDataset" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="dataset">
+        <xs:sequence>
+          <xs:element name="versjon" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="dataset" abstract="true">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="AvtaleSats" final="extension restriction">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="enhet" type="xs:string" minOccurs="0"/>
+      <xs:element name="enhetBeskrivelse" type="xs:string" minOccurs="0"/>
+      <xs:element name="annenEnhet" type="xs:string" minOccurs="0"/>
+      <xs:element name="annenEnhetBeskrivelse" type="xs:string" minOccurs="0"/>
+      <xs:element name="avtalesatser" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="avtale" type="Avtale" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Avtale">
+    <xs:sequence>
+      <xs:element name="landgruppe" type="xs:string" minOccurs="0"/>
+      <xs:element name="sats" type="Sats" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Sats">
+    <xs:sequence>
+      <xs:element name="satsVerdi" type="xs:string" minOccurs="0"/>
+      <xs:element name="satsEnhet" type="xs:string" minOccurs="0"/>
+      <xs:element name="satsEnhetBeskrivelse" type="xs:string" minOccurs="0"/>
+      <xs:element name="fomdato" type="xs:string" minOccurs="0"/>
+      <xs:element name="tomdato" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

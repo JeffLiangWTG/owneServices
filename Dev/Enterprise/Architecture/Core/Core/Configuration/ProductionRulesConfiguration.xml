@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<objects xmlns="http://www.springframework.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cargowise="http://www.cargowise.com/2008/spring-extensions" xsi:schemaLocation="http://www.springframework.net http://www.springframework.net/xsd/spring-objects.xsd" default-lazy-init="true">
+  <!-- Avoid using use singleton=true as this causes Spring to cache the object without the developer understanding the effects of this -->
+  <!-- The xmlns:cargowise namespace works in conjunction with LazyConfiguredApplicationContext to prevent types being loaded unnecessarily on startup -->
+  <object id="ProductionRule" type="Enterprise.ProductionRules.Business.ProductionRule, Enterprise.ProductionRules.Business" singleton="false" />
+  <object id="ProductionRuleScheduleQueue" type="Enterprise.ProductionRules.Business.ProductionRuleScheduleQueue, Enterprise.ProductionRules.Business" singleton="false" />
+  <object id="ProductionRuleSet" type="Enterprise.ProductionRules.Business.ProductionRuleSet, Enterprise.ProductionRules.Business" singleton="false" />
+  <object id="IProductionRuleSet" type="Enterprise.ProductionRules.Business.ProductionRuleSet, Enterprise.ProductionRules.Business" singleton="false" />
+  <object id="IProductionRuleScheduleTask" type="Enterprise.ProductionRules.ServiceTasks.ProductionRuleScheduleTask, Enterprise.ProductionRules.ServiceTasks" singleton="false" />
+  <object id="IUserHaltableProductionRulesEngineService" type="Enterprise.ProductionRules.GUI.UserHaltableProductionRulesEngineService, Enterprise.ProductionRules.GUI" singleton="true" />
+  <object id="IProductionRulesEnginePushService" type="Enterprise.ProductionRules.Business.CW1ProductionRulesEngineService, Enterprise.ProductionRules.Business" singleton="false" />
+  <object id="IProductionRulesEnginePullService" type="Enterprise.ProductionRules.Business.CW1ProductionRulesEnginePullService, Enterprise.ProductionRules.Business" singleton="false" />
+  <object id="IScheduledRuleLoader" type="Enterprise.ProductionRules.ServiceTasks.ScheduledRuleLoader, Enterprise.ProductionRules.ServiceTasks" singleton="false">
+    <constructor-arg index="0" ref="IScheduledRuleProcessorFactory" />
+  </object>
+  <object id="IScheduledRuleProcessorFactory" type="Enterprise.ProductionRules.ServiceTasks.ScheduledRuleProcessorFactory, Enterprise.ProductionRules.ServiceTasks" singleton="false" />
+  <object id="IScheduledProductionRuleQueueConsumer" type="Enterprise.ProductionRules.ServiceTasks.ScheduledProductionRuleQueueConsumer, Enterprise.ProductionRules.ServiceTasks" singleton="false">
+    <constructor-arg index="0" ref="IScheduledRuleLoader" />
+    <constructor-arg index="1" ref="IProductionRulesEnginePullService" />
+  </object>
+  <object id="ScheduledRuleProcessors" type="CargoWise.Application.KeyObjectHandleDictionaryObject, CargoWise.ApplicationContext" singleton="true">
+    <property name="SourceDictionary">
+      <dictionary>
+        <entry>
+          <key>
+            <value>ProductWarehouseWaveCreation</value>
+          </key>
+          <value>WaveCreationRuleProcessor</value>
+        </entry>
+        <entry>
+          <key>
+            <value>ProductWarehouseCycleCountTaskCreation</value>
+          </key>
+          <value>CycleCountTaskCreationRuleProcessor</value>
+        </entry>
+        <entry>
+          <key>
+            <value>TransitWarehouseCycleCountAutomation</value>
+          </key>
+          <value>TransitCycleCountAutomationProcessor</value>
+        </entry>
+      </dictionary>
+    </property>
+  </object>
+  <object id="WaveCreationRuleProcessor" type="Enterprise.Warehouse.Transactions.Business.WaveCreationRuleProcessor, Enterprise.Warehouse.Transactions.Business" singleton="true">
+    <constructor-arg index="0" ref="IPartiallyReplenishedPickSplitter" />
+  </object>
+  <object id="CycleCountTaskCreationRuleProcessor" type="Enterprise.Warehouse.Transactions.Business.CycleCountTaskCreationRuleProcessor, Enterprise.Warehouse.Transactions.Business" singleton="true">
+    <constructor-arg index="0" ref="IWhsCycleCountLocationCreator" />
+    <constructor-arg index="1" ref="ICycleCountLocationTaskCreationFactLoader" />
+  </object>
+  <object id="TransitCycleCountAutomationProcessor" type="Enterprise.Warehouse.Transit.Business.TransitCycleCountAutomationProcessor, Enterprise.Warehouse.Transit.Business" singleton="true">
+    <constructor-arg index="0" ref="IWhsItemCycleCountLocationCreator" />
+  </object>
+</objects>

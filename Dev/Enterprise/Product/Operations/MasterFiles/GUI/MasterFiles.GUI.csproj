@@ -1,0 +1,95 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <AssemblyName>Enterprise.MasterFiles.GUI</AssemblyName>
+    <RootNamespace>Enterprise.MasterFiles.GUI</RootNamespace>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+    <Configurations>Debug;Release;DEBUGFAST</Configurations>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Compile Remove="Winzor\**" />
+    <EmbeddedResource Remove="Winzor\**" />
+    <None Remove="Winzor\**" />
+    <Page Remove="Winzor\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.Main.Navigation" />
+    <Reference Include="Enterprise.RemoteDesktopServices.Shared" />
+    <Reference Include="ServiceManager.Integration.ServiceTasks.CW" />
+    <Reference Include="CargoWise.Interop" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Resources.Extensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Accounting\Registry\ThirdPartyIntegrationCredentials\D365CredentialsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="CreditCheckReport\CreditAppraisalList.cs">
+      <DependentUpon>CreditAppraisalList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="CreditCheckReport\FinancialStrengthList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FinancialStrengthList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="ReferenceFiles\RefShippingLine\RefShippingLineEBLProviderControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+    <None Update="CreditCheckReport\CreditAppraisalList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>CreditAppraisalList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.MasterFiles.GUI</CustomToolNamespace>
+    </None>
+    <None Update="CreditCheckReport\FinancialStrengthList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>FinancialStrengthList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.MasterFiles.GUI</CustomToolNamespace>
+    </None>
+    <Resource Include="CreditCheckReport\Resource\Image\ComingSoonBackground.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\CommercialBureauInquiryReport-BG.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\CommercialBureauInquiryReport.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\ComprehensiveReport-BG.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\ComprehensiveReport.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\FailureRiskReport-BG.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\FailureRiskReport.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\InfoGrey.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\ION-RGB-Logo.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\LatePaymentRiskReport-BG.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\LatePaymentRiskReport.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\TickGreen.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\WarningOrange.png" />
+    <Resource Include="CreditCheckReport\Resource\Image\WarningRed.png" />
+    <Content Include="Resources\cfr_freight.png" />
+    <Content Include="Resources\railfreight.png" />
+    <Content Include="Resources\roadfreight.png" />
+    <Content Include="Resources\Female.png" />
+    <Content Include="Resources\Male.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\..\..\..\Common\Tools\OutlookUtilities\OutlookUtilities.Test\Testing\TestOutlookMsg.msg" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+  <ItemGroup>
+    <AdditionalFiles Remove="Winzor\**" />
+  </ItemGroup>
+</Project>

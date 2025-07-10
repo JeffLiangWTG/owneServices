@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="copyright" content="Copyright (c)Japan Tariff Association">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <link rel="stylesheet" type="text/css" href="https://www.kanzei.or.jp/statistical/css/statistical.css">
+    <link rel="stylesheet" type="text/css" href="https://www.kanzei.or.jp/statistical/css/popupwindow/popupwindow.css">
+    <script type="text/javascript" src="https://www.kanzei.or.jp/statistical/js/jquery.js"></script>
+    <script type="text/javascript" src="https://www.kanzei.or.jp/statistical/js/popupwindow.js"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FCKLGTJLTY"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-FCKLGTJLTY');
+    </script>
+    <script type="text/javascript">
+        $.ajaxSetup({ cache: false });
+        $(function () {
+            $("#opt_alphabet").change(function () {
+                var alphabet = $("#opt_alphabet").val();
+                var strurl = encodeURI("https://www.kanzei.or.jp/statistical/tariff/detail/countryoptions/e/" + alphabet);
+                $.getJSON(strurl, function (json) {
+                    var opt_country = window.document.getElementById("opt_country");
+                    opt_country.length = 0;
+                    for (var i = 0; i < json.list.length; i++) {
+                        opt_country.options[opt_country.length] = new Option(json.list[i].nm, json.list[i].cd);
+                    }
+                    opt_country.selectedIndex = 0;
+                });
+            });
+
+            $("#btn_apply").click(function () {
+                var alphabet_cd = $("#opt_alphabet").val();
+                var country_cd = $("#opt_country").val();
+                var strurl = encodeURI("https://www.kanzei.or.jp/statistical/tariff/detail/setcountry/" + alphabet_cd + "/" + country_cd);
+                $.getJSON(strurl, function (json) {
+                    $("#msg").text(json.msg);
+                });
+            });
+            $("a.notelink").click(function () {
+                /*
+                var pop = new $pop(
+                        $(this).attr('href'),
+                        {
+                            type: 'iframe',
+                            width: 800,
+                            height: 600,
+                            resize: true
+                        }
+                    );
+                */
+                window.open(this.href, "WindowName", "width=800,height=600,resizable=yes,scrollbars=yes");
+                return false;
+            });
+        });
+    </script>
+    <script type="text/javascript" src="/statistical/js/fixed_midashi.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://www.kanzei.or.jp/statistical/css/tariff.css">
+    <title>webTARIFF</title>
+</head>
+<body onCopy="return false;" onContextmenu="return false;" onLoad="FixedMidashi.create();">
+    <!-- body onLoad="FixedMidashi.create();" -->
+    <div id="pagewidth">
+        <div id="header">
+            <table>
+                <tr>
+                    <td><h1 id="title_e">webTARIFF</h1></td>
+                    <td>&#x3010;2023-07-12&#x3011;</td>
+                </tr>
+            </table>
+        </div><!-- end header -->
+        <div class="navi1_container">
+            <div class="navi1_right">
+                <table>
+                    <tr>
+                        <th class="right">Country or Territory&nbsp;</th>
+                        <td>
+                            <select name="opt_alphabet" id="opt_alphabet">
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                                <option value="E">E</option>
+                                <option value="F">F</option>
+                                <option value="G">G</option>
+                                <option value="H">H</option>
+                                <option value="I">I</option>
+                                <option value="J">J</option>
+                                <option value="K">K</option>
+                                <option value="L">L</option>
+                                <option value="M">M</option>
+                                <option value="N">N</option>
+                                <option value="O">O</option>
+                                <option value="P">P</option>
+                                <option value="Q">Q</option>
+                                <option value="R">R</option>
+                                <option value="S">S</option>
+                                <option value="T">T</option>
+                                <option value="U">U</option>
+                                <option value="V">V</option>
+                                <option value="W">W</option>
+                                <option value="X">X</option>
+                                <option value="Y">Y</option>
+                                <option value="Z">Z</option>
+                            </select><select name="opt_country" id="opt_country">
+                                <option value="zzz">ALL</option>
+                                <option value="130">130 Afghanistan</option>
+                                <option value="229">229 Albania</option>
+                                <option value="503">503 Algeria</option>
+                                <option value="622">622 American Oceania</option>
+                                <option value="621">621 American Samoa</option>
+                                <option value="212">212 Andorra</option>
+                                <option value="535">535 Angola</option>
+                                <option value="331">331 Antigua and Barbuda</option>
+                                <option value="413">413 Argentina</option>
+                                <option value="151">151 Armenia</option>
+                                <option value="601">601 Australia</option>
+                                <option value="225">225 Austria</option>
+                                <option value="150">150 Azerbaijan</option>
+                                <option value="216">216 Azores (Portugal)</option>
+                            </select><input type="button" id="btn_apply" value="Select">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><span id="msg"></span></td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <ul id="navi1">
+                    <li><a href="https://www.kanzei.or.jp/statistical/tariff/top/index/e">&lt;&lt;Return TOP</a></li>
+                    <li><a href="https://www.kanzei.or.jp/statistical/tariff/headline/hs1dig/j">Japanese</a></li>
+                </ul>
+            </div>
+            <div class="navi1_clear"></div>
+        </div>
+
+        <div id="outer">
+            <div id="inner">
+
+                <div id="leftcol">
+                    <div class="content">
+                        <ul id="navi2">
+                            <li><a href="#hs1dig01" title="Live animals; animal products">section 01</a></li>
+                            <li><a href="#hs1dig02" title="Vegetable products">section 02</a></li>
+                            <li><a href="#hs1dig03" title="Animal, vegetable or microbial fats and oils and their cleavage products; prepared edible fats; animal or vegetable waxes">section 03</a></li>
+                            <li><a href="#hs1dig04" title="Prepared foodstuffs; beverages, spirits and vinegar; tobacco and manufactured tobacco substitutes; products, whether or not containing nicotine, intended for inhalation without combustion; other nicotine containing products intended for the intake of nicotine into the human body">section 04</a></li>
+                            <li><a href="#hs1dig05" title="Mineral products">section 05</a></li>
+                            <li><a href="#hs1dig06" title="Products of the chemical or allied industries">section 06</a></li>
+                            <li><a href="#hs1dig07" title="Plastics and articles thereof; rubber and articles thereof">section 07</a></li>
+                            <li><a href="#hs1dig08" title="Raw hides and skins, leather, furskins and articles thereof; saddlery and harness; travel goods, handbags and similar containers; articles of animal gut (other than silk-worm gut)">section 08</a></li>
+                            <li><a href="#hs1dig09" title="Wood and articles of wood; wood charcoal; cork and articles of cork; manufactures of straw, of esparto or of other plaiting materials; basketware and wickerwork">section 09</a></li>
+                            <li><a href="#hs1dig10" title="Pulp of wood or of other fibrous cellulosic material; recovered (waste and scrap) paper or paperboard; paper and paperboard and articles thereof">section 10</a></li>
+                            <li><a href="#hs1dig11" title="Textiles and textile articles">section 11</a></li>
+                            <li><a href="#hs1dig12" title="Footwear, headgear, umbrellas, sun umbrellas, walking-sticks, seat-sticks, whips, riding-crops and parts thereof; prepared feathers and articles made therewith; artificial flowers; articles of human hair">section 12</a></li>
+                            <li><a href="#hs1dig13" title="Articles of stone, plaster, cement, asbestos, mica or similar materials; ceramic products; glass and glassware">section 13</a></li>
+                            <li><a href="#hs1dig14" title="Natural or cultured pearls, precious or semi-precious stones, precious metals, metals clad with precious metal, and articles thereof; imitation jewellery; coin">section 14</a></li>
+                            <li><a href="#hs1dig15" title="Base metals and articles of base metal">section 15</a></li>
+                            <li><a href="#hs1dig16" title="Machinery and mechanical appliances; electrical equipment; parts thereof; sound recorders and reproducers, television image and sound recorders and reproducers, and parts and accessories of such articles">section 16</a></li>
+                            <li><a href="#hs1dig17" title="Vehicles, aircraft, vessels and associated transport equipment">section 17</a></li>
+                            <li><a href="#hs1dig18" title="Optical, photographic, cinematographic, measuring, checking, precision, medical or surgical instruments and apparatus; clocks and watches; musical instruments; parts and accessories thereof">section 18</a></li>
+                            <li><a href="#hs1dig19" title="Arms and ammunition; parts and accessories thereof">section 19</a></li>
+                            <li><a href="#hs1dig20" title="Miscellaneous manufactured articles">section 20</a></li>
+                            <li><a href="#hs1dig21" title="Works of art, collectors' pieces and antiques">section 21</a></li>
+
+                        </ul>
+                    </div><!--end content-->
+                </div><!--end leftcol-->
+
+                <div id="maincol">
+                    <div class="content">
+
+                        <h2 id="hs1dig01">
+                            <table class="headline1">
+                                <tr class="top">
+                                    <td class="cd">section 01</td>
+                                    <td>Live animals; animal products</td>
+                                    <td class="right"><a class="notelink" href="https://www.kanzei.or.jp/statistical/popcontent/note/tariff/hs1dig/e/01">note</a></td>
+                                </tr>
+                            </table>
+                        </h2>
+                        <table class="headline2">
+                            <tr class="top">
+                                <td class="cd"><a href="https://www.kanzei.or.jp/statistical/tariff/headline/hs2dig/e/04">chapter 04</td>
+                                <td>Dairy produce; birds' eggs; natural honey; edible products of animal origin, not elsewhere specified or included</td>
+                                <td class="right"><a class="notelink" href="https://www.kanzei.or.jp/statistical/popcontent/note/tariff/hs2dig/e/04">note</a></td>
+                            </tr>
+                        </table>
+                        <h2 id="hs1dig02">
+                            <table class="headline1">
+                                <tr class="top">
+                                    <td class="cd">section 02</td>
+                                    <td>Vegetable products</td>
+                                    <td class="right"><a class="notelink" href="https://www.kanzei.or.jp/statistical/popcontent/note/tariff/hs1dig/e/02">note</a></td>
+                                </tr>
+                            </table>
+                        </h2>
+                        <table class="headline2">
+
+                            <tr class="top">
+                                <td class="cd"><a href="https://www.kanzei.or.jp/statistical/tariff/headline/hs2dig/e/08">chapter 08</td>
+                                <td>Edible fruit and nuts; peel of citrus fruit or melons</td>
+                                <td class="right"><a class="notelink" href="https://www.kanzei.or.jp/statistical/popcontent/note/tariff/hs2dig/e/08">note</a></td>
+                            </tr>
+                        </table>
+                    </div><!--end content-->
+                </div><!--end maincol-->
+
+                <div class="clr"></div>
+
+                <!--
+                <div id="footer">
+                <div class="content">
+                </div>
+                </div>
+                -->
+
+            </div><!--end inner-->
+        </div><!--end outer-->
+
+
+    </div><!-- end pagewidth -->
+</body>
+</html>

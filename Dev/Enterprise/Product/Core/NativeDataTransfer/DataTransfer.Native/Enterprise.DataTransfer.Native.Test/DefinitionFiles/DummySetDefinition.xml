@@ -1,0 +1,38 @@
+<NativeSchemaSet Name="Dummy" Root="DummyBizo">
+  <Entities>
+    <Entity Name="DummyBizo" GenerateCustomFields="false">
+      <ExcludedProperty Name ="Z0_excludedColumn"/>
+      <ExcludedProperty Name ="Z0_FK_Code"/>
+      <ExcludedFromExportProperty Name ="Z0_AnotherNumber"/>
+    </Entity>
+    <Entity Name="DummyDependentBizo" UpdateOrInsertBehaviour="True" />
+    <Entity Name="DummyDependentBizo" Suffix="Suffix" />
+    <Entity Name="DummyPivot" />
+    <Entity Name="DummyBizo" Suffix="External" External="true"/>
+
+    <Entity Name="DummyPivot" EntityName="DummyPivotForExternalChild"/>
+    <Entity Name="DummyPivot" EntityName="DummyPivotForExternalParent"/>
+    <Entity Name="DummyDependentBizo" EntityName="ChildPivotRelatedDependentBizO" External="true"/>
+    <Entity Name="DummyDependentBizo" EntityName="ParentPivotRelatedDependentBizO" External="true"/>
+    
+    <Entity Name="DummyBizo" EntityName="DummyBizoAsExternalChild"/>
+    <Entity Name="DummyBizo" EntityName="DummyBizoAsExternalParent" External="true"/>
+  </Entities>
+  <Associations>
+    <Association From="DummyDependentBizo_Suffix" To="DummyBizo" Key="ZDP_Z0" Through="DummyPivot" ChildFK="ZDP_ZD1"/>
+    <Association From="DummyPivot" Key="ZDP_Z0"/>
+    <Association From="DummyDependentBizo" To="DummyBizo" Key="ZD1_Z0" Cardinality="1"/>
+
+    <Association From="DummyPivotForExternalChild" To="DummyBizo" Key="ZDP_Z0"/>
+    <Association From="DummyPivotForExternalChild" To="ChildPivotRelatedDependentBizO" Key="ZDP_ZD1" />
+    <Association From="DummyBizoAsExternalChild" To="ChildPivotRelatedDependentBizO" Key="Z0_Guid" ExternalChild="true"/>
+
+    <Association From="DummyPivotForExternalParent" To="DummyPivotForExternalChild" Key="ZDP_Z0"/>
+    <Association From="DummyPivotForExternalParent" To="ParentPivotRelatedDependentBizO" Key="ZDP_ZD1" />
+    <Association From="ParentPivotRelatedDependentBizO" To="DummyBizoAsExternalParent" Key="ZD1_Z0" ExternalParent="true"/>
+
+  </Associations>
+  <EDICodeMappings>
+    <Mapping Table="DummyBizo" PropertyName="Description" RelationshipResolver="LRR" />
+  </EDICodeMappings>
+</NativeSchemaSet>

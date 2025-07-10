@@ -1,0 +1,23 @@
+meta {
+  name: Delivery fields are not available for non-JobCharges query
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.DeliveryOrg = "ORG";
+   query.DeliveryAddrCode = "ADDR";
+   query.DeliveryCity = "CITY";
+   query.DeliveryPostcode = "POSTCODE";
+   
+   req.setBody(query);
+}

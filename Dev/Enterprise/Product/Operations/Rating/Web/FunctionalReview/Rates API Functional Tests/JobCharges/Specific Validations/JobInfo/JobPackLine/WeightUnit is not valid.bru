@@ -1,0 +1,55 @@
+meta {
+  name: WeightUnit is not valid
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.TransportMode = "SEA";
+   query.ContainerMode = "FCL";
+   
+   query.JobInfo = {
+       Containers: [
+           {
+               ContainerTypeCWCode : "20GP",
+               Number : "2983743874",
+               Unit: 2,
+               Commodity: "GEN",
+               Ownership: "CAR",
+               Packlines: [
+                   {
+                       PackageType : "PLT",
+                       Unit: 2,
+                       Commodity: null, 
+                       Weight: 3400,
+                       WeightUnit: "XX",
+                       Volume: 4.32,
+                       VolumeUnit: "M3"
+                   },
+               ]
+           },
+       ]
+   };
+   
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided WeightUnit ('XX') is not valid. It can only be one of these values: 'MC', 'MG', 'G', 'HG', 'KG', 'LB', 'OZ', 'LT', 'OT', 'T', 'KT', 'TN', 'TL', 'DT'.", function() {
+    expect(res.body.ModelState['JobInfo.Containers[0].PackLines[0].WeightUnit'][0]).to.equal("Provided WeightUnit ('XX') is not valid. It can only be one of these values: 'MC', 'MG', 'G', 'HG', 'KG', 'LB', 'OZ', 'LT', 'OT', 'T', 'KT', 'TN', 'TL', 'DT'.");
+  });
+}

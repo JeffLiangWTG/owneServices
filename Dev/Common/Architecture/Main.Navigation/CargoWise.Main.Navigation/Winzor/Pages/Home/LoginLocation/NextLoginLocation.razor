@@ -1,0 +1,74 @@
+@using Enterprise.ZArchitecture.Core
+@using Microsoft.AspNetCore.Components.Web
+@using CargoWiseNext.Blazor.Components
+@using System.Windows.Forms
+
+@namespace CargoWise.Main.Navigation.Pages
+
+<div @onclick="HandleComponentClick" @onclick:stopPropagation>
+    <CwnLayout Class="cwn-login-location">
+        <CwnMainContent Class="cwn-login-location__main">
+            <div class="cwn-login-location__logo" />
+            <CwnCard Class="cwn-login-location__operation-card">
+                <div class="cwn-login-location__operation-content">
+                    <CwnCardHeader Class="cwn-login-location__operation-header">
+                        @Data.Title
+                    </CwnCardHeader>
+                    <CwnCardContent class="cwn-login-location__operation-details">
+                        <div class="cwn-login-location__operation-item">
+                            <CwnText class="cwn-login-location__text">@Data.CompanyLabel</CwnText>
+                            <CwnDropDownList Class="cwn-login-location__item"
+                                             MaximumInputLength="3"
+                                             Items="@Companies"
+                                             SelectedCode="@(Data.Company?.Code)"
+                                             IsDropdownVisible="@IsCompanyDropdownOpen"
+                                             OnChange="OnSelectedCompanyChangeAsync"
+                                             OnKeyPress="OnCompanyKeyPressAsync"
+                                             OnDropDownToggle="() => ToggleDropdown(Data.CompanyLabel)"
+                                             OnFocusIn="() => HandleFocusIn(Data.CompanyLabel)"
+                                             @ref="companyDropDownList" />
+                        </div>
+                        <div class="cwn-login-location__operation-item">
+                            <CwnText class="cwn-login-location__text">@Data.BranchLabel</CwnText>
+                            <CwnDropDownList Class="cwn-login-location__item"
+                                             MaximumInputLength="3"
+                                             Items="@Branches"
+                                             SelectedCode="@(Data.Branch?.Code)"
+                                             IsDropdownVisible="@IsBranchDropdownOpen"
+                                             OnChange="@OnSelectedBranchChangeAsync"
+                                             OnKeyPress="OnBranchKeyPressAsync"
+                                             OnDropDownToggle="()=> ToggleDropdown(Data.BranchLabel)"
+                                             OnFocusIn="()=> HandleFocusIn(Data.BranchLabel)"
+                                             @ref="branchDropDownList" />
+                        </div>
+                        <div class="cwn-login-location__operation-item">
+                            <CwnText class="cwn-login-location__text">@Data.DepartmentLabel</CwnText>
+                            <CwnDropDownList Class="cwn-login-location__item"
+                                             MaximumInputLength="3"
+                                             Items="@Departments"
+                                             SelectedCode="@(Data.Department?.Code)"
+                                             IsDropdownVisible="@IsDepartmentDropdownOpen"
+                                             OnChange="OnSelectedDepartmentChangeAsync"
+                                             OnKeyPress="OnDepartmentKeyPressAsync"
+                                             OnDropDownToggle="() => ToggleDropdown(Data.DepartmentLabel)"
+                                             OnFocusIn="()=> HandleFocusIn(Data.DepartmentLabel)"
+                                             @ref="departmentDropDownList" />
+                        </div>
+                        @if (HasErrors)
+                        {
+                            <CwnCallout Type="CalloutType.Error">@Data.ErrorMessage</CwnCallout>
+                        }
+                        <div class="cwn-login-location__operation-buttons">
+                            <CwnButton Class="cwn-login-location__backbutton"
+                                       OnFocusIn="() => HandleFocusIn(string.Empty)"
+                                       OnClick="OnBackButtonClickAsync">@Data.BackButtonCaption</CwnButton>
+                            <CwnButton Class="cwn-login-location__loginbutton"
+                                       OnFocusIn="() => HandleFocusIn(string.Empty)"
+                                       OnClick="OnLoginButtonClickAsync" @ref="loginButton">@Data.LoginButtonCaption</CwnButton>
+                        </div>
+                    </CwnCardContent>
+                </div>
+            </CwnCard>
+        </CwnMainContent>
+    </CwnLayout>
+</div>

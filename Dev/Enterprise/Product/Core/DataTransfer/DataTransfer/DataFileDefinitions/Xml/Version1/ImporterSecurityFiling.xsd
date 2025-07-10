@@ -1,0 +1,691 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Elements.xsd"/>
+	<xs:include schemaLocation="Event.xsd"/>
+	<xs:element name="ISFs">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ISF" type="ISF" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ISF" type="ISF"/>
+	<xs:complexType name="ISF">
+		<xs:sequence>
+			<xs:element name="Action" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Messaging" minOccurs="0">
+							<xs:complexType>
+								<xs:attribute name="SendToCustoms" type="xs:boolean" use="optional"/>
+								<xs:attribute name="NoOfHTSDigitsToSend" use="optional">
+									<xs:simpleType>
+										<xs:restriction base="xs:NMTOKEN">
+											<xs:enumeration value="6"/>
+											<xs:enumeration value="8"/>
+											<xs:enumeration value="10"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:attribute>
+								<xs:attribute name="SendContainerDetailsToCustoms" use="optional">
+									<xs:annotation>
+										<xs:documentation>Indicate whether the container details should be send to Customs or not</xs:documentation>
+									</xs:annotation>
+									<xs:simpleType>
+										<xs:restriction base="xs:NMTOKEN">
+											<xs:enumeration value="Yes"/>
+											<xs:enumeration value="No"/>
+											<xs:enumeration value="Default"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:attribute>
+								<xs:attribute name="LineMergeStyle" use="optional">
+									<xs:annotation>
+										<xs:documentation>Indicate whether all the lines are merged before being send to Customs or not</xs:documentation>
+									</xs:annotation>
+									<xs:simpleType>
+										<xs:restriction base="xs:NMTOKEN">
+											<xs:enumeration value="NotMerge"/>
+											<xs:enumeration value="Merge"/>
+											<xs:enumeration value="Default"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:attribute>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="Type" use="optional">
+						<xs:simpleType>
+							<xs:restriction base="xs:NMTOKEN">
+								<xs:enumeration value="Add"/>
+								<xs:enumeration value="Replace"/>
+								<xs:enumeration value="Delete"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<xs:attribute name="ReasonCode" use="optional">
+						<xs:annotation>
+							<xs:documentation>CT = Compliant Transaction
+FR = Flexible Range
+FT = Flexible Timing
+
+ISF CSMS#09-000325 changes
+FX = Flexible Range and Flexible Timing</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:NMTOKEN">
+								<xs:enumeration value="CT"/>
+								<xs:enumeration value="FR"/>
+								<xs:enumeration value="FT"/>
+								<xs:enumeration value="FX"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Workflow" type="Workflow" minOccurs="0"/>
+			<xs:element name="ImporterOfRecord" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:choice>
+							<xs:element name="RegistrationNumber" type="RegistrationNumber"/>
+							<xs:element name="Organisation" type="Organisation">
+								<xs:annotation>
+									<xs:documentation>This is for import only, for export, the Registration number will appear in the XML</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:choice>
+						<xs:element name="DateOfBirth" type="xs:date" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Required When ShipmentTypeCode is 3 (Household Goods/personal effects)
+
+ISF CSMS#10-000246
+This is required when registration type is either a Passport or a Social Security Number.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="CountryOfIssue" type="CountryCode" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>This is required when registration type is a Passport.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="FullLegalName" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>ISF CSMS#10-000246
+This is required when registration type is either a Passport or a Social Security Number. For Passport the format should be "Last, First M Initial".</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SubmissionType" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="ISF5"/>
+						<xs:enumeration value="ISF10"/>
+						<xs:enumeration value="ISF5ToISF10"/>
+						<xs:enumeration value="ISF10ToISF5"/>
+						<xs:enumeration value="LateISF10"/>
+						<xs:enumeration value="LateISF5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ShipmentType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Only used for ISF10 
+
+01 = Standard or regular filings
+02 = To Order Shipments
+03 = Household Goods / Personal Effects (HHG / PE)
+04 = Military, Government
+05 = Diplomatic Shipment
+06 = Carnet
+07 = US Return Goods
+
+ISF CSMS#09-000325 changes
+08 = FTZ Shipments
+09 = International Mail Shipments
+
+ISF CSMS#10-000038 changes
+10 = Outer Continental Shelf Shipments
+
+ISF CSMS#10-000246 changes
+11 = Informal
+
+Shipment Type must = 01 when submitting Submission Type ISF5
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="01"/>
+						<xs:enumeration value="02"/>
+						<xs:enumeration value="03"/>
+						<xs:enumeration value="04"/>
+						<xs:enumeration value="05"/>
+						<xs:enumeration value="06"/>
+						<xs:enumeration value="07"/>
+						<xs:enumeration value="08"/>
+						<xs:enumeration value="09"/>
+						<xs:enumeration value="10"/>
+						<xs:enumeration value="11"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ShipmentSubType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>CSMS#10-000246 changes
+
+Only required when Shipment type is 11.
+
+01 = Section 321 Shipments
+02 = Informal Shipments
+03 = General Note 3(e) Shipments
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="01"/>
+						<xs:enumeration value="02"/>
+						<xs:enumeration value="03"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="EstimatedValue" type="xs:decimal" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>CSMS#10-000246 changes
+
+Only required when Shipment type is 11.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EstimatedWeight" type="DimensionValue" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>CSMS#10-000246 changes
+
+Only required when Shipment type is 11.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EstimatedQuantity" type="DimensionValue" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>CSMS#10-000246 changes
+
+Only required when Shipment type is 11.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TransportMode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Before ISF CSMS #09-000148 changes only '10' is allowed:
+
+10 = Ocean vessel non-containerized (Break Bulk)
+11 = Ocean vessel containerized</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="10"/>
+						<xs:enumeration value="11"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CarrierSCAC" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="2"/>
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OwnerReference" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BondActivityCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This field is part of ISF CSMS #09-000148 changes:
+
+01 = Importer or Broker
+02 = Custodian of Bonded Merchandise
+03 = International Carrier
+04 = Foreign Trade Zone Operator
+99 = ISF Bond  (Is removed in ISF CSMS #09-000325 changes)
+
+ISF CSMS#09-000325 changes
+16 = ISF Bond
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="01"/>
+						<xs:enumeration value="02"/>
+						<xs:enumeration value="03"/>
+						<xs:enumeration value="04"/>
+						<xs:enumeration value="16"/>
+						<xs:enumeration value="99"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BondType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This field is part of ISF CSMS #09-000148 changes:
+
+8 = Continuous
+9 = Single Transaction</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="8"/>
+						<xs:enumeration value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BondIndicator" type="TrueFalse" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This field will be obsolete as of May 18, 2009 as part of ISF CSMS #09-000148 changes</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BondHolder" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ForeignPortOfUnlading" type="UNLOCO" minOccurs="0"/>
+			<xs:element name="PlaceOfDelivery" type="UNLOCO" minOccurs="0"/>
+			<xs:element name="Parties" minOccurs="0">
+				<xs:complexType>
+					<xs:choice>
+						<xs:element name="ISF10" type="ISF10"/>
+						<xs:element name="ISF5" type="ISF5"/>
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ReferenceIDs" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ReferenceID" maxOccurs="1988">
+							<xs:annotation>
+								<xs:documentation>ReferenceIDs with Type 'OB' and 'BM' are also use for matching when the Action Type is 'Replace'</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Type">
+										<xs:annotation>
+											<xs:documentation>OB = Ocean Bill of Lading – used for Regular Bills
+BM = House Bill of Lading
+6B = US CBP Entry Number
+MB = Master Bill of Lading Number
+SBN = ISF Bond Number (Is removed in ISF CSMS #09-000148 changes)
+V1 = Surety Code
+
+ISF CSMS#09-000325 changes
+6C = Carnet Issuing Country Code and Carnet Number
+BRN = Bond Reference Number
+CR = User-defined Reference Number
+
+ISF CSMS#10-000246 changes
+FN = Full Name of ISF Importer
+
+</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:enumeration value="OB"/>
+												<xs:enumeration value="BM"/>
+												<xs:enumeration value="MB"/>
+												<xs:enumeration value="SBN"/>
+												<xs:enumeration value="V1"/>
+												<xs:enumeration value="6B"/>
+												<xs:enumeration value="6C"/>
+												<xs:enumeration value="BRN"/>
+												<xs:enumeration value="CR"/>
+												<xs:enumeration value="FN"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="Number">
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:maxLength value="50"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Containers" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Container" type="ISFContainer" maxOccurs="999"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Lines" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Line" type="ISFLine" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="TransactionNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Use for matching when the Action Type is a 'Replace'</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="JobReference" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Use for matching when the Action Type is a 'Replace'</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Status" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This data is for export only</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="MessageStatus" nillable="false">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string">
+										<xs:attribute name="Description" type="xs:string" use="optional"/>
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="CustomsResponse" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Only the most recent Customs Response will be reported</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="MessageTypeCode" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>01 = Data Rejected with error(s)
+02 = Data Accepted (error free)
+03 = Data Accepted with Warning
+
+ISF CSMS#09-000325 changes
+11 = Record Rejected
+13 = Record Accepted with Warning</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:enumeration value="01"/>
+												<xs:enumeration value="02"/>
+												<xs:enumeration value="03"/>
+												<xs:enumeration value="11"/>
+												<xs:enumeration value="13"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="RawFormat" type="xs:string" minOccurs="0"/>
+									<xs:element name="InterpretedFormat" minOccurs="0">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="MessageBlock" maxOccurs="unbounded">
+													<xs:complexType>
+														<xs:sequence>
+															<xs:element name="MessageField" maxOccurs="unbounded">
+																<xs:complexType>
+																	<xs:simpleContent>
+																		<xs:extension base="xs:string">
+																			<xs:attribute name="Name" type="xs:string" use="required"/>
+																		</xs:extension>
+																	</xs:simpleContent>
+																</xs:complexType>
+															</xs:element>
+														</xs:sequence>
+														<xs:attribute name="Name" type="xs:string" use="required"/>
+													</xs:complexType>
+												</xs:element>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+									<xs:element name="Bills" minOccurs="0">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="Bill" maxOccurs="999">
+													<xs:complexType>
+														<xs:sequence>
+															<xs:element name="Number" type="xs:string"/>
+															<xs:element name="DispositionCode" type="ISFDisposition"/>
+															<xs:element name="MatchedDate" type="xs:date" minOccurs="0"/>
+														</xs:sequence>
+													</xs:complexType>
+												</xs:element>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="ValidationResponse" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Any XML validation notifications that effect the system sending the data to Customs </xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="FirstAcceptedDate" type="xs:date" minOccurs="0"/>
+						<xs:element name="LastAcceptedDate" type="xs:date" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CustomValues" type="CustomValues" minOccurs="0"/>
+			<xs:element name="Routings" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Routing" type="PlannedLeg" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Events" type="Events" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This data is for export only</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ISF5">
+		<xs:sequence>
+			<xs:element name="BookingParties" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="BookingParty" type="DocAddress" maxOccurs="256"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ShipToParties" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ShipTo" type="DocAddress" maxOccurs="256"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ISF10">
+		<xs:sequence>
+			<xs:element name="BuyerOwners" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="BuyerOwner" type="DocAddress" maxOccurs="256"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Consignee" type="RegistrationNumber" minOccurs="0"/>
+			<xs:element name="ConsigneePassportDetails" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="DateOfBirth" type="xs:date" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Required When ShipmentTypeCode is 3 (Household Goods/personal effects)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="CountryOfIssue" type="CountryCode" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>This is required when registration type is a Passport.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ConsigneeFullLegalName" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ISF CSMS#10-000246
+This is required when registration type is either a Passport or a Social Security Number. For Passport the format should be "Last, First M Initial".</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ConsigneeDateOfBirth" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ISF CSMS#10-000246
+This is required when registration type is a Social Security Number.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Consolidators" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Consolidator" type="DocAddress" maxOccurs="256"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Manufacturers" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Manufacturer" type="ISFManufacturer" maxOccurs="256"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SellerOwners" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="SellerOwner" type="DocAddress" maxOccurs="256"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ShipToParties" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ShipTo" type="DocAddress" maxOccurs="256"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="StuffingLocations" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="StuffingLocation" type="DocAddress" maxOccurs="256"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ISFContainer">
+		<xs:sequence>
+			<xs:element name="DescriptionCode" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ContainerNumber" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ISOType" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ISFLine">
+		<xs:sequence>
+			<xs:element name="ProductCode" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="HTSNumber" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="TariffCode">
+						<xs:maxLength value="10"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CountryOfOrigin" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ISF10" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ManufacturerID" type="xs:IDREF"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CustomValues" type="CustomValues" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ISFManufacturer">
+		<xs:complexContent>
+			<xs:extension base="DocAddress">
+				<xs:attribute name="ManufacturerID" type="xs:ID" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ISFDisposition">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="Code">
+					<xs:simpleType>
+						<xs:restriction base="xs:NMTOKEN">
+              <xs:enumeration value="2O"/>
+              <xs:enumeration value="2P"/>
+              <xs:enumeration value="2Q"/>
+              <xs:enumeration value="2R"/>
+              <xs:enumeration value="4O"/>
+              <xs:enumeration value="4P"/>
+              <xs:enumeration value="4Q"/>
+              <xs:enumeration value="4R"/>
+							<xs:enumeration value="S1"/>
+							<xs:enumeration value="S2"/>
+							<xs:enumeration value="S3"/>
+							<xs:enumeration value="S4"/>
+							<xs:enumeration value="S5"/>
+							<xs:enumeration value="S6"/>
+							<xs:enumeration value="S7"/>
+							<xs:enumeration value="SA"/>
+							<xs:enumeration value="SB"/>
+							<xs:enumeration value="SC"/>
+							<xs:enumeration value="XX"/>
+            </xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+</xs:schema>

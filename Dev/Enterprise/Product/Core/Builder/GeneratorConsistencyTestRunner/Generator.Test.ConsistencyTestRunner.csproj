@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="BuildTools" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Odyssey.Schema.GeneratedResources" />
+    <Reference Include="NUnitCore" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Generator\Generator.csproj" />
+  </ItemGroup>
+  <!--Set the exe run condition to NetFramework because the generator csproj will find references in a different location in net8 and fail to build-->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Exec Command="$(TargetDir)GeneratorConsistencyTestGenerator.exe $(TargetPath)" />
+  </Target>
+</Project>

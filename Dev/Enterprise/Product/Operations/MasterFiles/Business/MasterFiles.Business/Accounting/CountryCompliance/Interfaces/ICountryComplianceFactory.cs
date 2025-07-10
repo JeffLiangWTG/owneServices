@@ -1,0 +1,47 @@
+using CargoWise.Types;
+using Enterprise.MasterFiles.Business.Accounting.CountryCompliance;
+using Enterprise.MasterFiles.Business.Accounting.CountryCompliance.Interfaces.ComplianceSubTypes;
+
+namespace Enterprise.MasterFiles.Business.CountryCompliance
+{
+	public interface ICountryComplianceFactory
+	{
+		IEquivalentComplianceSubTypeProvider GetIEquivalentComplianceSubTypeProvider(ZString countryCode);
+
+		IQRCodeDataProvider GetIQRCodeDataProvider(ZString countryCode);
+
+		IComplianceSubTypeAndNumberUpdateRules GetIComplianceSubTypeAndNumberUpdateRules(ZString countryCode);
+
+		IComplianceInfoElectronicInvoicing GetIComplianceInfoElectronicInvoicing(ZString countryCode);
+
+		IComplianceInfoElectronicInvoicingEligibleSubType GetIComplianceInfoElectronicInvoicingEligibleSubType(ZString countryCode);
+		
+		IComplianceNumberSequenceConfigurationProvider GetIComplianceNumberSequenceConfigurationProvider(ZString countryCode);
+
+		ITransactionAuthorisationRecordProvider GetTransactionAuthorisationRecordProvider(ZString countryCode);
+
+		IComplianceRegistryDefaultProvider GetIComplianceRegistryDefaultProvider(ZString countryCode);
+
+		IFiscalTaxCodeProvider GetIFiscalTaxCodeProvider(ZString countryCode);
+
+		IOriginalInvoiceReference GetIOriginalInvoiceReference(ZString countryCode);
+
+		IComplianceSubTypeRulesWithMultipleRuleSetProvider GetIComplianceSubTypeRulesWithMultipleRuleSetProvider(ZString countryCode);
+
+		ITransactionAuthorizationNumber GetITransactionAuthorizationNumber(ZString countryCode);
+
+		IOrgCusCodePredicateProvider GetIOrgCusCodePredicateProvider(ZString countryCode);
+
+		IComplianceSubTypeValidation GetIComplianceSubTypeValidation(ZString countryCode);
+
+		IComplianceDocumentStatusProvider GetIComplianceDocumentStatusProvider(ZString countryCode);
+
+		ICountryComplianceInfoBase GetICountryComplianceInfoBase(ZString countryCode);
+
+		IProtectComplianceSubTypeForEInvoicingTransactions GetIProtectComplianceSubTypeForEInvoicingTransactions(ZString countryCode);
+
+		IComplianceSubTypeGUIProvider GetIComplianceSubTypeGUIProvider(ZString countryCode);
+
+		IEInvoicingRegistryProvider GetIEInvoicingRegistryProvider(ZString countryCode);
+	}
+}

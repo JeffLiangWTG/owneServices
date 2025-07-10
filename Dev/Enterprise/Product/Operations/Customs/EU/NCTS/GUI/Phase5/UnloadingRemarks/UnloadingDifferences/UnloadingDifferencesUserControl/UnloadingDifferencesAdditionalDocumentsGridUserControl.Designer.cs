@@ -1,0 +1,74 @@
+namespace Enterprise.Customs.EU.NCTS.GUI
+{
+	partial class UnloadingDifferencesAdditionalDocumentsGridUserControl
+	{
+		/// <summary> 
+		/// Required designer variable.
+		/// </summary>
+		private System.ComponentModel.IContainer components = null;
+
+		/// <summary> 
+		/// Clean up any resources being used.
+		/// </summary>
+		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing && (components != null))
+			{
+				components.Dispose();
+			}
+			base.Dispose(disposing);
+		}
+
+		#region Component Designer generated code
+
+		/// <summary> 
+		/// Required method for Designer support - do not modify 
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{
+			this.AdditionalDocumentsGrid = new Enterprise.ZArchitecture.ZGrid();
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.AdditionalDocumentsGrid)).BeginInit();
+			this.AdditionalDocumentsGrid.SuspendLayout();
+			this.SuspendLayout();
+			// 
+			// BindingSource
+			// 
+			this.BindingSource.DataSourceType = typeof(Enterprise.Customs.EU.NCTS.Business.INctsAdditionalInfoCollection<Enterprise.Customs.EU.NCTS.Business.NctsAdditionalInfo>);
+			// 
+			// AdditionalDocumentsGrid
+			// 
+			this.AdditionalDocumentsGrid.AllowNavigation = false;
+			this.BindingSource.SetBindingMember(this.AdditionalDocumentsGrid, ".");
+			this.AdditionalDocumentsGrid.CaptionVisible = false;
+			this.AdditionalDocumentsGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.AdditionalDocumentsGrid.GridId = "a28bd4fd-b7f1-4389-aa31-b5c9e993c79f";
+			this.AdditionalDocumentsGrid.HeaderForeColor = System.Drawing.SystemColors.ControlText;
+			this.AdditionalDocumentsGrid.LayoutKey = "AdditionalDocumentsGrid";
+			this.AdditionalDocumentsGrid.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(0, 0, true);
+			this.AdditionalDocumentsGrid.Name = "AdditionalDocumentsGrid";
+			this.AdditionalDocumentsGrid.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(536, 75, true);
+			this.AdditionalDocumentsGrid.TabIndex = 0;
+			// 
+			// UnloadingDifferencesAdditionalDocumentsGridUserControl
+			// 
+			this.CaptionRenderingEnabled = true;
+			this.Controls.Add(this.AdditionalDocumentsGrid);
+			this.Name = "UnloadingDifferencesAdditionalDocumentsGridUserControl";
+			this.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(536, 75, true);
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.AdditionalDocumentsGrid)).EndInit();
+			this.AdditionalDocumentsGrid.ResumeLayout(false);
+			this.AdditionalDocumentsGrid.PerformLayout();
+			this.ResumeLayout(false);
+			this.PerformLayout();
+
+		}
+
+		#endregion
+
+		internal ZArchitecture.ZGrid AdditionalDocumentsGrid;
+	}
+}

@@ -1,0 +1,7 @@
+CREATE VIEW RefAirlineCommodityCodeTableView_V2 AS
+SELECT RAC_PK,
+RAC_AirlineID,
+RAC_Code,
+RAC_Description,
+RAC_SpecialHandlingCodes
+FROM RefAirlineCommodityCode

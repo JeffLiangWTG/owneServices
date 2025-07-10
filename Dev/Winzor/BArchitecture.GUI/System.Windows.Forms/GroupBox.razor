@@ -1,0 +1,20 @@
+@namespace System.Windows.Forms
+@using WinzorFramework.Extensions
+@inherits Control
+
+<fieldset class="groupbox @ModifierClass" @attributes="DataAttributes" style="@TopMarginStyle" @onmousedown="OnMouseDownAsync" @onmousedown:stopPropagation @oncontextmenu="OnContextMenuAsync" @oncontextmenu:stopPropagation @oncontextmenu:preventDefault>
+    @if (GroupBoxHasText)
+    {
+        <legend class="groupbox__text @BoldLegendClass" style="@FontStyleString">@Text.ProcessMnemonicToHtml(true)</legend>
+    }
+    @RenderControls()
+</fieldset>
+
+@code
+{
+    bool GroupBoxHasText => !string.IsNullOrEmpty(Text);
+    string ModifierClass => GroupBoxHasText ? "groupbox--with-text" : "groupbox--without-text";
+    string TopMarginStyle => GroupBoxHasText ? string.Empty : $"margin-top:{FontHeight * 0.5}px;height:calc(100% - {FontHeight * 0.5}px)";
+    string BoldLegendClass => BoldLegend ? "groupbox__text--bold" : string.Empty;
+    string FontStyleString => $"font-family:{Font.Name};font-size:{Font.Size}pt;";
+}

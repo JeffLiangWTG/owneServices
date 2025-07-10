@@ -1,0 +1,225 @@
+using System;
+using System.Linq;
+using Enterprise.Customs.ES.Business.Declaration;
+using Enterprise.Customs.ES.Business.MessageWrappers;
+using Enterprise.MasterFiles.Business;
+
+namespace Enterprise.Customs.ES.Business.Testing;
+
+public class ReceptionLineWrapperTest : WrapperHelperTest<ReceptionLineWrapper>
+{
+	public void ReceptionLineWrapperConstructor()
+	{
+		CombineAssertions(() =>
+		{
+			AssertExceptionThrown<ArgumentNullException>("EntryLine null", () => new ReceptionLineWrapper(null));
+			AssertExceptionThrown<ArgumentOutOfRangeException>("Empty InvoiceLines", () => new ReceptionLineWrapper(Factory.New<CusEntryLine>()));
+		});
+	}
+
+	public void TestLineNumber()
+	{
+		entryLine.CL_LineNumber = 2;
+		AssertEquals("Expected empty LineNumber", 2, wrapper.LineNumber);
+	}
+
+	public void TestGoodsCode()
+	{
+		invoiceLine.JI_Tariff = EntryLineData.Tariff;
+		AssertEquals("Expected filled GoodsCode", EntryLineData.TariffShort, wrapper.GoodsCode);
+	}
+
+	public void TestGoodsDescription()
+	{
+		invoiceLine.JI_Description = EntryLineData.GoodsDescription;
+		AssertEquals("Expected filled GoodsDescription", EntryLineData.GoodsDescription, wrapper.GoodsDescription);
+	}
+
+	public void TestGrossWeightInKG()
+	{
+		CombineAssertions(() =>
+		{
+			invoiceLine.JI_Weight = 200.4455M;
+			invoiceLine.JI_WeightUQ = Core.Constants.Weight.Kilograms;
+			AssertEquals("Expected filled GrossWeightInKG when weight > 1 rounded to the upper integer unit", 201M, wrapper.GrossWeightInKG);
+
+			invoiceLine.JI_Weight = 0.9886M;
+			AssertEquals("Expected filled GrossWeightInKG when weight < 1", 0.989M, wrapper.GrossWeightInKG);
+		});
+	}
+
+	public void TestNetWeightInKG()
+	{
+		CombineAssertions(() =>
+		{
+			invoiceLine.JI_NetWeightUQ = Core.Constants.Weight.Kilograms;
+			invoiceLine.JI_NetWeight = 2.3454m;
+			invoiceLine.JI_CustomsUnitQty = Core.Constants.Weight.Kilograms;
+			invoiceLine.JI_CustomsQuantity = 1.1234m;
+			AssertEquals("Expected filled NetWeightInKG with 1 invoice line", 1.123m, wrapper.NetWeightInKG);
+
+			var invLine2 = (JobComInvoiceLine)entryLine.InvoiceLines.AddNew();
+			invLine2.JI_NetWeightUQ = Core.Constants.Weight.Kilograms;
+			invLine2.JI_NetWeight = 2.3454m;
+			invLine2.JI_CustomsUnitQty = Core.Constants.Weight.Kilograms;
+			invLine2.JI_CustomsQuantity = 2.3211m;
+			AssertEquals("Expected filled NetWeightInKG with 2 invoice line", 3.445m, wrapper.NetWeightInKG);
+
+			var invLine3 = (JobComInvoiceLine)entryLine.InvoiceLines.AddNew();
+			invLine3.JI_NetWeightUQ = Core.Constants.Weight.Grams;
+			invLine3.JI_NetWeight = 2000.000m;
+			invLine3.JI_CustomsUnitQty = Core.Constants.Weight.Grams;
+			invLine3.JI_CustomsQuantity = 1000.0000m;
+			AssertEquals("Expected filled NetWeightInKG with 3 invoice line", 4.445m, wrapper.NetWeightInKG);
+		});
+	}
+
+	public void TestPackages()
+	{
+		var pack1 = Factory.New<Customs.Business.InvoiceLinePackagePivot>();
+		var packageInfo1 = Factory.New<Customs.Business.BasePackage>();
+		packageInfo1.CW_PackType = InternalPackage1.Type;
+		pack1.CHC_CW = packageInfo1.PK;
+		invoiceLine.PackagesPivot.Add(pack1);
+
+		var pack2 = Factory.New<Customs.Business.InvoiceLinePackagePivot>();
+		var packageInfo2 = Factory.New<Customs.Business.BasePackage>();
+		packageInfo2.CW_PackType = InternalPackage2.Type;
+		pack2.CHC_CW = packageInfo2.PK;
+		invoiceLine.PackagesPivot.Add(pack2);
+
+		var packages = wrapper.Packages;
+		CombineAssertions(() =>
+		{
+			AssertEquals("Expected filled Packages", 2, packages.Count);
+			AssertSame("Cached Packages", wrapper.Packages, packages);
+		});
+	}
+
+	public void TestPackagesWhenVehicles()
+	{
+		var vehicle = invoiceLine.Vehicles.AddNew();
+		vehicle.CVH_VehicleIdentificationNumber = EntryLineData.Vin;
+		var invLine2 = (JobComInvoiceLine)entryLine.InvoiceLines.AddNew();
+		var vehicle2 = invLine2.Vehicles.AddNew();
+		vehicle2.CVH_VehicleIdentificationNumber = EntryLineData.Vin;
+
+		var pack1 = Factory.New<Customs.Business.InvoiceLinePackagePivot>();
+		var packageInfo1 = Factory.New<Customs.Business.BasePackage>();
+		packageInfo1.CW_PackType = InternalPackage1.Type;
+		pack1.CHC_CW = packageInfo1.PK;
+		invoiceLine.PackagesPivot.Add(pack1);
+
+		var pack2 = Factory.New<Customs.Business.InvoiceLinePackagePivot>();
+		var packageInfo2 = Factory.New<Customs.Business.BasePackage>();
+		packageInfo2.CW_PackType = InternalPackage2.Type;
+		pack2.CHC_CW = packageInfo2.PK;
+		invoiceLine.PackagesPivot.Add(pack2);
+
+		var packages = wrapper.Packages;
+		CombineAssertions(() =>
+		{
+			AssertEquals("Expected filled Packages with vehicles and packages", 3, packages.Count);
+			AssertSame("Cached Packages", wrapper.Packages, packages);
+		});
+	}
+
+	public void TestPackagesWhenSamePackageType()
+	{
+		var pack1 = Factory.New<Customs.Business.InvoiceLinePackagePivot>();
+		var packageInfo1 = Factory.New<Customs.Business.BasePackage>();
+		packageInfo1.CW_PackType = InternalPackage1.Type;
+		pack1.CHC_CW = packageInfo1.PK;
+		invoiceLine.PackagesPivot.Add(pack1);
+
+		var pack2 = Factory.New<Customs.Business.InvoiceLinePackagePivot>();
+		var packageInfo2 = Factory.New<Customs.Business.BasePackage>();
+		packageInfo2.CW_PackType = InternalPackage1.Type;
+		pack2.CHC_CW = packageInfo2.PK;
+		invoiceLine.PackagesPivot.Add(pack2);
+
+		var packages = wrapper.Packages;
+		CombineAssertions(() =>
+		{
+			AssertEquals("Expected filled Packages for packages with the same type only 1", 1, packages.Count);
+			AssertSame("Cached Packages", wrapper.Packages, packages);
+		});
+	}
+
+	public void TestContainers()
+	{
+		var invoiceLine2 = invoice.InvoiceLines.AddNew();
+
+		foreach (var tag in ContainerTags)
+		{
+			var container = declaration.CusContainers.AddNew();
+			container.CO_ContainerNumber = tag;
+			invoiceLine.ContainersForInvoiceLinesForBindingOnly.FindByContainerNumber(tag).IsForInvoiceLine = true;
+			invoiceLine2.ContainersForInvoiceLinesForBindingOnly.FindByContainerNumber(tag).IsForInvoiceLine = true;
+		}
+
+		var mergeResult = declaration.DoMerge(new Customs.Business.SendsMessagesToCustomsShutterUpperer());
+		AssertEquals("Merge done", true, mergeResult);
+
+		entryLine = declaration.CustomsEntryHeaders[0].MergedLines[0];
+
+		wrapper = new ReceptionLineWrapper(entryLine);
+		var containers = wrapper.Containers;
+		CombineAssertions(() =>
+		{
+			AssertArrayEqualsByElements("Expected filled Containers", ContainerTags, containers.ToArray());
+			AssertSame("Cached Containers", wrapper.Containers, containers);
+		});
+	}
+
+	public void TestVehicles()
+	{
+		var vehicle = invoiceLine.Vehicles.AddNew();
+		vehicle.CVH_VehicleIdentificationNumber = "VINCODE";
+		var vehicleX = invoiceLine.Vehicles.AddNew();
+		vehicleX.CVH_VehicleIdentificationNumber = "VINCODEX";
+
+		var invLine2 = (JobComInvoiceLine)entryLine.InvoiceLines.AddNew();
+		var vehicle2 = invLine2.Vehicles.AddNew();
+		vehicle2.CVH_VehicleIdentificationNumber = "VINCODE";
+
+		var invLine3 = (JobComInvoiceLine)entryLine.InvoiceLines.AddNew();
+		var vehicle3 = invLine3.Vehicles.AddNew();
+		vehicle3.CVH_VehicleIdentificationNumber = "VINCODE2";
+
+		var vehiclesPac = wrapper.Vehicles;
+		CombineAssertions(() =>
+		{
+			AssertEquals("Expected filled Vehicles.Packages", 4, vehiclesPac.Count);
+			AssertSame("Cached Vehicles", wrapper.Vehicles, vehiclesPac);
+		});
+	}
+
+	protected override void SetUp()
+	{
+		base.SetUp();
+
+		declaration = Factory.New<JobDeclaration>();
+		declaration.FillWithValidTestData();
+		declaration.JE_ApplicationCode = Customs.Business.DeclarationApplicationCodeList.Codes.Builtin;
+		declaration.JE_MergeBy = OrgConstants.MergeInvoiceLines.Tariff;
+
+		invoice = declaration.Invoices.AddNew();
+		invoiceLine = invoice.InvoiceLines.AddNew();
+
+		var mergeResult = declaration.DoMerge(new Customs.Business.SendsMessagesToCustomsShutterUpperer());
+		AssertEquals("Merge done", true, mergeResult);
+
+		entryLine = declaration.CustomsEntryHeaders[0].MergedLines[0];
+
+		wrapper = new ReceptionLineWrapper(entryLine);
+	}
+
+	JobDeclaration declaration;
+	JobComInvoiceHeader invoice;
+	JobComInvoiceLine invoiceLine;
+	CusEntryLine entryLine;
+	ReceptionLineWrapper wrapper;
+
+	protected override ReceptionLineWrapper GetProvider() => wrapper;
+}

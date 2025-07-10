@@ -1,0 +1,6 @@
+CREATE VIEW RefCusTradeGroupLanguageTableView_V1 AS
+SELECT ZXD_PK,
+ZXD_ZX6_NKLanguage,
+ZXD_ZZA_TradeGroup,
+ZXD_Description
+FROM RefCusTradeGroupLanguage

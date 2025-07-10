@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+      None
+    </ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+    <RootNamespace>Enterprise.RemotePrinting.Client.Setup.Testing</RootNamespace>
+    <AssemblyName>RemotePrinting.Client.Setup.Testing</AssemblyName>
+    <TargetFrameworks>net48</TargetFrameworks>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="BuildTools" />
+    <Reference Include="Moq" />
+    <Reference Include="NUnitCore" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+    <Reference Include="WTG.TestHelpers" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web.Services" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="Core.System.ServiceProcess" />
+    <PackageReference Include="System.Management" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="DummyServiceInstaller.Designer.cs">
+      <DependentUpon>DummyServiceInstaller.cs</DependentUpon>
+    </Compile>
+    <Compile Update="DummyService.Designer.cs">
+      <DependentUpon>DummyService.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Client\Client.csproj" />
+    <ProjectReference Include="..\Setup\Setup.csproj" />
+  </ItemGroup>
+</Project>

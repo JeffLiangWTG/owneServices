@@ -1,0 +1,164 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"title": "TaxCore EInvoice Schema",
+	"description": "JSON Schema for Fiji E-Invoice JSON file format. The original draft3 version of the schema has been upgraded to current 2020-12 version",
+	"type": "object",
+	"properties": {
+		"DateAndTimeOfIssue": {
+			"description": "Sytem Create Date Time",
+			"type": "string",
+			"format": "date-time"
+		},
+		"Cashier": {
+			"description": "Create User Name",
+			"type": "string",
+			"maxLength": 50
+		},
+		"BD": {
+			"description": "Organisation TIN",
+			"type": "string",
+			"minLength": 1,
+			"maxLength": 20,
+			"pattern": "[\\x00-\\x7F]"
+		},
+		"BuyerCostCentreID": {
+			"description": "Buyer Cost Centre",
+			"type": "string",
+			"const": ""
+		},
+		"IT": {
+			"description": "Invoice Type. It is hardcoded to 'Normal' for CW1",
+			"type": "integer",
+			"enum": [
+				0 /* Normal */,
+				1 /* Proforma */,
+				2 /* Copy */,
+				3 /* Training */
+			]
+		},
+		"TT": {
+			"description": "Transaction Type(e.g. Invoice, Credit note etc.)",
+			"type": "integer",
+			"enum": [
+				0 /* Sale */,
+				1 /* Refund */
+			]
+		},
+		"PaymentType": {
+			"description": "Agreed Pay Method. It comes from the Organization's AR setup",
+			"type": "integer",
+			"enum": [
+				0 /* Other */,
+				1 /* Cash */,
+				2 /* Card */,
+				3 /* Check */,
+				4 /* WireTransfer */,
+				5 /* MobileMoney */,
+				6 /* Voucher */
+			]
+		},
+		"InvoiceNumber": {
+			"description": "AR Transaction Invoice Number",
+			"type": "string",
+			"minLength": 1,
+			"maxLength": 60
+		},
+		"ReferentDocumentNumber": {
+			"description": "Original Invoice Number as supplied from the Fiji Government",
+			"type": "string"
+		},
+		"ReferentDocumentDateAndTime": {
+			"description": "Original Invoice Date Time as supplied by the Fiji Government",
+			"type": "string",
+			"format": "date-time"
+		},
+		"PAC": {
+			"description": "Certificate registration number (PAC). For CW1, it is GP_MailboxID for the certificate that is selected.",
+			"type": "string"
+		},
+		"Options": {
+			"type": "object",
+			"properties": {
+				"OmitQRCodeGen": {
+					"description": "Omit QR code",
+					"type": "string",
+					"enum": [
+						"0" /* Include QR code */,
+						"1" /* Omit QR code */
+					]
+				},
+				"OmitTextualRepresentation": {
+					"description": "Omit Text representation",
+					"type": "string",
+					"enum": [
+						"0" /* Include Textual Representation */,
+						"1" /* Omit Textual Representation */
+					]
+				}
+			}
+		},
+		"Items": {
+			"description": "Invoice Lines",
+			"type": "array",
+			"minItems": 1,
+			"items": {
+				"type": "object",
+				"properties": {
+					"GTIN": {
+						"description": "Global Trade Item Number",
+						"type": "string",
+						"maxLength": 8
+					},
+					"Name": {
+						"description": "Charge Line Description",
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 2048
+					},
+					"Quantity": {
+						"description": "Quantity of the item",
+						"type": "number",
+						"minimum": 0.001
+					},
+					"Discount": {
+						"description": "Discount applied before TotalAmount is accounted for. It's not part of tax calculation",
+						"type": "number",
+						"minimum": 0
+					},
+					"UnitPrice": {
+						"description": "Unit price of the line item",
+						"type": "number",
+						"exclusiveMinimum": 0
+					},
+					"Labels": {
+						"description": "Array of labels. Each label represents one of the tax rates applied on invoice item. Tax items are calculated based on TotalAmount and applied Labels. In case no taxes are applicable on item this field is optional.",
+						"type": "array",
+						"minItems": 1,
+						"items": {
+							"types": "string",
+							"enum": [
+								"A",
+								"B",
+								"C",
+								"D",
+								"E",
+								"F",
+								"N",
+								"P",
+								"0"
+							]
+						}
+					},
+					"TotalAmount": {
+						"description": "This is the Tax Included Value of the lie item.",
+						"type": "number",
+						"exclusiveMinimum": 0
+					}
+				},
+				"required": [ "Name", "Quantity", "TotalAmount" ]
+			}
+		},
+		"Hash": true
+	},
+	"required": [ "IT", "TT", "PaymentType", "InvoiceNumber" ]
+}

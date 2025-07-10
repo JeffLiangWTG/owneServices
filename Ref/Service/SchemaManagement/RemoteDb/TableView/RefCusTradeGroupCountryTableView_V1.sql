@@ -1,0 +1,8 @@
+CREATE VIEW RefCusTradeGroupCountryTableView_V1 AS
+SELECT ZZB_PK,
+ZZB_ZZA_TradeGroup,
+ZZB_RN_NKTradeGroupCountryCode,
+ZZB_StartDate,
+ZZB_EndDate,
+ZZB_Description
+FROM RefCusTradeGroupCountry

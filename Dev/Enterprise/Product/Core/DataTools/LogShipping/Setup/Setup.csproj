@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Enterprise.LogShipping.Setup</RootNamespace>
+    <AssemblyName>Enterprise.LogShipping.Setup</AssemblyName>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <ApplicationManifest>..\..\..\..\..\..\main.manifest</ApplicationManifest>
+    <!-- WI00899902 Replace ILMerge with ILRepack for NetCore target -->
+    <PostBuildEvent Condition="'$(TargetFramework)' == 'net48'">
+      ILMerge.exe ^
+      /target:exe ^
+      /out:ediLogShippingSetup.exe ^
+      Enterprise.LogShipping.Setup.exe ^
+      CargoWise.DataProtection.dll ^
+      CargoWise.DataProtection.SqlExtensions.dll ^
+      CargoWise.DataProtection.Administration.dll ^
+      CargoWise.DataProtection.Administration.SqlServer.dll ^
+      Microsoft.Bcl.AsyncInterfaces.dll ^
+      Microsoft.Extensions.DependencyInjection.dll ^
+      Microsoft.Extensions.DependencyInjection.Abstractions.dll ^
+    </PostBuildEvent>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.Data.Providers.Common" />
+    <Reference Include="CargoWise.DataProtection" />
+    <Reference Include="CargoWise.DataProtection.SqlExtensions" />
+    <Reference Include="CargoWise.DataProtection.Administration" />
+    <Reference Include="CargoWise.DataProtection.Administration.SqlServer" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="WTG.Data.SqlClient" />
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <Reference Include="System.Resources.Extensions" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.ServiceProcess" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="System.ServiceProcess.ServiceController" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="..\..\..\..\Main\Enterprise.Main\App.config">
+      <Link>App.config</Link>
+    </None>
+    <None Include="..\..\..\..\..\..\main.manifest">
+      <Link>main.manifest</Link>
+    </None>
+  </ItemGroup>
+</Project>

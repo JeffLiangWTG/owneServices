@@ -1,0 +1,143 @@
+<EntityConfiguration>
+  <DataFileExtensions>xls, xlsx</DataFileExtensions>
+  <EntityTypes>
+    <EntityType Name="RefCusTariff" Data="true">
+      <Key>
+        <PropertyRef Name="ZZ1_TariffCode" />
+        <PropertyRef Name="ZZ1_ZZI_NKTariffType" />
+        <PropertyRef Name="ZZ1_ZZI_ZZZ_NKDataGrouping" />
+        <PropertyRef Name="ZZ1_ZZZ_NKDataGrouping" />
+      </Key>
+      <Properties>
+        <Property Name="RefCusRate" Type="RefCusRate" />
+        <Property Name="RefCusTariffAttribute" Type="RefCusTariffAttribute" />
+        <Property Name="RefCusTariffUOM" Type="RefCusTariffUOM" />
+        <Property Name="ZZ1_Description" Type="varchar" MaxLength="5" />
+        <Property Name="ZZ1_EndDate" Type="datetime" ConstantValue="2079-06-06 23:59:00"/>
+        <Property Name="ZZ1_StartDate" Type="datetime" />
+        <Property Name="ZZ1_TariffCode" Type="varchar" MaxLength="35" />
+        <Property Name="ZZ1_ZZI_NKTariffType" Type="varchar" MaxLength="5" ConstantValue="DMT" />
+        <Property Name="ZZ1_ZZI_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+        <Property Name="ZZ1_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+      </Properties>
+    </EntityType>
+    <EntityType Name="RefCusTariffUOM" Data="true">
+      <Key>
+        <PropertyRef Name="ZZ8_UOM" />
+      </Key>
+      <Properties>
+        <Property Name="ZZ8_Type" Type="varchar" />
+        <Property Name="ZZ8_UOM" Type="varchar" />
+        <Property Name="ZZ8_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+      </Properties>
+    </EntityType>
+    <EntityType Name="RefCusRate" Data="true">
+      <Key>
+        <PropertyRef Name="ZZ2_ZY1_NKRateCode" />
+        <PropertyRef Name="ZZ2_ZY1_ZZR_NKRateType" />
+        <PropertyRef Name="ZZ2_ZY1_ZZR_ZZZ_NKDataGrouping" />
+        <PropertyRef Name="ZZ2_ZZZ_NKDataGrouping" />
+      </Key>
+      <Properties>
+        <Property Name="ZZ2_EndDate" Type="datetime" />
+        <Property Name="ZZ2_RateFormula" Type="varchar" MaxLength="500" />
+        <Property Name="ZZ2_RateFormulaDerivedFrom" Type="varchar" MaxLength="1000" />
+        <Property Name="ZZ2_StartDate" Type="datetime" />
+        <Property Name="ZZ2_ZY1_NKRateCode" Type="varchar" MaxLength="5" />
+        <Property Name="ZZ2_ZY1_ZZR_NKRateType" Type="varchar" MaxLength="3" DefaultValue="DMT" />
+        <Property Name="ZZ2_ZY1_ZZR_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR"/>
+        <Property Name="ZZ2_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR"/>
+      </Properties>
+    </EntityType>
+    <EntityType Name="RefCusTariffAttribute" Data="true">
+      <Key>
+        <PropertyRef Name="ZZ3_Name" />
+      </Key>
+      <Properties>
+        <Property Name="ZZ3_Name" Type="varchar" MaxLength="50" />
+        <Property Name="ZZ3_Value" Type="nvarchar(max)" />
+      </Properties>
+    </EntityType>
+  </EntityTypes>
+  <EntityTypeExcelColumnMapping>
+    <SheetIndex>0</SheetIndex>
+    <StartRow>1</StartRow>
+    <IsCompositeKeyNeeded>true</IsCompositeKeyNeeded>
+    <EntityTypes>
+      <MappingEntityType Name="RefCusTariff">
+        <Properties>
+          <Property Name="AdditionalCode" IsNonPersistent="true" ExcelColumn="0" IsCompositeKey="true" />
+          <Property Name="TariffCode" IsNonPersistent="true" ExcelColumn="2" IsCompositeKey="true" />
+          <Property Name="ZZ1_StartDate" Type="datetime" ExcelColumn="8" DateTimeFormat ="yyyyMMdd" />
+          <Property Name="ZZ1_Description" Type="varchar" MaxLength="4000" ExcelColumn="3" />
+        </Properties>
+      </MappingEntityType>
+      <MappingEntityType Name="RefCusRate">
+        <Properties>
+          <Property Name="ZZ2_EndDate" Type="datetime" ExcelColumn="9" DateTimeFormat ="yyyyMMdd" IsEndDate ="true" />
+          <Property Name="ZZ2_StartDate" Type="datetime" ExcelColumn="8" DateTimeFormat ="yyyyMMdd" />
+          <Property Name="TaxRate" IsNonPersistent="true" ExcelColumn="4" />
+          <Property Name="UnitQuantity" IsNonPersistent="true" ExcelColumn="5" />
+          <Property Name="BasePrice" IsNonPersistent="true" ExcelColumn="6" />
+        </Properties>
+      </MappingEntityType>
+      <MappingEntityType Name="RefCusTariffAttribute">
+        <Properties>
+          <Property Name="AgricultureTaxBApplies" IsNonPersistent="true" ExcelColumn="7" />
+        </Properties>
+      </MappingEntityType>
+    </EntityTypes>
+  </EntityTypeExcelColumnMapping>
+  <Rules>
+    <Rule Name="Quantity Unit Codes">
+      <RuleValues>
+        <RuleValue Value="424000" QuantityUnit="M2,U" Formula="(VFD - MAX([M2] * 100000, {0}*[U]))*{1}"/>
+        <RuleValue Value="940000" QuantityUnit="KG,AC" Formula="[KG] * ({1} + IF([AC] > 95, 0.6 * ([AC] - 95), 0))"/>
+      </RuleValues>
+    </Rule>
+    <Rule Name="Education Tax Exemption Of Liquor Tax Tariffs">
+      <RuleValues>
+        <RuleValue Value="940000" />
+        <RuleValue Value="941100" />
+        <RuleValue Value="941210" />
+        <RuleValue Value="941211" />
+      </RuleValues>
+    </Rule>
+    <Rule Name="Additional Education Tax Of Liquor Tax Tariffs">
+      <RuleValues>
+        <RuleValue Value="941400" />
+        <RuleValue Value="941402" />
+      </RuleValues>
+    </Rule>
+    <Rule Name="Education Tax Exemption Of Special Consumption Tax Tariffs">
+      <RuleValues>
+        <RuleValue Value="524000" />
+        <RuleValue Value="525000" />
+        <RuleValue Value="525001" />
+        <RuleValue Value="525002" />
+        <RuleValue Value="525003" />
+        <RuleValue Value="527001" />
+        <RuleValue Value="527002" />
+        <RuleValue Value="527003" />
+        <RuleValue Value="803001" />
+        <RuleValue Value="803002" />
+        <RuleValue Value="803003" />
+        <RuleValue Value="803004" />
+        <RuleValue Value="803005" />
+        <RuleValue Value="803006" />
+        <RuleValue Value="803007" />
+        <RuleValue Value="803008" />
+        <RuleValue Value="803009" />
+        <RuleValue Value="803010" />
+      </RuleValues>
+    </Rule>
+    <Rule Name="Education Tax Reduction Of Special Consumption Tax Tariffs">
+      <RuleValues>
+        <RuleValue Value="523000" />
+        <RuleValue Value="523500" />
+        <RuleValue Value="524501" />
+        <RuleValue Value="526000" />
+      </RuleValues>
+    </Rule>
+  </Rules>
+</EntityConfiguration>

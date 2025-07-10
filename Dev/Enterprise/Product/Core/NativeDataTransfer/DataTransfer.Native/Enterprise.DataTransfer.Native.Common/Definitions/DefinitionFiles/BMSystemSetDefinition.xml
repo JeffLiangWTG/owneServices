@@ -1,0 +1,65 @@
+﻿<NativeSchemaSet Name="BMSystem" Root="BMSystem">
+	<Entities>
+		<Entity Name="BMSystem"/>
+		<Entity Name="BMControlCustomisationLink" IncludeParentTableCode="True"/>
+		<Entity Name="BMSystemWorkflowDeterminer"/>
+		<Entity Name="BMSystemReleaseGroup"/>
+		<Entity Name="BMComponent"/>
+		<Entity Name="BMComponent" EntityName="BMChildComponent"/>
+		<Entity Name="StmModuleFilter" RequiresAdditionOfActionEqualsMerge="True"/>
+		<Entity Name="StmModuleFilterUserData" />
+
+		<Entity Name="StmData" EntityName="ComponentStmData" RequiresAdditionOfActionEqualsMerge="True"/>
+		
+		<Entity Name="BMComponentReleaseGroupLink" />
+		<Entity Name="BMZoneCapacityMultiplier" />		
+		<Entity Name="BMComponentResourceLink" />
+		
+		<Entity Name="GlbGroup" External="True"/>
+		<Entity Name="GlbBranch" External="True" >
+			<ExcludedProperty Name="GB_GeoLocation" />
+			<ExcludedProperty Name="GB_ValidationStatus" />
+		</Entity>
+		<Entity Name="GlbDepartment" External="True" />
+		<Entity Name="GlbStaff" External="True" >
+			<ExcludedProperty Name="GS_GeoLocation" />
+			<ExcludedProperty Name="GS_ValidationStatus" />
+		</Entity>
+
+		<Entity Name="BMComponent" EntityName="ComponentFrom"/>
+		<Entity Name="BMComponent" EntityName="ComponentTo"/>
+		
+		<Entity Name="BMComponentLink" RequiresAdditionOfActionEqualsMerge="true"/>
+		
+    <Entity Name="StmNote">
+      <ExcludedProperty Name="ST_AutoVersion" />
+		</Entity>
+	</Entities>
+	<Associations>
+		<Association From="BMComponent" To="GlbBranch" Key="FC_GB_AgingBranch" External="True"/>
+		<Association From="BMComponent" To="GlbDepartment" Key="FC_GE_AgingDepartment" External="True"/>
+		<Association From="BMControlCustomisationLink" To="BMSystem" Key="FML_ParentId"/>
+		<Association From="BMControlCustomisationLink" To="BMControlCustomisation" Key="FML_FM_ControlCustomisation" External="True"/>
+		<Association From="ComponentStmData" To="BMComponentLink" Key="SD_Owner" />
+		<Association From="BMSystemWorkflowDeterminer" To="BMSystem" Key="FSW_FS_System" />
+		<Association From="BMSystemReleaseGroup" To="BMSystem" Key="FSG_FS_System" />
+		<Association From="BMComponent" To="BMSystem" Key="FC_FS_System" WhereThisColumnIsNull="FC_FC_ParentComponent" />
+		<Association From="BMChildComponent" To="BMComponent" Key="FC_FC_ParentComponent" />
+		
+		<Association From="BMComponentReleaseGroupLink" To="BMComponent" Key="FO_FC_Component" />
+		<Association From="BMComponentReleaseGroupLink" To="GlbGroup" Key="FO_GG_ReleaseGroup" External="True"/>
+		<Association From="BMZoneCapacityMultiplier" To="BMComponent" Key="BZC_FC_Component" />
+		<Association From="BMZoneCapacityMultiplier" To="GlbGroup" Key="BZC_GG_ReleaseGroup" External="True"/>
+		<Association From="BMComponentResourceLink" To="BMComponent" Key="FD_FC_Component" />
+		<Association From="BMComponentResourceLink" To="GlbStaff" Key="FD_GS_NKResource" External="True"/>
+
+		<Association From="StmModuleFilter" To="BMComponentLink" Key="S9_ParentID" Cardinality="1"/>
+		<Association From="StmModuleFilterUserData" To="StmModuleFilter" Key="S0_S9" Cardinality="1"/>
+		
+		<Association From="BMComponentLink" To="ComponentFrom" Key="FL_FC_ComponentFrom"/>
+		<Association From="ComponentFrom" To="BMSystem" Key="FC_FS_System"/>
+		<Association From="BMComponentLink" To="ComponentTo" Key="FL_FC_ComponentTo"/>
+		<Association From="ComponentTo" To="BMSystem" Key="FC_FS_System"/>
+		<Association From="StmNote" To="BMSystem" Key="ST_ParentID"/>
+	</Associations>
+</NativeSchemaSet>

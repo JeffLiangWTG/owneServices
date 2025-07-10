@@ -1,0 +1,9 @@
+// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+using System.Diagnostics.CodeAnalysis;
+[assembly: SuppressMessage("CargoWiseOne", "CW1062:Do not use System.DateTime.Today Rule", Justification = "Baseline WI00586871", Scope = "member", Target = "~M:Enterprise.Customs.ASYCUDA.Module.Testing.ASYCUDAManifestConsolControllerTest.GetBusinessObjectWithoutValidationErrors")] // Enterprise/Product/Operations/Customs/ASYCUDA/Module.Test/ASYCUDAManifestConsolControllerTest.cs:185,33
+[assembly: SuppressMessage("CargoWiseOne", "CW1062:Do not use System.DateTime.Today Rule", Justification = "Baseline WI00586871", Scope = "member", Target = "~M:Enterprise.Customs.ASYCUDA.Module.Testing.ASYCUDAManifestConsolControllerTest.GetBusinessObjectWithoutValidationErrors")] // Enterprise/Product/Operations/Customs/ASYCUDA/Module.Test/ASYCUDAManifestConsolControllerTest.cs:186,33
+[assembly: SuppressMessage("CargoWiseOne", "CW1062:Do not use System.DateTime.Today Rule", Justification = "Baseline WI00586871", Scope = "member", Target = "~M:Enterprise.Customs.ASYCUDA.Module.Testing.ASYCUDAManifestConsolControllerTest.GetBusinessObjectWithoutValidationErrors")] // Enterprise/Product/Operations/Customs/ASYCUDA/Module.Test/ASYCUDAManifestConsolControllerTest.cs:185,33
+[assembly: SuppressMessage("CargoWiseOne", "CW1062:Do not use System.DateTime.Today Rule", Justification = "Baseline WI00586871", Scope = "member", Target = "~M:Enterprise.Customs.ASYCUDA.Module.Testing.ASYCUDAManifestConsolControllerTest.GetBusinessObjectWithoutValidationErrors")] // Enterprise/Product/Operations/Customs/ASYCUDA/Module.Test/ASYCUDAManifestConsolControllerTest.cs:186,33

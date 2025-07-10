@@ -1,0 +1,1 @@
+Get-Process -Name Cargowise | Where-Object {$_.MainWindowTitle -notlike "*ediProd*"} | Stop-Process

@@ -1,0 +1,29 @@
+meta {
+  name: Client is Mandatory
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/clientrates/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForClientRates();
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Client is Mandatory.", function() {
+    expect(res.body.ModelState['Client'][0]).to.equal("Client is Mandatory.");
+  });
+}

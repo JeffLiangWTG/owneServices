@@ -1,0 +1,96 @@
+@using CargoWise.NetworkVisualisation.GUI.Models;
+@using CargoWise.NetworkVisualisation.Integration;
+@inherits NetworkNode<JobNodeModel>
+
+<div class="networknode jobnode">
+    <div class="networknode__card jobnode__card" style="@StatusColorStyle @BorderStyle" title="@Node.Tooltip">
+        <div class="jobnode__card__grid">
+            @if (@StatusImage != null)
+            {
+                <img class="jobnode__statusicon" src=@StatusImage title=@Node.StatusTooltip />
+            }
+            @if (@Node.HasNotifications)
+            {
+                <div style="@NotificationWarningStyle" class="jobnode__notification" title=@Node.EntityStateTooltip />
+            }
+            @if (@Node.ShowJobBar)
+            {
+                <div class="jobnode__jobnumbertext" title=@Node.JobNumberTooltip>@Node.JobNumberReadableText</div>
+            }
+            @if (Node.ShowJobBarAffinities)
+            {
+                <div class="jobnode__affinity" style="@(Node.ShowJobBar ? "grid-column: 3;" : "grid-column: 2 / 5;")" title=@Node.AppliedAttributesTooltip>@Node.AppliedAttributesReadableText</div>
+            }
+            @if (@Node.ShowJobBar)
+            {
+                <div class="jobnode__duration" title=@Node.DurationTooltip>@Node.DurationReadableText</div>
+            }
+            @if (EntityStateImage != null)
+            {
+                <img class="jobnode__entitystateicon" src=@EntityStateImage title=@Node.EntityStateTooltip />
+            }
+            <div class="jobnode__entitycontentwrapper">
+                <div class="jobnode__entitycontent">
+                    <DynamicTextArea Class="networknode__diagramname jobnode__diagramname"
+                                     Style=@($"font-weight: {StatusFontWeight};")
+                                     Placeholder="Job Summary"
+                                     AriaLabel="Job Summary"
+                                     IsMoving=@Node.IsMoving
+                                     @bind-Value=@Node.DiagramName
+                                     @bind-Value:after=@Node.Diagram_DiagramNameChangedAsync
+                                     />
+                    @if (@Node.HasLinkedEntity)
+                    {
+                        <div class="jobnode__jobdetails">
+                            <div class="jobnode__jobnumber">@Node.JobNumber</div>
+                            <input class="jobnode__jobname"
+                                    @bind=Node.JobName 
+                                    @bind:after=@Node.Diagram_JobNameChangedAsync 
+                                    @ondblclick:stopPropagation 
+                                    @onpointerdown:stopPropagation
+                                    style=@($"cursor: {(Node.IsMoving ? "move" : "text")};")
+                                    @onkeydown:stopPropagation
+                                    @ref=jobNameElementReference
+                                    @oncontextmenu=OpenTextBoxContextMenuAsync
+                                    @oncontextmenu:stopPropagation
+                                    @oncontextmenu:preventDefault />
+                        </div>
+                    }
+                    <DynamicTextArea Class="jobnode__completioncriteria"
+                                     Placeholder=@Node.CompletionCriteriaPlaceholder
+                                     AriaLabel=@Node.CompletionCriteriaPlaceholder
+                                     Style=@($"color: {CompletionCriteriaTextColor};")
+                                     IsMoving=@Node.IsMoving
+                                     @bind-Value=@Node.CompletionCriteria
+                                     @bind-Value:after=@Node.Diagram_CompletionCriteriaChangedAsync
+                                     />
+                    <div class="jobnode__description">@Node.Description</div>
+                    <DynamicTextArea Class="networknode__notes jobnode__notes"
+                                     Placeholder=@Node.NotesPlaceholder
+                                     AriaLabel=@Node.NotesPlaceholder
+                                     IsMoving=@Node.IsMoving
+                                     @bind-Value=@Node.Notes
+                                     @bind-Value:after=@Node.Diagram_NotesChangedAsync
+                                     />
+                </div>
+            </div>
+            @if (@Node.ShowScheduleDetails)
+            {
+                <div class="jobnode__startdate" title=@Node.StartDateTooltip>@Node.StartDateReadableText</div>
+                <div class="jobnode__remainingduration" title=@Node.RemainingDurationTooltip>@Node.RemainingDurationReadableText</div>
+                <div class="jobnode__finishdate" title=@Node.FinishDateTooltip>@Node.FinishDateReadableText</div>
+            }
+            @if (Node.ProgressBarModel != null)
+            {
+	            <div class="jobnode__progressbar">
+		            <ProgressBar Model=@Node.ProgressBarModel @key=@Node.ProgressBarModel />
+	            </div>
+            }
+        </div>
+        
+        @if (Node.HasPostReqLinks)
+        {
+            <div class="jobnode__postreqcircle"></div>
+        }
+    </div>
+</div>

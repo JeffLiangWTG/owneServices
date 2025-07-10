@@ -1,0 +1,8 @@
+CREATE VIEW RefCusCodeListAttributeNameLanguageTableView_V1 AS
+SELECT ZXH_PK,
+ZXH_ZX6_NKLanguage,
+ZXH_ZXE_CodeListAttributeName,
+ZXH_Description,
+ZXH_Name,
+ZXH_ColumnCaption
+FROM RefCusCodeListAttributeNameLanguage

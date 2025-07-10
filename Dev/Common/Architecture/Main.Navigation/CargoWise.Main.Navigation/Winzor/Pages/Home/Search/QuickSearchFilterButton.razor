@@ -1,0 +1,28 @@
+@using CargoWise.Main.Navigation.ViewModels;
+@using Microsoft.AspNetCore.Components.Web
+
+@namespace CargoWise.Main.Navigation.Pages
+
+@code{
+    [Parameter]
+    public SearchFilter SearchFilter { get; set; } = new SearchFilter();
+
+    public void OnClick()
+    {
+        SearchFilter.IsSelected = !SearchFilter.IsSelected;
+    }
+
+    private string GetName()
+    {
+        if(SearchFilter.IsSelected)
+        {
+            return " ✔ " + SearchFilter.Name;
+        }
+
+        return SearchFilter.Name;
+    }
+}
+
+<button class="cwn-quick-search-filter @(SearchFilter.IsSelected ? "cwn-quick-search-filter--selected" : "") cwn-quick-search-filter__text" @onclick="OnClick">
+    <p class="cwn-quick-search__filter-item-text">@GetName()</p>
+</button>

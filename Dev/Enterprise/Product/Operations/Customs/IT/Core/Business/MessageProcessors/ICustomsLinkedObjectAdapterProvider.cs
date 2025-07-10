@@ -1,0 +1,8 @@
+namespace Enterprise.Customs.IT.Business;
+
+public interface ICustomsLinkedObjectAdapterProvider
+{
+	ISadCustomsLinkedObjectAdapter GetSadCustomsLinkedObjectAdapter();
+	ISingleWindowCustomsLinkedObjectAdapter GetNewSingleWindowCustomsLinkedObjectAdapter();
+	IXmlCustomsLinkedObjectAdapter GetNewXmlCustomsLinkedObjectAdapter();
+}

@@ -1,0 +1,50 @@
+@using WinzorFramework
+@using WinzorFramework.Extensions
+@using System.Drawing
+@namespace System.Windows.Forms
+@inherits ToolStripDropDownItem
+
+<div class="toolstrip-item toolstrip-item--dropdownbutton @(!Enabled ? "disabled": "")" style="@LayoutStyleString">
+    <div class="toolstrip-item__visual-overlay"></div>
+    <button title="@ToolTipText" @attributes="DataAttributes" style="@LookStyleString" class="dropdownbutton__button @ButtonImageTextClasses @StylingClasses()" @onclick="OnClickAsync" @onclick:stopPropagation @onmousedown="OnMouseDownAsync" @onmousedown:stopPropagation @onmouseup="OnMouseUpAsync" @onmouseup:stopPropagation @onmouseenter="OnMouseEnterAsync" @onmouseleave="OnMouseLeaveAsync" disabled="@(!Enabled)" tabindex="-1">
+        @if (Image is not null)
+        {
+            <img class="dropdownbutton__button__image" src="@Image.ToBase64DataUrl()" style="@this.ToolStripItemImageStyleString()" />
+        }
+        @if (!string.IsNullOrWhiteSpace(Text))
+        {
+            <span class="dropdownbutton__button__text">@Text.ProcessMnemonicToHtml(true)</span>
+        }
+        @if (ShowDropDownArrow)
+        {
+            <div class="dropdownbutton__button__arrow" style="@LookStyleString">keyboard_arrow_down</div>
+        }
+    </button>
+</div>
+
+@code{
+    string ButtonImageTextClasses
+    {
+        get
+        {
+            var styleString = "dropdownbutton__button";
+
+            if (Image is not null)
+            {
+                if (!string.IsNullOrEmpty(Text))
+                {
+                    styleString += "--with-image-and-text";
+                }
+                else
+                {
+                    styleString += "--with-image-only";
+                }
+            } else
+            {
+                styleString += "--with-text-only";
+            }
+
+            return styleString;
+        }
+    }
+}

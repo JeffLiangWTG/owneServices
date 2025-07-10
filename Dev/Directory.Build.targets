@@ -1,0 +1,585 @@
+﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!--
+        also defined in NetCoreCommon.props, in case the actual csproj needs to use it during multi-targeting
+        needs to be declared here for all non-net core projects
+    -->
+    <IsNetFrameworkTargetFramework Condition="$(TargetFramework.StartsWith('net4'))">true</IsNetFrameworkTargetFramework>
+    <IsNetCoreTargetFramework Condition="$(TargetFramework.StartsWith('net8'))">true</IsNetCoreTargetFramework>
+    <IsNetCoreWindowsTargetFramework Condition="'$(IsNetCoreTargetFramework)' == 'true' and $(TargetFramework.EndsWith('-windows'))">true</IsNetCoreWindowsTargetFramework>
+  </PropertyGroup>
+
+  <Import Project="PopulateReferenceHintPaths.targets" />
+
+  <Import
+    Project=".paket\Paket.Restore.targets"
+    Condition="'$(UsingMicrosoftNETSdk)' == 'true' And Exists('.paket\Paket.Restore.targets') And Exists('$(MSBuildProjectDirectory)\paket.references')" />
+
+  <!-- Basic settings -->
+  <PropertyGroup>
+    <DevRootDirectory>$(MSBuildThisFileDirectory)</DevRootDirectory>
+    <DevBuildSettingsDirectory>$(DevRootDirectory)\Build\</DevBuildSettingsDirectory>
+    <DevPackagesRootDirectory>$([System.IO.Path]::GetFullPath('$(DevRootDirectory)\packages'))</DevPackagesRootDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CodeContractsRunCodeAnalysis>false</CodeContractsRunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeContractsReferenceAssembly>DoNotBuild</CodeContractsReferenceAssembly>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!--DefaultWinzorResourceStringsProcess cannot be set in the props file because when evaluated, DisableResourceStringsAnalyzer hasn't yet been set by the project file.-->
+    <DefaultWinzorResourceStringsProcess Condition="'$(IsWinzorProjectByName)' == 'true' And '$(IsCwTestProject)' != 'true' And '$(DisableResourceStringsAnalyzer)' != 'true'">true</DefaultWinzorResourceStringsProcess>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug' ">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' ">
+    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(CommonDefineConstants)' != ''">
+    <DefineConstants>$(CommonDefineConstants);$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <!--
+    Allows the C# 9 feature "init" for .NET 4.8
+    Shared.40 now contains a public static class called IsExternalInit (net framework only)
+    See: https://github.com/dotnet/roslyn/issues/45510
+
+    Opt-in: CWEnableIsExternalInitForNetFrameworkOnly must be set to 'true' in the csproj
+  -->
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true' and '$(CWEnableIsExternalInitForNetFrameworkOnly)' == 'true'">
+    <Compile Include="$(WTGBranchRoot)IsExternalInit.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsWinzorProjectByName)' == 'true'">
+    <Compile Remove="obj\**" />
+    <Content Remove="obj\**" />
+    <EmbeddedResource Remove="obj\**" />
+    <None Remove="obj\**" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsWinzorProjectByName)' != 'true'">
+    <Compile Remove="Winzor-obj\**" />
+    <Content Remove="Winzor-obj\**" />
+    <EmbeddedResource Remove="Winzor-obj\**" />
+    <None Remove="Winzor-obj\**" />
+  </ItemGroup>
+
+  <!--
+    Exclude the Winzor related projects, as their references should be published in ReadyToRun format for Release build.
+  -->
+  <ItemGroup Condition="!('$(IsWinzorProject)' == 'true' and '$(Configuration)' == 'Release')">
+    <Reference Update="*">
+      <Private>false</Private>
+      <CopyLocal>false</CopyLocal>
+    </Reference>
+  </ItemGroup>
+
+  <!--
+    Force all winzor project references to non-winzor projects to use the net48 target framework (WI00883445).
+    We are multi-targeting business projects to net core and project references by default will use the same target framework.
+
+    Exclude projects in the Winzor folder as they are not multi-targeted.
+  -->
+  <Target Name="ForceWinzorProjectReferencesToUseNet48" AfterTargets="IncludeTransitiveProjectReferences" Condition="'$(IsWinzorProject)' == 'true' and '$(CanNetCoreLibBeReferencedFromWinzor)' != 'true' and !$(MSBuildProjectFullPath.StartsWith('$(WTGBranchRoot)Winzor\'))">
+    
+    <!--
+      Item updates don't show in the MSBuild Structured Log Viewer. see: https://github.com/KirillOsenkov/MSBuildStructuredLog/issues/182
+
+      Instead, output some low importance messages, which will show these values in the binary log.
+    -->
+    <Message Importance="Low" Text="ForceWinzorProjectReferencesToUseNet48 before update: &lt;ProjectReference&gt; %(ProjectReference.Identity) SetTargetFramework = '%(ProjectReference.SetTargetFramework)'" />
+    
+    <ItemGroup>
+      <!-- exclude project references to things that live in \Winzor\ or end in .Winzor.csproj -->
+      <ProjectReference Condition="!$([System.String]::Copy('%(ProjectReference.Identity)').ToUpperInvariant().Contains('\WINZOR\')) and !$([System.String]::Copy('%(ProjectReference.Identity)').EndsWith('.Winzor.csproj', StringComparison.OrdinalIgnoreCase))">
+        <SetTargetFramework>TargetFramework=net48</SetTargetFramework>
+      </ProjectReference>
+    </ItemGroup>
+
+    <!--
+      commented out but useful in debugging.
+      copying the items into an unused variable is a useful trick to see the values
+      after update, given that the update itself does not show in the log.
+    <ItemGroup>
+      <MyProjectRef Include="@(ProjectReference)"/>
+    </ItemGroup>
+    -->
+
+    <Message Importance="Low" Text="ForceWinzorProjectReferencesToUseNet48 after update: &lt;ProjectReference&gt; %(ProjectReference.Identity) SetTargetFramework = '%(ProjectReference.SetTargetFramework)'" />
+  </Target>
+
+  <!--
+    This ensures that no outputs from referenced projects are copied to the output folder unnecessarily.
+    Even with msbuild property UseCommonOutputDirectory=true and no-dependencies param passed to `dotnet build`, some of the outputs are still copied over.
+    E.g. None and Content items added in the referenced project as part of imported .props files from a package.
+  -->
+  <Target Name="ForcePrivateFalseOnAllReferences" AfterTargets="IncludeTransitiveProjectReferences" Condition="!$(MSBuildProjectFullPath.StartsWith('$(WTGBranchRoot)Winzor\'))">
+    <!--
+      Item updates don't show in the MSBuild Structured Log Viewer. see: https://github.com/KirillOsenkov/MSBuildStructuredLog/issues/182
+
+      Instead, output some low importance messages, which will show these values in the binary log.
+    -->
+    <Message Importance="Low" Text="ForcePrivateFalseOnAllReferences before update: &lt;ProjectReference&gt; %(ProjectReference.Identity) Private = '%(ProjectReference.Private)', CopyLocal = '%(ProjectReference.CopyLocal)'" />
+
+    <ItemGroup>
+      <ProjectReference>
+        <Private>false</Private>
+        <CopyLocal>false</CopyLocal>
+      </ProjectReference>
+    </ItemGroup>
+
+    <Message Importance="Low" Text="ForcePrivateFalseOnAllReferences after update: &lt;ProjectReference&gt; %(ProjectReference.Identity) Private = '%(ProjectReference.Private)', CopyLocal = '%(ProjectReference.CopyLocal)'" />
+  </Target>
+
+  <!-- Enforce consistent TargetFramework -->
+  <Target Name="CheckTargetFrameworkIncludesMinorVersion" BeforeTargets="PrepareForBuild">
+    <Error Text="'$(MSBuildProjectName)' TargetFramework '$(TargetFramework)' needs a minor version specified. E.g. 'net8' should be 'net8.0' and 'net8-windows' should be 'net8.0-windows'. If this target framework is not consistent the output folders will be different."
+           Condition="
+           $(TargetFramework.StartsWith('net')) and
+           $(TargetFramework.StartsWith('net4')) == 'false' and
+           $(TargetFramework.Contains('.')) == 'false'"/>
+    <Error Text="'$(MSBuildProjectName)' TargetFramework '$(TargetFramework)' does not need '.', e.g. 'net4.8' should be 'net48'"
+           Condition="$(TargetFramework.StartsWith('net4')) and $(TargetFramework.Contains('.')) == 'true'"/>
+  </Target>
+
+  <!-- Non-SDK projects ignore conditions on package reference ItemGroup when VS builds the project, using Choose-When fixes the issue -->
+  <Choose>
+    <When Condition="'$(EnableWinzorTests)' == 'true' and '$(IsDebugBuild)' == 'true'">
+      <ItemGroup>
+        <PackageReference Include="bunit" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="Moq" />
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Condition="'$(CanNetCoreLibBeReferencedFromWinzor)' != 'true'" Include="System.Data.SqlClient" />
+        <PackageReference Condition="'$(CanNetCoreLibBeReferencedFromWinzor)' == 'true'" Include="Microsoft.Data.SqlClient" />
+        <PackageReference Include="System.Runtime.Caching" />
+        <PackageReference Include="System.Windows.Extensions" />
+      </ItemGroup>
+    </When>
+  </Choose>
+
+  <Choose>
+    <When Condition="'$(IsWinzorProject)' == 'true' and !$(MSBuildProjectFullPath.StartsWith('$(WTGBranchRoot)Winzor\Infrastructure'))">
+      <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
+        <Using Include="Microsoft.AspNetCore.Components.Web.MouseEventArgs" Alias="WebMouseEventArgs"/>
+        <Using Include="Microsoft.AspNetCore.Components.Web.KeyboardEventArgs" Alias="WebKeyboardEventArgs"/>
+        <Using Include="Microsoft.AspNetCore.Components.Web.DragEventArgs" Alias="WebDragEventArgs"/>
+      </ItemGroup>
+    </When>
+  </Choose>
+
+  <Choose>
+    <When Condition="'$(IsWinzorProject)' == 'true' or '$(IsNetCoreTargetFramework)' == 'true'">
+      <PropertyGroup>
+        <GenerateResourceWarnOnBinaryFormatterUse>false</GenerateResourceWarnOnBinaryFormatterUse>
+      </PropertyGroup>
+      <ItemGroup>
+        <!-- For references that are available as both NuGet packages and Framework references, force a NuGet reference so we have manual control over the package version to match what is used by CargoWise NET Framework code -->
+        <PackageReference Include="System.Text.Json" />
+      </ItemGroup>
+    </When>
+  </Choose>
+
+  <PropertyGroup Condition="'$(DefaultWinzorResourceStringsProcess)' == 'true'">
+    <!--
+      Winzor projects typically consist largely of file links to their "core" project. The ZRS file is written for the core project.
+      However, the Winzor project's linked code files do not have access to the generated code in the core project, so a local copy
+      must still be generated.
+    -->
+    <WriteResourceStringFiles>false</WriteResourceStringFiles>
+
+    <!--Do not override this setting if it's already set.  Make true the default.-->
+    <UseLegacyRsa Condition="'$(UseLegacyRsa)' == ''">true</UseLegacyRsa>
+  </PropertyGroup>
+  <Import Condition="'$(DefaultWinzorResourceStringsProcess)' == 'true'" Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets"/>
+
+  <PropertyGroup Condition="'$(SignAssembly)' == 'true' And
+    ('$(IsThirdParty)' != 'true' Or '$(IsWinzorProjectByName)' == 'true')"
+  >
+    <AssemblyOriginatorKeyFile>$(WTGBranchRoot)EDI-Release-private.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- To support Microsoft.CodeAnalysis.BannedApiAnalyzers -->
+    <AdditionalFiles Include="BannedSymbols*.txt" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DisableWinzor)' == 'true'">
+    <PackageReference Remove="Microsoft.NET.Test.Sdk"/>
+  </ItemGroup>
+
+  <PropertyGroup Condition="$(PublishForWebDeploy) != '' and '$(IsNetCoreTargetFramework)' == 'true'">
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+    <PublishDir>$(WTGBranchRoot)publish\$(PublishForWebDeploy)</PublishDir>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+  </PropertyGroup>
+
+  <Target Name="PublishForWebDeploy" AfterTargets="Build" Condition="$(PublishForWebDeploy) != '' and '$(IsNetCoreTargetFramework)' == 'true'">
+    <Message Text="Publishing '$(MSBuildProjectFullPath)' to '$(PublishDir)' for WebDeploy" Importance="High" />
+    <RemoveDir Directories="$(PublishDir)"></RemoveDir>
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Publish" Properties="NoBuild=true;SelfContained=False;" />
+  </Target>
+
+  <Target Name="WinzorTestSafeGuard" AfterTargets="PreBuildEvent" Condition="'$(IsWinzorProjectByName)' == 'true'">
+    <PropertyGroup>
+      <ReferenceList>@(Reference)</ReferenceList>
+      <PackageReferenceList>@(PackageReference)</PackageReferenceList>
+    </PropertyGroup>
+
+    <Error
+      Condition="'$(Configuration)' == 'Debug' and $(ReferenceList.Contains('NUnitCore')) AND !$(PackageReferenceList.Contains('Microsoft.NET.Test.Sdk'))"
+      Text="WinzorTestSafeGuard: Winzor projects that contain CW1 unit tests should have a Microsoft.NET.Test.Sdk package reference. To enable tests add &lt;EnableWinzorTests&gt;true&lt;/EnableWinzorTests&gt; to the Winzor project."/>
+
+    <Error
+      Condition="'$(Configuration)' == 'Debug' and '$(EnableWinzorTests)' == 'true' and !$(ReferenceList.Contains('NUnitCore'))"
+      Text="WinzorTestSafeGuard: Winzor projects that do not contain a reference to NUnitCore should not have &lt;EnableWinzorTests&gt;true&lt;/EnableWinzorTests&gt; in the .csproj file."/>
+
+    <Error
+      Condition="'$(Configuration)' == 'Release' and $(ReferenceList.Contains('NUnitCore'))"
+      Text="WinzorTestSafeGuard: Winzor projects that are built in Release mode should only have Debug configuration conditional references to NUnitCore (and other test assemblies). If this is a test project, disable it from building in Release configuration. Otherwise, in the .csproj you must move the NUnitCore reference and other test/mocking assembly references into an separate &lt;ItemGroup Condition=&quot;'%24(Configuration)' == 'Debug'&quot;&gt; element."/>
+  </Target>
+
+  <Target Name="CheckOptimizeForRelease" AfterTargets="PreBuildEvent">
+    <Error
+      Condition="'$(Configuration)' == 'Release' and '$(Optimize)' == 'false'"
+      Text="Release builds must have Optimize enabled."/>
+  </Target>
+
+  <Import Project="$(WTGPaketPackagesRoot)\CargoWise.FileStructureChecker\build\CargoWise.FileStructureChecker.props" Condition="Exists('$(WTGPaketPackagesRoot)\CargoWise.FileStructureChecker\build\CargoWise.FileStructureChecker.props')"/>
+  <Target Name="RunFileStructureChecker" AfterTargets="PreBuildEvent" Condition="Exists('$(WTGPaketPackagesRoot)\CargoWise.FileStructureChecker\build\CargoWise.FileStructureChecker.props')">
+
+    <!--
+    🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+    🚨 ____  _              _  🚨
+    🚨/ ___|| |_ ___  _ __ | | 🚨
+    🚨\___ \| __/ _ \| '_ \| | 🚨
+    🚨 ___) | || (_) | |_) |_| 🚨
+    🚨|____/ \__\___/| .__/(_) 🚨
+    🚨               |_|       🚨
+    🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+    DON'T ADD NEW PROJECTS TO THIS LIST - LEGACY PROJECTS ONLY.
+    Our new standard is that projects must not be in a nested directory
+    under another project. This is a list of legacy projects that still
+    need to be reorganised.  -->
+    <ItemGroup>
+      <KnownBadProject Include="Enterprise\Product\Testing\ReportTesting\ReportTestingDummy" />
+      <KnownBadProject Include="Enterprise\Product\Operations\Customs\AU\Declaration.Gui\Testing" />
+      <KnownBadProject Include="Enterprise\Architecture\GUI\Winzor.Test" />
+      <KnownBadProject Include="Common\Architecture\Windows.UI\Winzor.Test" />
+    </ItemGroup>
+    <CargoWise.FileStructureChecker.FileStructureChecker RootDirectory="$(DevRootDirectory)"
+                ProjectDirectory="$(MSBuildProjectDirectory)"
+                KnownBadProjectsList="@(KnownBadProject)"/>
+  </Target>
+
+  <Target Name="AssemblyNameContainingTestSafeGuard" AfterTargets="PreBuildEvent" Condition=" '$(Configuration)' == 'Release' AND $(AssemblyName.Contains('Test'))">
+    <ReadLinesFromFile File="$(MSBuildThisFileDirectory)ProjectSafeguards\AssemblyNamesContainingTestAllowedInReleaseConfig.txt">
+      <Output TaskParameter="Lines" ItemName="AssemblyNamesContainingTestAllowedInReleaseConfig" />
+    </ReadLinesFromFile>
+
+    <PropertyGroup>
+      <IsAssemblyNameAllowed Condition="'%(AssemblyNamesContainingTestAllowedInReleaseConfig.Identity)' == '$(AssemblyName)'">true</IsAssemblyNameAllowed>
+    </PropertyGroup>
+
+    <Error
+      Condition="$(IsAssemblyNameAllowed) != true"
+      Text="The output assembly name '$(AssemblyName)' contains the string 'Test' and is being built in Release configuration. Please untick this project in Visual Studio's Configuration Manager. If there is a genuine need for this assembly to be built in release mode, please add the assembly name to the file '@(AssemblyNamesContainingTestAllowedInReleaseConfigFile)'."/>
+
+  </Target>
+
+
+  <!--
+    🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+    🚨 ____  _              _  🚨
+    🚨/ ___|| |_ ___  _ __ | | 🚨
+    🚨\___ \| __/ _ \| '_ \| | 🚨
+    🚨 ___) | || (_) | |_) |_| 🚨
+    🚨|____/ \__\___/| .__/(_) 🚨
+    🚨               |_|       🚨
+    🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+    DON'T REMOVE THIS SAFEGUARD, NUNIT SHOULD NOW BE ONLY IN SEPERATE TEST PROJECTS -->
+  <Target Name="NUnitSafeGuard" AfterTargets="PreBuildEvent" Condition="!$(AssemblyName.Contains('Test')) AND !$(ProjectDir.Contains('ThirdParty')) AND '$(MSBuildProjectName)' != 'AnalyzersRunner.FunctionalTestingTarget'">
+    <ReadLinesFromFile File="$(MSBuildThisFileDirectory)ProjectSafeguards\NUnitSafeguardProjects.txt">
+      <Output TaskParameter="Lines" ItemName="NUnitWhiteListProjects" />
+    </ReadLinesFromFile>
+
+    <PropertyGroup>
+      <ReferenceList>;@(Reference);@(PackageReference);</ReferenceList>
+      <IsNUnitWhiteListed Condition="'%(NUnitWhiteListProjects.Identity)' == '$(AssemblyName)'">true</IsNUnitWhiteListed>
+    </PropertyGroup>
+
+    <Error
+      Condition="$(ReferenceList.Contains(';NUnitCore;')) AND $(IsNUnitWhiteListed) != true"
+      Text="NUnitSafeGuard: Core Project should not contain NUnitCore References. Please relocate NUnit tests to the accompanying test project."/>
+
+    <Error
+      Condition="!$(ReferenceList.Contains(';NUnitCore;')) AND $(IsNUnitWhiteListed) == true and '$(Configuration)' == 'Debug'"
+      Text="NUnitSafeGuard: Project that does not contain NUnitCore reference should not be listed in safeguard file. Please remove project from ProjectSafeguards\NUnitSafeguardProjects.txt."/>
+  </Target>
+
+
+  <Target Name="OxyPlotSafeGuard" AfterTargets="PreBuildEvent">
+    <ReadLinesFromFile File="$(MSBuildThisFileDirectory)ProjectSafeguards\OxyPlotProjectsSafeguard.txt">
+      <Output TaskParameter="Lines" ItemName="OxyPlotProjectsSafeguard" />
+    </ReadLinesFromFile>
+
+    <PropertyGroup>
+      <ReferenceList>;@(Reference);@(PackageReference);</ReferenceList>
+      <IsOxyPlotWhiteListed Condition="'%(OxyPlotProjectsSafeguard.Identity)' == '$(AssemblyName)'">true</IsOxyPlotWhiteListed>
+    </PropertyGroup>
+
+    <Error Condition="$(ReferenceList.Contains(';OxyPlot;')) AND $(IsOxyPlotWhiteListed) != true"
+      Text="The output assembly name '$(AssemblyName)' contains a reference to the OxyPlot library which is no longer allowed.  Please do not include any references to OxyPlot" />
+  </Target>
+
+  <Target Name="BetterListViewSafeGuard" AfterTargets="PreBuildEvent">
+    <Error Condition="$(ReferenceList.Contains(';BetterListViewExpress-net45;'))"
+      Text="The output assembly name '$(AssemblyName)' contains a reference to the BetterListView library which is no longer allowed.  Please do not include any references to BetterListView" />
+  </Target>
+
+  <Target Name="NewtonsoftJsonSchemaSafeGuard" AfterTargets="PreBuildEvent">
+    <ReadLinesFromFile File="$(MSBuildThisFileDirectory)ProjectSafeguards\NewtonsoftJsonSchemaProjectsSafeguard.txt">
+      <Output TaskParameter="Lines" ItemName="NewtonsoftJsonSchemaProjectsSafeguard" />
+    </ReadLinesFromFile>
+
+    <PropertyGroup>
+      <ReferenceList>;@(Reference);@(PackageReference);</ReferenceList>
+      <IsNewtonsoftJsonSchemaWhiteListed Condition="'%(NewtonsoftJsonSchemaProjectsSafeguard.Identity)' == '$(AssemblyName)'">true</IsNewtonsoftJsonSchemaWhiteListed>
+    </PropertyGroup>
+
+    <Error Condition="$(ReferenceList.Contains(';Newtonsoft.Json.Schema;')) AND $(IsNewtonsoftJsonSchemaWhiteListed) != true"
+      Text="The output assembly name '$(AssemblyName)' contains a reference to the Newtonsoft.Json.Schema library which is no longer allowed. Please use the JsonSchema.Net package instead (https://github.com/json-everything/json-everything); see WI00719241 for examples to get started." />
+  </Target>
+
+  <Target Name="FluentAssertionsSafeGuard" AfterTargets="PreBuildEvent">
+    <ReadLinesFromFile File="$(MSBuildThisFileDirectory)ProjectSafeguards\FluentAssertionsProjectsSafeguard.txt">
+      <Output TaskParameter="Lines" ItemName="FluentAssertionsProjectsSafeguard" />
+    </ReadLinesFromFile>
+
+    <PropertyGroup>
+      <ReferenceList>;@(Reference);@(PackageReference);</ReferenceList>
+      <IsFluentAssertionsWhiteListed Condition="'%(FluentAssertionsProjectsSafeguard.Identity)' == '$(AssemblyName)'">true</IsFluentAssertionsWhiteListed>
+    </PropertyGroup>
+
+    <Error Condition="$(ReferenceList.Contains(';FluentAssertions;')) AND '$(IsFluentAssertionsWhiteListed)' != 'true'"
+      Text="The output assembly name '$(AssemblyName)' contains a reference to the FluentAssertions library which is not allowed. Do not use FluentAssertions, use built-in Assert instead. See WI00855980 - Create FluentAssertions project safeguard and pin version" />
+
+    <Error
+      Condition="!$(ReferenceList.Contains(';FluentAssertions;')) AND $(IsFluentAssertionsWhiteListed) == true and '$(Configuration)' == 'Debug'"
+      Text="FluentAssertionsSafeGuard: Project that does not contain FluentAssertions reference should not be listed in safeguard file. Please remove project '$(AssemblyName)' from ProjectSafeguards\FluentAssertionsProjectsSafeguard.txt."/>
+  </Target>
+
+  <Target Name="CheckReferenceMatchAssemblyName" AfterTargets="PreBuildEvent" Condition="'$(UsingMicrosoftNETSdk)' == 'true'">
+
+    <!--
+      multi-targeting to net8 for some of the ServiceTests employed <HintPath>$(WTGBinRoot)
+      these absolute paths cause problems when we multi-target other projects.
+      <HintPath> element should be removed, so that our automatic hint path resolution can kick in.
+    -->
+    <Error Condition="$([System.String]::Copy('%(Reference.CWAutomaticHintPathSource)').EndsWith('existing hintpath not overwritten', StringComparison.OrdinalIgnoreCase))
+            and $([System.String]::Copy('%(Reference.HintPath)').StartsWith('$(WTGBinRoot)', StringComparison.OrdinalIgnoreCase))
+            and $([System.String]::Copy('%(Reference.HintPath)').EndsWith('.dll', StringComparison.OrdinalIgnoreCase))"
+          Text="&lt;Reference Include='%(Reference.Identity)'&gt;/&lt;HintPath&gt; should not start with $(WTGBinRoot). Use automatic hint path resolution instead, by removing the &lt;HintPath&gt; element entirely. See: https://github.com/WiseTechGlobal/Modernization.Content/blob/main/Controls/populate-reference-hint-path-automatically.md" />
+
+    <!--
+      no hint paths should contain \refs\. see: WI00871249 - Fix reference in Enterprise.Customs.BE.GUI.Winzor.csproj
+    -->
+    <Error Condition="$([System.String]::Copy('%(Reference.CWAutomaticHintPathSource)').EndsWith('existing hintpath not overwritten', StringComparison.OrdinalIgnoreCase))
+            and $([System.String]::Copy('%(Reference.HintPath)').ToLowerInvariant().Contains('\refs\'))"
+          Text="&lt;Reference Include='%(Reference.Identity)'&gt;/&lt;HintPath&gt; of '%(Reference.HintPath)' should not contain '\refs\'. Fix the assembly reference, or better yet, use automatic hint path resolution instead, by removing the &lt;HintPath&gt; element entirely. See: https://github.com/WiseTechGlobal/Modernization.Content/blob/main/Controls/populate-reference-hint-path-automatically.md" />
+
+    <PropertyGroup>
+      <ReferenceList>@(Reference);</ReferenceList>
+    </PropertyGroup>
+    <GetAssemblyIdentity AssemblyFiles="$([System.IO.Path]::GetFullPath('$(ProjectDir)\%(Reference.HintPath)'))" Condition="$([System.IO.File]::Exists('$(ProjectDir)\%(Reference.HintPath)')) == true">
+      <Output TaskParameter="Assemblies" ItemName="resolvedAssemblies" />
+    </GetAssemblyIdentity>
+    <Error Condition="$(ReferenceList.Contains('%(resolvedAssemblies.Name);')) != true"
+           Text="Reference name to %27%(resolvedAssemblies.Name)%27 does not match the [HintPath] specified in the .csproj file. Please ensure that the [Include] attribute of %3CReference> element matches that of the [HintPath]. (%(resolvedAssemblies.OriginalItemSpec))" />
+  </Target>
+
+  <!--
+    This safeguard ensures that <PackageReference> elements are not added to net48 projects. Net48 projects use paket for packagement management and assembly references to the actual dll.
+    There are some exceptions, which are listed in Directory.Build.props. These packages perform some action during the build and cannot be a simple assembly reference.
+  -->
+  <Target Name="PackageReferenceNotAllowedInNet48Safeguard" BeforeTargets="ResolvePackageAssets;PreBuildEvent" Condition="$(TargetFramework.StartsWith('net4'))">
+
+    <PropertyGroup>
+      <!--
+        Use the <PackageVersion> list from Directory.Build.props as the list of valid packages.
+
+        Pipe-delimit the valid packages, so the string.Contains call will actually check for exact package name, not substring matches.
+        To transform an array into a delimeter string. see: https://stackoverflow.com/a/7899245
+      -->
+      <ValidPackageReferencesInNet48PipeDelimited>|@(PackageVersion->'%(Identity)', '|')|</ValidPackageReferencesInNet48PipeDelimited>
+    </PropertyGroup>
+
+    <!-- useful for debugging
+    <Message Text="PackageReference@: @(PackageReference)" Importance="High" />
+    <Message Text="ValidPackageReferencesInNet48PipeDelimited: @(ValidPackageReferencesInNet48PipeDelimited)" Importance="High" />
+    <Message Text="%(PackageReference.Identity) = $(ValidPackageReferencesInNet48PipeDelimited.Contains(|%(PackageReference.Identity)|))" Importance="High" Condition="'%(PackageReference.Identity)' != ''" />
+    -->
+
+    <!--
+      There are NETStandard.Library is reported as referenced by Enterprise.Services.Scim.Business, but it is not in the .csproj. We can exclude this package reference.
+    -->
+    <Error Condition="'%(PackageReference.Identity)' != '' and !$(ValidPackageReferencesInNet48PipeDelimited.Contains(|%(PackageReference.Identity)|)) and '%(PackageReference.Identity)' != 'NETStandard.Library'"
+      Text="A &lt;PackageReference&gt; to '%(PackageReference.Identity)' should not be used in the net48 project '$(MSBuildProjectName)'. Instead, add the package with 'dotnet paket', then add a &lt;Copy&gt; entry to Build.xml to copy the package's binary to Bin folder, then finally add a &lt;Reference&gt; in this .csproj file to the binary in the Bin folder. The exception is packages that perform some build actions, rather than just containing assemblies. These packages can be added to the Directory.Build.props file in the root of the repository, in the 'packages for net48' section." />
+  </Target>
+
+  <!--
+  🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+  🚨 ____  _              _  🚨
+  🚨/ ___|| |_ ___  _ __ | | 🚨
+  🚨\___ \| __/ _ \| '_ \| | 🚨
+  🚨 ___) | || (_) | |_) |_| 🚨
+  🚨|____/ \__\___/| .__/(_) 🚨
+  🚨               |_|       🚨
+  🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+  DO NOT REMOVE THIS FILE OR ADD ADDITIONAL LINES TO THE EXISTING XAML FILES LIST BELOW. THIS IS TO PREVENT ANY NEW XAML FILES FROM BEING CREATED. -->
+
+  <Target Name="CheckNewXAMLFiles" AfterTargets="PreBuildEvent" Condition="'$(UseWPF)' == 'true'">
+    <ItemGroup>
+      <CurrentXamlFiles Include="$(MSBuildProjectDirectory)\**\*.xaml" />
+    </ItemGroup>
+
+    <ReadLinesFromFile File="$(MSBuildThisFileDirectory)\ProjectSafeguards\LegalXAMLFilesSafeguard.txt">
+      <Output TaskParameter="Lines" ItemName="XamlFile" />
+    </ReadLinesFromFile>
+
+    <CreateItem Include="@(CurrentXamlFiles->'%(FullPath)')">
+      <Output TaskParameter="Include" ItemName="CurrentXamlFilesWithAbsolutePath"/>
+    </CreateItem>
+
+    <PropertyGroup>
+      <RootDir>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)))</RootDir>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <LegalXamlFiles Include="$(RootDir)%(XamlFile.Identity)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <LegalXamlFilesWithLowerCase Include="@(LegalXamlFiles->ToLower())" />
+      <CurrentXamlFilesWithAbsolutePathWithLowerCase Include="@(CurrentXamlFilesWithAbsolutePath->ToLower())"/>
+    </ItemGroup>
+
+    <PropertyGroup>
+      <LegalXamlFilesWithAbsolutePathProperty>@(LegalXamlFilesWithLowerCase)</LegalXamlFilesWithAbsolutePathProperty>
+    </PropertyGroup>
+
+    <Error Condition="!$(LegalXamlFilesWithAbsolutePathProperty.Contains('%(CurrentXamlFilesWithAbsolutePathWithLowerCase.Identity)'))"
+      Text="%0ALegalXAMLFilesSafeguard does not allow to create any new .XAML files ('%(CurrentXamlFilesWithAbsolutePathWithLowerCase.Identity)') in a WPF project. %0AIf this .XAML file is meant to be kept please add the relative path into 'LegalXAMLFilesSafeguard.txt'."/>
+  </Target>
+
+  <!-- This conditional is required to filter out the non SDK-style projects as they cannot consume the NuGet in this format -->
+  <ItemGroup Condition="'$(UsingMicrosoftNETSdk)' == 'true'">
+    <PackageReference Include="WTG.BuildConfiguration.Analysis.SYSLIB">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>build; contentfiles</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <Target Name="CuratedReferencesSafeguard" AfterTargets="PreBuildEvent" Condition="'$(IsSelfContainedWithILMergeAndReferencesAreCurated)' == 'true'">
+    <ReadLinesFromFile File="$(MSBuildThisFileDirectory)ProjectSafeguards\CuratedReferencesSafeguard.txt">
+      <Output TaskParameter="Lines" ItemName="CuratedReferences" />
+    </ReadLinesFromFile>
+
+    <ItemGroup>
+      <CuratedReferencesWithoutComments Include="@(CuratedReferences)" Condition="!$([System.String]::Copy('%(CuratedReferences.Identity)').StartsWith('#'))" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <!--
+        pipe-delimit the curated references, so the string.Contains call will actually check for exact reference name, not substring matches.
+        to transform an array into a delimeter string. see: https://stackoverflow.com/a/7899245
+      -->
+      <CuratedReferencesPipeDelimited>|@(CuratedReferencesWithoutComments->'%(Identity)', '|')|</CuratedReferencesPipeDelimited>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <WithoutSystemReference Include="@(Reference)" Condition="!$([System.String]::Copy('%(Reference.Identity)').StartsWith('System')) and !$([System.String]::Copy('%(Reference.Identity)').ToLower().Contains('\.nuget\packages\system.')) and !$([System.String]::Copy('%(Reference.Identity)').ToLower().Contains('\nugetpackages')) and '%(Reference.Identity)' != 'mscorlib' and '%(Reference.Identity)' != 'WindowsBase' and !$([System.String]::Copy('%(Reference.Identity)').ToLower().Contains('\netcoreapp3.0\accessibility')) and !$([System.String]::Copy('%(Reference.Identity)').ToLower().Contains('.nuget\packages\microsoft.win32'))"/>
+    </ItemGroup>
+
+    <!-- useful for debugging
+    <Message Text="curated references: $(CuratedReferencesPipeDelimited)" Importance="High" />
+    <Message Text="%(WithoutSystemReference.Identity) = $(CuratedReferencesPipeDelimited.Contains(|%(WithoutSystemReference.Identity)|))" Importance="High" />
+    -->
+
+    <Error
+      Condition="!$(CuratedReferencesPipeDelimited.Contains(|%(WithoutSystemReference.Identity)|))"
+      Text="CuratedReferencesSafeguard: A reference to '%(WithoutSystemReference.Identity)' should not have been added to '$(MSBuildProjectName)' unless all dependencies have been added to the ILMerge list in the CargoWiseOne.Start.csproj. CargoWiseOne.Start.exe is a self-contained program combined using ILMerge.exe after build, the executable needs to run from the root path 'C:\Program Files (x86)\WiseTech Global\CargoWise One' without having the full CW1 binaries available. Adding this reference could break the execution because it is outside of the CW1 runtime. Best case it simply bloats the self-contained program. This project has the IsSelfContainedWithILMergeAndReferencesAreCurated property set to true in the .csproj file."/>
+  </Target>
+
+  <Target Name="DefineConstantsSafeGuard" AfterTargets="PreBuildEvent">
+
+    <!-- this safeguard checks the .csproj file for any re-definition of global DefineConstants, such as DEBUG, CODE_ANALYSIS, etc -->
+
+
+    <!-- for information on XmlPeek, see: https://learn.microsoft.com/en-us/visualstudio/msbuild/xmlpeek-task?view=vs-2022 -->
+    <XmlPeek XmlInputPath="$(MSBuildProjectFullPath)" Query="/Project//PropertyGroup//DefineConstants/text()">
+      <Output TaskParameter="Result" PropertyName="DefineConstantsFromCsProj" />
+    </XmlPeek>
+
+    <ItemGroup>
+      <DefaultConstant Include="$(CommonDefineConstants)"/>
+      <DefaultConstant Include="DEBUG"/>
+      <DefaultConstant Include="RELEASE"/>
+      <DefaultConstant Include="TRACE"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <DefaultConstantPipeDelimited Include="|%(DefaultConstant.Identity)|"/>
+    </ItemGroup>
+
+    <PropertyGroup>
+      <!--
+        pipe-delimit the curated references, so the string.Contains call will actually check for exact define constant name, not substring matches.
+        to transform an array into a delimeter string. see: https://stackoverflow.com/a/7899245
+      -->
+      <DefineConstantsFromCsProjPipeDelimited>|$(DefineConstantsFromCsProj.ToUpper().Replace(';', '|'))|</DefineConstantsFromCsProjPipeDelimited>
+    </PropertyGroup>
+
+    <!-- useful for debugging
+    <Message Importance="High" Text="DefineConstants: $(DefineConstants). CommonDefineConstants: $(CommonDefineConstants). DefineConstantsFromCsProj: $(DefineConstantsFromCsProj)"/>
+    <Message Importance="High" Text="defined in project: $(DefineConstantsFromCsProjPipeDelimited). CommonDefineConstants element: %(DefaultConstantPipeDelimited.Identity). Project re-defines something from common? $(DefineConstantsFromCsProjPipeDelimited.Contains(%(DefaultConstantPipeDelimited.Identity)))" />
+    -->
+
+    <Error Condition="$(DefineConstantsFromCsProjPipeDelimited.Contains(%(DefaultConstantPipeDelimited.Identity)))"
+      Text="Re-definition of global DefineConstant. The project file '$(MSBuildProjectFullPath)' has DefineConstants of '$([System.String]::Copy('%(DefaultConstantPipeDelimited.Identity)').Replace('|', ''))'. This constant is defined globally and does not need to be re-defined at the project level. Please remove it from the .csproj file"
+    />
+
+  </Target>
+
+  <Target Name="AssemblyPropertyInCWReferenceStatusSafeGuard" BeforeTargets="Build" Condition="'$(CWEnableReferenceStatusSafeGuard)' == 'true'">
+    <PropertyGroup>
+      <_AssemblyName Condition="'$(AssemblyName)' == ''">$(MSBuildProjectName)</_AssemblyName>
+      <_AssemblyName Condition="'$(AssemblyName)' != ''">$(AssemblyName)</_AssemblyName>
+      <CWReferencePropsFile Condition="'$(CWEnableFullNetCoreBuild)' != 'true'">$(WTGBranchRoot)Directory.CargoWiseReferences.props</CWReferencePropsFile>
+      <CWReferencePropsFile Condition="'$(CWEnableFullNetCoreBuild)' == 'true'">$(WTGBranchRoot)NetCore\Temp_TransitionToNet8\Directory.CargoWiseReferences.props</CWReferencePropsFile>
+    </PropertyGroup>
+
+    <XmlPeek XmlInputPath="$(CWReferencePropsFile)" Query="/Project/ItemGroup/CWReferenceStatus[@Include='$(_AssemblyName)']/@HasNetCore">
+      <Output TaskParameter="Result" PropertyName="_HasNetCore" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(CWReferencePropsFile)" Query="/Project/ItemGroup/CWReferenceStatus[@Include='$(_AssemblyName)']/@HasNetFramework">
+      <Output TaskParameter="Result" PropertyName="_HasNetFramework" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(CWReferencePropsFile)" Query="/Project/ItemGroup/CWReferenceStatus[@Include='$(_AssemblyName)']/@HasWinzor">
+      <Output TaskParameter="Result" PropertyName="_HasWinzor" />
+    </XmlPeek>
+
+    <Error Condition="('$(IsNetCoreWindowsTargetFramework)' == 'true' or '$(IsNetCoreTargetFramework)' == 'true') and '$(IsWinzorProject)' != 'true' and ('$(_HasNetCore)' != 'true')"
+           Text="The project '$(_AssemblyName)' is targeting '$(TargetFramework)', but the corresponding &lt;CWReferenceStatus&gt; in Directory.CargoWiseReferences.props does not have HasNetCore set to 'true'." />
+    <Error Condition="'$(IsNetFrameworkTargetFramework)' == 'true' and ('$(_HasNetFramework)' == 'false')"
+           Text="The project '$(_AssemblyName)' is targeting '$(TargetFramework)', but the corresponding &lt;CWReferenceStatus&gt; in Directory.CargoWiseReferences.props has HasNetFramework set to 'false'." />
+    <Error Condition="'$(IsWinzorProject)' == 'true' and ('$(_HasWinzor)' != 'true')"
+           Text="The project '$(_AssemblyName)' is targeting 'Winzor', but the corresponding &lt;CWReferenceStatus&gt; in Directory.CargoWiseReferences.props does not have HasWinzor set to 'true'." />
+  </Target>
+
+</Project>

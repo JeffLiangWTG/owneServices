@@ -1,0 +1,74 @@
+@namespace System.Windows.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using System.ComponentModel
+@using WebMouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs;
+@using WinzorFramework.Extensions
+
+<th @ref=column style="@Styles" class="@CssClass"
+@onmouseup="OnHeaderMouseUp" @onmouseup:stopPropagation
+@onmousedown="OnHeaderMouseDown" @onmousedown:stopPropagation>
+    <span>@HeaderText</span>
+    <div class="listview__column_resizer"
+    @onmousedown="async (args) => await OnResizerMouseDown(args)" @onmousedown:stopPropagation
+    @onmouseup="async (args) => await OnResizerMouseUp(args)" @onmouseup:stopPropagation></div>
+</th>
+
+@code
+{
+    [Parameter]
+    public string CssClass { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Styles { get; set; } = string.Empty;
+
+    [Parameter]
+    public string HeaderText { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<WebMouseEventArgs> HeaderMouseDown
+    {
+        get; set;
+    }
+
+    [Parameter]
+    public EventCallback<WebMouseEventArgs> HeaderMouseUp
+    {
+        get; set;
+    }
+
+    [Parameter]
+    public EventCallback<ResizerEventArgs> ResizerMouseDown
+    {
+        get; set;
+    }
+
+    [Parameter]
+    public EventCallback<ResizerEventArgs> ResizerMouseUp
+    {
+        get; set;
+    }
+
+    ElementReference column;
+
+    async Task OnHeaderMouseUp(WebMouseEventArgs args)
+    {
+        await HeaderMouseUp.InvokeAsync(args);
+    }
+
+    async Task OnHeaderMouseDown(WebMouseEventArgs args)
+    {
+        await HeaderMouseDown.InvokeAsync(args);
+    }
+
+    async Task OnResizerMouseUp(WebMouseEventArgs args)
+    {
+        await ResizerMouseUp.InvokeAsync(new ResizerEventArgs(args, column));
+    }
+
+    async Task OnResizerMouseDown(WebMouseEventArgs args)
+    {
+        await ResizerMouseDown.InvokeAsync(new ResizerEventArgs(args, column));
+    }
+
+    public record ResizerEventArgs(WebMouseEventArgs Args, ElementReference Column);
+}

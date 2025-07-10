@@ -1,0 +1,371 @@
+using System;
+using System.Drawing;
+using CargoWise.Application;
+using CargoWise.Common;
+using CargoWise.Interop;
+using CargoWise.Types;
+using Enterprise.BufferManagement.Integration;
+using Enterprise.Environment;
+using Enterprise.MasterFiles.Business;
+using Enterprise.Security;
+using Enterprise.ZArchitecture.Business;
+using Enterprise.ZArchitecture.GUI;
+using Enterprise.ZArchitecture.GUI.Balloons;
+
+namespace Enterprise.MasterFiles.GUI
+{
+	public partial class ZWorkflowUserControl : ZUserControl
+	{
+		public ZWorkflowUserControl()
+		{
+			InitializeComponent();
+
+			MainTabControl.MouseHover += new EventHandler(MainTabControl_MouseHover);
+#if !WINZOR
+			MainTabControl.MouseMove += (s, e) => OnMouseMove();
+#endif
+		}
+
+		#region Layout
+
+		public override void SetDataBinding(object dataSource, string dataMember)
+		{
+			var workflowProvider = (IWorkflowProvider)dataSource;
+			if (workflowProvider != null)
+			{
+				SetupLayoutIfRequired(workflowProvider);
+			}
+
+			base.SetDataBinding(dataSource, dataMember);
+		}
+
+		void SetupLayoutIfRequired(IWorkflowProvider provider)
+		{
+			if (!layoutSetup)
+			{
+				layoutSetup = true;
+				SetupLayout(provider);
+			}
+		}
+
+		bool layoutSetup;
+
+		void SetupLayout(IWorkflowProvider provider)
+		{
+			var descriptor = GetWorkflowDescriptor(provider.WorkflowType);
+			var supportsEventTracking = descriptor != null && descriptor.SupportsEventTracking;
+			var shouldHideTasksTab = descriptor != null && descriptor.ShouldHideTasksTabOnJobs;
+			var supportValidationRules = descriptor != null && descriptor.ValidationToolSettings.SupportsValidationRules;
+
+			if (ObjectFactory.Get<IBMSRegistry>().AlwaysViewWorkflowManagementTab || Env.Security.ViewWorkflowManagementTab.IsAllowed)
+			{
+				managementTab = (ZTabPage)GetNewWorkflowManagementTabPage(provider);
+			}
+
+			if (managementTab != null)
+			{
+				managementTab.Name = "ManagementTab";
+				managementTab.CaptionResourceString = Res.GetData("ZWorkflowUserControl|FBBBB8AB-E2FD-4fa5-A1BE-A5BC8D6B4BDA", "Management", "The Workflow Management tab.");
+				MainTabControl.TabPages.Add(managementTab);
+			}
+
+			if (!shouldHideTasksTab)
+			{
+				tasksTab = GetNewTaskWithDetailsAndFilterTab(provider);
+				tasksTab.Name = "TasksTab";
+				tasksTab.CaptionResourceString = Res.GetData("ZWorkflowUserControl|FBBBB8AB-E2FD-4fa5-A1BE-A5BC8D7E4BEC", "Tasks", "The Tasks tab.");
+				MainTabControl.TabPages.Add(tasksTab);
+			}
+
+			if (supportsEventTracking)
+			{
+				milestonesTab = new ZMilestonesTabPage();
+				milestonesTab.Name = "MilestonesTab";
+				milestonesTab.CaptionResourceString = Res.GetData("ZWorkflowUserControl|252FE6AB-F494-4534-B297-07A26EE9A393", "Milestones", "The Milestones tab.");
+				MainTabControl.TabPages.Add(milestonesTab);
+
+				exceptionsTab = new ZExceptionsTabPage();
+				exceptionsTab.Name = "ExceptionsTab";
+				exceptionsTab.CaptionResourceString = Res.GetData("ZWorkflowUserControl|A0307618-9EF2-464a-BDA9-1A2B7096D375", "Exceptions", "The Exceptions tab.");
+				MainTabControl.TabPages.Add(exceptionsTab);
+
+				triggersTab = new ZWorkflowTriggersTabPage();
+				triggersTab.Name = "TriggersTab";
+				triggersTab.CaptionResourceString = Res.GetData("ZWorkflowUserControl|99BC5B22-4ACD-4735-B016-CB586ECBA1E6", "Triggers", "The Triggers tab.");
+				MainTabControl.TabPages.Add(triggersTab);
+
+				AddValidationToolTab();
+
+				MainTabControl.TabPages.Add(NewEventsTab());
+			}
+			else
+			{
+				AddValidationToolTab();
+			}
+
+			return;
+
+			void AddValidationToolTab()
+			{
+				if (!supportValidationRules)
+				{
+					return;
+				}
+
+				validationToolTab = new ValidationToolTabPage();
+				validationToolTab.Name = "ValidationToolTab";
+				validationToolTab.CaptionResourceString = Res.GetData("ZWorkflowUserControl|f1fb496b-15bf-4f0a-9d56-b05c955f1ba4", "Validation", "The Validation tab.");
+				MainTabControl.TabPages.Add(validationToolTab);
+			}
+		}
+
+		protected virtual IWorkflowManagementTabPage GetNewWorkflowManagementTabPage(IWorkflowProvider provider)
+		{
+			return ObjectFactory.Get<IWorkflowManagementTabPageProvider>().GetTabPage(provider);
+		}
+
+		protected virtual TaskWithDetailsAndFilterTab GetNewTaskWithDetailsAndFilterTab(IWorkflowProvider provider)
+		{
+			return new TaskWithDetailsAndFilterTab();
+		}
+
+		ZStmALogTabPage NewEventsTab()
+		{
+			ZStmALogTabPage eventsTab = new ZStmALogTabPage();
+			eventsTab.GetStmALogFilterStripBusinessObject = GetStmALogFilterStripBusinessObject;
+			eventsTab.LogsToShow = LogsToShow.Operations;
+			eventsTab.CaptionResourceString = Res.GetData("ZWorkflowUserControl|2EB03D0A-0ECF-4bd2-A502-B0B065EBE689", "Events", "The Events tab.");
+			eventsTab.Name = "EventsTab";
+			eventsTab.FilterStripsModifiable = true;
+			eventsTab.Bound += (s, e) =>
+			{
+				eventsTab.EventUserControl.CheckAndConsumeWorkflowLicenceIfAllowed(
+					null,
+					() => { }, SecurityCore.WorkflowEventsJustViewAutoGeneratedCode, SecurityCore.WorkflowEventsJustViewAutoGeneratedCode
+				);
+				var cancelEventsCheckpoint = IRequiresWorkflowSecurityExtensions.GetSecurityCheckpoint(eventsTab.EventUserControl, null, SecurityCore.WorkflowCancelEventsAutoGeneratedCode);
+				var addEventsCheckpoint = IRequiresWorkflowSecurityExtensions.GetSecurityCheckpoint(eventsTab.EventUserControl, null, SecurityCore.WorkflowAddEventsAutoGeneratedCode);
+				var canCancel = cancelEventsCheckpoint?.IsAllowed ?? true;
+				var canAdd = addEventsCheckpoint?.IsAllowed ?? true;
+				eventsTab.EventUserControl.CheckNewAndCancelSecurity(canAdd, canCancel);
+			};
+			return eventsTab;
+		}
+
+		protected virtual GetStmALogFilterStripBusinessObject GetStmALogFilterStripBusinessObject { get; set; }
+
+		#endregion
+
+		#region Dispose
+
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				if (components != null)
+				{
+					components.Dispose();
+				}
+			}
+			base.Dispose(disposing);
+		}
+
+		#endregion
+
+		#region IWorkflowForm
+
+		public virtual void NavigateToWorkflowItem(ProcessTask task)
+		{
+			if (CheckTabControlNotDisposed() && task != null)
+			{
+				if (task.IsException && exceptionsTab != null)
+				{
+					MainTabControl.SelectedTab = exceptionsTab;
+					((ZExceptionsTabPage)(exceptionsTab)).ExceptionsUserControl.NavigateToWorkflowItem(task);
+				}
+				else if (task.IsMilestone && milestonesTab != null)
+				{
+					MainTabControl.SelectedTab = milestonesTab;
+					((ZMilestonesTabPage)(milestonesTab)).MilestonesUserControl.NavigateToWorkflowItem(task);
+				}
+				else if (task.IsTrigger() && triggersTab != null)
+				{
+					MainTabControl.SelectedTab = triggersTab;
+					((ZWorkflowTriggersTabPage)(triggersTab)).WorkflowTriggersUserControl.NavigateToWorkflowItem(task);
+				}
+				else
+				{
+					if (managementTab != null)
+					{
+						MainTabControl.SelectedTab = managementTab;
+						((IWorkflowManagementTabPage)managementTab).NavigateToWorkflowItem(task);
+					}
+					else if (tasksTab != null)
+					{
+						MainTabControl.SelectedTab = tasksTab;
+						((TaskWithDetailsAndFilterTab)(tasksTab)).FilterControl.NavigateToWorkflowItem(task);
+					}
+				}
+			}
+		}
+
+		public void NavigateToWorkflowItem(IProcessHeader workflow)
+		{
+			if (CheckTabControlNotDisposed() && workflow != null && managementTab != null)
+			{
+				MainTabControl.SelectedTab = managementTab;
+				((IWorkflowManagementTabPage)managementTab).NavigateToWorkflowItem(workflow);
+			}
+		}
+
+		bool CheckTabControlNotDisposed()
+		{
+			if (MainTabControl.IsDisposed && !IsDisposed)
+			{
+				ErrorReporter.ReportOnce("NavigateToWorkflowItem", "MainTabControl is already disposed before NavigateToWorkflowItem() call while ZWorkflowUserControl is not yet disposed.");
+				return false;
+			}
+
+			return true;
+		}
+
+		#endregion
+
+		#region Implementation
+
+#if !WINZOR
+
+		protected void OnMouseMove()
+		{
+			var tabPage = GetMouseHoveringTabPage();
+			var tab = tabPage?.Tab;
+			if (lastMouseHoveringTabPage != tab)
+			{
+				lastMouseHoveringTabPage = tab;
+				SafeNativeMethods.TrackMouse(MainTabControl.Handle);
+			}
+		}
+
+		ZTabPage lastMouseHoveringTabPage;
+
+#endif
+
+		protected ZTabPage managementTab, tasksTab, milestonesTab, triggersTab, exceptionsTab, validationToolTab;
+
+		protected virtual WorkflowDescriptor GetWorkflowDescriptor(ZString workflowType)
+		{
+			return WorkflowDescriptors.Instance.TryGetValueSafe(workflowType);
+		}
+
+		void MainTabControl_MouseHover(object sender, EventArgs e)
+		{
+			// Capture the actual MouseHoveringTabPage that triggered this call
+			// as soon as possible as it can change with mouse drift.
+
+			var tabWithPosition = GetMouseHoveringTabPage();
+			var tabPage = tabWithPosition?.Tab;
+			if (tabPage != null && Enterprise.ZArchitecture.Environment.EnvProxy.Instance.Registry.TraningModeEnabled)
+			{
+				if (tabPage is IWorkflowManagementTabPage)
+				{
+					ShowBalloon(Res.GetString("c5d45c2b-788d-4734-9d62-1f50abc20d12", "Management"), Res.GetString("15357c67-2272-400b-9521-deaf20e7cda3", "Management related information about this job, that will be used in Buffer Management."), tabWithPosition);
+				}
+				else if (tabPage is TaskWithDetailsAndFilterTab)
+				{
+					ShowBalloon(Res.GetString("c5d45c2b-788d-4734-9d62-1f50abc30e00", "Tasks"), Res.GetString("15357c67-2272-400b-9521-deaf20e7baf6", "A task is a unit of work related to the job."), tabWithPosition);
+				}
+				else if (tabPage is ZMilestonesTabPage)
+				{
+					ShowBalloon(Res.GetString("5ed31684-5702-4635-aaa4-86cf2bbe34da", "Milestones"), Res.GetString("9ed4b302-a8fa-4336-93f8-862835341ce3", "A milestone is a point in time at which a key part of the process completes."), tabWithPosition);
+				}
+				else if (tabPage is ZExceptionsTabPage)
+				{
+					ShowBalloon(
+						Res.GetString("2f3491fc-b80c-416e-851e-c45eb8c2cd67", "Exceptions"),
+						Res.GetString("ee560d27-274b-41c8-87aa-7d011f89f0fa", "An exception represents a deviation from the normal flow of a process and usually indicates a problem.\r\nAn exception is automatically raised when a milestone isn't reached at the expected time."),
+												tabWithPosition);
+				}
+				else if (tabPage is ZWorkflowTriggersTabPage)
+				{
+					ShowBalloon(
+						Res.GetString("5e4d3f7c-2686-4a1e-b757-dcd74236b91e", "Triggers"),
+						Res.GetString("62af105c-0862-4f02-92f0-369db30f53e5", @"A Workflow Trigger is an action that can be configured to occur when
+- A Workflow Event has been raised (see the Events tab)
+- The value of a field on the form has been entered or changed
+
+A Workflow Trigger action can be configured to:
+- Send a document to configured recipients
+- Send an XML file to configured recipients") + "\r\n", tabWithPosition);
+				}
+				else if (tabPage is ZStmALogTabPage)
+				{
+					ShowBalloon(Res.GetString("7bd58c99-bb2f-4463-8fe7-c9d703c31664", "Events"), Res.GetString("1526a565-b2d5-48f1-8463-855fed91432a", "An event is raised when a milestone has been reached."), tabWithPosition);
+				}
+				else if (tabPage is ValidationToolTabPage)
+				{
+					ShowBalloon(Res.GetString("fb3d2106-52b5-4ff2-9ed7-d54fd3925877", "Validation"), Res.GetString("5526bca6-200b-4ef5-a30e-67d287469101", "A validation rule is related to a job."), tabWithPosition);
+				}
+			}
+		}
+
+		#region ShowBalloon
+
+		protected virtual void ShowBalloon(string caption, string message, TabPageWithHeaderPostion mouseHoveringTabPage)
+		{
+			if (mouseHoveringTabPage != null && Balloon.Instance != null)
+			{
+				// MainTabControl
+
+				Balloon.Instance.Show(caption, message, mouseHoveringTabPage.Tab, mouseHoveringTabPage.HeaderPosition, true, true);
+			}
+		}
+
+		#endregion
+
+		#region MouseHoveringTabPage
+
+		TabPageWithHeaderPostion GetMouseHoveringTabPage()
+		{
+			return (MainTabControl == null || MainTabControl.IsDisposed)
+				? null
+				: FindTabControlFromHeader(MainTabControl, MainTabControl.PointToClient(FormMousePosition));
+		}
+
+		protected virtual Point FormMousePosition
+		{
+			get { return MousePosition; }
+		}
+
+		TabPageWithHeaderPostion FindTabControlFromHeader(ZTabControl tabControl, Point point)
+		{
+			if (tabControl.TabPages != null)
+			{
+				for (int i = 0; i < tabControl.TabPages.Count; i++)
+				{
+					var rectangle = tabControl.GetTabRect(i);
+					if (rectangle.Contains(point))
+					{
+						return new TabPageWithHeaderPostion((ZTabPage)tabControl.TabPages[i], rectangle);
+					}
+				}
+			}
+			return null;
+		}
+
+		protected class TabPageWithHeaderPostion
+		{
+			public TabPageWithHeaderPostion(ZTabPage tab, Rectangle rectangle)
+			{
+				Tab = tab;
+				HeaderPosition = rectangle;
+			}
+
+			public ZTabPage Tab { get; }
+			public Rectangle HeaderPosition { get; }
+		}
+
+		#endregion
+
+		#endregion
+	}
+}

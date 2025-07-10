@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<!-- This XSD is a published inteface, and has to remain backwards compatible.  Elements must not be removed under any circumstances -->
+<!-- If you want to change this XSD, you should release a new version. Talk to Brendon -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified"
+	targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns="http://www.edi.com.au/EnterpriseService/">
+	<xs:include schemaLocation="Elements.xsd"/>
+	<xs:include schemaLocation="Shipment.xsd"/>
+	<xs:include schemaLocation="Consol.xsd"/>
+	<xs:complexType name="ShipmentBooking">
+		<xs:sequence>
+			<xs:element name="ShipmentBookingDetail">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="PortOfLoading" type="Movement" minOccurs="0"/>
+						<xs:element name="PortOfDischarge" type="Movement" minOccurs="0"/>
+            <xs:choice minOccurs="0">
+							<xs:sequence>
+								<xs:element name="RoadRailFlight" type="FlightWithFlightNumber"/>
+							</xs:sequence>
+							<xs:sequence>
+								<xs:element name="Sailing" type="SailingWithVesselVoyage"/>
+							</xs:sequence>
+						</xs:choice>
+            <xs:element name="Carrier" type="Organisation" minOccurs="0"/>
+						<xs:element name="IsDirectBooking" type="TrueFalse" minOccurs="0"/>
+						<xs:element name="ClientRequestedETA" type="xs:dateTime" minOccurs="0"/>
+						<xs:element name="CFSReference" type="xs:string" minOccurs="0"/>
+						<xs:element name="Containers" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Container" type="Container" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Shipment" type="Shipment"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ShipmentBookings">
+		<xs:sequence>
+			<xs:element name="ShipmentBooking" type="ShipmentBooking" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ShipmentBookings" type="ShipmentBookings"/>
+</xs:schema>

@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<!-- NOTE WELL:  ANY CHANGES TO THIS FORMAT MUST BE REFLECTED IN DOCUMENTATION AND SAMPLE FILES AS PUBLISHED ON OUR WEBSITE. -->
+<!-- FUNCTIONAL TESTING SHOULD INCLUDE THE SAMPLE FILE PUBLISHED ON OUR WEBSITE. -->
+<xs:schema targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Elements.xsd"/>
+	<xs:element name="Products">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Product" type="Product" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Version" type="Version" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Product" type="Product"/>
+	<xs:complexType name="Product">
+		<xs:sequence>
+			<xs:element name="ProductCode" type="xs:string"/>
+			<xs:element name="ProductDescription" type="xs:string"/>
+			<xs:element name="StockUnit" type="xs:string"/>
+			<xs:element name="BrandName" type="xs:string" minOccurs="0"/>
+			<xs:element name="Model" type="xs:string" minOccurs="0"/>
+			<xs:element name="DecimalPlaces" type="xs:short" minOccurs="0"/>
+			<xs:element name="RelatedOrganisations" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="RelatedOrganisation" type="RelatedOrganisation" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DimensionDetails" type="Dimensions" minOccurs="0"/>
+			<xs:element name="UnitConversions" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="UnitConversion" type="UnitConversion" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Barcodes" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Barcode" type="Barcode" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="BillOfMaterials" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="BillOfMaterial" type="BillOfMaterials" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DangerousGoods" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="UNDG" type="HazardousGoods" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="UNDG" type="HazardousGoods" minOccurs="0"/>
+			<xs:element name="ClientDefinedDetails" type="ClientDefinedFields" minOccurs="0"/>
+			<xs:element name="BasicStockControl" type="BasicStockControl" minOccurs="0"/>
+			<xs:element name="ClientWarehouseDetails" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ClientWarehouseDetail" type="ClientWarehouseDetail" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="PickfaceDetails" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="PickFaceDetail" type="PickFaceDetail" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CustomValues" type="CustomValues" minOccurs="0"/>
+			<xs:element name="Customs" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Classifications">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Classification" type="Classification" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Notes" type="Notes" minOccurs="0"/>
+      <xs:element minOccurs="0" default="true" name="IsActive" type="xs:boolean" />
+			<!-- Legacy - contains the 'first' DG -->
+			<!-- End Legacy -->
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Barcode">
+		<xs:sequence>
+			<xs:element name="PackageUQ" type="xs:string"/>
+			<xs:element name="BarcodeString" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BasicStockControl">
+		<xs:sequence>
+			<xs:element name="WeightedCost" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="LastCost" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="QtyInStock" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="CostCurrency" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BillOfMaterials">
+		<xs:sequence>
+			<xs:element name="AllowResale" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="AllowDisassemblyOfKit" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="AllowAutoReplenishKit" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="AutoPrintAssemblyInstruction" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="Components" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Components" type="BOMComponentPart" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BOMComponentPart">
+		<xs:sequence>
+			<xs:element name="ComponentPart" type="Product"/>
+			<xs:element name="StockUnit" type="xs:string"/>
+			<xs:element name="Quantity" type="xs:decimal"/>
+			<xs:element name="Reusable" type="xs:boolean" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ClientDefinedFields">
+		<xs:sequence>
+			<xs:element name="OrderMultipleQty" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="VendorPack" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="Department" type="xs:string" minOccurs="0"/>
+			<xs:element name="Division" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ClientWarehouseDetail">
+		<xs:sequence>
+			<xs:element name="Client" type="Organisation"/>
+			<xs:element name="WarehouseCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="StockTakeCycle" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>WK: Weekly MTH: Monthly, TUE: Every Tuesday</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ExpiryPeriod" type="xs:int" minOccurs="0"/>
+			<xs:element name="ReplenishMinimum" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="ReplenishMultiple" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="EconomicQty" type="xs:decimal" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>In this product's StockUnit</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Dimensions">
+		<xs:sequence>
+			<xs:element name="Depth" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Width" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Height" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="DimensionUnit" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The unit of Depth, Width and Height</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GrossWeight" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="NetWeight" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Volume" type="DimensionValue" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Classification">
+		<xs:sequence>
+			<xs:element name="Name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Used in US Only.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="LookupCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>If lookup code is supplied, system will search for existing lookup. If no lookup is found, then a new one will only be created if tariff is supplied.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="LookupType" type="xs:string" use="required"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="RelatedOrg" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Used In US Only. This allows classification per related orgarnization on the product</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Code" type="xs:string"/>
+						<xs:element name="Relationship">
+							<xs:simpleType>
+								<xs:restriction base="xs:NMTOKEN">
+									<xs:enumeration value="OWN"/>
+									<xs:enumeration value="SUP"/>
+									<xs:enumeration value="BTH"/>
+									<xs:enumeration value="CLS"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Tariff" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>If Tariff is Specified and Lookup Code is not, a new unpublished Lookup will be created. For US a lookup will not be created, the tariff will simply be used.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SupplementaryTariff" type="xs:anySimpleType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Used in US only.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Description" type="xs:string" minOccurs="0"/>
+			<xs:element name="ClassificationType" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>For US The following codes are valid; HTI (HTS Import), HTE (HTS Export) and SHB (Schedule B).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CountryCode" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This is the country code representing where the classification is valid. ie, if it is a US classification, then the country code should be US. This will default to the currently logged in country</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CountryClassifications" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="USClassification" type="USProductClassification" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>US Specific Classification Information</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Children" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Used in US Imports only. This element is used to define related and child classification lines in the case of sets components or assemblies. This is only imported when classification type is HTI</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Child" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Order" type="xs:short" minOccurs="0"/>
+									<xs:element name="Type" type="xs:string">
+										<xs:annotation>
+											<xs:documentation>use COM for component tariff and REL for related tariff</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="Tariff" type="xs:string"/>
+									<xs:element name="CountryClassifications" minOccurs="0">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="USClassification" type="USProductClassification" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>US Specific Classification Information</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Attributes" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Used in US only. This provides additional for product matching purposes. If an attribute from this list matches part attribute 1 or part attribute 2 or part attribute 3 on the invoice line, then this classification will be used on the invoice line. This is only imported when classification type is HTI</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Attribute" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Value" type="xs:string"/>
+								</xs:sequence>
+								<xs:attribute name="Type" use="optional">
+									<xs:annotation>
+										<xs:documentation>AT1 = Part Attribute 1
+AT2 = Part Attribute 2
+AT3 = Part Attribute 3
+
+If not specified then AT1 will be use</xs:documentation>
+									</xs:annotation>
+									<xs:simpleType>
+										<xs:restriction base="xs:NMTOKEN">
+											<xs:enumeration value="AT1"/>
+											<xs:enumeration value="AT2"/>
+											<xs:enumeration value="AT3"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:attribute>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PickFaceDetail">
+		<xs:sequence>
+			<xs:element name="Client" type="Organisation" minOccurs="0"/>
+			<xs:element name="WarehouseCode" type="xs:string"/>
+			<xs:element name="Location" type="xs:string"/>
+			<xs:element name="ReplenishMinimum" type="xs:int" minOccurs="0"/>
+			<xs:element name="ReplenishMaximum" type="xs:int" minOccurs="0"/>
+			<xs:element name="LocationCode" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RelatedOrganisation">
+		<xs:sequence>
+			<xs:element name="Organisation" type="Organisation"/>
+			<xs:element name="RelationshipType" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>OWN: Owner SUP: Supplier BTH: Both owner and supplier WCN: Warehouse Client CLS: Classification Organization</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ClientUQ" type="xs:string" minOccurs="0"/>
+			<xs:element name="LocalProductNumber" type="xs:string" minOccurs="0"/>
+			<xs:element name="LocalProductDescription" type="xs:string" minOccurs="0"/>
+			<xs:element name="UseAttribute1" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="UseAttribute2" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="UseAttribute3" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="UseExpiryDate" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="ConsigneeMinShelfLifeAccepted" type="xs:short" minOccurs="0"/>
+      <xs:element name="UsePackingDate" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="RFAttributeConfirm" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>NON: None AT1: Attribute1 AT2: Attribute2 AT3: Attribute3</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="NON"/>
+						<xs:enumeration value="AT1"/>
+						<xs:enumeration value="AT2"/>
+						<xs:enumeration value="AT3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="LCMarkUpPercentage1" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="LCMarkUpPercentage2" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="LCMarkUpPercentage3" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="RoyaltyPercentage" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="RoyaltyFlatAmount" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="Hi" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The  number of layers a product is stacked on a pallet</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Ti" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The number of items per layer</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="UnitConversion">
+		<xs:sequence>
+			<xs:element name="Package" type="DimensionValue">
+				<xs:annotation>
+					<xs:documentation>If the conversion is 20 bottles in a box, then this is 20 bottles.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ParentUQ" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>If the conversion is 20 bottles in a box, then this is Box</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="USProductClassification">
+		<xs:sequence>
+			<xs:element name="CountryOfOrigin" type="CountryCode" minOccurs="0"/>
+			<xs:element name="Manufacturer" type="ManufacturerType" minOccurs="0"/>
+			<xs:element name="ProductClaim" type="xs:string" minOccurs="0"/>
+			<xs:element name="SPI" type="xs:string" minOccurs="0"/>
+			<xs:element name="AntiDumping" type="AntiDumping" minOccurs="0"/>
+			<xs:element name="Countervailing" type="Countervailing" minOccurs="0"/>
+			<xs:element name="PermitsLicenses" type="PermitAndLicenceType" minOccurs="0"/>
+			<xs:element name="PIRPRuling" type="PIRPRulingType" minOccurs="0"/>
+			<xs:element name="NAFTANetCost" type="TrueFalse" minOccurs="0"/>
+			<xs:element name="OGAIndicators" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="FDAIndicator" type="OGAIndicator" minOccurs="0"/>
+						<xs:element name="FCCIndicator" type="OGAIndicator" minOccurs="0"/>
+						<xs:element name="DOTIndicator" type="OGAIndicator" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="FDAs" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="FDA" type="USFDA" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="FCCs" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="FCC" type="USFCC" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DOTs" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="DOT" type="USDOT" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="PercentageOfActiveIngredient" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="TSCAIndicator" type="xs:string" minOccurs="0"/>
+			<xs:element name="ZoneStatus" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="D"/>
+						<xs:enumeration value="N"/>
+						<xs:enumeration value="P"/>
+						<xs:enumeration value="Z"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SoftwoodLumber" type="SoftwoodLumberType" minOccurs="0"/>
+			<xs:element name="LaceyActDetails" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="LaceyAct" type="USLaceyAct" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="TaxCode" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="016"/>
+						<xs:enumeration value="017"/>
+						<xs:enumeration value="018"/>
+						<xs:enumeration value="022"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxRateType" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="P"/>
+						<xs:enumeration value="S"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OverriddenTaxRate" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="PerUnit" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AMMVPerUnit" type="xs:decimal" minOccurs="0"/>
+						<xs:element name="CostPerUnit" type="FinancialValue" minOccurs="0"/>
+						<xs:element name="US9802PerUnit" type="xs:decimal" minOccurs="0"/>
+						<xs:element name="US9802InInvCurrPerUnit" type="FinancialValue" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Weight" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Only for Related and Component Classifications. Weght for other classifications is on the main product</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Gross" type="xs:decimal" minOccurs="0"/>
+						<xs:element name="Net" type="xs:decimal" minOccurs="0"/>
+						<xs:element name="UQ" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

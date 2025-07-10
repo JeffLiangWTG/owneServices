@@ -1,0 +1,17 @@
+﻿CREATE TRIGGER RptDt_TG_AccTransactionLines_InsertToReversedLinesTable
+ON AccTransactionLines
+AFTER INSERT, UPDATE
+AS
+INSERT INTO RptDtUnprocessedReversedAL (URL_ALPK)
+SELECT
+	i.AL_PK
+FROM
+	INSERTED i
+	LEFT JOIN DELETED d ON i.AL_PK = d.AL_PK
+WHERE
+	i.AL_LineType in ('REV','WIP','CST','ACR')
+	AND i.AL_ReverseDate IS NOT NULL
+	AND d.AL_ReverseDate IS NULL
+	AND i.AL_JH IS NOT NULL
+	AND i.AL_AG IS NOT NULL
+	AND i.AL_GC IS NOT NULL

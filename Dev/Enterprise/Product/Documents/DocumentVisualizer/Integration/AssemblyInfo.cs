@@ -1,0 +1,2 @@
+﻿ [assembly: WTG.StaticAnalysis.Annotation.UsesConstants(typeof(Enterprise.DocumentVisualizer.Core.Constants))]
+ [assembly: WTG.StaticAnalysis.Annotation.UsesConstants(typeof(Enterprise.ZArchitecture.Business.Events))]

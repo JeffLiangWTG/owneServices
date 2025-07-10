@@ -1,0 +1,82 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(CWNetCoreTargetFramework);net48</TargetFrameworks>
+    <RootNamespace>Enterprise.Accounting.ElectronicPayment</RootNamespace>
+    <AssemblyName>Enterprise.Accounting.ElectronicPayment</AssemblyName>
+    <Configurations>Debug;Release;DEBUGFAST</Configurations>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+    <CWGenerateXmlSerializationAssemblies>true</CWGenerateXmlSerializationAssemblies>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DEBUGFAST|AnyCPU'">
+    <CWGenerateXmlSerializationAssemblies>false</CWGenerateXmlSerializationAssemblies>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.ComponentModel.DataAnnotations"/>
+    <Reference Include="System.Runtime.Serialization.Primitives"/>
+    <Reference Include="System.Text.Json"/>
+    <Reference Include="System.Threading.Tasks.Extensions"/>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Common\GlobalElectronicPayment\GlobalElectronicPayment.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GlobalElectronicPayment.xsd</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Common\GlobalElectronicPayment\GlobalElectronicPayment.xsd">
+      <SubType>Designer</SubType>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>GlobalElectronicPayment.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Common\GlobalElectronicPayment\PaymentRequest\PaymentRequestSchema.json" />
+    <EmbeddedResource Include="Common\GlobalElectronicPayment\BeneficiaryRequest\BeneficiarySearchRequestSchema.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.ApplicationContext"/>
+    <Reference Include="CargoWise.Common"/>
+    <Reference Include="CargoWise.Common.JSON"/>
+    <Reference Include="CargoWise.ComponentModel"/>
+    <Reference Include="CargoWise.Data"/>
+    <Reference Include="CargoWise.Database.Shared"/>
+    <Reference Include="CargoWise.Definitions"/>
+    <Reference Include="CargoWise.EntityFramework"/>
+    <Reference Include="CargoWise.Integration"/>
+    <Reference Include="CargoWise.ResourceStrings.Cache"/>
+    <Reference Include="CargoWise.EventReference"/>
+    <Reference Include="CargoWise.Schema"/>
+    <Reference Include="CargoWise.Shared.40"/>
+    <Reference Include="CargoWise.Types"/>
+    <Reference Include="CargoWise.ResourceStrings"/>
+    <Reference Include="Enterprise.Accounting.Business"/>
+    <Reference Include="Enterprise.Accounting.ElectronicMessaging"/>
+    <Reference Include="Enterprise.Billing.Integration"/>
+    <Reference Include="Enterprise.Customs.Business"/>
+    <Reference Include="Enterprise.Accounting.Export"/>
+    <Reference Include="Enterprise.Environment"/>
+    <Reference Include="Enterprise.Integration"/>
+    <Reference Include="Enterprise.MasterFiles.Business"/>
+    <Reference Include="Enterprise.MasterFiles.Integration"/>
+    <Reference Include="Enterprise.Messaging.Business"/>
+    <Reference Include="Enterprise.Messaging.Integration"/>
+    <Reference Include="Enterprise.Registry.Business"/>
+    <Reference Include="Enterprise.ServiceManager.Shared"/>
+    <Reference Include="Enterprise.UniversalDataBuss.DataObjects"/>
+    <Reference Include="Enterprise.UniversalDataBuss.Integration"/>
+    <Reference Include="Enterprise.UniversalDataBuss.Management"/>
+    <Reference Include="Enterprise.ZArchitecture.Business"/>
+    <Reference Include="Enterprise.ZArchitecture.Core"/>
+    <Reference Include="CargoWise.Odyssey.Schema"/>
+    <Reference Include="JsonPointer.Net"/>
+    <Reference Include="JsonSchema.Net"/>
+    <Reference Include="Newtonsoft.Json"/>
+    <Reference Include="Newtonsoft.Json.Schema"/>
+    <Reference Include="Resources"/>
+    <Reference Include="WTG.StaticAnalysis.Annotation"/>
+    <Reference Include="ServiceManager.Integration.Abstractions"/>
+    <Reference Include="ServiceManager.Integration.ServiceTasks.CW"/>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <RootNamespace />
+    <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);1701;1702;CS0067;CS0169;CS0414;CS0436;CS0649;CS8002</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(CodeAnalysisEnabled)' == 'True'">
+    <Analyzer Include="$(WTGPaketPackagesRoot)\$(WTGPaketBuildItemsGroupName)\Microsoft.VisualStudio.Threading.Analyzers\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.CSharp.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)\$(WTGPaketBuildItemsGroupName)\Microsoft.VisualStudio.Threading.Analyzers\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Scripts\eslint.config.mjs" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="System.Drawing.Common" />
+    <PackageReference Include="System.Threading.AccessControl" />
+    <PackageReference Include="WTG.RtfConverter" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.Blazor.Client.Integration" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('wwwroot\css\_gen\default.css')">
+    <Content Include="wwwroot\css\_gen\default.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="wwwroot\images\cursors\ne.cur">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\cursors\nomove2d.cur">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\cursors\nomoveh.cur">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\cursors\nomovev.cur">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\cursors\north.cur">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\cursors\nw.cur">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\cursors\se.cur">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\cursors\south.cur">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\cursors\sw.cur">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\cursors\uparrow.cur">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\cursors\west.cur">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="dotnet tool run webcompiler -- -r themes -o wwwroot/css/_gen -z disable -p disable -c excubowebcompiler.json" StandardOutputImportance="high" />
+    <Exec Command="powershell.exe -ExecutionPolicy Bypass -File Scripts\JsCleaner.ps1 wwwroot Scripts\eslint.config.mjs" StandardOutputImportance="high" ContinueOnError="false" />
+    <Exec Command="powershell.exe -ExecutionPolicy Bypass -File Scripts\CssCleaner.ps1 themes" StandardOutputImportance="high" ContinueOnError="true" />
+    <ItemGroup>
+      <CssFiles Include="$(MSBuildProjectDirectory)\themes\*.css" />
+    </ItemGroup>
+    <Delete Files="@(CssFiles)" />
+  </Target>
+</Project>

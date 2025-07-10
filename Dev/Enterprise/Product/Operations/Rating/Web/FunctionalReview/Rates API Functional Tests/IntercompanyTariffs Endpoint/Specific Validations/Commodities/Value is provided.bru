@@ -1,0 +1,30 @@
+meta {
+  name: Value is provided
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/intercompanytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForIntercompanyTariffs();
+   query.Commodities = [{ Type: "UCG", Value: "ABCDEFGHJI" }];
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided Type ('UCG') is not valid. It can only be used for querying Costings or calculating charges.", function() {
+    expect(res.body.ModelState['Commodities[0].Type'][0]).to.equal("Provided Type ('UCG') is not valid. It can only be used for querying Costings or calculating charges.");
+  });
+}

@@ -1,0 +1,185 @@
+namespace Enterprise.Integration.Accounting
+{
+	public enum BusinessContext
+	{
+		CASS,
+		OverrideGovernmentAllocatedID,
+		OverrideTransactionDescription,
+		OverrideTransactionBranchAndDepartment,
+		OverrideInvoiceAddressContact,
+		MatchingReadOnly,
+		MultipleImport,
+		InterCompanyInvoiceExport,
+		BulkTransactionSaving,
+		IncompleteInvoiceDataAdapter,
+		ReverseDateForm,
+		APBulkInvoicePoster,
+		ClientSpecificProfitShareDetails,
+		OverrideReceiptPaymentCashFlowCategory,
+		InvoicingPlugInGUI,
+		IncompleteInvoiceSaving,
+		PeriodicInvoicePosting,
+		ImportingENettTransaction,
+		PayableOrder,
+		APInvoiceForm,
+		APCreditNoteForm,
+		UnapprovedAPInvoiceCreatedForRequestPreview,
+		CopyChargePersistentValues,
+		ChargeProcessingForAPTransactionPosting,
+		LegacyXMLImport,
+		EnableDirectSettingConsolCostParent,
+		ReportDeletingCharges,
+		SavingAsIncomplete,
+		SavingIncompleteTransaction,
+		OverrideTransactionAgreedPaymentMethod,
+		IntercompanyInvoiceAutoImport,
+		ImportMultipleInvoicesWithSameTransformer,
+		ChargeReloader,
+		PreviewInvoice,
+		WipAccrualReversing,
+		ApportionRevenueToShipment,
+		JobCreatedFromJobLoader,
+		JobCreatedFromImporter,
+		JobIsSavedSoonAfterDisposal_RecheckIfThisStillTrue,
+		JobIsDisposedShouldPreventSave,
+		ShouldSkipConsolRevenueApportionFormClosing,
+		APInvoiceApportionToConsol,
+		AutoJobRevenueJournal,
+		AutoEliminationJournal,
+		AllowReopenJobWhenImporting,
+		AmendingInvoice,
+		DeletingConsolCost,
+		ConflictWithCriticalFields,
+		PostingReceivableCharges,
+		SetDefaultsForJob,
+		CreateJobRevenueJournalNotInRevenueJournalModule,
+		SetDefaultCostRevenueType,
+		DeletingJobCharge,
+		ValidateTransactionForApproveAndPost,
+		SavingChargeCodeFromCompany,
+		AllocatingTransaction,
+		OverrideInvoiceRemittanceType,
+		SkipDataRefreshBusUpdateDueToAnyChange,
+		SkipDataRefreshBusUpdateDueToSubscriberIsDeleted,
+		ChangingCurrencyToDifferentDecimalPlaces,
+		WarningOnlyValidation,
+		NonAccountingCode, //this is a temporary solution until WIP/Accrual creation logic will be moved to run in accounting only code
+		JobChargeAfterOnSaving,
+		DeletingExchangeRate,
+		SavingDsbJobBatch,
+		IsUpdatedDueToChangesInDB,
+		InterCompanyInvoiceImportedFromGatewayConsol,
+		AddingDefaultApportionmentCharge,
+		SkipDataRefreshBusUpdateAsLedgerOrTransactionTypeIsCriticallyChanged,
+		CriticalValidation,
+		SavingFailedDueToDBError,
+		PostingChargesFromConsol,
+		CreatingProfitShareCharge,
+		MaximumJobInvoiceNumberError,
+		NewChargeCostIsGoingToBePostedInTransformer,
+		PostingReceivableChargesForFactoryLevel,
+		PostingReceivableChargesForTaxCalculation,
+		CancelApprovalRequestDueToUpdatingLinkedTransaction,
+		CancelApprovalRequestByUser,
+		CancelApprovalRequestAsTransactionAlreadyCancelledOrPosted,
+		PostUnapprovedCreditNoteForApproveClaim,
+		GetDefaultDebtorWithoutChargeCode,
+		RecalculatingLineTaxAmountForAdjustingTaxAtHeaderLevel,
+		ModifyingConsolCostDetailsFromAPInvoice,
+		OSTaxAmountModifiedFromCalculatedAmountForConsolCost,
+		OverrideInvoiceReference,
+		AutoRating,
+		SuppressAutoRatingChange,
+		RepReceivReports,
+		RepPayablesReports,
+		OverrideMatchStatus,
+		CalculateCommissionOnJobClosure,
+		SystemCreatedAmending,
+		InterCompanyInvoiceImport,
+		UseCacheToGetOrgsFromJobChargesInDb,
+		MakingChangesToOtherTaxes,
+		MakingChangesNotAffectingTaxRecordParent,
+		PostManagerCreatingTransaction,
+		ChangingCurrentCellOnJobChargeBoundGrid,
+		PermittedToDeleteJobExchangeRateConfig,
+		PermittedToDeleteCFXUpliftConfig,
+		ConvertingAmountsForExportAWBHeader,
+		SavingPaymentApprovalAsDraft,
+		EditingPaymentApprovalBatch,
+		UniversalTransactionBatchImport,
+		RemittanceFileImport,
+		JobIsManuallyDeactivating,
+		JobDeactivationForAllCompanies,
+		InvoicingPluginGUIExcludingConsol,
+		UseCurrentDateAsTransactionDateWhenAutoPosting,
+		HasDeletedExchangeRate,
+		CheckTransactionLineTotalsMatchTransactionHeaderAmountsIsSuspended,
+		ShouldTraceExchangeRateError,
+		PostingChargesFromLogWalker,
+		RemittanceReferenceNumberExceedMaxLength,
+		SurchargeLine,
+		PopulateBankTransferWithEPaymentData,
+		SuspendInvoiceCopies,
+		PostDraftPaymentApproval,
+		ExcludeFromDirectDebitBatchCriticalValidation,
+		InterCompanyJobOperation,
+		JobChargeInvalidDebtorWarningInsteadOfError,
+		HasBeenValidatedByDifferentCompany,
+		JobLockedByAnotherUser,
+		EnableJobHeaderNumberChange,
+		PeriodicInvoiceHasAlreadyBeenValidatedInAnotherFactory,
+		JobChargeImportingFromEDIMessage,
+		CreateTransactionsBeforePostingForFactoryLevel,
+		NotUpdateExchangeRateWhenExRateOptionIsEITFromBulkConsolCostImport,
+		NotDeletingOrgCompanyDataIndependentCollectionsOnHandlingUniqueIndexFailure,
+		eNettOutboundSubscriberLWKServiceTask,
+		AllowReopenJobWhenAutoPostingARCreditNote,
+		SkipTaxIdAndTaxMessageMappingValidation,
+		SkipJobHeaderRefreshParentDuringWIPAccrualReversing,
+
+#if DEBUG
+		DisableSetHasChangesIfHasErrors_ForTestOnly,
+		EnableCheckFieldCannotChangeWhenJobIsAlreadyInDatabase_ForTestOnly
+#endif
+	}
+
+	public static class BusinessContextSets
+	{
+		public static BusinessContext[] GetDoNotDefaultInvalidOrInactiveDebtorSet()
+		{
+			return new[] {
+					BusinessContext.CASS,
+					BusinessContext.InvoicingPlugInGUI,
+					BusinessContext.APInvoiceForm,
+					BusinessContext.APCreditNoteForm,
+					BusinessContext.APBulkInvoicePoster,
+					BusinessContext.AutoRating,
+					BusinessContext.JobChargeImportingFromEDIMessage,
+					BusinessContext.CreatingProfitShareCharge,
+				};
+		}
+
+		public static BusinessContext[] GetDoNotDefaultInvalidCreditorSet()
+		{
+			return new[] {
+					BusinessContext.InvoicingPlugInGUI,
+					BusinessContext.AutoRating,
+				};
+		}
+
+		public static BusinessContext[] GetSkipDataRefreshBusUpdateSet()
+		{
+			return new[] {
+					BusinessContext.SkipDataRefreshBusUpdateDueToAnyChange,
+					BusinessContext.SkipDataRefreshBusUpdateDueToSubscriberIsDeleted,
+					BusinessContext.SkipDataRefreshBusUpdateAsLedgerOrTransactionTypeIsCriticallyChanged
+				};
+		}
+	}
+
+	public enum ConsolCostStrategy
+	{
+		ConsolCostCalculationStrategyWithoutCalculations,
+		ConsolCostCalculationStrategyWithCalculationsDuringPosting
+	}
+}

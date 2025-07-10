@@ -1,0 +1,53 @@
+<NativeSchemaSet Name="Declaration" Root="JobDeclaration">
+	<Entities>
+		<Entity Name="JobDeclaration"/>
+		<Entity Name="JobComInvoiceHeader" />
+		<Entity Name="JobComInvoiceLine" />
+		<Entity Name="CusContainer" />
+		<Entity Name="CusEntryHeader" />
+		<Entity Name="CusEntryHeaderCharges" />
+		<Entity Name="CusEntryLine" />
+		<Entity Name="CusEntryLineFee" />
+    <Entity Name="CusEntryNum"/>
+		<Entity Name="CusDecHouseBill" />
+		<Entity Name="JobDocsAndCartage" />
+		<Entity Name="JobOrderItem" />
+		<Entity Name="JobService" />
+		<Entity Name="LandedCostHeader" />
+		<Entity Name="LandCostInput" />
+		<Entity Name="LandedCostHistory" />
+    <Entity Name="OrgHeader" EntityName="Buyer" External="true" ShowAll="true"/>
+    <Entity Name="OrgHeader" EntityName="Importer" External="true" ShowAll="true"/>
+    <Entity Name="OrgHeader" EntityName="Supplier" External="true" ShowAll="true"/>
+		<Entity Name="OrgHeader" EntityName="ShippingLine" External="true" ShowAll="true"/>
+		<Entity Name="OrgHeader" EntityName="Forwarder" External="true" ShowAll="true"/>
+    <Entity Name="RefVessel" EntityName="Vessel" External="true" ShowAll="true"/>    
+	</Entities>
+	<Associations>
+		<Association From="JobComInvoiceHeader" To="JobDeclaration" Key="JZ_JE"/>
+		<Association From="JobComInvoiceLine" To="JobComInvoiceHeader" Key="JI_JZ"/>
+		<Association From="CusContainer" To="JobDeclaration" Key="CO_JE"/>
+		<Association From="CusEntryHeader" To="JobDeclaration" Key="CH_JE"/>
+		<Association From="CusEntryHeaderCharges" To="CusEntryHeader" Key="C1_CH"/>
+		<Association From="CusEntryLine" To="CusEntryHeader" Key="CL_CH"/>
+		<Association From="CusEntryLineFee" To="CusEntryLine" Key="CF_CL"/>
+    <Association From="CusEntryNum" To="CusEntryHeader" Key="CE_ParentID"/>
+    <Association From="CusEntryNum" To="JobDeclaration" Key="CE_ParentID"/>
+		<Association From="CusDecHouseBill" To="JobDeclaration" Key="CU_JE"/>
+		<Association From="JobDocsAndCartage" To="JobDeclaration" Key="JP_ParentID"/>
+		<Association From="JobOrderItem" To="JobDocsAndCartage" Key="JT_JP"/>
+		<Association From="JobService" To="JobDocsAndCartage" Key="ES_ParentID"/>
+		<Association From="LandedCostHeader" To="JobDeclaration" Key="LT_ParentID"/>
+		<Association From="LandCostInput" To="LandedCostHeader" Key="LI_LT"/>
+		<Association From="LandedCostHistory" To="LandedCostHeader" Key="LH_LT"/>
+    <Association From="JobDeclaration" To="Importer" Key="JE_OH_Importer"/>
+    <Association From="JobDeclaration" To="Supplier" Key="JE_OH_Supplier"/>
+    <Association From="JobDeclaration" To="ShippingLine" Key="JE_OH_ShippingLine"/>
+    <Association From="JobDeclaration" To="Vessel">
+      <AssociationKey Key="JE_VesselName" RefKey="RV_Code"/>
+    </Association>    
+    <Association From="JobDeclaration" To="Forwarder" Key="JE_OH_Forwarder"/>
+    <Association From="JobComInvoiceHeader" To="Buyer" Key="JZ_OH_Buyer"/>
+    <Association From="JobComInvoiceHeader" To="Supplier" Key="JZ_OH_Supplier"/>
+  </Associations>
+</NativeSchemaSet>

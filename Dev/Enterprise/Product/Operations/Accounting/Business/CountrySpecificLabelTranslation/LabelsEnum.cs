@@ -1,0 +1,29 @@
+namespace Enterprise.Accounting.Business
+{
+	public enum LabelsEnum
+	{
+		InvoiceAuthorisationRecordAuthorisationDataLabel,
+		InvoiceAuthorisationRecordIssuerAuthorizationDataLabel,
+		InvoiceAuthorisationRecordPlaceOfIssueLabel,
+		InvoiceAuthorisationRecordIssuerCertificateIdentifierLabel,
+		GovernmentCreditTermsLabel,
+		InvoiceAuthorisationRecordDebtorNumberLabel,
+		InvoiceAuthorisationRecordCounterLabel,
+		InvoiceAuthorisationRecordTimeLabel,
+		ComplianceSubtypeLabel,
+		EInvoicingGovernmentAllocatedNumberLabel,
+		TaxRegimeInformationLabel,
+		GovernmentAgreedPaymentMethodLabel,
+		InvoiceAuthorizationRecordVerificationURLLabel,
+		SubjectToTaxLabel,
+		MeasurementUnitLabel,
+		GovernmentReportingCodeLabel,
+		TaxBaseAmountLabel,
+		TaxLabel,
+		TaxAmountLabel,
+		IVATaxLabel,
+		RetentionTaxLabel,
+		RecipientConsumptionTaxRegimeHeading,
+		DebtorTaxRegimeLabel,
+	}
+}

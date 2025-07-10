@@ -1,0 +1,700 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSet Name="TrialBalanceTransactionsDataset">
+    <Query>
+      <DataSourceReference>FinanceModel</DataSourceReference>
+		<DataSetParameters>
+			<DataSetParameter Name="Company">
+				<DefaultValue>[ZBI] ANOTHER BI TESTING COMPANY</DefaultValue>
+				<ReadOnly>false</ReadOnly>
+				<Nullable>false</Nullable>
+				<OmitFromQuery>false</OmitFromQuery>
+				<rd:UserDefined>true</rd:UserDefined>
+				<rd:DbType>String</rd:DbType>
+			</DataSetParameter>
+			<DataSetParameter Name="ShowZeroBalance">
+				<DefaultValue>No</DefaultValue>
+				<ReadOnly>false</ReadOnly>
+				<Nullable>false</Nullable>
+				<OmitFromQuery>false</OmitFromQuery>
+				<rd:UserDefined>true</rd:UserDefined>
+				<rd:DbType>String</rd:DbType>
+			</DataSetParameter>
+			<DataSetParameter Name="PresentationJournal">
+				<DefaultValue>None</DefaultValue>
+				<ReadOnly>false</ReadOnly>
+				<Nullable>false</Nullable>
+				<OmitFromQuery>false</OmitFromQuery>
+				<rd:UserDefined>true</rd:UserDefined>
+				<rd:DbType>String</rd:DbType>
+			</DataSetParameter>
+			<DataSetParameter Name="Language">
+				<DefaultValue>English</DefaultValue>
+				<ReadOnly>false</ReadOnly>
+				<Nullable>false</Nullable>
+				<OmitFromQuery>false</OmitFromQuery>
+				<rd:UserDefined>true</rd:UserDefined>
+				<rd:DbType>String</rd:DbType>
+			</DataSetParameter>
+			<DataSetParameter Name="StartPeriod">
+				<DefaultValue>200101</DefaultValue>
+				<ReadOnly>false</ReadOnly>
+				<Nullable>false</Nullable>
+				<OmitFromQuery>false</OmitFromQuery>
+				<rd:UserDefined>true</rd:UserDefined>
+				<rd:DbType>String</rd:DbType>
+			</DataSetParameter>
+			<DataSetParameter Name="EndPeriod">
+				<DefaultValue>202308</DefaultValue>
+				<ReadOnly>false</ReadOnly>
+				<Nullable>false</Nullable>
+				<OmitFromQuery>false</OmitFromQuery>
+				<rd:UserDefined>true</rd:UserDefined>
+				<rd:DbType>String</rd:DbType>
+			</DataSetParameter>
+		</DataSetParameters>		
+      <CommandText>// DAX Query
+DEFINE
+  MEASURE 'Report Measures'[__PresentationJournalFilter] = 
+    (/* USER DAX BEGIN */
+
+IF (
+    CALCULATE ( COUNTROWS ( 'GLTransaction' ) ) &gt; 0,
+    SWITCH (
+        TRUE (),
+        NOT ISFILTERED ( 'Presentation Journal'[Code] ), "visible",
+         (
+             			(((
+                FIRSTNONBLANK ( GLTransaction[Transaction Type], 1 ) = "AJL"
+                            || FIRSTNONBLANK ( GLTransaction[Transaction Type], 1 ) = "RJL"
+                            || FIRSTNONBLANK ( GLTransaction[Transaction Type], 1 ) = "GJL"
+                    )
+             &amp;&amp; ((SEARCH(FIRSTNONBLANK(GLTransaction[Transaction Category],1), FIRSTNONBLANK ('Presentation Journal'[Code],1),,0) &gt; 0) ||
+						FIRSTNONBLANK ( GLTransaction[Transaction Category], 1 ) = ""))
+            || (FIRSTNONBLANK ( GLTransaction[Transaction Type], 1 ) &lt;&gt; "AJL"
+                &amp;&amp; FIRSTNONBLANK ( GLTransaction[Transaction Type], 1 ) &lt;&gt; "RJL"
+                &amp;&amp; FIRSTNONBLANK ( GLTransaction[Transaction Type], 1 ) &lt;&gt; "GJL"))	
+    ),"visible",
+    BLANK ()
+)
+)
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[__IsCFXAccountLineForCurrentCompany] = 
+    (/* USER DAX BEGIN */
+
+   If( COUNTROWS (
+        FILTER (
+            'ControllingAccount ReportSubCode Mapping',
+            'ControllingAccount ReportSubCode Mapping'[Report SubCode] &lt;&gt; "*JC*JNL*CFX*" || ('ControllingAccount ReportSubCode Mapping'[Report SubCode] = "*JC*JNL*CFX*"
+                &amp;&amp; 'ControllingAccount ReportSubCode Mapping'[Controlling Account Key] =  [__Acckey]
+                &amp;&amp; (  ISBLANK('ControllingAccount ReportSubCode Mapping'[Company Key]) ||  'ControllingAccount ReportSubCode Mapping'[Company Key]
+                    = FIRSTNONBLANK ( VALUES ( 'Company Branch'[Company Key] ), 1 )))
+        )
+    )&gt;0 ,1,BLANK())
+
+ 
+
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[__Acckey] = 
+    (/* USER DAX BEGIN */
+
+    SWITCH (
+        TRUE (),
+        ISFILTERED ( GLAccount[Level 1] ) &amp;&amp; ISFILTERED ( GLAccount[Level 2] )
+            &amp;&amp; ISFILTERED ( GLAccount[Level 3] ), VALUES ( GLAccount[Account Key] ),
+        ISFILTERED ( GLAccount[Level 1] ) &amp;&amp; ISFILTERED ( GLAccount[Level 2] ),
+            CALCULATE (
+                FIRSTNONBLANK ( GLAccount[Account Key], TRUE () ),
+                FILTER ( GLAccount, GLAccount[Account No.] = GLAccount[Level 2] )
+            ),
+        CALCULATE (
+            FIRSTNONBLANK ( GLAccount[Account Key], TRUE () ),
+            FILTER ( GLAccount, GLAccount[Account No.] = GLAccount[Level 1] )
+        )
+    )
+
+
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[Account No] = 
+    (/* USER DAX BEGIN */
+var accKey  =FIRSTNONBLANK(GLTransaction[Mapped  GLAccount Key],TRUE()) return 
+IF (COUNTROWS(VALUES(GLTransaction[Mapped  GLAccount Key]))=1,if(accKey=-1,FIRSTNONBLANK(GLAccount[Account No.],TRUE()),CALCULATE(FIRSTNONBLANK(GLAccount[Account No.],TRUE()),Filter(GLAccount,GLAccount[Account Key]=accKey))))
+/* USER DAX END */)
+
+  VAR __DS0FilterTable = 
+    FILTER(
+      KEEPFILTERS(VALUES('GLAccount'[Level 1])),
+      AND(
+        AND(NOT(ISBLANK('GLAccount'[Level 1])), 'GLAccount'[Level 1] = "1010.00.00"),
+        NOT(ISBLANK('GLAccount'[Level 1]))
+      )
+    )
+
+  VAR __DS0FilterTable2 = 
+    FILTER(
+      KEEPFILTERS(VALUES('Period'[Period])),
+      AND(
+        AND(
+          AND('Period'[Period] &gt;= VALUE(@StartPeriod), 'Period'[Period] &lt;= VALUE(@EndPeriod)),
+          'Period'[Period] &gt;= VALUE(@StartPeriod)
+        ),
+        'Period'[Period] &lt;= VALUE(@EndPeriod)
+      )
+    )
+
+  VAR __DS0FilterTable3 = 
+    FILTER(KEEPFILTERS(VALUES('Language'[Description])), 'Language'[Description] = @Language)
+
+  VAR __DS0FilterTable4 = 
+    FILTER(
+      KEEPFILTERS(VALUES('Presentation Journal'[Code])),
+      'Presentation Journal'[Code] = @PresentationJournal
+    )
+
+  VAR __DS0FilterTable5 = 
+    FILTER(
+      KEEPFILTERS(VALUES('Include Zero Balance'[Include Zero Balance])),
+      'Include Zero Balance'[Include Zero Balance] = @ShowZeroBalance
+    )
+
+  VAR __DS0FilterTable6 = 
+    FILTER(
+      KEEPFILTERS(VALUES('Company Branch'[Company])),
+      'Company Branch'[Company] = @Company
+    )
+
+  VAR __ValueFilterDM0 = 
+    FILTER(
+      KEEPFILTERS(
+        SUMMARIZECOLUMNS(
+          'Period'[Period],
+          'GLTransaction'[Ledger],
+          'GLTransaction'[Transaction Number],
+          'GLTransaction'[Transaction Type],
+          'GLTransaction'[Transaction Reference],
+          'Branch'[Branch Code],
+          'Department'[Department Name],
+          'GLTransaction'[SubType],
+          'Organization'[Organization Name],
+          'GLTransaction'[Report Post Date],
+          'GLTransaction'[GLAmount Debit],
+          'GLTransaction'[GLAmount Credit],
+          __DS0FilterTable,
+          __DS0FilterTable2,
+          __DS0FilterTable3,
+          __DS0FilterTable4,
+          __DS0FilterTable5,
+          __DS0FilterTable6,
+          "Account No", 'Report Measures'[Account No],
+          "__PresentationJournalFilter", IGNORE('Report Measures'[__PresentationJournalFilter]),
+          "__IsCFXAccountLineForCurrentCompany", IGNORE('Report Measures'[__IsCFXAccountLineForCurrentCompany])
+        )
+      ),
+      AND(
+        NOT(ISBLANK([__PresentationJournalFilter])),
+        NOT(ISBLANK([__IsCFXAccountLineForCurrentCompany]))
+      )
+    )
+
+  VAR __DS0Core = 
+    SUMMARIZECOLUMNS(
+      'Period'[Period],
+      'GLTransaction'[Ledger],
+      'GLTransaction'[Transaction Number],
+      'GLTransaction'[Transaction Type],
+      'GLTransaction'[Transaction Reference],
+      'Branch'[Branch Code],
+      'Department'[Department Name],
+      'GLTransaction'[SubType],
+      'Organization'[Organization Name],
+      'GLTransaction'[Report Post Date],
+      'GLTransaction'[GLAmount Debit],
+      'GLTransaction'[GLAmount Credit],
+      __DS0FilterTable,
+      __DS0FilterTable2,
+      __DS0FilterTable3,
+      __DS0FilterTable4,
+      __DS0FilterTable5,
+      __DS0FilterTable6,
+      __ValueFilterDM0,
+      "Account No", 'Report Measures'[Account No]
+    )
+
+  VAR __DS0PrimaryWindowed = 
+    TOPN(
+      1000000,
+      __DS0Core,
+      [Account No],
+      1,
+      'Period'[Period],
+      1,
+      'GLTransaction'[Ledger],
+      1,
+      'GLTransaction'[Transaction Number],
+      1,
+      'GLTransaction'[Transaction Type],
+      1,
+      'GLTransaction'[Transaction Reference],
+      1,
+      'Branch'[Branch Code],
+      1,
+      'Department'[Department Name],
+      1,
+      'GLTransaction'[SubType],
+      1,
+      'Organization'[Organization Name],
+      1,
+      'GLTransaction'[Report Post Date],
+      1,
+      'GLTransaction'[GLAmount Debit],
+      1,
+      'GLTransaction'[GLAmount Credit],
+      1
+    )
+
+EVALUATE
+  __DS0PrimaryWindowed
+
+ORDER BY
+  [Account No],
+  'Period'[Period],
+  'GLTransaction'[Ledger],
+  'GLTransaction'[Transaction Number],
+  'GLTransaction'[Transaction Type],
+  'GLTransaction'[Transaction Reference],
+  'Branch'[Branch Code],
+  'Department'[Department Name],
+  'GLTransaction'[SubType],
+  'Organization'[Organization Name],
+  'GLTransaction'[Report Post Date],
+  'GLTransaction'[GLAmount Debit],
+  'GLTransaction'[GLAmount Credit]</CommandText>
+      <rd:DesignerState>
+        <QueryDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/AnalysisServices/QueryDefinition">
+          <CommandType>DAX</CommandType>
+          <Type>Query</Type>
+          <QuerySpecification xsi:type="MDXQuerySpecification">
+            <Select>
+              <Items>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>Period</DimensionName>
+                    <HierarchyName>Period</HierarchyName>
+                    <HierarchyUniqueName>[Period].[Period]</HierarchyUniqueName>
+                    <LevelName>Period</LevelName>
+                    <UniqueName>[Period].[Period].[Period]</UniqueName>
+                  </ID>
+                  <ItemCaption>Period</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>GLTransaction</DimensionName>
+                    <HierarchyName>Ledger</HierarchyName>
+                    <HierarchyUniqueName>[GLTransaction].[Ledger]</HierarchyUniqueName>
+                    <LevelName>Ledger</LevelName>
+                    <UniqueName>[GLTransaction].[Ledger].[Ledger]</UniqueName>
+                  </ID>
+                  <ItemCaption>Ledger</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>GLTransaction</DimensionName>
+                    <HierarchyName>Transaction Number</HierarchyName>
+                    <HierarchyUniqueName>[GLTransaction].[Transaction Number]</HierarchyUniqueName>
+                    <LevelName>Transaction Number</LevelName>
+                    <UniqueName>[GLTransaction].[Transaction Number].[Transaction Number]</UniqueName>
+                  </ID>
+                  <ItemCaption>Transaction Number</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>GLTransaction</DimensionName>
+                    <HierarchyName>Transaction Type</HierarchyName>
+                    <HierarchyUniqueName>[GLTransaction].[Transaction Type]</HierarchyUniqueName>
+                    <LevelName>Transaction Type</LevelName>
+                    <UniqueName>[GLTransaction].[Transaction Type].[Transaction Type]</UniqueName>
+                  </ID>
+                  <ItemCaption>Transaction Type</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>GLTransaction</DimensionName>
+                    <HierarchyName>Transaction Reference</HierarchyName>
+                    <HierarchyUniqueName>[GLTransaction].[Transaction Reference]</HierarchyUniqueName>
+                    <LevelName>Transaction Reference</LevelName>
+                    <UniqueName>[GLTransaction].[Transaction Reference].[Transaction Reference]</UniqueName>
+                  </ID>
+                  <ItemCaption>Transaction Reference</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>Branch</DimensionName>
+                    <HierarchyName>Branch Code</HierarchyName>
+                    <HierarchyUniqueName>[Branch].[Branch Code]</HierarchyUniqueName>
+                    <LevelName>Branch Code</LevelName>
+                    <UniqueName>[Branch].[Branch Code].[Branch Code]</UniqueName>
+                  </ID>
+                  <ItemCaption>Branch Code</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>Department</DimensionName>
+                    <HierarchyName>Department Name</HierarchyName>
+                    <HierarchyUniqueName>[Department].[Department Name]</HierarchyUniqueName>
+                    <LevelName>Department Name</LevelName>
+                    <UniqueName>[Department].[Department Name].[Department Name]</UniqueName>
+                  </ID>
+                  <ItemCaption>Department Name</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>GLTransaction</DimensionName>
+                    <HierarchyName>SubType</HierarchyName>
+                    <HierarchyUniqueName>[GLTransaction].[SubType]</HierarchyUniqueName>
+                    <LevelName>SubType</LevelName>
+                    <UniqueName>[GLTransaction].[SubType].[SubType]</UniqueName>
+                  </ID>
+                  <ItemCaption>SubType</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>Organization</DimensionName>
+                    <HierarchyName>Organization Name</HierarchyName>
+                    <HierarchyUniqueName>[Organization].[Organization Name]</HierarchyUniqueName>
+                    <LevelName>Organization Name</LevelName>
+                    <UniqueName>[Organization].[Organization Name].[Organization Name]</UniqueName>
+                  </ID>
+                  <ItemCaption>Organization Name</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>GLTransaction</DimensionName>
+                    <HierarchyName>Report Post Date</HierarchyName>
+                    <HierarchyUniqueName>[GLTransaction].[Report Post Date]</HierarchyUniqueName>
+                    <LevelName>Report Post Date</LevelName>
+                    <UniqueName>[GLTransaction].[Report Post Date].[Report Post Date]</UniqueName>
+                  </ID>
+                  <ItemCaption>Report Post Date</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>GLTransaction</DimensionName>
+                    <HierarchyName>GLAmount Debit</HierarchyName>
+                    <HierarchyUniqueName>[GLTransaction].[GLAmount Debit]</HierarchyUniqueName>
+                    <LevelName>GLAmount Debit</LevelName>
+                    <UniqueName>[GLTransaction].[GLAmount Debit].[GLAmount Debit]</UniqueName>
+                  </ID>
+                  <ItemCaption>GLAmount Debit</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Level">
+                    <DimensionName>GLTransaction</DimensionName>
+                    <HierarchyName>GLAmount Credit</HierarchyName>
+                    <HierarchyUniqueName>[GLTransaction].[GLAmount Credit]</HierarchyUniqueName>
+                    <LevelName>GLAmount Credit</LevelName>
+                    <UniqueName>[GLTransaction].[GLAmount Credit].[GLAmount Credit]</UniqueName>
+                  </ID>
+                  <ItemCaption>GLAmount Credit</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[Account No]</ColumnName>
+                  </ID>
+                  <ItemCaption>Account No</ItemCaption>
+                </Item>
+              </Items>
+            </Select>
+            <AutoExecute>false</AutoExecute>
+            <From>Model</From>
+            <Filter>
+              <FilterItems />
+            </Filter>
+            <Calculations />
+            <Aggregates />
+            <QueryProperties />
+          </QuerySpecification>
+          <Query>
+            <Statement>// DAX Query
+DEFINE
+  MEASURE 'Report Measures'[__PresentationJournalFilter] = 
+    (/* USER DAX BEGIN */
+
+IF (
+    CALCULATE ( COUNTROWS ( 'GLTransaction' ) ) &gt; 0,
+    SWITCH (
+        TRUE (),
+        NOT ISFILTERED ( 'Presentation Journal'[Code] ), "visible",
+         (
+             			(((
+                FIRSTNONBLANK ( GLTransaction[Transaction Type], 1 ) = "AJL"
+                            || FIRSTNONBLANK ( GLTransaction[Transaction Type], 1 ) = "RJL"
+                            || FIRSTNONBLANK ( GLTransaction[Transaction Type], 1 ) = "GJL"
+                    )
+             &amp;&amp; ((SEARCH(FIRSTNONBLANK(GLTransaction[Transaction Category],1), FIRSTNONBLANK ('Presentation Journal'[Code],1),,0) &gt; 0) ||
+						FIRSTNONBLANK ( GLTransaction[Transaction Category], 1 ) = ""))
+            || (FIRSTNONBLANK ( GLTransaction[Transaction Type], 1 ) &lt;&gt; "AJL"
+                &amp;&amp; FIRSTNONBLANK ( GLTransaction[Transaction Type], 1 ) &lt;&gt; "RJL"
+                &amp;&amp; FIRSTNONBLANK ( GLTransaction[Transaction Type], 1 ) &lt;&gt; "GJL"))	
+    ),"visible",
+    BLANK ()
+)
+)
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[__IsCFXAccountLineForCurrentCompany] = 
+    (/* USER DAX BEGIN */
+
+   If( COUNTROWS (
+        FILTER (
+            'ControllingAccount ReportSubCode Mapping',
+            'ControllingAccount ReportSubCode Mapping'[Report SubCode] &lt;&gt; "*JC*JNL*CFX*" || ('ControllingAccount ReportSubCode Mapping'[Report SubCode] = "*JC*JNL*CFX*"
+                &amp;&amp; 'ControllingAccount ReportSubCode Mapping'[Controlling Account Key] =  [__Acckey]
+                &amp;&amp; (  ISBLANK('ControllingAccount ReportSubCode Mapping'[Company Key]) ||  'ControllingAccount ReportSubCode Mapping'[Company Key]
+                    = FIRSTNONBLANK ( VALUES ( 'Company Branch'[Company Key] ), 1 )))
+        )
+    )&gt;0 ,1,BLANK())
+
+ 
+
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[__Acckey] = 
+    (/* USER DAX BEGIN */
+
+    SWITCH (
+        TRUE (),
+        ISFILTERED ( GLAccount[Level 1] ) &amp;&amp; ISFILTERED ( GLAccount[Level 2] )
+            &amp;&amp; ISFILTERED ( GLAccount[Level 3] ), VALUES ( GLAccount[Account Key] ),
+        ISFILTERED ( GLAccount[Level 1] ) &amp;&amp; ISFILTERED ( GLAccount[Level 2] ),
+            CALCULATE (
+                FIRSTNONBLANK ( GLAccount[Account Key], TRUE () ),
+                FILTER ( GLAccount, GLAccount[Account No.] = GLAccount[Level 2] )
+            ),
+        CALCULATE (
+            FIRSTNONBLANK ( GLAccount[Account Key], TRUE () ),
+            FILTER ( GLAccount, GLAccount[Account No.] = GLAccount[Level 1] )
+        )
+    )
+
+
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[Account No] = 
+    (/* USER DAX BEGIN */
+var accKey  =FIRSTNONBLANK(GLTransaction[Mapped  GLAccount Key],TRUE()) return 
+IF (COUNTROWS(VALUES(GLTransaction[Mapped  GLAccount Key]))=1,if(accKey=-1,FIRSTNONBLANK(GLAccount[Account No.],TRUE()),CALCULATE(FIRSTNONBLANK(GLAccount[Account No.],TRUE()),Filter(GLAccount,GLAccount[Account Key]=accKey))))
+/* USER DAX END */)
+
+  VAR __DS0FilterTable = 
+    FILTER(
+      KEEPFILTERS(VALUES('GLAccount'[Level 1])),
+      AND(
+        AND(NOT(ISBLANK('GLAccount'[Level 1])), 'GLAccount'[Level 1] = "1010.00.00"),
+        NOT(ISBLANK('GLAccount'[Level 1]))
+      )
+    )
+
+  VAR __DS0FilterTable2 = 
+    FILTER(
+      KEEPFILTERS(VALUES('Period'[Period])),
+      AND(
+        AND(
+          AND('Period'[Period] &gt;= VALUE(@StartPeriod), 'Period'[Period] &lt;= VALUE(@EndPeriod)),
+          'Period'[Period] &gt;= VALUE(@StartPeriod)
+        ),
+        'Period'[Period] &lt;= VALUE(@EndPeriod)
+      )
+    )
+
+  VAR __DS0FilterTable3 = 
+    FILTER(KEEPFILTERS(VALUES('Language'[Description])), 'Language'[Description] = @Language)
+
+  VAR __DS0FilterTable4 = 
+    FILTER(
+      KEEPFILTERS(VALUES('Presentation Journal'[Code])),
+      'Presentation Journal'[Code] = @PresentationJournal
+    )
+
+  VAR __DS0FilterTable5 = 
+    FILTER(
+      KEEPFILTERS(VALUES('Include Zero Balance'[Include Zero Balance])),
+      'Include Zero Balance'[Include Zero Balance] = @ShowZeroBalance
+    )
+
+  VAR __DS0FilterTable6 = 
+    FILTER(
+      KEEPFILTERS(VALUES('Company Branch'[Company])),
+      'Company Branch'[Company] = @Company
+    )
+
+  VAR __ValueFilterDM0 = 
+    FILTER(
+      KEEPFILTERS(
+        SUMMARIZECOLUMNS(
+          'Period'[Period],
+          'GLTransaction'[Ledger],
+          'GLTransaction'[Transaction Number],
+          'GLTransaction'[Transaction Type],
+          'GLTransaction'[Transaction Reference],
+          'Branch'[Branch Code],
+          'Department'[Department Name],
+          'GLTransaction'[SubType],
+          'Organization'[Organization Name],
+          'GLTransaction'[Report Post Date],
+          'GLTransaction'[GLAmount Debit],
+          'GLTransaction'[GLAmount Credit],
+          __DS0FilterTable,
+          __DS0FilterTable2,
+          __DS0FilterTable3,
+          __DS0FilterTable4,
+          __DS0FilterTable5,
+          __DS0FilterTable6,
+          "Account No", 'Report Measures'[Account No],
+          "__PresentationJournalFilter", IGNORE('Report Measures'[__PresentationJournalFilter]),
+          "__IsCFXAccountLineForCurrentCompany", IGNORE('Report Measures'[__IsCFXAccountLineForCurrentCompany])
+        )
+      ),
+      AND(
+        NOT(ISBLANK([__PresentationJournalFilter])),
+        NOT(ISBLANK([__IsCFXAccountLineForCurrentCompany]))
+      )
+    )
+
+  VAR __DS0Core = 
+    SUMMARIZECOLUMNS(
+      'Period'[Period],
+      'GLTransaction'[Ledger],
+      'GLTransaction'[Transaction Number],
+      'GLTransaction'[Transaction Type],
+      'GLTransaction'[Transaction Reference],
+      'Branch'[Branch Code],
+      'Department'[Department Name],
+      'GLTransaction'[SubType],
+      'Organization'[Organization Name],
+      'GLTransaction'[Report Post Date],
+      'GLTransaction'[GLAmount Debit],
+      'GLTransaction'[GLAmount Credit],
+      __DS0FilterTable,
+      __DS0FilterTable2,
+      __DS0FilterTable3,
+      __DS0FilterTable4,
+      __DS0FilterTable5,
+      __DS0FilterTable6,
+      __ValueFilterDM0,
+      "Account No", 'Report Measures'[Account No]
+    )
+
+  VAR __DS0PrimaryWindowed = 
+    TOPN(
+      1000000,
+      __DS0Core,
+      [Account No],
+      1,
+      'Period'[Period],
+      1,
+      'GLTransaction'[Ledger],
+      1,
+      'GLTransaction'[Transaction Number],
+      1,
+      'GLTransaction'[Transaction Type],
+      1,
+      'GLTransaction'[Transaction Reference],
+      1,
+      'Branch'[Branch Code],
+      1,
+      'Department'[Department Name],
+      1,
+      'GLTransaction'[SubType],
+      1,
+      'Organization'[Organization Name],
+      1,
+      'GLTransaction'[Report Post Date],
+      1,
+      'GLTransaction'[GLAmount Debit],
+      1,
+      'GLTransaction'[GLAmount Credit],
+      1
+    )
+
+EVALUATE
+  __DS0PrimaryWindowed
+
+ORDER BY
+  [Account No],
+  'Period'[Period],
+  'GLTransaction'[Ledger],
+  'GLTransaction'[Transaction Number],
+  'GLTransaction'[Transaction Type],
+  'GLTransaction'[Transaction Reference],
+  'Branch'[Branch Code],
+  'Department'[Department Name],
+  'GLTransaction'[SubType],
+  'Organization'[Organization Name],
+  'GLTransaction'[Report Post Date],
+  'GLTransaction'[GLAmount Debit],
+  'GLTransaction'[GLAmount Credit]
+</Statement>
+            <ParameterDefinitions />
+          </Query>
+        </QueryDefinition>
+      </rd:DesignerState>
+    </Query>
+    <Fields>
+      <Field Name="Period">
+        <DataField>Period[Period]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Ledger">
+        <DataField>GLTransaction[Ledger]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Transaction_Number">
+        <DataField>GLTransaction[Transaction Number]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Transaction_Type">
+        <DataField>GLTransaction[Transaction Type]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Transaction_Reference">
+        <DataField>GLTransaction[Transaction Reference]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Branch_Code">
+        <DataField>Branch[Branch Code]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Department_Name">
+        <DataField>Department[Department Name]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="SubType">
+        <DataField>GLTransaction[SubType]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Organization_Name">
+        <DataField>Organization[Organization Name]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Report_Post_Date">
+        <DataField>GLTransaction[Report Post Date]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="GLAmount_Debit">
+        <DataField>GLTransaction[GLAmount Debit]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="GLAmount_Credit">
+        <DataField>GLTransaction[GLAmount Credit]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Account_No">
+        <DataField>[Account No]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

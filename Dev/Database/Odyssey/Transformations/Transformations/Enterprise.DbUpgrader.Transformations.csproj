@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreTargetFramework)</TargetFrameworks>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <SuppressObsoleteWarnings>SYSLIB0011</SuppressObsoleteWarnings>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <!-- BEGIN - Required references for Transforms.Documents.ExternalStorageSizeRetrieval-->
+    <Reference Include="AWSSDK.Core" />
+    <Reference Include="AWSSDK.S3" />
+    <!-- END - Required references for Transforms.Documents.ExternalStorageSizeRetrieval-->
+    <Reference Include="CargoWise.Bi.Common" />
+    <Reference Include="CargoWise.Bi.ConfigLoader" />
+    <Reference Include="CargoWise.Bi.Configuration" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.Database.Abstractions" />
+    <Reference Include="CargoWise.Database.ExtendedProperties" />
+    <Reference Include="CargoWise.Database.Shared" />
+    <Reference Include="CargoWise.DbUpgrader.Foundation" />
+    <Reference Include="CargoWise.DbUpgrader.Scripts.Abstractions" />
+    <Reference Include="CargoWise.Schema" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="Enterprise.ChangeDataCapture.Common" />
+    <Reference Include="Enterprise.DbUpgrader.Schema.Synchroniser" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Data.Shared" />
+    <Reference Include="CargoWise.DataProtection" />
+    <Reference Include="Enterprise.DbUpgrader.Resource.Version" />
+    <Reference Include="Enterprise.DbUpgrader.Shared" />
+    <Reference Include="Enterprise.ZArchitecture.Core.Encryption" /> <!--Reference for TwoWayEncoder support-->
+    <Reference Include="CargoWise.Odyssey.Schema" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="System.Memory" />
+    <Reference Include="System.Text.Json" />
+    <Reference Include="WTG.Foundation.Cryptography" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+    <Reference Include="System.Collections.Immutable" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="PreUpgrade\Public\Customs\Asycuda\ClearCountryCodeFromABCCusEntryNum.cs">
+      <DependentUpon>MergeAsycudaBillCountryIntoAsycudaBill.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Enterprise.DbUpgrader.Transformation.Common.csproj" />
+  </ItemGroup>
+</Project>

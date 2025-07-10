@@ -1,0 +1,50 @@
+using CargoWise.Types;
+using NUnit.Framework;
+
+namespace Enterprise.Customs.AU.Declaration.Business.Testing
+{
+	[TestedType(typeof(CMRIDLMessage))]
+	sealed class CMRIDLMessageTest : CMRCUSRESMessageTest
+	{
+		public void TestSendersReference()
+		{
+			AssertEquals("B00122382/1", Message.SendersReference);
+		}
+
+		public void TestStatusOfLinesReport()
+		{
+			AssertEquals(ZString.Empty, Message.StatusOfLinesReport);
+		}
+
+		public void TestGetErrorsArrayList()
+		{
+			AssertEquals(1, Message.GetErrorsArrayList().Count);
+		}
+
+		public void TestGetStatus()
+		{
+			AssertEquals("IDLE", Message.GetStatus());
+		}
+
+		public void TestGetStatusDescription()
+		{
+			AssertEquals("", Message.GetStatusDescription());
+		}
+
+		CMRIDLMessage message;
+		CMRIDLMessage Message
+		{
+			get
+			{
+				if (message == null)
+				{
+					message = Factory.New<CMRIDLMessage>();
+					message.EM_MessageText = SampleIDL;
+				}
+				return message;
+			}
+		}
+
+		const string SampleIDL = "UNH+000001+CUSRES:D:99B:UN'BGM+961:::IDL+33JA H56B 790E:001+14'NAD+MR+41065894724::95'DOC+1'RFF+TN:AAAAEFFME'RFF+ACW:EDN'RFF+ABO:B00122382/1'RFF+ACE:20040617'FTX+AAH+++THE CAN MENTIONED IN THE LINE TO WHICH THIS ADVICE RELATES HAS BEEN DEEMED AS IDLE BY CUSTOMS. IF THE CAN HAS BEEN EXPORTED, PROVIDE CUSTOMS WITH A PROOF OF EXPORT. IF THE EXPORTATION HAS BEEN DELAYED, AMEND THE DATE OF EXPORT ON THE CAN TO THE NEW DATE. IF THE GOODS ARE NOT BE EXPORTED, WITHDRAW THE CAN. IF NO ACTION IS TAKEN BY 03-JUL-2004 THEN THE CAN AND THE AUTHORITY TO DEAL FOR THE ASSOCIATED GOODS WILL BE REVOKED BY CUSTOMS.'UNT+10+000001'";
+	}
+}

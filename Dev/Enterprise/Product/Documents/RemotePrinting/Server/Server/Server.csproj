@@ -1,0 +1,129 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Enterprise.RemotePrinting.Server</RootNamespace>
+    <AssemblyName>RemotePrinting.Server</AssemblyName>
+    <TransformOnBuild>true</TransformOnBuild>
+    <OverwriteReadOnlyOutputFiles>true</OverwriteReadOnlyOutputFiles>
+    <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+    <ApplicationManifest>.gitignore</ApplicationManifest>
+    <!-- Multi-targeting reverted as RemotePrintingService.cs uses bunch of System.Web.Services -->
+    <TargetFrameworks>net48</TargetFrameworks>
+    <ProjectConfigFileName>Web.Base.config</ProjectConfigFileName>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+    <RunCommand>$(MSBuildExtensionsPath64)\..\IIS Express\iisexpress</RunCommand>
+    <RunArguments>/path:"$(MSBuildProjectDirectory)" /port:57935</RunArguments>
+    <TransformWebResourceStrings>true</TransformWebResourceStrings>
+    <SuppressObsoleteWarnings>SYSLIB0014</SuppressObsoleteWarnings>
+    <CWGenerateXmlSerializationAssemblies>true</CWGenerateXmlSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(DAT_IS_BUILDING)' != 'true'">
+    <PostBuildEvent>if not exist $(MSBuildProjectDirectory)\Bin mklink /J $(MSBuildProjectDirectory)\Bin $(OutputPath)</PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.ComponentModel" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Database.Shared" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.Integration" />
+    <Reference Include="CargoWise.Odyssey.Schema" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="CargoWise.Schema" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="CargoWiseOne.WebInfrastructure" />
+    <Reference Include="Enterprise.DocumentEngine" />
+    <Reference Include="Enterprise.Environment" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Enterprise.ZArchitecture.Web.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Web.GlobalBase" />
+    <Reference Include="Enterprise.ZArchitecture.Web.GUI" />
+    <Reference Include="Enterprise.ZArchitecture.Web.GUI.Ajax" />
+    <Reference Include="Enterprise.ZArchitecture.Web.Utilities" />
+    <Reference Include="Microsoft.AspNet.SignalR.Core" />
+    <Reference Include="Microsoft.Owin" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="Owin" />
+    <Reference Include="RemotePrinting.Types" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+    <Reference Include="WTG.TestHelpers" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Http" />
+    <Reference Include="System.Web.Http.WebHost" />
+    <Reference Include="System.Web.Services" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CargoWise.png" />
+    <EmbeddedResource Include="Controls\RequestLogsPopupButton\RequestLogsPage.aspx" />
+    <Content Include="Error.aspx" />
+    <Content Include="Global.asax" />
+    <Content Include="RemotePrintingService.asmx" />
+    <Content Include="Styles\BaseStyle.css" />
+    <Content Include="Styles\SupportDiagnostics.css" />
+    <Content Include="Support\Diagnostics.aspx" />
+    <Content Include="Support\SupportService.asmx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Controls\RequestLogsPopupButton\RequestLogsPage.aspx.cs">
+      <DependentUpon>RequestLogsPage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Update="Controls\RequestLogsPopupButton\RequestLogsPage.aspx.designer.cs">
+      <DependentUpon>RequestLogsPage.aspx</DependentUpon>
+    </Compile>
+    <Compile Update="Error.aspx.cs">
+      <DependentUpon>Error.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Update="Error.aspx.designer.cs">
+      <DependentUpon>Error.aspx</DependentUpon>
+    </Compile>
+    <Compile Update="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Update="Support\Diagnostics.aspx.cs">
+      <DependentUpon>Diagnostics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Update="Support\Diagnostics.aspx.designer.cs">
+      <DependentUpon>Diagnostics.aspx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Web.Base.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.Base.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.Base.config</DependentUpon>
+    </None>
+    <!--
+      not required as it is default for Sdk="Microsoft.NET.Sdk.Web"
+      BUT REQUIRED for QGL and DAT
+    -->
+    <None Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JobPrinting\JobPrinting.csproj" />
+    <ProjectReference Include="..\RPSCore\RPSCore.csproj" />
+    <ProjectReference Include="..\Server.Strong\Server.Strong.csproj" />
+  </ItemGroup>
+  <Target Name="WebConfig" AfterTargets="PrepareForBuild">
+    <TransformXml Source="Web.Base.config" Transform="Web.$(Configuration).config" Destination="Web.config" StackTrace="true" />
+  </Target>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

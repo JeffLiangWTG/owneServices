@@ -1,0 +1,87 @@
+namespace Enterprise.Customs.US.Messaging.Business.MessageBuildingBlocks.Input
+{
+	using CargoWise.Types;
+
+	// This message block has been removed from the latest spec but we still keep it here for old messages
+	[InputBlock("SF10108")]
+	public partial class FTZSF10 : MessageBlock
+	{
+		public FTZSF10()
+			: base("SF10108")
+		{
+		}
+
+		/// <summary>
+		/// A = Add, D = Delete, R = Replace
+		/// </summary>
+		[MessageBlockString(1, 8, "M")]
+		public ZString ActionCode;
+
+		/// <summary>
+		/// CT = Complete Transaction
+		/// </summary>
+		[MessageBlockString(2, 9, "C")]
+		public ZString ActionReasonCode;
+
+		/// <summary>
+		/// Qualifier denoting the type of data provided in the ISF Importer Number field.
+		/// </summary>
+		[MessageBlockString(3, 11, "M")]
+		public ZString ISFImporterNumberQualifier;
+
+		/// <summary>
+		/// ISF Importer Number
+		/// </summary>
+		[MessageBlockString(15, 14, "M")]
+		public ZString ISFImporterNumber;
+
+		/// <summary>
+		/// Space fill.
+		/// </summary>
+		[MessageBlockString(8, 29, "M")]
+		public ZString Reserved;
+
+		/// <summary>
+		/// Ocean vessel non-containerized = ‘10’ (Break Bulk)
+		/// Ocean vessel containerized = ‘11’
+		/// </summary>
+		[MessageBlockString(2, 37, "O")]
+		public ZString ModeOfTransportation;
+
+		/// <summary>
+		/// Unique transaction identifier assigned by CBP
+		/// </summary>
+		[MessageBlockString(15, 39, "C")]
+		public ZString ISFTransactionNumber;
+
+		/// <summary>
+		/// Standard Carrier Alpha Code. The SCAC of the vessel operator that is transporting the container.
+		/// </summary>
+		[MessageBlockString(4, 54, "O")]
+		public ZString SCACIdentifier;
+
+		/// <summary>
+		/// Identification number of the party whose bond is being obligated for the Importer Security Filing.
+		/// </summary>
+		[MessageBlockString(15, 58, "C")]
+		public ZString BondHolder;
+
+		/// <summary>
+		/// CBP code identifying the activity of bond being used.
+		/// </summary>
+		[MessageBlockString(2, 73, "C")]
+		public ZString BondActivityCode;
+
+		/// <summary>
+		/// CBP code identifying the bond type
+		/// </summary>
+		[MessageBlockInt(1, 75, "C")]
+		public ZInt BondType;
+
+		/// <summary>
+		/// Space fill.
+		/// </summary>
+		[MessageBlockString(2, 79, "M")]
+		public ZString Reserved1;
+	}
+}

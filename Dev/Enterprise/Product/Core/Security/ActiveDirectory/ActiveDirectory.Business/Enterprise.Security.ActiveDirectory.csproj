@@ -1,0 +1,98 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <CWGenerateXmlSerializationAssemblies>true</CWGenerateXmlSerializationAssemblies>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="System.DirectoryServices" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" />
+    <PackageReference Include="System.Drawing.Common" />
+    <PackageReference Include="System.Runtime.Caching" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.Runtime.Caching" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <Reference Include="CargoWise.ActiveDirectory.TestFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.ActiveDirectory" />
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="CargoWise.BrandManager" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.ComponentModel" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Definitions" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.Integration" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="CargoWise.Schema" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="Enterprise.DocumentEngine" />
+    <Reference Include="Enterprise.DocumentEngineCore" />
+    <Reference Include="Enterprise.DocumentEngineIntegration" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.MasterData.Common" />
+    <Reference Include="Enterprise.MasterFiles.Business" />
+    <Reference Include="Enterprise.MasterFiles.Integration" />
+    <Reference Include="Enterprise.Registry.Business" />
+    <Reference Include="Enterprise.Scheduler.Business" />
+    <Reference Include="Enterprise.ServiceManager.Shared" />
+    <Reference Include="Enterprise.StabilityChecker" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Enterprise.ZArchitecture.Core.Encryption" />
+    <Reference Include="Enterprise.ZArchitecture.Modules" />
+    <Reference Include="CargoWise.Odyssey.Schema" />
+    <Reference Include="Resources" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+    <Reference Include="ServiceManager.Integration.Abstractions" />
+    <Reference Include="ServiceManager.Integration.ServiceTasks.CW" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Registry\EntitiesToSyncList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntitiesToSyncList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Registry\SyncDirectionList.cs">
+      <DependentUpon>SyncDirectionList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Registry\SyncModeList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SyncModeList.xml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ActiveDirectory.Integration\Enterprise.Security.ActiveDirectory.Integration.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Registry\EntitiesToSyncList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>EntitiesToSyncList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Security.ActiveDirectory</CustomToolNamespace>
+    </None>
+    <None Update="Registry\SyncDirectionList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>SyncDirectionList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Security.ActiveDirectory</CustomToolNamespace>
+    </None>
+    <None Update="Registry\SyncModeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>SyncModeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Security.ActiveDirectory</CustomToolNamespace>
+    </None>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

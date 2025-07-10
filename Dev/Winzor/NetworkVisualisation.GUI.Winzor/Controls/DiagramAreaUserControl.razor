@@ -1,0 +1,140 @@
+@namespace CargoWise.NetworkVisualisation.GUI
+@inherits UserControl
+@using System.Windows.Forms
+@using WinzorFramework.Extensions
+@using CargoWise.NetworkVisualisation.GUI.Events.Scroll
+@using CargoWise.NetworkVisualisation.GUI.Components;
+@using global::Blazor.Diagrams;
+
+<div class="diagramareausercontrol" style="@DiagramAreaUserControlStyleString"
+    @onthrottledscroll=OnScrollAsync
+    @onkeyup=OnKeyUp
+    @onpointerdown=OnPointerDownOutsideDiagramCanvas
+    @oncontextmenu=OpenContextMenuAsync @oncontextmenu:preventDefault @oncontextmenu:stopPropagation
+    @ref=ElementReference>
+    <CascadingValue Value="(IDiagramAreaUserControl)this" IsFixed="true">
+        <CascadingValue Value="(BlazorDiagram)DiagramModel">
+            <div class="diagramareausercontrol__diagramnode@(supportsDiagramVisualStyles ? " diagramareausercontrol__diagramnode--visualstyles" : string.Empty)" style=@GetWidthForDiagramNode()>
+                @if (supportsDiagramVisualStyles)
+                {
+                    <div class="diagramnode__header">
+                        @if (IsNonScheduled)
+                        {
+                            <p class="diagramnode__nonscheduleddiagramname">@NonScheduledDiagramName</p>
+                        }
+                        else
+                        {
+                            <DynamicTextArea Class="diagramnode__diagramname"
+                                         Maxlength="256"
+                                         @bind-Value=@diagramName
+                                         @bind-Value:after=@Diagram_DiagramNameChangedAsync
+                                         />
+                        }
+                        <div class="diagramnode__diagramdetails">
+                            <div class="diagramnode__jobname" style=@JobNumberStyleString>@jobNumber</div>
+                            <DynamicTextArea Class="diagramnode__diagramnumber"
+                                             Readonly=@jobNameReadOnly
+                                             Placeholder=@jobNamePlaceholder
+                                             @bind-Value=@jobName
+                                             @bind-Value:after=@Diagram_JobNameChangedAsync
+                                             />
+                        </div>
+                        <DynamicTextArea Class="diagramnode__completioncriteria"
+                                         Placeholder=@completionCriteriaPlaceholder
+                                         @bind-Value=@completionCriteria
+                                         @bind-Value:after=@Diagram_CompletionCriteriaChangedAsync
+                                         />
+                    </div>
+                    <hr class="diagramnode__divider" />
+                }
+                <div class="diagramnode__content">
+                    @if (supportsDiagramVisualStyles && hasChannels)
+                    {
+                        <div class="diagramnode__channelheaders@(IsChannelHeadersFrozen ? " diagramnode__channelheaders--frozen" : string.Empty)" style="width: @(columnWidth * contentZoom)px; border-right: black solid @(2 * contentZoom)px;">
+                            @{
+                                var i = 0;
+                                var dividerTop = 0d;
+                                @foreach (var (channel, channelHeight) in channelAndHeightTuples.ToList())
+                                {
+                                    var index = i++;
+                                    dividerTop += channelHeight;
+                                    <div class="channelheader" style="min-height: @(channelHeight)px">
+                                        <div class="channelheader__label" style="font-size: @(Constants.ChannelHeaderFontSize * contentZoom)px;">@(channel.Name)</div>
+                                        <div class="channel__divider" style="top: @(dividerTop)px; border-bottom: silver solid @(1 * contentZoom)px;"></div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="diagramnode__channeldividers">
+                            @{
+                                i = 0;
+                                dividerTop = 0d;
+                                foreach (var (channel, channelHeight) in channelAndHeightTuples.ToList())
+                                {
+                                    var index = i++;
+                                    dividerTop += channelHeight;
+                                    if (index < numberOfChannels - 1)
+                                    {
+                                        <div class="channel__divider" style="top: @(dividerTop)px; border-bottom: silver solid @(1 * contentZoom)px;">
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
+                    }
+                    @if (!IsNonScheduled && isDiagramScaled)
+                    {
+                        <div class="diagramnode__backgrounds" style="margin-left: @(leftMarginForBackgrounds)px;">
+                            @foreach (var backgroundStyleString in backgroundStyleStrings.ToList())
+                            {
+                                <div class="background__strip" style=@backgroundStyleString>
+                                </div>
+                            }
+                        </div>
+                    }
+                    <div class="diagramnode__diagramarea@(IsTimeLabelsFrozen ? " schedulegrid_labels--frozen" : string.Empty)" @oncontextmenu=OpenContextMenuAsync @oncontextmenu:preventDefault @oncontextmenu:stopPropagation @ref=diagramCanvasRef @onpointerdown:stopPropagation>
+                        <Blazor.Diagrams.Components.DiagramCanvas @key="DiagramModel.DiagramId">
+                            <Widgets>
+                                <NCNSelectionBoxWidget />
+                            </Widgets>
+                            <AdditionalHtml>
+                                @if (!IsNonScheduled && isDiagramScaled)
+                                {
+                                    <div class="diagramareausercontrol_schedulegrid" style="height: @(100 / contentZoom)%;">
+                                        <div class="schedulegrid__scales" style="@GenerateScheduleGridStyle()">
+                                            @for (var colNumber = 0; colNumber < numberOfColumnsRequired; colNumber += numberOfMergedColumns)
+                                            {
+                                                var isChannelHeaderColumn = (hasChannels && colNumber == 0);
+                                                if (isChannelHeaderColumn)
+                                                {
+                                                    continue;
+                                                }
+
+                                                <div class="schedulegrid_box">
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="schedulegrid_labels">
+                                            @for (var colNumber = 0; colNumber < numberOfColumnsRequired; colNumber += numberOfMergedColumns)
+                                            {
+                                                var isChannelHeaderColumn = (hasChannels && colNumber == 0);
+                                                if (isChannelHeaderColumn)
+                                                {
+                                                    continue;
+                                                }
+
+                                                <div class="schedulegrid_timescale_label" style="@GenerateTimeScaleLabelStyle(colNumber)">
+                                                    <p class="timescale_label_text">@(GetTimeScaleLabel(colNumber))</p>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </AdditionalHtml>
+                        </Blazor.Diagrams.Components.DiagramCanvas>
+                    </div>
+                </div>
+            </div>
+        </CascadingValue>
+    </CascadingValue>
+</div>

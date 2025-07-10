@@ -1,0 +1,56 @@
+meta {
+  name: Call endpoint using All Provided Variables Usable For Intercompany Tariffs
+  type: http
+  seq: 22
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/intercompanytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetRateQueryWithMandatoryFieldsForProvidedVariables(false);
+   
+   query.ServiceProviders = RatesAPIsHelper.GetAllServiceProviders();
+   query.Carriers = RatesAPIsHelper.GetAllCarriers();
+   query.CarrierServiceLevels = RatesAPIsHelper.GetCarrierServiceLevelssWithCW1Codes();
+   query.ServiceLevels = RatesAPIsHelper.GetServiceLevels();
+   query.GatewayServiceLevels = RatesAPIsHelper.GetGatewayServiceLevels();
+   query.ShipmentGatewayServiceLevels = RatesAPIsHelper.GetShipmentGatewayServiceLevels();
+   query.ContainerTypes = RatesAPIsHelper.GetAllContainerTypes();
+   query.Commodities = RatesAPIsHelper.GetCommoditiesWithCW1Codes();
+   query.NamedAccounts = RatesAPIsHelper.GetNamedAccountsWithCW1Codes();
+   query.PaymentTermOverride = RatesAPIsHelper.GetPaymentTermOverride();
+   query.PlannedLoad = 
+       {
+           Type: bru.getEnvVar("PlannedLoadType"),
+           Value: bru.getEnvVar("PlannedLoadValue")
+       };
+   query.PlannedDischarge =
+       {
+           Type: bru.getEnvVar("PlannedDischargeType"),
+           Value: bru.getEnvVar("PlannedDischargeValue")
+       };
+   query.RateOrigin = 
+       {
+           Type: bru.getEnvVar("RateOriginType"),
+           Value: bru.getEnvVar("RateOriginValue")
+       };
+   query.RateDestination =
+       {
+           Type: bru.getEnvVar("RateDestinationType"),
+           Value: bru.getEnvVar("RateDestinationValue")
+       };
+   query.Locations = RatesAPIsHelper.GetLocations();
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

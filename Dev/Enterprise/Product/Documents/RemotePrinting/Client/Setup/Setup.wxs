@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<?include SetupVariables.wxi ?>
+	<Product Id="{D8BCA8FF-5AB8-481B-9AFF-2FBD05446A4B}" Version="$(var.VersionNumber)" UpgradeCode="{FBDAD1E4-0EFC-406c-96A3-432FBB5C64B4}" Name="CargoWise One WebPrint Client" Language="1033" Manufacturer="WiseTech Global">
+
+		<Package Comments="CargoWise One WebPrint Client Installation" Compressed="yes" Description="CargoWise One WebPrint Client Setup Package" InstallerVersion="200" Keywords="Database, Installer" Languages="1033" Manufacturer="WiseTech Global" />
+
+		<Upgrade Id="{FBDAD1E4-0EFC-406c-96A3-432FBB5C64B4}">
+			<UpgradeVersion Minimum="$(var.VersionNumber)" Property="NEWERVERSIONDETECTED" OnlyDetect="yes" IncludeMinimum="yes" />
+			<UpgradeVersion Minimum="1.0.0" Maximum="$(var.VersionNumber)" Property="OLDERVERSIONBEINGUPGRADED" IncludeMinimum="yes" />
+		</Upgrade>
+
+		<Media Id="1" Cabinet="setup.cab" EmbedCab="yes" />
+
+		<WixVariable Id="WixUIDialogBmp" Value="..\Enterprise\Product\Documents\RemotePrinting\Client\Setup\Binary\WixUI_Bmp_Dialog.bmp" />
+		<WixVariable Id="WixUIBannerBmp" Value="..\Enterprise\Product\Documents\RemotePrinting\Client\Setup\Binary\WixUI_Bmp_Banner.bmp" />
+
+		<Condition Message="An administrator must approve or install [ProductName].">Privileged</Condition>
+		<Condition Message="A later version of [ProductName] is already installed.">NOT NEWERVERSIONDETECTED</Condition>
+
+		<PropertyRef Id="NETFRAMEWORK40FULL" />
+		<Condition Message="This application requires .NET Framework 4. Please install the .NET Framework then run this installer again.">
+			(Installed AND NOT UPGRADINGPRODUCTCODE) OR NETFRAMEWORK40FULL = "#1"
+		</Condition>
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+
+			<Directory Id="ProgramFilesFolder" Name="PFiles">
+				<Directory Id="CompanyFolder" Name="WiseTech Global">
+					<Directory Id="ProductFolder" Name="CargoWise One WebPrint Client">
+
+						<Directory Id="x64libs" Name="x64">
+							<Component Id="PdfiumCore_x64" Guid="{610933b0-8eaa-40f2-8d46-69334a939dee}">
+								<File Id="Pdfium64" Name="Pdfium.dll" Source="x64\pdfium.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							</Component>
+						</Directory>
+
+						<Component Id="CoreComponent" Guid="{93F408DC-D456-406c-AF22-A507214C010E}">
+							<RemoveFile Id="RemoveDLLs" Name="*.dll" On="install" />
+							<File Id="NewtonSoftJsonDll" Name="Newtonsoft.Json.dll" Source="Newtonsoft.Json.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="MicrosoftSignalrClientDll" Name="Microsoft.AspNet.SignalR.Client.dll" Source="Microsoft.AspNet.SignalR.Client.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="ERemotePrintingClientDLL" Name="RemotePrinting.Client.dll" Source="RemotePrinting.Client.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="ERemotePrintingEngineDLL" Name="RemotePrinting.Engine.dll" Source="RemotePrinting.Engine.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="ERemotePrintingTypesDLL" Name="RemotePrinting.Types.dll" Source="RemotePrinting.Types.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="CWSHAREDDLL" Name="CargoWise.Shared.40.dll" Source="CargoWise.Shared.40.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="CargoWiseeHubCommon" Name="CargoWise.eHub.Common.dll" Source="CargoWise.eHub.Common.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="FlexCelDLL" Name="FlexCel.dll" Source="FlexCel.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="ConfiguratorUI" Name="RemotePrinting.Client.Configurator.exe" Source="RemotePrinting.Client.Configurator.exe" Vital="yes" DiskId="1" Checksum="yes" KeyPath="yes" />
+							<File Id="ConfiguratorUIConfig" Name="RemotePrinting.Client.Configurator.exe.config" Source="RemotePrinting.Client.Configurator.exe.config" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="PdfiumWrapper" Name="CargoWise.PdfiumWrapper.dll" Source="CargoWise.PdfiumWrapper.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="WTGErrorReportingDLL" Name="WTG.ErrorReporting.dll" Source="WTG.ErrorReporting.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="SystemNumericsVectorsDLL" Name="System.Numerics.Vectors.dll" Source="System.Numerics.Vectors.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="SystemMemoryDLL" Name="System.Memory.dll" Source="System.Memory.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="SystemResourcesExtensionsDLL" Name="System.Resources.Extensions.dll" Source="System.Resources.Extensions.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="SystemRuntimeCompilerServicesUnsafeDLL" Name="System.Runtime.CompilerServices.Unsafe.dll" Source="System.Runtime.CompilerServices.Unsafe.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="NLogDLL" Name="NLog.dll" Source="NLog.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="MailKitDLL" Name="MailKit.dll" Source="MailKit.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="MimeKitDLL" Name="MimeKit.dll" Source="MimeKit.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="EnterprisexTMessagingSharedDLL" Name="Enterprise.xTMessaging.Shared.dll" Source="Enterprise.xTMessaging.Shared.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="EnterpriseMessagingIntergration" Name="Enterprise.Messaging.Integration.dll" Source="Enterprise.Messaging.Integration.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="EnterpriseIntegrationDLL" Name="Enterprise.Integration.dll" Source="Enterprise.Integration.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="EnterpriseZArchitectureCoreDLL" Name="Enterprise.ZArchitecture.Core.dll" Source="Enterprise.ZArchitecture.Core.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="XWareXtGrpcApplicationDLL" Name="Xware.Xt.Grpc.Application.dll" Source="Xware.Xt.Grpc.Application.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="XWareXtGrpcConfigDLL" Name="Xware.Xt.Grpc.Config.dll" Source="Xware.Xt.Grpc.Config.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="GrpcCoreDLL" Name="Grpc.Core.dll" Source="Grpc.Core.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="GrpcCoreApiDLL" Name="Grpc.Core.Api.dll" Source="Grpc.Core.Api.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="GoogleProtobufDLL" Name="Google.Protobuf.dll" Source="Google.Protobuf.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="GrpcCsharpExt86" Name="grpc_csharp_ext.x86.dll" Source="..\packages\Grpc.Core\runtimes\win-x86\native\grpc_csharp_ext.x86.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="GrpcCsharpExt64" Name="grpc_csharp_ext.x64.dll" Source="..\packages\Grpc.Core\runtimes\win-x64\native\grpc_csharp_ext.x64.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="CargoWiseCommon" Name="CargoWise.Common.dll" Source="CargoWise.Common.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="SystemBuffers" Name="System.Buffers.dll" Source="System.Buffers.dll" Vital="yes" DiskId="1" Checksum="yes" />
+							<Shortcut Id="ConfiguratorShortcut" Directory="ProductDir" Name="Configure" Icon="RemotePrinting.Client.Configurator.exe" IconIndex="0" Advertise="yes" />
+						</Component>
+
+						<Component Id="DesktopComponent" Guid="{3743D5B4-F769-4a25-9725-E1B493D8AD51}">
+							<RemoveFile Id="RemoveConfigDesktop" Name="*.config" On="install" />
+							<File Id="DesktopUI" Name="RemotePrinting.Client.Desktop.exe" Source="RemotePrinting.Client.Desktop.exe" Vital="yes" DiskId="1" Checksum="yes" KeyPath="yes" />
+							<File Id="DesktopUIConfig" Name="RemotePrinting.Client.Desktop.exe.config" Source="RemotePrinting.Client.Desktop.exe.config" Vital="yes" DiskId="1" Checksum="yes" />
+							<Shortcut Id="DesktopShortcut" Directory="ProductDir" Name="Desktop Client" Icon="RemotePrinting.Client.Desktop.exe" IconIndex="0" Advertise="yes" />
+						</Component>
+
+						<Component Id="ServiceComponent" Guid="{008911A5-2C55-4f6f-AF3D-A01B442B0FEC}">
+							<RemoveFile Id="RemoveConfigService" Name="*.config" On="install" />
+							<File Id="ServiceExe" Name="RemotePrinting.Client.Service.exe" Source="RemotePrinting.Client.Service.exe" KeyPath="yes" Vital="yes" DiskId="1" Checksum="yes" />
+							<File Id="ServiceExeConfig" Name="RemotePrinting.Client.Service.exe.config" Source="RemotePrinting.Client.Service.exe.config" Vital="yes" DiskId="1" Checksum="yes" />
+						</Component>
+
+					</Directory>
+				</Directory>
+			</Directory>
+			<Directory Id="ProgramMenuFolder" Name="ProgMenu">
+				<Directory Id="ProgramMenuDir" Name="WiseTech Global">
+					<Directory Id="ProductDir" Name="CargoWise One WebPrint">
+						<Component Id="ProgramMenuShortcutComponent" Guid="{B303237A-ABBC-4b50-8400-AB262C130BD5}">
+							<RegistryKey Id="regC988CAEF72554c0bB6E0AFDBC3A1F3E3" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Key="Software\CargoWise edi\ediWebPrint" Root="HKMU" />
+							<RegistryValue Id="regECB7A9C795AF4f99B94BEF172DD67435" Root="HKMU" Key="Software\CargoWise edi\ediWebPrint" Name="Installed" Value="[BinDir]" Type="string" KeyPath="yes" />
+							<RemoveFolder Id="CleanupShortcutFolder1" Directory="ProgramMenuDir" On="uninstall" />
+							<RemoveFolder Id="CleanupShortcutFolder2" Directory="ProductDir" On="uninstall" />
+						</Component>
+					</Directory>
+				</Directory>
+			</Directory>
+
+			<Directory Id="FontsFolder">
+				<Component Id="FontsRequiredForPrinting" Guid="{6B2D00D5-E7D4-4FDD-96A6-1DF7819749A7}">
+					<File Id="Font_3OF9TTF" Name="3OF9.TTF" Source="FontsForRemotePrinting\3OF9.TTF" TrueType="yes" Vital="yes" DiskId="1" />
+					<File Id="Font_abri128sttf" Name="abri128s.ttf" Source="FontsForRemotePrinting\abri128s.ttf" TrueType="yes" Vital="yes" DiskId="1" />
+					<File Id="Font_Z3OF9TTF" Name="Z3OF9.TTF" Source="FontsForRemotePrinting\Z3OF9.TTF" TrueType="yes" Vital="yes" DiskId="1" />
+					<File Id="Font_GNUMICRTTF" Name="GNUMICR.TTF" Source="FontsForRemotePrinting\GNUMICR.TTF" TrueType="yes" Vital="yes" DiskId="1" />
+				</Component>
+			</Directory>
+
+		</Directory>
+
+		<Feature Id="ClientFeature" Level="1" AllowAdvertise="no" Title="CargoWise One WebPrint Client" Description="CargoWise One WebPrint client suite" Absent="disallow" Display="expand">
+
+			<ComponentRef Id="PdfiumCore_x64" />
+			<ComponentRef Id="CoreComponent" />
+			<ComponentRef Id="ProgramMenuShortcutComponent" />
+			<ComponentRef Id="FontsRequiredForPrinting" />
+
+			<Feature Id="DesktopClientFeature" Level="1" AllowAdvertise="no" Title="Desktop application" Description="Desktop client application">
+				<ComponentRef Id="DesktopComponent" />
+			</Feature>
+
+			<Feature Id="WindowsServiceFeature" Level="1" AllowAdvertise="no" Title="Windows service" Description="Dedicated windows service">
+				<ComponentRef Id="ServiceComponent" />
+			</Feature>
+
+		</Feature>
+
+		<Binary Id="CustomSetupCode" SourceFile="RemotePrinting.Client.Setup.exe" />
+
+		<Property Id="ALLUSERS" Value="1" />
+		<Property Id="ARPPRODUCTICON" Value="ApplicationIcon" />
+		<Property Id="NEWERVERSIONDETECTED" Secure="yes" />
+		<Property Id="OLDERVERSIONBEINGUPGRADED" Secure="yes" />
+		<Property Id="WIXUI_INSTALLDIR" Value="ProductFolder" />
+		<Property Id="WixAppFolder" Value="WixPerMachineFolder" />
+
+		<Icon Id="ApplicationIcon" SourceFile="..\..\..\..\..\..\Resources\ApplicationIcon.ico" />
+		<Icon Id="RemotePrinting.Client.Configurator.exe" SourceFile="RemotePrinting.Client.Configurator.exe" />
+		<Icon Id="RemotePrinting.Client.Desktop.exe" SourceFile="RemotePrinting.Client.Desktop.exe" />
+
+		<UIRef Id="WixUI_Common" />
+
+		<UI>
+			<Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+			<TextStyle Id="WixUI_Font_Normal" FaceName="Arial" Size="8" />
+			<TextStyle Id="WixUI_Font_Bigger" FaceName="Arial" Size="12" Red="0" Green="52" Blue="121" />
+			<TextStyle Id="WixUI_Font_Title" FaceName="Arial" Size="12" Red="0" Green="52" Blue="121" />
+
+			<DialogRef Id="BrowseDlg" />
+			<DialogRef Id="DiskCostDlg" />
+			<DialogRef Id="ErrorDlg" />
+			<DialogRef Id="FatalError" />
+			<DialogRef Id="FilesInUse" />
+			<DialogRef Id="MsiRMFilesInUse" />
+			<DialogRef Id="PrepareDlg" />
+			<DialogRef Id="ProgressDlg" />
+			<DialogRef Id="ResumeDlg" />
+			<DialogRef Id="UserExit" />
+
+			<Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="CustomizeDlg">1</Publish>
+
+			<Publish Dialog="CustomizeDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="1">Installed</Publish>
+			<Publish Dialog="CustomizeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">NOT Installed</Publish>
+			<Publish Dialog="CustomizeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">NOT Installed</Publish>
+
+			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="CustomizeDlg" Order="1">NOT Installed</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed</Publish>
+
+			<Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+			<Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+			<Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+			<Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+
+			<Dialog Id="ExitDlg" Width="370" Height="270" Title="!(loc.ExitDialog_Title)">
+				<Control Id="Finish" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Cancel="yes" Text="!(loc.WixUIFinish)">
+					<Publish Event="EndDialog" Value="Return">1</Publish>
+				</Control>
+
+				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Disabled="yes" Text="!(loc.WixUICancel)" />
+				<Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" TabSkip="no" Text="!(loc.ExitDialogBitmap)" />
+				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Disabled="yes" Text="!(loc.WixUIBack)" />
+				<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+				<Control Id="Description" Type="Text" X="135" Y="70" Width="220" Height="80" Transparent="yes" NoPrefix="yes" Text="!(loc.ExitDialogDescription)" />
+				<Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Transparent="yes" NoPrefix="yes" Text="!(loc.ExitDialogTitle)" />
+				<Control Id="LaunchReccomendation" Type="Text" X="135" Y="100" Width="220" Height="60" Transparent="yes" NoPrefix="yes" Text="Please Configure [ProductName] using the Web Print Configuration tool if needed." />
+			</Dialog>
+		</UI>
+
+		<CustomAction Id="CA_SAVESTATE" BinaryKey="CustomSetupCode" ExeCommand='"Save" "[ProductFolder]"' />
+		<CustomAction Id="CA_RESTORESTATE" BinaryKey="CustomSetupCode" ExeCommand='"Restore" "[ProductFolder]"' />
+		<CustomAction Id="CA_DELETE" BinaryKey="CustomSetupCode" ExeCommand='"DeleteService" "[ProductFolder]"' />
+
+		<InstallExecuteSequence>
+			<Custom Action="CA_SAVESTATE" Before="RemoveFiles">Installed AND (NOT ((NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")))</Custom>
+			<Custom Action="CA_RESTORESTATE" After="InstallFinalize">Installed AND (NOT ((NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")))</Custom>
+			<Custom Action="CA_DELETE" After="InstallInitialize">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+			<RemoveExistingProducts After="InstallValidate" />
+		</InstallExecuteSequence>
+
+		<AdminUISequence>
+			<Show Dialog="ExitDlg" OnExit="success" />
+		</AdminUISequence>
+
+		<InstallUISequence>
+			<Show Dialog="ExitDlg" OnExit="success" />
+			<LaunchConditions Sequence="100" />
+			<FindRelatedProducts Sequence="99" />
+			<ValidateProductID Sequence="700" />
+			<CostInitialize Sequence="800" />
+			<FileCost Sequence="900" />
+			<CostFinalize Sequence="1000" />
+			<MigrateFeatureStates Sequence="1200" />
+			<ExecuteAction Sequence="1300" />
+		</InstallUISequence>
+
+	</Product>
+</Wix>

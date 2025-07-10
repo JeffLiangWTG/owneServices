@@ -1,0 +1,80 @@
+<NativeSchemaSet Name="Rate" Root="RatingHeader" UseBatching="true">
+	<Entities>
+		<Entity Name="RatingHeader">
+			<ExcludedProperty Name ="TH_SpotRate"/>
+			<ExcludedProperty Name ="TH_RX_NKSpotRateCurrency"/>
+		</Entity>
+		<Entity Name="RateEntry" Behaviour="RateEntryDateRangeUpdate" DateRangeStartField="TI_RateStartDate" DateRangeEndField="TI_RateEndDate">
+			<ExcludedProperty Name="TI_RateKey"/>
+			<UniqueCriteria>
+				<ExcludedProperties>
+					<Property Name="TI_LineOrder"></Property>
+					<Property Name="TI_RX_NKCurrency"></Property>
+					<Property Name="TI_PageHeading"></Property>
+					<Property Name="TI_PageOpeningText"></Property>
+					<Property Name="TI_PageClosingText"></Property>
+					<Property Name="TI_OH_AgentOverride"></Property>
+					<Property Name="TI_QuotePageIncoTerm"></Property>
+					<Property Name="TI_BuyersConsolRateMode"></Property>
+					<Property Name="TI_IsValid"></Property>
+					<Property Name="TI_DataChecked"></Property>
+					<Property Name="TI_SystemCreateTimeUtc"></Property>
+					<Property Name="TI_SystemLastEditTimeUtc"></Property>
+					<Property Name="TI_SystemCreateUser"></Property>
+					<Property Name="TI_SystemLastEditUser"></Property>
+					<Property Name="TI_RateKey"></Property>
+					<Property Name="TI_CreationSource"></Property>
+					<Property Name="TI_ProviderReferenceID"></Property>
+				</ExcludedProperties>
+			</UniqueCriteria>
+		</Entity>
+		<Entity Name="RateLines">
+			<UniqueCriteria>
+				<ExcludedProperties>
+					<Property Name="TL_LineOrder"></Property>
+					<Property Name="TL_IsValid"></Property>
+					<Property Name="TL_ProviderReferenceID"></Property>
+				</ExcludedProperties>
+			</UniqueCriteria>
+		</Entity>
+		<Entity Name="RateLineItems">
+			<UniqueCriteria>
+				<ExcludedProperties>
+					<Property Name="TM_LineOrder"></Property>
+					<Property Name="TM_IsValid"></Property>
+					<Property Name="TM_Value"></Property>
+					<Property Name="TM_FlatAmount"></Property>
+					<Property Name="TM_AgentDeclaredRate"></Property>
+				</ExcludedProperties>
+			</UniqueCriteria>
+		</Entity>
+		<Entity Name="StmNote">
+			<ExcludedProperty Name="ST_AutoVersion" />
+		</Entity>
+		<Entity Name="JobDocAddress">
+			<ExcludedProperty Name="E2_PK" />
+			<ExcludedProperty Name="E2_ValidationStatus" />
+			<ExcludedProperty Name="E2_GeoLocation" />
+			<ExcludedProperty Name="E2_AutoVersion" />
+		</Entity>
+		<Entity Name="OrgAddress">
+			<ExcludedProperty Name="OA_ValidationStatus" />
+			<ExcludedProperty Name="OA_GeofencePolygon" />
+			<ExcludedProperty Name="OA_GeoLocation" />
+		</Entity>
+	</Entities>
+	<Associations>
+		<Association From="RateEntry" To="GlbCompany" Key="TI_GC_Publisher"/>
+		<Association From="RateEntry" To="RatingHeader" Key="TI_TH"/>
+		<Association From="RateLines" To="RateEntry" Key="TL_TI"/>
+		<Association From="RateLineItems" To="RateLines" Key="TM_TL"/>
+		<Association From="StmNote" To="RateLines" Key="ST_ParentID"/>
+		<Association From="JobDocAddress" To="RatingHeader" Key="E2_ParentID"/>
+		<Association From="OrgAddress" To="JobDocAddress" Key="OA_OH"/>
+	</Associations>
+	<EDICodeMappings>
+		<Mapping Table="RateEntry" PropertyName="OriginLRC" RelationshipResolver="LRR" />
+		<Mapping Table="RateEntry" PropertyName="DestinationLRC" RelationshipResolver="LRR" />
+		<Mapping Table="RateEntry" PropertyName="ViaLRC" RelationshipResolver="LRR" />
+	</EDICodeMappings>
+</NativeSchemaSet>

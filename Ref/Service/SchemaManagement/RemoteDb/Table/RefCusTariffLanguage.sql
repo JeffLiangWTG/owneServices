@@ -1,0 +1,17 @@
+CREATE TABLE RefCusTariffLanguage
+(
+[ZX7_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefCusTariffLanguage_ZX7_PK] DEFAULT(NEWID()),
+[ZX7_ZX6_NKLanguage] VARCHAR(3) NOT NULL,
+[ZX7_ZZ1_Tariff] UNIQUEIDENTIFIER NOT NULL,
+[ZX7_Description] NVARCHAR(MAX) NOT NULL CONSTRAINT [DF_RefCusTariffLanguage_ZX7_Description] DEFAULT(''),
+
+CONSTRAINT [PK_RefCusTariffLanguage] PRIMARY KEY CLUSTERED ([ZX7_PK] ASC),
+CONSTRAINT [FK_RefCusTariffLanguage_RefLanguageType] FOREIGN KEY([ZX7_ZX6_NKLanguage]) REFERENCES [RefLanguageType] ([ZX6_Language]),
+CONSTRAINT [FK_RefCusTariffLanguage_RefCusTariff] FOREIGN KEY([ZX7_ZZ1_Tariff]) REFERENCES [RefCusTariff] ([ZZ1_PK])
+)
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_RefCusTariffLanguage_ZX7_ZX6_NKLanguage_ZX7_ZZ1_Tariff ON RefCusTariffLanguage (ZX7_ZX6_NKLanguage, ZX7_ZZ1_Tariff)
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusTariffLanguage_ZX7_ZZ1_Tariff ON RefCusTariffLanguage (ZX7_ZZ1_Tariff)
+GO
+ALTER TABLE RefCusTariffLanguage SET (LOCK_ESCALATION = DISABLE);

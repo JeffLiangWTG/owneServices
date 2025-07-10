@@ -1,0 +1,107 @@
+# Database type: Audit
+# Database test mode: SelfHostedOpen
+
+# Principals
+| Member Type | Member Name                                                                  | Default Schema | Parent Roles                                              |
+|-------------|------------------------------------------------------------------------------|----------------|-----------------------------------------------------------|
+| R           | cwHRMStaffRole                                                               |                |                                                           |
+| R           | cwReaderRole                                                                 |                | db_datareader                                             |
+| R           | cwRestrictedReaderRole                                                       |                |                                                           |
+| R           | cwRestrictedWriterRole                                                       |                |                                                           |
+| R           | cwUnrestrictedWriterRole                                                     |                |                                                           |
+| S           | EnterpriseDbUser_f962da91-CustomerDb_BobBackupOperator                       |                | db_backupoperator                                         |
+| S           | EnterpriseDbUser_f962da91-CustomerDb_BobDeveloper                            |                |                                                           |
+| S           | EnterpriseDbUser_f962da91-CustomerDb_BobDeveloperBackupOperatorReaderHrmUser |                | cwRestrictedReaderRole, db_backupoperator, cwHRMStaffRole |
+| S           | EnterpriseDbUser_f962da91-CustomerDb_BobReader                               |                | cwRestrictedReaderRole                                    |
+| S           | f962da91-CustomerDb_CargoWiseReaderLogin                                     |                | cwReaderRole, db_datareader                               |
+| S           | f962da91-CustomerDb_CargoWiseWriterLogin                                     |                | cwRestrictedWriterRole                                    |
+| S           | f962da91-CustomerDb_RestrictedReaderLogin                                    |                | cwRestrictedReaderRole                                    |
+| S           | f962da91-CustomerDb_RestrictedWriterLogin                                    |                | cwRestrictedWriterRole                                    |
+| S           | f962da91-CustomerDb_UnrestrictedWriterLogin                                  |                | cwUnrestrictedWriterRole                                  |
+| U           | Domain\BobBackupOperator                                                     |                | db_backupoperator                                         |
+| U           | Domain\BobDeveloper                                                          |                |                                                           |
+| U           | Domain\BobDeveloperBackupOperatorReaderHrmUser                               |                | cwRestrictedReaderRole, db_backupoperator, cwHRMStaffRole |
+| U           | Domain\BobReader                                                             |                | cwRestrictedReaderRole                                    |
+
+# Permissions
+| State | Permission           | Grantee                                                                      | Securable Type | Securable Schema | Securable                                 | Securable Column | Grantor |
+|-------|----------------------|------------------------------------------------------------------------------|----------------|------------------|-------------------------------------------|------------------|---------|
+| G     | SELECT               | cwHRMStaffRole                                                               | SCHEMA         |                  | hrm                                       |                  |         |
+| G     | SHOWPLAN             | cwReaderRole                                                                 | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | VIEW DEFINITION      | cwReaderRole                                                                 | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | SHOWPLAN             | cwRestrictedReaderRole                                                       | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | VIEW DEFINITION      | cwRestrictedReaderRole                                                       | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | SELECT               | cwRestrictedReaderRole                                                       | OBJECT         | sys              | sql_expression_dependencies               |                  |         |
+| G     | EXECUTE              | cwRestrictedReaderRole                                                       | SCHEMA         |                  | dbo                                       |                  |         |
+| G     | SELECT               | cwRestrictedReaderRole                                                       | SCHEMA         |                  | dbo                                       |                  |         |
+| G     | EXECUTE              | cwRestrictedReaderRole                                                       | SCHEMA         |                  | OrderTracking                             |                  |         |
+| G     | SELECT               | cwRestrictedReaderRole                                                       | SCHEMA         |                  | OrderTracking                             |                  |         |
+| G     | EXECUTE              | cwRestrictedReaderRole                                                       | SCHEMA         |                  | TestSchema                                |                  |         |
+| G     | SELECT               | cwRestrictedReaderRole                                                       | SCHEMA         |                  | TestSchema                                |                  |         |
+| G     | ALTER                | cwRestrictedWriterRole                                                       | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CREATE SCHEMA        | cwRestrictedWriterRole                                                       | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | REFERENCES           | cwRestrictedWriterRole                                                       | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | SHOWPLAN             | cwRestrictedWriterRole                                                       | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | VIEW DATABASE STATE  | cwRestrictedWriterRole                                                       | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | VIEW DEFINITION      | cwRestrictedWriterRole                                                       | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | SELECT               | cwRestrictedWriterRole                                                       | OBJECT         | sys              | sql_expression_dependencies               |                  |         |
+| G     | ALTER                | cwRestrictedWriterRole                                                       | SCHEMA         |                  | dbo                                       |                  |         |
+| G     | CREATE SEQUENCE      | cwRestrictedWriterRole                                                       | SCHEMA         |                  | dbo                                       |                  |         |
+| G     | DELETE               | cwRestrictedWriterRole                                                       | SCHEMA         |                  | dbo                                       |                  |         |
+| G     | EXECUTE              | cwRestrictedWriterRole                                                       | SCHEMA         |                  | dbo                                       |                  |         |
+| G     | INSERT               | cwRestrictedWriterRole                                                       | SCHEMA         |                  | dbo                                       |                  |         |
+| G     | SELECT               | cwRestrictedWriterRole                                                       | SCHEMA         |                  | dbo                                       |                  |         |
+| G     | UPDATE               | cwRestrictedWriterRole                                                       | SCHEMA         |                  | dbo                                       |                  |         |
+| G     | ALTER                | cwRestrictedWriterRole                                                       | SCHEMA         |                  | OrderTracking                             |                  |         |
+| G     | CREATE SEQUENCE      | cwRestrictedWriterRole                                                       | SCHEMA         |                  | OrderTracking                             |                  |         |
+| G     | DELETE               | cwRestrictedWriterRole                                                       | SCHEMA         |                  | OrderTracking                             |                  |         |
+| G     | EXECUTE              | cwRestrictedWriterRole                                                       | SCHEMA         |                  | OrderTracking                             |                  |         |
+| G     | INSERT               | cwRestrictedWriterRole                                                       | SCHEMA         |                  | OrderTracking                             |                  |         |
+| G     | SELECT               | cwRestrictedWriterRole                                                       | SCHEMA         |                  | OrderTracking                             |                  |         |
+| G     | UPDATE               | cwRestrictedWriterRole                                                       | SCHEMA         |                  | OrderTracking                             |                  |         |
+| G     | ALTER                | cwRestrictedWriterRole                                                       | SCHEMA         |                  | TestSchema                                |                  |         |
+| G     | CREATE SEQUENCE      | cwRestrictedWriterRole                                                       | SCHEMA         |                  | TestSchema                                |                  |         |
+| G     | DELETE               | cwRestrictedWriterRole                                                       | SCHEMA         |                  | TestSchema                                |                  |         |
+| G     | EXECUTE              | cwRestrictedWriterRole                                                       | SCHEMA         |                  | TestSchema                                |                  |         |
+| G     | INSERT               | cwRestrictedWriterRole                                                       | SCHEMA         |                  | TestSchema                                |                  |         |
+| G     | SELECT               | cwRestrictedWriterRole                                                       | SCHEMA         |                  | TestSchema                                |                  |         |
+| G     | UPDATE               | cwRestrictedWriterRole                                                       | SCHEMA         |                  | TestSchema                                |                  |         |
+| G     | IMPERSONATE          | cwRestrictedWriterRole                                                       | USER           |                  | f962da91-CustomerDb_CargoWiseReaderLogin  |                  |         |
+| G     | IMPERSONATE          | cwRestrictedWriterRole                                                       | USER           |                  | f962da91-CustomerDb_RestrictedReaderLogin |                  |         |
+| G     | DELETE               | cwUnrestrictedWriterRole                                                     | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | EXECUTE              | cwUnrestrictedWriterRole                                                     | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | INSERT               | cwUnrestrictedWriterRole                                                     | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | SELECT               | cwUnrestrictedWriterRole                                                     | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | UPDATE               | cwUnrestrictedWriterRole                                                     | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | VIEW DATABASE STATE  | cwUnrestrictedWriterRole                                                     | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | VIEW DEFINITION      | cwUnrestrictedWriterRole                                                     | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CREATE SEQUENCE      | cwUnrestrictedWriterRole                                                     | SCHEMA         |                  | cdc                                       |                  |         |
+| G     | VIEW CHANGE TRACKING | cwUnrestrictedWriterRole                                                     | SCHEMA         |                  | cdc                                       |                  |         |
+| G     | CREATE SEQUENCE      | cwUnrestrictedWriterRole                                                     | SCHEMA         |                  | dbo                                       |                  |         |
+| G     | VIEW CHANGE TRACKING | cwUnrestrictedWriterRole                                                     | SCHEMA         |                  | dbo                                       |                  |         |
+| G     | CREATE SEQUENCE      | cwUnrestrictedWriterRole                                                     | SCHEMA         |                  | hrm                                       |                  |         |
+| G     | VIEW CHANGE TRACKING | cwUnrestrictedWriterRole                                                     | SCHEMA         |                  | hrm                                       |                  |         |
+| G     | CREATE SEQUENCE      | cwUnrestrictedWriterRole                                                     | SCHEMA         |                  | OrderTracking                             |                  |         |
+| G     | VIEW CHANGE TRACKING | cwUnrestrictedWriterRole                                                     | SCHEMA         |                  | OrderTracking                             |                  |         |
+| G     | CREATE SEQUENCE      | cwUnrestrictedWriterRole                                                     | SCHEMA         |                  | Staging                                   |                  |         |
+| G     | VIEW CHANGE TRACKING | cwUnrestrictedWriterRole                                                     | SCHEMA         |                  | Staging                                   |                  |         |
+| G     | CREATE SEQUENCE      | cwUnrestrictedWriterRole                                                     | SCHEMA         |                  | TestSchema                                |                  |         |
+| G     | VIEW CHANGE TRACKING | cwUnrestrictedWriterRole                                                     | SCHEMA         |                  | TestSchema                                |                  |         |
+| G     | CONNECT              | Domain\BobBackupOperator                                                     | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CONNECT              | Domain\BobDeveloper                                                          | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CONNECT              | Domain\BobDeveloperBackupOperatorReaderHrmUser                               | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CONNECT              | Domain\BobReader                                                             | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CONNECT              | EnterpriseDbUser_f962da91-CustomerDb_BobBackupOperator                       | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CONNECT              | EnterpriseDbUser_f962da91-CustomerDb_BobDeveloper                            | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CONNECT              | EnterpriseDbUser_f962da91-CustomerDb_BobDeveloperBackupOperatorReaderHrmUser | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CONNECT              | EnterpriseDbUser_f962da91-CustomerDb_BobReader                               | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CONNECT              | f962da91-CustomerDb_CargoWiseReaderLogin                                     | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | EXECUTE              | f962da91-CustomerDb_CargoWiseReaderLogin                                     | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CONNECT              | f962da91-CustomerDb_CargoWiseWriterLogin                                     | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | EXECUTE              | f962da91-CustomerDb_CargoWiseWriterLogin                                     | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CONNECT              | f962da91-CustomerDb_RestrictedReaderLogin                                    | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | EXECUTE              | f962da91-CustomerDb_RestrictedReaderLogin                                    | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CONNECT              | f962da91-CustomerDb_RestrictedWriterLogin                                    | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | EXECUTE              | f962da91-CustomerDb_RestrictedWriterLogin                                    | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | CONNECT              | f962da91-CustomerDb_UnrestrictedWriterLogin                                  | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |
+| G     | EXECUTE              | f962da91-CustomerDb_UnrestrictedWriterLogin                                  | DATABASE       |                  | f962da91-CustomerDb_Audit                 |                  |         |

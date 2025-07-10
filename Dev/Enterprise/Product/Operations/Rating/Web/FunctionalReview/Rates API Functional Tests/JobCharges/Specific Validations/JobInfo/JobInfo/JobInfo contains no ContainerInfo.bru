@@ -1,0 +1,33 @@
+meta {
+  name: JobInfo contains no ContainerInfo
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+           query.JobInfo = {
+               Containers: [ ]
+           };
+   
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Containers of JobInfo should contain at least one element for calculating job charges.", function() {
+    expect(res.body.ModelState['JobInfo.Containers'][0]).to.equal("Containers of JobInfo should contain at least one element for calculating job charges.");
+  });
+}

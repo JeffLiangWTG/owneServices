@@ -1,0 +1,30 @@
+meta {
+  name: RateQuery not provided
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   req.setBody(null);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: The request is invalid. Please provide RateQuery.", function() {
+    expect(res.body.Message).to.equal('The request is invalid. Please provide RateQuery.');
+  });
+  
+  
+  
+}

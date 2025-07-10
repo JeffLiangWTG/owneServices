@@ -1,0 +1,102 @@
+namespace Enterprise.Customs.ES.NCTS.Business
+{
+	public sealed class NctsDepartureCargoDescPhase5ValidationDecider : EU.NCTS.Business.INctsDepartureCargoDescPhase5ValidationDecider
+	{
+		readonly EU.NCTS.Business.NctsCommonCargoDesc goodsItem;
+
+		public NctsDepartureCargoDescPhase5ValidationDecider(EU.NCTS.Business.NctsCommonCargoDesc goodsItem)
+		{
+			this.goodsItem = goodsItem;
+		}
+
+		public bool IsRuleB1805_1Active => false;
+
+		public bool IsRuleB1875_1Active => false;
+
+		public bool IsRuleB1922Active => false;
+
+		public bool IsRuleB2101Active => false;
+
+		public bool IsRuleB2400_1Active => false;
+
+		public bool IsRuleC0045Active => true;
+
+		public bool IsRuleC0153_1Active => false;
+
+		public bool IsRuleC0343Active => false;
+
+		public bool IsRuleC0343_1Active => false;
+
+		public bool IsRuleC0343_2Active => false;
+
+		public bool IsRuleC0821_1Active => false;
+
+		public bool IsRuleC0837Active => true;
+
+		public bool IsRuleC0837_1Active => false;
+
+		public bool IsRuleC901Active => true;
+
+		public bool IsRuleC0909Active => true;
+
+		public bool IsRuleC0909_1Active => false;
+
+		public bool IsRuleE1107Active => false;
+
+		public bool IsRuleE1107_1Active => false;
+
+		public bool IsRuleE1109Active => true;
+
+		public bool IsRuleE1301Active => false;
+
+		public bool IsRuleE1407Active => true;
+
+		public bool IsRuleNR0020Active => false;
+
+		public bool IsRuleNR0021Active => false;
+
+		public bool IsRuleNR0024Active => true;
+
+		public bool IsRuleNR0025Active => false;
+
+		public bool IsRuleNR0040Active => false;
+
+		public bool IsRuleNR0041Active => false;
+
+		public bool IsRuleNR0042Active => false;
+
+		public bool IsRuleNR0043Active => false;
+
+		public bool IsRuleNR0044Active => false;
+
+		public bool IsRuleNR0045Active => false;
+
+		public bool IsRuleNR0058Active => true;
+
+		public bool IsRuleNR0059Active => true;
+
+		public bool IsRuleNR0060Active => true;
+
+		public bool IsRuleR0221_1Active => false;
+
+		public bool IsRuleR0221_3Active => goodsItem is NctsDepartureCargoDesc departureGoodsItem && !departureGoodsItem.IsVehicles;
+
+		public bool IsRuleR0507Active => true;
+
+		public bool IsRuleR0507_1Active => false;
+
+		public bool IsRuleR0601_1Active => false;
+
+		public bool IsRuleR0909Active => true;
+
+		public bool IsRuleRP11Active => false;
+
+		public bool IsRuleTR0068Active => true;
+
+		public bool IsRuleTR0076Active => true;
+
+		public bool IsRuleTR0096Active => true;
+
+		public bool IsRuleTR0100Active => true;
+	}
+}

@@ -1,0 +1,123 @@
+workspace "Facilities" "Transit warehouse, container yard, time slot & booking management, and gate management products" {
+
+    model {
+        // Users
+        transportOrg = person "Transport company"
+        facilityOrg1 = person "Facility manager (Time slot management)"
+        facilityOrg2 = person "Facility manager (Dock management)"
+        gateClerk = person "Gate clerk"
+        driver = person "Vehicle driver"
+        transitWarehouseOperator = person "Warehouse operator"
+        transitWarehouseSupervisor = person "Warehouse supervisor"
+        transitWarehouseAdmin = person "Warehouse admin"
+        pwhYardOperator = person "Yard operator"
+        pwhForkliftDriver = person "Forklift driver (Product warehouse)"
+        pwhClient = person "Product warehouse client"
+        pwhAdmin = person "Product warehouse admin"
+        cyDepotManager = person "Depot manager"
+        cyForkliftDriver = person "Forklift driver (Yard)"
+        cyContainerInspector = person "Container inspector (Supervisor)"
+        cyMRStaff = person "M&R staff (Repairer)"
+        cyYardPlanner = person "Yard planner"
+        cyDepotAdmin = person "Depot admin"
+        
+        // Software systems
+        timeslot = softwareSystem "Time slot management"
+        booking = softwareSystem "Booking management"
+        proxy = softwareSystem "Booking / Facility proxy"
+        gate = softwareSystem "Gate management" {
+            gateWebApp = container "Gate web app" "GLOW app"
+            gateIntegration = container "Gate integration" "CW1 backend code for gate integration with other apps"
+        }
+        dock = softwareSystem "Dock management"
+        transitWarehouse = softwareSystem "Transit warehouse" {
+            twhWebApp = container "Transit warehouse web app" "GLOW app"
+            twhMobileApp = container "Transit warehouse mobile app" "GLOW app"
+            twhIntegration = container "Transit warehouse integration" "CW1 backend code for transit warehouse integration with other apps"
+        }
+        cy = softwareSystem "Yard" {
+            cyWebApp = container "Yard web app" "GLOW app"
+            cyMobileApp = container "Yard mobile app" "GLOW app"
+            cyIntegration = container "Yard integration" "CW1 backend code for yard integration with other apps"
+        }
+        forwarding = softwareSystem "CW1 forwarding/customs module"
+        productWarehouse = softwareSystem "Product warehouse" {
+            pwhRfApp = container "Warehouse RF application"
+            pwhCW1 = container "CW1 product warehouse"
+            pwhWebTracker = container "Web tracker"
+        }
+        pwh3rdParty = softwareSystem "Product warehouse 3rd party software"
+        shippingLine = softwareSystem "Shipping line / Yard equipment effective controller"
+        landTransport = softwareSystem "Land transport"
+        portModule = softwareSystem "Port module"
+
+        // User to software system relationships
+        facilityOrg1 -> timeslot "Creates timeslots"
+        transportOrg -> booking "Books a timeslot for drop-off and/or pick-up"
+        gateIntegration -> driver "Sends information about upcoming jobs & dock information for current job"
+        gateClerk -> gateWebApp "Records gate-in and gate-out"
+        facilityOrg2 -> dock "Defines docks, parameters, and dock allocation production rules"
+        transitWarehouseOperator -> twhMobileApp "Commences load or unload tasks"
+        transitWarehouseSupervisor -> twhWebApp "Review receive & dispatch instruction and manually change job or dock status"
+        transitWarehouseAdmin -> twhWebApp "Manually create & manage receive & dispatch instruction"
+        pwhYardOperator -> pwhRfApp "Commences load/unload & scans packages being unloaded at the dock door or loaded to the truck"
+        pwhForkliftDriver -> pwhRfApp "Commences pick/put-away & scans packages being put away inside the warehouse or picked from the warehouse to the dock door"
+        pwhCW1 -> pwhClient "Sends an email to notify completed receive jobs or orders"
+        pwhClient -> pwhWebTracker "Records an upcoming receive jobs (ASN) or dispatch jobs (orders)"
+        pwhAdmin -> pwhCW1 "Manually records upcoming receive jobs (ASN) or dispatch jobs (orders)"
+        cyDepotManager -> cyWebApp "Enters master data, monitors and manages yard activities"
+        cyForkliftDriver -> cyMobileApp "Updates container location, serves requests"
+        cyContainerInspector -> cyMobileApp "Updates container status"
+        cyMRStaff -> cyMobileApp "Updates container status"
+        cyYardPlanner -> cyWebApp "Updates inventory, determines yard storage"
+        cyDepotAdmin -> cyWebApp "Updates inventory, determines yard storage, monitors and manages yard activitie"
+
+        // Inter software system relationships
+        timeslot -> booking "Sends information about capacity"
+        booking -> proxy "Requests information about bookings being created using a reference number"
+        proxy -> twhIntegration "Requests authorization information"
+        proxy -> cyIntegration "Requests authority to release or drop-off"
+        booking -> gateIntegration "Sends notifications when bookings are created, edited, or deleted"
+        gateIntegration -> dock "Requests a dock to be assigned for a vehicle"
+        gateIntegration -> booking "Sends gate-in & gate-out actuals including unannounced"
+        gateIntegration -> twhIntegration "Sends gate-in and gate-out events"
+        gateIntegration -> cyIntegration "Sends gate-in and gate-out events"
+        twhIntegration -> dock "Sends dock status update events"
+        forwarding -> twhIntegration "Sends dispatch or receive instructions"
+        twhIntegration -> forwarding "Sends updates on dispatch or receive task progress & package level data"
+        pwhCW1 -> pwh3rdParty "Sends a notification through eHub to notify compelted receive jobs or orders"
+        pwh3rdParty -> pwhCW1 "Sends a notification through eHub to record upcoming receive jobs (ASN) or dispatch jobs (orders)"
+        forwarding -> pwhCW1 "Notifies product warehouse of customs declaration (becomes an ASN) or shipments (becomes an order)"
+        shippingLine -> cyIntegration "Records authority to release or drop-off"
+        cyIntegration -> shippingLine "Sends gate-in & gate-out events"
+        landTransport -> cyIntegration "Sends transport run sheets"
+        portModule -> cyIntegration "Sends transport run sheets"
+        //currently the warehouse gets notified through another system that the carrier is sending a truck to pick up an order
+        //opportunities for pwh in future: get notification about truck bookings, get notifications about trucks arriving, assign docks to trucks
+    }
+    
+    views {
+        theme default
+        systemLandscape "Facilities" "Facilities High-level Context Diagram" {
+            include *
+            autoLayout
+        }
+        container TransitWarehouse "TransitWarehouse" "Transit Warehouse Container Diagram" {
+            include transitWarehouse twhWebApp twhMobileApp twhIntegration transitWarehouseOperator transitWarehouseSupervisor transitWarehouseAdmin proxy gate dock forwarding
+            autoLayout
+        }
+        container CY "Yard" "Yard Container Diagram" {
+            include cy cyWebApp cyMobileApp cyIntegration shippingLine proxy gate cyDepotManager cyForkliftDriver cyContainerInspector cyMRStaff cyYardPlanner cyDepotAdmin landTransport portModule
+            autoLayout
+        }
+        container ProductWarehouse "ProductWarehouse" "Product Warehouse Container Diagram" {
+            include pwhYardOperator productWarehouse pwhRfApp pwhForkliftDriver pwhClient pwhCW1 pwh3rdParty pwhWebTracker pwhAdmin forwarding
+            autoLayout
+        }
+        container Gate "Gate" "Gate Management Container Diagram" {
+            include gate gateWebApp gateIntegration gateClerk driver booking dock booking twhIntegration cyIntegration
+            autoLayout
+        }
+    }
+
+}

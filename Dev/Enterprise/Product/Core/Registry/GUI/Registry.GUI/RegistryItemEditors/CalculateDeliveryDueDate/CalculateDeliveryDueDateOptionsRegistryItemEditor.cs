@@ -1,0 +1,24 @@
+using CargoWise.EntityFramework;
+using Enterprise.Integration;
+using Enterprise.ZArchitecture.Environment;
+
+namespace Enterprise.Registry.GUI
+{
+	public class CalculateDeliveryDueDateOptionsRegistryItemEditor : NonPersistentBusinessObjectBindingRegistryItemEditor
+	{
+		public CalculateDeliveryDueDateOptionsRegistryItemEditor(IRegistryDataType dataType, FallbackLevel fallbackLevel, BusinessObjectFactory factory)
+			: base(dataType, fallbackLevel, factory)
+		{
+		}
+
+		protected override RegistryZUserControl NewBoundWinFormsEditorPane()
+		{
+			return new CalculateDeliveryDueDateOptionsRegistryItemControl();
+		}
+
+		protected override EditorPaneAnchor Anchor => RegistryItemEditor.EditorPaneAnchor.All;
+	}
+}
+
+
+

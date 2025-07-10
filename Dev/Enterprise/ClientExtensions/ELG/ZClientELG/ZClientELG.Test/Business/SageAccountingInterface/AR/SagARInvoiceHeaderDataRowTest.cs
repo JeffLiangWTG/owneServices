@@ -1,0 +1,25 @@
+using CargoWise.Types;
+
+namespace Enterprise.Client.ELG.Testing
+{
+	internal class SagARInvoiceHeaderDataRowTest : SagInvoiceHeaderDataRowTest
+	{
+		public override void TestProperties()
+		{
+			SagARInvoiceHeaderDataRow row = (SagARInvoiceHeaderDataRow)NewSagInvoiceHeaderDataRow;
+			row.TransactionNumber = new ZString("vtgihjmohmamsswthwojbvbsutajnayvyxchmovgodotvdqoislrwcczsonoicbhnenvpogtbiuygiwqcmauogzwvcpyahxmbhfrpvyumsqoidtjrxmwbhsgeranyittkhwzcfbgngivqlorjfgdvbkuozmxvlvdywdahthmvfivywqtdidsbqyixbldsdlckexuhnkpyuhpspvritunidbixudfidtrtgluzvlpxnuhiiqhftuzjyuhcownkeh");
+			row.JobNumberReference = new ZString("ubpwmebrniepuiuzpevzpjtivmerlzxesfzftmddebhqejzyiohipfslhgbazjgnkawojogcarvncdelmfjwsopnnoymldduvtgenkotieixjfjecpnuakvvkibuqurwnbsiwaycrpongreiftjwqjukyktfjudnnlkhmahbqkckwiptdspwkufdhhkmgttwlazvgwvemhfggjopuabqehcsfhafquvwrgyviumgxkkcozwxtusgsdsexhpzwqo");
+			AssertEquals("TransactionNumber", new ZString("vtgihjmohmamsswthwojbvbsutajnayvyxchmovgodotvdqoislrwcczsonoicbhnenvpogtbiuygiwqcmauogzwvcpyahxmbhfrpvyumsqoidtjrxmwbhsgeranyittkhwzcfbgngivqlorjfgdvbkuozmxvlvdywdahthmvfivywqtdidsbqyixbldsdlckexuhnkpyuhpspvritunidbixudfidtrtgluzvlpxnuhiiqhftuzjyuhcownkeh"), row.GetField(SagARInvoiceHeaderDataRow.Schema.TransactionNumber));
+			AssertEquals("JobNumberReference", new ZString("ubpwmebrniepuiuzpevzpjtivmerlzxesfzftmddebhqejzyiohipfslhgbazjgnkawojogcarvncdelmfjwsopnnoymldduvtgenkotieixjfjecpnuakvvkibuqurwnbsiwaycrpongreiftjwqjukyktfjudnnlkhmahbqkckwiptdspwkufdhhkmgttwlazvgwvemhfggjopuabqehcsfhafquvwrgyviumgxkkcozwxtusgsdsexhpzwqo"), row.GetField(SagARInvoiceHeaderDataRow.Schema.JobNumberReference));
+			base.TestProperties();
+		}
+
+		protected override SagInvoiceHeaderDataRow NewSagInvoiceHeaderDataRow
+		{
+			get
+			{
+				return new SagARInvoiceHeaderDataRow();
+			}
+		}
+	}
+}

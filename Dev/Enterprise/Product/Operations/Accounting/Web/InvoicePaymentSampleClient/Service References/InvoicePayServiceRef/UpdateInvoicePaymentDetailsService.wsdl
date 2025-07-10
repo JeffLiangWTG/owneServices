@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://cargowise.com/Accounting/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://cargowise.com/Accounting/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://cargowise.com/Accounting/">
+      <s:element name="UpdateInvoicePaymentDetails">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="request" type="tns:UpdateInvoicePaymentDetailsRequest" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="UpdateInvoicePaymentDetailsRequest">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="AccLedger" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="TransactionType" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="TransactionNumber" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="JobTransactionNumber" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="InternalReference" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="PaymentReference" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CompanyCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="OrgCode" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="PaymentDate" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountPaidInCompanyCurrency" type="s:decimal" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="UpdateInvoicePaymentDetailsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UpdateInvoicePaymentDetailsResult" type="tns:UpdateInvoicePaymentDetailsResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="UpdateInvoicePaymentDetailsResponse">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:ResponseBase">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="OriginalRequest" type="tns:UpdateInvoicePaymentDetailsRequest" />
+              <s:element minOccurs="0" maxOccurs="1" name="CurrencyCode" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="InvoiceTotal" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="PaidAmount" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="PaymentStatus" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="FullyPaidDate" type="s:dateTime" />
+              <s:element minOccurs="1" maxOccurs="1" name="FullyPaidDateHasValue" type="s:boolean" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="ResponseBase">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Succeeded" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="ErrorMessage" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="SecuritySOAPHeader" type="tns:SecuritySOAPHeader" />
+      <s:complexType name="SecuritySOAPHeader">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+        </s:sequence>
+        <s:anyAttribute />
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="UpdateInvoicePaymentDetailsSoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateInvoicePaymentDetails" />
+  </wsdl:message>
+  <wsdl:message name="UpdateInvoicePaymentDetailsSoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateInvoicePaymentDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="UpdateInvoicePaymentDetailsSecuritySOAPHeader">
+    <wsdl:part name="SecuritySOAPHeader" element="tns:SecuritySOAPHeader" />
+  </wsdl:message>
+  <wsdl:portType name="UpdateInvoicePaymentDetailsServiceSoap">
+    <wsdl:operation name="UpdateInvoicePaymentDetails">
+      <wsdl:input message="tns:UpdateInvoicePaymentDetailsSoapIn" />
+      <wsdl:output message="tns:UpdateInvoicePaymentDetailsSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="UpdateInvoicePaymentDetailsServiceSoap" type="tns:UpdateInvoicePaymentDetailsServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="UpdateInvoicePaymentDetails">
+      <soap:operation soapAction="http://cargowise.com/Accounting/UpdateInvoicePaymentDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:UpdateInvoicePaymentDetailsSecuritySOAPHeader" part="SecuritySOAPHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="UpdateInvoicePaymentDetailsServiceSoap12" type="tns:UpdateInvoicePaymentDetailsServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="UpdateInvoicePaymentDetails">
+      <soap12:operation soapAction="http://cargowise.com/Accounting/UpdateInvoicePaymentDetails" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:UpdateInvoicePaymentDetailsSecuritySOAPHeader" part="SecuritySOAPHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="UpdateInvoicePaymentDetailsService">
+    <wsdl:port name="UpdateInvoicePaymentDetailsServiceSoap" binding="tns:UpdateInvoicePaymentDetailsServiceSoap">
+      <soap:address location="http://localhost:55899/UpdateInvoicePaymentDetailsService.asmx" />
+    </wsdl:port>
+    <wsdl:port name="UpdateInvoicePaymentDetailsServiceSoap12" binding="tns:UpdateInvoicePaymentDetailsServiceSoap12">
+      <soap12:address location="http://localhost:55899/UpdateInvoicePaymentDetailsService.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

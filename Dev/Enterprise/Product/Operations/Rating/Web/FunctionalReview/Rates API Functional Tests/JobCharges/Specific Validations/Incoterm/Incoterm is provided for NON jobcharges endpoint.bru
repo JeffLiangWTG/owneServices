@@ -1,0 +1,31 @@
+meta {
+  name: Incoterm is provided for NON jobcharges endpoint
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.Incoterm = "EXW";
+   
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Incoterm is only applicable for job charges calculation endpoint.", function() {
+    expect(res.body.ModelState['Incoterm'][0]).to.equal("Incoterm is only applicable for job charges calculation endpoint.");
+  });
+}

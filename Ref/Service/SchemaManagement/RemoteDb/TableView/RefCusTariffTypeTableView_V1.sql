@@ -1,0 +1,7 @@
+CREATE VIEW RefCusTariffTypeTableView_V1 AS
+SELECT ZZI_PK,
+ZZI_TariffType,
+ZZI_Description,
+ZZI_ZZ9_NKNomenclatureGroupType,
+ZZI_ZZZ_NKDataGrouping
+FROM RefCusTariffType

@@ -1,0 +1,55 @@
+meta {
+  name: VolumeUnit is not valid
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.TransportMode = "SEA";
+   query.ContainerMode = "FCL";
+   
+   query.JobInfo = {
+       Containers: [
+           {
+               ContainerTypeCWCode : "20GP",
+               Number : "2983743874",
+               Unit: 2,
+               Commodity: "GEN",
+               Ownership: "CAR",
+               Packlines: [
+                   {
+                       PackageType : "PLT",
+                       Unit: 2,
+                       Commodity: null, 
+                       Weight: 3400,
+                       WeightUnit: "KG",
+                       Volume: 4.32,
+                       VolumeUnit: "XX"
+                   },
+               ]
+           },
+       ]
+   };
+   
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided VolumeUnit ('XX') is not valid. It can only be one of these values: 'M3', 'D3', 'CF', 'CY', 'CI', 'L', 'ML', 'TE', 'CC', 'GA', 'GI'.", function() {
+    expect(res.body.ModelState['JobInfo.Containers[0].PackLines[0].VolumeUnit'][0]).to.equal("Provided VolumeUnit ('XX') is not valid. It can only be one of these values: 'M3', 'D3', 'CF', 'CY', 'CI', 'L', 'ML', 'TE', 'CC', 'GA', 'GI'.");
+  });
+}

@@ -1,0 +1,35 @@
+meta {
+  name: IATA City is more than 3 characters
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.Destination = { Type: "IATACITY", Value: "ABCD" };
+   query.TransportMode = "AIR";
+   query.ContainerMode = "LSE";
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided IATA City ('ABCD') is not valid. It should be a string of 3 characters.", function() {
+    expect(res.body.ModelState['Destination.Value'][0]).to.equal("Provided IATA City ('ABCD') is not valid. It should be a string of 3 characters.");
+  });
+  
+  
+  
+}

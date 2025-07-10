@@ -1,0 +1,7 @@
+namespace Enterprise.Accounting.Business.AccountingCriticalValidationDependency
+{
+	public class AccountingCriticalValidationDependencyFactory : IAccountingCriticalValidationDependencyFactory
+	{
+		IAccountingCriticalValidationInfoCollectionHelper IAccountingCriticalValidationDependencyFactory.GetAccountingCriticalValidationInfoCollectionHelper() => new AccountingCriticalValidationInfoCollectionHelper();
+	}
+}

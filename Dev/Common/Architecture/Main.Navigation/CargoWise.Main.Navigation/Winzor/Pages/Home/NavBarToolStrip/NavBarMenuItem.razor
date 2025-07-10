@@ -1,0 +1,61 @@
+@using CargoWiseNext.Blazor.Components
+@namespace CargoWise.Main.Navigation.Pages
+@inherits CwnComponentBase
+@if (Item != null)
+{
+    @if (Item.IsSeparator)
+    {
+        <CwnDivider />
+    }
+    else if (Item.SubMenuItems.Count > 0)
+    {
+        <CwnListItem Class="dropdown" data-id="@ItemId">
+            @if (IsChangeBranch)
+            {
+                <CwnElement OnSingleClick="async ()=> { await  ItemClickAsync(Item);}"
+                            HtmlTag="a">
+                    @GetStripTitle(Item)
+                    @if (!string.IsNullOrEmpty(Item.InputGestureText))
+                    {
+                        <span class="cwn-menu__gesture-text">@Item.InputGestureText</span>
+                    }
+                </CwnElement>
+            }
+            else
+            {
+                <CwnElement HtmlTag="span">
+                    @GetStripTitle(Item)
+                    @if (!string.IsNullOrEmpty(Item.InputGestureText))
+                    {
+                        <span class="cwn-menu__gesture-text">@Item.InputGestureText</span>
+                    }
+                </CwnElement>
+            }
+            <CwnList Class="cwn-submenu" data-id="@ItemId">
+                @foreach (var submenu in Item.SubMenuItems)
+                {
+                    <NavBarMenuItem Item="submenu"></NavBarMenuItem>
+                }
+            </CwnList>
+        </CwnListItem>
+    }
+    else
+    {
+        <CwnListItem>
+            <CwnElement OnSingleClick="async ()=> { await  ItemClickAsync(Item);}"
+                        HtmlTag="a">
+                @GetStripTitle(Item)
+                @if (!string.IsNullOrEmpty(Item.InputGestureText))
+                {
+                    <span class="cwn-menu__gesture-text"><CwnShortcut Shortcuts="@(GetShortcutKeys(Item.InputGestureText))"></CwnShortcut></span>
+                }
+                @if (@Item.IsChecked)
+                {
+                    <input type="checkbox"
+                           class="cwn-menu__checked"
+                           checked />
+                }
+            </CwnElement>
+        </CwnListItem>
+    }
+}

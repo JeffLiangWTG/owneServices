@@ -1,0 +1,25 @@
+meta {
+  name: PickupPostcode only
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.RateParties = RatesAPIsHelper.GetRateParties();
+   
+    Requirement: setup client rate / costing in CW1 matching the below request values to have rates
+   query.PickupPostcode = "1112"
+   query.Origin.Value = "USLAX"  default is AUSYD
+   query.Destination.Value = "ESBOL"  default is USLAX
+   
+   req.setBody(query);
+}

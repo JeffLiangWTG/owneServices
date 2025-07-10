@@ -1,0 +1,102 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <OutputType>WinExe</OutputType>
+    <PublishSingleFile>true</PublishSingleFile>
+    <RootNamespace>Enterprise.Server.Setup</RootNamespace>
+    <AssemblyName>CargoWiseServerSetup.Unmerged</AssemblyName>
+    <ApplicationIcon>..\..\..\..\Resources\ApplicationIcon.ico</ApplicationIcon>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <ApplicationManifest>..\..\..\..\main.manifest</ApplicationManifest>
+    <!-- WI00899902 Replace ILMerge with ILRepack for NetCore target -->
+    <PostBuildEvent Condition="'$(TargetFramework)' == 'net48'">
+      cd $(TargetDir)
+      ILMerge.exe ^
+      /keyfile:..\EDI-Release-private.snk ^
+      /out:CargoWiseServerSetup.exe ^
+      CargoWiseServerSetup.Unmerged.exe ^
+      CargoWise.BrandManager.dll ^
+      CargoWise.Common.dll ^
+      ServiceManager.Integration.ServiceHostUtilities.dll ^
+      CargoWise.Shared.40.dll ^
+      CargoWise.ActiveDirectory.dll ^
+      CargoWise.Loader.Common.dll ^
+      CargoWise.Data.dll ^
+      Enterprise.Client.Common.dll ^
+      Enterprise.Upgrades.dll ^
+      NUnitCore.dll ^
+      ICSharpCode.SharpZipLib.dll ^
+      CargoWise.Odyssey.Schema.dll ^
+      CargoWise.DataProtection.dll ^
+      CargoWise.DataProtection.SqlExtensions.dll ^
+      CargoWise.DataProtection.Administration.dll ^
+      CargoWise.DataProtection.Administration.SqlServer.dll ^
+      Microsoft.Bcl.AsyncInterfaces.dll ^
+      Microsoft.Extensions.DependencyInjection.Abstractions.dll ^
+      Microsoft.Extensions.DependencyInjection.dll ^
+      Microsoft.Win32.Registry.dll ^
+      System.Memory.dll ^
+      System.Numerics.Vectors.dll ^
+      System.Runtime.CompilerServices.Unsafe.dll ^
+      System.Text.Encodings.Web.dll ^
+      System.Text.Json.dll ^
+      System.Threading.Tasks.Extensions.dll ^
+      System.ValueTuple.dll ^
+      WTG.Data.SqlClient.dll
+      copy CargoWiseServerSetup.Unmerged.exe.config CargoWiseServerSetup.exe.config
+    </PostBuildEvent>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+    <SuppressObsoleteWarnings>SYSLIB0014</SuppressObsoleteWarnings>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <PropertyGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.ActiveDirectory" />
+    <Reference Include="CargoWise.BrandManager" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.DataProtection" />
+    <Reference Include="CargoWise.DataProtection.SqlExtensions" />
+    <Reference Include="CargoWise.DataProtection.Administration" />
+    <Reference Include="CargoWise.DataProtection.Administration.SqlServer" />
+    <Reference Include="ServiceManager.Integration.ServiceHostUtilities" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="Enterprise.Upgrades" />
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <Reference Include="System.DirectoryServices" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Management" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceProcess" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="System.Management" />
+    <PackageReference Include="System.ServiceModel.Primitives" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\..\Resources\ApplicationIcon.ico">
+      <Link>ApplicationIcon.ico</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CargoWise.Loader.Common\CargoWise.Loader.Common.csproj" />
+    <ProjectReference Include="..\Enterprise.Client.Common\Enterprise.Client.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\Enterprise\Product\Main\Enterprise.Main\App.config">
+      <Link>App.config</Link>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="..\..\..\..\main.manifest">
+      <Link>main.manifest</Link>
+    </None>
+  </ItemGroup>
+</Project>

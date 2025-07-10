@@ -1,0 +1,40 @@
+@namespace CargoWiseNext.Blazor.Components
+@inherits CwnComponentBase
+
+@{
+    var key = SelectedCode ?? string.Empty;
+    var description = GetItemValue(SelectedCode ?? string.Empty);
+}
+
+<div @attributes="UserAttributes" class="@Classname"
+    @onkeypress="OnKeyPressAsync" @onkeypress:stopPropagation
+    @ref="DropDownListElementReference">
+    <button Class="cwn-dropdownlist__button" @onclick="@OnToggleDropdownAsync" @onclick:stopPropagation tabindex="-1">
+        <span class="cwn-dropdownlist-content">
+            <input type="text" maxlength="@MaximumInputLength" class="cwn-dropdownlist__selected-key" tabindex="0"
+                   @onfocusin="OnFocusInAsync" @onfocusin:stopPropagation
+                   @onclick:stopPropagation @bind="@key" @ref="InputElementReference"/>
+            <span class="cwn-dropdownlist__selected-value" title="@description">@description</span>
+        </span>
+    </button>
+
+    <div class="cwn-dropdownlist-container">
+        <CwnButtonGroup Class="@DropdownListClass">
+            @foreach (var item in Items)
+            {
+                <div @ref="ItemsElementReferencesDict[item.Key]"
+                     role="option"
+                     title="@item.Value"
+                     aria-selected="@(IsSelected(item.Key))">
+                    <button class="@GetClass(item.Key)" tabindex="-1"
+                            @onclick="() => OnHandleButtonClickAsync(item.Key)" @onclick:stopPropagation>
+                        <span class="cwn-dropdownlist-content">
+                            <span class="cwn-dropdownlist-content-key">@item.Key</span>
+                            <span class="cwn-dropdownlist-content-value">@item.Value</span>
+                        </span>
+                    </button>
+                </div>
+            }
+        </CwnButtonGroup>
+    </div>
+</div>

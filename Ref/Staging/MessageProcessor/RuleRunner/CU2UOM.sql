@@ -1,0 +1,3 @@
+﻿DECLARE @id uniqueidentifier
+SELECT @id = NEWID(); INSERT INTO RefCusTariffRule (ZZ1_PK, ZZ1_TariffCode, ZZ1_ZZZ_NKDataGrouping) VALUES (@id, '82032020', 'ZA'); INSERT INTO RefCusTariffUOMRule (ZZ8_ZZ1_Tariff, ZZ8_Type, ZZ8_UOM) VALUES (@id, 'CU2','MM'); INSERT INTO RefCusTariffAttributeRule (ZZ3_ZZ1_Tariff, ZZ3_Name, ZZ3_Value) VALUES (@id, 'CheckDigit', '4')
+SELECT @id = NEWID(); INSERT INTO RefCusTariffRule (ZZ1_PK, ZZ1_TariffCode, ZZ1_ZZZ_NKDataGrouping) VALUES (@id, '761210', 'ZA'); INSERT INTO RefCusTariffUOMRule (ZZ8_ZZ1_Tariff, ZZ8_Type, ZZ8_UOM) VALUES (@id, 'CU2','LI'); INSERT INTO RefCusTariffAttributeRule (ZZ3_ZZ1_Tariff, ZZ3_Name, ZZ3_Value) VALUES (@id, 'CheckDigit', '3')

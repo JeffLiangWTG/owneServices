@@ -1,0 +1,33 @@
+@namespace System.Windows.Forms
+@inherits ToolStrip
+
+<div class="splitbutton__dropdown" @attributes="DataAttributes" @onfocusin="OpenDropdown" @onfocusout="CloseDropdown">
+    @foreach (var item in Items)
+    {
+        <ControlProxyComponent Control=item @key=item.WinzorControlGuid />
+    }
+</div>
+
+@code {
+    async Task OpenDropdown()
+    {
+        await InvokeWinzorDispatcherAsync(() =>
+        {
+            if (OwnerItem is not null)
+            {
+                OwnerItem.IsDropdownOpen = true;
+            }
+        });
+    }
+
+    async Task CloseDropdown()
+    {
+        await InvokeWinzorDispatcherAsync(() =>
+        {
+            if (OwnerItem is not null)
+            {
+                OwnerItem.IsDropdownOpen = false;
+            }
+        });
+    }
+}

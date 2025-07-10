@@ -1,0 +1,97 @@
+@page "/Backchannel"
+@using Microsoft.Extensions.Logging
+@using CargoWise.Blazor.Client.Integration.Messaging
+@using CargoWise.Blazor.HostedAppRuntime.Backchannel
+@using Enterprise.BlazorWinFormsInterop
+@using System.Windows.Forms
+@namespace AppServer.Pages
+
+@inject ILifecycleService LifecycleService
+@inject IBackchannelProvider BackchannelProvider
+@inject NavigationManager NavigationManager
+@inject IWindowService WindowService
+@inject ILogger<Backchannel> Logger
+
+<h3>Backchannel</h3>
+<ol>
+    @foreach (var message in messages)
+    {
+        <li>@message</li>
+    }
+</ol>
+
+@code {
+    List<string> messages = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        BackchannelProvider.OnConnectFailed += async () =>
+        {
+            await InvokeAsync(async () =>
+            {
+                await LifecycleService.RequestApplicationShutDownAsync();
+                Environment.Exit(0);
+            });
+        };
+
+        await BackchannelProvider.HubConnector.ConnectionStarted.Task;
+
+        BackchannelProvider.OnOpen((string queryString) => InvokeAsync(async () =>
+        {
+            messages.Add($"{DateTime.Now:u} {nameof(IBlazorClient.OpenUrlInWinzorMode)} {queryString}");
+            Logger.LogDebug($"{DateTime.Now:u} {nameof(IBlazorClient.OpenUrlInWinzorMode)} {queryString}");
+
+            try
+            {
+                var authority = new Uri(NavigationManager.BaseUri).GetLeftPart(UriPartial.Authority);
+                const string winzorBaseUri = "/";
+                var targetUri = new Uri($"{authority}{winzorBaseUri}?{queryString}");
+                messages.Add(targetUri.ToString());
+                Logger.LogDebug(targetUri.ToString());
+                var loadResult = await WindowService.RequestCreateHiddenWindowAsync(new CreateWindowOptions { Uri = targetUri });
+                messages.Add($"{DateTime.Now:u} Load result: {loadResult}");
+                Logger.LogDebug($"{DateTime.Now:u} Load result: {loadResult}");
+			}
+			catch (Exception ex)
+			{
+				messages.Add($"{DateTime.Now:u} Exception: {ex}");
+                Logger.LogDebug($"{DateTime.Now:u} Exception: {ex}");
+			}
+
+			StateHasChanged();
+		}));
+
+		BackchannelProvider.OnExit(() => InvokeAsync(async () =>
+		{
+			try
+			{
+				var message = $"{DateTime.Now:u} {nameof(IBlazorClient.ExitWinzorMode)}";
+                messages.Add(message);
+				Logger.LogDebug(message);
+				await LifecycleService.RequestApplicationShutDownAsync();
+				Environment.Exit(0);
+			}
+			catch (Exception ex)
+			{
+				var message = $"{DateTime.Now:u} Exception: {ex}";
+				messages.Add(message);
+                Logger.LogDebug(message);
+			}
+			StateHasChanged();
+		}));
+
+        // Tell WinForms we've hooked up our event listeners and are ready to receive backchannel events
+        await BackchannelProvider.HubConnector.HubProxy.Invoke(nameof(IBlazorHub.BackchannelConnected));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+		if (firstRender)
+		{
+			await LifecycleService.NotifyApplicationReadyAsync(TimeSpan.FromMinutes(5));
+		}
+
+		await base.OnAfterRenderAsync(firstRender);
+	}
+
+}

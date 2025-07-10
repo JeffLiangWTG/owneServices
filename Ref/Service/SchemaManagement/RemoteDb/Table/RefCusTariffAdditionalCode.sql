@@ -1,0 +1,40 @@
+CREATE TABLE RefCusTariffAdditionalCode
+(
+ZY2_PK UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_RefCusTariffAdditionalCode_ZY2_PK DEFAULT NEWID(),
+ZY2_ZZ1_Tariff UNIQUEIDENTIFIER,
+ZY2_ZZW_NationalCode UNIQUEIDENTIFIER,
+ZY2_AdditionalCode NVARCHAR(15) NOT NULL CONSTRAINT DF_RefCusTariffAdditionalCode_ZY2_AdditionalCode DEFAULT '',
+ZY2_Description NVARCHAR(200) CONSTRAINT DF_RefCusTariffAdditionalCode_ZY2_Description DEFAULT '',
+ZY2_ZY3_NKCategory CHAR(3) NOT NULL,
+ZY2_ParentAdditionalCode NVARCHAR(15) NOT NULL CONSTRAINT DF_RefCusTariffAdditionalCode_ZY2_ParentAdditionalCode DEFAULT '',
+ZY2_ZY3_NKParentCategory CHAR(3) NOT NULL CONSTRAINT DF_RefCusTariffAdditionalCode_ZY2_ZY3_NKParentCategory DEFAULT '',
+ZY2_IsMandatory BIT CONSTRAINT DF_RefCusTariffAdditionalCode_ZY2_IsMandatory DEFAULT 0,
+ZY2_ZZZ_NKDataGrouping VARCHAR(3) NOT NULL,
+ZY2_StartDate SMALLDATETIME NOT NULL CONSTRAINT DF_RefCusTariffAdditionalCode_ZY2_StartDate default '1900-01-01', 
+ZY2_EndDate SMALLDATETIME NOT NULL CONSTRAINT DF_RefCusTariffAdditionalCode_ZY2_EndDate default '2079-06-06 23:59',
+
+CONSTRAINT PK_RefCusTariffAdditionalCode PRIMARY KEY NONCLUSTERED (ZY2_PK ASC),
+CONSTRAINT FK_RefCusTariffAdditionalCode_RefCusTariff FOREIGN KEY(ZY2_ZZ1_Tariff) REFERENCES RefCusTariff (ZZ1_PK),
+CONSTRAINT FK_RefCusTariffAdditionalCode_RefCusTariffNationalCode FOREIGN KEY(ZY2_ZZW_NationalCode) REFERENCES RefCusTariffNationalCode (ZZW_PK),
+
+CONSTRAINT CK_RefCusTariffAdditionalCode_ZY2_ZZ1_Tariff_ZY2_ZZW_NationalCode CHECK (ZY2_ZZ1_Tariff IS NULL OR ZY2_ZZW_NationalCode IS NULL),
+CONSTRAINT CK_RefCusTariffAdditionalCode_ZY2_StartDate_ZY2_EndDate CHECK (ZY2_StartDate<=ZY2_EndDate)
+)
+GO
+CREATE CLUSTERED INDEX IX_RefCusTariffAdditionalCode_ZY2_ZZZ_NKDataGrouping_ZY2_PK ON RefCusTariffAdditionalCode (ZY2_ZZZ_NKDataGrouping ASC, ZY2_PK ASC)
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_RefCusTariffAdditionalCode_NKDataGrouping_NKCategory_AdditionalCode_Tariff_NationalCode_ParentAdditionalCode_NKParentCategory ON RefCusTariffAdditionalCode (ZY2_ZZZ_NKDataGrouping ASC, ZY2_ZY3_NKCategory ASC, ZY2_AdditionalCode ASC, ZY2_ZZ1_Tariff ASC, ZY2_ZZW_NationalCode ASC, ZY2_ParentAdditionalCode ASC, ZY2_ZY3_NKParentCategory ASC)
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusTariffAdditionalCode_ZY2_ZZZ_NKDataGrouping_ZY2_ZZ1_Tariff ON RefCusTariffAdditionalCode (ZY2_ZZZ_NKDataGrouping, ZY2_ZZ1_Tariff)
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusTariffAdditionalCode_ZY2_ZZZ_NKDataGrouping_ZY2_ZZW_NationalCode ON RefCusTariffAdditionalCode (ZY2_ZZZ_NKDataGrouping, ZY2_ZZW_NationalCode)
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusTariffAdditionalCode_ZY2_AdditionalCode_ZY2_ZY3_NKCategory ON RefCusTariffAdditionalCode (ZY2_AdditionalCode, ZY2_ZY3_NKCategory)
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusTariffAdditionalCode_ZY2_ParentAdditionalCode_ZY2_ZY3_NKParentCategory ON RefCusTariffAdditionalCode (ZY2_ParentAdditionalCode, ZY2_ZY3_NKParentCategory)
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusTariffAdditionalCode_ZY2_ZZ1_Tariff ON RefCusTariffAdditionalCode (ZY2_ZZ1_Tariff) WHERE ZY2_ZZ1_Tariff IS NOT NULL
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusTariffAdditionalCode_ZY2_ZZW_NationalCode ON RefCusTariffAdditionalCode (ZY2_ZZW_NationalCode) WHERE ZY2_ZZW_NationalCode IS NOT NULL
+GO
+ALTER TABLE RefCusTariffAdditionalCode SET (LOCK_ESCALATION = DISABLE);

@@ -1,0 +1,832 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "AIS API",
+    "version": "v1"
+  },
+  "paths": {
+    "/errors": {
+      "post": {
+        "tags": [
+          "Errors"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ReportErrorRequest"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ReportErrorRequest"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ReportErrorRequest"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/v1/vessels/{vesselImo}/portCalls": {
+      "get": {
+        "tags": [
+          "PortCalls"
+        ],
+        "summary": "Get port calls of a particular vessel within a date range",
+        "parameters": [
+          {
+            "name": "vesselImo",
+            "in": "path",
+            "description": "Vessel IMO number",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "9748291"
+          },
+          {
+            "name": "pageIndex",
+            "in": "query",
+            "description": "Page index, starting from 1",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "example": 1
+            },
+            "example": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "example": 25
+            },
+            "example": 25
+          },
+          {
+            "name": "timeFrom",
+            "in": "query",
+            "description": "Earliest date and time in UTC format or local date and time with an offset",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "timeTo",
+            "in": "query",
+            "description": "Latest date and time in UTC format or local date and time with an offset",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "carrierCode",
+            "in": "query",
+            "description": "Carrier SCAC",
+            "schema": {
+              "type": "string"
+            },
+            "example": "CMDU"
+          },
+          {
+            "name": "voyageNumber",
+            "in": "query",
+            "description": "Voyage Number",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0NG02W1MA"
+          },
+          {
+            "name": "departurePortUnloco",
+            "in": "query",
+            "description": "All port calls before departure port will be filtered out",
+            "schema": {
+              "type": "string"
+            },
+            "example": "AUSYD"
+          },
+          {
+            "name": "arrivalPortUnloco",
+            "in": "query",
+            "description": "All port calls after arrival port will be filtered out",
+            "schema": {
+              "type": "string"
+            },
+            "example": "NZAKL"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortCallPage"
+                },
+                "example": {"totalItems":1,"totalPages":1,"items":[{"port":{"id":"PO271700T000000B000000","name":"Tekirdag","unloco":"TRTEK","geoCoordinates":{"latitude":40.9644667,"longitude":27.5085667},"timeZone":"+03:00"},"ata":"2020-06-01T08:53:08+03:00"}]}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid filter or paging parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                },
+                "example": {"title":"One or more validation errors occurred.","status":400,"errors":{"Imo":["Invalid IMO value '11'. Valid format: 1234567"]}}
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {"title":"NoAuthorizationFound","status":401,"detail":"Unauthorized. Authorization header not found."}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vessels/{vesselImo}/portCallsAndMovements": {
+      "get": {
+        "tags": [
+          "PortCallsAndMovements"
+        ],
+        "summary": "Get port calls and vessel movements of a particular vessel within a date range",
+        "parameters": [
+          {
+            "name": "vesselImo",
+            "in": "path",
+            "description": "Vessel IMO number",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "9748291"
+          },
+          {
+            "name": "timeFrom",
+            "in": "query",
+            "description": "Earliest date and time in UTC format or local date and time with an offset",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "timeTo",
+            "in": "query",
+            "description": "Latest date and time in UTC format or local date and time with an offset",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "carrierCode",
+            "in": "query",
+            "description": "Carrier SCAC",
+            "schema": {
+              "type": "string"
+            },
+            "example": "CMDU"
+          },
+          {
+            "name": "voyageNumber",
+            "in": "query",
+            "description": "Voyage Number",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0NG02W1MA"
+          },
+          {
+            "name": "departurePortUnloco",
+            "in": "query",
+            "description": "All port calls before departure port will be filtered out",
+            "schema": {
+              "type": "string"
+            },
+            "example": "AUSYD"
+          },
+          {
+            "name": "arrivalPortUnloco",
+            "in": "query",
+            "description": "All port calls after arrival port will be filtered out",
+            "schema": {
+              "type": "string"
+            },
+            "example": "NZAKL"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortCallsAndVesselMovements"
+                },
+                "example": {"portCalls":{"totalItems":1,"totalPages":1,"items":[{"port":{"id":"PO271700T000000B000000","name":"Tekirdag","unloco":"TRTEK","geoCoordinates":{"latitude":40.9644667,"longitude":27.5085667},"timeZone":"+03:00"},"ata":"2020-06-01T08:53:08+03:00"}]},"movements":{"totalItems":1,"totalPages":1,"items":[{"time":"2020-05-02T03:50:25+03:00","draught":8.8,"destinationDescription":"TR IZT","eta":"2020-05-02T03:00:00","heading":98,"speed":15.6,"navigationStatus":"UWE","geoCoordinates":{"latitude":40.72966,"longitude":28.678717}}]}}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid filter or paging parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                },
+                "example": {"title":"One or more validation errors occurred.","status":400,"errors":{"Imo":["Invalid IMO value '11'. Valid format: 1234567"]}}
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {"title":"NoAuthorizationFound","status":401,"detail":"Unauthorized. Authorization header not found."}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vessels/{vesselImo}/movements": {
+      "get": {
+        "tags": [
+          "Vessels"
+        ],
+        "summary": "Get movements of a particular vessel within a date range",
+        "parameters": [
+          {
+            "name": "vesselImo",
+            "in": "path",
+            "description": "Vessel IMO number",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "9748291"
+          },
+          {
+            "name": "pageIndex",
+            "in": "query",
+            "description": "Page index, starting from 1",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "example": 1
+            },
+            "example": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "example": 25
+            },
+            "example": 25
+          },
+          {
+            "name": "timeFrom",
+            "in": "query",
+            "description": "Earliest date and time in UTC format or local date and time with an offset",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "timeTo",
+            "in": "query",
+            "description": "Latest date and time in UTC format or local date and time with an offset",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "carrierCode",
+            "in": "query",
+            "description": "Carrier SCAC",
+            "schema": {
+              "type": "string"
+            },
+            "example": "CMDU"
+          },
+          {
+            "name": "voyageNumber",
+            "in": "query",
+            "description": "Voyage Number",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0NG02W1MA"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VesselMovementPage"
+                },
+                "example": {"totalItems":1,"totalPages":1,"items":[{"time":"2020-05-02T03:50:25+03:00","draught":8.8,"destinationDescription":"TR IZT","eta":"2020-05-02T03:00:00","heading":98,"speed":15.6,"navigationStatus":"UWE","geoCoordinates":{"latitude":40.72966,"longitude":28.678717}}]}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid filter or paging parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                },
+                "example": {"title":"One or more validation errors occurred.","status":400,"errors":{"Imo":["Invalid IMO value '11'. Valid format: 1234567"]}}
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {"title":"NoAuthorizationFound","status":401,"detail":"Unauthorized. Authorization header not found."}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vessels/{vesselImo}": {
+      "get": {
+        "tags": [
+          "Vessels"
+        ],
+        "summary": "Get information about a particular vessel by IMO.",
+        "parameters": [
+          {
+            "name": "vesselImo",
+            "in": "path",
+            "description": "Vessel IMO number",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "9748291"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vessel"
+                },
+                "example": {"imoNumber":"9748291","mmsi":"636017870","callSign":"D5NC3","name":"DONINGTON","typeDescription":"Cargo","length":199.6,"breadth":38.3}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid vesselImo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                },
+                "example": {"title":"One or more validation errors occurred.","status":400,"errors":{"Imo":["Invalid IMO value '11'. Valid format: 1234567"]}}
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {"title":"NoAuthorizationFound","status":401,"detail":"Unauthorized. Authorization header not found."}
+              }
+            }
+          },
+          "404": {
+            "description": "No results are found for the given input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "example": {"title":"Vessel not found.","status":404}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ClientError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "stackTrace": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "inner": {
+            "$ref": "#/components/schemas/ClientError"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ErrorData"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ErrorData": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GeoCoordinates": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "description": "Geo latitude",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "description": "Geo longitude",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Port": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Port identifier",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Port name",
+            "nullable": true
+          },
+          "unloco": {
+            "type": "string",
+            "description": "Port universal location code",
+            "nullable": true
+          },
+          "geoCoordinates": {
+            "$ref": "#/components/schemas/GeoCoordinates"
+          },
+          "timeZone": {
+            "type": "string",
+            "description": "Time zone",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PortCall": {
+        "type": "object",
+        "properties": {
+          "port": {
+            "$ref": "#/components/schemas/Port"
+          },
+          "ata": {
+            "type": "string",
+            "description": "Actual time of arrival",
+            "format": "date-time",
+            "nullable": true
+          },
+          "atd": {
+            "type": "string",
+            "description": "Actual time of departure",
+            "format": "date-time",
+            "nullable": true
+          },
+          "eta": {
+            "type": "string",
+            "description": "Estimated time of arrival",
+            "format": "date-time",
+            "nullable": true
+          },
+          "etd": {
+            "type": "string",
+            "description": "Estimated time of departure",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PortCallPage": {
+        "type": "object",
+        "properties": {
+          "totalItems": {
+            "type": "integer",
+            "description": "Total number of items",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortCall"
+            },
+            "description": "Array of items",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PortCallsAndVesselMovements": {
+        "type": "object",
+        "properties": {
+          "portCalls": {
+            "$ref": "#/components/schemas/PortCallPage"
+          },
+          "movements": {
+            "$ref": "#/components/schemas/VesselMovementPage"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
+      },
+      "ReportErrorRequest": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ClientError"
+          },
+          "browserUri": {
+            "type": "string",
+            "nullable": true
+          },
+          "userDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "userName": {
+            "type": "string",
+            "nullable": true
+          },
+          "userEmailAddress": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
+      },
+      "Vessel": {
+        "type": "object",
+        "properties": {
+          "imoNumber": {
+            "type": "string",
+            "description": "Vessel IMO Number / Lloyds number",
+            "nullable": true
+          },
+          "mmsi": {
+            "type": "string",
+            "description": "Vessel MMSI",
+            "nullable": true
+          },
+          "callSign": {
+            "type": "string",
+            "description": "Call sign",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Vessel name",
+            "nullable": true
+          },
+          "typeDescription": {
+            "type": "string",
+            "description": "Vessel type",
+            "nullable": true
+          },
+          "length": {
+            "type": "number",
+            "description": "Vessel length in meters",
+            "format": "double",
+            "nullable": true
+          },
+          "breadth": {
+            "type": "number",
+            "description": "Vessel breadth in meters",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VesselMovement": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string",
+            "description": "Timestamp of this movement",
+            "format": "date-time",
+            "nullable": true
+          },
+          "draught": {
+            "type": "number",
+            "description": "Vessel draught in meters",
+            "format": "double",
+            "nullable": true
+          },
+          "destinationDescription": {
+            "type": "string",
+            "description": "Destination description",
+            "nullable": true
+          },
+          "eta": {
+            "type": "string",
+            "description": "Estimated time of arrival",
+            "format": "date-time",
+            "nullable": true
+          },
+          "heading": {
+            "type": "number",
+            "description": "Heading",
+            "format": "double",
+            "nullable": true
+          },
+          "course": {
+            "type": "number",
+            "description": "Course",
+            "format": "double",
+            "nullable": true
+          },
+          "speed": {
+            "type": "number",
+            "description": "Speed in knots",
+            "format": "double",
+            "nullable": true
+          },
+          "navigationStatus": {
+            "type": "string",
+            "description": "Navigation status",
+            "nullable": true
+          },
+          "geoCoordinates": {
+            "$ref": "#/components/schemas/GeoCoordinates"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VesselMovementPage": {
+        "type": "object",
+        "properties": {
+          "totalItems": {
+            "type": "integer",
+            "description": "Total number of items",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VesselMovement"
+            },
+            "description": "Array of items",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

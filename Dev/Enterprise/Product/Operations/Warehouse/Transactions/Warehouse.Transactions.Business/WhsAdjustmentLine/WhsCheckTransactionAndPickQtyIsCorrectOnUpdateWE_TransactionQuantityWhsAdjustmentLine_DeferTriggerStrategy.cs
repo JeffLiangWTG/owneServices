@@ -1,0 +1,17 @@
+using CargoWise.EntityFramework;
+
+namespace Enterprise.Warehouse.Transactions.Business
+{
+	interface IWhsCheckTransactionAndPickQtyIsCorrectOnUpdateWE_TransactionQuantityWhsAdjustmentLine_DeferTriggerStrategy
+	{
+	}
+
+	class WhsCheckTransactionAndPickQtyIsCorrectOnUpdateWE_TransactionQuantityWhsAdjustmentLine_DeferTriggerStrategy : WhsCheckTransactionAndPickQtyIsCorrectOnUpdateWE_TransactionQuantity_DeferTriggerStrategy, IWhsCheckTransactionAndPickQtyIsCorrectOnUpdateWE_TransactionQuantityWhsAdjustmentLine_DeferTriggerStrategy
+	{
+		WhsCheckTransactionAndPickQtyIsCorrectOnUpdateWE_TransactionQuantityWhsAdjustmentLine_DeferTriggerStrategy()
+		{
+		}
+
+		protected override bool ShouldDeferTrigger(BusinessObject businessEntity) => base.ShouldDeferTrigger(businessEntity) && ((WhsAdjustmentLine)businessEntity).IsAdjustmentOut;
+	}
+}

@@ -1,0 +1,2389 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript"><!--
+var keepParam;
+var months = new Array();
+var dateParameterName;
+var fieldContents;
+
+months[0] = "January";
+months[1] = "February";
+months[2] = "March";
+months[3] = "April";
+months[4] = "May";
+months[5] = "June";
+months[6] = "July";
+months[7] = "August";
+months[8] = "September";
+months[9] = "October";
+months[10] = "November";
+months[11] = "December";
+
+function keyUp(e)
+{
+	validateBeforeQuit();
+}
+
+function validateBeforeQuit()
+{
+  var date = validateInputDate();
+  if(date==null)
+    return false;
+  return true;
+}
+
+function enterKey(e)
+{
+  var keynum
+  var keychar
+  var numcheck
+
+  var enterId = (e.target || e.srcElement).id;
+  
+  if (enterId == "input_day" || enterId == "input_month" || enterId == "input_year")
+  {
+    if(window.event) <!--  IE -->
+    {
+      keynum = e.keyCode
+    } 
+    else if (e.which) <!--  Netscape/Firefox/Opera -->
+    {
+      keynum = e.which
+    }
+    if (keynum==13)
+    {
+        if(!validateBeforeQuit())
+          return;
+        var link = new url(window.location.href);
+        var row;
+        for(row in fieldContents){
+           link.setParameter(fieldContents[row][0],fieldContents[row][1]);
+        }
+        var inputDay = document.getElementById("input_day");
+        var inputMonth = document.getElementById("input_month");
+        var inputYear = document.getElementById("input_year");  
+        var day = inputDay.value;
+        var month = inputMonth.value;
+        var year = inputYear.value;
+        var date = year+""+month+""+day;
+        link.setParameter(dateParameterName,date);
+        window.location.href = link.currentUrl;
+    }
+  }  
+  
+}
+
+function inputFocus(element)
+{
+	var date = validateInputDate();
+  if(date!=null)
+    reload(date.getTime(), dateParameterName, fieldContents);
+  element.select(); 
+}
+
+function validateInputDate()
+{
+  var valid = true;
+	var inputDay = document.getElementById("input_day");
+  var inputMonth = document.getElementById("input_month");
+  var inputYear = document.getElementById("input_year");  
+  var day = inputDay.value;
+  var month = inputMonth.value;
+  var year = inputYear.value;
+
+  //check if the fields are numeric or not
+  var valid = true;
+  if(!isNumeric(day))
+  {
+    inputDay.style.color = "red";
+    valid = false;
+  }
+  if(!isNumeric(month))
+  {
+    inputMonth.style.color = "red";
+    valid = false;
+  }  
+  
+  if(!validateYear(year))
+  {
+    inputYear.style.color = "red";
+    valid = false;
+  }   
+  if(!valid)
+    return null;
+  
+  //validate all the date
+  var date = isValidDate(year, month, day); 
+  if(date!=null)
+  {
+	  inputDay.style.color = "black";
+	  inputMonth.style.color = "black";
+	  inputYear.style.color = "black";
+	  return date;
+  }
+
+  if(isValidDate(year, month, 1)!=null) //The day is not valid
+  {
+    inputDay.style.color = "red";
+  }
+  else
+  if(isValidDate(year, 1, 1)!=null) //The month is not valid
+  {
+    inputMonth.style.color = "red";
+  }
+  else
+  if(isValidDate(2000, 1, 1)!=null) //The year is not valid
+  {
+    inputYear.style.color = "red";
+  }
+
+  return null;
+}
+
+function validateYear(text)
+{
+	if(!isNumeric(text))
+		return false;
+
+	if(text.length !=4)
+		return false;
+
+	return true;
+}
+
+function isNumeric(text)
+{
+   var validChars = "0123456789";
+   var char;
+ 
+   for (i = 0; i < text.length; i++) 
+   { 
+	   char = text.charAt(i); 
+	   if (validChars.indexOf(char) == -1) 
+	   {
+	     return false;
+	   }
+   }
+   return true;
+}
+
+function reload(timeInMilliseconds, dateParameterName, keepParams)
+{ 
+  this.dateParameterName = dateParameterName;
+  this.fieldContents = keepParams;
+ 
+  loadYear(document.getElementById("year"), document.getElementById("input_year"), timeInMilliseconds)
+  loadMonth(document.getElementById("month"), document.getElementById("input_day"), document.getElementById("input_month"), timeInMilliseconds);
+  loadDays(timeInMilliseconds);
+}
+
+function loadMonth(element, inputZoneDay, inputZoneMonth, timeInMilliseconds)
+{
+  var currentDate = new Date(timeInMilliseconds);
+  
+  clearElement(element);
+
+  if (currentDate.getMonth() > 0)
+  {
+    var month = new Date(timeInMilliseconds);
+    month.setMonth(month.getMonth()-1);
+    var href = document.createElement("a");
+    href.setAttribute("href", "javascript:reload("+month.getTime()+", dateParameterName, fieldContents);");
+    href.setAttribute("onclick", "reload("+month.getTime()+", dateParameterName, fieldContents);");
+    href.appendChild(document.createTextNode("<<"));
+    element.appendChild(href);
+    element.appendChild(document.createTextNode(" "));
+  }
+
+  element.appendChild(document.createTextNode(months[currentDate.getMonth()]));
+
+  var m = ""+(currentDate.getMonth()+1);
+  if(m.length == 1)
+	  m = "0"+m;  
+  var d = ""+(currentDate.getDate());
+  if(d.length == 1)
+    d = "0"+d;  
+  inputZoneMonth.value = m;
+  inputZoneDay.value = d;
+
+  if (currentDate.getMonth() < 11)
+  {
+    element.appendChild(document.createTextNode(" "));
+    var month = new Date(timeInMilliseconds);
+    month.setMonth(month.getMonth()+1);
+    var href = document.createElement("a");
+    href.setAttribute("href", "javascript:reload("+month.getTime()+", dateParameterName, fieldContents);");
+    href.setAttribute("onclick", "reload("+month.getTime()+", dateParameterName, fieldContents);");
+    href.appendChild(document.createTextNode(">>"));
+    element.appendChild(href);
+  }
+}
+
+function loadYear(element, inputZone, timeInMilliseconds)
+{
+  var currentDate = new Date(timeInMilliseconds);
+
+  clearElement(element);
+
+  {
+    var year = new Date(timeInMilliseconds);
+    year.setFullYear(year.getFullYear()-1);
+    var href = document.createElement("a");
+    href.setAttribute("href", "javascript:reload("+year.getTime()+", dateParameterName, fieldContents);");
+    href.setAttribute("onclick", "reload("+year.getTime()+", dateParameterName, fieldContents);");
+
+    href.appendChild(document.createTextNode("<<"));
+    element.appendChild(href);
+    element.appendChild(document.createTextNode(" "));
+  }
+
+  element.appendChild(document.createTextNode(""+currentDate.getFullYear()));
+  inputZone.value = currentDate.getFullYear();
+  {
+    element.appendChild(document.createTextNode(" "));
+    var year = new Date(timeInMilliseconds);
+    year.setFullYear(year.getFullYear()+1);
+    var href = document.createElement("a");
+    href.setAttribute("href", "javascript:reload("+year.getTime()+", dateParameterName, fieldContents);");
+    href.setAttribute("onclick", "reload("+year.getTime()+", dateParameterName, fieldContents);");
+    href.appendChild(document.createTextNode(">>"));
+    element.appendChild(href);
+  }
+}
+
+function loadDays(timeInMilliseconds)
+{
+ 
+  var firstOfMonth = new Date(timeInMilliseconds);
+  firstOfMonth.setDate(1);
+  var week = 0;
+  var month = firstOfMonth.getMonth();
+
+  for (var i = 0; i < 6; i++)
+    for (var j = 0; j < 7; j++)
+      clearElement(document.getElementById("day"+i+""+j));
+
+  for (; firstOfMonth.getDay() < 7 && firstOfMonth.getMonth() == month; firstOfMonth.setDate(firstOfMonth.getDate()+1))
+  {
+    var day = document.getElementById("day"+week+""+firstOfMonth.getDay());
+    var href = document.createElement("a");
+    var date = 
+      firstOfMonth.getFullYear()+
+      (firstOfMonth.getMonth()+1 < 10 ? "0"+(firstOfMonth.getMonth()+1) : ""+(firstOfMonth.getMonth()+1))+
+      (firstOfMonth.getDate() < 10 ? "0"+firstOfMonth.getDate() : ""+firstOfMonth.getDate());
+    
+    var link = new url(window.location.href);
+    link.setParameter(dateParameterName,date);
+	for(row in fieldContents){
+	   link.setParameter(fieldContents[row][0],fieldContents[row][1]);
+	}
+   
+    href.setAttribute("href", link.currentUrl);
+    href.appendChild(document.createTextNode(firstOfMonth.getDate()));
+    day.appendChild(href);
+
+    if (firstOfMonth.getDay() == 0)
+      week++;
+  }
+}
+
+
+function today()
+{
+  var todayDate = new Date();
+
+  reload(todayDate.getTime(), dateParameterName, fieldContents);
+  
+  inputFocus(document.getElementById("input_year"));
+}
+
+function clearElement(element)
+{
+  while (element != null && element.hasChildNodes())
+    element.removeChild(element.lastChild);
+}
+
+--></script>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+    <html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="application" content="DDS2-ECICS"/>
+<meta name="version" content="3.3.1.0"/>
+<!-- Defect# CUSTD00024724 Start -->
+<!-- IPG Rule requires the following 7 metatags in all application pages. Additional metatags e.g. version and application can be added if required by the application. -->
+<meta http-equiv="Content-Language" content="en">
+<meta name="description" content="DDS2-ECICS Application page">
+<meta name="reference" content="DDS2-ECICS Reference">
+<meta name="creator" content="DG-TAXUD">
+<meta name="classification" content="DDS2-ECICS">
+<meta name="keywords" content="DDS2-ECICS, ECICS, DDS2">
+<meta name="date" content="">
+<!-- Defect# CUSTD00024724 End -->
+
+        <title>ECICS Consultation</title>
+
+        <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/ecics/europa/dds2-ecics.css">
+        <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/ecics/europa/ecl/css/ecl-ec-preset-website.css" media="screen">
+        <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/ecics/europa/ecl/css/ecl-ec-preset-website-print.css" media="print">
+        <link href="https://ec.europa.eu/taxation_customs/dds2/ecics/popup_files/fonts-min.css" type=text/css rel=stylesheet>
+        <link href="https://ec.europa.eu/taxation_customs/dds2/ecics/popup_files/container.css" type=text/css rel=stylesheet>
+        <link href="https://ec.europa.eu/taxation_customs/dds2/ecics/popupList.css" type="text/css" rel="stylesheet"/>
+
+
+        <script src="https://ec.europa.eu/taxation_customs/dds2/ecics/europa/ecl/js/ecl-ec-preset-website.js"></script>
+        <script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/ecics/language_combo/language_combo_en.js'></script>
+        <script type="text/javascript"
+                src='https://ec.europa.eu/taxation_customs/dds2/ecics/nomenclature_system_combo/nomenclature_system_combo_en.js'></script>
+        <script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/ecics/generalchar_combo/generalchar_combo_en.js'></script>
+        <script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/ecics/overlay.js'></script>
+        <script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/ecics/util.js'></script>
+        <script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/ecics/buttons.js'></script>
+        <script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/ecics/iframes/iframes.js'></script>
+        <script>
+            var isIE = !!document.all, calque, essai;
+
+            function buildLanguageSelect(screen, lang) {
+                var languagecomboarray;
+                var client = getClient();
+                client.open("GET", "language_combo/language_combo_" + lang.toLowerCase() + ".js", false);
+                client.send(null);
+                eval(client.responseText);
+                var selectString = "<select id='LangNm' name='LangNm' class='ecl-select dropforpopup'>";
+                document.write("<select id='LangNm' name='LangNm' class='ecl-select dropforpopup'>");
+                if (screen != "0")
+                    return;
+                if (languagecomboarray == null)
+                    return;
+                var i = 0;
+                var languageTab;
+                var option = "";
+                for (i = 0; i < languagecomboarray.length; i++) {
+                    languageTab = languagecomboarray[i];
+                    isSelected = '';
+                    if (languageTab[0] == "null")
+                        continue;
+                    else if (languageTab[0] == 'en')
+                        isSelected = 'selected';
+                    option = "<option id='' value='" + languageTab[0] + "' " + isSelected + ">" + getSelectText(languageTab[1]) + "</option>";
+                    selectString = selectString + option;
+                    document.write(option);
+                }
+                selectString = selectString + "</select>";
+                document.write("</select>");
+            }
+
+            function buildGeneralCharSelect(screen, lang) {
+                var generalcharcomboarray;
+                var client = getClient();
+                client.open("GET", "generalchar_combo/generalchar_combo_" + lang.toLowerCase() + ".js", false);
+                client.send(null);
+                eval(client.responseText);
+                var selectString = "<select id='Characteristic' name='Characteristic' class='ecl-select dropforpopup'><option id='option_template' value=''>-----</option>";
+                document.write("<select id='Characteristic' name='Characteristic' class='ecl-select dropforpopup'><option id='option_template' value=''>-----</option>");
+                if (screen != "0")
+                    return;
+                if (generalcharcomboarray == null)
+                    return;
+                var i = 0;
+                var generalCharTab;
+                var option = "";
+                for (i = 0; i < generalcharcomboarray.length; i++) {
+                    generalCharTab = generalcharcomboarray[i];
+                    isSelected = '';
+                    if (generalCharTab[0] == "null")
+                        continue;
+                    else if (generalCharTab[0] == '')
+                        isSelected = 'selected';
+                    option = "<option id='' value='" + generalCharTab[0] + "' " + isSelected + ">" + getSelectText(generalCharTab[1]) + "</option>";
+                    selectString = selectString + option;
+                    document.write(option);
+                }
+                selectString = selectString + "</select>";
+                document.write("</select>");
+            }
+
+            function buildNomenclatureSystemSelect(screen, lang) {
+                var nomenclaturesystemcomboarray;
+                var client = getClient();
+                client.open("GET", "nomenclature_system_combo/nomenclature_system_combo_" + lang.toLowerCase() + ".js", false);
+                client.send(null);
+                eval(client.responseText);
+                var selectString = "<select id='NomenclatureSystem' name='NomenclatureSystem' class='ecl-select dropforpopup'><option id='option_template' value=''>-----</option>";
+                document.write("<select id='NomenclatureSystem' name='NomenclatureSystem' class='ecl-select dropforpopup'><option id='option_template' value=''>-----</option>")
+                if (screen != "0")
+                    return;
+                if (nomenclaturesystemcomboarray == null)
+                    return;
+                var i = 0;
+                var nomenclatureSystemTab;
+                var option = "";
+                for (i = 0; i < nomenclaturesystemcomboarray.length; i++) {
+                    nomenclatureSystemTab = nomenclaturesystemcomboarray[i];
+                    isSelected = '';
+                    if (nomenclatureSystemTab[0] == "null")
+                        continue;
+                    else if (nomenclatureSystemTab[0] == '')
+                        isSelected = 'selected';
+                    option = "<option id='' value='" + nomenclatureSystemTab[0] + "' " + isSelected + ">" + nomenclatureSystemTab[0] + " - " + getSelectText(nomenclatureSystemTab[1]) + "</option>";
+                    selectString = selectString + option;
+                    document.write(option)
+                }
+                selectString = selectString + "</select>";
+                document.write("</select>");
+            }
+
+            function getSelectText(text) {
+                if (text == null)
+                    return "";
+                if (text == "null")
+                    return "";
+                return text;
+            }
+
+            window.onload = function () {
+                //force the call, cause not working onload
+                var orderByIndexParam = '';
+                document.ecics_form.sortOrder.selectedIndex = (orderByIndexParam == null || orderByIndexParam.length == 0) ? "0" : (orderByIndexParam - 1);
+
+                var langNm = 'en';
+                if (langNm == null || langNm.length <= 0) setSelectedLanguage('en');
+
+                autoSubmit(false);
+                setCursorFocus();
+            }
+
+            function setSelectedLanguage(lang) {
+                if (languagecomboarray == null) {
+                    return;
+                }
+
+                var select = document.getElementById("LangNm");
+
+                if (select == null)
+                    return;
+                if (select.selectedIndex > 0)
+                    return;
+
+                var i = 0;
+                var languageTab;
+                var copy;
+
+                var selected = 0;
+                if (lang.length <= 0)
+                    selected = -1;
+
+                for (i = 0; i < languagecomboarray.length; i++) {
+                    languageTab = languagecomboarray[i];
+                    if (languageTab[0] == "null")
+                        continue;
+                    if (lang == languageTab[0])
+                        selected = i; //The 0 value in the select is reserved for "------" all countries
+                }
+
+                if (selected >= 0)
+                    select.selectedIndex = selected;
+            }
+
+            NumChars = "0123456789";
+            var refrnce;
+            OtherChars = "-";
+            AllChars = NumChars + OtherChars;
+
+            function autoSubmit(submitted, isNextClicked, isPreviousClicked, forcedOffset) {
+                if (submitted != true) return;
+                document.getElementById('offset').value = (!isNextClicked && !isPreviousClicked) ? '0' : document.getElementById('offset').value;
+
+                if (isNextClicked)
+                    document.getElementById('offset').value = eval(document.getElementById('offset').value) +25;
+                else if (isPreviousClicked)
+                    document.getElementById('offset').value = eval(document.getElementById('offset').value) -25;
+                if (forcedOffset) document.getElementById('offset').value = forcedOffset;
+                var pane = document.getElementById("overlayPanel");
+                var link = new url("chemicalsubstance_list.jsp");
+                link.setParameter("viewVal", '');
+                link.setParameter("Lang", 'en');
+                link.setParameter("offset", document.getElementById('offset').value);
+                link.setParameter("Cas", '');
+                link.setParameter("Cus", '');
+                link.setParameter("CnCode", '');
+                link.setParameter("EcCode", '');
+                link.setParameter("UnCode", '');
+                link.setParameter("Name", '');
+                link.setParameter("LangNm", 'en');
+                link.setParameter("NomenclatureSystem", '');
+                link.setParameter("Inchi", '');
+                link.setParameter("Inchikey", '');
+                link.setParameter("Characteristic", '');
+                link.setParameter("sortOrder", '');
+                showPanel(link.currentUrl, setValue, mngGridButtons, "error_code");
+            }
+
+            function mngGridButtons() {
+                if (document.getElementById('tblData') && document.getElementById('tblData').rows.length == 2) {
+                    openDetails(document.getElementById('tblData').rows[1].id);
+                }
+            }
+
+            function setCursorFocus(screen) {
+                var legacyEcicsFocus = document.getElementById("Cas");
+                if (legacyEcicsFocus == null)
+                    return;
+                legacyEcicsFocus.focus();
+            }
+
+            /**
+             * Callback function for the overlay panel
+             */
+            function setValue(value) {
+                setInvisible(document.getElementById("overlayPanel"));
+            }
+
+            function setVisible(el) {
+                if (el == null) return;
+                var style = el.style.cssText;
+                style = style.replace(/display:\s*none/i, "display: block");
+                el.style.cssText = style;
+            }
+
+            function setInvisible(el) {
+                if (el == null) return;
+                var style = el.style.cssText;
+                style = style.replace(/display:\s*block/i, "display: none");
+                el.style.cssText = style;
+            }
+
+            function setDivInvisible(el) {
+                var style = el.style;
+                if (el == null) return false;
+                if (style == null) return false;
+                el.style.visibility='hidden';
+            }
+
+            function isVisible(el) {
+                if (el == null) return false;
+                var style = el.style.cssText;
+                if (style == null) return false;
+                return !/display:\s*none/i.test(style);
+            }
+
+            function buttonClick() {
+                if (!validateSearchParameters(document.ecics_form)) return false;
+                var link = new url(window.location.href);
+                document.ecics_form.action = link.currentUrl;
+                document.ecics_form.submit();
+            }
+
+            function isCasNumberValid(cas) {
+                //999999-99-9
+
+                if (cas.length <= 0)
+                    return true;
+
+                if (cas.length != 11 && (cas.indexOf("_") >= 0 || cas.indexOf("%") >= 0))
+                    return true;
+
+                if (!/(\d|%|_)+(-|%|_)(\d|%|_)+(-|%|_)(\d|%|_)+/.test(cas))
+                    return false;
+
+                return true;
+            }
+
+            function isCusNumberValid(cus) {
+                //9999999-9
+                if (cus.length <= 0)
+                    return true;
+
+                if (cus.length != 9 && (cus.indexOf("_") >= 0 || cus.indexOf("%") >= 0))
+                    return true;
+
+                if (!/(\d|%|_)+(-|%|_)(\d|%|_)+/.test(cus))
+                    return false;
+
+                return true;
+            }
+
+
+            function isCNCodeValid(cn) {
+                //9999999999
+                if (cn.length <= 0)
+                    return true;
+
+                if (cn.length != 10 && (cn.indexOf("_") >= 0 || cn.indexOf("%") >= 0))
+                    return true;
+
+                if (!/(\d|%|_)+/.test(cn))
+                    return false;
+
+                return true;
+            }
+
+            function isECNumberValid(ec) {
+                //999-999-9
+                if (ec.length <= 0)
+                    return true;
+
+                if (ec.length != 8 && (ec.indexOf("_") >= 0 || ec.indexOf("%") >= 0))
+                    return true;
+                if (!/(\d|%|_)+(-|%|_)(\d|%|_)+(-|%|_)(\d|%|_)+/.test(ec))
+                    return false;
+
+                return true;
+            }
+
+            function isUNNumberValid(un) {
+                //9999
+                if (un.length <= 0)
+                    return true;
+
+                if (un.length != 4 && (un.indexOf("_") >= 0 || un.indexOf("%") >= 0))
+                    return true;
+                if (!/(\d|%|_)+/.test(un))
+                    return false;
+
+                return true;
+            }
+
+            function isInchikeyValid(inchikey) {
+                //ZZZZZZZZZZZZZZ-ZZZZZZZZZZ-Z
+                if (inchikey.length <= 0)
+                    return true;
+
+                if (inchikey.length != 27 && (inchikey.indexOf("_") >= 0 || inchikey.indexOf("%") >= 0))
+                    return true;
+
+                if (!/^([a-zA-Z]|%|_)+(-|%|_)*([a-zA-Z]|%|_)*(-|%|_)*([a-zA-Z]|%|_)*/.test(inchikey))
+                    return false;
+
+                return true;
+            }
+
+            /**
+             * This function validates the input parameters in order to display the error messages at the page load level
+             **/
+            function validateSearchParameters(form) {
+                var status = true;
+                hideErrorMessage("error_cas_number", "Cas");
+                hideErrorMessage("error_cus_number", "Cus");
+                hideErrorMessage("error_cn_code", "CnCode");
+                hideErrorMessage("error_ec_number", "EcCode");
+                hideErrorMessage("error_un_number", "UnCode");
+                hideErrorMessage("error_name", null);
+                hideErrorMessage("error_inchi", null);
+                hideErrorMessage("error_inchikey", "Inchikey");
+
+                hideErrorMessage("error_enter_one_field");
+
+                if (!isCasNumberValid(form.Cas.value)) {
+                    showErrorMessage("error_cas_number", "Cas");
+                    status = false;
+                }
+                if (!isCusNumberValid(form.Cus.value)) {
+                    showErrorMessage("error_cus_number", "Cus");
+                    status = false;
+                }
+
+                if (!isCNCodeValid(form.CnCode.value)) {
+                    showErrorMessage("error_cn_code", "CnCode");
+                    status = false;
+                }
+                if (!isECNumberValid(form.EcCode.value)) {
+                    showErrorMessage("error_ec_number", "EcCode");
+                    status = false;
+                }
+                if (!isUNNumberValid(form.UnCode.value)) {
+                    showErrorMessage("error_un_number", "UnCode");
+                    status = false;
+                }
+
+                if (!isInchikeyValid(form.Inchikey.value)) {
+                    showErrorMessage("error_inchikey", "Inchikey");
+                    status = false;
+                }
+                return status;
+            }
+
+            function isCAS(Data) {
+                var It = true;
+                var c;
+                for (var x = 0; x < Data.length; x++) {
+                    if (It) {
+                        c = Data.charAt(x);
+                        It = (AllChars.indexOf(c) != -1);
+                    }
+                }
+                return It;
+            }
+
+            function IsStringValid(Data) {
+                var It = true;
+                var c;
+                for (var x = 0; x < Data.length; x++)
+                    if (It) {
+                        c = Data.charAt(x);
+                        if (c == "\'") {
+                            return false;
+                        }
+                    }
+                return It;
+
+            }
+
+            function countNum(Data) {
+                var count = 0;
+                var c;
+                for (var x = 0; x < Data.length; x++) {
+                    c = Data.charAt(x);
+                    if (NumChars.indexOf(c) != -1) {
+                        count++;
+                    }
+                }
+                return count;
+            }
+
+            function countWild(Data) {
+                var count = 0;
+                var c;
+                for (var x = 0; x < Data.length; x++) {
+                    if (Data.charAt(x) == '%') {
+                        count++;
+                    }
+                }
+                return count;
+            }
+
+            function isWild(Data) {
+                return (Data.indexOf("_") != -1) || (Data.indexOf("%") != -1);
+            }
+
+            function isNUM(Data) {
+                var It = true;
+                var c;
+                for (var x = 0; x < Data.length; x++) {
+                    if (It) {
+                        c = Data.charAt(x);
+                        It = (NumChars.indexOf(c) != -1);
+                    }
+                }
+                return It;
+            }
+
+            function isCUS(Data) {
+                var It = true;
+                var c;
+                for (var x = 0; x < Data.length; x++) {
+                    if (It) {
+                        c = Data.charAt(x);
+                        It = (AllChars.indexOf(c) != -1);
+                    }
+                }
+                return It;
+            }
+
+            function checkField(Data, format) {
+                var exact = false;
+                if (format == "CAS")
+                    exact = isCAS(Data);
+                if (format == "CUS")
+                    exact = isCUS(Data);
+                if (format == "NUM")
+                    exact = isNUM(Data);
+                if (format == "WILD")
+                    exact = isWild(Data);
+                return exact;
+            }
+
+            function checkcasrn(Data) {
+                if (Data.length > 11) {
+                    return false;
+                } else {
+                    var N = 0;
+                    var c;
+                    for (var x = 0; x < Data.length; x++) {
+                        c = Data.charAt(x);
+                        if (OtherChars.indexOf(c) != -1) {
+                            N = N + 1;
+                        }
+                    }
+                    if (N > 2) {
+                        return false;
+                    }
+                    if (N < 2) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            function hideErrorMessage(errDivName, divName) {
+                var errDesc = document.getElementById(errDivName);
+                var errDiv = document.getElementById(divName);
+                if (errDesc != null)
+                    errDesc.style.display = "none";
+                if (errDiv != null)
+                    errDiv.style.borderColor = 'none';
+            }
+
+            function showErrorMessage(errDivName, divName) {
+                var errDesc = document.getElementById(errDivName);
+                var errDiv = document.getElementById(divName);
+                if (errDesc != null)
+                    errDesc.style.display = "block";
+                if (errDiv != null)
+                    errDiv.style.borderColor = 'red';
+            }
+
+            function openDetails(cusNumber) {
+                var link = new url("chemicalsubstance_details.jsp");
+                link.setParameter("Lang", 'en');
+                link.setParameter("Cus", cusNumber);
+                link.setParameter("Header", 'false');
+                showPanel(link.currentUrl, null, null, null, "overlayDetails");
+                setDivInvisible(document.getElementById("topLink"));
+            }
+
+            function openTestTranslation() {
+                var win = window.open("cs_translate_test.jsp", '_blank');
+                win.focus();
+            }
+
+            function openDetailsNewPage(cusNumber) {
+                document.location.href = "chemicalsubstance_details.jsp?Lang=en&Cus=" + cusNumber;
+            }
+
+            function checkViewType() {
+                var radios = document.getElementsByName("View");
+                for (var i = 0, len = radios.length; i < len; i++) {
+                    if (radios[i].checked == true) {
+                        viewType = radios[i].value;
+                        break;
+                    }
+                }
+                document.getElementById('viewVal').value = viewType;
+                return viewType;
+            }
+
+            function getMolecularStructureImg(molStructId) {
+                var molecularstructurearray;
+                var client = getClient();
+                client.open("GET", "molecular_structure/molecular_structure_" + molStructId + ".png", false);
+                client.send(null);
+                eval(client.responseText);
+                if (molecularstructurearray == null)
+                    return;
+                return molecularstructurearray;
+            }
+
+            function afficheImage(elt, cusNumber, molStructId) {
+                calque = document.getElementById("overlay");
+                essai = elt.cloneNode(false);
+                essai.id = "ajout";
+                var molStructImg = getMolecularStructureImg(molStructId);
+
+                var table = document.createElement("table");
+                table.style = "border: 2px solid black;";
+
+                var row1 = table.insertRow(0);
+                row1.style = "background-color: lightgrey; border: none;";
+
+                var cell1_1 = row1.insertCell(0);
+                cell1_1.innerHTML = "&nbsp;[" + cusNumber + "]";
+
+                var cell1_2 = row1.insertCell(1);
+                cell1_2.style = "width: 20px; padding: 2px;";
+                var divClose = document.createElement("div");
+                divClose.innerHTML = "X";
+                divClose.style = "text-align: center; font-weight: bold;"
+                cell1_2.appendChild(divClose);
+
+                var row2 = table.insertRow(1);
+                var cell2_1 = row2.insertCell(0);
+                cell2_1.colSpan = "2";
+                var img = document.createElement("img");
+                img.src = "data:image/png;base64," + molStructImg;
+                cell2_1.appendChild(img);
+
+                essai.appendChild(table);
+                document.body.appendChild(essai);
+
+                calque.style = "background-color: #EEEEEE; opacity: 0.6;"
+                calque.style.width = document.body.offsetWidth + "px";
+                calque.style.height = document.body.offsetHeight + "px";
+                calque.style.display = "block";
+
+                essai.style = "border: none; position: fixed; top: 250px; left: 500px";
+                essai.style.zIndex = "1";
+                essai.style.display = "block";
+                essai.onclick = closeImage;
+            }
+
+            function closeImage() {
+                calque.style.display = 'none';
+                document.body.removeChild(document.getElementById('ajout'));
+                if (isIE)
+                    essai.filters[0].opacity = 0;
+                else
+                    essai.style.opacity = 0;
+            }
+
+            function closeImage() {
+                calque.style.display = 'none';
+                document.body.removeChild(document.getElementById('ajout'));
+                if (isIE)
+                    essai.filters[0].opacity = 0;
+                else
+                    essai.style.opacity = 0;
+            }
+
+            function clearForm() {
+                document.getElementById("Cas").value = "";
+                document.getElementById("Cus").value = "";
+                document.getElementById("CnCode").value = "";
+                document.getElementById("EcCode").value = "";
+                document.getElementById("UnCode").value = "";
+                document.getElementById("Name").value = "";
+                document.getElementById("Inchi").value = "";
+                document.getElementById("Inchikey").value = "";
+                document.getElementById("LangNm").value = "en";
+                document.getElementById("NomenclatureSystem").selectedIndex = "0";
+                document.getElementById("Characteristic").selectedIndex = "0";
+                document.getElementById("sortOrder").selectedIndex = "0";
+            }
+
+        </script>
+    </head>
+    <a id="top-page" name="top-page"></a>
+    <body onclick="closeEcicsOverlayPanels(event);" style="background-color: #FFFFFF;" class=" yui-skin-sam">
+    
+    
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        <div>
+            
+            <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+
+
+
+
+
+
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+<html>
+<head>
+    <meta name="application" content="DDS2-ECICS"/>
+<meta name="version" content="3.3.1.0"/>
+<!-- Defect# CUSTD00024724 Start -->
+<!-- IPG Rule requires the following 7 metatags in all application pages. Additional metatags e.g. version and application can be added if required by the application. -->
+<meta http-equiv="Content-Language" content="en">
+<meta name="description" content="DDS2-ECICS Application page">
+<meta name="reference" content="DDS2-ECICS Reference">
+<meta name="creator" content="DG-TAXUD">
+<meta name="classification" content="DDS2-ECICS">
+<meta name="keywords" content="DDS2-ECICS, ECICS, DDS2">
+<meta name="date" content="">
+<!-- Defect# CUSTD00024724 End -->
+
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+
+    <script> var contextPath = "/taxation_customs/dds2/ecics";</script>
+    <link type="text/css" media="all" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/ecics/europa/ec-ie.css">
+    <script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/ecics/europa/js/ec.js'></script>
+
+    <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/ecics/europa/dds2-ecics.css">
+    <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/ecics/europa/ecl/css/ecl-ec-preset-website.css" media="screen">
+    <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/ecics/europa/ecl/css/ecl-ec-preset-website-print.css" media="print">
+    <script src="https://ec.europa.eu/taxation_customs/dds2/ecics/europa/ecl/js/ecl-ec-preset-website.js"></script>
+
+    
+
+    <script type="text/javascript">
+        window.onbeforeunload = function () {
+        }
+    </script>
+
+    <script type="text/javascript">
+        function getClient() {
+            var xmlhttp = null;
+            try {
+                xmlhttp = new XMLHttpRequest();
+            } catch (e) {
+            }
+            if (xmlhttp != null)
+                return xmlhttp;
+            try {
+                xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+            } catch (e) {
+            }
+            if (xmlhttp != null)
+                return xmlhttp;
+
+            try {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (E) {
+            }
+            return xmlhttp;
+        }
+
+        window.addEventListener('load', function () {
+            var client = getClient();
+            client.open("GET", "/taxation_customs/dds2/ecics/special_message.html", false);
+            client.send(null);
+            document.getElementById('message-container').innerHTML = client.responseText;
+        });
+    </script>
+
+    <script type="text/javascript">
+
+        function closeButton() {
+            document.getElementById("meta-container").removeChild(document.getElementById("message-container"));
+        }
+
+        function showOverlay() {
+            document.getElementById("language-list-overlay").style.display = 'block';
+        }
+
+        function closeOverlay() {
+            document.getElementById("language-list-overlay").style.display = 'none';
+        }
+
+        function toggleTiles(elem) {
+            setTimeout(function () {
+                elem.firstElementChild.firstElementChild.classList.toggle('tiles-focus');
+            }, 200);
+        }
+
+        if (!String.prototype.startsWith) {
+            String.prototype.startsWith = function (searchString, position) {
+                position = position || 0;
+                return this.substr(position, searchString.length) === searchString;
+            };
+        }
+    </script>
+</head>
+
+<body>
+
+
+
+    
+    
+    
+
+    <div>
+        <div class="ecl-site-switcher ecl-site-switcher--header">
+            <div class="ecl-container">
+                <h2 class="ecl-u-sr-only">ECL site switcher</h2>
+                <ul id="ecl-site-switcher" class="ecl-site-switcher__list ecl-container">
+                    <li class=" ecl-site-switcher__option"><a href="https://ec.europa.eu/commission/index"
+                                                              class="ecl-site-switcher__link ecl-link">Commission and
+                        its
+                        priorities</a></li>
+                    <li class="ecl-site-switcher__option ecl-site-switcher__option--is-selected"><a
+                            href="https://ec.europa.eu/info/index" class="ecl-site-switcher__link ecl-link">Policies,
+                        information and services</a></li>
+                </ul>
+            </div>
+        </div>
+        <header data-ecl-auto-init="SiteHeaderHarmonised"
+                class="ecl-site-header-harmonised--group1 ecl-site-header-harmonised">
+            <div class="ecl-site-header-harmonised__container ecl-container">
+                <div class="ecl-site-header-harmonised__top"><a
+                        class="ecl-link ecl-link--standalone ecl-site-header-harmonised__logo-link"
+                        href="https://ec.europa.eu" aria-label="European Commission"><img alt="European Commission logo"
+                                                                                          title="European Commission"
+                                                                                          class="ecl-site-header-harmonised__logo-image"
+                                                                                          src="https://ec.europa.eu/taxation_customs/dds2/ecics/europa/ecl/images/logo/logo--en.svg"/></a>
+                    <div class="ecl-site-header-harmonised__action">
+                        <a onclick="showOverlay()"
+                           class="ecl-link ecl-link--standalone ecl-site-header-harmonised__language-selector"
+                           href="javascript:void(0)" data-ecl-language-selector="true"
+                           aria-controls="language-list-overlay"
+                           aria-expanded="false"><span class="ecl-site-header-harmonised__language-icon">
+                            <svg focusable="false" aria-hidden="true"
+                                 class="ecl-site-header-harmonised__icon ecl-icon ecl-icon--s" width="24" height="24"
+                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M18.191 1H5.81A4.812 4.812 0 001 5.818v8.338a4.812 4.812 0 004.809 4.818h.746V23l8.41-4.026h3.226c2.636 0 4.809-2.156 4.809-4.818V5.818C23 3.156 20.827 1 18.191 1z"/>
+                            </svg>
+                            <span class="ecl-site-header-harmonised__language-code">en</span></span>
+                            English</a>
+                        <div class="ecl-site-header-core__search-container">
+                            <a class="ecl-link ecl-link--standalone ecl-site-header-core__search-toggle"
+                               data-ecl-search-toggle="true" aria-controls="search-form-id" aria-expanded="false">
+                                <svg focusable="false" aria-hidden="true" class="ecl-icon ecl-icon--s" width="24"
+                                     height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path d="M22.457 20.018L17.67 15.46l-.065-.063a8.322 8.322 0 001.493-4.746C19.097 5.864 15.034 2 10.048 2 5.063 2 1 5.843 1 10.63c0 4.789 4.063 8.653 9.048 8.653a9.284 9.284 0 004.964-1.428l.065.063 4.766 4.578a1.946 1.946 0 002.613 0c.725-.672.725-1.785 0-2.478h.001zM10.05 16.28c-3.272 0-5.908-2.52-5.908-5.65 0-3.128 2.636-5.648 5.908-5.648 3.25 0 5.908 2.52 5.908 5.649S13.3 16.28 10.05 16.28z"/>
+                                </svg>
+                                Search</a>
+                            <form action="https://ec.europa.eu/search" id="search-form-id" data-ecl-search-form="true"
+                                  class="ecl-site-header-core__search ecl-search-form" role="search">
+                                <input type="hidden" name="query_source" value="TAXUD">
+                                <div class="ecl-form-group ecl-form-group--text-input"><label
+                                        class="ecl-search-form__label ecl-form-label"
+                                        for="search-input-id">Search</label><input type="search" id="search-input-id"
+                                                                                   class="ecl-search-form__text-input ecl-text-input"
+                                                                                   name="QueryText"/></div>
+                                <button aria-label="Search" type="submit" class="ecl-search-form__button ecl-button ecl-button--search">
+									<span class="ecl-button__container">
+										<span class="ecl-button__label" data-ecl-label="true">Search</span>
+										<svg focusable="false" aria-hidden="true" data-ecl-icon="true"
+                                             class="ecl-button__icon ecl-button__icon--after ecl-icon ecl-icon--s">
+											<path d="M22.457 20.018L17.67 15.46l-.065-.063a8.322 8.322 0 001.493-4.746C19.097 5.864 15.034 2 10.048 2 5.063 2 1 5.843 1 10.63c0 4.789 4.063 8.653 9.048 8.653a9.284 9.284 0 004.964-1.428l.065.063 4.766 4.578a1.946 1.946 0 002.613 0c.725-.672.725-1.785 0-2.478h.001zM10.05 16.28c-3.272 0-5.908-2.52-5.908-5.65 0-3.128 2.636-5.648 5.908-5.648 3.25 0 5.908 2.52 5.908 5.649S13.3 16.28 10.05 16.28z"/>
+										</svg>
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <nav data-ecl-auto-init="Menu" class="ecl-menu--group1 ecl-menu" aria-expanded="false" data-ecl-menu="true">
+                    <div class="ecl-menu__overlay" data-ecl-menu-overlay="true"></div>
+                    <div class="ecl-container ecl-menu__container">
+                        <a class="ecl-link ecl-link--standalone ecl-menu__open" href="javascript:void(0)" data-ecl-menu-open="true">
+                            <svg focusable="false" class="ecl-icon ecl-icon--s" fill="#fff" aria-hidden="true" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M0 19.2h24v2.402H0zm0-8.4h24v2.4H0zm0-8.402h24v2.403H0zm0 0"/></svg>
+                            Menu
+                        </a>
+                        <div class="ecl-menu__site-name">Taxation and Customs Union</div>
+                        <section class="ecl-menu__inner" data-ecl-menu-inner="true">
+                        <header class="ecl-menu__inner-header">
+                            <button data-ecl-menu-close="true" type="submit"
+                                    class="ecl-menu__close ecl-button ecl-button--text">
+                                  <span class="ecl-menu__close-container ecl-button__container">
+                                      <svg focusable="false" aria-hidden="true" data-ecl-icon="true" class="ecl-button__icon ecl-button__icon--after ecl-icon ecl-icon--s" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                            <path fill="#ffffff" d="M16.538 15.205L13.32 11.99l3.199-3.194-1.332-1.332-3.2 3.193L8.812 7.48 7.48 8.812l3.177 3.177-3.195 3.199 1.334 1.333 3.193-3.2 3.217 3.217 1.333-1.333zm5.594-7.49a10.886 10.886 0 00-2.355-3.492 10.882 10.882 0 00-3.492-2.355A10.906 10.906 0 0012 1c-1.488 0-2.93.293-4.286.868a10.958 10.958 0 00-3.492 2.355 10.888 10.888 0 00-2.355 3.492A10.925 10.925 0 001 12a10.958 10.958 0 003.222 7.778 10.9 10.9 0 003.492 2.355C9.07 22.707 10.512 23 12 23a10.964 10.964 0 007.777-3.222 10.912 10.912 0 002.355-3.492A10.94 10.94 0 0023 12c0-1.487-.294-2.93-.868-4.285zM21.702 12a9.642 9.642 0 01-2.844 6.858A9.619 9.619 0 0112 21.703a9.635 9.635 0 01-6.859-2.844A9.617 9.617 0 012.298 12a9.619 9.619 0 012.843-6.859A9.615 9.615 0 0112 2.298a9.619 9.619 0 016.858 2.843A9.623 9.623 0 0121.703 12z"/>
+                                      </svg>
+                                     <span class="ecl-button__label" data-ecl-label="true">Close</span>
+                                  </span>
+                            </button>
+
+                            <div class="ecl-menu__title">Taxation and Customs Union</div>
+                            <button data-ecl-menu-back="true" type="submit" class="ecl-menu__back ecl-button ecl-button--text">
+                                    <span class="ecl-button__container">
+                                         <svg focusable="false" aria-hidden="true" data-ecl-icon="true" class="ecl-button__icon ecl-button__icon--before ecl-icon ecl-icon--s ecl-icon--rotate-270">
+                                            <use xlink:href="europa/ecl/images/icons/sprites/icons.svg#ui--corner-arrow"></use>
+                                         </svg>
+                                     <span class="ecl-button__label" data-ecl-label="true">Back</span>
+                                    </span>
+                            </button>
+                        </header>
+                        <ul class="ecl-menu__list">
+                            <li class="ecl-menu__item" data-ecl-has-children="false" data-ecl-menu-item="true"><a
+                                    href='https://ec.europa.eu/taxation_customs/dds2/ecics/help/index.jsp?Lang=en'
+                                    class="ecl-menu__link" data-ecl-menu-link="true">Help</a></li>
+                            <li class="ecl-menu__item" data-ecl-has-children="false"
+                                data-ecl-menu-item="true"><a
+                                    href='https://ec.europa.eu/taxation_customs/dds2/ecics/news/newstar.jsp?Lang=en'
+                                    class="ecl-menu__link" data-ecl-menu-link="true">What's new?</a></li>
+                            <li class="ecl-menu__item" data-ecl-has-children="false"
+                                data-ecl-menu-item="true"><a
+                                    href='http://ec.europa.eu/taxation_customs/online-services/eu-customs-inventory-chemical-substances_en'
+                                    class="ecl-menu__link" data-ecl-menu-link="true">Information</a></li>
+                            <li class="ecl-menu__item" data-ecl-has-children="false"
+                                data-ecl-menu-item="true"><a
+                                    href='https://ec.europa.eu/taxation_customs/dds2/ecics/faq/faqecics.jsp?Lang=en'
+                                    class="ecl-menu__link" data-ecl-menu-link="true">FAQ</a></li>
+                            <li class="ecl-menu__item" data-ecl-has-children="false"
+                                data-ecl-menu-item="true"><a
+                                    href='mailto:TAXUD-DDS-ECICS@ec.europa.eu'
+                                    class="ecl-menu__link" data-ecl-menu-link="true">Mail Box</a></li>
+                        </ul>
+                        </section>
+                    </div>
+                </nav>
+            </div>
+            <div id="language-list-overlay" hidden="" class="ecl-language-list ecl-language-list--overlay"
+                 aria-labelledby="ecl-language-list__title" role="dialog" data-ecl-language-list-overlay="true">
+                <div class="ecl-language-list__container ecl-container">
+                    <div class="ecl-row">
+                        <div class="ecl-language-list__close ecl-col-12 ecl-col-lg-8 ecl-offset-lg-2">
+                            <button onclick="closeOverlay()" data-ecl-language-list-close="true" type="submit"
+                                    class="ecl-language-list__close-button ecl-button ecl-button--ghost">
+                                <span
+                                        class="ecl-button__container"><span class="ecl-button__label"
+                                                                            data-ecl-label="true">Close</span>
+                                <svg focusable="false" aria-hidden="true" data-ecl-icon="true"
+                                     class="ecl-button__icon ecl-button__icon--after ecl-icon ecl-icon--s" width="24"
+                                     height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path fill="#ffffff"
+                                          d="M16.538 15.205L13.32 11.99l3.199-3.194-1.332-1.332-3.2 3.193L8.812 7.48 7.48 8.812l3.177 3.177-3.195 3.199 1.334 1.333 3.193-3.2 3.217 3.217 1.333-1.333zm5.594-7.49a10.886 10.886 0 00-2.355-3.492 10.882 10.882 0 00-3.492-2.355A10.906 10.906 0 0012 1c-1.488 0-2.93.293-4.286.868a10.958 10.958 0 00-3.492 2.355 10.888 10.888 0 00-2.355 3.492A10.925 10.925 0 001 12a10.958 10.958 0 003.222 7.778 10.9 10.9 0 003.492 2.355C9.07 22.707 10.512 23 12 23a10.964 10.964 0 007.777-3.222 10.912 10.912 0 002.355-3.492A10.94 10.94 0 0023 12c0-1.487-.294-2.93-.868-4.285zM21.702 12a9.642 9.642 0 01-2.844 6.858A9.619 9.619 0 0112 21.703a9.635 9.635 0 01-6.859-2.844A9.617 9.617 0 012.298 12a9.619 9.619 0 012.843-6.859A9.615 9.615 0 0112 2.298a9.619 9.619 0 016.858 2.843A9.623 9.623 0 0121.703 12z"/>
+                                </svg>
+                            </span>
+                            </button>
+                        </div>
+                        <div class="ecl-language-list__title ecl-col-12 ecl-col-lg-8 ecl-offset-lg-2"
+                             id="ecl-language-list__title">
+                            <svg focusable="false" aria-hidden="true"
+                                 class="ecl-language-list__title-icon ecl-icon ecl-icon--m" width="24" height="24"
+                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path fill="#ffffff"
+                                      d="M15.134 12.329h1.842c.303-.653.49-1.353.536-2.1h-2.076c-.023.77-.14 1.47-.303 2.1zm.326-2.938h2.076A5.82 5.82 0 0017 7.29h-1.865c.162.63.28 1.33.326 2.1zm-3.358 3.777v2.401c.373-.28 1.235-1.026 1.842-2.401h-1.842zm2.729 0a7.872 7.872 0 01-1.307 2.192c1.213-.42 2.239-1.166 2.962-2.192H14.83zm.046-6.716h1.632a5.881 5.881 0 00-2.915-2.215c.42.536.91 1.259 1.282 2.215h.001zm-.606.84H12.1V9.39h2.52c-.047-.793-.164-1.493-.35-2.1zm.326 2.938h-2.495v2.099h2.169a7.944 7.944 0 00.326-2.1zm-.653-3.8c-.186-.514-.466-.933-.7-1.283-.35-.466-.7-.793-.956-1.003-.047-.07-.116-.093-.186-.14V6.43h1.842zm-4.524 0h1.866V4.027c-.397.28-1.26 1.05-1.866 2.401zm-2.541 0h1.655A7.34 7.34 0 019.84 4.237 5.957 5.957 0 006.879 6.43zm1.026 3.777H5.829a5.7 5.7 0 00.536 2.098h1.842c-.163-.63-.256-1.306-.303-2.098zm.326-2.939H6.39a6.367 6.367 0 00-.56 2.1h2.099c.047-.77.14-1.47.303-2.1zM0 13.818c0 2.822 2.192 5.091 5.09 5.091h3.637L17.455 24v-5.09h1.454c2.875 0 5.091-1.87 5.091-4.693V5.091C24 2.269 21.784 0 18.91 0H5.09C2.193 0 0 2.27 0 5.09v8.728zm4.99-4.031c0-3.708 3.008-6.716 6.715-6.692a6.663 6.663 0 016.67 6.715c0 3.708-3.008 6.716-6.716 6.693a6.663 6.663 0 01-6.67-6.716zm3.521 3.358H6.856a6.044 6.044 0 002.938 2.215 7.476 7.476 0 01-1.282-2.215zm.606-.84h2.146v-2.098H8.767c.024.792.14 1.492.35 2.098zm-.349-2.938h2.495V7.268H9.095c-.187.607-.28 1.307-.327 2.1zm.63 3.801c.21.49.489.91.722 1.259.35.443.7.793.956 1.003a.45.45 0 00.163.14v-2.402H9.397z"/>
+                            </svg>
+                            Select your language
+                        </div>
+                    </div>
+                    <div class="ecl-row">
+                        <div class="ecl-language-list__column ecl-col-12 ecl-col-lg-4 ecl-offset-lg-2">
+                            <ul class="ecl-language-list__list">
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="bg"
+                                                                        hrefLang="bg"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=bg&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">български
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="cs"
+                                                                        hrefLang="cs"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=cs&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Čeština
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="da"
+                                                                        hrefLang="da"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=da&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Dansk
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="de"
+                                                                        hrefLang="de"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=de&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Deutsch
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="et"
+                                                                        hrefLang="et"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=et&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Eesti keel
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="el"
+                                                                        hrefLang="el"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=el&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Ελληνικα
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item ecl-language-list__item--is-active"><a
+                                        lang="en"
+                                        hrefLang="en"
+                                        rel="alternate"
+                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=en&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                        class="ecl-language-list__link ecl-link ecl-link--standalone ecl-link--icon ecl-link--icon-after"><span
+                                        class="ecl-link__label">English</span>
+                                    <svg focusable="false" aria-hidden="true"
+                                         class="ecl-link__icon ecl-icon ecl-icon--xs" width="24" height="24"
+                                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M18.333 4L9 13.465 4.778 9.183l-3.111 3.155L9 20 21.667 7.155z"/>
+                                    </svg>
+                                </a></li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="es"
+                                                                        hrefLang="es"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=es&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Español
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="fr"
+                                                                        hrefLang="fr"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=fr&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Français
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="ga"
+                                                                        hrefLang="ga"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=ga&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Gaelic
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="hr"
+                                                                        hrefLang="hr"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=hr&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Hrvatski
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="it"
+                                                                        hrefLang="it"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=it&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Italiano
+                                </a>
+                                </li>
+                                
+                            </ul>
+                        </div>
+                        <div class="ecl-language-list__column ecl-col-12 ecl-col-lg-4">
+                            <ul class="ecl-language-list__list">
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="lv"
+                                                                        hrefLang="lv"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=lv&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Latviešu valoda
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="lt"
+                                                                        hrefLang="lt"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=lt&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Lietuvu kalba
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="mt"
+                                                                        hrefLang="mt"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=mt&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Maltese
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="hu"
+                                                                        hrefLang="hu"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=hu&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Magyar
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="nl"
+                                                                        hrefLang="nl"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=nl&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Nederlands
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="pl"
+                                                                        hrefLang="pl"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=pl&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Polski
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="pt"
+                                                                        hrefLang="pt"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=pt&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Português
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="ro"
+                                                                        hrefLang="ro"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=ro&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Româna
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="sk"
+                                                                        hrefLang="sk"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=sk&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Slovencina
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="sl"
+                                                                        hrefLang="sl"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=sl&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Slovenšcina
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="fi"
+                                                                        hrefLang="fi"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=fi&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Suomi
+                                </a>
+                                </li>
+                                
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                
+                                
+                                
+                                    
+                                    
+                                    
+                                
+                                
+                                <li class="ecl-language-list__item "><a lang="sv"
+                                                                        hrefLang="sv"
+                                                                        rel="alternate"
+                                                                        href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Cus=&NomenclatureSystem=&offset=0&Screen=0&Characteristic=&Inchi=&logoPath=europa%2fecl%2fimages%2flogo&Lang=sv&MaxSize=1000&viewVal=&Name=&Cas=&europaPath=europa&Expand=false&LangNm=en&sortOrder=&CnCode=&EcCode=&UnCode=&Inchikey="
+                                                                        class="ecl-language-list__link ecl-link ecl-link--standalone">Svenska
+                                </a>
+                                </li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </div>
+
+
+</body>
+</html>
+        </div>
+
+        <main>
+            <div>
+
+
+                <!-- Breadcrumb -->
+                <div class="ecl-page-header-harmonised">
+                    <div class="ecl-container" id="meta-container">
+                        <nav data-ecl-auto-init="BreadcrumbHarmonised"
+                             class="ecl-page-header-harmonised__breadcrumb ecl-breadcrumb-harmonised"
+                             aria-label="You are here:" data-ecl-breadcrumb-harmonised="true">
+                            <ol class="ecl-breadcrumb-harmonised__container">
+                                <li class="ecl-breadcrumb-harmonised__segment"
+                                    data-ecl-breadcrumb-harmonised-item="static" aria-hidden="false"><a
+                                        href='http://ec.europa.eu/index_en.htm'
+                                        class="ecl-breadcrumb-harmonised__link ecl-link ecl-link--standalone">European Commission</a>
+                                    <svg focusable="false" aria-hidden="true" role="presentation"
+                                         class="ecl-breadcrumb-harmonised__icon ecl-icon ecl-icon--2xs ecl-icon--rotate-90" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                                    </svg>
+                                </li>
+                                <li class="ecl-breadcrumb-harmonised__segment"
+                                    data-ecl-breadcrumb-harmonised-item="static" aria-hidden="false"><a
+                                        href='http://ec.europa.eu/taxation_customs/index_en.htm'
+                                        class="ecl-breadcrumb-harmonised__link ecl-link ecl-link--standalone">Taxation and Customs Union</a>
+                                    <svg focusable="false" aria-hidden="true" role="presentation"
+                                         class="ecl-breadcrumb-harmonised__icon ecl-icon ecl-icon--2xs ecl-icon--rotate-90" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                                    </svg>
+                                </li>
+                                <li class="ecl-breadcrumb-harmonised__segment"
+                                    data-ecl-breadcrumb-harmonised-item="static" aria-hidden="false"><a
+                                        href='http://ec.europa.eu/taxation_customs/online-services_en'
+                                        class="ecl-breadcrumb-harmonised__link ecl-link ecl-link--standalone">Databases</a>
+                                    <svg focusable="false" aria-hidden="true" role="presentation"
+                                         class="ecl-breadcrumb-harmonised__icon ecl-icon ecl-icon--2xs ecl-icon--rotate-90" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                                    </svg>
+                                </li>
+                                </li>
+
+                                
+                                <li class="ecl-breadcrumb-harmonised__segment"
+                                    data-ecl-breadcrumb-harmonised-item="static" aria-hidden="false">
+
+                                    <a href="https://ec.europa.eu/taxation_customs/dds2/ecics/chemicalsubstance_consultation.jsp?Lang=en"
+                                       class="ecl-breadcrumb-harmonised__link ecl-link ecl-link--standalone">ECICS</a>
+                                    <svg focusable="false" aria-hidden="true" role="presentation"
+                                         class="ecl-breadcrumb-harmonised__icon ecl-icon ecl-icon--2xs ecl-icon--rotate-90" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                                    </svg>
+                                    <span class="ecl-breadcrumb__current-page">ECICS Consultation</span>
+                                </li>
+                                
+                            </ol>
+                        </nav>
+                        <!-- Message Container-->
+                        <div class="ecl-container" id="message-container"></div>
+                        <!-- Page Title-->
+                        <div class="ecl-row ecl-container">
+                            <h1 class="ecl-page-header-harmonised__title"
+                                style="display: inline-block;width: 83%;">ECICS Consultation</h1>
+                            <p>
+                                <span>Last update:
+                                    02-08-2021
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="ecl-container" id="outer-container">
+                <!-- Chemical Substance form -->
+                <input type="hidden" name="Lang" value="en"/>
+
+                <div id="ecics-form-container">
+                    <div id="ecics-form-title">
+                        <h2 style="margin: 0px">Search for chemical substance information</h2>
+                    </div>
+                    <div class="ecics-form-content">
+                        <div class="ecl-form-group" style="display: block;">
+                            <form name="ecics_form" method="get"
+                                  onsubmit="document.getElementById('offset').value=0;return buttonClick();"
+                                  style="width: 100%">
+                                <input type="hidden" name="Lang" value='en'/>
+                                <!--CAS RN-->
+                                <div class="ecics-form-inner-content">
+                                    <label title="CAS RN Tooltip"
+                                           class="ecl-form-label ecics-form-label" for="Cas">CAS RN</label>
+                                    <input type="text"
+                                           class="ecl-text-input ecics-form-input" maxlength="12" id="Cas" name="Cas"
+                                           value=''
+                                           onkeypress="if(event.keyCode==13){document.getElementById('offset').value=0;return buttonClick();}"/>
+                                    <label class="ecl-form-label ecics-form-tip-label" for="">(ZZZZ999-99-9; wild cards: '_' or '%') </label>
+                                    <div role="alert" id="error_cas_number" class="ecl-message" data-ecl-message="true"
+                                         style="display: none; padding-top:0.2rem;padding-bottom: 0.2rem;">
+                                         <span>
+                                                <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20"
+                                                     height="20"
+                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                     style="fill: red;">
+                                                    <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                </svg>
+                                        </span>
+                                        <div class="ecl-message__content"
+                                             style="display: inline-block;vertical-align: middle;">
+                                            <p class="ecl-message__description"
+                                               style="display: inline;">Invalid format</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--CUS-->
+                                <div class="ecics-form-inner-content">
+                                    <label title="CUS Tooltip"
+                                           class="ecl-form-label ecics-form-label" for="Cus">CUS</label>
+                                    <input type="text"
+                                           class="ecl-text-input ecics-form-input" maxlength="9" id="Cus" name="Cus"
+                                           value=''
+                                           onkeypress="if(event.keyCode==13){document.getElementById('offset').value=0;return buttonClick();}"/>
+                                    <label class="ecl-form-label ecics-form-tip-label" for="">(9999999-9; wild cards: '_' or '%')	</label>
+                                    <div role="alert" id="error_cus_number" class="ecl-message" data-ecl-message="true"
+                                         style="display: none; padding-top:0.2rem;padding-bottom: 0.2rem;">
+                                         <span>
+                                                <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20"
+                                                     height="20"
+                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                     style="fill: red;">
+                                                    <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                </svg>
+                                        </span>
+                                        <div class="ecl-message__content"
+                                             style="display: inline-block;vertical-align: middle;">
+                                            <p class="ecl-message__description"
+                                               style="display: inline;">Invalid format</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--CN Code-->
+                                <div class="ecics-form-inner-content">
+                                    <label title="CN code Tooltip"
+                                           class="ecl-form-label ecics-form-label" for="CnCode">CN code</label>
+                                    <input type="text"
+                                           class="ecl-text-input ecics-form-input" maxlength="10" id="CnCode"
+                                           name="CnCode"
+                                           value=''
+                                           onkeypress="if(event.keyCode==13){document.getElementById('offset').value=0;return buttonClick();}"/>
+                                    <label class="ecl-form-label ecics-form-tip-label" for="">(9999999999; wild cards: '_' or '%')</label>
+                                    <div role="alert" id="error_cn_code" class="ecl-message" data-ecl-message="true"
+                                         style="display: none; padding-top:0.2rem;padding-bottom: 0.2rem;">
+                                         <span>
+                                                <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20"
+                                                     height="20"
+                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                     style="fill: red;">
+                                                    <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                </svg>
+                                        </span>
+                                        <div class="ecl-message__content"
+                                             style="display: inline-block;vertical-align: middle;">
+                                            <p class="ecl-message__description"
+                                               style="display: inline;">Invalid format</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--EC Number-->
+                                <div class="ecics-form-inner-content">
+                                    <label title="EC Number Tooltip"
+                                           class="ecl-form-label ecics-form-label" for="EcCode">EC Number</label>
+                                    <input type="text"
+                                           class="ecl-text-input ecics-form-input" maxlength="9" id="EcCode"
+                                           name="EcCode"
+                                           value=''
+                                           onkeypress="if(event.keyCode==13){document.getElementById('offset').value=0;return buttonClick();}"/>
+                                    <label class="ecl-form-label ecics-form-tip-label" for="">(999-999-9; wild cards: '_' or '%')</label>
+                                    <div role="alert" id="error_ec_number" class="ecl-message" data-ecl-message="true"
+                                         style="display: none; padding-top:0.2rem;padding-bottom: 0.2rem;">
+                                         <span>
+                                                <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20"
+                                                     height="20"
+                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                     style="fill: red;">
+                                                    <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                </svg>
+                                        </span>
+                                        <div class="ecl-message__content"
+                                             style="display: inline-block;vertical-align: middle;">
+                                            <p class="ecl-message__description"
+                                               style="display: inline;">Invalid format</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--UN Number-->
+                                <div class="ecics-form-inner-content">
+                                    <label title="UN Number Tooltip"
+                                           class="ecl-form-label ecics-form-label" for="UnCode">UN Number</label>
+                                    <input type="text"
+                                           class="ecl-text-input ecics-form-input" maxlength="7" id="UnCode"
+                                           name="UnCode"
+                                           value=''
+                                           onkeypress="if(event.keyCode==13){document.getElementById('offset').value=0;return buttonClick();}"/>
+                                    <label class="ecl-form-label ecics-form-tip-label" for="">(9999; wild cards: '_' or '%')</label>
+                                    <div role="alert" id="error_un_number" class="ecl-message" data-ecl-message="true"
+                                         style="display: none; padding-top:0.2rem;padding-bottom: 0.2rem;">
+                                         <span>
+                                                <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20"
+                                                     height="20"
+                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                     style="fill: red;">
+                                                    <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                </svg>
+                                        </span>
+                                        <div class="ecl-message__content"
+                                             style="display: inline-block;vertical-align: middle;">
+                                            <p class="ecl-message__description"
+                                               style="display: inline;">Invalid format</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--Name-->
+                                <div class="ecics-form-inner-content">
+                                    <label title="Name Tooltip"
+                                           class="ecl-form-label ecics-form-label" for="Name">Name</label>
+                                    <input type="text"
+                                           class="ecl-text-input ecics-form-input" maxlength="200" id="Name" name="Name"
+                                           value=""
+                                           onkeypress="if(event.keyCode==13){document.getElementById('offset').value=0;return buttonClick();}"/>
+                                    <label class="ecl-form-label ecics-form-tip-label-smaller" for="">(wild cards: '_' or '%')  in</label>
+                                    <div class="ecl-form-group ecl-form-group--select ecics-form-select">
+                                        <div class="ecl-select__container">
+                                            <script type="text/javascript">buildLanguageSelect(0, "en");</script>
+                                            <div class="ecl-select__icon" style="z-index:0">
+                                                <svg class="ecl-select__icon-shape ecl-icon ecl-icon--s ecl-icon--rotate-180"
+                                                     width="24" height="24" xmlns="http://www.w3.org/2000/svg"
+                                                     viewBox="0 0 24 24">
+                                                    <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div role="alert" id="error_name" class="ecl-message" data-ecl-message="true"
+                                         style="display: none; padding-top:0.2rem;padding-bottom: 0.2rem;">
+                                         <span>
+                                                <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20"
+                                                     height="20"
+                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                     style="fill: red;">
+                                                    <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                </svg>
+                                        </span>
+                                        <div class="ecl-message__content"
+                                             style="display: inline-block;vertical-align: middle;">
+                                            <p class="ecl-message__description"
+                                               style="display: inline;">Invalid format</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--Nomenclature-->
+                                <div class="ecics-form-inner-content">
+                                    <label title="Nomenclature Tooltip"
+                                           class="ecl-form-label ecics-form-label" for="">Nomenclature</label>
+                                    <div class="ecl-form-group ecl-form-group--select ecics-form-select">
+                                        <div class="ecl-select__container">
+                                            <script type="text/javascript">buildNomenclatureSystemSelect(0, "en");</script>
+                                            <div class="ecl-select__icon" style="z-index:0">
+                                                <svg class="ecl-select__icon-shape ecl-icon ecl-icon--s ecl-icon--rotate-180"
+                                                     width="24" height="24" xmlns="http://www.w3.org/2000/svg"
+                                                     viewBox="0 0 24 24">
+                                                    <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--InChI-->
+                                <div class="ecics-form-inner-content">
+                                    <label title="InChI Tooltip"
+                                           class="ecl-form-label ecics-form-label" for="InChi">InChI </label>
+                                    <input type="text"
+                                           class="ecl-text-input ecics-form-input" maxlength="200" id="Inchi"
+                                           name="Inchi"
+                                           value=''
+                                           onkeypress="if(event.keyCode==13){document.getElementById('offset').value=0;return buttonClick();}"/>
+                                    <label class="ecl-form-label ecics-form-tip-label" for="">(wild cards: '_' or '%')</label>
+                                    <div role="alert" id="error_inchi" class="ecl-message" data-ecl-message="true"
+                                         style="display: none; padding-top:0.2rem;padding-bottom: 0.2rem;">
+                                         <span>
+                                                <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20"
+                                                     height="20"
+                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                     style="fill: red;">
+                                                    <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                </svg>
+                                        </span>
+                                        <div class="ecl-message__content"
+                                             style="display: inline-block;vertical-align: middle;">
+                                            <p class="ecl-message__description"
+                                               style="display: inline;">Invalid format</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--InChiKey-->
+                                <div class="ecics-form-inner-content">
+                                    <label title="InChIKey Tooltip"
+                                           class="ecl-form-label ecics-form-label" for="Inchikey">InChIKey</label>
+                                    <input type="text"
+                                           class="ecl-text-input ecics-form-input" maxlength="200" id="Inchikey"
+                                           name="Inchikey"
+                                           value=''
+                                           onkeypress="if(event.keyCode==13){document.getElementById('offset').value=0;return buttonClick();}"/>
+                                    <label class="ecl-form-label ecics-form-tip-label" for="">(ZZZZZZZZZZZZZZ-ZZZZZZZZZZ-Z; wild cards: '_' or '%')</label>
+                                    <div role="alert" id="error_inchikey" class="ecl-message" data-ecl-message="true"
+                                         style="display: none; padding-top:0.2rem;padding-bottom: 0.2rem;">
+                                         <span>
+                                                <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20"
+                                                     height="20"
+                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                     style="fill: red;">
+                                                    <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                </svg>
+                                        </span>
+                                        <div class="ecl-message__content"
+                                             style="display: inline-block;vertical-align: middle;">
+                                            <p class="ecl-message__description"
+                                               style="display: inline;">Invalid format</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--Characteristic-->
+                                <div class="ecics-form-inner-content">
+                                    <label title="Characteristic Tooltip"
+                                           class="ecl-form-label ecics-form-label" for="Characteristic">Characteristic</label>
+                                    <div class="ecl-form-group ecl-form-group--select ecics-form-select">
+                                        <div class="ecl-select__container">
+                                            <script type="text/javascript">buildGeneralCharSelect(0, "en");</script>
+                                            <div class="ecl-select__icon" style="z-index:0">
+                                                <svg class="ecl-select__icon-shape ecl-icon ecl-icon--s ecl-icon--rotate-180"
+                                                     width="24" height="24" xmlns="http://www.w3.org/2000/svg"
+                                                     viewBox="0 0 24 24">
+                                                    <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <label class="ecl-form-label ecics-form-tip-label" for="">Choose from list </label>
+                                </div>
+                                <!--Sort Order-->
+                                <div class="ecics-form-inner-content">
+                                    <label title="Sort order Tooltip"
+                                           class="ecl-form-label ecics-form-label" for="">Sort order</label>
+                                    <div class="ecl-form-group ecl-form-group--select ecics-form-select">
+                                        <div class="ecl-select__container">
+                                            <select class="ecl-select" name="sortOrder" id="sortOrder">
+                                                <option value="1">CUS</option>
+                                                <option value="2">
+                                                    CAS RN</option>
+                                                <option value="3">
+                                                    CN code</option>
+                                                <option value="4">
+                                                    EC number</option>
+                                                <option value="5">
+                                                    UN number</option>
+                                                <option value="6">Name</option>
+                                            </select>
+                                            <div class="ecl-select__icon" style="z-index:0">
+                                                <svg class="ecl-select__icon-shape ecl-icon ecl-icon--s ecl-icon--rotate-180"
+                                                     width="24" height="24" xmlns="http://www.w3.org/2000/svg"
+                                                     viewBox="0 0 24 24">
+                                                    <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div role="alert" id="error_enter_one_field" class="ecl-message"
+                                         data-ecl-message="true"
+                                         style="display: none; padding-top:0.2rem;padding-bottom: 0.2rem;">
+                                         <span>
+                                                <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20"
+                                                     height="20"
+                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                     style="fill: red;">
+                                                    <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                </svg>
+                                        </span>
+                                        <div class="ecl-message__content"
+                                             style="display: inline-block;vertical-align: middle;">
+                                            <p class="ecl-message__description"
+                                               style="display: inline;">Please enter a value in one of the top 6 fields!</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: center" class="form-button-area">
+                                    <div>
+                                        <button type="submit"
+                                                class="ecl-button ecl-button--primary ecics-form-btn"
+                                                value="Submit"
+                                                onclick="document.getElementById('offset').value=0;buttonClick();">
+                                            <span class="ecl-button__container" style="width: 100%;text-align: center;">
+                                                <span class="ecl-button__label" style="width: 100%;"
+                                                      data-ecl-label="true">
+                                                    Submit</span></span>
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button type="button"
+                                                class="ecl-button ecl-button--primary ecics-form-btn"
+                                                value="Clear"
+                                                onclick="clearForm();">
+                                            <span class="ecl-button__container" style="width: 100%;text-align: center;">
+                                                <span class="ecl-button__label" style="width: 100%;"
+                                                      data-ecl-label="true">
+                                                    Clear</span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <br>
+                                <div style="text-align: center">
+                                    <button type="button"
+                                            class="ecl-button ecl-button--primary ecics-translation-btn"
+                                            value="Translate chemical name"
+                                            onclick="openTestTranslation();">
+                                            <span class="ecl-button__container" style="width: 100%;text-align: center;">
+                                                <span class="ecl-button__label" style="width: 100%;"
+                                                      data-ecl-label="true">
+                                                    Translate chemical name</span>
+                                            </span>
+                                    </button>
+                                </div>
+                                <input type="hidden" name="Expand" value="true"/>
+                                <input type="hidden" id="offset" name="offset" value='0'/>
+                                <input type="hidden" id="viewVal" name="viewVal"
+                                       value=''/>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="overlayPanel" class="information" style="display:none; width: 100%;"></div>
+                <div id="topLink" class="ecics-top-btn-area"><a class="ecl-link ecl-link--standalone" href="#top-page">Top</a></div>
+            </div>
+        </main>
+    
+
+    
+        
+        <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+
+
+
+
+<html>
+<body>
+<footer class="ecl-footer-harmonised--group1 ecl-footer-harmonised">
+    <div class="ecl-container ecl-footer-harmonised__container">
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section1"><a href="https://ec.europa.eu/taxation_customs/home_en" class="ecl-footer-harmonised__title ecl-link ecl-link--standalone">Taxation and Custom Union</a>
+        </div>
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section2">
+            <div class="ecl-footer-harmonised__title ecl-footer-harmonised__title--separator">Contact us</div>
+            <ul class="ecl-footer-harmonised__list">
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/taxation_customs/contacts_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Contact information of the DG TAXUD</a></li>
+            </ul>
+        </div>
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section3">
+            <div class="ecl-footer-harmonised__title ecl-footer-harmonised__title--separator">About us</div>
+            <ul class="ecl-footer-harmonised__list">
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/taxation_customs/newsletters_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Newsletter</a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/taxation_customs/dds2/susp/faq/20131127-Contact-List.pdf#zoom=125" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Contact List</a></li>
+            </ul>
+        </div>
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section4">
+            <div class="ecl-footer-harmonised__title ecl-footer-harmonised__title--separator">Follow us on</div>
+            <ul class="ecl-footer-harmonised__list ecl-footer-harmonised__list--inline">
+                <li class="ecl-footer-harmonised__list-item"><a href="https://www.flickr.com/photos/146315122@N05" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone ecl-link--icon ecl-link--icon-before">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 50 50" class="ecl-link__icon ecl-icon ecl-icon--xs">
+                        <path fill="#ffffff" d="M 20,0 V 40 H 60 V 0 Z m 14.4,24.5 c -2.5,0 -4.4,-2 -4.4,-4.4 0,-2.5 2,-4.4 4.4,-4.4 2.5,0 4.4,2 4.4,4.4 0,2.4 -2,4.4 -4.4,4.4 z m 11.2,0 c -2.5,0 -4.4,-2 -4.4,-4.4 0,-2.5 2,-4.4 4.4,-4.4 2.5,0 4.4,2 4.4,4.4 0,2.4 -2,4.4 -4.4,4.4 z"/>
+                    </svg><span class="ecl-link__label">Flickr</span></a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://twitter.com/EU_Taxud" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone ecl-link--icon ecl-link--icon-before">
+                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="ecl-link__icon ecl-icon ecl-icon--xs">
+                        <path fill="#ffffff" d="M20.592 8.031C20.592 14.068 16.104 21 7.896 21 5.269 21 2.86 20.217 1 18.876h.985c2.08 0 3.94-.783 5.582-2.013a4.415 4.415 0 01-4.268-3.13c.437.112.656.112.875.112.438 0 .766 0 1.204-.112-2.08-.447-3.612-2.236-3.612-4.472.657.223 1.314.559 2.08.559-1.314-.783-2.08-2.236-2.08-3.801 0-.895.22-1.677.657-2.348 2.189 2.907 5.582 4.695 9.303 4.92-.11-.448-.11-.672-.11-1.007 0-2.46 2.08-4.584 4.488-4.584 1.423 0 2.627.559 3.394 1.453.985-.111 1.97-.559 2.845-1.006-.219 1.006-.985 2.013-1.97 2.46.876-.112 1.751-.447 2.627-.783-.766.783-1.532 1.565-2.408 2.236v.671z"/>
+                    </svg><span class="ecl-link__label">Twitter</span></a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://www.youtube.com/EUTaxud" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone ecl-link--icon ecl-link--icon-before">
+                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="ecl-link__icon ecl-icon ecl-icon--xs">
+                        <path fill="#ffffff" d="M9.729 15.32l-.001-7.191 5.944 3.608-5.943 3.582zM22.78 6.882s-.215-1.763-.874-2.54c-.837-1.02-1.775-1.024-2.205-1.084C16.623 3 12.005 3 12.005 3h-.01S7.377 3 4.3 3.259c-.43.06-1.368.065-2.205 1.084-.66.777-.874 2.54-.874 2.54S1 8.954 1 11.025v1.942c0 2.07.22 4.142.22 4.142s.215 1.763.874 2.54c.837 1.02 1.936.987 2.426 1.094C6.28 20.939 12 21 12 21s4.623-.008 7.701-.267c.43-.06 1.368-.065 2.205-1.084.66-.777.874-2.54.874-2.54s.22-2.071.22-4.142v-1.942c0-2.07-.22-4.142-.22-4.142z"/></svg>
+                    <span class="ecl-link__label">YouTube</span></a></li>
+            </ul>
+        </div>
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section7"><a href="https://ec.europa.eu/info/index_en" class="ecl-footer-harmonised__title ecl-link ecl-link--standalone">European Commission</a></div>
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section8">
+            <ul class="ecl-footer-harmonised__list">
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/about-european-commission/contact_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Contact the European Commission</a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://europa.eu/european-union/contact/social-networks_en#n:+i:4+e:1+t:+s" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone ecl-link--icon ecl-link--icon-after"><span class="ecl-link__label">Follow the European Commission on social media</span>
+                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="ecl-link__icon ecl-icon ecl-icon--xs">
+                        <path fill="#ffffff" d="M1 1l8.25.046v2.71H3.796V20.29H20.25v-5.465H23V23H1V1zm11.468 0H23v10.494l-3.944-3.93-5.892 5.87-2.599-2.588 5.847-5.824L12.468 1z"/>
+                    </svg>
+                </a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/about-commissions-new-web-presence" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">About the Commission's new web presence</a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/resources-partners" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Resources for partners</a></li>
+            </ul>
+        </div>
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section9">
+            <ul class="ecl-footer-harmonised__list">
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/language-policy_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Language policy</a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/cookies_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Cookies</a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/privacy-policy_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Privacy policy</a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/legal-notice_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Legal notice</a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+<script>
+    ECL.autoInit();
+    document.querySelector(".ecl-site-header-harmonised__logo-link").style.flex="1 0 auto";
+</script>
+</body>
+</html>
+    
+
+    </body>
+    </html>
+

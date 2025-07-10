@@ -1,0 +1,29 @@
+@namespace System.Windows.Forms
+@using WinzorFramework
+@inherits DataGridRow
+
+@{
+    var currentCell = DataGrid.CurrentCell;
+    var isRowEditing = currentCell.RowNumber == RowNumber;
+}
+<tr style="@GetStyleString()" class="@RowCss(Selected, isRowEditing) @IndicatorCss(isRowEditing)" @key="@WinzorControlId" data-row-number="@RowNumber">
+    @*
+    // There is a bug in the way CW1 renders grid icons that causes them to display differently to WinForms.
+    // In WinForms, a new row will render a * for the row header icon when the row is selected but not
+    // being edited. In ZGrid GetRowHeaderImageFromRowIndex, the CW1 behaviour differs from WinForms as
+    // the arrow icon will render for a new row if the row is selected. We will copy the CW1 behaviour here.
+    *@
+	<DataGridRowHeader RowIndicator="@(isRowEditing ? "arrow_right" : "*")" ShowRowIndicator="true" MouseDown="RowHeaderMouseDownAsync" MouseUp="RowHeaderMouseUpAsync" ContextMenu="RowHeaderContextMenuAsync" />
+    @foreach (var (columnStyle, columnIndex, cellData, isCellReadOnly) in ColumnsToRender.ToArray())
+    {
+        var isReadOnly = DataGrid.ReadOnly && isCellReadOnly && dgTable.ReadOnly;
+        <td @onmousedown=cellData.MouseDown @onmousedown:stopPropagation @onmouseup=cellData.MouseUp @onmouseup:stopPropagation
+            @oncontextmenu=cellData.ContextMenu @oncontextmenu:stopPropagation @oncontextmenu:preventDefault
+            tabindex="@(isReadOnly ? "-1" : "0")" @onwinzorfocusin=cellData.FocusIn @onwinzorfocusin:stopPropagation>
+            @if (DataBound)
+            {
+                @cellData.Html
+            }
+        </td>
+    }
+</tr>

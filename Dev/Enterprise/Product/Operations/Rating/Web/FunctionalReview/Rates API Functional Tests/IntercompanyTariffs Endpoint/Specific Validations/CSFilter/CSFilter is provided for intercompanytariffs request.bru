@@ -1,0 +1,30 @@
+meta {
+  name: CSFilter is provided for intercompanytariffs request
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/intercompanytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForIntercompanyTariffs();
+   query.CSFilter = { ServiceStrings: ["A", "ABC", "210938190238"] }
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: CSFilter can only be provided when querying Costings or calculating charges. Otherwise it should be null.", function() {
+    expect(res.body.ModelState['CSFilter'][0]).to.equal("CSFilter can only be provided when querying Costings or calculating charges. Otherwise it should be null.");
+  });
+}

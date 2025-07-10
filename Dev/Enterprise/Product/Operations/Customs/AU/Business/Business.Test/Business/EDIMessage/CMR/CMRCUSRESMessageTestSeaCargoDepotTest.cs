@@ -1,0 +1,64 @@
+namespace Enterprise.Customs.AU.Declaration.Business.Testing
+{
+	sealed class CMRCUSRESMessageTestSeaCargoDepotTest : CMRSeaCargoDepotTestCase
+	{
+		public void TestIsAir()
+		{
+			AssertEquals("AirMessage Is Air", true, HAWBCMRCARSTMessage.IsAir);
+			AssertEquals("Sea Message Is Air", false, OBL250805001_CargoStatusAdviceMessage_FRCU3948922.IsAir);
+			AssertEquals("Sea Message Is Air", false, OBL250805001_UnderbondApprovalAdviceMessage_FRCU3948922.IsAir);
+		}
+
+		public void TestIsSea()
+		{
+			AssertEquals("Sea Message Is Sea", true, OBL250805001_CargoStatusAdviceMessage_FRCU3948922.IsSea);
+			AssertEquals("Sea Message Is Sea", true, OBL250805001_UnderbondApprovalAdviceMessage_FRCU3948922.IsSea);
+			AssertEquals("AirMessage Is Sea", false, HAWBCMRCARSTMessage.IsSea);
+		}
+
+		#region Implmentation
+
+		CMRCARSTMessage fHAWBCMRCARSTMessage;
+		CMRCARSTMessage HAWBCMRCARSTMessage
+		{
+			get
+			{
+				if (fHAWBCMRCARSTMessage == null)
+				{
+					fHAWBCMRCARSTMessage = Factory.New<CMRCARSTMessage>();
+					fHAWBCMRCARSTMessage.EM_MessageText = @"UNH+000001+CUSRES:D:99B:UN'
+BGM+34:::CARST+5AFE B52J 755:1+8'
+DTM+9:20050725203721536492:ZZZ'
+DTM+132:20050404:102'
+FTX+AHN+++CONSOLIDATED STATUS:HELD'
+FTX+AHN+++DEPARTURE FROM LAST OVERSEAS PORT:YES'
+FTX+AHN+++QUOTED MASTER / OCEAN BILL EXISTS:YES'
+FTX+AHN+++IAR ACS CLEARED:YES'
+FTX+AHN+++COMPLETE UNDERBOND SERIES APPROVED:N/A'
+FTX+AHN+++LCL UNDERBOND SATISFIED:N/A'
+FTX+AHN+++DECONSOLIDATION UNDERBOND SATISFIED:YES'
+FTX+AHN+++CARGO REPORT ACS EVALUATED:YES'
+FTX+AHN+++IAR AQIS CLEARED:YES'
+FTX+AHN+++CARGO REPORT AQIS EVALUATED:YES'
+FTX+AHN+++IMPORT DECLARATIONS MATCHED:NO'
+FTX+AHN+++IMPORT DECLARATION ACS EVALUATED:NO'
+FTX+AHN+++IMPORT DECLARATION AQIS EVALUATED:YES'
+FTX+AHN+++ACS EVALUATION COMPLETE:YES'
+FTX+AHN+++AQIS CARGO REPORT EVALUATION COMPLETE:YES'
+FTX+AHN+++ACS IMPORT DECLARATION EVALUATION COMPLETE:NO'
+FTX+AHN+++AQIS IMPORT DECLARATION EVALUATION COMPLETE:YES'
+FTX+AHN+++IMPORT DECLARATION PAID:N/A'
+TDT+20+300++6+QF::3'
+LOC+12+AUSYD::6'
+NAD+MR+AAA374M::95'
+RFF+MWB:08130038433'
+RFF+HWB:1'
+UNT+28+000001'".Replace("\r\n", "");
+				}
+				return fHAWBCMRCARSTMessage;
+			}
+		}
+
+		#endregion
+	}
+}

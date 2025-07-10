@@ -1,0 +1,96 @@
+@namespace System.Windows.Forms
+@using System.ComponentModel
+@using WinzorFramework
+@using WinzorFramework.Extensions
+@using WinzorFramework.JSInterop
+@using Microsoft.JSInterop;
+@inherits Control
+
+<div class="listview @(GridLines ? "gridline" : "") @BorderClassString" style="@LookStyleString" @attributes="DataAttributes">
+    <table>
+        <thead>
+            <tr>
+                @if (View == View.Details)
+                {
+                    @foreach (var columnHeader in Columns)
+                    {
+                        <ListViewDetailsColumnHeader Styles="@columnHeader.StyleString" CssClass="listview__header" HeaderText="@columnHeader.Text"                                                      
+                                                     HeaderMouseUp="OnHeaderMouseUp"
+                                                     HeaderMouseDown="OnHeaderMouseDown"
+                                                     ResizerMouseDown="OnResizerMouseDownAsync" />
+                    }
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Items.Count; i++)
+            {
+                var item = Items[i];
+                <tr draggable="@(AllowDrop ? "true" : "false")" data-drag-winzor-id="@i">
+                    @for (int j = 0; j < Columns.Count; j++)
+                    {
+                        var column = Columns[j];
+                        @if (j == 0)
+                        {
+                            <td style="@column.StyleString">
+                                <div class="listviewitem">
+                                    @if (item.ImageKey != string.Empty)
+                                    {
+                                        var imageList = View == View.LargeIcon ? LargeImageList : SmallImageList;
+                                        var image = imageList?.Images[item.ImageKey];
+                                        @if (imageList is not null && image is not null)
+                                        {
+                                            <img src="@image.ToBase64DataUrl()" width=@($"{imageList.ImageSize.Width}px") height=@($"{imageList.ImageSize.Height}px") />
+                                        }
+                                    }
+                                    <span>@item.Text</span>
+                                </div>
+                            </td>
+                        }
+                        else if (j > 0 && j < item.SubItems.Count + 1)
+                        {
+                            var subItem = item.SubItems[j - 1];
+                            <td style="@column.StyleString">
+                                <span>@subItem.Text</span>
+                            </td>
+                        }
+                    }
+                </tr>
+            }
+        </tbody> 
+    </table>
+</div>
+
+@code {
+    private string thActiveClass = "";
+
+    protected internal override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        GetJSInterop<IListViewJSInterop>()?.PreloadInterop();
+    }
+
+    [JSInvokable("SetColumnSize")]
+    public async Task SetColumnSize(int columnIndex, int newWidth)
+    {
+        await InvokeWinzorDispatcherAsync(() =>
+        {
+            if (columnIndex > -1 && columnIndex < Columns.Count)
+            {
+                var column = Columns[columnIndex];
+                column.Width = newWidth;
+                NotifyRenderRequired();
+            }
+        });
+    }
+
+    void OnHeaderMouseDown(WebMouseEventArgs args) => thActiveClass = "active";
+    void OnHeaderMouseUp(WebMouseEventArgs args) => thActiveClass = "";
+
+    string BorderClassString => BorderStyle switch
+    {
+        BorderStyle.FixedSingle => "listview--border-fixedsingle",
+        BorderStyle.Fixed3D => "listview--border-fixed3d",
+        _ => string.Empty,
+    };
+}

@@ -1,0 +1,8 @@
+// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+using System.Diagnostics.CodeAnalysis;
+[assembly: SuppressMessage("CargoWiseOne", "CW1107:Do Not Use Db.Connection Methods", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~M:Enterprise.Semaphores.Common.SqlMutex.SqlMutexLockDbManager.AcquireOrUpdateSqlMutexCore(CargoWise.Data.DbConnection,System.String,System.String,System.TimeSpan,System.String,System.Guid,System.String,System.Int32,System.String,System.Boolean)")] // C:\git\wtg\CargoWise\Dev\Enterprise\Product\Core\ServiceManager\ServiceManager\ServiceManager.Common.CW\SqlMutex\SqlMutexLockDbManager.cs:24:24
+[assembly: SuppressMessage("CargoWiseOne", "CW1107:Do Not Use Db.Connection Methods", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~M:Enterprise.Semaphores.Common.SqlMutex.SqlMutexLockDbManager.ReleaseLocks(Enterprise.Semaphores.Common.SqlMutexLockInfo)")] // C:\git\wtg\CargoWise\Dev\Enterprise\Product\Core\ServiceManager\ServiceManager\ServiceManager.Common.CW\SqlMutex\SqlMutexLockDbManager.cs:135:24
+[assembly: SuppressMessage("CargoWiseOne", "CW1050:Use System.TimeSpan Type For A Duration", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~F:Enterprise.Semaphores.Common.SqlMutex.SqlMutexLockDbManager.TimeOutInSecondsToReleaseLock")] // C:\git\wtg\CargoWise\Dev\Enterprise\Product\Core\ServiceManager\ServiceManager\ServiceManager.Common.CW\SqlMutex\SqlMutexLockDbManager.cs:190:12

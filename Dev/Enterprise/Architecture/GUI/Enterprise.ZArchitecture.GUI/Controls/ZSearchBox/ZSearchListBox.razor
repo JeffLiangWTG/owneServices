@@ -1,0 +1,91 @@
+@namespace Enterprise.ZArchitecture.GUI.SearchBox
+@using System.Drawing
+@using WinzorFramework.Extensions
+@using Microsoft.AspNetCore.Components.Web
+@using MouseEventArgs = System.Windows.Forms.MouseEventArgs
+@inherits CargoWise.Windows.UI.KListBox
+@{
+	// Take explicit copies of items that can be affected by the WinzorDispatcher
+	// This ensures we are operating on the same dataset throughout the render
+	var items = ItemsAsDisplayItems.ToList();
+	var selectedItem = SelectedItem;
+}
+<ul class="zsearchbox zsearchbox--striped">
+    @foreach (var item in items)
+    {
+        @if (item.IsSelectable)
+        {
+			if (selectedItem == item)
+            {
+                <li class="zsearchbox-item zsearchbox-item--selected" style="@(GetListItemStyleString(item))">
+                    <a @ref=selectedElement @onclick="async () => await OnListItemClicked(item)" @onclick:preventDefault @onclick:stopPropagation>
+                        @foreach (var line in item.Data)
+                        {
+                            <span class="text-decoration-underline">@line</span>
+                            <br/>
+                        }
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="zsearchbox-item" style="@(GetListItemStyleString(item))">
+                    <a @onclick="async () => await OnListItemClicked(item)" @onclick:preventDefault @onclick:stopPropagation>
+                        @foreach (var line in item.Data)
+                        {
+                            <span>@line</span>
+                            <br/>
+                        }
+                    </a>
+                </li>
+            }
+        }
+        else
+        {
+            <li class="zsearchbox-item zsearchbox-item--non-interactive" style="@(GetListItemStyleString(item))">
+                @foreach (var line in item.Data)
+                {
+                    <span>@line</span>
+                    <br/>
+                }
+            </li>
+        }
+    }
+</ul>
+
+@code {
+
+    ElementReference selectedElement;
+
+    async Task OnListItemClicked(IDisplayItem item)
+    {
+        await InvokeWinzorDispatcherAsync(() =>
+        {
+            if (item.IsSelectable)
+            {
+                SelectedIndex = Items.IndexOf(item);
+            }
+
+            ExecuteSelectedItem();
+        });
+    }
+
+    string GetListItemStyleString(IDisplayItem item)
+    {
+        string style = $"color:{item.Theme.ForeColour.GetColorStyleValue()}; {new Font(Font, item.Theme.FontStyle).FontStyleString()}";
+
+        if (item.Theme.BackColour != Color.White)
+        {
+            style += $"background-color: {item.Theme.BackColour.GetColorStyleValue()};";
+        }
+
+        return style;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await selectedElement.ScrollElementIntoViewIfNeededAsync(JSRuntime);
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+}

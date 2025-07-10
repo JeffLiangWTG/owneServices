@@ -1,0 +1,6 @@
+CREATE VIEW RefCusConditionCodeLanguageTableView_V1 AS
+SELECT ZY8_PK,
+ZY8_ZY7_ConditionCode,
+ZY8_ZX6_NKLanguage,
+ZY8_Description
+FROM RefCusConditionCodeLanguage

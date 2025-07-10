@@ -1,0 +1,9 @@
+using Enterprise.Accounting.CountryCompliance.Implementation.Testing.CountrySpecificRegistryDefaultValues;
+
+namespace Enterprise.Accounting.CountryCompliance.Implementation.CountrySpecificRegistryDefaultValues.Testing
+{
+	class SaintMartinRegistryItemsDefaultValuesTestData : DefaultTestDataForCountrySpecificRegistryItems
+	{
+		public override bool ExpectedDefaultShowLocalCurrencyEquivalentTotalsOnARInvoiceInOSCurrency => true;
+	}
+}

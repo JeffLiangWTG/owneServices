@@ -1,0 +1,358 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using CargoWise.RefDbRepo.Common.Infrastructure.Test;
+using CargoWise.RefDbRepo.Staging.Schema_New;
+using NUnit.Framework;
+using Safe = CargoWise.RefDbRepo.Common.SafeDataClient.CargoWise.RefDbRepo.Service.Schema_0_9_New;
+
+namespace CargoWise.RefDbRepo.Staging.UniversalXMLStagingDataProcessor.Test
+{
+	class Test_Deletion_Rate_App_DataIsFalse_ExcludeTradeGroup : IXmlProcessIntegrationTest
+	{
+		public string[] FileNames => ["TestFiles\\Test_Deletion1_Rate_App_ExcludeTradeGroup.xml", "TestFiles\\Test_Deletion2_Rate_App_DataIsFalse_ExcludeTradeGroup.xml"];
+
+		public XmlProcessIntegrationTestAssertResultHandler[] AssertResults => [AssertResult_AfterProcessingXml1, AssertResult_AfterProcessingXml2];
+
+		public string TestDescription => "Test Deletion on RefCusExcludeTradeGroup when RefCusRate and RefCusApplicability IsData=False";
+
+		public void PrepareData(IDbCommand stagingCommand, IDbCommand safeCommand)
+		{
+			Console.WriteLine("Start Preparing Data");
+
+			var safeSql = @"
+insert into [dbo].[RefDataSetInformation] (RDS_PK,RDS_DataSetId,RDS_TableName,RDS_DataSetName,RDS_DataSetTableCode,RDS_PriorityLevel)
+values (NEWID(), 23, 'RefCusTariff', 'RefCusTariff','ZZ1',0);
+
+insert into [dbo].[RefDataGrouping] (ZZZ_PK,ZZZ_DataGrouping,ZZZ_Description,ZZZ_ZZZ_NKGrouping)
+values (newid(), 'EUN', 'European Union', null);
+
+insert into [dbo].[RefCusRateType] (ZZR_PK,ZZR_RateType,ZZR_Description,ZZR_IsPayable,ZZR_ZZZ_NKDataGrouping,ZZR_RX_NKFormulaCurrency,ZZR_CustomsValueFormula,ZZR_IsExport)
+values ('D2E07963-932F-4BB4-A2E1-9C90F8848C23','DTY', 'Duty',1, 'EUN', '', 'CV',0);
+
+insert into [dbo].[RefCusTariffType] (ZZI_PK,ZZI_TariffType,ZZI_Description,ZZI_ZZ9_NKNomenclatureGroupType,ZZI_ZZZ_NKDataGrouping,ZZI_ZZR_RateType,ZZI_HasFormulaSpecificQuestions)
+values ('FC6DB681-F5F4-4B2F-9020-84AFF4F8BE98', 'IMP', 'Import Tariff', '', 'EUN', 'D2E07963-932F-4BB4-A2E1-9C90F8848C23', 0);
+
+insert into [dbo].[RefCusTradeGroup] (ZZA_PK, ZZA_TradeGroup, ZZA_Description, ZZA_StartDate, ZZA_EndDate, ZZA_ZZZ_NKDataGrouping)
+values ('73DD6854-4168-4D35-B9B9-3F8F99DB0108', 'AD',' ERGA OMNES', '1958-01-01 00:00:00', '2079-06-06 23:59:00','EUN'),
+('7683597F-BE7D-42E1-8012-16FC33D77C12', '1011',' ERGA OMNES1', '1958-01-01 00:00:00', '2079-06-06 23:59:00','EUN');
+
+insert into [dbo].[RefCusRateCode] (ZY1_PK, ZY1_RateCode, ZY1_ZZR_RateType, ZY1_Description, ZY1_InternalUse)
+values (newid(), 'A00', 'D2E07963-932F-4BB4-A2E1-9C90F8848C23', 'Customs duties on industrial products', 0),
+ (newid(), 'EAR', 'D2E07963-932F-4BB4-A2E1-9C90F8848C23', 'Customs duties on industrial products', 0);
+";
+			safeCommand.CommandText = safeSql;
+			safeCommand.ExecuteNonQuery();
+
+			Console.WriteLine("Preparing Data Successfully");
+		}
+
+		void AssertResult_AfterProcessingXml1(IDbCommand stagingCommand, IDbCommand safeCommand)
+		{
+			Assert.Multiple(() =>
+			{
+				AssertResult_StagingDb_SourceData_SDA_Status_AfterProcessingXml1(stagingCommand);
+				AssertResult_StagingDb_DataProcessingResult_AfterProcessingXml1(stagingCommand);
+
+				AssertResult_SafeDb_RefCusTariff_AfterProcessingXml1(safeCommand);
+				AssertResult_SafeDb_RefCusRate_AfterProcessingXml1(safeCommand);
+				AssertResult_SafeDb_RefCusApplicability_AfterProcessingXml1(safeCommand);
+				AssertResult_SafeDb_RefCusExcludedTradeGroup_AfterProcessingXml1(safeCommand);
+			});
+		}
+
+		void AssertResult_AfterProcessingXml2(IDbCommand stagingCommand, IDbCommand safeCommand)
+		{
+			Assert.Multiple(() =>
+			{
+				AssertResult_StagingDb_SourceData_SDA_Status_AfterProcessingXml2(stagingCommand);
+				AssertResult_StagingDb_DataProcessingResult_AfterProcessingXml2(stagingCommand);
+				AssertResult_StagingDb_RefCusRate_AfterProcessingXml2(stagingCommand);
+				AssertResult_StagingDb_RefCusApplicability_AfterProcessingXml2(stagingCommand);
+				AssertResult_StagingDb_RefCusExcludedTradeGroup_AfterProcessingXml2(stagingCommand);
+
+				var tariffs = AssertResult_SafeDb_RefCusTariff_AfterProcessingXml2(safeCommand);
+				AssertResult_SafeDb_RefCusRate_AfterProcessingXml2(safeCommand);
+				AssertResult_SafeDb_RefCusApplicability_AfterProcessingXml2(safeCommand);
+				AssertResult_SafeDb_RefCusExcludedTradeGroup_AfterProcessingXml2(tariffs, safeCommand);
+			});
+		}
+
+		void AssertResult_StagingDb_SourceData_SDA_Status_AfterProcessingXml1(IDbCommand stagingCommand)
+		{
+			var sourceData = new SourceData();
+			stagingCommand.CommandText = "SELECT * FROM dbo.SourceData";
+			using (var reader = stagingCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					sourceData.SDA_PK = (Guid)reader[nameof(SourceData.SDA_PK)];
+					sourceData.SDA_Status = reader[nameof(SourceData.SDA_Status)].ToString();
+				}
+			}
+			Assert.That(sourceData.IsSourceDataMergedStatus());
+		}
+
+		void AssertResult_StagingDb_DataProcessingResult_AfterProcessingXml1(IDbCommand stagingCommand)
+		{
+			var dataProcessingResults = new List<DataProcessingResult>();
+			stagingCommand.CommandText = "SELECT * FROM dbo.DataProcessingResult";
+			using (var reader = stagingCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var dataProcessingResult = new DataProcessingResult();
+					dataProcessingResult.DPR_SubSource = reader[nameof(DataProcessingResult.DPR_SubSource)].ToString();
+					dataProcessingResult.DPR_ParentTableCode = reader[nameof(DataProcessingResult.DPR_ParentTableCode)].ToString();
+					dataProcessingResult.DPR_Status = reader[nameof(DataProcessingResult.DPR_Status)].ToString();
+					dataProcessingResults.Add(dataProcessingResult);
+				}
+			}
+			Assert.That(dataProcessingResults, Has.Count.EqualTo(8));
+			Assert.That(dataProcessingResults.All(x => x.DPR_SubSource == "IntegrationTest for Deletion"));
+			Assert.That(dataProcessingResults.All(x => x.DPR_Status == "QUE"));
+			CollectionAssert.AreEquivalent(new string[] { "ZZ1", "ZZ2", "ZZT", "ZZC" }, dataProcessingResults.Select(x => x.DPR_ParentTableCode).Distinct());
+		}
+
+		void AssertResult_SafeDb_RefCusTariff_AfterProcessingXml1(IDbCommand safeCommand)
+		{
+			var tariffs = new List<Safe.RefCusTariff>();
+			safeCommand.CommandText = "SELECT * FROM dbo.RefCusTariff";
+			using (var reader = safeCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var tariff = new Safe.RefCusTariff();
+					tariff.ZZ1_TariffCode = reader[nameof(Safe.RefCusTariff.ZZ1_TariffCode)].ToString();
+					tariffs.Add(tariff);
+				}
+			}
+			Assert.That(tariffs, Has.Count.EqualTo(2));
+			CollectionAssert.AreEquivalent(new string[] { "22030", "22031" }, tariffs.Select(x => x.ZZ1_TariffCode).Distinct());
+		}
+
+		void AssertResult_SafeDb_RefCusRate_AfterProcessingXml1(IDbCommand safeCommand)
+		{
+			var rates = new List<Safe.RefCusRate>();
+			safeCommand.CommandText = "SELECT * FROM dbo.RefCusRate";
+			using (var reader = safeCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var rate = new Safe.RefCusRate();
+					rate.ZZ2_RateFormula = reader[nameof(Safe.RefCusRate.ZZ2_RateFormula)].ToString();
+					rate.ZZ2_EndDate = (DateTime)reader[nameof(Safe.RefCusRate.ZZ2_EndDate)];
+					rates.Add(rate);
+				}
+			}
+			Assert.That(rates, Has.Count.EqualTo(2));
+			CollectionAssert.AreEquivalent(new string[] { "2079-06-06 00:00:00" }, rates.Select(x => $"{x.ZZ2_EndDate:yyyy-MM-dd HH:mm:ss}").Distinct());
+			CollectionAssert.AreEquivalent(new string[] { "43.92 * [HLT]", "47.48 * [HLT]" }, rates.Select(x => x.ZZ2_RateFormula).Distinct());
+		}
+
+		void AssertResult_SafeDb_RefCusApplicability_AfterProcessingXml1(IDbCommand safeCommand)
+		{
+			var apps = new List<Safe.RefCusApplicability>();
+			safeCommand.CommandText = "SELECT * FROM dbo.RefCusApplicability";
+			using (var reader = safeCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var app = new Safe.RefCusApplicability();
+					app.ZZT_AdditionalCode = reader[nameof(Safe.RefCusApplicability.ZZT_AdditionalCode)].ToString();
+					app.ZZT_EndDate = (DateTime)reader[nameof(Safe.RefCusApplicability.ZZT_EndDate)];
+					apps.Add(app);
+				}
+			}
+			Assert.That(apps, Has.Count.EqualTo(2));
+			CollectionAssert.AreEquivalent(new string[] { "2029-06-06 23:59:00" }, apps.Select(x => $"{x.ZZT_EndDate:yyyy-MM-dd HH:mm:ss}").Distinct());
+			CollectionAssert.AreEquivalent(new string[] { "U319", "U313" }, apps.Select(x => x.ZZT_AdditionalCode).Distinct());
+		}
+
+		void AssertResult_SafeDb_RefCusExcludedTradeGroup_AfterProcessingXml1(IDbCommand safeCommand)
+		{
+			var exs = new List<Safe.RefCusExcludedTradeGroup>();
+			safeCommand.CommandText = "SELECT * FROM dbo.RefCusExcludedTradeGroup";
+			using (var reader = safeCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var ex = new Safe.RefCusExcludedTradeGroup();
+					ex.ZZC_ZZA_TradeGroup = (Guid)reader[nameof(Safe.RefCusExcludedTradeGroup.ZZC_ZZA_TradeGroup)];
+					exs.Add(ex);
+				}
+			}
+			Assert.That(exs, Has.Count.EqualTo(2));
+			CollectionAssert.AreEquivalent(new Guid[] { Guid.Parse("7683597F-BE7D-42E1-8012-16FC33D77C12"), Guid.Parse("73DD6854-4168-4D35-B9B9-3F8F99DB0108") }, exs.Select(x => x.ZZC_ZZA_TradeGroup).Distinct());
+		}
+
+		void AssertResult_StagingDb_SourceData_SDA_Status_AfterProcessingXml2(IDbCommand stagingCommand)
+		{
+			var sourceDatas = new List<SourceData>();
+			stagingCommand.CommandText = "SELECT * FROM dbo.SourceData";
+			using (var reader = stagingCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var sourceData = new SourceData();
+					sourceData.SDA_PK = (Guid)reader[nameof(SourceData.SDA_PK)];
+					sourceData.SDA_Status = reader[nameof(SourceData.SDA_Status)].ToString();
+					sourceDatas.Add(sourceData);
+				}
+			}
+			Assert.That(sourceDatas, Has.Count.EqualTo(2));
+			Assert.That(sourceDatas.All(x => x.IsSourceDataMergedStatus()));
+		}
+
+		void AssertResult_StagingDb_DataProcessingResult_AfterProcessingXml2(IDbCommand stagingCommand)
+		{
+			var dataProcessingResults = new List<DataProcessingResult>();
+			stagingCommand.CommandText = "SELECT * FROM dbo.DataProcessingResult";
+			using (var reader = stagingCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var dataProcessingResult = new DataProcessingResult();
+					dataProcessingResult.DPR_ParentTableCode = reader[nameof(DataProcessingResult.DPR_ParentTableCode)].ToString();
+					dataProcessingResult.DPR_Status = reader[nameof(DataProcessingResult.DPR_Status)].ToString();
+					dataProcessingResults.Add(dataProcessingResult);
+				}
+			}
+			Assert.That(dataProcessingResults, Has.Count.EqualTo(7));
+			CollectionAssert.AreEquivalent(new string[] { "ZZC", "ZZ1", "ZZ2", "ZZT", }, dataProcessingResults.Select(x => x.DPR_ParentTableCode).Distinct());
+			Assert.That(dataProcessingResults.All(x => x.DPR_Status == "QUE"));
+		}
+
+		void AssertResult_StagingDb_RefCusRate_AfterProcessingXml2(IDbCommand stagingCommand)
+		{
+			var rates = new List<RefCusRate>();
+			stagingCommand.CommandText = "SELECT * FROM dbo.RefCusRate";
+			using (var reader = stagingCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var rate = new RefCusRate();
+					rate.ZZ2_RateFormula = reader[nameof(RefCusRate.ZZ2_RateFormula)].ToString();
+					rate.ZZ2_EndDate = (DateTime)reader[nameof(RefCusRate.ZZ2_EndDate)];
+					rates.Add(rate);
+				}
+			}
+			Assert.That(rates, Has.Count.EqualTo(3));
+			CollectionAssert.AreEquivalent(new string[] { "43.92 * [HLT]", "47.48 * [HLT]" }, rates.Select(x => x.ZZ2_RateFormula).Distinct());
+			CollectionAssert.AreEquivalent(new DateTime[] { new DateTime(2029, 6, 6, 23, 59, 0, DateTimeKind.Utc) }, rates.Select(x => x.ZZ2_EndDate).Distinct());
+		}
+
+		void AssertResult_StagingDb_RefCusApplicability_AfterProcessingXml2(IDbCommand stagingCommand)
+		{
+			var apps = new List<RefCusApplicability>();
+			stagingCommand.CommandText = "SELECT * FROM dbo.RefCusApplicability";
+			using (var reader = stagingCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var app = new RefCusApplicability();
+					app.ZZT_AdditionalCode = reader[nameof(RefCusApplicability.ZZT_AdditionalCode)].ToString();
+					app.ZZT_EndDate = (DateTime)reader[nameof(RefCusApplicability.ZZT_EndDate)];
+					apps.Add(app);
+				}
+			}
+			Assert.That(apps, Has.Count.EqualTo(3));
+			CollectionAssert.AreEquivalent(new string[] { "U319", "U313" }, apps.Select(x => x.ZZT_AdditionalCode).Distinct());
+			CollectionAssert.AreEquivalent(new DateTime[] { new DateTime(2029, 6, 6, 23, 59, 0, DateTimeKind.Utc) }, apps.Select(x => x.ZZT_EndDate).Distinct());
+		}
+
+		void AssertResult_StagingDb_RefCusExcludedTradeGroup_AfterProcessingXml2(IDbCommand stagingCommand)
+		{
+			var exs = new List<RefCusExcludedTradeGroup>();
+			stagingCommand.CommandText = "SELECT * FROM dbo.RefCusExcludedTradeGroup";
+			using (var reader = stagingCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var ex = new RefCusExcludedTradeGroup();
+					ex.ZZC_ZZA_NKTradeGroup = reader[nameof(RefCusExcludedTradeGroup.ZZC_ZZA_NKTradeGroup)].ToString();
+					exs.Add(ex);
+				}
+			}
+			Assert.That(exs, Has.Count.EqualTo(3));
+			CollectionAssert.AreEquivalent(new string[] { "AD", "1011" }, exs.Select(x => x.ZZC_ZZA_NKTradeGroup).Distinct());
+		}
+
+		Safe.RefCusTariff[] AssertResult_SafeDb_RefCusTariff_AfterProcessingXml2(IDbCommand safeCommand)
+		{
+			var tariffs = new List<Safe.RefCusTariff>();
+			safeCommand.CommandText = "SELECT * FROM dbo.RefCusTariff";
+			using (var reader = safeCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var tariff = new Safe.RefCusTariff();
+					tariff.ZZ1_PK = (Guid)reader[nameof(Safe.RefCusTariff.ZZ1_PK)];
+					tariff.ZZ1_TariffCode = reader[nameof(Safe.RefCusTariff.ZZ1_TariffCode)].ToString();
+					tariffs.Add(tariff);
+				}
+			}
+			Assert.That(tariffs, Has.Count.EqualTo(2));
+			CollectionAssert.AreEquivalent(new string[] { "22030", "22031" }, tariffs.Select(x => x.ZZ1_TariffCode).Distinct());
+			return tariffs.ToArray();
+		}
+
+		void AssertResult_SafeDb_RefCusRate_AfterProcessingXml2(IDbCommand safeCommand)
+		{
+			var rates = new List<Safe.RefCusRate>();
+			safeCommand.CommandText = "SELECT * FROM dbo.RefCusRate";
+			using (var reader = safeCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var rate = new Safe.RefCusRate();
+					rate.ZZ2_RateFormula = reader[nameof(Safe.RefCusRate.ZZ2_RateFormula)].ToString();
+					rate.ZZ2_EndDate = (DateTime)reader[nameof(Safe.RefCusRate.ZZ2_EndDate)];
+					rates.Add(rate);
+				}
+			}
+			Assert.That(rates, Has.Count.EqualTo(2));
+			CollectionAssert.AreEquivalent(new string[] { "2079-06-06 00:00:00" }, rates.Select(x => $"{x.ZZ2_EndDate:yyyy-MM-dd HH:mm:ss}").Distinct());
+			CollectionAssert.AreEquivalent(new string[] { "43.92 * [HLT]", "47.48 * [HLT]" }, rates.Select(x => x.ZZ2_RateFormula).Distinct());
+		}
+
+		void AssertResult_SafeDb_RefCusApplicability_AfterProcessingXml2(IDbCommand safeCommand)
+		{
+			var apps = new List<Safe.RefCusApplicability>();
+			safeCommand.CommandText = "SELECT * FROM dbo.RefCusApplicability";
+			using (var reader = safeCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var app = new Safe.RefCusApplicability();
+					app.ZZT_AdditionalCode = reader[nameof(Safe.RefCusApplicability.ZZT_AdditionalCode)].ToString();
+					app.ZZT_EndDate = (DateTime)reader[nameof(Safe.RefCusApplicability.ZZT_EndDate)];
+					apps.Add(app);
+				}
+			}
+			Assert.That(apps, Has.Count.EqualTo(2));
+			CollectionAssert.AreEquivalent(new string[] { "2029-06-06 23:59:00" }, apps.Select(x => $"{x.ZZT_EndDate:yyyy-MM-dd HH:mm:ss}").Distinct());
+			CollectionAssert.AreEquivalent(new string[] { "U319", "U313" }, apps.Select(x => x.ZZT_AdditionalCode).Distinct());
+		}
+
+		void AssertResult_SafeDb_RefCusExcludedTradeGroup_AfterProcessingXml2(Safe.RefCusTariff[] tariffs, IDbCommand safeCommand)
+		{
+			var exs = new List<Safe.RefCusExcludedTradeGroup>();
+			safeCommand.CommandText = "SELECT * FROM dbo.RefCusExcludedTradeGroup";
+			using (var reader = safeCommand.ExecuteReader())
+			{
+				while (reader.Read())
+				{
+					var ex = new Safe.RefCusExcludedTradeGroup();
+					ex.ZZC_ZZA_TradeGroup = (Guid)reader[nameof(Safe.RefCusExcludedTradeGroup.ZZC_ZZA_TradeGroup)];
+					ex.ZZC_DataSetPK = (Guid)reader[nameof(Safe.RefCusExcludedTradeGroup.ZZC_DataSetPK)];
+					exs.Add(ex);
+				}
+			}
+			Assert.That(exs, Has.Count.EqualTo(1));
+			CollectionAssert.AreEquivalent(new Guid[] { Guid.Parse("7683597f-be7d-42e1-8012-16fc33d77c12") }, exs.Select(x => x.ZZC_ZZA_TradeGroup).Distinct());
+			Assert.That(exs[0].ZZC_DataSetPK == tariffs.First(y => y.ZZ1_TariffCode == "22031").ZZ1_PK);
+		}
+	}
+}

@@ -1,0 +1,49 @@
+{
+	"Logging": {
+		"LogLevel": {
+			"Default": "Information",
+			"Microsoft.AspNetCore": "Warning"
+		}
+	},
+	"AllowedHosts": "*",
+
+	"serilog:using:RollingFile": "Serilog.Sinks.RollingFile",
+	"serilog:write-to:RollingFile.pathFormat": "%BASEDIR%\\..\\..\\logs\\{RefLogFileName}-{Date}.txt",
+	"serilog:write-to:RollingFile.outputTemplate": "{Timestamp:HH:mm:ss.fff} [{SourceContext}] [{Level}] {Message}{NewLine}{Exception}",
+	"serilog:write-to:RollingFile.shared": "true",
+	"QuartzPanelPort": "9000",
+	"SafeUpdateServiceUri": "http://localhost:37016/odata",
+	"PortalUri": "http://localhost:19488",
+	"CheckAuthorization": "false",
+
+	"TenantId": "1b20b87e-cebd-43cc-97bd-bdd41a2f5cf1",
+	"ClientId": "6d64c4a4-a646-4af5-9e08-1760bb9d8d2f",
+	"ServiceId": "4ec2a7e9-7281-4144-82b4-fce61faff360",
+	"PrivateKeyFileName": "private_test.key",
+	"CertificateFileName": "quartzscheduler_test.cer",
+	"RefreshAdvanceInMinutes": "15",
+
+	"MemoryMonitorIntervalInSeconds": "5",
+
+	"quartz": {
+		"quartz.scheduler.instanceName": "RefDbRepoQuartzServer",
+		"quartz.scheduler.instanceId": "auto",
+		"quartz.threadPool.maxConcurrency": "10",
+		"quartz.jobStore.misfireThreshold": "60000",
+		"quartz.jobStore.type": "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz",
+		"quartz.jobStore.useProperties": "false",
+		"quartz.jobStore.dataSource": "default",
+		"quartz.jobStore.tablePrefix": "QRTZ_",
+		"quartz.jobStore.clustered": "true",
+		"quartz.jobStore.driverDelegateType": "Quartz.Impl.AdoJobStore.SqlServerDelegate, Quartz",
+		"quartz.dataSource.default.connectionString": "data source=localhost;initial catalog=RefDbRepoStaging;integrated security=True;TrustServerCertificate=True",
+		"quartz.dataSource.default.provider": "SqlServer",
+		"quartz.plugin.jobInitializer.type": "Quartz.Plugin.Xml.XMLSchedulingDataProcessorPlugin, Quartz.Plugins",
+		"quartz.plugin.jobInitializer.fileNames": "~\\Configuration\\QuartzAppRunnerJobs.xml,~\\Configuration\\QuartzProcessorRunnerJobs.xml,~\\Configuration\\SingleInstanceQuartzProcessorRunnerJobs.xml,~\\Configuration\\QuartzDataUpdaterJobs.xml",
+		"quartz.plugin.jobInitializer.failOnFileNotFound": "true",
+		"quartz.server.serviceName": "RefDbRepoQuartzServer",
+		"quartz.server.serviceDisplayName": "RefDbRepo Quartz Server",
+		"quartz.server.serviceDescription": "RefDbRepo Quartz Job Scheduling Server",
+		"quartz.serializer.type": "json"
+	}
+}

@@ -1,0 +1,31 @@
+meta {
+  name: TransportMode and ContainerMode combination is not supported
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.TransportMode = "AIR";
+   query.ContainerMode = "FCL";
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided combination of TransportMode ('AIR') and ContainerMode ('FCL') is not supported.", function() {
+    expect(res.body.ModelState['CW1RateMode'][0]).to.equal("Provided combination of TransportMode ('AIR') and ContainerMode ('FCL') is not supported.");
+  });
+}

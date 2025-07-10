@@ -1,0 +1,6 @@
+CREATE VIEW RefCarrierCodeAttributeTableView_V1 AS
+SELECT ZZG_PK,
+ZZG_ZZ4_CarrierCode,
+ZZG_Name,
+ZZG_Value
+FROM RefCarrierCodeAttribute

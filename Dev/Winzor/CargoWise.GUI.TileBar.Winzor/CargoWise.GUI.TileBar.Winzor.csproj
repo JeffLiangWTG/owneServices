@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <AssemblyName>CargoWise.GUI.TileBar</AssemblyName>
+    <RootNamespace>CargoWise.GUI.TileBar</RootNamespace>
+    <UseLegacyRsa>false</UseLegacyRsa>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Architecture\Main.Navigation\CargoWise.Main.Navigation\CargoWise.Main.Navigation.Winzor.csproj" />
+    <ProjectReference Include="..\BArchitecture.GUI\WinzorFramework.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.Blazor.Client.Integration" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Enterprise.ZArchitecture.Favorites" />
+    <Reference Include="Enterprise.ZArchitecture.Modules" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('wwwroot\css\_gen\cargowise.gui.tilebar.css')">
+    <Content Include="wwwroot\css\_gen\cargowise.gui.tilebar.css" />
+  </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="dotnet tool run webcompiler -- style/cargowise.gui.tilebar.scss -o wwwroot/css/_gen -z disable -m disable -p disable" StandardOutputImportance="high" />
+    <ItemGroup>
+      <CssFiles Include="$(MSBuildProjectDirectory)\themes\*.css" />
+    </ItemGroup>
+    <Delete Files="@(CssFiles)" />
+  </Target>
+</Project>

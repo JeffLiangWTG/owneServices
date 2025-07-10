@@ -1,0 +1,7 @@
+CREATE VIEW RefCusConditionValueTypeTableView_V1 AS
+SELECT ZX4_PK,
+ZX4_ValueType,
+ZX4_Description,
+ZX4_IsFormula,
+ZX4_ZZZ_NKDataGrouping
+FROM RefCusConditionValueType

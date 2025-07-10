@@ -1,0 +1,37 @@
+using CargoWise.EntityFramework;
+using CargoWise.EntityFramework.Testing;
+using Enterprise.Customs.BE.Business.MasterFiles;
+using Enterprise.MasterFiles.Business;
+using NUnit.Framework;
+using OrgSupplierPart = Enterprise.Customs.BE.Business.MasterFiles.OrgSupplierPart;
+
+namespace Enterprise.Customs.BE.Business.Declaration.Testing;
+
+[TestedType(typeof(Tax_OnlyForPivot))]
+public class Tax_OnlyForPivotTest : BusinessObjectBaseTestCase
+{
+	public void TestLookups()
+	{
+		var tax = pivot.Taxes.AddNew().Data;
+		AssertType<BEAddInfoTaxLookups>(tax.Lookups);
+	}
+
+	protected override BusinessObject GetNewBusinessObject()
+	{
+		return pivot.Taxes.AddNew().Data;
+	}
+
+	protected override void SetUp()
+	{
+		org = Factory.NewWithValidTestData<OrgHeader>();
+		var product = (OrgSupplierPart)Enterprise.Customs.EU.Business.MasterFiles.OrgSupplierPart.New(Factory);
+		product.OP_PartNum = "POOPY";
+		var relationship = product.RelatedOrganisations.AddNew();
+		relationship.OU_Relationship = "BTH";
+		relationship.OU_OH = org.PK;
+		pivot = product.PivotsForBinding.AddNew();
+		pivot.CI_ChildType = Common.ClassificationType.Both;
+	}
+	OrgHeader org;
+	CusClassPartPivot pivot;
+}

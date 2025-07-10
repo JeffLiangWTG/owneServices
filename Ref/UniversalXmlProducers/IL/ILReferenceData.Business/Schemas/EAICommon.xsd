@@ -1,0 +1,5062 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2013 rel. 2 (x64) (http://www.altova.com) by Avi Koas (Malam Systems Ltd.) -->
+<xs:schema xmlns="http://malam.com/customs/EAICommon.xsd" xmlns:b="http://schemas.microsoft.com/BizTalk/2003" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:altova="http://www.altova.com/xml-schema-extensions" targetNamespace="http://malam.com/customs/EAICommon.xsd" elementFormDefault="qualified" id="EAICommon">
+	<xs:complexType name="AccountDetails">
+		<xs:annotation>
+			<xs:documentation>פרטי חשבון</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="bank" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>בנק</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="branch" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר סניף</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="accountNumber" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר חשבון</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="11"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AddAGlobalScannedAttachmentToEntityResponse">
+		<xs:annotation>
+			<xs:documentation>תשובה למסר צרופה </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="externalAttachmentID" type="Guid" nillable="true" minOccurs="0"/>
+			<xs:element name="ResponseContentHeader" type="ResponseContentHeader"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AddressDetails">
+		<xs:annotation>
+			<xs:documentation>פרטי לקוח עבור לקוחות</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="AddressGeneralDetails" type="AddressGeneralDetails" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>פרטי כתובת שלא משותפים לחטיבות האחרות</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="HeaderAddress" type="HeaderAddress">
+				<xs:annotation>
+					<xs:documentation>פרטי כותרת כתובת</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="LocalAddress" type="LocalAddress" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>כתובת בעברית</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EnglishAddress" type="EnglishAddress" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>כתובת באנגלית</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CommunicationDevice" type="CommunicationDevice" minOccurs="0" maxOccurs="99">
+				<xs:annotation>
+					<xs:documentation>אמצעי תקשורת</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="addressContactState">
+				<xs:annotation>
+					<xs:documentation>מצב רשומת כתובת איש קשר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="addressId" nillable="true" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AddressGeneralDetails">
+		<xs:annotation>
+			<xs:documentation>פרטי כתובת שלא משותפים לחטיבות האחרות</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="branchName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם סניף</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="25"/>
+						<xs:pattern value="[&#x0020;-&#x007E;&#x00C0;-&#x00FF;&#x0100;-&#x017F;&#x0180;-&#x021F;\p{IsHebrew}]{0,25}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="contactId" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר ת.ז. איש קוד</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="contactFirstName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם פרטי לאיש קשר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="15"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="contactLastName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם משפחה לאיש קשר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="19"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="contactRoleType" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>תפקיד איש קשר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="FileContent" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>צרופה- דוגמת חתימה של מורשה חתימה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="FileContent"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="AuthorizedSignerPermit" nillable="true" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AuthorizedSignerPermit" maxOccurs="99">
+							<xs:annotation>
+								<xs:documentation>קוד הרשאה למורשה חתימה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="Amount">
+		<xs:annotation>
+			<xs:documentation>סכומים עשרוניים ואחוזים</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal"/>
+	</xs:simpleType>
+	<xs:simpleType name="ANCode">
+		<xs:restriction base="Text"/>
+	</xs:simpleType>
+	<xs:complexType name="AnswerForCollateral">
+		<xs:sequence>
+			<xs:element name="collateralRequestNumber">
+				<xs:annotation>
+					<xs:documentation>מספר מזהה הדרישה לבטוחה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="remarks" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>הערות הסוכן למענה לדרישה לבטוחה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="512"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="AnswersList" maxOccurs="20">
+				<xs:annotation>
+					<xs:documentation>חטיבה שמייצגת רשימת מענים עבור דרישה לבטוחה אחת.
+כל מופע חטיבה זו מייצג מענה אחד לדרישה לבטוחה
+</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="allocatedAmount">
+							<xs:annotation>
+								<xs:documentation>הסכום המוקצה מתוך המענה לדרישה לבטוחה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Amount">
+									<xs:maxExclusive value="9999999999999999.99"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="answerEntityType">
+							<xs:annotation>
+								<xs:documentation>סוג ישות מענה לדרישה לבטוחה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="TPGIdentifier" type="TPGIdentifier">
+							<xs:annotation>
+								<xs:documentation>מזהה תיק תפ"ג</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Attachment">
+		<xs:sequence>
+			<xs:element name="content" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>תוכן המסמך</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="FileContent"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="fileName">
+				<xs:annotation>
+					<xs:documentation>שם הקובץ</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="256"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="documentType">
+				<xs:annotation>
+					<xs:documentation>מזהה סוג צרופה  מטבלת סוגי צרופות</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="ANCode">
+						<xs:maxLength value="16"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="keywords" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מערך של מילות מפתח</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="512"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="attachmentID" type="Guid" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה צרופה</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="externalAttachmentID" type="Guid" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה חיצוני של הצרופה</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AdditionalData" minOccurs="0" maxOccurs="99">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="fieldID" type="Code"/>
+						<xs:element name="fieldData" type="Text"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Remark" nillable="true" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="1000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="IsAttachment" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="Text">
+					<xs:pattern value="(T|t)(R|r)(U|u)(E|e)"/>
+					<xs:pattern value="(F|f)(A|a)(L|l)(S|s)(E|e)"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="cargoIdentifier">
+		<xs:annotation>
+			<xs:documentation>מזהה מטען</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="cargoIdentifierType">
+				<xs:annotation>
+					<xs:documentation>סוג מזהה מטען</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="cargoIdentifierKey1">
+				<xs:annotation>
+					<xs:documentation>מפתח ראשון לזיהוי המטען</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="cargoIdentifierKey2" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מפתח שני לזיהוי המטען  </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="cargoIdentifierKey3" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מפתח שלישי לזיהוי המטען  </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CIDetailsHeader">
+		<xs:sequence>
+			<xs:element name="customsBookType" type="Code">
+				<xs:annotation>
+					<xs:documentation>סוג ספר מכס</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="fullClassification">
+				<xs:annotation>
+					<xs:documentation>סיווג של פרט מכס</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="13"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="goodsDescription" type="Text">
+				<xs:annotation>
+					<xs:documentation>תיאור טובין של פרט מכס</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="customsItemPath" type="Text">
+				<xs:annotation>
+					<xs:documentation>נתיב מלא של פרט מכס</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ClientDetails">
+		<xs:annotation>
+			<xs:documentation>פרטי לקוח- רכב</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ownerCustomerIdentity" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>זיהוי לקוח-בעל הרכב</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ownerCustomerFamilyName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם משפחה של בעל הרכב</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="22"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ownerCustomerFirstName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם פרטי של בעל הרכב</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="8"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="entitlementType" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סוג מעמד/
+סוג זכאות
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ClientForeignResidentIdentification">
+		<xs:annotation>
+			<xs:documentation>זיהוי תושב זר</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="passportNumber">
+				<xs:annotation>
+					<xs:documentation>מספר דרכון / תעודת מעבר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="15"/>
+						<xs:pattern value="[&#x0020;-&#x007E;&#x00C0;-&#x00FF;&#x0100;-&#x017F;&#x0180;-&#x021F;]{0,15}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="passportCountry" type="Country">
+				<xs:annotation>
+					<xs:documentation>מדינה שהפיקה את הדרכון / תעודת מעבר</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="passportType">
+				<xs:annotation>
+					<xs:documentation>סוג תעודה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="passportFirstName">
+				<xs:annotation>
+					<xs:documentation>שם פרטי+אמצעי באנגלית בדרכון</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="20"/>
+						<xs:pattern value="[&#x0020;-&#x002F;&#x003A;-&#x007E;&#x00C0;-&#x00FF;&#x0100;-&#x017F;&#x0180;-&#x021F;]{0,20}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="passportLastName">
+				<xs:annotation>
+					<xs:documentation>שם משפחה באנגלית בדרכון</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="30"/>
+						<xs:pattern value="[&#x0020;-&#x002F;&#x003A;-&#x007E;&#x00C0;-&#x00FF;&#x0100;-&#x017F;&#x0180;-&#x021F;]{0,30}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="englishBirthPlace" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מקום לידה לפי הדרכון - מדינה, עיר או שילוב ביניהם</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+						<xs:pattern value="[&#x0020;-&#x007E;&#x00C0;-&#x00FF;&#x0100;-&#x017F;&#x0180;-&#x021F;]{0,35}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="englishFatherName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם אב באנגלית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="20"/>
+						<xs:pattern value="[&#x0020;-&#x002F;&#x003A;-&#x007E;&#x00C0;-&#x00FF;&#x0100;-&#x017F;&#x0180;-&#x021F;]{0,20}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="passportExpirationDate" type="Date">
+				<xs:annotation>
+					<xs:documentation>תאריך סיום תוקף הדרכון / תעודת מעבר</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="passportIssueDate" type="Date">
+				<xs:annotation>
+					<xs:documentation>תאריך הוצאת הדרכון</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="Code">
+		<xs:restriction base="xs:int"/>
+	</xs:simpleType>
+	<xs:complexType name="CollateralRequestDetails">
+		<xs:annotation>
+			<xs:documentation>פרטי הדרישה לבטוחה</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="collateralRequestNumber">
+				<xs:annotation>
+					<xs:documentation>מספר הדרישה לבטוחה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="remarks" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>הערות לדרישה לבטוחה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="512"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="collateralValidityDate" type="DateTime">
+				<xs:annotation>
+					<xs:documentation>תוקף מבוקש לבטוחה</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="requestValidityDate" type="DateTime">
+				<xs:annotation>
+					<xs:documentation>תוקף הדרישה לבטוחה</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="collateralRequestStatus">
+				<xs:annotation>
+					<xs:documentation>סטאטוס הדרישה לבטוחה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="requestedCollateralType">
+				<xs:annotation>
+					<xs:documentation>סוג בטוחה מבוקש</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CollateralConditioning" maxOccurs="99">
+				<xs:annotation>
+					<xs:documentation>פרטי התנאים להחזרת הבטוחה </xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="conditionCode">
+							<xs:annotation>
+								<xs:documentation>קוד התנאי להחזרת הבטוחה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="requestedAmount">
+							<xs:annotation>
+								<xs:documentation>שווי התנאי להחזרת הדרישה לבטוחה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Amount">
+									<xs:maxExclusive value="9999999999999999.99"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="RelatedEntity" type="ConnectedEntity">
+				<xs:annotation>
+					<xs:documentation>מזהה הישות בגינה נדרשת הבטוחה</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Worker" type="Worker" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה עובד המכס שיזם הדרישה לבטוחה</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CollateralRequestMsg">
+		<xs:annotation>
+			<xs:documentation>בקשה לדרישה לבטוחה</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="GeneralDetails">
+				<xs:annotation>
+					<xs:documentation>פרטי כלליים של מסר הדרישה לבטוחה</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="agentExternalID">
+							<xs:annotation>
+								<xs:documentation>מספר מזהה חיצוני של סוכן המכס</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="9"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="declarationId">
+							<xs:annotation>
+								<xs:documentation>מספר הצהרה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="35"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="leadingDocumentVersion">
+							<xs:annotation>
+								<xs:documentation>מספר גרסה הצהרה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="9"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="remarks" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הערות לדרישה לבטוחה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="512"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CollateralRequestDetails">
+				<xs:annotation>
+					<xs:documentation>פרטי הדרישה לבטוחה</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="collateralRequestNumber">
+							<xs:annotation>
+								<xs:documentation>מספר בטוחה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="9"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="remarks" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הערות לדרישה לבטוחה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="512"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="requestInitiator">
+							<xs:annotation>
+								<xs:documentation>יוזם הדרישה לבטוחה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="9"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="validityDate" type="Date">
+							<xs:annotation>
+								<xs:documentation>תוקף מבוקש</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="requestedCollateralType">
+							<xs:annotation>
+								<xs:documentation>סוג בטוחה מבוקש</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="CollateralConditioning" maxOccurs="99">
+							<xs:annotation>
+								<xs:documentation>פרטי התנאים להחזרת הבטוחה </xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="conditionCode">
+										<xs:annotation>
+											<xs:documentation>קוד התנאי להחזרת הבטוחה</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="Code">
+												<xs:totalDigits value="2"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="remarks" nillable="true" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>הערות במלל חופשי</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="Text">
+												<xs:maxLength value="512"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="taxParagraph" type="TaxParagraph" maxOccurs="10">
+										<xs:annotation>
+											<xs:documentation>פרטי סעיפי המס המרכיבים את הסכום הנדרש בבטוחה</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="RequestedCollateralTypes">
+							<xs:annotation>
+								<xs:documentation>פרטי הרכב הבטוחה המבוקשת</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="requestedAmount">
+										<xs:annotation>
+											<xs:documentation>סכום הבטוחה המבוקש</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="Amount">
+												<xs:maxInclusive value="9999999999999999.99"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="requestedCollateralType">
+										<xs:annotation>
+											<xs:documentation>סוג בטוחה מבוקש</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="Code">
+												<xs:totalDigits value="2"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="Pointer" type="Pointer">
+							<xs:annotation>
+								<xs:documentation>מזהה הסחורה בגינה נדרשת הבטוחה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="CommandStatusType">
+		<xs:restriction base="Text">
+			<xs:enumeration value="Success"/>
+			<xs:enumeration value="Error"/>
+			<xs:enumeration value="ApplicationException"/>
+			<xs:enumeration value="UnhandledSync"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="CommunicationDevice">
+		<xs:annotation>
+			<xs:documentation>אמצעי תקשורת לכתובת</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="communicationType">
+				<xs:annotation>
+					<xs:documentation>סוג התקשורת</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="ANCode">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="communicationAddress">
+				<xs:annotation>
+					<xs:documentation>כתובת להתקשרות</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ConnectedEntity">
+		<xs:annotation>
+			<xs:documentation>ישות מקושרת</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="entityIdKey1">
+				<xs:annotation>
+					<xs:documentation>מזהה חיצוני של הישות המקושרת מפתח 1</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="entityType" type="Code">
+				<xs:annotation>
+					<xs:documentation>סוג ישות מקושרת</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="entityPath" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה מחרוזתי של שדה בהצהרה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="entityIdKey2" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה חיצוני של הישות המקושרת מפתח 2</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="entityIdKey3" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה חיצוני של הישות המקושרת מפתח 3</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="entityIdExternalReferenceID" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה הישות במערכת הסוכן </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="Country">
+		<xs:annotation>
+			<xs:documentation>קוד מדינה לפי תקן ISO 3166-1 alpha-2
+מחרוזת 2 תווים.
+</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="ANCode">
+			<xs:maxLength value="2"/>
+			<xs:pattern value="([A-Z]{2})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="CustomerIdentification">
+		<xs:annotation>
+			<xs:documentation>פרטי זיהוי לקוח</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="externalID" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר מזהה לפי מערכת שע"ם (ת"ז, ח"פ וכד')</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="passportNumber" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר דרכון / תעודת מעבר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="15"/>
+						<xs:pattern value="[&#x0020;-&#x007E;&#x00C0;-&#x00FF;&#x0100;-&#x017F;&#x0180;-&#x021F;]{0,15}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="passportCountry" type="Country" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מדינה שהפיקה את הדרכון / תעודת מעבר או ארגון בינלאומי שמפיק דרכונים</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="passportType" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סוג תעודה לתושב זר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CustomerShortIdentification">
+		<xs:sequence>
+			<xs:element name="Name">
+				<xs:annotation>
+					<xs:documentation>שם</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ExternalID">
+				<xs:annotation>
+					<xs:documentation>ת"ז</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CustomerShortMixedIdentification">
+		<xs:sequence>
+			<xs:element name="Name">
+				<xs:annotation>
+					<xs:documentation>שם</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="IdentifyingDocumentNumber">
+				<xs:annotation>
+					<xs:documentation>ת"ז החותם / מס' דרכון / מס' תעודת מעבר
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="15"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="customsBookDetail">
+		<xs:sequence>
+			<xs:element name="customsItemId">
+				<xs:annotation>
+					<xs:documentation>מזהה של פרט מכס</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="validToDate" type="DateTime">
+				<xs:annotation>
+					<xs:documentation>נכון לתאריך</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="customsBookType">
+		<xs:sequence>
+			<xs:element name="customsBookType">
+				<xs:annotation>
+					<xs:documentation>סוג ספר המכס</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="validToDate" type="DateTime">
+				<xs:annotation>
+					<xs:documentation>נכון לתאריך</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="Date">
+		<xs:annotation>
+			<xs:documentation>תאריך קצר</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:date"/>
+	</xs:simpleType>
+	<xs:simpleType name="DateMonthYear">
+		<xs:annotation>
+			<xs:documentation>תאריך רק של חודש ושנה</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:gYearMonth"/>
+	</xs:simpleType>
+	<xs:simpleType name="DateTime">
+		<xs:annotation>
+			<xs:documentation>תאריך+ שעה</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:dateTime"/>
+	</xs:simpleType>
+	<xs:complexType name="DF_FRM14100_ProceduralFaultMsg">
+		<xs:annotation>
+			<xs:documentation>חטיבת רישום או עדכון ליקוי </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="GeneralDetails">
+				<xs:annotation>
+					<xs:documentation>פרטים כלליים על ההצהרה אליה רשימת הליקויים קשורה</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="countableType">
+							<xs:annotation>
+								<xs:documentation>גורם ספירת ליקוי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="createDate" type="Date">
+							<xs:annotation>
+								<xs:documentation>מועד יצירת הליקוי</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="discovererCustomerId">
+							<xs:annotation>
+								<xs:documentation>מספר לקוח מגלה הליקוי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="9"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="inputType">
+							<xs:annotation>
+								<xs:documentation>אופן הזנה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="inspectionType">
+							<xs:annotation>
+								<xs:documentation>סוג ביקורת</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="proceduralFaultCode">
+							<xs:annotation>
+								<xs:documentation>קוד ליקוי מנהלי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="proceduralFaultInputProcess">
+							<xs:annotation>
+								<xs:documentation>תהליך הזנת ליקוי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="proceduralFaultNumber">
+							<xs:annotation>
+								<xs:documentation>מספר מופע הליקוי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="9"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="proceduralFaultStatus">
+							<xs:annotation>
+								<xs:documentation>סטאטוס ליקוי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="ransomViolationSum" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>ערך הטובין בגין ההפרה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Amount">
+									<xs:maxInclusive value="9999999999999999.99"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="ransomViolationType" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>סוג הפרה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="remarks" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הערה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="512"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="responsibleType">
+							<xs:annotation>
+								<xs:documentation>אחראי ליקוי </xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="1"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="updateDate" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מועד עדכון הליקוי
+באם הליקוי הוא חדש ונוצר לראשונה אזי שדה זה יהיה ריק.
+</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="updateUser" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>עובד מעדכן הליקוי
+באם הליקוי הוא חדש ונוצר לראשונה אזי שדה זה יהיה ריק.
+</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="9"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="createUserId">
+							<xs:annotation>
+								<xs:documentation>מספר עובד מכס מזין הליקוי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="9"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="declarationId">
+							<xs:annotation>
+								<xs:documentation>מספר הצהרה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="35"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="leadingDocumentVersion">
+							<xs:annotation>
+								<xs:documentation>מספר גרסה הצהרה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="9"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ProceduralFaultDetails" maxOccurs="99">
+				<xs:annotation>
+					<xs:documentation>פרטי הליקוי</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Pointer" type="Pointer" maxOccurs="99">
+							<xs:annotation>
+								<xs:documentation>מזהה חלק ההצהרה בגינו נרשם הליקוי </xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="FaultUpdateWorker" type="Worker" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>עובד המכס מזין/מעדכן הליקוי</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="FaultDiscovererWorker" type="Worker" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>עובד המכס מגלה הליקוי</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="dunsNumber">
+		<xs:annotation>
+			<xs:documentation>מספר Dun and Bradstreet</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="Identifier">
+			<xs:totalDigits value="9"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="EnglishAddress">
+		<xs:annotation>
+			<xs:documentation>כתובת באנגלית</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="englishCountry" type="Country" nillable="true">
+				<xs:annotation>
+					<xs:documentation>מדינה (כתובת באנגלית)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="englishSubCountry" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>חלוקת משנה של מדינה (כתובת באנגלית)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="englishSubCountry">
+						<xs:maxLength value="6"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="englishCityName" nillable="true">
+				<xs:annotation>
+					<xs:documentation>יישוב (כתובת באנגלית)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="englishMainAddressLine" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>רחוב ובית או תא דואר (כתובת באנגלית)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="70"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="englishPostalCode" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מיקוד (כתובת באנגלית)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="englishSubCountry">
+		<xs:annotation>
+			<xs:documentation>תת חלוקה של מדינה</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token">
+			<xs:pattern value="([A-Z]{2}-[A-Z0-9]{1,3})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EnglishText">
+		<xs:annotation>
+			<xs:documentation>טקסט באנגלית בלבד</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="Text">
+			<xs:pattern value="[a-zA-Z, ,]{1,55}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="Exception">
+		<xs:sequence>
+			<xs:element name="ExceptionLevel" type="Code"/>
+			<xs:element name="ExeptionType" type="Code"/>
+			<xs:element name="ExceptionParms" type="Text" nillable="true" minOccurs="0" maxOccurs="99"/>
+			<xs:element name="ExeptionDescription" type="Text"/>
+			<xs:element name="EnglishDescription" type="Text" nillable="false" minOccurs="0"/>
+			<xs:element name="BindingXpathField" type="Text" nillable="true" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="FileContent">
+		<xs:annotation>
+			<xs:documentation>תוכן המסמך</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:base64Binary"/>
+	</xs:simpleType>
+	<xs:simpleType name="FractionQuantity">
+		<xs:restriction base="Amount">
+			<xs:maxExclusive value="999999999999.99999"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="FRMbankDetails">
+		<xs:annotation>
+			<xs:documentation>פרטי חשבון בנק להחזר</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="accountCountry" type="Code">
+				<xs:annotation>
+					<xs:documentation>המדינה בה מנוהל חשבון הבנק</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bank" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>בנק</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="branch" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר סניף</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="accountNumber">
+				<xs:annotation>
+					<xs:documentation>מספר חשבון</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="11"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Abroad_BankAccount" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>קוד בנק </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Abroad_AccountBranch" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>קוד סניף  בנק </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="paymentMethodTypeCode">
+				<xs:annotation>
+					<xs:documentation>סוג אמצעי תשלום להחזר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FRMCommunicationDevice">
+		<xs:annotation>
+			<xs:documentation>אמצעי תקשורת לכתובת בטפסים</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Telephone" type="InternationalTelephone">
+				<xs:annotation>
+					<xs:documentation>מספר טלפון</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MobileTelephone" type="InternationalTelephone">
+				<xs:annotation>
+					<xs:documentation>מספר טלפון נייד</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Fax" type="InternationalTelephone" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר פקס</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="email" nillable="true" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="50"/>
+						<xs:pattern value="[A-Za-z0-9_]+([-+.'][A-Za-z0-9_]+)*@[A-Za-z0-9_]+([-.][A-Za-z0-9_]+)*\.[A-Za-z0-9_]+([-.][A-Za-z0-9_]+)*"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FRMCustomerDetails">
+		<xs:annotation>
+			<xs:documentation>פרטי כתובת כלליים</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="tehilaClientType">
+				<xs:annotation>
+					<xs:documentation>הערכים: לפי טבלה 1 - TehilaClientType סוג ישות לטופס תהילה.  בתיבת הבחירה מוצגים ערכים בעברית או באנגלית לפי השפה שנבחרה.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CustomerIdentification" type="CustomerIdentification" nillable="true">
+				<xs:annotation>
+					<xs:documentation>זיהוי לקוח ישראלי / תושב חו"ל</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="GeneralDetails" type="GeneralDetails" nillable="true">
+				<xs:annotation>
+					<xs:documentation>פרטי לקוח כלליים
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="gender">
+				<xs:annotation>
+					<xs:documentation> מין שדה זה יוצג רק אם נבחר בשדה TehilaClientType עם ערך שונה מ-1=תאגיד, ואז שדה חובה.
+לפי טבלה 5 שבמסמך חלק משותף ללקוח בטפסי תהילה גירסה 2.3</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FRMCustomerDetailsAddressLocalLegal">
+		<xs:annotation>
+			<xs:documentation>פרטי לקוח וכתובות </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="CustomerDetails" type="FRMCustomerDetails"/>
+			<xs:element name="MailAddress" type="FRMMailAddress">
+				<xs:annotation>
+					<xs:documentation>כתובת להתכתבות</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsSameLegalAddress" type="Indicator">
+				<xs:annotation>
+					<xs:documentation>כתובת חזקה משפטית זהה לכתובת הקודמת</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="LegalAddress" type="FRMMailAddress" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>כתובת חזקה משפטית</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AuthorizedSignerList" type="FRMLocalAddress" minOccurs="0" maxOccurs="3">
+				<xs:annotation>
+					<xs:documentation>איש קשר לפעילות הישבון</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FRMCustomerDetailsAndAddress">
+		<xs:annotation>
+			<xs:documentation>פרטי לקוח וכתבת לקוח בטפסי תהילה</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="FRMCustomerDetails" type="FRMCustomerDetails">
+				<xs:annotation>
+					<xs:documentation>נתוני הלקוח</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FRMMailAddress" type="FRMMailAddress">
+				<xs:annotation>
+					<xs:documentation>נתוני כתובת הלקוח</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FRMGeneral">
+		<xs:annotation>
+			<xs:documentation>שפת הטופס</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="applicationLanguage" default="1">
+				<xs:annotation>
+					<xs:documentation>אנא בחר את שפת הטופס </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FRMLegalPresumptionAddress">
+		<xs:annotation>
+			<xs:documentation>פרטי כתובת חזקה משפטית בטפסים</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="isSameLegalAddress" type="Indicator" default="1">
+				<xs:annotation>
+					<xs:documentation>כתובת חזקה משפטית זהה לכתובת הקודמת</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="AddressDetails" type="FRMMailAddress" nillable="true">
+				<xs:annotation>
+					<xs:documentation>מיקום הכתובת בישראל/ ברש"פ/כתובת בינלאומית</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FRMLocalAddress">
+		<xs:sequence>
+			<xs:element name="AddressGeneralDetails" type="AddressGeneralDetails"/>
+			<xs:element name="FRMCommunicationDevice" type="FRMCommunicationDevice"/>
+			<xs:element name="LocalAddress" type="LocalAddress"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FRMMailAddress">
+		<xs:annotation>
+			<xs:documentation>כתובת להתכתבות בטופס</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="addressLocation">
+				<xs:annotation>
+					<xs:documentation>מיקום הכתובת בישראל/ ברש"פ/כתובת בינלאומית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="LocalAddress" type="LocalAddress" nillable="true">
+				<xs:annotation>
+					<xs:documentation>פרטי כתובת בעברית</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EnglishAddress" type="EnglishAddress" nillable="true">
+				<xs:annotation>
+					<xs:documentation>פרטי כתובת באנגלית</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FRMCommunicationDevice" type="FRMCommunicationDevice" nillable="true">
+				<xs:annotation>
+					<xs:documentation>אמצעי תקשורת   </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GeneralDetails">
+		<xs:annotation>
+			<xs:documentation>פרטי לקוח כלליים</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="localFirstName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם פרטי בעברית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="15"/>
+						<xs:pattern value="[\p{IsHebrew},\W]{0,15}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="localLastName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם משפחה בעברית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="19"/>
+						<xs:pattern value="[\p{IsHebrew},\W]{0,19}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="localCorporationName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם תאגיד בעברית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="55"/>
+						<xs:pattern value="[&#x0020;-&#x007E;&#x00C0;-&#x00FF;&#x0100;-&#x017F;&#x0180;-&#x021F;\p{IsHebrew}]{0,55}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="englishFirstName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם פרטי + אמצעי בלועזית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="41"/>
+						<xs:pattern value="[&#x0020;-&#x002F;&#x003A;-&#x007E;&#x00C0;-&#x00FF;&#x0100;-&#x017F;&#x0180;-&#x021F;]{0,41}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="englishLastName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם משפחה בלועזית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="30"/>
+						<xs:pattern value="[&#x0020;-&#x002F;&#x003A;-&#x007E;&#x00C0;-&#x00FF;&#x0100;-&#x017F;&#x0180;-&#x021F;]{0,30}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="englishCorporationName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם תאגיד באנגלית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="55"/>
+						<xs:pattern value="[&#x0020;-&#x007E;&#x00C0;-&#x00FF;&#x0100;-&#x017F;&#x0180;-&#x021F;]{0,55}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="birthDate" type="Date" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>תאריך לידה</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dunsNumber" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר Dun and Bradstreet</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="dunsNumber">
+						<xs:pattern value="[0-9]{1,9}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="Guid">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+        The representation of a GUID, generally the id of an element.
+      </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="36"/>
+			<xs:pattern value="[a-zA-Z0-9-]{1,36}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="HeaderAddress">
+		<xs:annotation>
+			<xs:documentation>פרטי כותרת כתובת</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="addressType">
+				<xs:annotation>
+					<xs:documentation>סוג כתובת</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="addressPurpose" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מטרת כתובת</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="isPalestinianCity" type="Indicator">
+				<xs:annotation>
+					<xs:documentation>האם כתובת ברש"פ</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="isHebrewAddress" type="Indicator">
+				<xs:annotation>
+					<xs:documentation>האם כתובת בעברית</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="HebrewText">
+		<xs:annotation>
+			<xs:documentation>טקסט בעברית בלבד</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="Text">
+			<xs:pattern value="[, ,'\p{IsHebrew}]{1,55}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Identifier">
+		<xs:annotation>
+			<xs:documentation>מזהה</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int"/>
+	</xs:simpleType>
+	<xs:simpleType name="Indicator">
+		<xs:annotation>
+			<xs:documentation>מזהה כן לא</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:boolean"/>
+	</xs:simpleType>
+	<xs:simpleType name="InternationalTelephone">
+		<xs:annotation>
+			<xs:documentation>מספר טלפון בינלאומי</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="Text">
+			<xs:maxLength value="20"/>
+			<xs:minLength value="1"/>
+			<xs:pattern value="([0-9]{1,3}-[0-9]{3,15})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LargeNumeric">
+		<xs:annotation>
+			<xs:documentation>int גדול</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:pattern value="([0-9])*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="LocalAddress">
+		<xs:annotation>
+			<xs:documentation>כתובת בעברית</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="localCity" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>יישוב בישראל / ברש"פ</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="localSecondLine" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שורה שנייה בכתובת בעברית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="25"/>
+						<xs:pattern value="[\p{IsHebrew},\W,0-9]{0,25}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="localStreetName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>רחוב</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="20"/>
+						<xs:pattern value="[\p{IsHebrew},\W,0-9]{0,25}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="localHouseNumber" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר בית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="localHouseLetter" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>אות בית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="1"/>
+						<xs:pattern value="[\p{IsHebrew},\p{Zs}]{0,1}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="localEntrance" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>כניסה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="localApartment" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>דירה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="localPOBox" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>תא דואר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="localPostalCode" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מיקוד</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="7"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="Long">
+		<xs:annotation>
+			<xs:documentation>int64</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:long"/>
+	</xs:simpleType>
+	<xs:simpleType name="LongText">
+		<xs:restriction base="xs:token">
+			<xs:maxLength value="80000"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Measure">
+		<xs:annotation>
+			<xs:documentation>ערך מספרי יחד עם יחידת מידה</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:maxInclusive value="99999999999999.999"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="MerkavaFinancial">
+		<xs:sequence>
+			<xs:element name="MerkavaTransactionsBakara">
+				<xs:annotation>
+					<xs:documentation>שליחת קובץ דיווח תנועות תשלומים למרכבה - רשומת בקרה</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="sugReshuma">
+							<xs:annotation>
+								<xs:documentation>סוג רשומה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="companyCode">
+							<xs:annotation>
+								<xs:documentation>קוד חברה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="shnatKsafim">
+							<xs:annotation>
+								<xs:documentation>שנת כספים</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="tkufatDivuach">
+							<xs:annotation>
+								<xs:documentation>תקופת דיווח</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="taarichMismach" type="DateTime">
+							<xs:annotation>
+								<xs:documentation>תאריך מסמך</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="taarichRishum" type="DateTime">
+							<xs:annotation>
+								<xs:documentation>תאריך רישום</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="misparMimshak">
+							<xs:annotation>
+								<xs:documentation>מספר ממשק</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="16"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="misparReshumotSug1">
+							<xs:annotation>
+								<xs:documentation>כמות רשומות כותרת בקובץ</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="7"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="misparReshumotSug2">
+							<xs:annotation>
+								<xs:documentation>כמות רשומות תנועה בקובץ </xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="7"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="totalDebitInFile">
+							<xs:annotation>
+								<xs:documentation>סה"כ חובה בקובץ</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Amount">
+									<xs:maxExclusive value="999999999999999.99"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="totalCreditInFile">
+							<xs:annotation>
+								<xs:documentation>סה"כ זכות בקובץ</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Amount">
+									<xs:maxExclusive value="99999999999999.99"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MerkavaTransactionsKoteret" maxOccurs="999999">
+				<xs:annotation>
+					<xs:documentation>נתוני כותרת לפקודת יומן.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="sugReshuma" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>סוג רשומה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="zihuyMaarechetSholachat" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>זיהוי מערכת שולחת</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="25"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="misparPkuda" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מספר פקודה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="20"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="asmachtatKoteret" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>אסמכתת כותרת</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="16"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="companyCode">
+							<xs:annotation>
+								<xs:documentation>קוד חברה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="shnatKsafim">
+							<xs:annotation>
+								<xs:documentation>שנת כספים </xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="taarichMismach" type="DateTime">
+							<xs:annotation>
+								<xs:documentation>תאריך מסמך</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="taarichRishum">
+							<xs:annotation>
+								<xs:documentation>תאריך רישום</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="8"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="taarichKabalatMismach" type="DateTime">
+							<xs:annotation>
+								<xs:documentation>תאריך קבלת מסמך</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="tkufaCheshbonait">
+							<xs:annotation>
+								<xs:documentation>תקופה חשבונאית</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="6"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="kamutShurotBaMismach">
+							<xs:annotation>
+								<xs:documentation>כמות שורות במסמך</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="totalDebitInDocument">
+							<xs:annotation>
+								<xs:documentation>סה"כ חובה במסמך</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Amount">
+									<xs:maxExclusive value="99999999999999.99"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="totalCreditInDocument">
+							<xs:annotation>
+								<xs:documentation>סה"כ זכות במסמך</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Amount">
+									<xs:maxExclusive value="999999999999999.99"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="textKoteret">
+							<xs:annotation>
+								<xs:documentation>טקסט כותרת</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="25"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="mafteachSimuchin2forKoteret">
+							<xs:annotation>
+								<xs:documentation>מפתח סימוכין 2 כותרת </xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="20"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MerkavaTransactionsTnua" maxOccurs="999999">
+				<xs:annotation>
+					<xs:documentation>רשומת תנועה בפקודת יומן</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="sugReshuma">
+							<xs:annotation>
+								<xs:documentation>סוג רשומה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="misparPkuda">
+							<xs:annotation>
+								<xs:documentation>מספר פקודה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="20"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="misparchayav" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מספר חייב</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="10"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="misparzakay" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מספר זכאי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="10"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="misparCheshbonSeferRashi">
+							<xs:annotation>
+								<xs:documentation>מספר חשבון ספר ראשי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="10"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="tchumIski" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תחום עסקי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="taarichBasisLetnayTashlum" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך בסיס לתנאי תשלום</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="8"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="registrationKey" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מפתח רישום</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="matbea">
+							<xs:annotation>
+								<xs:documentation>מטבע</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="5"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="schum">
+							<xs:annotation>
+								<xs:documentation>סכום</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Amount">
+									<xs:maxExclusive value="999999999999.99"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="shitatTashlum">
+							<xs:annotation>
+								<xs:documentation>שיטת תשלום</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="1"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="kodHaktzaatBank" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>קוד הקצאת בנק</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="tnaeyTashluM" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תנאי תשלום</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="bankBait" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>בנק בית</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="5"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="kodMAAM" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>קוד מעמ</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="misparAsmachta" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>misparAsmachta</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="18"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="textShura" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>טקסט שורה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="50"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="merkazAlut" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מרכז עלות</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="10"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="hazmanaPnimit" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הזמנה פנימית</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="12"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="objectwbs" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>אובייקט wbs</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="24"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="paritHitchayvut" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>פריט התחייבות</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="8"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="merkazKranot" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מרכז קרנות</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="16"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="kerenMeyuedet" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>קרן מיוחדת</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="10"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="misparShuraBakeren" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מספר שורה בקרן</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="dunningKey" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מפתח גביה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="1"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="chasimatTizkoret" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>חסימת תזכורת</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="1"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="reasonCode" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>קוד סיבה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="filler" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>פילר</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="221"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="mafteachSimuchin2" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מפתח סימוכין 2</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="12"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="mafteachSimuchin3" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מפתח סימוכין 3</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="20"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="kamut" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>כמות</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Quantity">
+									<xs:totalDigits value="17"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="yechidatMidaBsisit" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>יחידת מידה בסיסית</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MerkavaHeader">
+		<xs:annotation>
+			<xs:documentation>מרכבה</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="MerkavaHeader1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="interfaceStatus">
+							<xs:annotation>
+								<xs:documentation>סטאטוס ממשק</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="updateDate" type="DateTime">
+							<xs:annotation>
+								<xs:documentation>תאריך עדכון</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="updateTime" type="DateTime">
+							<xs:annotation>
+								<xs:documentation>זמן עדכון</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="sAPSYS">
+							<xs:annotation>
+								<xs:documentation>קוד מערכת יעד</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="sAPClient">
+							<xs:annotation>
+								<xs:documentation>מספר קליינט יעד </xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="sAPModule">
+							<xs:annotation>
+								<xs:documentation>קוד מודול</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="sAPModuleNumber">
+							<xs:annotation>
+								<xs:documentation>מספר ממשק במודול</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="budgetYear">
+							<xs:annotation>
+								<xs:documentation>שנה קלנדרית</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="intrNumber">
+							<xs:annotation>
+								<xs:documentation>מספר ממשק</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="7"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="sYSName">
+							<xs:annotation>
+								<xs:documentation>קוד זיהוי מערכת המקור</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="computerName">
+							<xs:annotation>
+								<xs:documentation>שם מחשב מערכת המקור</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="20"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="userName" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>שם משתמש במחשב המקור</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="15"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="feedbackReturned" type="Indicator">
+							<xs:annotation>
+								<xs:documentation>מצריך היזון חוזר</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="filler" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>filler</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MerkavaHeader2">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="intrFileName">
+							<xs:annotation>
+								<xs:documentation>שם קובץ הנתונים </xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="40"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="createDate" type="DateTime">
+							<xs:annotation>
+								<xs:documentation>תאריך יצירת הממשק</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="createTime" type="DateTime">
+							<xs:annotation>
+								<xs:documentation>זמן יצירת הממשק</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="sAPClient">
+							<xs:annotation>
+								<xs:documentation>מספר קליינט</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="codeChevra">
+							<xs:annotation>
+								<xs:documentation>קוד חברה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="filler" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>פילר ריק</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="19"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MerkavaHeader3">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="parameter1" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>פרמטר טעינה 1</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="40"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="parameter2" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>פרמטר טעינה 2</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="40"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MerkavaHeader4">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="parameter3" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>פרמטר 3</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="40"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="filler" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>פילר</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="40"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="MerkavaHeader5">
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="80"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MerkavaOwersInfo">
+		<xs:annotation>
+			<xs:documentation>נתוני לקוחות וחשבונות בנק עבור הקצאת מספר מרכבה</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="misparReshuma">
+				<xs:annotation>
+					<xs:documentation>מספר רץ</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="sugReshuma">
+				<xs:annotation>
+					<xs:documentation>סוג רשומה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="merkavaInternalCustomerID" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר במרכבה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="shem" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="misparMezahe" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ת.ז./ ח.פ</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="shemRechov" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>רחוב</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="shemIr" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם עיר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Mikud5" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מיקוד</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="taDoar" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>תא דואר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Mikud5TaDoar" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מיקוד תא דואר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="irNosefetTaDoar" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>עיר נוספת</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="misparTelephone" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר טלפון</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="16"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="misparFax" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר פקס</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="doraElectroniMail" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>דואר אלקטרוני</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="tnaeyTakbul">
+				<xs:annotation>
+					<xs:documentation>תנאי תקבול</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="chasimatTashlum" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>חסימת תשלום</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="shitatTakbul">
+				<xs:annotation>
+					<xs:documentation>שיטת תקבול</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="kodHaktzaatBank" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>קוד הקצאת הבנק</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="mafteachBank" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מפתח בנק</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="15"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="misparCheshbonBank" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר חשבון בנק</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="samenIshurGviya" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סמן אישור גביה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="misparBait" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר בית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="7"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Mikud" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מיקוד</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="MikudTaDoar" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מיקוד תא דואר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="kodHakluka" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>קוד חלוקה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="15"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="NumbersEnglishTextAndPunctuation">
+		<xs:annotation>
+			<xs:documentation>טקסט באנגלית, ספרות וסימני פיסוק בלבד</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="Text">
+			<xs:maxLength value="8000"/>
+			<xs:pattern value="[A-Z,a-z,0-9,'?','~','`','!','*',','-','+','.', ,'=','_','|',\p{IsLatinExtended-A},\p{IsLatin-1Supplement}]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Numeric">
+		<xs:restriction base="xs:int"/>
+	</xs:simpleType>
+	<xs:complexType name="PackingDetails">
+		<xs:annotation>
+			<xs:documentation>פרטי אריזה</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="packageType" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סוג אריזה </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="ANCode">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="packageId" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>זיהוי יחידת אריזה </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="32"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="quantity" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>כמות</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Quantity">
+						<xs:totalDigits value="16"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="weight" type="Measure" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>משקל</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PaymentDetail">
+		<xs:sequence>
+			<xs:element name="TransactonType" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סוג פעולה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="RikuzDate" type="DateTime" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>תאריך ריכוז</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RikuzNumber" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר ריכוז</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="8"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="sugAsraiBank">
+				<xs:annotation>
+					<xs:documentation>אמצעי תשלום</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="ANCode">
+						<xs:maxLength value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="hevratSlika">
+				<xs:annotation>
+					<xs:documentation>חברת סליקה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="ANCode">
+						<xs:maxLength value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="misparTashlumim">
+				<xs:annotation>
+					<xs:documentation>מספר תשלומים </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="misparShovar">
+				<xs:annotation>
+					<xs:documentation>מספר שובר </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="8"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="misparIshur">
+				<xs:annotation>
+					<xs:documentation>מספר אישור של אשראית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="64"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="schumTashlum">
+				<xs:annotation>
+					<xs:documentation>סכום התשלום</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Amount">
+						<xs:maxExclusive value="99999999999.99"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="asmachta" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>אסמכתא</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="misparHazmana">
+				<xs:annotation>
+					<xs:documentation>מספר הזמנה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="13"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="shemMeshalem" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם משלם</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="sugTashlum" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סוג הוראת תשלום</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="tarichTashlum" type="Date">
+				<xs:annotation>
+					<xs:documentation>תאריך ביצוע התשלום</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CreditCardDigits" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>זיהוי כרטיס האשראי</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PaymentDetails" type="PaymentDetails"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PaymentDetails">
+		<xs:annotation>
+			<xs:documentation>פרטי הוראת תשלום</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="CustomerActivityType" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סוג מוטב</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="paymentID">
+				<xs:annotation>
+					<xs:documentation>זיהוי הוראת תשלום</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="externalID">
+				<xs:annotation>
+					<xs:documentation>מספר לקוח</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PersonalSignCertificate">
+		<xs:annotation>
+			<xs:documentation>חתימה אישית בטופס</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Subject">
+				<xs:annotation>
+					<xs:documentation>מה שצרוב בכרטיס </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OrganzationUnitID">
+				<xs:annotation>
+					<xs:documentation>הח.פ של החברה של בעל הכרטיס  </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SenderID">
+				<xs:annotation>
+					<xs:documentation> תעודת הזהות של בעל הכרטיס </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Pointer">
+		<xs:annotation>
+			<xs:documentation>חטיבת הצבעה לשדות במסרי WCO</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="documentSectionCode" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>קוד חטיבת נתונים</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="ANCode">
+						<xs:maxLength value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="sequenceNumeric" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר סידורי</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="tagID" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה השדה במסר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="ANCode">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="naturalKey" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מפתח טבעי</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="Quantity">
+		<xs:restriction base="xs:integer"/>
+	</xs:simpleType>
+	<xs:complexType name="RelatedEntity">
+		<xs:annotation>
+			<xs:documentation>ישות מקושרת </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="entityId">
+				<xs:annotation>
+					<xs:documentation>מזהה חיצוני של הישות המקושרת</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="entityType" type="Code">
+				<xs:annotation>
+					<xs:documentation>סוג ישות מקושרת</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="invoiceNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר סידורי  חשבון</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="26"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="goodsItemId" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר סידורי  סחורה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="27"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="entityPath" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה מחרוזתי של שדה בהצהרה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="entityIdKey2" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה חיצוני של הישות המקושרת מפתח 2</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="entityIdKey3" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה חיצוני של הישות המקושרת מפתח 3</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="entityIdExternalReferenceID" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה הישות במערכת הסוכן 	</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RequestContentHeader">
+		<xs:sequence>
+			<xs:element name="TransmitionDateTime" type="DateTime"/>
+			<xs:element name="SenderID" type="Numeric"/>
+			<xs:element name="RecieverID" type="Numeric" minOccurs="0" maxOccurs="9"/>
+			<xs:element name="Convertor" type="Text" nillable="true" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RequestConfirmation">
+		<xs:annotation>
+			<xs:documentation>אישור קליטת בקשה</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ConditionalExemptionRequestID" type="Identifier">
+				<xs:annotation>
+					<xs:documentation>מספר הבקשה הינה:</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ConditionalExemptionUnit" type="Identifier">
+				<xs:annotation>
+					<xs:documentation>תחנת המכס המטפלת:</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RequiredDocumentDetails">
+		<xs:annotation>
+			<xs:documentation>מסמך נדרש</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="documentID">
+				<xs:annotation>
+					<xs:documentation>מספר מזהה מסמך</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="requiredDocumentMessageType">
+				<xs:annotation>
+					<xs:documentation>סוג מסר
+חדש/מחיקה
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="typeID">
+				<xs:annotation>
+					<xs:documentation>סוג מסמך
+טופס הצהרה וכדו'
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="16"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="remarks" nillable="true" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="512"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ResponseContentHeader">
+		<xs:sequence>
+			<xs:element name="TransmitionDateTime" type="DateTime"/>
+			<xs:element name="ApplicationID" type="Numeric"/>
+			<xs:element name="Exception" type="Exception" minOccurs="0" maxOccurs="99"/>
+			<xs:element name="Remark" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>הערה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="1000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SignDeclaration">
+		<xs:annotation>
+			<xs:documentation>הצהרה על חטיבה אישית הטקסט בטופס של נוסח ההצהרה הוא דינאמי עבור כל סוג הצהרה</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="startDate" type="Date" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>החל מיום</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="declarerName">
+				<xs:annotation>
+					<xs:documentation>שם המצהיר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:minLength value="3"/>
+						<xs:maxLength value="40"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="declarerRole">
+				<xs:annotation>
+					<xs:documentation>תפקיד המצהיר</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:minLength value="3"/>
+						<xs:maxLength value="40"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="declarationDate" type="Date">
+				<xs:annotation>
+					<xs:documentation>תאריך ההצהרה</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PersonalSignCertificate" type="PersonalSignCertificate">
+				<xs:annotation>
+					<xs:documentation>מגיע מתוך הכרטיס החכם</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PysicallSignedFile" type="Attachment" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>צרופה של החתימה </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TaxParagraph">
+		<xs:annotation>
+			<xs:documentation>פרטי סעיפי המס </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="paragraphType">
+				<xs:annotation>
+					<xs:documentation>סוג סעיף מס</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="amount">
+				<xs:annotation>
+					<xs:documentation>סכום סעיף מס</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Amount">
+						<xs:maxInclusive value="9999999999999999.99"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="Text">
+		<xs:restriction base="xs:token">
+			<xs:maxLength value="8000"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="TPGIdentifier">
+		<xs:annotation>
+			<xs:documentation>מזהה תיק תפ"ג</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="fileNumber">
+				<xs:annotation>
+					<xs:documentation>מספר תיק תפ"ג</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="numeral">
+				<xs:annotation>
+					<xs:documentation>מספר רץ</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="FillingNumber" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר תיק לתיוק לתיק תפ"ג פיזי
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="13"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TransportVehicleDetails">
+		<xs:annotation>
+			<xs:documentation>פרטי רכב של משרד התחבורה</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="declarationNo" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר הצהרת יבוא</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="richbitFileNumber" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר תיק רכבית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="greenIndex" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>קבוצת  זיהום אוויר </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Amount">
+						<xs:maxExclusive value="999999999.999"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="dateOnRoad" type="DateMonthYear" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>תאריך עליה על הכביש (בחול</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="israelEnterDate" type="Date" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>תאריך כניסה לארץ/ נמל</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="engineCapacityType" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>נפח מנוע</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="fuelTypeCode" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סוג דלק</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="medalNumber" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר זכות ציבורית</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="modelDescription">
+				<xs:annotation>
+					<xs:documentation>תאור דגם</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="standardizationTypeCode" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>קוד מקוריות
+חדש,משומש,יבוא מסחרי, מדינת ישראל, רכב אספנות
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="vehicleChassisNumber" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר שילדה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="vehicleManufactureDate" type="DateMonthYear" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>תאריך יצור רכב</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="vehicleManufacturerCode" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>יצרן רכב
+טבלה 1632
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="modelCode" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>קוד דגם רכב</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="vehicleWeight" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>משקל רכב כולל</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="vehicleTypeCode" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סוג רכב ראשי</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="VehicleOwner">
+		<xs:annotation>
+			<xs:documentation>פרטים של בעל רכב נוסף
+</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="identityNumber">
+				<xs:annotation>
+					<xs:documentation>מספר תעודת זהות</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="firstName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם פרטי של בעל נוסף</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="8"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="lastName" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם משפחה של בעל רכב נוסף</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="14"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="partyType">
+				<xs:annotation>
+					<xs:documentation> סוג שותף </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="VehicleRestrictionType">
+		<xs:annotation>
+			<xs:documentation>סוג הגבלה על רכב ע"פ טבלת סוגי ההגבלות</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="Code">
+			<xs:totalDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="VP_MSG100_VehicleIn">
+		<xs:annotation>
+			<xs:documentation>פרטי רכב ברכישה מקומית</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="VehicleDetails" minOccurs="0" maxOccurs="1000">
+				<xs:annotation>
+					<xs:documentation>פרטים כלליים על הרכב</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="richbitFileNumber" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מספר תיק רכב ("רכבית")</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Long">
+									<xs:totalDigits value="10"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="richbitOpenDate" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך פתיחת תיק רכב ("ריכבית")</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="vehicleChassisNumber">
+							<xs:annotation>
+								<xs:documentation>מספר שילדה</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="20"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="vehiclePoolType">
+							<xs:annotation>
+								<xs:documentation>סוג מאגר רכב</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="vehiclePriceListType" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>סוג מחירון רכב</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="vehicleManufacturerId">
+							<xs:annotation>
+								<xs:documentation>תוצר רכב</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="5"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="modelCode" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>קוד דגם רכב</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="5"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="isABS" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>ABS</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="airBags" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>כמות כריות אוויר</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="converterType" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>סוג ממיר</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="isArmoredVehicle" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>רכב ממוגן</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="isLoweringVehicleForInvalid" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>רכב מונמך לנכה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="greenIndex" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>ציון מדד ירוק</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Amount">
+									<xs:maxInclusive value="999999.999"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="greenIndexGroup" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>קבוצת זיהום</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="isStabilityControl" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>אינדיקציה בקרת יציבות</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="israelEnterDate" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך כניסה לארץ/ נמל</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="engineCapacity">
+							<xs:annotation>
+								<xs:documentation>נפח מנוע</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="5"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="vehiclePowerKW" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הספק מנוע ב-KW</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="5"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="isHybrid" type="Indicator">
+							<xs:annotation>
+								<xs:documentation>אינדיקציה לרכב היברידי</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="fuelTypeCode">
+							<xs:annotation>
+								<xs:documentation>סוג דלק</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="vehicleWindowNumber" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מספר חלון</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="20"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="manufactureCountry">
+							<xs:annotation>
+								<xs:documentation>מדינת יצור</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="medalNumber" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מס' רישיון הסעה </xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="9"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="commercialNickname" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>כינוי מסחרי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="15"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="modelDescription" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאור דגם</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="18"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="numberOfSeats" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מספר מושבים כולל הנהג</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="totalVehicleWeight">
+							<xs:annotation>
+								<xs:documentation>משקל רכב כולל</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="5"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="selfVehicleWeight" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>משקל רכב עצמי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="5"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="numberOfWheels">
+							<xs:annotation>
+								<xs:documentation>מספר גלגלים</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Numeric">
+									<xs:totalDigits value="2"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="vehicleManufactureDate" type="Date">
+							<xs:annotation>
+								<xs:documentation>תאריך יצור רכב</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="vehicleNumber" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מספר רישוי</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="15"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="licenseCountry" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מדינת רישום</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="vehicleLicenseValidityDate" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תוקף רישיון רכב</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="vehicleNumberDate" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך רישוי</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="vehicleTypeId">
+							<xs:annotation>
+								<xs:documentation>סוג רכב</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Code">
+									<xs:totalDigits value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="transmissionDateWithoutTax" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך שידור ללא מיסים</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="importerIdentity">
+							<xs:annotation>
+								<xs:documentation>מספר זהות של יבואן</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Identifier">
+									<xs:totalDigits value="9"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="importerName">
+							<xs:annotation>
+								<xs:documentation>שם היבואן</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="Text">
+									<xs:maxLength value="55"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="dateOnRoadAbroad" type="DateTime" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך עליה לכביש של הרכב בחו"ל</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="VehicleOwner" minOccurs="0" maxOccurs="20">
+							<xs:annotation>
+								<xs:documentation>פרטי בעלי הרכב </xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="externalID">
+										<xs:annotation>
+											<xs:documentation>זיהוי בעל הרכב – מספר ישות</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="Identifier">
+												<xs:totalDigits value="9"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="lastNameOrCorporationName">
+										<xs:annotation>
+											<xs:documentation>שם משפחה של בעל הרכב או שם תאגיד</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="Text">
+												<xs:maxLength value="22"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="firstName" nillable="true" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>שם פרטי של בעל הרכב</xs:documentation>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="Text">
+												<xs:maxLength value="15"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="isMain" type="Indicator">
+										<xs:annotation>
+											<xs:documentation>האם הבעלים הראשון</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="VehicleToDelete" minOccurs="0" maxOccurs="1000">
+				<xs:annotation>
+					<xs:documentation>כלי רכב לביטול</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Long">
+						<xs:totalDigits value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Worker">
+		<xs:annotation>
+			<xs:documentation>זיהוי עובד מכס</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="organizationUnitType">
+				<xs:annotation>
+					<xs:documentation>קוד יחידה מקצועית </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="customsHouse">
+				<xs:annotation>
+					<xs:documentation>קוד בית מכס</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="workerName">
+				<xs:annotation>
+					<xs:documentation>שרשור של שמו הפרטי + שם משפחתו של העובד</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProtestDetails">
+		<xs:annotation>
+			<xs:documentation>נתוני תשלום אגב מחאה</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="paymentProtestType" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סיבת המחאה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="customsAgentExplanation" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>נימוק</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="InvoiceNumber" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר חשבון בהצהרה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="goodsItemLineNumber" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר שורת פרט מכס </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="goodsItemClassification" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סיווג</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="13"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="amountInDispute" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סכום במחלוקת</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Amount">
+						<xs:maxExclusive value="9999999999999999.99"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MetaData">
+		<xs:annotation>
+			<xs:documentation>מטא דאטה </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="metaDataRemark" type="Text">
+				<xs:annotation>
+					<xs:documentation>נתונים מתוך הקובץ המצורף המסייעים באיתורה של הצרופה במאגר הצרופות</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="specialFieldDefinitionID" type="Code" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>שם שדה</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SpecialFieldValue" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ערך</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProceduralFaultDetails">
+		<xs:annotation>
+			<xs:documentation>EV_NG_8218_MSG14100_ProceduralFaultMsg</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="createDate" type="Date">
+				<xs:annotation>
+					<xs:documentation>מועד יצירת הליקוי</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="discovererCustomerId">
+				<xs:annotation>
+					<xs:documentation>מספר לקוח מגלה הליקוי</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="inputType">
+				<xs:annotation>
+					<xs:documentation>אופן הזנה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="inspectionType">
+				<xs:annotation>
+					<xs:documentation>סוג ביקורת</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="proceduralFaultCode">
+				<xs:annotation>
+					<xs:documentation>קוד ליקוי מנהלי</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="proceduralFaultInputProcess">
+				<xs:annotation>
+					<xs:documentation>תהליך הזנת ליקוי</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="proceduralFaultNumber">
+				<xs:annotation>
+					<xs:documentation>מספר מופע הליקוי</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Numeric">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="proceduralFaultStatus">
+				<xs:annotation>
+					<xs:documentation>סטאטוס ליקוי</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ransomViolationSum" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ערך הטובין בגין ההפרה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Amount">
+						<xs:maxInclusive value="9999999999999999.99"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ransomViolationType" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>סוג הפרה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="remarks" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>הערה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="512"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="isCustomerResponsibility" type="Indicator">
+				<xs:annotation>
+					<xs:documentation>חיווי האם הליקוי באחריות הסוכן</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="isCustomerProceduralFaultCountable" type="Indicator">
+				<xs:annotation>
+					<xs:documentation>חיווי האם ניקוד הליקוי  נספר ללקוח</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="isAgentResponsibility" type="Indicator">
+				<xs:annotation>
+					<xs:documentation>חיווי האם הליקוי באחריות הסוכן</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="isAgentProceduralFaultCountable" type="Indicator">
+				<xs:annotation>
+					<xs:documentation>חיווי האם ניקוד הליקוי  נספר לסוכן </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="updateDate" type="Date" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מועד עדכון הליקוי
+באם הליקוי הוא חדש ונוצר לראשונה אזי שדה זה יהיה ריק
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="leadingDocumentVersion" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מספר גרסה הצהרה</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Text">
+						<xs:maxLength value="5"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ConnectedEntity" type="ConnectedEntity" maxOccurs="99">
+				<xs:annotation>
+					<xs:documentation>מזהה חלק ההצהרה בגינו נרשם הליקוי </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FaultUpdateWorker" type="Worker" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>עובד המכס מזין/מעדכן הליקוי</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FaultDiscovererWorker" type="Worker" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>עובד המכס מגלה הליקוי</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ConstraintList">
+		<xs:annotation>
+			<xs:documentation>חטיבת אילוצים שנסגרו בגין תיקון ההצהרה</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="sequenceNumeric">
+				<xs:annotation>
+					<xs:documentation>מספר סידורי של האילוץ</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="constraintId">
+				<xs:annotation>
+					<xs:documentation>Id של אילוץ</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Identifier">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ConstraintProcessTypeID">
+				<xs:annotation>
+					<xs:documentation>סוג אילוץ</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ConstraintTypeID">
+				<xs:annotation>
+					<xs:documentation>קוד אילוץ</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ConstraintStatus">
+				<xs:annotation>
+					<xs:documentation>סטאטוס האילוץ</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="Code">
+						<xs:totalDigits value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ReferenceListMsg">
+		<xs:annotation>
+			<xs:documentation>DF_MSG26000_ReferenceListMsg</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ClassificationReferenceDeteails" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>פרטי אסמכתא סיווג</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="HSExplanationsPage" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>דברי הסבר ל- HS עמוד</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="classificationInstructionsNum" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הנחיות סיווג מס'</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="classificationRuleChapter" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>לפרק</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="classificationRulePart" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>לחלק</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="classificationRuleNum" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>כלל מס'</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="classificationPrincipleNumber" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>עקרון סיווג מספר</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="otherReasons" type="Text" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>אחרת</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="customsApprovalNumber" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>אישור הנהלת המכס (רק לאחר פניית מעריך ראשי להנהלה)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="PTMConditionType" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>אי עמידה בתנאי הפטור מותנה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="EvaluationReferenceDeteails" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="IsResemblingGoods" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>טובין דומים ע"פ סעיף 133 ב. לפקודה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsIdenticalGoods" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>טובין זהים עפ"י סעיף 133 א. לפקודה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsInterestAddedCost" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>ריבית שנוספה למחיר היות ולא נתקיימו אחד מתנאי סעיף 132 (ד) לפקודה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsUnReasonableAddedValue" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הנחות / הפחתות בלתי קבילות שנוספו לערך</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsInsuranceCost" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>עלות הביטוח</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsLoadingCost" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תשלומים עבור טעינה, פריקה וטיפול, הקשורים בהובלת הטובין לנמל הייבוא או למקום הייבוא, ובכלל זה אגרות סבלות, אגרות סוורות ואגרות רציף</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsTransportationCost" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>עלות ההובלה של הטובין לנמל הייבוא או למקום הייבוא </xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsExpectedIncome" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תקבולים הצפויים מכל מכירה של הטובין או משימוש בהם, שבוצעו לאחר מכירתם לייצוא לישראל</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsLicense" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תגמולים ודמי רישיון</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsDevelopmentIncluded" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הנדסה, פיתוח, עבודת אמנות, עבודת עיצוב תכניות וסקיצות, שנעשו מחוץ לישראל, ונדרשו בייצור הטובין</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsDisIntegratedTools" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>חומרים שנצרכו והתכלו בייצור הטובין</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsUsedTools" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>כלים, תבניות ופריטים דומים, ששימשו בייצור הטובין</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsPartsIncluded" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>חומרים, מרכיבים, חלקים ופריטים דומים, הכלולים בטובין</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsPackageCost" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>עלות האריזה לרבות עלות העבודה ועלות חומרי האריזה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsCanisterCost" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>עלות כלי הקיבול</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsCommission" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>עמלות ו/או דמי תיווך</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsMatchCommitted" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>התאמות שנעשו ע"פ סעיף 133 לפקודה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsUnReasonableValue" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הערך אינו סביר לפי החלטה 6.1. של הועדה הטכנית</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsOtherInvoiceFound" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>נמצא חשבון ספק אחר/נוסף שלא הוצג לרשות המכס</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsNoMatchInvoiceAgreement" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>אין התאמה בין חשבון הספק/ההסכם לבין המוצהר בהצהרה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsNoMatchCommitted" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>לא נעשו התאמות עפ"י סעיף 133 לפקודה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsInvalidInterest" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>חולצו דמי הריבית שלא על פי סעיף 132(ד) לפקודה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsUnReasonableDiscount" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>נכללה הנחה / הפחתה  בלתי קבילה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsFullfilCondition" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>לא התקיים אחד התנאים המנויים בסעיף 132 (ב) לפקודה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsDependence" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>קיימים יחסי תלות ( כמוגדר בסעיף 129 לפקודה), שהשפיעו על מחיר העיסקה ע"פ סעיף 132.(ב).(4) לפקודה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="otherReasonsRemarks" type="Text" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>אחרת (לפי סעיף 133ו לפקודה): </xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsOtherReason" type="Indicator" nillable="true" minOccurs="0"/>
+						<xs:element name="IsOtherInvoiceAdded" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>חשבון ספק אחר /נוסף</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsCalculatedValue" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>ערך מחושב ע"פ סעיף 133 ה. לפקודה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsSellingPrice" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מחיר מכירה בארץ ע"פ סעיף 133 ד. לפקודה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="OriginRulesReferenceDeteails" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>פרטי אסמכתא כללי מקור</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="TradeAgreementState" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הסכם סחר</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="PerferenceDocSumbitionDate" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך הגשת מסמך העדפה לרשות המכס</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="isNoAnswerGiven" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>לא התקבלה תשובה מרשות המכס תוך 10 חודשים ממועד הפניה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="isUnIntitiledGoods" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>עפ"י הודעת רשות מכס זו הטובין אינם עומדים בכללי המקור ואינם זכאים להעדפת מכס, ולפיכך חבים במלוא המיסים</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="secondaryParagraphState" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>טבלה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="secondaryParagraph" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>סעיף משנה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="noPerferenceDocumentAttached" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הטובין שוחררו במסגרת הסכמי הסחר המקנה העדפת מכס, ונמצא כי הטובין אינם זכאים להעדפת מכס, מאחר ולא צורף מסמך העדפה, כאמור בסעיף 12 לצו תעריף המכס,</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="tradeAgreementState" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הסכם סחר</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="perferenceDocsSumbitionDate" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך הגשת מסמך העדפה לרשות המכס</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="signedPerferenceDocDate" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך חתימה מסמך העדפה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="tradeAgreementNoAnswareGiven" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>לא התקבלה תשובה מרשות המכס תוך 10 חודשים ממועד הפניה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="tradeAgreementUnIntitiledGoods" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>עפ"י הודעת רשות מכס זו הטובין אינם עומדים בכללי המקור ואינם זכאים להעדפת מכס, ולפיכך חבים במלוא המיסים</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="tradeAgreementStateVarification" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הסכם הסחר</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="isSelected" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>האם נבחר</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="referenceOriginRulesReasonType" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>נימוק לאסמכתא כללי מקור</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="SecondaryParagraphState" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>טבלה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="SecondaryParagraph" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>סעיף משנה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="OthersRemarks" type="Text" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>אחר</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="DocumentFaultsRemarks" type="Text" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>פירוט (הפגם והמקור לפסילת התעודה): </xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsDocumentFaults" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>התעודה נפסלה בשל פגמים בתעודה המצדיקים את פסילתה בהתאם להסכם הסחר / הוראות הנוהל / דברי הסבר להסכם הסחר</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsTradeAgreementNoAnswerGiven" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>לא התקבלה תשובה לאימות בפרק הזמן שנקבע.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="TradeAgreementStateVerification" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הסכם הסחר</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="isTradeAgreementNoCertificate" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>לא צורפה תעודה במסגרת הזמן שניתן</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsTradeAgreementUnIntitiledGoods" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>במענה לפנייתנו עלה כי התעודה )כולה/חלקה( פסולה ולפיכך תחויב במלוא המס.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsIvalidInvoice" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תעודת המקור או חשבון הספק שצורפו לרשימון נשלחו לאימות עפ"י סעיף 12 (א) לצו תעריף המכס ועפ"י </xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsInvalidTransportation" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>על פי סעיף 12 (א) לצו תעריף המכס, נמצא כי הטובין לא הובלו במישרין, כפי שנקבע</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="SignedPerferenceDocDate" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך חתימה מסמך העדפה</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsInvalidPerferenceDocument" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>בבדיקה שנערכה נמצא כי מסמך ההעדפה שצורף אינו בתוקף, כאמור בסעיף 12 (ב)(2) לצו תעריף המכס</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsNoPerferenceDocumentAttached" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>הטובין שוחררו במסגרת הסכמי הסחר המקנה העדפת מכס, ונמצא כי הטובין אינם זכאים להעדפת מכס, מאחר ולא צורף מסמך העדפה, כאמור בסעיף 12 לצו תעריף המכס, </xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="IsOther" type="Indicator" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>אחר</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="TradeLevyReferenceDeteails" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>פרטי אסמכתא היטלים</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="tradeLevyNum" type="Identifier" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מספר היטל</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="orderDate" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך צו</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="mkType" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך פירסום מק"ח</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="mkPublishDate" type="Date" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>תאריך פירסום מק"ח</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="tradeLevyName" type="Text" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>שם היטל </xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="tradeLevyType" type="Text" nillable="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>מספר היטל</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="referenceInputType">
+				<xs:annotation>
+					<xs:documentation>תהליך הזנת אסמכתא</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="ANCode">
+						<xs:maxLength value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="remarks" type="Text" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>הערה</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="referenceType">
+				<xs:annotation>
+					<xs:documentation>סוג אסמכתא</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="ANCode">
+						<xs:maxLength value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="referenceStatus">
+				<xs:annotation>
+					<xs:documentation>סטאטוס אסמכתא</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="ANCode">
+						<xs:maxLength value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="referenceID" type="Identifier" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>מזהה אסמכתא</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

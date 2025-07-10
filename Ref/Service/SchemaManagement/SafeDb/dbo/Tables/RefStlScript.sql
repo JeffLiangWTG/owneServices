@@ -1,0 +1,48 @@
+CREATE TABLE [RefStlScript] (
+	[STL_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefStlScript_STL_PK] DEFAULT (NEWID()),
+	[STL_FeatureCode] CHAR(3) NOT NULL CONSTRAINT [DF_RefStlScript_STL_FeatureCode] DEFAULT (''),
+	[STL_RoleName] NVARCHAR(50) NOT NULL CONSTRAINT [DF_RefStlScript_STL_RoleName] DEFAULT (''),
+	[STL_ModuleName] NVARCHAR(50) NOT NULL CONSTRAINT [DF_RefStlScript_STL_ModuleName] DEFAULT (''),
+	[STL_FunctionName] NVARCHAR(50) NOT NULL CONSTRAINT [DF_RefStlScript_STL_FunctionName] DEFAULT (''),
+	[STL_FeatureName] NVARCHAR(75) NOT NULL CONSTRAINT [DF_RefStlScript_STL_FeatureName] DEFAULT (''),
+	[STL_DataGranularity] CHAR(3) NOT NULL CONSTRAINT [DF_RefStlScript_STL_DataGranularity] DEFAULT ('TRN'),
+	[STL_CompanyCode] NVARCHAR(1000) NOT NULL CONSTRAINT [DF_RefStlScript_STL_CompanyCode] DEFAULT (''),
+	[STL_BranchCode] NVARCHAR(1000) NOT NULL CONSTRAINT [DF_RefStlScript_STL_BranchCode] DEFAULT (''),
+	[STL_TransactionDateUtc] NVARCHAR(1000) NOT NULL CONSTRAINT [DF_RefStlScript_STL_TransactionDateUtc] DEFAULT (''),
+	[STL_CreatingUserCode] NVARCHAR(1000) NOT NULL CONSTRAINT [DF_RefStlScript_STL_CreatingUserCode] DEFAULT (''),
+	[STL_GuidReference] NVARCHAR(1000) NOT NULL CONSTRAINT [DF_RefStlScript_STL_GuidReference] DEFAULT (''),
+	[STL_BillingReference1] NVARCHAR(1000) NOT NULL CONSTRAINT [DF_RefStlScript_STL_BillingReference1] DEFAULT (''),
+	[STL_BillingReference2] NVARCHAR(1000) NOT NULL CONSTRAINT [DF_RefStlScript_STL_BillingReference2] DEFAULT (''),
+	[STL_BillingReference3] NVARCHAR(1000) NOT NULL CONSTRAINT [DF_RefStlScript_STL_BillingReference3] DEFAULT (''),
+	[STL_BillingReference4] NVARCHAR(1000) NOT NULL CONSTRAINT [DF_RefStlScript_STL_BillingReference4] DEFAULT (''),
+	[STL_AdditionalRefs] NVARCHAR(1000) NOT NULL CONSTRAINT [DF_RefStlScript_STL_AdditionalRefs] DEFAULT (''),
+	[STL_TransactionCount] NVARCHAR(1000) NOT NULL CONSTRAINT [DF_RefStlScript_STL_TransactionCount] DEFAULT ('1'),
+	[STL_PreparationScript] NVARCHAR(MAX) NOT NULL CONSTRAINT [DF_RefStlScript_STL_PreparationScript] DEFAULT (''),
+	[STL_FromClause] NVARCHAR(MAX) NOT NULL CONSTRAINT [DF_RefStlScript_STL_FromClause] DEFAULT (''),
+	[STL_WhereClause] NVARCHAR(MAX) NOT NULL CONSTRAINT [DF_RefStlScript_STL_WhereClause] DEFAULT (''),
+	[STL_WithOptionRecompile] BIT NOT NULL CONSTRAINT [DF_RefStlScript_STL_WithOptionRecompile] DEFAULT (0),
+	[STL_UsedInBilling] BIT NOT NULL CONSTRAINT [DF_RefStlScript_STL_UsedInBilling] DEFAULT (1),
+	[STL_ActiveOn] CHAR(3) NOT NULL CONSTRAINT [DF_RefStlScript_STL_ActiveOn] DEFAULT ('ALL'),
+	[STL_MinCW1Version] NVARCHAR(20) NOT NULL CONSTRAINT [DF_RefStlScript_STL_MinCW1Version] DEFAULT (''),
+	[STL_MaxCW1Version] NVARCHAR(20) NOT NULL CONSTRAINT [DF_RefStlScript_STL_MaxCW1Version] DEFAULT (''),
+	[STL_DateType] CHAR(3) NOT NULL CONSTRAINT [DF_RefStlScript_STL_DateType] DEFAULT 'DTE',
+	[STL_CollectionStartDateUtc] DATETIME NULL,
+	[STL_SysStartTime] DATETIME2 GENERATED ALWAYS AS ROW START NOT NULL CONSTRAINT [DF_STL_SysStartTime] DEFAULT CONVERT(DATETIME2, '1900-01-01 0:0:0.0000000'),
+	[STL_SysEndTime] DATETIME2 GENERATED ALWAYS AS ROW END NOT NULL CONSTRAINT [DF_STL_SysEndTime] DEFAULT CONVERT(DATETIME2, '9999-12-31 23:59:59.9999999'),
+	PERIOD FOR SYSTEM_TIME ([STL_SysStartTime], [STL_SysEndTime]),
+	CONSTRAINT [PK_RefStlScript] PRIMARY KEY CLUSTERED ([STL_PK] ASC),
+	CONSTRAINT [CK_RefStlScript_STL_FeatureCode] CHECK ([STL_FeatureCode] <> ''),
+	CONSTRAINT [CK_RefStlScript_STL_DataGranularity] CHECK ([STL_DataGranularity]='TRN' OR [STL_DataGranularity]='MAH' OR [STL_DataGranularity]='MCO' OR [STL_DataGranularity]='DAY' OR [STL_DataGranularity]='SPS'),
+	CONSTRAINT [CK_RefStlScript_STL_TransactionDateUtc] CHECK ([STL_TransactionDateUtc] <> ''),
+	CONSTRAINT [CK_RefStlScript_STL_GuidReference] CHECK ([STL_GuidReference] <> ''),
+	CONSTRAINT [CK_RefStlScript_STL_TransactionCount] CHECK ([STL_TransactionCount] <> ''),
+	CONSTRAINT [CK_RefStlScript_STL_FromClause] CHECK ([STL_FromClause] <> ''),
+	CONSTRAINT [CK_RefStlScript_STL_ActiveOn] CHECK ([STL_ActiveOn]='ALL' OR [STL_ActiveOn]='NON' OR [STL_ActiveOn]='PRD' OR [STL_ActiveOn]='TST'),
+	CONSTRAINT [CK_RefStlScript_STL_DateType] CHECK ([STL_DateType]='SDT' OR [STL_DateType]='DTE' OR [STL_DateType]='DTO'),
+	CONSTRAINT [CK_RefStlScript_STL_CollectionStartDateUtc] CHECK ([STL_CollectionStartDateUtc] IS NULL OR [STL_CollectionStartDateUtc] > '1900-01-01 00:00:00')
+)
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.RefStlScriptHistory))
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_RefStlScript_STL_FeatureCode_STL_ActiveOn_STL_MinCW1Version_STL_MaxCW1Version] ON [RefStlScript] ([STL_FeatureCode], [STL_ActiveOn], [STL_MinCW1Version], [STL_MaxCW1Version])
+GO
+ALTER TABLE RefStlScript SET (LOCK_ESCALATION = DISABLE);

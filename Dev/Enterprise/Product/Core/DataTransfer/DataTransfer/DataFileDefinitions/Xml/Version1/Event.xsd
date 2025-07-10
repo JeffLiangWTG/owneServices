@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Elements.xsd"/>
+	<xs:complexType name="Events">
+		<xs:sequence>
+			<xs:element name="Event" type="Event" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="Version" type="Version" use="optional"/>
+		<xs:attribute name="InitialDataExported" type="xs:dateTime" use="optional" />
+	</xs:complexType>
+	<xs:element name="Events" type="Events"/>
+	<xs:complexType name="Event">
+		<xs:sequence>
+			<xs:element name="Source" type="xs:string"/>
+			<xs:element name="Code" type="xs:string"/>
+			<xs:element name="CodeDescription" type="xs:string" minOccurs="0"/>
+			<xs:element name="DateTime" type="xs:dateTime"/>
+			<xs:element name="PostedDateTime" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="Information" type="xs:string" minOccurs="0"/>
+			<xs:element name="User" type="xs:string" minOccurs="0"/>
+			<xs:element name="UserName" type="xs:string" minOccurs="0"/>
+			<xs:element name="UserEmailAddress" type="xs:string" minOccurs="0"/>
+			<xs:element name="TriggeredBy" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="ReferenceKeys" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ReferenceKey" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string">
+										<xs:attribute name="ReferenceKeyCountry" type="CountryCode"/>
+										<xs:attribute name="ReferenceKeyName" type="ReferenceType" use="required"/>
+										<xs:attribute name="ReferenceKeyType" type="xs:string"/>
+										<xs:attribute name="ReferenceKeyDateTime" type="xs:dateTime"/>
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="IsEstimatedDate" type="TrueFalse" minOccurs="0"/>
+			<xs:element name="Payload" type="Payload" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RootNamespace>CargoWise.RefDbRepo.Common.SafeDataClient</RootNamespace>
+    <AssemblyName>CargoWise.RefDbRepo.Common.SafeDataClient</AssemblyName>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputPath>..\..\..\Bin\Common\</OutputPath>
+    <Configurations>Debug;Release;UAT</Configurations>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\CommonAssemblyInfo.cs" Link="CommonAssemblyInfo.cs" />
+    <Compile Update="SafeDataClient.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SafeDataClient.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SafeDataClient.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SafeDataClient.cs</LastGenOutput>
+      <CustomToolNamespace>CargoWise.RefDbRepo.Common.SafeDataClient</CustomToolNamespace>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Argument\Argument.csproj" />
+    <ProjectReference Include="..\TypeProvider\TypeProvider.csproj" />
+    <ProjectReference Include="..\Utils\Utils.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /r /y &quot;$(TargetPath)&quot; &quot;$(TargetDir)..\..\UniversalXMLProducers\net8.0\&quot;&#xD;&#xA;xcopy /r /y &quot;$(TargetPath)&quot; &quot;$(TargetDir)..\..\Staging\net8.0\&quot;&#xD;&#xA;xcopy /r /y &quot;$(TargetPath)&quot; &quot;$(TargetDir)..\..\StagingService\net8.0\&quot;&#xD;&#xA;if not $(Configuration) == Release (&#xD;&#xA;xcopy /r /y &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(TargetDir)..\..\UniversalXMLProducers\net8.0\&quot;&#xD;&#xA;xcopy /r /y &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(TargetDir)..\..\Staging\net8.0\&quot;&#xD;&#xA;xcopy /r /y &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(TargetDir)..\..\StagingService\net8.0\&quot;&#xD;&#xA;)" />
+  </Target>
+  <Import Project="..\..\..\.paket\Paket.Restore.targets" />
+</Project>

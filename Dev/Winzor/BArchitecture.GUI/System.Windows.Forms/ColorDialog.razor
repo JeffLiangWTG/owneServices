@@ -1,0 +1,92 @@
+@namespace System.Windows.Forms
+@inherits Form
+@using System.Drawing
+@using WinzorFramework.Extensions
+
+<PageTitle>Color</PageTitle>
+<div class="colordialog" style="@ColorDialogStyle" @attributes="DataAttributes">
+	<div class="colordialog__basicpanel">
+		<div class="colordialog__palettetitle">Basic colors:</div>
+		<div class="colordialog__colorpalette colordialog__basicpalette">
+			@for (var i = 0; i < basicColors.Length; i++)
+			{
+				var index = i;
+				<button class=@($"colordialog__colorswatch{(index == SelectedColorIndex ? " colordialog__colorswatch--selected" : string.Empty)}")
+						style=@SwatchStyleString(basicColors[index])
+						@onclick="async () => await SetSelectedColorAsync(index)" @onclick:stopPropagation></button>
+			}
+		</div>
+		<div class="colordialog__palettetitle">Custom colors:</div>
+		<div class="colordialog__colorpalette colordialog__custompalette">
+			@for (var i = 0; i < customColors.Length; i++)
+			{
+				var index = basicColors.Length + i;
+				<button class=@($"colordialog__colorswatch{(index == SelectedColorIndex ? " colordialog__colorswatch--selected" : string.Empty)}")
+						style=@SwatchStyleString(customColors[i])
+						@onclick="async () => await SetSelectedColorAsync(index)" @onclick:stopPropagation></button>
+			}
+		</div>
+		<div class="colordialog__buttonspanel">
+			<button class="button button--standard colordialog--fullwidth button--center" @onclick="ExtendColorDialogAsync" @onclick:stopPropagation disabled="@FullOpen">
+				<div>Define Custom Colors >></div>
+			</button>
+			<button class="button button--standard button--center" @onclick="async () => await CloseDialogAsync(DialogResult.OK)" @onclick:stopPropagation>
+				<div>OK</div>
+			</button>
+			<button class="button button--standard button--center" @onclick="async () => await CloseDialogAsync(DialogResult.Cancel)" @onclick:stopPropagation>
+				<div>Cancel</div>
+			</button>
+		</div>
+	</div>
+	@if (FullOpen)
+	{
+		<div class="colordialog__extendedpanel">
+			<div class="colordialog__colorpicker">
+				<div class="colordialog__spectrum" style="@ColordialogSpectrumStyle" @onmousedown=@GetColorPickerMouseDown() @onmousedown:stopPropagation @onmouseup="async (e) => await ColorPickerMouseUpAsync(e)" @onmouseup:stopPropagation @ref=@colorPicker>
+					<div class="colordialog__spectrumguide" style="@SpectrumGuideStyle"></div>
+				</div>
+				<div class="colordialog__luminance">
+					<div class="colordialog__luminanceclickarea" @onmousedown=@GetLuminanceMouseDown() @onmousedown:stopPropagation @onmouseup="async (e) => await LuminanceMouseUpAsync(e)" @onmouseup:stopPropagation @ref=@luminanceClickArea></div>
+					<div class="colordialog__luminanceguide" style="@LuminanceGuideStyle"></div>
+				</div>
+			</div>
+			<div class="colordialog__properties">
+				<div class="colordialog__propertiespanel">
+					<div class="colordialog__previewswatch"></div>
+					<div class="colordialog__previewtext">Color|Solid</div>
+				</div>
+				<div class="colordialog__propertiespanel">
+					<div class="colordialog__property">
+						<label for="hue">Hue:</label>
+						<input type="number" name="hue" min=0 @bind=@HueInput @bind:after=@HandleHSLInputChangeAsync />
+					</div>
+					<div class="colordialog__property">
+						<label for="sat">Sat:</label>
+						<input type="number" name="sat" min=0 @bind=@SatInput @bind:after=@HandleHSLInputChangeAsync />
+					</div>
+					<div class="colordialog__property">
+						<label for="lum">Lum:</label>
+						<input type="number" name="lum" min=0 @bind=@LumInput @bind:after=@HandleHSLInputChangeAsync />
+					</div>
+				</div>
+				<div class="colordialog__propertiespanel">
+					<div class="colordialog__property">
+						<label for="red">Red:</label>
+						<input type="number" name="red" min=0 @bind=@RedInput @bind:after=@HandleRGBInputChangeAsync />
+					</div>
+					<div class="colordialog__property">
+						<label for="green">Green:</label>
+						<input type="number" name="green" min=0 @bind=@GreenInput @bind:after=@HandleRGBInputChangeAsync />
+					</div>
+					<div class="colordialog__property">
+						<label for="blue">Blue:</label>
+						<input type="number" name="blue" min=0 @bind=@BlueInput @bind:after=@HandleRGBInputChangeAsync />
+					</div>
+				</div>
+			</div>
+            <button class="button button--standard colordialog__addbutton button--center" @onclick="async() => await AddCustomColorAsync()" @onclick:stopPropagation>
+                <div>Add to Custom Colors</div>
+			</button>
+		</div>
+	}
+</div>

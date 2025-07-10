@@ -1,0 +1,19 @@
+CREATE TABLE RefCountry (
+	RN_PK UNIQUEIDENTIFIER NOT NULL,
+	RN_Code CHAR(2) NOT NULL CONSTRAINT DF_RN_Code DEFAULT (''),
+	RN_IsActive BIT NOT NULL CONSTRAINT DF_RN_IsActive DEFAULT (1),
+	RN_Desc VARCHAR(35) NOT NULL CONSTRAINT DF_RN_Desc DEFAULT (''),
+	RN_EconomicGrouping VARCHAR(3) NOT NULL CONSTRAINT DF_RN_EconomicGrouping DEFAULT (''),
+	RN_CountryDialingCode VARCHAR(3) NOT NULL CONSTRAINT DF_RN_CountryDialingCode DEFAULT (''),
+	RN_AddressFormattingRule VARCHAR(3) NOT NULL CONSTRAINT DF_RN_AddressFormattingRule DEFAULT ('DEF'),
+	RN_PostcodeValidationRule VARCHAR(3) NOT NULL CONSTRAINT DF_RN_PostcodeValidationRule DEFAULT ('NVR'),
+	RN_StateProvinceValidationRule VARCHAR(3) NOT NULL CONSTRAINT DF_RN_StateProvinceValidationRule DEFAULT ('NVR'),
+	RN_RX_NKLocalCurrency VARCHAR(3) NOT NULL CONSTRAINT DF_RX_NKLocalCurrency DEFAULT (''),
+	RN_RX_NKAirWaybillCurrency VARCHAR(3) NOT NULL CONSTRAINT DF_RN_NKAirWaybillCurrency DEFAULT (''),
+	RN_IsoAlpha3Code VARCHAR(3) NOT NULL CONSTRAINT DF_RN_IsoAlpha3Code DEFAULT (''),
+	RN_IsoNumericUNM49Code VARCHAR(3) NOT NULL CONSTRAINT DF_RN_IsoNumericUNM49Code DEFAULT (''),
+	RN_ValidationStatus CHAR(3) NOT NULL CONSTRAINT DF_RN_ValidationStatus DEFAULT ('NAV'),
+	CONSTRAINT PK_UX__RN_PK PRIMARY KEY CLUSTERED ( RN_PK ASC ),
+	CONSTRAINT CK_RN_ValidationStatus CHECK ((RN_ValidationStatus='SNP' OR RN_ValidationStatus='STP' OR RN_ValidationStatus='NUM' OR RN_ValidationStatus='STR' OR RN_ValidationStatus='NAV'))
+)
+GO

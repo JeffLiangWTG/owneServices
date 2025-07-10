@@ -1,0 +1,16 @@
+using Enterprise.Accounting.Registry.Business;
+using Enterprise.MasterFiles.Integration;
+
+namespace Enterprise.Accounting.Business.ARAP.CashAdvance
+{
+	public class CashAdvanceFunctionalityChecker : IAccCashAdvanceFunctionalityChecker
+	{
+		public bool IsReceivablesCashAdvanceFunctionalityEnabled => AccountingConfigurationRegistry.Instance.EnableReceivablesCashAdvanceFunctionality.Value;
+
+		public bool IsPayablesCashAdvanceFunctionalityEnabled => AccountingConfigurationRegistry.Instance.EnablePayablesCashAdvanceFunctionality.Value;
+
+		public bool IsManualSettingOfReceivablesCashAdvanceRequestStatusToPaidAllowed => AccountingConfigurationRegistry.Instance.AllowManualSettingOfReceivablesCashAdvanceRequestStatusToPaid.Value;
+
+		public bool IsManualSettingOfPayablesCashAdvanceRequestStatusToPaidAllowed => AccountingConfigurationRegistry.Instance.AllowManualSettingOfPayablesCashAdvanceRequestStatusToPaid.Value;
+	}
+}

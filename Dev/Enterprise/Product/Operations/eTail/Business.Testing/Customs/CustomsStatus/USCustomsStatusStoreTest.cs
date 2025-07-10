@@ -1,0 +1,99 @@
+using System;
+using System.Linq;
+using System.Reflection;
+using CargoWise.Common;
+using CargoWise.EntityFramework.Testing;
+using CargoWise.Types;
+using Enterprise.Customs.Business;
+using Enterprise.Customs.US.Business;
+using Enterprise.MasterFiles.Business;
+using static Enterprise.Core.Constants;
+using RefCusCodeListTypes = Enterprise.Core.Constants.Customs.Universal.RefCusCodeListTypes;
+
+namespace Enterprise.eTail.Business.Testing
+{
+	internal class USCustomsStatusStoreTest : TestCaseWithFactory
+	{
+		public void TestUSCodeDescriptionPairList()
+		{
+			using (GlbCompany.CurrentCompany.TemporarilySetCountry(CountryCodes.UnitedStates))
+			{
+				HVLVCustomsStatusTestHelper.AddRefCusCodeList(Factory, "UUU", "CSTA - Description Test", HVLVReleaseStatus.Held, RefCusCodeListTypes.Codes.CustomsStatus, GlbCompany.CurrentCompany.GC_RN_NKCountryCode);
+				HVLVCustomsStatusTestHelper.AddRefCusCodeList(Factory, "KKK", "CSTI - Description Test", HVLVReleaseStatus.Cleared, RefCusCodeListTypes.Codes.CustomsStatusForInterface, GlbCompany.CurrentCompany.GC_RN_NKCountryCode);
+
+				var cstiCodeDescriptionPairList = new CRLReleaseStatusList();
+				var expectedCodes = cstiCodeDescriptionPairList.ToArray().Select(codeDescriptionPair => (codeDescriptionPair.Code, codeDescriptionPair.Description)).ToList();
+				expectedCodes.Add(("UUU", "CSTA - Description Test"));
+
+				var usCustomsStatusStore = new USCustomsStatusStore(Factory);
+				var actualList = usCustomsStatusStore.GetAllRefCusCodeList(true);
+				AssertCodeDescriptionPairList(actualList, expectedCodes.ToArray());
+
+				actualList = usCustomsStatusStore.GetAllRefCusCodeList(false);
+				AssertCodeDescriptionPairList(actualList, ("UUU", "CSTA - Description Test"));
+			}
+		}
+
+		public void TestTryGetReleaseStatusAndCustomsStatusDescription()
+		{
+			using (GlbCompany.CurrentCompany.TemporarilySetCountry(CountryCodes.UnitedStates))
+			{
+				HVLVCustomsStatusTestHelper.AddRefCusCodeList(Factory, "UUU", "CSTA - Description Test", HVLVReleaseStatus.Held, RefCusCodeListTypes.Codes.CustomsStatus, GlbCompany.CurrentCompany.GC_RN_NKCountryCode);
+				HVLVCustomsStatusTestHelper.AddRefCusCodeList(Factory, "KKK", "CSTI - Description Test", HVLVReleaseStatus.Cleared, RefCusCodeListTypes.Codes.CustomsStatusForInterface, GlbCompany.CurrentCompany.GC_RN_NKCountryCode);
+
+				var bookingHeader = Factory.NewWithValidTestData<HVLVBookingHeader>();
+				var consignment = bookingHeader.Consignments.AddNew();
+
+				CombineAssertions(() =>
+				{
+					AssertEquals("precondition - HVC_ReleaseStatus is NON by default", HVLVReleaseStatus.None, consignment.HVC_ReleaseStatus);
+					AssertEquals("precondition - HVC_ImportReleaseStatus is NON by default", HVLVReleaseStatus.None, consignment.HVC_ImportReleaseStatus);
+					AssertEquals("precondition - ReleaseStatusDescription is None by default", HVLVReleaseStatus.NoneDescription, consignment.ReleaseStatusDescription);
+					AssertEquals("precondition - CustomsStatusDescription is empty by default", string.Empty, consignment.HVC_ImportCustomsClearanceStatus);
+				});
+
+				consignment.HVC_ImportCustomsClearanceStatus = "UUU";
+				CombineAssertions(() =>
+				{
+					AssertEquals("HVC_ReleaseStatus should be Held", HVLVReleaseStatus.Held, consignment.HVC_ReleaseStatus);
+					AssertEquals("HVC_ImportReleaseStatus should be Held", HVLVReleaseStatus.Held, consignment.HVC_ImportReleaseStatus);
+					AssertEquals("ReleaseStatusDescription should be Held", HVLVReleaseStatus.HeldDescription, consignment.ReleaseStatusDescription);
+					AssertEquals("CustomsStatusDescription", "CSTA - Description Test", consignment.ImportCustomsClearanceStatusDescription);
+				});
+
+				consignment.HVC_JE_ImportDeclaration = Guid.NewGuid();
+				var importDeclaration = Factory.NewWithValidTestData<BaseJobDeclaration>();
+				importDeclaration.IsCancelled = false;
+				consignment.HVC_JE_ImportDeclaration = importDeclaration.PK;
+				consignment.HVC_ImportCustomsClearanceStatus = "XXX";
+
+				AssertContains("Detail info should be reported in Error Reporter",
+					"Current Customs Status Codes is [XXX]\r\nOf type: [CSTI]\r\nSearched code list: [ADM,CAN,DEL,DOC,EXM,HLD,N/R,NRC,NRL,REL,RVW]",
+					ErrorReporter.LastMessageReported);
+
+				ErrorReporter.Clear();
+
+				importDeclaration.IsCancelled = true;
+				consignment.HVC_ImportCustomsClearanceStatus = "UUU";
+				CombineAssertions(() =>
+				{
+					AssertEquals("HVC_ReleaseStatus should be Held", HVLVReleaseStatus.Held, consignment.HVC_ReleaseStatus);
+					AssertEquals("HVC_ImportReleaseStatus should be Held", HVLVReleaseStatus.Held, consignment.HVC_ImportReleaseStatus);
+					AssertEquals("ReleaseStatusDescription should be Held", HVLVReleaseStatus.HeldDescription, consignment.ReleaseStatusDescription);
+					AssertEquals("CustomsStatusDescription", "CSTA - Description Test", consignment.ImportCustomsClearanceStatusDescription);
+				});
+			}
+		}
+
+		public void TestOverridenMembers()
+		{
+			var customsStatusStore = new USCustomsStatusStore(Factory);
+			var customsStatusStoreType = typeof(USCustomsStatusStore);
+
+			var countryCodeProperty = customsStatusStoreType.GetProperty("CountryCode", BindingFlags.NonPublic | BindingFlags.Instance);
+			var countryCode = (ZString?)countryCodeProperty?.GetValue(customsStatusStore);
+			AssertNotNull(countryCode);
+			AssertEquals(CountryCodes.UnitedStates, countryCode);
+		}
+	}
+}

@@ -1,0 +1,64 @@
+@namespace Aga.Controls.Tree
+@using System.Windows.Forms
+@using System.Drawing
+@using Microsoft.AspNetCore.Components.Web
+@using WinzorFramework.Extensions
+@using static Aga.Controls.Tree.TreeViewAdv
+
+<li class="treeviewadv__row" style="@RowStyleString">
+	<div class="@RowContentClass" style="@RowContentStyleString" data-row-cursors="@Row.DropPositionCursors" ondragstart="@DragStartHandler()" data-sales-relation="@Row.IsMasterActivitySalesRelation">
+		@foreach (var control in Row.Controls)
+		{
+			<div class="@control.CssClass treeviewadv__item" style="@ControlStyleString(control)" columnindex="@control.ParentColumnIndex" draggable="true" @onmouseup=control.OnMouseUp @onmouseup:stopPropagation @onmousedown=control.OnMouseDown @onmousedown:stopPropagation @onclick=control.OnClick @onclick:stopPropagation @ondblclick=control.OnDblClick @ondblclick:stopPropagation>
+				@control.ControlContent
+			</div>
+		}
+	</div>
+	@if (Row.CanExpand && Row.IsExpanded)
+	{
+		<ul class="treeviewadv__rows">
+			@foreach (var row in Row.Rows)
+			{
+				<TreeViewAdvRow Row=row />
+			}
+		</ul>
+	}
+</li>
+
+@code {
+	[Parameter] public TreeViewAdvRowData Row { get; init; }
+
+	string ControlStyleString(TreeViewAdvControlData control) => $"position:absolute;padding-left:{control.LeftMargin}px;width:{Math.Max(control.Bounds.Width, 0)}px;height:{control.Bounds.Height}px;left:{control.Bounds.Left}px;";
+
+	string RowContentStyleString => $"height:{Row.Bounds.Height}px;width:{Row.Bounds.Width}px;";
+
+	string RowStyleString => $"--row-height:{Row.Bounds.Height}px;--line-left:{Row.Controls[0].Bounds.Left}px;background-color:{Row.BackgroundColor};";
+
+	string RowContentClass
+	{
+		get
+		{
+			var rowContentClass = "treeviewadv__rowcontent";
+			if (Row.IsSelected)
+			{
+				rowContentClass += " treeviewadv__rowcontent--selected";
+			}
+			return rowContentClass;
+		}
+	}
+
+	string DragStartHandler()
+	{
+		var handlerString = "event.dataTransfer.setDragImage(new Image(), 0, 0);";
+
+		if (Row.TreeAllowDrop)
+		{
+			handlerString += "event.dataTransfer.effectAllowed='move';this.classList.add('treeviewadv__rowcontent--ondrag');";
+		}
+		else
+		{
+			handlerString += "event.dataTransfer.effectAllowed='none';";
+		}
+		return handlerString;
+	}
+}

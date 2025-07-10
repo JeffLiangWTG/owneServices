@@ -1,0 +1,18 @@
+using System;
+using Enterprise.Core;
+using Enterprise.ZArchitecture.Modules;
+using Enterprise.ZArchitecture.Modules.Testing;
+using NUnit.Framework;
+
+namespace Enterprise.Customs.CA.Module.Testing
+{
+	[TestedType(typeof(RNSMFTallyShipmentsPlugInController))]
+	sealed class RNSMFTallyShipmentsPlugInControllerTest : ZControllerBasherTest
+	{
+		public override Type ControllerToBashType => typeof(RNSMFTallyShipmentsPlugInController);
+
+		protected override string CountryCode => Constants.CountryCodes.Canada;
+
+		protected override ControllerID GetControllerID() => ControllerIDs.Customs.CA.RNSMFTallyShipmentsPlugIn;
+	}
+}

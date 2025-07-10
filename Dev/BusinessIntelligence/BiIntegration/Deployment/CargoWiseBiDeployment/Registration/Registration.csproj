@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreTargetFramework)</TargetFrameworks>
+    <RootNamespace>CargoWise.Bi.Registration</RootNamespace>
+    <AssemblyName>CargoWise.Bi.Registration</AssemblyName>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="System.DirectoryServices.AccountManagement" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.DirectoryServices.AccountManagement" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.ActiveDirectory" />
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="CargoWise.Bi.Common" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Database.Shared" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.Registry.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+  </ItemGroup>
+  <ItemGroup Condition="$(Configuration) == 'Debug'">
+    <EmbeddedResource Include="Test\SSAS\TestDeployment.bim" />
+    <EmbeddedResource Include="Test\SSAS\Model with DAX Calculation.bim" />
+    <EmbeddedResource Include="Test\SSAS\Model with Partition Query.bim" />
+  </ItemGroup>
+  <ItemGroup Condition="$(Configuration) == 'Debug'">
+    <EmbeddedResource Include="Test\SSRS\ColumnSelectionTest\ColumnSelectionTestReport.xml" />
+    <EmbeddedResource Include="Test\SSRS\SpecialCharactersTest\SpecialCharactersTestReport.xml" />
+    <EmbeddedResource Include="Test\SSRS\ColumnSelectionTest\ColumnSelectionTestReport.rdl" />
+    <EmbeddedResource Include="Test\SSRS\ColumnSelectionTest\Column_Layout_DataSet.rsd" />
+    <EmbeddedResource Include="Test\SSRS\ColumnSelectionTest\Rows_DataSet.rsd" />
+    <EmbeddedResource Include="Test\SSRS\SpecialCharactersTest\SpecialCharactersTestReport.rdl" />
+    <EmbeddedResource Include="Test\SSRS\ColumnSelectionTest\ColumnSelectionTestReportDax.rdl" />
+    <EmbeddedResource Include="Test\SSRS\ColumnSelectionTest\ColumnSelectionTestReportDaxColumnInlineRemoval.rdl" />
+  </ItemGroup>
+  <Choose>
+    <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.CodedUITestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Extension, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITesting, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

@@ -1,0 +1,9 @@
+// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CargoWiseOne", "CW1107:Do Not Use Db.Connection Methods", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~P:Enterprise.Warehouse.Transit.Business.WhsItemDispatchTransportationUnit.Enterprise#Warehouse#Transit#Business#ITransitJobForRating#TransitPackagesForRating")] // C:\git\wtg\CargoWise\Dev\Enterprise\Product\Operations\Warehouse\TransitWarehouse\TransitWarehouse.Business\DispatchTransportationUnit\WhsItemDispatchTransportationUnit.cs:1102:25
+[assembly: SuppressMessage("CargoWiseOne", "CW1107:Do Not Use Db.Connection Methods", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~P:Enterprise.Warehouse.Transit.Business.WhsItemReceiveTransportationUnit.Enterprise#Warehouse#Transit#Business#ITransitJobForRating#TransitPackagesForRating")] // C:\git\wtg\CargoWise\Dev\Enterprise\Product\Operations\Warehouse\TransitWarehouse\TransitWarehouse.Business\ReceiveTransportationUnit\WhsItemReceiveTransportationUnit.cs:1102:25
+[assembly: SuppressMessage("CargoWiseOne", "CW1107:Do Not Use Db.Connection Methods", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~P:Enterprise.Warehouse.Transit.Business.WhsItemReceiveConsignment.Enterprise#Warehouse#Transit#Business#ITransitJobForRating#TransitPackagesForRating")] // C:\git\wtg\CargoWise\Dev\Enterprise\Product\Operations\Warehouse\TransitWarehouse\TransitWarehouse.Business\ReceiveConsignment\WhsItemReceiveConsignment.cs:1144:25

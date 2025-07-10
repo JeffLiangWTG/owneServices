@@ -1,0 +1,1 @@
+<%@ Control Language="c#" AutoEventWireup="false" Codebehind="ZNavigationBar.ascx.cs" Inherits="Enterprise.ZArchitecture.Web.GUI.WebControls.ZNavigationBar" TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>

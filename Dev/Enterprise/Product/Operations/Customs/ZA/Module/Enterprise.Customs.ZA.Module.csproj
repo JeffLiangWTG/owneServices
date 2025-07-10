@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="Enterprise.Freight.Integration" />
+    <Reference Include="Enterprise.Freight.Forwarding.GUI" />
+    <Reference Include="Enterprise.MasterData.Common" />
+    <Reference Include="Enterprise.TransportBookings.Shared" />
+    <Reference Include="WTG.SecurityRights" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GUI\Enterprise.Customs.ZA.GUI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="WarehouseOperatorTransactions\AutoNonPersistentExpiryDateObject.cs">
+      <DependentUpon>AutoNonPersistentExpiryDateObject.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="WarehouseOperatorTransactions\AutoNonPersistentExpiryDateObject.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoNonPersistentExpiryDateObject.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Customs.ZA.Module</CustomToolNamespace>
+    </None>
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Design" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

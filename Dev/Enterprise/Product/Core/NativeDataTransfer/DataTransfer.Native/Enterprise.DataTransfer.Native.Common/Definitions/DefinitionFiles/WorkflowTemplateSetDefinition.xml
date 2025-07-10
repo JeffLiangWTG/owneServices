@@ -1,0 +1,84 @@
+<NativeSchemaSet Name="WorkflowTemplate" Root="ProcessTaskTemplate">
+  <Entities>
+    <Entity Name="ProcessTaskTemplate">
+      <ExcludedFromImportProperty Name="P0_IsSystem"/>
+    </Entity>
+    <Entity Name="ProcessTemplateTrigger"/>
+    <Entity Name="ProcessHeader" EntityName="ProcessJobHeader">
+      <ExcludedProperty Name="FH_FC_CurrentComponent"/>
+    </Entity>
+    <Entity Name="ProcessHeader" EntityName="Workflow">
+      <ExcludedProperty Name="FH_FC_CurrentComponent"/>
+    </Entity>
+    <Entity Name="TagLink" IncludeParentTableCode="True" RequiresAdditionOfActionEqualsMerge="True"/>
+    <Entity Name="TagMagnitude" External="True"/>
+    <Entity Name="TagDefinition" External="True"/>
+    <Entity Name="ProcessTasks">
+      <ExcludedProperty Name="P9_FormFlowType"/>
+    </Entity>
+    <Entity Name="ProcessTaskNotification" EntityName="ProcessTaskNotification_RegularTriggers"/>
+    <Entity Name="ProcessTaskNotification" EntityName="ProcessTaskNotification_UniversalTriggers"/>
+    <Entity Name="ProcessTemplateReleaseGroupRule" EntityName="ReleaseGroupRule"/>
+    <Entity Name="ProcessTemplateReleaseGroupRuleCategory" EntityName="RuleCategory"/>
+    <Entity Name="ProcessTemplateReleaseGroupRuleMapping" EntityName="GroupRuleMapping"/>
+    <Entity Name="GlbCapability" External="True"/>
+    <Entity Name="GlbStaff" External="True">
+      <ExcludedProperty Name="GS_GeoLocation" />
+      <ExcludedProperty Name="GS_ValidationStatus" />
+    </Entity>
+    <Entity Name="GlbGroup" External="True"/>
+    <Entity Name="OrgAddress" External="True">
+      <ExcludedProperty Name="OA_GeoLocation" />
+      <ExcludedProperty Name="OA_GeofencePolygon" />
+      <ExcludedProperty Name="OA_ValidationStatus" />
+    </Entity>
+    <Entity Name="OrgHeader" External="True"/>
+    <Entity Name="WhsWarehouse" External="True"/>
+    <Entity Name="ProcessHeader" EntityName="ProcessHeaderFrom">
+      <ExcludedProperty Name="FH_FC_CurrentComponent"/>
+    </Entity>
+    <Entity Name="ProcessHeader" EntityName="ProcessHeaderTo">
+      <ExcludedProperty Name="FH_FC_CurrentComponent"/>
+    </Entity>
+    <Entity Name="ProcessHeaderLink" RequiresAdditionOfActionEqualsMerge="True"/>
+    <Entity Name="StmNote">
+      <ExcludedProperty Name="ST_AutoVersion" />
+    </Entity>
+    <Entity Name="StmNote" EntityName="TemplateConditionNote">
+      <ExcludedProperty Name="ST_AutoVersion" />
+    </Entity>
+    <Entity Name="GenCustomColumnDefinition"/>
+  </Entities>
+  <Associations>
+    <Association From="ProcessTemplateTrigger" To="ProcessTaskTemplate" Key="P9T_P0_Template"/>
+    <Association From="ProcessTaskTemplate" To="OrgAddress" Key="P0_OA_Address" External="True"/>
+    <Association From="ProcessTaskTemplate" To="OrgHeader" Key="P0_OH_Client" External="True"/>
+    <Association From="ProcessTaskTemplate" To="WhsWarehouse" Key="P0_WW" External="True"/>
+    <Association From="ProcessJobHeader" To="GlbGroup" Key="FH_GG_ReleaseGroup" External="True"/>
+    <Association From="Workflow" To="GlbGroup" Key="FH_GG_ReleaseGroup" External="True"/>
+    <Association From="Workflow" To="ProcessJobHeader" Key="FH_FH_ParentHeader"/>
+    <Association From="TagLink" To="TagMagnitude" Key="TGL_TGM_Magnitude" External="True"/>
+    <Association From="TagMagnitude" To="TagDefinition" Key="TGM_TGD_Tag" External="True"/>
+    <Association From="TagLink" To="Workflow" Key="TGL_ParentId"/>
+    <Association From="TagLink" To="ProcessJobHeader" Key="TGL_ParentId"/>
+    <Association From="ProcessJobHeader" To="ProcessTaskTemplate" Key="FH_P0_Template" WhereThisColumnIsNull="FH_FH_ParentHeader"/>
+    <Association From="Workflow" To="ProcessTaskTemplate" Key="FH_P0_Template"/>
+    <Association From="ProcessTaskNotification_RegularTriggers" To="ProcessTasks" Key="PQ_P9"/>
+    <Association From="ProcessTaskNotification_UniversalTriggers" To="ProcessTemplateTrigger" Key="PQ_P9T_Trigger"/>
+    <Association From="ProcessTasks" To="GlbCapability" Key="P9_G4_RequiredCapability" External="True"/>
+    <Association From="ProcessTasks" To="GlbStaff" Key="P9_GS_NKAssignedStaffMember" External="True"/>
+    <Association From="ProcessTasks" To="Workflow" Key="P9_FH_ProcessHeader"/>
+    <Association From="ProcessTasks" To="ProcessTaskTemplate" Key="P9_ParentID"/>
+    <Association From="ProcessHeaderFrom" To="ProcessTaskTemplate" Key="FH_P0_Template"/>
+    <Association From="ProcessHeaderTo" To="ProcessTaskTemplate" Key="FH_P0_Template"/>
+    <Association From="ProcessHeaderLink" To="ProcessHeaderFrom" Key="FP_FH_HeaderFrom"/>
+    <Association From="ProcessHeaderLink" To="ProcessHeaderTo" Key="FP_FH_HeaderTo"/>
+    <Association From="StmNote" To="ProcessTaskTemplate" Key="ST_ParentID"/>
+    <Association From="TemplateConditionNote" To="ProcessTasks" Key="ST_ParentID"/>
+    <Association From="GenCustomColumnDefinition" To="ProcessTaskTemplate" Key="XC_ParentID"/>
+    <Association From="ReleaseGroupRule" To="ProcessTaskTemplate" Key="PTR_P0_Template"/>
+    <Association From="RuleCategory" To="ReleaseGroupRule" Key="PTC_PTR_Rule"/>
+    <Association From="GroupRuleMapping" To="ReleaseGroupRule" Key="PTM_PTR_Rule"/>
+    <Association From="GroupRuleMapping" To="GlbGroup" Key="PTM_GG_Group"/>
+  </Associations>
+</NativeSchemaSet>

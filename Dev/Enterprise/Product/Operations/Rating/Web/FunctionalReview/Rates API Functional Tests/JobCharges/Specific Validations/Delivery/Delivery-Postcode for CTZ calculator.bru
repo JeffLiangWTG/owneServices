@@ -1,0 +1,36 @@
+meta {
+  name: Delivery-Postcode for CTZ calculator
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.RateParties = RatesAPIsHelper.GetRateParties();
+   
+    Requirement: setup client rate / costing in CW1 matching the below request values to have rates
+    Transport zone settings to be used in CTZ calculator
+   query.DeliveryPostcode = "2005"
+   query.Origin.Value = "AUSYD"  default is AUSYD
+   query.Destination.Value = "AUMEL"  default is USLAX
+   query.TransportMode = "AIR"  default is SEA
+   query.ContainerMode = "LSE"  default is FCL
+   
+    autorating log may contain:
+    Matched 'SYD' for RateLine DADF-CTZ-KG-Client Rate ITISYS
+     - Delivery Distance: empty
+     - Distance Calculation Service: empty (registry disabled)
+     - Lat/Long Postcode Distance: empty (Consignee Delivery Address to CTO/Wharf)
+     - No transport zone could be matched by distance (0)
+     - 'SYD' transport zone matched by Consignee Pickup/Delivery Address fallback
+   
+   req.setBody(query);
+}

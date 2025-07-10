@@ -1,0 +1,1 @@
+﻿BACKUP DATABASE [StlAnalysis] TO DISK = 'F:\BACKUPS\StlAnalysis_YYYYMMDD_hhmmss.bak' WITH INIT, COMPRESSION;

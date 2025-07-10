@@ -1,0 +1,24 @@
+meta {
+  name: Call endpoint using Carriers with C1CCode
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetRateQueryWithMandatoryFieldsForProvidedVariables();
+   query.Carriers = RatesAPIsHelper.GetCarriersWithCICCodes();
+   
+   req.setBody(query);
+}
+
+tests {
+  
+}

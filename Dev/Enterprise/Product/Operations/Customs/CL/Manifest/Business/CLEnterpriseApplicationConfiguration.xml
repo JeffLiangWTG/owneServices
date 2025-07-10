@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<objects xmlns="http://www.springframework.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cargowise="http://www.cargowise.com/2008/spring-extensions" xsi:schemaLocation="http://www.springframework.net http://www.springframework.net/xsd/spring-objects.xsd" default-lazy-init="true">
+  <!-- Avoid using use singleton=true as this causes Spring to cache the object without the developer understanding the effects of this -->
+  <!-- The xmlns:cargowise namespace works in conjunction with LazyConfiguredApplicationContext to prevent types being loaded unnecessarily on startup -->
+  <!-- Customs CL -->
+  <object id="CL.ICLCustomsRegistry" type="Enterprise.Customs.CL.Manifest.Business.CLCustomsDataRegistry, Enterprise.Customs.CL.Manifest.Business" singleton="false" />
+  <object id="CL.ICLMessage" type="Enterprise.Customs.CL.Manifest.Business.CLMessage, Enterprise.Customs.CL.Manifest.Business" singleton="false" />
+  
+  <!-- Customs CLManifest Manifest -->
+  <object id="CLManifest.IAsycudaManifestHeader" type="Enterprise.Customs.CL.Manifest.Business.AsycudaManifestHeader, Enterprise.Customs.CL.Manifest.Business" singleton="false" />
+  <object id="CLManifest.IAsycudaBill" type="Enterprise.Customs.CL.Manifest.Business.AsycudaBill, Enterprise.Customs.CL.Manifest.Business" singleton="false" />
+  <object id="CLManifest.IAsycudaPack" type="Enterprise.Customs.CL.Manifest.Business.AsycudaPack, Enterprise.Customs.CL.Manifest.Business" singleton="false" />
+
+  <!-- GlobalManifestApplicationBusinessProvider -->
+  <object id="GlobalManifestApplicationBusinessProvider" type="CargoWise.Application.ListObject, CargoWise.ApplicationContext">
+    <property name="SourceList" isSubSet="true">
+      <list>
+        <ref object="CLManifest.ApplicationBusinessProvider" />
+      </list>
+    </property>
+  </object>
+  <object id="CLManifest.ApplicationBusinessProvider" type="Enterprise.Customs.CL.Manifest.Business.ApplicationBusinessProvider, Enterprise.Customs.CL.Manifest.Business" singleton="false" />
+
+  <!-- GlobalManifestApplicationGuiProvider -->
+  <object id="GlobalManifestApplicationGuiProvider" type="CargoWise.Application.ListObject, CargoWise.ApplicationContext">
+    <property name="SourceList" isSubSet="true">
+      <list>
+        <ref object="CLManifest.ApplicationGUIProvider" />
+      </list>
+    </property>
+  </object>
+  <object id="CLManifest.ApplicationGUIProvider" type="Enterprise.Customs.CL.Manifest.GUI.ApplicationGUIProvider, Enterprise.Customs.CL.Manifest.GUI" singleton="false" />
+</objects>

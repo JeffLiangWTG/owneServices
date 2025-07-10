@@ -1,0 +1,28 @@
+@using WinzorFramework.Extensions
+@using Microsoft.AspNetCore.Components.Web
+@using Winform = System.Windows.Forms;
+@namespace Enterprise.ZArchitecture.GUI.Internal
+@inherits ZUserControl
+
+<div class="zdropbutton @disabledClass">
+	<button data-winzor-control-id="@WinzorControlId" style="@buttonStyleString" disabled="@IsDisabled" tabindex="@this.TabIndexHtmlAttributeValue()" @onmousedown=OnDropButtonClickAsync @onmousedown:stopPropagation @onmousedown:preventDefault>keyboard_arrow_down</button>
+</div>
+
+@code
+{
+    string disabledClass => IsDisabled ? "zdropbutton--disabled" : string.Empty;
+
+    bool IsDisabled => !Enabled || ReadOnly;
+
+    string buttonStyleString => $"left:{ButtonBounds.Left}px;width:{ButtonBounds.Width}px;height:{ButtonBounds.Height}px;";
+
+    internal async virtual Task OnDropButtonClickAsync(MouseEventArgs e)
+    {
+        if (!IsDisabled)
+        {
+            await InvokeWinzorDispatcherAsync(() => OnMouseDown(new Winform.MouseEventArgs(e.GetMouseButtons(), (int)e.Detail, (int)e.ClientX, (int)e.ClientY, 0)));
+        }
+    }
+
+	protected override bool ShouldRender => base.ShouldRender && ButtonSize.Width > 0 && ButtonSize.Height > 0;
+}

@@ -1,0 +1,34 @@
+meta {
+  name: Valid Request To Costing - Asking For XML
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/xml
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   req.setBody(query);
+   
+   
+}
+
+tests {
+  test("Should return status code 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("Should return XML content", function() {
+    expect(res.getHeader('content-type')).to.equal('application/xml; charset=utf-8');
+  });
+}

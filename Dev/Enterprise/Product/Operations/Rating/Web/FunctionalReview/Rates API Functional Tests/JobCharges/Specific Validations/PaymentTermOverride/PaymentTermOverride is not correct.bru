@@ -1,0 +1,31 @@
+meta {
+  name: PaymentTermOverride is not correct
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.PaymentTermOverride = "XXX";
+   
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided PaymentTermOverride ('XXX') is not valid. It can only be one of these values: 'PPD', 'CCX'.", function() {
+    expect(res.body.ModelState['PaymentTermOverride'][0]).to.equal("Provided PaymentTermOverride ('XXX') is not valid. It can only be one of these values: 'PPD', 'CCX'.");
+  });
+}

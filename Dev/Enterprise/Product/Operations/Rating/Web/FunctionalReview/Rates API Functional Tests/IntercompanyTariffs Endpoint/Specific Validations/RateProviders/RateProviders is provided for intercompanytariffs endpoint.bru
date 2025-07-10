@@ -1,0 +1,30 @@
+meta {
+  name: RateProviders is provided for intercompanytariffs endpoint
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/intercompanytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForIntercompanyTariffs();
+   query.RateProviders = ["CW"];
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: RateProviders is only applicable to costing endpoint.", function() {
+    expect(res.body.ModelState['RateProviders'][0]).to.equal("RateProviders is only applicable to costing endpoint.");
+  });
+}

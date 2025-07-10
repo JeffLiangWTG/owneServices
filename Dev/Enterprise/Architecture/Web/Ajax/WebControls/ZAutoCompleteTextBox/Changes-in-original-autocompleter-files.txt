@@ -1,0 +1,95 @@
+﻿
+Changes were made in original files in order to make mootools autocompleter suitable to our needs:
+
+1. autocompleter.css
+Reason: To differ the second, third and next rows for the multi-row option. Following style applies to these rows.
+
+Added style:
+ul.autocompleter-choices li b
+{
+	display:   block;
+	font-size: 0.7em;
+	line-height: 1em;
+}
+
+
+
+2. autocompleter.request.js
+Reason: To resolve bug caused implicit encoding of HTML (default presentation of "A & B" was  "A &amp; B").
+
+Changed line (Autocompleter.Request.HTML class, queryResponse method):
+was:          var value = choice.innerHTML;
+changed to:   var value = choice.innerHTML.replace("&amp;", "&");
+
+
+
+3. autocompleter.js
+Reason: To add ability to do auto post back if an option was selected by mouse. It worked quite fine if an option was seleted by keyboard but
+        there was the bug if user clicked on an option by mouse, submit ocurred before the selected option was pasted into the textbox.
+                
+Changed line (Autocompleter class, onCommand method):
+was:
+	case 'enter':
+		if (this.element.value != this.opted) return true;
+		if (this.selected && this.visible) {
+			this.choiceSelect(this.selected);
+			return !!(this.options.autoSubmit);
+		}
+
+changed to:
+	case 'enter':
+		if (this.element.value != this.opted) return true;
+		if (this.selected && this.visible) {
+			this.choiceSelect(this.selected);
+			return false;
+		}
+
+
+
+Added line (Autocompleter class, choiceSelect method):
+
+was:
+	choiceSelect: function(choice) {
+		if (choice) this.choiceOver(choice);
+		this.setSelection(true);
+		this.queryValue = false;
+		this.hideChoices();
+	},
+
+
+changed to:
+	choiceSelect: function(choice) {
+		if (choice) this.choiceOver(choice);
+		this.setSelection(true);
+		this.queryValue = false;
+		this.hideChoices();
+
+		if (this.options.autoSubmit)
+		    setTimeout("__doPostBack('"+this.element.name+"','')", 0);
+	},
+
+
+4. autocompleter.js
+Reason: To add ability to do auto post back if an option was selected by pressing "tab" key. 
+
+
+Changed line (Autocompleter class, onCommand method):
+
+was:
+		        case 'esc': case 'tab':
+					this.hideChoices(true);
+					break;
+
+changed to:
+				case 'esc': 
+					this.hideChoices(true);
+					break;
+				case 'tab':
+					if (this.element.value != this.opted) 
+					    return true;
+					if (this.selected && this.visible) 
+					{
+						this.choiceSelect(this.selected);
+						return true;
+					}
+				    break;	

@@ -1,0 +1,6 @@
+CREATE VIEW RefCusConditionCodeTableView_V1 AS
+SELECT ZY7_PK,
+ZY7_ConditionCode,
+ZY7_Description,
+ZY7_ZZZ_NKDataGrouping
+FROM RefCusConditionCode

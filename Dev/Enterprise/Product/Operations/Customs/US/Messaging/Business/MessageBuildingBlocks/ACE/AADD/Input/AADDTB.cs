@@ -1,0 +1,28 @@
+// Use ADDTB instead
+//namespace Enterprise.Customs.US.Messaging.Business.MessageBuildingBlocks.ACE.Input
+//{
+//    using CargoWise.Types;
+
+//    [InputBlock("TB")]
+//    public partial class AADDTB : MessageBlock
+//    {
+//        public AADDTB()
+//            : base("TB")
+//        {
+//        }
+
+//        /// <summary>
+//        /// The business address, if it is different from the mailing address in positions 48-79, Record Identifier T1. If the mailing address is a U.S. Post Office box or a drawer, this data field is mandatory.
+//        /// </summary>
+//        [MessageBlockString(32, 3, "M")]
+//        public ZString LineOneOfTheSecondaryAddress;
+
+//        /// <summary>
+//        /// The second line of the secondary address. 
+//        /// 
+//        /// Space fill if the address is foreign.
+//        /// </summary>
+//        [MessageBlockString(32, 35, "C")]
+//        public ZString LineTwoOfTheSecondaryAddress;
+//    }
+//}

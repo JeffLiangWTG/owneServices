@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <StartupObject>AnalyzersRunner.Runner</StartupObject>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="BuildTools" />
+    <Reference Include="Microsoft.Build.Locator" />
+    <Reference Include="Microsoft.CodeAnalysis" />
+    <Reference Include="Microsoft.CodeAnalysis.Workspaces" />
+    <Reference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
+    <Reference Include="NUnitCore" />
+    <Reference Include="System.Collections.Immutable" />
+    <Reference Include="System.Memory" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Exec Command="$(OutDir)AnalyzersUnitTestGenerator.exe $(OutDir)$(AssemblyName).exe" />
+  </Target>
+</Project>

@@ -1,0 +1,6 @@
+CREATE VIEW RefMessagingBussPackageInfoAttributeTableView_V1 AS
+SELECT ZPA_PK,
+ZPA_ZMP_PackageInfo,
+ZPA_ZAI_AttributeInfo,
+ZPA_AttributeValue
+FROM RefMessagingBussPackageInfoAttribute

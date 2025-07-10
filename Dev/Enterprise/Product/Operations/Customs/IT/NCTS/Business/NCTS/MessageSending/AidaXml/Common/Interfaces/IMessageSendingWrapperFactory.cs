@@ -1,0 +1,10 @@
+namespace Enterprise.Customs.IT.NCTS.Business.MessageSending.AidaXml;
+
+public interface IMessageSendingWrapperFactory
+{
+	INctsHeaderWrapper GetNewNctsHeaderWrapper(NctsHeader header);
+
+	IHouseConsignmentCustomsMessageWrapper GetNewHouseConsignmentCustomsMessageWrapper(NctsBill bill);
+
+	IConsignmentItemCustomsMessageWrapper GetNewConsignmentItemCustomsMessageWrapper(NctsDepartureCargoDesc goodsItem);
+}

@@ -1,0 +1,807 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreTargetFramework)</TargetFrameworks>
+    <AssemblyName>Enterprise.DataTransfer</AssemblyName>
+    <RootNamespace>Enterprise.DataTransfer</RootNamespace>
+    <SGenUseProxyTypes>false</SGenUseProxyTypes>
+    <SuppressObsoleteWarnings>SYSLIB0014</SuppressObsoleteWarnings>
+    <CWGenerateXmlSerializationAssemblies>true</CWGenerateXmlSerializationAssemblies>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'FailuresAreOk|AnyCPU' ">
+    <DefineConstants>FAILURESAREOK</DefineConstants>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.ComponentModel" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Database.Shared" />
+    <Reference Include="CargoWise.Definitions" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.Integration" />
+    <Reference Include="CargoWise.IO" />
+    <Reference Include="CargoWise.Odyssey.Schema" />
+    <Reference Include="CargoWise.Organizations.CodeGeneration" />
+    <Reference Include="CargoWise.Organizations.PatternMatching" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="CargoWise.Schema" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="Enterprise.Accounting.Integration" />
+    <Reference Include="Enterprise.Billing.Integration" />
+    <Reference Include="Enterprise.DataTransfer.Integration" />
+    <Reference Include="Enterprise.DataTransfer.Native.Integration" />
+    <Reference Include="Enterprise.DocumentEngine" />
+    <Reference Include="Enterprise.DocumentEngineCore" />
+    <Reference Include="Enterprise.eHubMessaging.Business" />
+    <Reference Include="Enterprise.Environment" />
+    <Reference Include="Enterprise.Freight.Integration" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.MasterData.Common" />
+    <Reference Include="Enterprise.MasterFiles.Business" />
+    <Reference Include="Enterprise.MasterFiles.Integration" />
+    <Reference Include="Enterprise.MasterFiles.Tracking" />
+    <Reference Include="Enterprise.Messaging.Business" />
+    <Reference Include="Enterprise.Messaging.Integration" />
+    <Reference Include="Enterprise.Registry.Business" />
+    <Reference Include="Enterprise.UniversalDataBuss.Integration" />
+    <Reference Include="Enterprise.Warehouse.Integration" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Enterprise.ZArchitecture.Modules" />
+    <Reference Include="MailManager" />
+    <Reference Include="MailManager.Integration" />
+    <Reference Include="Microsoft.SqlServer.Types" />
+    <Reference Include="Resources" />
+    <Reference Include="System.Collections.Immutable" />
+    <Reference Include="System.Memory" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\Consol.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>Consol.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\Elements.xsd">
+      <Generator>XsdClassGeneratorWithAnyElements</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Elements.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\ExportAWBHeader.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>ExportAWBHeader.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\AlternateGLAccount.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>AlternateGLAccount.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\GLHeader.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>GLHeader.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\ChargeCode.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>ChargeCode.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\GLHeaderMultiLanguageMapping.xsd">
+      <SubType>Designer</SubType>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>GLHeaderMultiLanguageMapping.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\GLHeaderMultiLanguageReportSetup.xsd">
+      <SubType>Designer</SubType>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>GLHeaderMultiLanguageReportSetup.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\GLHeadersAndChargeCodes.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>GLHeadersAndChargeCodes.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\AgencyBillOfLading.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>AgencyBillOfLading.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\AdvantageCustoms.xsd">
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>AdvantageCustoms.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\AdvantageCustomsResponseStatus.xsd">
+      <SubType>Designer</SubType>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>AdvantageCustomsResponseStatus.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Update="DataFileDefinitions\Xml\Version1\AgencyBillOfLading.xsx">
+      <DependentUpon>AgencyBillOfLading.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\ALPOAUFTRAG.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1.ALPO</CustomToolNamespace>
+      <LastGenOutput>ALPOAUFTRAG.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Update="DataFileDefinitions\Xml\Version1\BankStatement.xsx">
+      <DependentUpon>BankStatement.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\BusinessObjectPK.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>BusinessObjectPK.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Update="DataFileDefinitions\Xml\Version1\BusinessObjectPK.xsx">
+      <DependentUpon>BusinessObjectPK.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\Consol.xsx">
+      <DependentUpon>Consol.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\CustomerServiceRequest.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>CustomerServiceRequest.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\ContainerEvents.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>ContainerEvents.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <None Update="DataFileDefinitions\Xml\Version1\ContainerEvents.xsx">
+      <DependentUpon>ContainerEvents.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\Billing.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>Billing.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\WhsInventorys.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>WhsInventorys.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\Balance.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>Balance.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\ContainerMovement.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>ContainerMovement.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Update="DataFileDefinitions\Xml\Version1\CustomerService.xsd">
+      <SubType>Designer</SubType>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>CustomerService.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\CustomerServiceRequest.xsx">
+      <DependentUpon>CustomerServiceRequest.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\CustomerServiceResponse.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>CustomerServiceResponse.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Update="DataFileDefinitions\Xml\Version1\CustomerServiceResponse.xsx">
+      <DependentUpon>CustomerServiceResponse.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\DebtorBalance.xsd">
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>DebtorBalance.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\Declaration.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>Declaration.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\ERequestDocument.xsd">
+      <SubType>Designer</SubType>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>ERequestDocument.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <None Update="DataFileDefinitions\Xml\Version1\GLHeadersAndChargeCodes.xsx">
+      <DependentUpon>GLHeadersAndChargeCodes.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\Shipment.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>Shipment.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\WhsDocket.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>WhsDocket.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\RateCalculator.xsd">
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>RateCalculator.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\ImporterSecurityFiling.xsd">
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>ImporterSecurityFiling.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\IncompleteTransaction.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>IncompleteTransaction.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\Product.xsd">
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>Product.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\NettingClearingJournals.xsd">
+      <SubType>Designer</SubType>
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>NettingClearingJournals.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Update="DataFileDefinitions\Xml\Version1\Order.xsx">
+      <DependentUpon>Order.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\RateCalculator.xsx">
+      <DependentUpon>RateCalculator.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\StorageDocs.xsd">
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>StorageDocs.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Update="DataFileDefinitions\Xml\Version1\WhsDocket.xsx">
+      <DependentUpon>WhsDocket.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\WhsDocketIFS.xsd">
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>WhsDocketIFS.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Update="DataFileDefinitions\Xml\Version1\WhsDocketIFS.xsx">
+      <DependentUpon>WhsDocketIFS.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\APTrans.xsx">
+      <DependentUpon>APTrans.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\CartageJob.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>CartageJob.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\ConsolAndShipmentForInternalUse.xsd">
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>ConsolAndShipmentForInternalUse.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Update="DataFileDefinitions\Xml\Version1\ConsolAndShipmentForInternalUse.xsx">
+      <DependentUpon>ConsolAndShipmentForInternalUse.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\CusImportManifest.xsx">
+      <DependentUpon>CusImportManifest.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\FinancialInvoice.xsx">
+      <DependentUpon>FinancialInvoice.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\FinancialInvoiceLine.xsx">
+      <DependentUpon>FinancialInvoiceLine.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\FinancialTransactions.xsx">
+      <DependentUpon>FinancialTransactions.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\FinancialWipOrAccrual.xsx">
+      <DependentUpon>FinancialWipOrAccrual.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\GLJournal.xsx">
+      <DependentUpon>GLJournal.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\Rate.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>Rate.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Update="DataFileDefinitions\Xml\Version1\Rate.xsx">
+      <DependentUpon>Rate.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\Schedule.xsx">
+      <DependentUpon>Schedule.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\WebConsol.xsx">
+      <DependentUpon>WebConsol.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\WebContainer.xsx">
+      <DependentUpon>WebContainer.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\WebInvoiceFilter.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>WebInvoiceFilter.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\WebInvoiceFilter.xsx">
+      <DependentUpon>WebInvoiceFilter.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\WebOrder.xsx">
+      <DependentUpon>WebOrder.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\WebOrderFilter.xsx">
+      <DependentUpon>WebOrderFilter.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\WebOrderSummary.xsx">
+      <DependentUpon>WebOrderSummary.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\WebPacking.xsx">
+      <DependentUpon>WebPacking.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\WebShipment.xsx">
+      <DependentUpon>WebShipment.xsd</DependentUpon>
+    </None>
+    <None Update="DataFileDefinitions\Xml\Version1\WebShipmentFilter.xsx">
+      <DependentUpon>WebShipmentFilter.xsd</DependentUpon>
+    </None>
+    <None Update="DataAdapters\Testing\TestValueObjectsForCoverageTest.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>TestValueObjectsForCoverageTest.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.TestValueObjectsForCoverageTest</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </None>
+    <None Update="DataAdapters\Testing\TestValueObjectsForCoverageTest.xsx">
+      <DependentUpon>TestValueObjectsForCoverageTest.xsd</DependentUpon>
+    </None>
+    <None Update="Xml\Testing\XsdTypeNameSameAsElementNameTestCase\XmlArrayItemElementNameAttributeToBeClassNameAgnosticTestXsd.xsx">
+      <DependentUpon>XmlArrayItemElementNameAttributeToBeClassNameAgnosticTestXsd.xsd</DependentUpon>
+    </None>
+    <None Update="Xml\Testing\XsdTypeNameSameAsElementNameTestCase\XsiTypeAttributeToBeClassNameAgnosticTestXsd.xsx">
+      <DependentUpon>XsiTypeAttributeToBeClassNameAgnosticTestXsd.xsd</DependentUpon>
+    </None>
+    <None Update="Xml\Testing\XsdTypeNameSameAsElementNameTestCase\XsiTypeAttributeToBeClassNameAgnosticTestXsd_ToInclude.xsx">
+      <DependentUpon>XsiTypeAttributeToBeClassNameAgnosticTestXsd_ToInclude.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\BankStatement.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>BankStatement.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\CusImportManifest.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>CusImportManifest.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\Event.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>Event.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\FinancialInvoice.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>FinancialInvoice.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\FinancialInvoiceLine.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>FinancialInvoiceLine.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\FinancialTransactions.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>FinancialTransactions.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\FinancialWipOrAccrual.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>FinancialWipOrAccrual.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\GLJournal.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>GLJournal.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\Invoice.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>Invoice.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\Order.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>Order.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\Schedule.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>Schedule.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\ShipmentBooking.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>ShipmentBooking.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\WebConsol.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>WebConsol.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\WebContainer.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>WebContainer.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\WebOrder.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>WebOrder.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\WebOrderFilter.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>WebOrderFilter.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\WebOrderSummary.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>WebOrderSummary.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\WebPacking.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>WebPacking.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\WebShipment.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>WebShipment.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\WebShipmentFilter.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>WebShipmentFilter.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataFileDefinitions\Xml\Version1\XmlInterchange.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+      <LastGenOutput>XmlInterchange.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Xml\Testing\XsdTypeNameSameAsElementNameTestCase\XmlArrayItemElementNameAttributeToBeClassNameAgnosticTestXsd.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>XmlArrayItemElementNameAttributeToBeClassNameAgnosticTestXsd.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.Testing</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Xml\Testing\XsdTypeNameSameAsElementNameTestCase\XsiTypeAttributeToBeClassNameAgnosticTestXsd.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>XsiTypeAttributeToBeClassNameAgnosticTestXsd.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.Testing</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Xml\Testing\XsdTypeNameSameAsElementNameTestCase\XsiTypeAttributeToBeClassNameAgnosticTestXsd_ToInclude.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>XsiTypeAttributeToBeClassNameAgnosticTestXsd_ToInclude.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.Testing</CustomToolNamespace>
+    </EmbeddedResource>
+    <Compile Update="DataFileDefinitions\Xml\Version1\EDIClientConnectionRequest.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EDIClientConnectionRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\AlternateGLAccount.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AlternateGLAccount.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\Rate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Rate.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\Product.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Product.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\Order.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Order.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\RateCalculator.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RateCalculator.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\ShipmentBooking.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ShipmentBooking.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\Shipment.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Shipment.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\Schedule.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Schedule.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\NettingClearingJournals.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>NettingClearingJournals.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\Balance.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Balance.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\GLHeadersAndChargeCodes.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GLHeadersAndChargeCodes.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\GLHeaderMultiLanguageReportSetup.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GLHeaderMultiLanguageReportSetup.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\GLJournal.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GLJournal.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\Invoice.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Invoice.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\IncompleteTransaction.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IncompleteTransaction.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\ImporterSecurityFiling.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ImporterSecurityFiling.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\WhsDocket.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WhsDocket.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\WebShipmentFilter.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WebShipmentFilter.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\WebShipment.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WebShipment.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\WhsDocketIFS.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WhsDocketIFS.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\XmlInterchange.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>XmlInterchange.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\WhsInventorys.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WhsInventorys.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\WebPacking.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WebPacking.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\WebContainer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WebContainer.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\WebConsol.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WebConsol.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\StorageDocs.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>StorageDocs.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\WebInvoiceFilter.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WebInvoiceFilter.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\WebOrderSummary.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WebOrderSummary.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\WebOrderFilter.cs">
+      <DependentUpon>WebOrderFilter.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\WebOrder.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WebOrder.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\Consol.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Consol.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\ChargeCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ChargeCode.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\CartageJob.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CartageJob.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\ConsolAndShipmentForInternalUse.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConsolAndShipmentForInternalUse.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\CusImportManifest.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CusImportManifest.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\ContainerMovement.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ContainerMovement.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\ContainerEvents.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ContainerEvents.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\BusinessObjectPK.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BusinessObjectPK.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\AgencyBillOfLading.cs">
+      <DependentUpon>AgencyBillOfLading.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\AdvantageCustomsResponseStatus.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AdvantageCustomsResponseStatus.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\AdvantageCustoms.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AdvantageCustoms.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\ALPOAUFTRAG.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ALPOAUFTRAG.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\Billing.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Billing.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\BankStatement.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BankStatement.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\APTrans.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>APTrans.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\FinancialInvoiceLine.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FinancialInvoiceLine.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\FinancialInvoice.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FinancialInvoice.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\ExportAWBHeader.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ExportAWBHeader.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\FinancialTransactions.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FinancialTransactions.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\GLHeaderMultiLanguageMapping.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GLHeaderMultiLanguageMapping.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\GLHeader.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GLHeader.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\FinancialWipOrAccrual.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FinancialWipOrAccrual.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\Event.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Event.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\CustomerServiceResponse.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CustomerServiceResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\CustomerServiceRequest.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CustomerServiceRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\CustomerService.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CustomerService.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\DebtorBalance.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DebtorBalance.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\ERequestDocument.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ERequestDocument.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\Elements.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Elements.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataFileDefinitions\Xml\Version1\Declaration.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Declaration.xsd</DependentUpon>
+    </Compile>
+    <Content Include="DataFileDefinitions\Xml\Version1\APTrans.xsd">
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>APTrans.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.DataTransfer.Xml.XsdVersion1</CustomToolNamespace>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

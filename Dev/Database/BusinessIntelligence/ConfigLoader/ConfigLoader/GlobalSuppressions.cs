@@ -1,0 +1,10 @@
+// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~M:CargoWise.Bi.ConfigLoader.BiConfigurationData.LoadBiConfigurationFromEmbeddedResources(CargoWise.Bi.ConfigLoader.BiConfigurationData.BiConfigurationFileType[])")] // C:\git\wtg\CargoWise\Dev\Database\BusinessIntelligence\ConfigLoader\ConfigLoader\BiConfigurationData.cs:308:35
+[assembly: SuppressMessage("CargoWiseOne", "CW1060:Do not use System.DateTime.Now Rule", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~M:CargoWise.Bi.ConfigLoader.Testing.ExpressionsTest.GetPossibleValues(System.String,System.Int32,System.Int32,System.Int32,System.Boolean)")] // C:\git\wtg\CargoWise\Dev\Database\BusinessIntelligence\ConfigLoader\ConfigLoader\BiAutomationConfigLoader.cs:1173:79
+[assembly: SuppressMessage("CargoWiseOne", "CW1060:Do not use System.DateTime.Now Rule", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~M:CargoWise.Bi.ConfigLoader.Testing.ExpressionsTest.GetPossibleValues(System.String,System.Int32,System.Int32,System.Int32,System.Boolean)")] // C:\git\wtg\CargoWise\Dev\Database\BusinessIntelligence\ConfigLoader\ConfigLoader\BiAutomationConfigLoader.cs:1176:101
+[assembly: SuppressMessage("CargoWiseOne", "CW1060:Do not use System.DateTime.Now Rule", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~M:CargoWise.Bi.ConfigLoader.Testing.ExpressionsTest.GetPossibleValues(System.String,System.Int32,System.Int32,System.Int32,System.Boolean)")] // C:\git\wtg\CargoWise\Dev\Database\BusinessIntelligence\ConfigLoader\ConfigLoader\BiAutomationConfigLoader.cs:1191:97

@@ -1,0 +1,30 @@
+meta {
+  name: ContainerTypes is Provided for JobCharges Endpoint
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.ContainerTypes = [{ Type: "CW", Value: "20GP" }];
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: ContainerTypes is not applicable for job charges calculation endpoint.", function() {
+    expect(res.body.ModelState['ContainerTypes'][0]).to.equal("ContainerTypes is not applicable for job charges calculation endpoint.");
+  });
+}

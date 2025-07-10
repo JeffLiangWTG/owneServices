@@ -1,0 +1,37 @@
+meta {
+  name: Vias contains empty elements
+  type: http
+  seq: 17
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   
+   query.TransportMode = "AIR";
+   query.ContainerMode = "LSE";
+   
+   
+   query.CGFilter = { Vias: [""] }
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided Vias is not valid. It shouldn't contain null or empty elements.", function() {
+    expect(res.body.ModelState['CGFilter.Vias'][0]).to.equal("Provided Vias is not valid. It shouldn't contain null or empty elements.");
+  });
+  
+  
+}

@@ -1,0 +1,46 @@
+@using CargoWise.NetworkVisualisation.GUI.Models
+@using CargoWise.NetworkVisualisation.Integration;
+@inherits NetworkNode<BufferNodeModel>
+
+<div class="networknode buffernode">
+    <div class="buffernode__cardwrapper">
+        <div class="networknode__card buffernode__card" style="@StatusColorStyle @BorderStyle" title="@Node.Tooltip">
+            <div class="buffernode__card__grid">
+                @if (@StatusImage != null)
+                {
+                    <img class="buffernode__statusicon" src=@StatusImage title=@Node.StatusTooltip />
+                }
+                @if (EntityStateImage is not null)
+                {
+                    <img class="buffernode__entitystateicon" src=@EntityStateImage title=@Node.EntityStateTooltip />
+                }
+                <DynamicTextArea Class="networknode__diagramname buffernode__diagramname" @bind-Value=Node.DiagramName @bind-Value:after=@Node.Diagram_DiagramNameChangedAsync Style=@($"font-weight: {StatusFontWeight};") />
+                @if (@Node.HasNotifications)
+                {
+                    <div style="@NotificationWarningStyle" class="buffernode__notification" title=@Node.EntityStateTooltip />
+                }
+                <div class="buffernode__contentwrapper">
+                    <div class="buffernode__content">
+                        @if (!string.IsNullOrWhiteSpace(Node.PenetrationPercentLabel))
+                        {
+                            <div class="buffernode__penetrationlabel">
+                                @Node.PenetrationPercentLabel
+                            </div>
+                        }
+                        <div class="buffernode__bottom__wrapper" style="@BufferDetailsMarginStyle">
+                            <div class="buffernode__bottom">
+                                <span class="buffernode__description">@Node.Description</span>
+                                <span class="additional-detail-content">@Node.AdditionalDetail</span>
+                            </div>
+                        </div>
+                        <DynamicTextArea Class="networknode__notes buffernode__notes" Placeholder=@Node.NotesPlaceholder @bind-Value=Node.Notes @bind-Value:after=@Node.Diagram_NotesChangedAsync IsMoving=@Node.IsMoving />
+                    </div>
+                </div>
+            </div>
+            @if (Node.ProgressBarModel != null)
+            {
+                <ProgressBar Model=@Node.ProgressBarModel @key=@Node.ProgressBarModel />
+            }
+        </div>
+    </div>
+</div>

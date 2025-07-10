@@ -1,0 +1,243 @@
+@namespace System.Windows.Forms
+@inherits TextBoxBase
+@using WinzorFramework.Extensions;
+@using Microsoft.JSInterop
+@using WinzorFramework
+@using System.Threading;
+@using System.Drawing;
+@using System.IO
+@using WinzorFramework.JSInterop
+
+<div @attributes="DataAttributes" @ref="ElementReference" style="@ControlStyleString"
+	 class="richtextbox @getBorderStyle(BorderStyle) richtextbox--wtgeditor @ReadOnlyClass() @WordWrapClass()"
+	 @onmousedown="OnMouseDownAsync" @onmousedown:stopPropagation
+	 @onrichtextboxcontextmenu="OnRichTextBoxContextMenuAsync" @oncontextmenu:stopPropagation @oncontextmenu:preventDefault
+	 @onwinzorfocusin="OnFocusInAsync" @onwinzorfocusin:stopPropagation
+	 @onwinzorfocusout="OnFocusOutAsync" @onwinzorfocusout:stopPropagation
+	 @onlinkclicked="OnLinkClickedAsync"
+	 @onmodified=OnModifiedAsync @oncontentchanged=OnContentChangedAsync>
+	@if (IsToolBarVisible)
+	{
+		<div class="richtextbox__toolbar" aria-label="Toolbar" role="toolbar" style="@ToolbarBackground">
+			<div class="richtextbox__toolbar-item richtextbox__toolbar-item--combobox combobox" title="Fonts">
+				<input class="combobox__input" aria-label="Fonts" role="menu" disabled="@ReadOnly" tabindex="-1" />
+				<button class="combobox__button" aria-label="Open fonts menu" tabindex="-1">keyboard_arrow_down</button>
+				<datalist id="@(WinzorControlId)-Fonts">
+					@foreach (var font in @GetServerInstalledFonts())
+					{
+						<option value="@font">
+							@font
+						</option>
+					}
+				</datalist>
+			</div>
+
+			<div class="richtextbox__toolbar-item richtextbox__toolbar-item--combobox combobox" title="Font sizes">
+				<input class="combobox__input" aria-label="Font sizes" role="menu" disabled="@ReadOnly" tabindex="-1"/>
+				<button class="combobox__button" aria-label="Open font sizes menu" tabindex="-1">keyboard_arrow_down</button>
+				<datalist id="@(WinzorControlId)-FontSizes">
+					@foreach (var fontSize in fontSizeList)
+					{
+						<option value="@fontSize">
+							@fontSize
+						</option>
+					}
+				</datalist>
+			</div>
+			<div class="richtextbox__toolbar-spacer"></div>
+			<button class="richtextbox__toolbar-item richtextbox__toolbar-item--button" aria-label="Bold" role="button" title="Bold" disabled="@ReadOnly" tabindex="-1">
+				<svg></svg>
+			</button>
+			<button class="richtextbox__toolbar-item richtextbox__toolbar-item--button" aria-label="Italic" role="button" title="Italic" disabled="@ReadOnly" tabindex="-1">
+				<svg></svg>
+			</button>
+			<button class="richtextbox__toolbar-item richtextbox__toolbar-item--button" aria-label="Underline" role="button" title="Underline" disabled="@ReadOnly" tabindex="-1">
+				<svg></svg>
+			</button>
+			<button class="richtextbox__toolbar-item richtextbox__toolbar-item--button" aria-label="Strikethrough" role="button" title="Strikethrough" disabled="@ReadOnly" tabindex="-1">
+				<svg></svg>
+			</button>
+			<button class="richtextbox__toolbar-item richtextbox__toolbar-item--button" aria-label="Bullet list" role="button" title="Bullet list" disabled="@ReadOnly" tabindex="-1">
+				<svg></svg>
+			</button>
+			<button class="richtextbox__toolbar-item richtextbox__toolbar-item--button" aria-label="Numbered list" role="button" title="Numbered list" disabled="@ReadOnly" tabindex="-1">
+				<svg></svg>
+			</button>
+			<div class="richtextbox__toolbar-spacer"></div>
+			<button class="richtextbox__toolbar-item richtextbox__toolbar-item--button" aria-label="Attach a file" role="button" title="Attach a file" disabled="@ReadOnly" tabindex="-1">
+				<svg></svg>
+			</button>
+			<button class="richtextbox__toolbar-item richtextbox__toolbar-item--button" aria-label="Insert Image" role="button" title="Insert Image" disabled="@ReadOnly" tabindex="-1">
+				<svg></svg>
+			</button>
+			<button class="richtextbox__toolbar-item richtextbox__toolbar-item--button" aria-label="Decrease indent" role="button" title="Decrease indent" disabled="@ReadOnly" tabindex="-1">
+				<svg></svg>
+			</button>
+			<button class="richtextbox__toolbar-item richtextbox__toolbar-item--button" aria-label="Increase indent" role="button" title="Increase indent" disabled="@ReadOnly" tabindex="-1">
+				<svg></svg>
+			</button>
+			<button class="richtextbox__toolbar-item richtextbox__toolbar-item--button" aria-label="Text color" role="button" title="Text color" disabled="@ReadOnly" @onclick="PickColorAsync" @onclick:stopPropagation tabindex="-1">
+				@if (!ReadOnly)
+				{
+					<input type="color" readonly tabindex="-1">
+				}
+				<svg></svg>
+			</button>
+			<button class="richtextbox__toolbar-item richtextbox__toolbar-item--button" aria-label="Format Painter - Copy Selected Formatting" role="button" title="Format Painter - Copy Selected Formatting" disabled="@ReadOnly" tabindex="-1">
+				<svg></svg>
+			</button>
+		</div>
+	}
+	@if (placeholderContent is not null)
+	{
+		<div class="richtextbox__placeholder" style="@ScrollStyleString">@placeholderContent</div>
+	}
+	<div class="richtextbox__data" style="@ScrollStyleString" data-read-only="@ReadOnly" data-accepts-tab="@AcceptsTab"></div>
+	@RenderControls()
+</div>
+
+@code {
+	List<int> fontSizeList = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 32, 48, 96 };
+	string fontSizeUnit = "pt";
+	string defaultFontName = "Microsoft Sans Serif";
+
+	[JSInvokable]
+	public async Task OnContentsResized(int scrollHeight)
+	{
+		await InvokeWinzorDispatcherAsync(() =>
+		{
+			OnContentsResized(new ContentsResizedEventArgs(new Rectangle(0, 0, this.Width, scrollHeight)));
+		});
+	}
+
+    [JSInvokable]
+    public async Task<string> GetTimeStampWithUserTextAsync()
+    {
+        var result = new TaskCompletionSource<string>();
+        await InvokeWinzorDispatcherAsync(() =>
+        {
+            try
+            {
+                var executedResult = this.userTimestampFunctor?.Invoke() ?? throw new InvalidOperationException();
+                result.SetResult(executedResult);
+            }
+            catch (Exception ex)
+            {
+                result.SetException(ex);
+            }
+        });
+        return await result.Task;
+    }
+
+    [JSInvokable]
+    public virtual async Task OnInsertImagesAsync(BrowserFile[] images, int selectionStart, int selectionEnd)
+    {
+        string[]? uploadedImagePaths = null;
+        await WithExceptionHandlingAsync(async () =>
+        {
+            if (ImagesInserted is not null && FindForm()?.CargoWiseClientServices?.FileService is { } fileService)
+            {
+                // This method doesn't limit by Registry(eDocs Maximum File Size),So we set 100M temporarily.
+                uploadedImagePaths = await fileService.UploadFilesToServerAsync(images, 104857600, CancellationToken.None);
+            }
+        });
+
+        await InvokeWinzorDispatcherAsync(() =>
+        {
+            SelectionStart = selectionStart;
+            SelectionLength = selectionEnd - selectionStart;
+
+            if (uploadedImagePaths is not null)
+            {
+                ImagesInserted?.Invoke(this, uploadedImagePaths);
+            }
+        });
+    }
+
+	// OnInsertImagesAsync() works perfectly for non-image files, but at least one person will be unhappy
+	// if we use it as-is for non-image file uploads, hence why we have a proxy.
+	[JSInvokable]
+	public virtual async Task OnInsertFileAsync(BrowserFile[] file, int selectionStart, int selectionEnd)
+	{
+		await OnInsertImagesAsync(file, selectionStart, selectionEnd);
+	}
+
+	public event EventHandler<string[]>? ImagesInserted;
+
+	public new void Dispose()
+	{
+		dotNetObjectReference?.Dispose();
+		base.Dispose();
+	}
+
+	string getBorderStyle(BorderStyle style)
+	{
+		switch (style)
+		{
+			case BorderStyle.None:
+				return "richtextbox--none";
+			case BorderStyle.Fixed3D:
+				return "richtextbox--fixed3d";
+			case BorderStyle.FixedSingle:
+				return "richtextbox--fixedsingle";
+		}
+		return String.Empty;
+	}
+
+	string ReadOnlyClass() => ReadOnly ? "richtextbox--readonly" : string.Empty;
+
+	protected virtual internal string ScrollStyleString
+	{
+		get
+		{
+			string style = WordWrap ? "overflow-wrap:break-word;" : "overflow-wrap:normal;";
+
+			if (!Multiline)
+			{
+				return style + "overflow:hidden;";
+			}
+
+			style += $"overflow-x:{ScrollBars.GetHorizontalScrollStyleString(WordWrap)};";
+			style += $"overflow-y:{ScrollBars.GetVerticalScrollStyleString()};";
+
+			return style;
+		}
+	}
+
+	[JSInvokable]
+	public Task<Dictionary<string, string>> RichTextBoxEditorStyleString()
+	{
+		var styles = new Dictionary<string, string>();
+
+		styles.Add("overflow-wrap", WordWrap ? "break-word" : "normal");
+
+		if (!Multiline)
+		{
+			styles.Add("overflow", "hidden");
+		}
+		else
+		{
+			styles.Add("overflow-y", ScrollBars.GetVerticalScrollStyleString());
+			styles.Add("overflow-x", ScrollBars.GetHorizontalScrollStyleString(WordWrap));
+		}
+		return Task.FromResult(styles);
+	}
+
+
+	protected virtual List<string> GetServerInstalledFonts() => FontFamily.Families.Select(f => f.Name).ToList();
+
+	public string ToolbarBackground
+	{
+		get
+		{
+			if (Parent == null)
+			{
+				return "background-color: transparent";
+			}
+			var argb = Parent!.BackColor;
+			return "background-color: " + (argb != Drawing.Color.Empty ? string.Format("#{0:x6}", argb.ToArgb() & 0xFFFFFF) : "transparent");
+		}
+	}
+
+	string WordWrapClass() => WordWrap ? "richtextbox--wordwrap" : string.Empty;
+}

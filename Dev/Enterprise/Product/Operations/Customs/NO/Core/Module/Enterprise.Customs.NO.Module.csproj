@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <RootNamespace>Enterprise.Customs.NO.Module</RootNamespace>
+    <AssemblyName>Enterprise.Customs.NO.Module</AssemblyName>
+	  <OutputPath>$(WTGBinRoot)</OutputPath>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <ProjectReference Include="..\GUI\Enterprise.Customs.NO.GUI.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Design" />
+  </ItemGroup>
+  <ItemGroup>
+	<Compile Update="Module\CodeDescriptionPairLists\*.cs">
+	  <DesignTime>True</DesignTime>
+	  <AutoGen>True</AutoGen>
+	  <DependentUpon>%(Filename).xml</DependentUpon>
+	</Compile>
+  </ItemGroup>
+  <ItemGroup>
+	<None Update="Module\CodeDescriptionPairLists\*.xml">
+	  <Generator>CodeDescriptionPairListGenerator</Generator>
+	  <LastGenOutput>%(Filename).cs</LastGenOutput>
+	  <CustomToolNamespace>Enterprise.Customs.NO.Module</CustomToolNamespace>
+	</None>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

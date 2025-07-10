@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WL5G3N2:definitions xmlns:WL5G3N3="http://agriculture.gov.au/nexdoc/GenericCodeSetSoap_1.0" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:WL5G3N5="http://agriculture.gov.au/nexdoc/service/codeset" xmlns:WL5G3N6="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:WL5G3N1="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:WL5G3N4="http://agriculture.gov.au/nexdoc/common/CommonTypes_1.0" xmlns:WL5G3N0="http://schemas.xmlsoap.org/ws/2004/09/policy" targetNamespace="http://agriculture.gov.au/nexdoc/service/codeset" xmlns:WL5G3N2="http://schemas.xmlsoap.org/wsdl/">
+  <WL5G3N0:Policy WL5G3N1:Id="Mtom.xml">
+    <wsoma:OptimizedMimeSerialization xmlns:wsoma="http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization" />
+  </WL5G3N0:Policy>
+  <WL5G3N0:Policy WL5G3N1:Id="wss_username_token_service_policy">
+    <sp:SupportingTokens xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+      <wsp:Policy>
+        <sp:UsernameToken sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+          <wsp:Policy>
+            <sp:WssUsernameToken10 />
+          </wsp:Policy>
+        </sp:UsernameToken>
+      </wsp:Policy>
+    </sp:SupportingTokens>
+  </WL5G3N0:Policy>
+  <WL5G3N0:Policy WL5G3N1:Id="binding_authorization_policy_web_services_client">
+    <orasp:binding-authorization ns0:Enforced="true" ns0:Silent="false" ns0:category="security/authorization" ns0:name="J2EE services Authorization" xmlns:ns0="http://schemas.oracle.com/ws/2006/01/policy" xmlns:orasp="http://schemas.oracle.com/ws/2006/01/securitypolicy">
+      <orasp:role orasp:name="web-services-user" />
+    </orasp:binding-authorization>
+  </WL5G3N0:Policy>
+  <wsp:UsingPolicy WL5G3N2:Required="true" />
+  <WL5G3N2:types>
+    <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ct="http://agriculture.gov.au/nexdoc/common/CommonTypes_1.0" xmlns:WL5G3N4="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:rrs="http://agriculture.gov.au/nexdoc/GenericCodeSetSoap_1.0" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:WL5G3N1="http://agriculture.gov.au/nexdoc/GenericCodeSetSoap_1.0" xmlns:WL5G3N0="http://schemas.xmlsoap.org/wsdl/" xmlns:WL5G3N3="http://agriculture.gov.au/nexdoc/service/codeset" xmlns:tns="http://agriculture.gov.au/nexdoc/service/codeset" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:WL5G3N2="http://agriculture.gov.au/nexdoc/common/CommonTypes_1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <xsd:import schemaLocation="https://online-vnd.agriculture.gov.au:443/nexdoc-ws-ext-proxy/ReferenceDataService?SCHEMA%2FSBTokenResolutionProject%2FResources%2Fxsd%2FGenericCodeSetSoap" namespace="http://agriculture.gov.au/nexdoc/GenericCodeSetSoap_1.0" />
+      <xsd:import schemaLocation="https://online-vnd.agriculture.gov.au:443/nexdoc-ws-ext-proxy/ReferenceDataService?SCHEMA%2FSBTokenResolutionProject%2FResources%2Fxsd%2Fcommon%2FCommonTypes" namespace="http://agriculture.gov.au/nexdoc/common/CommonTypes_1.0" />
+    </xsd:schema>
+  </WL5G3N2:types>
+  <WL5G3N2:message name="GenericCodeSet">
+    <WL5G3N2:part name="parameters" element="WL5G3N3:GenericCodeSet" />
+  </WL5G3N2:message>
+  <WL5G3N2:message name="GenericCodeSetResponse">
+    <WL5G3N2:part name="parameters" element="WL5G3N3:GenericCodeSetResponse" />
+  </WL5G3N2:message>
+  <WL5G3N2:message name="NexdocSoapFault">
+    <WL5G3N2:part name="fault" element="WL5G3N4:NexdocSoapFault" />
+  </WL5G3N2:message>
+  <WL5G3N2:portType name="GenericCodeSetPort">
+    <WL5G3N2:operation name="GenericCodeSet">
+      <WL5G3N2:input message="WL5G3N5:GenericCodeSet" />
+      <WL5G3N2:output message="WL5G3N5:GenericCodeSetResponse" />
+      <WL5G3N2:fault name="NexdocSoapFault" message="WL5G3N5:NexdocSoapFault" />
+    </WL5G3N2:operation>
+  </WL5G3N2:portType>
+  <WL5G3N2:binding name="GenericCodeSetSOAPBinding" type="WL5G3N5:GenericCodeSetPort">
+    <WL5G3N6:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsp:Policy>
+      <wsp:PolicyReference URI="#wss_username_token_service_policy" />
+      <wsp:PolicyReference URI="#binding_authorization_policy_web_services_client" />
+      <wsp:PolicyReference URI="#Mtom.xml" />
+    </wsp:Policy>
+    <WL5G3N2:operation name="GenericCodeSet">
+      <WL5G3N6:operation soapAction="http://agriculture.gov.au/nexdoc/service/codeset/GenericCodeSet" style="document" />
+      <WL5G3N2:input>
+        <WL5G3N6:body use="literal" />
+      </WL5G3N2:input>
+      <WL5G3N2:output>
+        <WL5G3N6:body use="literal" />
+      </WL5G3N2:output>
+      <WL5G3N2:fault name="NexdocSoapFault">
+        <WL5G3N6:fault use="literal" name="NexdocSoapFault" namespace="" />
+      </WL5G3N2:fault>
+    </WL5G3N2:operation>
+  </WL5G3N2:binding>
+  <WL5G3N2:service name="GenericCodeSetService">
+    <WL5G3N2:documentation>OSB Service</WL5G3N2:documentation>
+    <WL5G3N2:port name="GenericCodeSetPort" binding="WL5G3N5:GenericCodeSetSOAPBinding">
+      <WL5G3N6:address location="https://online-vnd.agriculture.gov.au:443/nexdoc-ws-ext-proxy/ReferenceDataService" />
+    </WL5G3N2:port>
+  </WL5G3N2:service>
+</WL5G3N2:definitions>

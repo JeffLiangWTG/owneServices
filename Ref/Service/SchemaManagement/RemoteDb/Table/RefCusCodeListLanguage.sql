@@ -1,0 +1,16 @@
+CREATE TABLE RefCusCodeListLanguage
+(
+[ZXA_PK] UNIQUEIDENTIFIER NOT NULL  CONSTRAINT [DF_RefCusCodeListLanguage_ZXA_PK] DEFAULT(NEWID()),
+[ZXA_ZX6_NKLanguage] VARCHAR(3) NOT NULL,
+[ZXA_ZZD_CodeList] UNIQUEIDENTIFIER NOT NULL,
+[ZXA_Description] NVARCHAR(MAX) NOT NULL CONSTRAINT [DF_RefCusCodeListLanguage_ZXA_Description] DEFAULT(''),
+
+CONSTRAINT [PK_RefCusCodeListLanguage] PRIMARY KEY CLUSTERED ([ZXA_PK] ASC),
+CONSTRAINT [FK_RefCusCodeListLanguage_RefLanguageType] FOREIGN KEY([ZXA_ZX6_NKLanguage]) REFERENCES [RefLanguageType] ([ZX6_Language]),
+CONSTRAINT [FK_RefCusCodeListLanguage_RefCusCodeList] FOREIGN KEY([ZXA_ZZD_CodeList]) REFERENCES [RefCusCodeList] ([ZZD_PK]),
+)
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_RefCusCodeListLanguage_ZXA_ZX6_NKLanguage_ZXA_ZZD_CodeList ON RefCusCodeListLanguage (ZXA_ZX6_NKLanguage, ZXA_ZZD_CodeList)
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusCodeListLanguage_ZXA_ZZD_CodeList ON RefCusCodeListLanguage (ZXA_ZZD_CodeList)
+GO

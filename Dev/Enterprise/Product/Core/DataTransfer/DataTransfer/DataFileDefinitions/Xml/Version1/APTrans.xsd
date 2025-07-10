@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified"
+	targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns="http://www.edi.com.au/EnterpriseService/">
+	<xs:include schemaLocation="Elements.Xsd" />
+	<xs:element name="APTrans">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="APTran" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="TranDetail">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="TranType">
+											<xs:simpleType>
+												<xs:restriction base="xs:NMTOKEN">
+													<xs:enumeration value="INV" />
+													<xs:enumeration value="CRD" />
+													<xs:enumeration value="ADJ" />
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Description" type="xs:string" minOccurs="0" />
+										<xs:element name="InvDate" type="xs:dateTime" />
+										<xs:element name="DueDate" type="xs:dateTime" minOccurs="0" />
+										<xs:element name="InvNo" type="xs:NMTOKEN" />
+										<xs:element name="Currency" type="xs:NMTOKEN" />
+										<xs:element name="ExchRate" type="xs:decimal" />
+										<xs:element name="ExchRateBasis">
+											<xs:simpleType>
+												<xs:restriction base="xs:NMTOKEN">
+													<xs:enumeration value="L" />
+													<xs:enumeration value="F" />
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="Supplier" type="Organisation" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="TranLines">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="TranLine" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="JobNumber" type="xs:NMTOKEN" />
+													<xs:element name="ChargeCode" type="xs:NMTOKEN" />
+													<xs:element name="Branch">
+														<xs:simpleType>
+															<xs:restriction base="xs:NMTOKEN">
+																<xs:maxLength value="3" />
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="Dept">
+														<xs:simpleType>
+															<xs:restriction base="xs:NMTOKEN">
+																<xs:maxLength value="3" />
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="Description">
+														<xs:simpleType>
+															<xs:restriction base="xs:string">
+																<xs:maxLength value="50" />
+															</xs:restriction>
+														</xs:simpleType>
+													</xs:element>
+													<xs:element name="Amount" type="MonetaryAmount" />
+													<xs:element name="TaxRate" type="xs:decimal" minOccurs="0" />
+													<xs:element name="TaxId" type="xs:NMTOKEN" minOccurs="0" />
+													<xs:element name="TaxAmount" type="MonetaryAmount" minOccurs="0" />
+													<xs:element name="Total" type="MonetaryAmount" />
+													<xs:element name="Final" type="xs:boolean" />
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

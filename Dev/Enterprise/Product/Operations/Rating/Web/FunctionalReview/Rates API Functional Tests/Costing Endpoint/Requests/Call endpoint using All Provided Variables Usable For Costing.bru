@@ -1,0 +1,35 @@
+meta {
+  name: Call endpoint using All Provided Variables Usable For Costing
+  type: http
+  seq: 25
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetRateQueryWithMandatoryFieldsForProvidedVariables();
+   query.ServiceProviders = RatesAPIsHelper.GetAllServiceProviders();
+   query.Carriers = RatesAPIsHelper.GetAllCarriers();
+   query.CarrierContracts = RatesAPIsHelper.GetCarrierContracts();
+   query.CarrierServiceLevels = RatesAPIsHelper.GetAllCarrierServiceLevels();
+   query.ServiceLevels = RatesAPIsHelper.GetServiceLevels();
+   query.ContainerTypes = RatesAPIsHelper.GetAllContainerTypes();
+   query.Commodities = RatesAPIsHelper.GetAllCommodities();
+   query.NamedAccounts = RatesAPIsHelper.GetAllNamedAccounts();
+   query.CSFilter = RatesAPIsHelper.GetCSFilter();
+   query.CGFilter = RatesAPIsHelper.GetCGFilter();
+   query.CarrierPayTerm = RatesAPIsHelper.GetCarrierPayTerm();
+   query.Via = RatesAPIsHelper.GetVia();
+   query.Locations = RatesAPIsHelper.GetLocations();
+   req.setBody(query);
+}
+
+tests {
+  
+}

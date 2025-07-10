@@ -1,0 +1,6 @@
+CREATE VIEW RefCusTariffAdditionalCodeCategoryTableView_V1 AS
+SELECT ZY3_PK,
+ZY3_Category,
+ZY3_Description,
+ZY3_ZZZ_NKDataGrouping
+FROM RefCusTariffAdditionalCodeCategory

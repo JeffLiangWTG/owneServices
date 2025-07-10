@@ -1,0 +1,57 @@
+@using CargoWiseNext.Blazor.Components
+@namespace CargoWise.Main.Navigation.Pages
+
+@{
+	var localSearchResults = NavigationViewModel?.SearchViewModel.SearchResultsToRender;
+}
+
+<div @ref="_parentRef" class="cwn-quick-search">
+	<CwnSearch id="@QuickSearchId"
+			   @ref="_searchRef"
+			   Placeholder="Search CargoWise Next"
+			   OnFocus="@HandleSearchFocusAsync"
+			   OnInput="@HandleSearchInputAsync"
+			   Shortcut="@SearchShortcut"/>
+	<CwnPopover Id="@SearchPopoverId" TargetId="@QuickSearchId.ToString()" Class="cwn-quick-search__result" Style="@popoverHeight" OnToggle="OnToggleAsync">
+		<div class="cwn-quick-search__result-panel">
+			@if (NavigationViewModel is not null)
+			{
+				<QuickSearchFilterSection SearchViewModel=NavigationViewModel.SearchViewModel />
+			}
+			<div class="cwn-quick-search__result-items">
+				@if (localSearchResults is not null)
+				{
+					@foreach (var item in localSearchResults)
+					{
+						<SearchResultSection OnMenuItemClick="@OnMenuClick" Title="@item.DisplayName" SectionType="@item.SectionType" Items="@item.Items" />
+					}
+				}
+				@if (shouldShowNoResults)
+				{
+					<div class="cwn-quick-search__no-result">
+						<CwnText HtmlTag="div" Class="cwn-quick-search__no-result-hint">@NavigationViewModel!.NoResultsText</CwnText>
+						<CwnText HtmlTag="div" Class="cwn-quick-search__no-result-hint-info">@NavigationViewModel!.TryAnotherTermText</CwnText>
+					</div>
+				}
+			</div>
+			<div class="cwn-quick-search__footer" style="@(shouldShowNoResults ? "height: 50px": "")">
+				@if (!shouldShowNoResults)
+				{
+					<div class="cwn-quick-search__shortcut">
+						<CwnSearchShortcut><CwnIcon Icon="Icon.ArrowUp" Size="Size.Small" Color="Color.Default" /></CwnSearchShortcut>
+						<CwnSearchShortcut><CwnIcon Icon="Icon.ArrowDown" Size="Size.Small" Color="Color.Default" /></CwnSearchShortcut>
+						<CwnText>Navigate</CwnText>
+					</div>
+					<div class="cwn-quick-search__shortcut">
+						<CwnSearchShortcut><CwnIcon Icon="Icon.Enter" Size="Size.Small" Color="Color.Default" /></CwnSearchShortcut>
+						<CwnText>Open</CwnText>
+					</div>
+					<div class="cwn-quick-search__shortcut">
+						<CwnSearchShortcut><CwnIcon Icon="Icon.Esc" Size="Size.Small" Color="Color.Default" /></CwnSearchShortcut>
+						<CwnText>Close</CwnText>
+					</div>
+				}
+			</div>
+		</div>
+	</CwnPopover>
+</div>

@@ -1,0 +1,17 @@
+using Enterprise.Integration;
+
+namespace Enterprise.BufferManagement.Integration
+{
+	public interface ISupportedWorkflowTypesForAllDescriptorsTestRunner
+	{
+		void RunTestAllSupportedJobTypes(IWorkflowDescriptor descriptor);
+		void RunTestAllSupportedJobTypes_ShouldDisplayOnVisualBoard(IWorkflowDescriptor descriptor);
+		void RunTestAllSupportedJobTypes_ShouldPerformFilterOnVisualBoard(IWorkflowDescriptor descriptor);
+		void RunTestAllSupportedJobTypes_ShouldDisplayManagementTab(IWorkflowDescriptor descriptor);
+		void RunTestInactiveRelatedJobType_ShouldNotDisplayManagementTab(IWorkflowDescriptor descriptor);
+		void RunTestActiveRelatedJobType_ShouldDisplayManagementTab(IWorkflowDescriptor descriptor);
+		void RunTestAllSupportedJobTypes_ShouldSafelyCreateFetchHints(IWorkflowDescriptor descriptor);
+		void RunTestAllSupportedJobTypes_ShouldBeAbleToSaveJobNetworks(IWorkflowDescriptor descriptor);
+		void RunTestAllSupportedJobTypes_ShouldBeWorkQueuable_ShouldNotDieHorribly(IWorkflowDescriptor descriptor);
+	}
+}

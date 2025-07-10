@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputPath>$(WTGBinRoot)</OutputPath>
+  </PropertyGroup>
+
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+
+  <ItemGroup>
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="CargoWise.Schema" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.Database.Abstractions" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <Reference Include="Microsoft.SqlServer.Types" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- net framework only: make System.Data.SqlClient a global using-->
+    <Using Condition="'$(IsNetFrameworkTargetFramework)' == 'true'" Include="System.Data.SqlClient" />
+
+    <!-- net core only: add package to Microsoft.Data.SqlClient and make Microsoft.Data.SqlClient a global using-->
+    <PackageReference Condition="'$(IsNetCoreTargetFramework)' == 'true'" Include="Microsoft.Data.SqlClient" />
+    <Using Condition="'$(IsNetCoreTargetFramework)' == 'true'" Include="Microsoft.Data.SqlClient" />
+  </ItemGroup>
+</Project>

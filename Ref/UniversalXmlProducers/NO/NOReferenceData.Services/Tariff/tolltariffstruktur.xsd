@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="tolltariffstruktur" type="TolltariffStruktur"/>
+
+  <xs:complexType name="TolltariffStruktur">
+    <xs:complexContent>
+      <xs:extension base="norskDataset">
+        <xs:sequence>
+          <xs:element name="avsnitt" type="Avsnitt" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="norskDataset" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="dataset">
+        <xs:sequence>
+          <xs:element name="versjon" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="dataset" abstract="true">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="Avsnitt">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="beskrivelse" type="xs:string" minOccurs="0"/>
+      <xs:element name="kapitler" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="kapittel" type="Kapittel" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Kapittel">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="beskrivelse" type="xs:string" minOccurs="0"/>
+      <xs:element name="inndelinger" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="underkapittel" type="Underkapittel"/>
+              <xs:element name="posisjon" type="Posisjon"/>
+            </xs:choice>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Underkapittel">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="beskrivelse" type="xs:string" minOccurs="0"/>
+      <xs:element name="posisjoner" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="posisjon" type="Posisjon" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Posisjon">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="beskrivelse" type="xs:string" minOccurs="0"/>
+      <xs:element name="henvisninger" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="kode" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="oppdelinger" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="underposisjon" type="Underposisjon"/>
+              <xs:element name="vare" type="Vare"/>
+            </xs:choice>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Underposisjon">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="hsNummer" type="xs:string" minOccurs="0"/>
+      <xs:element name="beskrivelse" type="xs:string" minOccurs="0"/>
+      <xs:element name="oppdelinger" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="vare" type="Vare"/>
+              <xs:element name="underposisjon" type="Underposisjon"/>
+            </xs:choice>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Vare">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0"/>
+      <xs:element name="hsNummer" type="xs:string" minOccurs="0"/>
+      <xs:element name="vareslag" type="xs:string" minOccurs="0"/>
+      <xs:element name="blv" type="xs:boolean"/>
+      <xs:element name="henvisninger" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="kode" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

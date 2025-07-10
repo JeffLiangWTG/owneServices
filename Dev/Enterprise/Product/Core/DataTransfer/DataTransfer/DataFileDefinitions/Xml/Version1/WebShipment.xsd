@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by Alex (None) -->
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Elements.xsd" />
+	<xs:include schemaLocation="WebConsol.xsd" />
+	<xs:include schemaLocation="WebPacking.xsd" />
+	<xs:include schemaLocation="WebOrderSummary.xsd" />
+	<xs:include schemaLocation="WebContainer.xsd" />
+	<xs:complexType name="WebShipment">
+		<xs:sequence>
+			<xs:element name="Number" type="xs:NMTOKEN" />
+			<xs:element name="HouseBill" type="xs:NMTOKEN" minOccurs="0" />
+			<xs:element name="Shipper" type="Organisation" minOccurs="0" />
+			<xs:element name="Consignee" type="Organisation" minOccurs="0" />
+			<xs:element name="ClientReference" type="xs:normalizedString" minOccurs="0" />
+			<xs:element name="GoodsDescription" type="xs:normalizedString" minOccurs="0" />
+			<xs:element name="ServiceLevel" type="xs:NMTOKEN" minOccurs="0" />
+			<xs:element name="Origin" type="UNLOCO" minOccurs="0" />
+			<xs:element name="Destination" type="UNLOCO" minOccurs="0" />
+			<xs:element name="ETD" type="xs:dateTime" minOccurs="0" />
+			<xs:element name="ETA" type="xs:dateTime" minOccurs="0" />
+			<xs:element name="DeliveredDate" type="xs:dateTime" minOccurs="0" />
+			<xs:element name="Size" type="DimensionValue" minOccurs="0" />
+			<xs:element name="Weight" type="DimensionValue" minOccurs="0" />
+			<xs:element name="Quantity" type="DimensionValue" minOccurs="0" />
+			<xs:element name="Consols" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Consol" type="WebConsol" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Packings" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Packing" type="WebPacking" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Orders" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Order" type="WebOrderSummary" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Containers" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Container" type="WebContainer" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Notes" type="Notes" minOccurs="0" />
+			<xs:sequence minOccurs="0">
+				<xs:element name="Custom" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CustomAttrib1" type="xs:string" minOccurs="0" />
+							<xs:element name="CustomAttrib2" type="xs:string" minOccurs="0" />
+							<xs:element name="CustomDate1" type="xs:dateTime" minOccurs="0" />
+							<xs:element name="CustomDate2" type="xs:dateTime" minOccurs="0" />
+							<xs:element name="CustomDecimal1" type="xs:decimal" minOccurs="0" />
+							<xs:element name="CustomDecimal2" type="xs:decimal" minOccurs="0" />
+							<xs:element name="CustomFlag1" type="xs:boolean" minOccurs="0" />
+							<xs:element name="CustomFlag2" type="xs:boolean" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:element name="Deliver" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Available" type="xs:dateTime" minOccurs="0" />
+						<xs:element name="StorageCommences" type="xs:dateTime" minOccurs="0" />
+						<xs:element name="DeliveryFrom" type="xs:dateTime" minOccurs="0" />
+						<xs:element name="DeliveryRequiredBy" type="xs:dateTime" minOccurs="0" />
+						<xs:element name="CartageAdvised" type="xs:dateTime" minOccurs="0" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+      <xs:element name="DocumentLinks" type="DocumentLinks" minOccurs="0" />
+      <xs:element name="RelatedInvoiceLinks" type = "InvoiceLinks" minOccurs="0" />
+    </xs:sequence>
+	</xs:complexType>
+	<xs:element name="WebShipments">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="WebShipment" type="WebShipment" maxOccurs="unbounded" />
+			</xs:sequence>
+			<xs:attribute name="TotalRows" type="xs:positiveInteger" use="required" />
+			<xs:attribute name="ReturnedRows" type="xs:positiveInteger" use="required" />
+			<xs:attribute name="Version" type="Version" use="optional" />
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

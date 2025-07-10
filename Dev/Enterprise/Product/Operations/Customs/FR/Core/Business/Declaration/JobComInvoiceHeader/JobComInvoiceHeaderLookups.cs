@@ -1,0 +1,14 @@
+namespace Enterprise.Customs.FR.Business.Declaration
+{
+	public class JobComInvoiceHeaderLookups : EU.Business.Declaration.JobComInvoiceHeaderLookups
+	{
+		public JobComInvoiceHeaderLookups(JobComInvoiceHeader parent)
+			: base(parent)
+		{
+		}
+
+		protected new JobComInvoiceHeader Parent => (JobComInvoiceHeader)base.Parent;
+
+		protected new JobComInvoiceHeader Invoice => (JobComInvoiceHeader)base.Invoice;
+	}
+}

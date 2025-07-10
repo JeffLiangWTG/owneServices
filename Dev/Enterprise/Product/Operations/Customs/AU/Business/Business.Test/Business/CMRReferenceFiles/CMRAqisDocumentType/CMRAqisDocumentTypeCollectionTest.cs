@@ -1,0 +1,12 @@
+using CargoWise.EntityFramework;
+using CargoWise.EntityFramework.Testing;
+using NUnit.Framework;
+
+namespace Enterprise.Customs.AU.Declaration.Business.Testing
+{
+	[TestedType(typeof(CMRAqisDocumentTypeCollection))]
+	sealed class CMRAqisDocumentTypeCollectionTest : BusinessObjectCollectionTestCase
+	{
+		protected override BusinessObjectCollection GetCollectionToTest() => new CMRAqisDocumentTypeCollection(Factory);
+	}
+}

@@ -1,0 +1,42 @@
+@namespace CargoWiseNext.Blazor.Components
+@inherits CwnComponentBase
+
+<div class="@Classname" style="@Stylename" @attributes="@UserAttributes">
+    <CwnIcon Class="@IconClassname" Icon="@GetIcon" Size="@Size.Medium" />
+    @if(ChildContent is not null)
+    {
+        <div class="@ContentClassname">@ChildContent</div>
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public CalloutType Type { get; set; } = CalloutType.Info;
+    [Parameter] public string? ClassContent { get; set; }
+
+    protected string Classname => new CssBuilder()
+        .AddClass("cwn-callout")
+        .AddClass($"cwn-callout--{Type.GetDescription()}")
+        .AddClass(Class)
+        .Build();
+
+    protected string? Stylename => new StyleBuilder()
+        .AddStyle(Style)
+        .Build();
+
+    protected string IconClassname => new CssBuilder()
+        .AddClass($"cwn-callout__icon--{Type.GetDescription()}")
+        .Build();
+
+    protected string ContentClassname => new CssBuilder()
+        .AddClass("cwn-callout__content")
+        .AddClass(ClassContent)
+        .Build();
+
+    protected Icon GetIcon => Type switch
+    {
+        CalloutType.Error => Icon.Critical,
+        CalloutType.Warning => Icon.Warning,
+        _ => Icon.Info
+    };
+}

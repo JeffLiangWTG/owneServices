@@ -1,0 +1,63 @@
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using NUnit.Framework;
+
+namespace CargoWise.RefDbRepo.MXReferenceData.Tests
+{
+	public static class Extensions
+	{
+		public static byte[] Stream2ByteArray(this Stream stream)
+		{
+			using (MemoryStream ms = new MemoryStream())
+			{
+				stream.CopyTo(ms);
+				return ms.ToArray();
+			}
+		}
+
+		public static string Stream2String(this Stream stream)
+		{
+			using (StreamReader reader = new StreamReader(stream, System.Text.Encoding.UTF8))
+			{
+				return reader.ReadToEnd();
+			}
+		}
+
+		public static void CompareStreamContent(Stream expectedStream, Stream actualStream)
+		{
+			Assert.IsNotNull(expectedStream);
+			Assert.IsNotNull(actualStream);
+
+			expectedStream.Position = 0;
+			actualStream.Position = 0;
+
+			using (var expectedReader = new StreamReader(expectedStream, Encoding.UTF8))
+			using (var actualReader = new StreamReader(actualStream, Encoding.UTF8))
+			{
+				var expected = expectedReader.ReadToEnd().CorrectBeforeComparison();
+				var actual = actualReader.ReadToEnd().CorrectBeforeComparison();
+				Assert.AreEqual(expected, actual);
+			}
+		}
+
+		static string CorrectBeforeComparison(this string input) => input.RemoveAppProgramArgs().RemoveAppName().RemoveIgnoreChars();
+
+		static string RemoveIgnoreChars(this string input) => input.Replace("\n", "").Replace("\r", "");
+
+		static string RemoveAppProgramArgs(this string xml) => RemoveNodesByTag(xml, "AppProgramArgs");
+
+		static string RemoveAppName(this string xml) => RemoveNodesByTag(xml, "AppName");
+
+		static string RemoveNodesByTag(this string xml, string tag)
+		{
+			var regex = new Regex($"  <{tag}>(.*?)</{tag}>");
+			var match = regex.Match(xml);
+			if (match.Success)
+			{
+				xml = xml.Replace(match.Value, "");
+			}
+			return xml;
+		}
+	}
+}

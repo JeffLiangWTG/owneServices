@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>CargoWise.RemoteDesktopServices.Upgrader.Unmerged</AssemblyName>
+    <RootNamespace>CargoWise.RemoteDesktopServices.Upgrader</RootNamespace>
+    <ApplicationManifest>..\..\..\..\..\main.manifest</ApplicationManifest>
+    <PostBuildEvent Condition="'$(TargetFramework)' == 'net48'">cd $(TargetDir)
+      echo $(FrameworkDir)
+      ILMerge.exe /closed /targetplatform:"v4" /keyfile:..\EDI-Release-private.snk /out:CargoWise.RemoteDesktopServices.Upgrader.exe CargoWise.RemoteDesktopServices.Upgrader.Unmerged.exe CargoWise.BrandManager.dll CargoWise.Shared.40.dll CargoWise.ActiveDirectory.dll CargoWise.Loader.Common.dll CargoWise.RemoteDesktopServices.Upgrader.Common.dll
+    </PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.ApplicationManager.Common" />
+    <Reference Include="CargoWise.Loader.Common" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="Enterprise.RemoteDesktopServices.Shared" />
+  </ItemGroup>
+  <ItemGroup Label="Not referenced explicitly">
+    <Reference Include="CargoWise.ApplicationManager.Common" />
+    <Reference Include="Microsoft.Graph" />
+    <Reference Include="Microsoft.Graph.Core" />
+    <Reference Include="MimeKit" />
+    <Reference Include="Outlook" />
+    <Reference Include="WTG.Authenticode" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\..\..\..\Bin\CargoWiseRemoteDesktopServicesSetup.exe">
+      <LogicalName>CargoWiseRemoteDesktopServicesSetup.exe</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\main.manifest">
+      <Link>main.manifest</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RemoteDesktopServices.Upgrader.Common\CargoWise.RemoteDesktopServices.Upgrader.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Design" />
+  </ItemGroup>
+</Project>

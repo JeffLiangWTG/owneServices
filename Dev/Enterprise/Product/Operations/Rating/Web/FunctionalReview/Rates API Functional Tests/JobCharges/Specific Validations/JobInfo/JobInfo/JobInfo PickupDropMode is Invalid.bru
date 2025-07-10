@@ -1,0 +1,53 @@
+meta {
+  name: JobInfo PickupDropMode is Invalid
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+           query.JobInfo = {
+               PickupDropMode: "XYZ",
+               Containers: [
+                   {
+                       ContainerTypeCWCode : "20GP",
+                       Number : "2983743874",
+                       Unit: 2,
+                       Commodity: "GEN",
+                       Ownership: "CAR",
+                       Packlines: [
+                           {
+                               PackageType : "PLT",
+                               Unit: 2,
+                               Commodity: null, 
+                               Weight: 3400,
+                               WeightUnit: "KG",
+                               Volume: 4.32,
+                               VolumeUnit: "M3"
+                           },
+                       ]
+                   },
+               ]
+           };
+   
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided PickupDropMode ('XYZ') is not valid. It can only be one of these values: 'ANY', 'ASK', 'HSL', 'HUL', 'HWL', 'LOF', 'PSL', 'SDL', 'TRL', 'WUP'.", function() {
+    expect(res.body.ModelState['JobInfo.PickupDropMode'][0]).to.equal("Provided PickupDropMode ('XYZ') is not valid. It can only be one of these values: 'ANY', 'ASK', 'HSL', 'HUL', 'HWL', 'LOF', 'PSL', 'SDL', 'TRL', 'WUP'.");
+  });
+}

@@ -1,0 +1,26 @@
+using System;
+using Enterprise.Customs.MX.Business;
+
+namespace Enterprise.Customs.MX.GUI
+{
+	public partial class CusClassificationForm : Customs.GUI.BaseClassificationForm
+	{
+		[Obsolete("Do not call. Only for designer use.")]
+		public CusClassificationForm()
+		{
+		}
+
+		public CusClassificationForm(CusClassification classification)
+			: base(classification)
+		{
+		}
+
+		protected override Customs.GUI.BaseClassificationUserControl GetUserControl() => new CusClassificationUserControl();
+
+		protected override void InitialiseForm()
+		{
+			base.InitialiseForm();
+			InitializeComponent();
+		}
+	}
+}

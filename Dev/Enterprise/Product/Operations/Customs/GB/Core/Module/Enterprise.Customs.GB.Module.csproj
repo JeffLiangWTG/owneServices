@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="Enterprise.Billing.Integration" />
+    <Reference Include="Enterprise.Warehouse.Integration" />
+    <Reference Include="WTG.SecurityRights" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Design" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GUI\Enterprise.Customs.GB.GUI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="OperationalActions\AutoGbDeclarationActionMethodApplicator.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AutoGbDeclarationActionMethodApplicator.xml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="OperationalActions\AutoGbDeclarationActionMethodApplicator.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoGbDeclarationActionMethodApplicator.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

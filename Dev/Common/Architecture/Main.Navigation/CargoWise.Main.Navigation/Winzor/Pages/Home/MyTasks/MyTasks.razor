@@ -1,0 +1,94 @@
+@using Microsoft.AspNetCore.Components.Web
+@using CargoWiseNext.Blazor.Components
+@namespace CargoWise.Main.Navigation.Pages
+
+@inherits CwnComponentBase
+
+<CwnCard Class="@Classname">
+    <CwnCardHeader>
+        <CardHeaderContent>
+            <span class="cwn-my-tasks__title" @onclick="TitleClickAsync">
+                @MyTasksViewModel?.DisplayName
+            </span>
+            <CwnIconButton Icon="@Icon.Refresh"
+               title="Refresh My Tasks"
+               OnSingleClick="RefreshMyTasksClickAsync"
+               Variant="@(Variant.Text)"
+               Color="@(Color.Default)"
+               Class="cwn-my-tasks__refresh-btn" />
+        </CardHeaderContent>
+    </CwnCardHeader>
+    <CwnCardContent style="width: 100%;">
+        @if (MyTasksViewModel != null && MyTasksViewModel.MyTasks?.Any() == true)
+        {
+            <table class="cwn-my-tasks__table">
+                <thead class="cwn-my-tasks__table_header">
+                <tr>
+                    <th class="cwn-my-tasks__table_header_id">@MyTasksViewModel?.IdHeaderText</th>
+                    <th class="cwn-my-tasks__table_header_name">@MyTasksViewModel?.NameHeaderText</th>
+                    <th class="cwn-my-tasks__table_header_description">@MyTasksViewModel?.TaskDescriptionHeaderText</th>
+                    <th class="cwn-my-tasks__table_header_status">@MyTasksViewModel?.StatusHeaderText</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in MyTasksViewModel!.MyTasks)
+                {
+                    <CwnElement Key=item.Key
+                                Class="cwn-my-tasks__item"
+                                OnSingleClick="async (e) => await ClickAsync(item)"
+                                HtmlTag="tr">
+                        <td class="cwn-my-tasks__item_id">@item.ParentId</td>
+                        <td title="@item.ParentSummary"
+                            class="cwn-my-tasks__item_name">
+                            @item.ParentSummary
+                        </td>
+                        <td class="cwn-my-tasks__item_description">@item.Description</td>
+                        @if (item.Status == "WRK" || item.Status == "SUS")
+                        {
+                            <td class="cwn-my-tasks__item_status">
+                                <CwnTaskStatus Status="@item.Status">@item.StatusText</CwnTaskStatus>
+                            </td>
+                        }
+                    </CwnElement>
+                }
+                </tbody>
+            </table>
+            <ul class="cwn-my-tasks__list">
+                @foreach (var item in MyTasksViewModel!.MyTasks)
+                {
+                    <li>
+                        <CwnElement Key=item.Key
+                        Class="cwn-my-tasks__item"
+                        OnSingleClick="async (e) => await ClickAsync(item)"
+                        HtmlTag="div">
+                            <div class="cwn-my-tasks__item-content">
+                                <div class="cwn-my-tasks__text">
+                                    <div class="cwn-my-tasks__top-row">
+                                        <span class="cwn-my-tasks__task-id">@item.ParentId</span>
+                                        @if(item.ParentId != item.ParentSummary)
+                                        {
+                                            <span class="cwn-my-tasks__summary">@item.ParentSummary</span>
+                                        }
+                                    </div>
+                                    <span>@item.Description</span>
+                                </div>
+                                @if (item.Status == "WRK" || item.Status == "SUS")
+                                {
+                                    <div class="cwn-my-tasks__status-block">
+                                        <CwnTaskStatus StatusClass="cwn-my-tasks__status" Status="@item.Status" StatusIconSize="Size.Large">
+                                            <span class="cwn-my-tasks__status-text">@item.StatusText</span>
+                                        </CwnTaskStatus>
+                                    </div>
+                                }
+                            </div>
+                    </CwnElement>
+                    </li>
+            }
+            </ul>
+        }
+        else
+        {
+            <div class="cwn-my-tasks__empty">@(MyTasksViewModel?.NoMyTasksText)</div>
+        }
+    </CwnCardContent>
+</CwnCard>

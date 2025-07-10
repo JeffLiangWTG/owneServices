@@ -1,0 +1,33 @@
+meta {
+  name: Duplicate Role Exists In Rate Parties
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.RateParties = [
+       {Code: "ABCD", Role: "RAG" },
+       {Code: "EFGH", Role: "RAG"},
+   ];
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided RateParties is not valid. Each role should be unique.", function() {
+    expect(res.body.ModelState['RateParties'][0]).to.equal("Provided RateParties is not valid. Each role should be unique.");
+  });
+}

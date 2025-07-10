@@ -1,0 +1,43 @@
+using System;
+using System.Linq;
+using Enterprise.BatchProcessor;
+using Enterprise.Customs.Common.EU;
+using Enterprise.Customs.IE.Business;
+using Enterprise.Customs.IE.Messaging;
+using Enterprise.Customs.IE.NCTS.Messaging;
+
+namespace Enterprise.Customs.IE.NCTS.Business
+{
+	public class TR884CProcessor : NCTSDepartureMessageProcessor<NCTSInboundEDIMessage, TR884CProvider>
+	{
+		public TR884CProcessor(LoggingInformation logger, Type xmlObjectType) : base(logger, xmlObjectType)
+		{
+		}
+
+		protected override string MessageFriendlyNameCore => Res.GetString("927A5D27-D51A-4614-AC7E-02939B85DC76", "TR884C: DOCUMENT PRESENTATION REQUEST CANCELLATION");
+
+		public override string GetLogicalStatus(NCTSInboundEDIMessage message, IMessageAttachee messageAttachee, TR884CProvider provider) => LogicalStatusList.Codes.Accepted;
+
+		protected override Type MessageInterpreterType => typeof(TR884CMessageInterpreter);
+
+		protected override void UpdateMessageAttacheeCore(IMessageAttachee messageAttachee, TR884CProvider provider)
+		{
+			if (messageAttachee is NctsDepartureMovementHeader movementHeader && movementHeader.Header is NctsHeader nctsHeader)
+			{
+				PopulateRequestedDocuments(nctsHeader);
+			}
+		}
+
+		void PopulateRequestedDocuments(NctsHeader nctsHeader)
+		{
+			var requestedDocumentsNeedUpdate = nctsHeader.RequestedDocuments.Cast<EU.Business.RequestedDocument>().Where(p => p.CSI_Status.EqualsIgnoringCase(EU.Business.CodeDescriptionPairLists.RequestedDocumentStatusList.Codes.PhysicallyPresentDocument));
+
+			foreach (var requestedDocument in requestedDocumentsNeedUpdate)
+			{
+				requestedDocument.CSI_Status = EU.Business.CodeDescriptionPairLists.RequestedDocumentStatusList.Codes.RequestCancelled;
+			}
+		}
+
+		protected override bool NeedToSendEmailNotification(EDIMessage message) => false;
+	}
+}

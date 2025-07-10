@@ -1,0 +1,1 @@
+﻿<%@ WebService Language="C#" CodeBehind="CreditLimitService.asmx.cs" Class="Enterprise.Accounting.Web.CreditLimitService" %>

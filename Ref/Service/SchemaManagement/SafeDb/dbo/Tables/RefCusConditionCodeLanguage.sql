@@ -1,0 +1,20 @@
+CREATE TABLE RefCusConditionCodeLanguage
+(
+	[ZY8_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefCusConditionCodeLanguage_ZY8_PK] DEFAULT NEWID(),
+	[ZY8_ZY7_ConditionCode] UNIQUEIDENTIFIER NOT NULL,
+	[ZY8_ZX6_NKLanguage] VARCHAR(3) NOT NULL,
+	[ZY8_Description] NVARCHAR(MAX) NOT NULL,
+	[ZY8_SysStartTime] DATETIME2 GENERATED ALWAYS AS ROW START NOT NULL CONSTRAINT [DF_ZY8_SysStartTime] DEFAULT CONVERT(DATETIME2, '1900-01-01 0:0:0.0000000'),
+	[ZY8_SysEndTime] DATETIME2 GENERATED ALWAYS AS ROW END NOT NULL CONSTRAINT [DF_ZY8_SysEndTime] DEFAULT CONVERT(DATETIME2, '9999-12-31 23:59:59.9999999'),
+	PERIOD FOR SYSTEM_TIME ([ZY8_SysStartTime], [ZY8_SysEndTime]),
+	CONSTRAINT [PK_RefCusConditionCodeLanguage] PRIMARY KEY CLUSTERED ([ZY8_PK]),
+	CONSTRAINT [CK_ZY8_ZX6_NKLanguageNotEmpty] CHECK ([ZY8_ZX6_NKLanguage] <> ''),
+	CONSTRAINT [CK_ZY8_DescriptionNotEmpty] CHECK ([ZY8_Description] <> ''),
+	CONSTRAINT [FK_RefCusConditionLanguageCode_RefCusConditionCode] FOREIGN KEY ([ZY8_ZY7_ConditionCode]) REFERENCES RefCusConditionCode ([ZY7_PK]),
+	CONSTRAINT [FK_RefCusConditionLanguageCode_RefLanguageType] FOREIGN KEY ([ZY8_ZX6_NKLanguage]) REFERENCES RefLanguageType([ZX6_Language])
+)
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = [dbo].[RefCusConditionCodeLanguageHistory]))
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_RefCusConditionCodeLanguage_ZY8_ZX7_ConditionCode_ZY8_ZX6_NKLanguage] ON RefCusConditionCodeLanguage([ZY8_ZY7_ConditionCode] ASC, [ZY8_ZX6_NKLanguage] ASC)
+GO
+ALTER TABLE RefCusConditionCodeLanguage SET (LOCK_ESCALATION = DISABLE);

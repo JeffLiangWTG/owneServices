@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+    <CWGenerateXmlSerializationAssemblies>true</CWGenerateXmlSerializationAssemblies>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Design" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.ComponentModel" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.Integration" />
+    <Reference Include="CargoWise.Odyssey.Schema" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="CargoWise.Schema" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="Enterprise.DocumentEngine" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.MasterFiles.Business" />
+    <Reference Include="Enterprise.MasterFiles.Integration" />
+    <Reference Include="Enterprise.Registry.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Enterprise.ZArchitecture.Modules" />
+    <Reference Include="Resources" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Business\Port\PortSystemCodeList.cs">
+      <DependentUpon>PortSystemCodeList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Business\TriggerPointsConfiguration\TriggerPointsCodeList.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>TriggerPointsCodeList.xml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Business\Port\PortSystemCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>PortSystemCodeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Customs.FR.Registry</CustomToolNamespace>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Business\TriggerPointsConfiguration\TriggerPointsCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>TriggerPointsCodeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Customs.FR.Registry</CustomToolNamespace>
+    </None>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

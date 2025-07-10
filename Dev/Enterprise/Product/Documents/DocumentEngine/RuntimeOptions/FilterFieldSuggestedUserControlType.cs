@@ -1,0 +1,34 @@
+namespace Enterprise.DocumentEngine.RuntimeOptions
+{
+	public enum FilterFieldSuggestedUserControlType
+	{
+		None,
+		AccountingPeriodFieldUserControl,
+		AccountingPeriodsRangeUserControl,
+		CodeListMultipleChoiceUserControl,
+		CodeLookupFieldUserControl,
+		ColumnConfigurationFieldUserControl,
+		DateFieldUserControl,
+		DateRangeFieldUserControl,
+		DateTimeOffsetFieldUserControl,
+		DateTimeOffsetRangeFieldUserControl,
+		LookupFieldUserControl,
+		MultipleChoiceUserControl,
+		MultipleSelectionLookupUserControl,
+		NumberUserControl,
+		NumberNotInRangeUserControl,
+		NumberRangeUserControl,
+		AccountingNumberRangeUserControl,
+		OptionGroupUserControl,
+		SecurityFilterControl,
+		SingleAccountingPeriodUserControl,
+		TextFieldUserControl,
+		TextRangeFieldUserControl,
+		ZCheckBox,
+		ZMultiLineTextFieldUserControl,
+		RegistrationCodedUserControl,
+		SalesTradeLaneChecklistUserControl,
+		PermitTypeChecklistUserControl,
+		MonthYearPeriodUserControl,
+	}
+}

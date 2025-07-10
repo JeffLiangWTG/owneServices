@@ -1,0 +1,8 @@
+CREATE VIEW RefCusNomenclatureGroupNoteTableView_V1 AS
+SELECT ZZL_PK,
+ZZL_ZZ5_NomenclatureGroup,
+ZZL_ZZZ_NKDataGrouping,
+ZZL_ZX6_NKLanguage,
+ZZL_NoteType,
+ZZL_Note
+FROM RefCusNomenclatureGroupNote

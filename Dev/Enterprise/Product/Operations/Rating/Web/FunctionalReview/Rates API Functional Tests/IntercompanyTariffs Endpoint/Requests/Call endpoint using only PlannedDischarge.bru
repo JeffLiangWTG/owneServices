@@ -1,0 +1,29 @@
+meta {
+  name: Call endpoint using only PlannedDischarge
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/intercompanytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetRateQueryWithMandatoryFieldsForProvidedVariables(false);
+   query.PlannedDischarge =
+       {
+           Type: bru.getEnvVar("PlannedDischargeType"),
+           Value: bru.getEnvVar("PlannedDischargeValue")
+       };
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

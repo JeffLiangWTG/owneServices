@@ -1,0 +1,6 @@
+CREATE VIEW RefCusRateCodeLanguageTableView_V1 AS
+SELECT ZXC_PK,
+ZXC_ZX6_NKLanguage,
+ZXC_ZY1_RateCode,
+ZXC_Description
+FROM RefCusRateCodeLanguage

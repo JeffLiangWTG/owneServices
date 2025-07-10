@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <!-- WI00774883: CA2213:Disposable fields should be disposed analyzer is triggering for types outside of a project. -->
+    <NoWarn>$(NoWarn);CA2213</NoWarn>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Compile Remove="ClientLink\ClientLinkWinzorLauncher.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="BrowserInterop\Resources\GlowLoadingPage.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise.Freight.Integration" />
+    <Reference Include="CargoWise.Async" />
+    <Reference Include="System.Reactive" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreWindowsTargetFramework)' == 'true'">
+    <Reference Include="System.Drawing.Common" />
+    <Reference Include="System.Windows.Forms.Primitives" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Enterprise.ZArchitecture.GUI\Enterprise.ZArchitecture.GUI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="BrowserInterop\Resources\GlowLoadingPage.html" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

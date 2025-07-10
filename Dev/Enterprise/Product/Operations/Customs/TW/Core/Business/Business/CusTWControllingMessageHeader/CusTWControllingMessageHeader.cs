@@ -1,0 +1,1818 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.ComponentModel;
+using System.Data;
+using System.Linq;
+using CargoWise.Common;
+using CargoWise.ComponentModel;
+using CargoWise.EntityFramework;
+using CargoWise.Types;
+using CargoWiseOne.ResourceStrings;
+using Enterprise.Customs.Business;
+using Enterprise.Customs.Business.Extensions;
+using Enterprise.Customs.Business.FetchStrategies;
+using Enterprise.Customs.Common;
+using Enterprise.Customs.Common.TW;
+using Enterprise.Customs.TW.Messaging;
+using Enterprise.Customs.Universal;
+using Enterprise.DocumentEngineCore.DocumentSupport;
+using Enterprise.Environment;
+using Enterprise.MasterFiles.Business;
+using Enterprise.MasterFiles.Business.CustomValues;
+using Enterprise.MasterFiles.Integration;
+using Enterprise.Security;
+using Enterprise.ZArchitecture.Business;
+using Enterprise.ZArchitecture.Schema;
+using static Enterprise.Core.Constants.Customs.Universal.RefCusCodeListTypes;
+
+namespace Enterprise.Customs.TW.Business
+{
+	[SystemDefinedValues]
+	[SingleObjectAroundARow]
+	[DependentBusinessObject(typeof(CusEntryInstruction), "ControllingMessageHeaders")]
+	public class CusTWControllingMessageHeader : AutoCusTWControllingMessageHeader, IDocAddresses, Integration.Customs.ICusSupportingInfoTypeSupporter, ITWMessageInfoProvider, IDocumentSupportable, ICusEntryNumberParent, IShortSequenceNumberLine
+	{
+		public CusTWControllingMessageHeader(BusinessObjectFactory factory, DataRow row)
+			: base(factory, row)
+		{
+		}
+
+		#region Schema
+		public new abstract class Schema : AutoCusTWControllingMessageHeader.Schema
+		{
+			public new const int TW1_ControllingMessageTypeMaxLength = 8;
+			public const string ControllingMessageTypeDescription = nameof(CusTWControllingMessageHeader.ControllingMessageTypeDescription);
+			public const string CertificateTypeDescription = nameof(CusTWControllingMessageHeader.CertificateTypeDescription);
+			public const string BusinessTypeDescription = nameof(CusTWControllingMessageHeader.BusinessTypeDescription);
+			public const string ProcessingUnitDescription = nameof(CusTWControllingMessageHeader.ProcessingUnitDescription);
+			public const string TW1_ECFAPrintedRemarks = nameof(CusTWControllingMessageHeader.TW1_ECFAPrintedRemarks);
+			public const string PermitNumber = nameof(CusTWControllingMessageHeader.PermitNumber);
+			public const string PermitNoExpirationDate = nameof(CusTWControllingMessageHeader.PermitNoExpirationDate);
+			public const string BulkApplicationID = nameof(CusTWControllingMessageHeader.BulkApplicationID);
+			public const string BulkPaymentID = nameof(CusTWControllingMessageHeader.BulkPaymentID);
+			public const string ProcessingNumber = nameof(CusTWControllingMessageHeader.ProcessingNumber);
+			public const string CustomsMessageIdentifier = nameof(CusTWControllingMessageHeader.CustomsMessageIdentifier);
+			public const string TW_Notes = nameof(CusTWControllingMessageHeader.TW_Notes);
+			public const string LicensingStatusDescription = nameof(CusTWControllingMessageHeader.LicensingStatusDescription);
+			public const string LicensingMessageStatusDescription = nameof(CusTWControllingMessageHeader.LicensingMessageStatusDescription);
+		}
+		#endregion
+
+		bool ShouldDefaultZZZCertificateTypes(ZString certificateType)
+		{
+			var zzzCertificateTypes = new string[] { CertificateTypeList.Codes.Code9, CertificateTypeList.Codes.Code11, CertificateTypeList.Codes.Code13, CertificateTypeList.Codes.Code14 };
+			return zzzCertificateTypes.Any(x => x.Equals(certificateType));
+		}
+
+		public bool IsEmpty
+		{
+			get
+			{
+				return !TW1_AppointmentDate.IsValid &&
+					TW1_AppointmentPeriod.IsEmpty &&
+					TW1_BusinessType.IsEmpty &&
+					TW1_ControllingAgency.IsEmpty &&
+					TW1_FunctionalReferenceId.IsEmpty &&
+					TW1_PaymentMethod.IsEmpty &&
+					PermitNumber.IsEmpty &&
+					TW1_ProcessingUnit.IsEmpty &&
+					TW1_RequestDescription.IsEmpty;
+			}
+		}
+
+		#region Properties
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader.TW1_Sequence", Caption = "Sequence Number", MediumCaption = "Sequence No", ShortCaption = "Seq. #")]
+		public override ZShort TW1_Sequence
+		{
+			get => base.TW1_Sequence;
+			set
+			{
+				var oldValue = TW1_Sequence;
+				var hasChanged = oldValue != value;
+				base.TW1_Sequence = value;
+				if (!IsCopying && EntryInstruction is CusEntryInstruction entryInstruction)
+				{
+					entryInstruction.ControllingMessageHeaderNumberGenerator.RecalculateWhenRenumbered(this, oldValue);
+					if (hasChanged)
+					{
+						entryInstruction.ControllingMessageHeaderNumberGenerator.ReCalculateAll();
+					}
+				}
+			}
+		}
+
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader.TW1_FunctionalReferenceId", Caption = "Reference", ShortCaption = "Ref.", FullDescription = "The identification number of the licensing message. It is a unique number and automatically generated by the system.")]
+		public override ZString TW1_FunctionalReferenceId
+		{
+			get => base.TW1_FunctionalReferenceId;
+			set => base.TW1_FunctionalReferenceId = value;
+		}
+
+		[ReadOnly(true)]
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.ControllingAgencyList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader.TW1_ControllingAgency", Caption = "Controlling Agency", FullDescription = "The identification code of the controlling agency.")]
+		public override ZString TW1_ControllingAgency
+		{
+			get => base.TW1_ControllingAgency;
+			set => base.TW1_ControllingAgency = value;
+		}
+
+		public ZString ControllingAgencyDescription => Lookups.ControllingAgencyList.GetDescriptionFromCode(TW1_ControllingAgency);
+
+		IEnumerable<ZPropertyInfo> ReadOnlyPropertyInfos
+		{
+			get
+			{
+				yield return TW1_ApplyForSampleReturnInfo;
+				yield return TW1_AppointmentDateInfo;
+				yield return TW1_AppointmentPeriodInfo;
+				yield return TW1_CertificateTypeInfo;
+				yield return TW1_ElectronicReceiptInfo;
+				yield return TW1_FunctionalReferenceIdInfo;
+				yield return TW1_InspectionRegistrationNumberInfo;
+				yield return TW1_PaymentMethodInfo;
+				yield return PermitNumberInfo;
+				yield return TW1_PrePermitNumberInfo;
+				yield return TW1_PreWineInspectionStatusInfo;
+				yield return TW1_ProcessingUnitInfo;
+				yield return TW1_ProofOfPaperInfo;
+				yield return TW1_RequestDescriptionInfo;
+				yield return TW1_PurposeInfo;
+				yield return TW1_SampleReturnAddressInfo;
+				yield return TW1_SamplingReductionReasonInfo;
+				yield return TW1_IsSpecialApplicationInfo;
+				yield return TW1_SpecialApplicationIdInfo;
+				yield return TW1_CopyQuantityInfo;
+				yield return TW1_OriginalQuantityInfo;
+				yield return TW1_EUSteelProductNoInfo;
+				yield return TW1_EUSteelProductPhaseInfo;
+				yield return TW1_ManufacturerPrintingCodeInfo;
+				yield return TW1_ObservationsInfo;
+				yield return TW1_IsTriangularTradeInfo;
+				yield return TW1_RemarksInfo;
+				yield return TW1_IsEstimatedLoadingDateInfo;
+			}
+		}
+
+		IEnumerable<BusinessObjectCollection> ReadOnlyPropertyCollections
+		{
+			get
+			{
+				yield return ProductLabelRanges;
+				yield return EthanolPermitNumbers;
+			}
+		}
+
+		void ResetPropertiesOnMessageTypeChanged()
+		{
+			ReadOnlyPropertyInfos.ForEach(x => x.ClearValueIfReadOnly());
+			ReadOnlyPropertyCollections.ForEach(x => x.RemoveAndDeleteAllIfReadOnly());
+			ResetTW1_ControllingAgency();
+			TW1_BusinessType = Lookups.BusinessTypeList.GetAllCodes().FirstOrDefault();
+			Declaration?.InvoiceLines?.Cast<JobComInvoiceLine>()?.ForEach(x => x.ClearDataByControllingAgency(PK));
+			LocalProcessorAddress.RefreshBindingIncludingChildren();
+		}
+
+		void ResetTW1_ControllingAgency()
+		{
+			switch (TW1_ControllingMessageType)
+			{
+				case ControllingMessageTypeList.Codes.NX101:
+				case ControllingMessageTypeList.Codes.X101:
+				case ControllingMessageTypeList.Codes.NX201_01:
+				case ControllingMessageTypeList.Codes.NX201_07:
+					TW1_ControllingAgency = ControllingAgencyList.Codes.FT;
+					break;
+				case ControllingMessageTypeList.Codes.NX301:
+					TW1_ControllingAgency = ControllingAgencyList.Codes.CI;
+					break;
+				case ControllingMessageTypeList.Codes.NX301_AX:
+					TW1_ControllingAgency = ControllingAgencyList.Codes.AX;
+					break;
+				case ControllingMessageTypeList.Codes.NX301_DN:
+					TW1_ControllingAgency = ControllingAgencyList.Codes.DN;
+					break;
+				case ControllingMessageTypeList.Codes.NX401:
+					TW1_ControllingAgency = ControllingAgencyList.Codes.VP;
+					break;
+				case ControllingMessageTypeList.Codes.NX601:
+					TW1_ControllingAgency = ControllingAgencyList.Codes.IF;
+					break;
+				case ControllingMessageTypeList.Codes.NX603:
+					TW1_ControllingAgency = ControllingAgencyList.Codes.CD;
+					break;
+				default:
+					TW1_ControllingAgencyInfo.ClearValue();
+					break;
+			}
+		}
+
+		public ZBool IsX101 => TW1_ControllingMessageType == ControllingMessageTypeList.Codes.X101;
+
+		public ZBool IsNX101 => Factory.GetValue(ref isNX101Cached, () => TW1_ControllingMessageType == ControllingMessageTypeList.Codes.NX101);
+		CachedProperty<ZBool> isNX101Cached;
+
+		public ZBool IsNX101OrX101 => IsX101 || IsNX101;
+
+		public ZBool IsNX201_01 => TW1_ControllingMessageType == ControllingMessageTypeList.Codes.NX201_01;
+
+		public ZBool IsNX201_07 => TW1_ControllingMessageType == ControllingMessageTypeList.Codes.NX201_07;
+
+		public ZBool IsNX301 => TW1_ControllingMessageType == ControllingMessageTypeList.Codes.NX301;
+
+		public ZBool IsNX301_AX => TW1_ControllingMessageType == ControllingMessageTypeList.Codes.NX301_AX;
+
+		public ZBool IsNX301_DN => TW1_ControllingMessageType == ControllingMessageTypeList.Codes.NX301_DN;
+
+		public ZBool IsNX401 => TW1_ControllingMessageType == ControllingMessageTypeList.Codes.NX401;
+
+		public ZBool IsNX601 => TW1_ControllingMessageType == ControllingMessageTypeList.Codes.NX601;
+
+		public ZBool IsNX603 => TW1_ControllingMessageType == ControllingMessageTypeList.Codes.NX603;
+
+		#region TW1_CertificateType Properties
+		public ZBool IsNX101ContainZZZCertificateTypes => IsNX101 && ShouldDefaultZZZCertificateTypes(TW1_CertificateType);
+		public ZBool IsNX101NotContainZZZCertificateTypes => IsNX101 && !ShouldDefaultZZZCertificateTypes(TW1_CertificateType);
+		#endregion
+
+		public ZBool IsCertificate15 => TW1_CertificateType == CertificateTypeList.Codes.Code15;
+
+		#region ReadOnly
+
+		ZBool TW1_CertificateType_ReadOnly => GetReadOnly(Schema.TW1_CertificateType);
+
+		ZBool TW1_BusinessType_ReadOnly => GetReadOnly(Schema.TW1_BusinessType);
+
+		ZBool TW1_ProcessingUnit_ReadOnly => GetReadOnly(Schema.TW1_ProcessingUnit);
+
+		ZBool TW1_ManufacturerPrintingCode_ReadOnly => GetReadOnly(Schema.TW1_ManufacturerPrintingCode);
+
+		ZBool TW1_PrintingCode_ReadOnly => GetReadOnly(Schema.TW1_PrintingCode);
+
+		ZBool TW1_OriginalQuantity_ReadOnly => GetReadOnly(Schema.TW1_OriginalQuantity);
+
+		ZBool TW1_CopyQuantity_ReadOnly => GetReadOnly(Schema.TW1_CopyQuantity);
+
+		ZBool TW1_BeforeClearanceApplicationReason_ReadOnly => GetReadOnly(Schema.TW1_BeforeClearanceApplicationReason);
+
+		ZBool TW1_IsTriangularTrade_ReadOnly => GetReadOnly(Schema.TW1_IsTriangularTrade);
+
+		ZBool TW1_IsEstimatedLoadingDate_ReadOnly => GetReadOnly(Schema.TW1_IsEstimatedLoadingDate) || !IsCertificate15;
+
+		ZBool TW1_PaymentMethod_ReadOnly => GetReadOnly(Schema.TW1_PaymentMethod);
+
+		ZBool TW1_Purpose_ReadOnly => GetReadOnly(Schema.TW1_Purpose);
+
+		ZBool BulkPaymentID_ReadOnly => GetReadOnly(Schema.BulkPaymentID);
+
+		ZBool TW1_ElectronicReceipt_ReadOnly => GetReadOnly(Schema.TW1_ElectronicReceipt);
+
+		ZBool TW1_AppointmentDate_ReadOnly => GetReadOnly(Schema.TW1_AppointmentDate);
+
+		ZBool TW1_AppointmentPeriod_ReadOnly => GetReadOnly(Schema.TW1_AppointmentPeriod);
+
+		ZBool TW1_ProofOfPaper_ReadOnly => GetReadOnly(Schema.TW1_ProofOfPaper);
+
+		ZBool TW1_InspectionRegistrationNumber_ReadOnly => GetReadOnly(Schema.TW1_InspectionRegistrationNumber);
+
+		ZBool TW1_PreWineInspectionStatus_ReadOnly => GetReadOnly(Schema.TW1_PreWineInspectionStatus);
+
+		ZBool PermitNumber_ReadOnly => GetReadOnly(Schema.PermitNumber);
+
+		ZBool PermitNoExpirationDate_ReadOnly => GetReadOnly(Schema.PermitNoExpirationDate);
+
+		ZBool TW1_PrePermitNumber_ReadOnly => GetReadOnly(Schema.TW1_PrePermitNumber);
+
+		ZBool BulkApplicationID_ReadOnly => GetReadOnly(Schema.BulkApplicationID);
+
+		ZBool TW1_PortOfBulkCommodity_ReadOnly => GetReadOnly(Schema.TW1_PortOfBulkCommodity);
+
+		ZBool TW1_SampleReturnAddress_ReadOnly => GetReadOnly(Schema.TW1_SampleReturnAddress);
+
+		ZBool TW1_ApplyForSampleReturn_ReadOnly => GetReadOnly(Schema.TW1_ApplyForSampleReturn);
+
+		ZBool TW1_SamplingReductionReason_ReadOnly => GetReadOnly(Schema.TW1_SamplingReductionReason);
+
+		ZBool TW1_RequestDescription_ReadOnly => GetReadOnly(Schema.TW1_RequestDescription);
+
+		ZBool TW1_ReturnPreviousCOO_ReadOnly => GetReadOnly(Schema.TW1_ReturnPreviousCOO);
+
+		ZBool TW1_IsSpecialApplication_ReadOnly => GetReadOnly(Schema.TW1_IsSpecialApplication);
+
+		ZBool TW1_SpecialApplicationId_ReadOnly => GetReadOnly(Schema.TW1_SpecialApplicationId);
+
+		ZBool TW1_EUSteelProductPhase_ReadOnly => GetReadOnly(Schema.TW1_EUSteelProductPhase);
+
+		ZBool TW1_EUSteelProductNo_ReadOnly => GetReadOnly(Schema.TW1_EUSteelProductNo);
+
+		ZBool ProcessingNumber_ReadOnly => GetReadOnly(Schema.ProcessingNumber);
+
+		ZBool CustomsMessageIdentifier_ReadOnly => GetReadOnly(Schema.CustomsMessageIdentifier);
+
+		ZBool TW1_Observations_ReadOnly => GetReadOnly(Schema.TW1_Observations);
+
+		ZBool TW1_Remarks_ReadOnly => GetReadOnly(Schema.TW1_Remarks);
+
+		ZBool EthanolPermitNumbers_ReadOnly => GetReadOnly(nameof(EthanolPermitNumbers));
+
+		ZBool LocalProcessorAddress_ReadOnly => GetReadOnly(nameof(LocalProcessorAddress));
+
+		ZBool ProductLabelRanges_ReadOnly => GetReadOnly(nameof(ProductLabelRanges));
+
+		ZBool TW1_RL_NKPortOfLoading_ReadOnly => GetReadOnly(Schema.TW1_RL_NKPortOfLoading);
+
+		ZBool TW1_PortOfLoadingName_ReadOnly => GetReadOnly(Schema.TW1_PortOfLoadingName);
+
+		ZBool TW1_RL_NKPortOfUnloading_ReadOnly => GetReadOnly(Schema.TW1_RL_NKPortOfUnloading);
+
+		ZBool TW1_PortOfUnloadingName_ReadOnly => GetReadOnly(Schema.TW1_PortOfUnloadingName);
+
+		ZBool GetReadOnly(string propertyName) => propertiesEditable.TryGetValue(propertyName, out var properties) && !properties.Contains(TW1_ControllingMessageType);
+
+		static readonly Dictionary<ZString, ImmutableHashSet<string>> propertiesEditable = new Dictionary<ZString, ImmutableHashSet<string>>()
+		{
+			{
+				Schema.TW1_CertificateType, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.X101,
+					ControllingMessageTypeList.Codes.NX101
+					)
+			},
+			{
+				Schema.TW1_BusinessType, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX201_01,
+					ControllingMessageTypeList.Codes.NX201_07,
+					ControllingMessageTypeList.Codes.NX301_DN,
+					ControllingMessageTypeList.Codes.NX401,
+					ControllingMessageTypeList.Codes.NX603
+					)
+			},
+			{
+				Schema.TW1_ProcessingUnit, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.X101,
+					ControllingMessageTypeList.Codes.NX101,
+					ControllingMessageTypeList.Codes.NX201_01,
+					ControllingMessageTypeList.Codes.NX201_07,
+					ControllingMessageTypeList.Codes.NX301,
+					ControllingMessageTypeList.Codes.NX301_AX,
+					ControllingMessageTypeList.Codes.NX401,
+					ControllingMessageTypeList.Codes.NX601,
+					ControllingMessageTypeList.Codes.NX603
+					)
+			},
+			{
+				Schema.TW1_ManufacturerPrintingCode, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.X101,
+					ControllingMessageTypeList.Codes.NX101
+					)
+			},
+			{
+				Schema.TW1_PrintingCode, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.X101,
+					ControllingMessageTypeList.Codes.NX101
+					)
+			},
+			{
+				Schema.TW1_OriginalQuantity, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.X101,
+					ControllingMessageTypeList.Codes.NX101
+					)
+			},
+			{
+				Schema.TW1_CopyQuantity, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.X101,
+					ControllingMessageTypeList.Codes.NX101
+					)
+			},
+			{
+				Schema.TW1_BeforeClearanceApplicationReason, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.X101,
+					ControllingMessageTypeList.Codes.NX101
+					)
+			},
+			{
+				Schema.TW1_IsTriangularTrade, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.X101,
+					ControllingMessageTypeList.Codes.NX101
+					)
+			},
+			{
+				Schema.TW1_IsEstimatedLoadingDate, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.X101,
+					ControllingMessageTypeList.Codes.NX101
+					)
+			},
+			{
+				Schema.TW1_PaymentMethod, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301,
+					ControllingMessageTypeList.Codes.NX301_AX,
+					ControllingMessageTypeList.Codes.NX301_DN,
+					ControllingMessageTypeList.Codes.NX401,
+					ControllingMessageTypeList.Codes.NX601,
+					ControllingMessageTypeList.Codes.NX603
+					)
+			},
+			{
+				Schema.TW1_Purpose, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301_DN
+					)
+			},
+			{
+				Schema.BulkPaymentID, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301_AX
+					)
+			},
+			{
+				Schema.TW1_ElectronicReceipt, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301,
+					ControllingMessageTypeList.Codes.NX301_AX,
+					ControllingMessageTypeList.Codes.NX603
+					)
+			},
+			{
+				Schema.TW1_AppointmentDate, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301,
+					ControllingMessageTypeList.Codes.NX301_AX,
+					ControllingMessageTypeList.Codes.NX301_DN,
+					ControllingMessageTypeList.Codes.NX401,
+					ControllingMessageTypeList.Codes.NX601,
+					ControllingMessageTypeList.Codes.NX603
+					)
+			},
+			{
+				Schema.TW1_AppointmentPeriod, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301,
+					ControllingMessageTypeList.Codes.NX301_AX,
+					ControllingMessageTypeList.Codes.NX301_DN,
+					ControllingMessageTypeList.Codes.NX401,
+					ControllingMessageTypeList.Codes.NX601,
+					ControllingMessageTypeList.Codes.NX603
+					)
+			},
+			{
+				Schema.TW1_ProofOfPaper, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301_AX,
+					ControllingMessageTypeList.Codes.NX401,
+					ControllingMessageTypeList.Codes.NX601,
+					ControllingMessageTypeList.Codes.NX603
+					)
+			},
+			{
+				Schema.TW1_InspectionRegistrationNumber, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301
+					)
+			},
+			{
+				Schema.TW1_PreWineInspectionStatus, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301_DN
+					)
+			},
+			{
+				Schema.PermitNumber, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX201_01,
+					ControllingMessageTypeList.Codes.NX201_07,
+					ControllingMessageTypeList.Codes.NX301,
+					ControllingMessageTypeList.Codes.NX301_AX,
+					ControllingMessageTypeList.Codes.NX301_DN,
+					ControllingMessageTypeList.Codes.NX401,
+					ControllingMessageTypeList.Codes.NX601,
+					ControllingMessageTypeList.Codes.NX603
+					)
+			},
+			{
+				Schema.PermitNoExpirationDate, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX201_07
+					)
+			},
+			{
+				Schema.TW1_PrePermitNumber, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101,
+					ControllingMessageTypeList.Codes.X101,
+					ControllingMessageTypeList.Codes.NX301_DN,
+					ControllingMessageTypeList.Codes.NX401
+					)
+			},
+			{
+				Schema.BulkApplicationID, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301_AX
+					)
+			},
+			{
+				Schema.TW1_PortOfBulkCommodity, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301_AX
+					)
+			},
+			{
+				Schema.TW1_SampleReturnAddress, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301_DN
+					)
+			},
+			{
+				Schema.TW1_ApplyForSampleReturn, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX601
+					)
+			},
+			{
+				Schema.TW1_SamplingReductionReason, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX601
+					)
+			},
+			{
+				Schema.TW1_RequestDescription, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301,
+					ControllingMessageTypeList.Codes.NX301_AX,
+					ControllingMessageTypeList.Codes.NX301_DN,
+					ControllingMessageTypeList.Codes.NX401,
+					ControllingMessageTypeList.Codes.NX601,
+					ControllingMessageTypeList.Codes.NX603
+					)
+			},
+			{
+				Schema.TW1_ReturnPreviousCOO, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101,
+					ControllingMessageTypeList.Codes.X101
+					)
+			},
+			{
+				Schema.TW1_IsSpecialApplication, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101,
+					ControllingMessageTypeList.Codes.X101
+					)
+			},
+			{
+				Schema.TW1_SpecialApplicationId, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101,
+					ControllingMessageTypeList.Codes.X101
+					)
+			},
+			{
+				Schema.TW1_EUSteelProductPhase, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101,
+					ControllingMessageTypeList.Codes.X101
+					)
+			},
+			{
+				Schema.TW1_EUSteelProductNo, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101,
+					ControllingMessageTypeList.Codes.X101
+					)
+			},
+			{
+				Schema.ProcessingNumber, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX201_01
+					)
+			},
+			{
+				Schema.CustomsMessageIdentifier, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX201_01
+					)
+			},
+			{
+				Schema.TW1_Observations, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101,
+					ControllingMessageTypeList.Codes.X101
+					)
+			},
+			{
+				Schema.TW1_Remarks, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101,
+					ControllingMessageTypeList.Codes.X101
+					)
+			},
+			{
+				nameof(EthanolPermitNumbers), ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301_DN
+					)
+			},
+			{
+				nameof(LocalProcessorAddress), ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101,
+					ControllingMessageTypeList.Codes.X101,
+					ControllingMessageTypeList.Codes.NX601
+					)
+			},
+			{
+				nameof(ProductLabelRanges), ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX301
+					)
+			},
+			{
+				Schema.TW1_RL_NKPortOfLoading, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101
+					)
+			},
+			{
+				Schema.TW1_PortOfLoadingName, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101
+					)
+			},
+			{
+				Schema.TW1_RL_NKPortOfUnloading, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101
+					)
+			},
+			{
+				Schema.TW1_PortOfUnloadingName, ImmutableHashSet.Create(
+					ControllingMessageTypeList.Codes.NX101
+					)
+			},
+		};
+
+		#endregion
+
+		[ReadOnlyMember(nameof(TW1_IsSpecialApplication_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_IsSpecialApplication", Caption = "Special Application", MediumCaption = "Special App", ShortCaption = "Special App", FullDescription = "Indicates that this certificate of origin message is a Special Application.")]
+		public override ZBool TW1_IsSpecialApplication { get => base.TW1_IsSpecialApplication; set => base.TW1_IsSpecialApplication = value; }
+
+		[ReadOnlyMember(nameof(TW1_SpecialApplicationId_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_SpecialApplicationId", Caption = "Special Application ID", MediumCaption = "Special Application ID", ShortCaption = "Special App ID", FullDescription = "Indicates the Special Application approval receipt ID.")]
+		public override ZString TW1_SpecialApplicationId { get => base.TW1_SpecialApplicationId; set => base.TW1_SpecialApplicationId = value; }
+
+		[MaxLength(2)]
+		[ReadOnlyMember(nameof(TW1_CopyQuantity_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_CopyQuantity", Caption = "Copy Quantity", MediumCaption = "Copy QTY", ShortCaption = "CQ", FullDescription = "Indicates the number of copies of the application.")]
+		public override ZByte TW1_CopyQuantity { get => base.TW1_CopyQuantity; set => base.TW1_CopyQuantity = value; }
+
+		[MaxLength(2)]
+		[ReadOnlyMember(nameof(TW1_OriginalQuantity_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_OriginalQuantity", Caption = "Original Copy", MediumCaption = "Orig Copy", ShortCaption = "OC", FullDescription = "Indicates the number of original copies of the application.")]
+		public override ZByte TW1_OriginalQuantity { get => base.TW1_OriginalQuantity; set => base.TW1_OriginalQuantity = value; }
+
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.EUSteelDeclarationCodeList))]
+		[ReadOnlyMember(nameof(TW1_EUSteelProductNo_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_EUSteelProductNo", Caption = "EU Steel Product No.", MediumCaption = "EU Steel No.", ShortCaption = "EU ST No.", FullDescription = "Indicates the EU steel quota declared category.")]
+		public override ZString TW1_EUSteelProductNo { get => base.TW1_EUSteelProductNo; set => base.TW1_EUSteelProductNo = value; }
+
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.EUSteelPhaseCodeList))]
+		[ReadOnlyMember(nameof(TW1_EUSteelProductPhase_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_EUSteelProductPhase", Caption = "EU Steel Phase", MediumCaption = "EU ST Phase", ShortCaption = "EU ST Phase", FullDescription = "Indicates the EU steel quota phase.")]
+		public override ZString TW1_EUSteelProductPhase { get => base.TW1_EUSteelProductPhase; set => base.TW1_EUSteelProductPhase = value; }
+
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.CPT_123_PrintingCodeList))]
+		[ReadOnlyMember(nameof(TW1_PrintingCode_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_PrintingCode", Caption = "Printing Option", MediumCaption = "Printing OPT", ShortCaption = "Printing OPT", FullDescription = "Indicates the print option for the Certificate of Origin.")]
+		public override ZString TW1_PrintingCode { get => base.TW1_PrintingCode; set => base.TW1_PrintingCode = value; }
+
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.ManufacturerPrintingCodeList))]
+		[ReadOnlyMember(nameof(TW1_ManufacturerPrintingCode_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_ManufacturerPrintingCode", Caption = "Manufacturer Printing Option", MediumCaption = "Manufacturer Printing OPT", ShortCaption = "Mfr. Printing OPT", FullDescription = "Indicates the manufacturer's data printing option.")]
+		public override ZString TW1_ManufacturerPrintingCode { get => base.TW1_ManufacturerPrintingCode; set => base.TW1_ManufacturerPrintingCode = value; }
+
+		[ReadOnlyMember(nameof(TW1_Observations_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_Observations", Caption = "Observations", MediumCaption = "Observations", ShortCaption = "Obs.", FullDescription = "Indicates observation records. When the certificate type is '09', '11', '13', '14', the applicant can describe the remarks related to the goods.")]
+		public override ZString TW1_Observations { get => base.TW1_Observations; set => base.TW1_Observations = value; }
+
+		[ReadOnlyMember(nameof(TW1_ReturnPreviousCOO_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_ReturnPreviousCOO", Caption = "Return Previous COO", MediumCaption = "Return Pre. COO", ShortCaption = "RET Pre. COO", FullDescription = "Indicates the option to return the original Certificate of Origin.")]
+		public override ZBool TW1_ReturnPreviousCOO { get => base.TW1_ReturnPreviousCOO; set => base.TW1_ReturnPreviousCOO = value; }
+
+		[ReadOnlyMember(nameof(TW1_IsTriangularTrade_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_IsTriangularTrade", Caption = "Triangular Trade", MediumCaption = "Triangular Trade", ShortCaption = "Triangular Trade", FullDescription = "Indicates that this certificate of origin is a triangular trade.")]
+		public override ZBool TW1_IsTriangularTrade { get => base.TW1_IsTriangularTrade; set => base.TW1_IsTriangularTrade = value; }
+
+		[ReadOnlyMember(nameof(TW1_Remarks_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_Remarks", Caption = "Remarks", MediumCaption = "Remarks", ShortCaption = "Remarks", FullDescription = "Indicates other transaction remarks for the certificate of origin printing.")]
+		public override ZString TW1_Remarks { get => base.TW1_Remarks; set => base.TW1_Remarks = value; }
+
+		[ReadOnlyMember(nameof(TW1_IsEstimatedLoadingDate_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_IsEstimatedLoadingDate", Caption = "Estimated Date of Loading", MediumCaption = "Est. Date Of Lading", ShortCaption = "ETL", FullDescription = "Indicates whether it is the estimated date of Loading. Only enable when Certificate Type is '15'.")]
+		public override ZBool TW1_IsEstimatedLoadingDate { get => base.TW1_IsEstimatedLoadingDate; set => base.TW1_IsEstimatedLoadingDate = value; }
+
+		[ReadOnlyMember(nameof(PermitNumber_ReadOnly))]
+		[MaxLength(14)]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|PermitNumber", Caption = "Permit No", FullDescription = "The permit number pre-allocated by the controlling agency.")]
+		public ZString PermitNumber
+		{
+			get => EntryNumber.CE_EntryNum;
+			set
+			{
+				var oldVale = PermitNumber;
+				if (oldVale != value)
+				{
+					CheckMaximumLength(PermitNumberInfo, value);
+					EntryNumber.CE_EntryNum = value;
+					PermitNumberInfo.RefreshBinding(oldVale);
+					if (!IsValidationSuspended)
+					{
+						Validation.ValidatePermitNumber();
+					}
+				}
+			}
+		}
+		public ZPropertyInfo PermitNumberInfo => GetZPropertyInfo(nameof(PermitNumber));
+
+		[ReadOnlyMember(nameof(PermitNoExpirationDate_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|PermitNoExpirationDate", Caption = "Permit No Expiration Date")]
+		public ZDateTime PermitNoExpirationDate
+		{
+			get => EntryNumber.CE_ExpiryDate;
+			set
+			{
+				var oldVale = PermitNoExpirationDate;
+				if (oldVale != value)
+				{
+					EntryNumber.CE_ExpiryDate = value;
+					PermitNoExpirationDateInfo.RefreshBinding(oldVale);
+				}
+			}
+		}
+		public ZPropertyInfo PermitNoExpirationDateInfo => GetZPropertyInfo(nameof(PermitNoExpirationDate));
+
+		CusEntryNumber EntryNumber
+		{
+			get
+			{
+				if (fEntryNumber == null || fEntryNumber.IsDeleted)
+				{
+					fEntryNumber = CusEntryNumber.LoadOrCreate(this, CusEntryNumberTypes.Taiwan.Permit, Core.Constants.CountryCodes.Taiwan);
+				}
+
+				return fEntryNumber;
+			}
+		}
+		CusEntryNumber fEntryNumber;
+
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.BusinessTypeList))]
+		[ReadOnlyMember(nameof(TW1_BusinessType_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader.TW1_BusinessType", Caption = "Business Type", FullDescription = "The type of the application business included in the licensing service platform.")]
+		public override ZString TW1_BusinessType
+		{
+			get => base.TW1_BusinessType;
+			set
+			{
+				base.TW1_BusinessType = value;
+				if (!IsValidationSuspended)
+				{
+					Validation.ValidateTW1_Purpose();
+				}
+			}
+		}
+
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|BusinessTypeDescription", Caption = "Business Type Description")]
+		public ZString BusinessTypeDescription => Lookups.BusinessTypeList.GetDescriptionFromCode(TW1_BusinessType);
+
+		public ZPropertyInfo BusinessTypeDescriptionInfo => GetZPropertyInfo(Schema.BusinessTypeDescription);
+
+		public ZZRefCusCodeListCombined ProcessingUnit => TWRefCusCodeListLoader.GetProcessingUnit(Factory, IsNX101, TW1_ProcessingUnit, EntryInstruction?.DateOfValuation ?? ZDateTime.Today);
+
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.ProcessingUnitList))]
+		[ReadOnlyMember(nameof(TW1_ProcessingUnit_ReadOnly))]
+		[RelatedBusinessObject(nameof(ProcessingUnit))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader.TW1_ProcessingUnit", Caption = "Processing Unit", FullDescription = "The processing or issuing unit of the licensing authority.")]
+		public override ZString TW1_ProcessingUnit { get => base.TW1_ProcessingUnit; set => base.TW1_ProcessingUnit = value; }
+
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|ProcessingUnitDescription", Caption = "Processing Unit Description")]
+		public ZString ProcessingUnitDescription => Lookups.ProcessingUnitList.GetDescriptionFromCode(TW1_ProcessingUnit);
+
+		public ZPropertyInfo ProcessingUnitDescriptionInfo => GetZPropertyInfo(Schema.ProcessingUnitDescription);
+
+		[ReadOnlyMember(nameof(TW1_PaymentMethod_ReadOnly))]
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.CPT_116_PaymentMethodList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader.TW1_PaymentMethod", Caption = "Payment Method", FullDescription = "The payment method of the licensing fee.")]
+		public override ZString TW1_PaymentMethod { get => base.TW1_PaymentMethod; set => base.TW1_PaymentMethod = value; }
+
+		[ReadOnlyMember(nameof(TW1_ProofOfPaper_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader.TW1_ProofOfPaper", Caption = "Apply for Proof of Paper", FullDescription = "Indicates that the importer (tax obligor, inspection obligor or importer) or inspection/application agent applies for hard copies of the certificate.")]
+		public override ZBool TW1_ProofOfPaper { get => base.TW1_ProofOfPaper; set => base.TW1_ProofOfPaper = value; }
+
+		[ReadOnlyMember(nameof(TW1_ElectronicReceipt_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader.TW1_ElectronicReceipt", Caption = "Apply for Electronic Receipt", FullDescription = "Indicates whether to apply for electronic receipt.")]
+		public override ZBool TW1_ElectronicReceipt { get => base.TW1_ElectronicReceipt; set => base.TW1_ElectronicReceipt = value; }
+
+		[ReadOnlyMember(nameof(TW1_RequestDescription_ReadOnly))]
+		[MaxLength(256)]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader.TW1_RequestDescription", Caption = "Request", FullDescription = "The remarks and marks of special request.")]
+		public override ZString TW1_RequestDescription { get => base.TW1_RequestDescription; set => base.TW1_RequestDescription = value; }
+
+		[ReadOnlyMember(nameof(TW1_AppointmentDate_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader.TW1_AppointmentDate", Caption = "Appointment Date", FullDescription = "The appointment date of the quarantine or inspection.")]
+		public override ZDate TW1_AppointmentDate { get => base.TW1_AppointmentDate; set => base.TW1_AppointmentDate = value; }
+
+		[ReadOnlyMember(nameof(TW1_AppointmentPeriod_ReadOnly))]
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.AppointmentPeriodList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader.TW1_AppointmentPeriod", Caption = "Appointment Period", FullDescription = "The appointment period of the quarantine or inspection.")]
+		public override ZString TW1_AppointmentPeriod { get => base.TW1_AppointmentPeriod; set => base.TW1_AppointmentPeriod = value; }
+
+		[ReadOnlyMember(nameof(TW1_ApplyForSampleReturn_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_ApplyForSampleReturn", Caption = "Apply for Sample Return", ShortCaption = "Sample Return", FullDescription = "Indicates that the importer (tax obligor, inspection obligor or importer) or inspection/application agent applies for the return of samples of inspection residue.")]
+		public override ZBool TW1_ApplyForSampleReturn { get => base.TW1_ApplyForSampleReturn; set => base.TW1_ApplyForSampleReturn = value; }
+
+		[ReadOnlyMember(nameof(TW1_SampleReturnAddress_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_SampleReturnAddress", Caption = "Sample Return Address", FullDescription = "The Chinese address of the sample being returned.")]
+		public override ZString TW1_SampleReturnAddress { get => base.TW1_SampleReturnAddress; set => base.TW1_SampleReturnAddress = value; }
+
+		[ReadOnlyMember(nameof(TW1_SamplingReductionReason_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_SamplingReductionReason", Caption = "Sampling Reduction Reason", FullDescription = "The reason to apply for reduction of samples.")]
+		public override ZString TW1_SamplingReductionReason { get => base.TW1_SamplingReductionReason; set => base.TW1_SamplingReductionReason = value; }
+
+		[ReadOnlyMember(nameof(TW1_InspectionRegistrationNumber_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_InspectionRegistrationNumber", Caption = "Inspection Reg. Number", ShortCaption = "Inspection Reg. No.", FullDescription = "The inspection registration number of the inspection application must be obtained in advance according to the regulations of the Bureau of Standards, Metrology and Inspection.")]
+		public override ZString TW1_InspectionRegistrationNumber { get => base.TW1_InspectionRegistrationNumber; set => base.TW1_InspectionRegistrationNumber = value; }
+
+		[ReadOnlyMember(nameof(TW1_PreWineInspectionStatus_ReadOnly))]
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.PreWineInspectionStatusList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_PreWineInspectionStatus", Caption = "Previous Wine Inspection Status", ShortCaption = "Pre. Wine Ins. Status", FullDescription = "The previous inspection status of this alcohol.")]
+		public override ZString TW1_PreWineInspectionStatus { get => base.TW1_PreWineInspectionStatus; set => base.TW1_PreWineInspectionStatus = value; }
+
+		[ReadOnlyMember(nameof(TW1_Purpose_ReadOnly))]
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.PurposeList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_Purpose", Caption = "Purpose Code", ShortCaption = "Purpose", FullDescription = "The purpose of imported goods.")]
+		public override ZString TW1_Purpose { get => base.TW1_Purpose; set => base.TW1_Purpose = value; }
+
+		[ReadOnlyMember(nameof(TW1_PrePermitNumber_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_PrePermitNumber", Caption = "Previous Permit Number", ShortCaption = "Pre. Permit No.", FullDescription = "The previous permit number that was issued before. The previous permit number of the case that has been inspected and approved by the National Treasury Administration.")]
+		public override ZString TW1_PrePermitNumber { get => base.TW1_PrePermitNumber; set => base.TW1_PrePermitNumber = value; }
+
+		#region TW1_ControllingMessageType
+		[MaxLength(Schema.TW1_ControllingMessageTypeMaxLength)]
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.ControllingMessageTypeList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_ControllingMessageType", Caption = "Controlling Message Type", ShortCaption = "Msg. Type", FullDescription = "The type of the licensing message.")]
+		public override ZString TW1_ControllingMessageType
+		{
+			get => base.TW1_ControllingMessageType;
+			set
+			{
+				var oldValue = base.TW1_ControllingMessageType;
+				base.TW1_ControllingMessageType = value;
+				if (!IsCopying && oldValue != TW1_ControllingMessageType)
+				{
+					ResetPropertiesOnMessageTypeChanged();
+					Validation.ValidateTW1_OH_Applicant();
+					ApplicantDocumentaryAddress.LocalAddress?.Validation.ValidateE2_CompanyName();
+				}
+			}
+		}
+
+		[ReadOnlyMember(nameof(TW1_CertificateType_ReadOnly))]
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.CertificateTypeList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_CertificateType", Caption = "Certificate Type", FullDescription = "The type of the certificate.")]
+		public override ZString TW1_CertificateType
+		{
+			get => base.TW1_CertificateType;
+			set
+			{
+				var oldValue = base.TW1_CertificateType;
+				base.TW1_CertificateType = value;
+				if (!IsCopying && oldValue != TW1_CertificateType)
+				{
+					if (IsCertificate15)
+					{
+						TW1_OriginalQuantity = 1;
+					}
+
+					if (IsNX101)
+					{
+						if (IsCertificate15)
+						{
+							ControllingMessageHeaderLinkInvoiceLines.Cast<ControllingMessageHeaderLinkInvoiceLine>().ForEach(x => x.Invoiceline.JI_CustomPermitUQ = ZString.Empty);
+						}
+						else
+						{
+							ControllingMessageHeaderLinkInvoiceLines.Cast<ControllingMessageHeaderLinkInvoiceLine>().Select(x => x.Invoiceline).Where(x => x.JI_CustomPermitUQ.IsEmpty).ForEach(x => x.JI_CustomPermitUQ = x.JI_PermitUQ);
+						}
+
+						DefaultPortsIfNeeded();
+					}
+				}
+				if (!IsValidationSuspended)
+				{
+					ValidateDeclaration();
+				}
+			}
+		}
+
+		void ValidateDeclaration()
+		{
+			if (Declaration is JobDeclaration declaration)
+			{
+				var validation = declaration.Validation;
+				validation.ValidateJE_VoyageFlightNo();
+				validation.ValidateJE_RL_NKOrigin();
+				validation.ValidateJE_ExportDate();
+			}
+		}
+
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|CertificateTypeDescription", Caption = "Certificate Type Description")]
+		public ZString CertificateTypeDescription => Lookups.CertificateTypeList.GetDescriptionFromCode(TW1_CertificateType);
+
+		public ZPropertyInfo CertificateTypeDescriptionInfo => GetZPropertyInfo(Schema.CertificateTypeDescription);
+
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|ControllingMessageTypeDescription", Caption = "Message Type Description", ShortCaption = "Msg. Type Desc.")]
+		public ZString ControllingMessageTypeDescription => Lookups.ControllingMessageTypeList.GetDescriptionFromCode(TW1_ControllingMessageType);
+
+		public ZPropertyInfo ControllingMessageTypeDescriptionInfo => GetZPropertyInfo(Schema.ControllingMessageTypeDescription);
+
+		#endregion
+
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.LicensingStatusList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_EntryStatus", Caption = "Licensing Status", MediumCaption = "Status", ShortCaption = "Status", FullDescription = "The status of the licensing message.")]
+		public override ZString TW1_EntryStatus { get => base.TW1_EntryStatus; set => base.TW1_EntryStatus = value; }
+
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|LicensingStatusDescription", Caption = "Licensing Status Description", MediumCaption = "Description", ShortCaption = "Description", FullDescription = "The status Description of the licensing message.")]
+		public ZString LicensingStatusDescription => Lookups.LicensingStatusList.GetDescriptionFromCode(TW1_EntryStatus);
+
+		public ZPropertyInfo LicensingStatusDescriptionInfo => GetZPropertyInfo(Schema.LicensingStatusDescription);
+
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.LicensingMessageStatusList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_MessageStatus", Caption = "Licensing Message Status", MediumCaption = "Message Status", ShortCaption = "Message Status", FullDescription = "The Message status of the licensing message.")]
+		public override ZString TW1_MessageStatus { get => base.TW1_MessageStatus; set => base.TW1_MessageStatus = value; }
+
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|LicensingMessageStatusDescription", Caption = "Licensing Message Status Description", MediumCaption = "Description", ShortCaption = "Description", FullDescription = "The Message status Description of the licensing message.")]
+		public ZString LicensingMessageStatusDescription => Lookups.LicensingMessageStatusList.GetDescriptionFromCode(TW1_MessageStatus);
+
+		public ZPropertyInfo LicensingMessageStatusDescriptionInfo => GetZPropertyInfo(Schema.LicensingMessageStatusDescription);
+
+		protected override void SetDefaultValues()
+		{
+			base.SetDefaultValues();
+			TW1_MessageStatus = TWMessageStatusCodeList.Codes.NotSent;
+		}
+
+		[ReadOnlyMember(nameof(TW1_BeforeClearanceApplicationReason_ReadOnly))]
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.CPT_127_GoodsReleaseReasonCodeList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_BeforeClearanceApplicationReason", Caption = "Reason to apply C/O before clearance", MediumCaption = "Before Clearance C/O Application Reason", ShortCaption = "Before Clearance Reason", FullDescription = "Indicates the reasons why Certificate of Origin is applied before clearance.")]
+		public override ZString TW1_BeforeClearanceApplicationReason { get => base.TW1_BeforeClearanceApplicationReason; set => base.TW1_BeforeClearanceApplicationReason = value; }
+
+		HiddenTextNote TW1_ECFAPrintedRemarksNote => ecfaPrintedRemarksNote ?? (ecfaPrintedRemarksNote = new HiddenTextNote(this, PredefinedNoteTypes.Instance.ECFAPrintedRemarks.Description));
+		HiddenTextNote ecfaPrintedRemarksNote;
+
+		[MaxLength(256)]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_ECFAPrintedRemarks", Caption = "ECFA Printed Remarks", MediumCaption = "ECFA Remarks", ShortCaption = "ECFA Remarks", FullDescription = "Indicates ECFA print remarks. When the certificate type is '15', the ECFA transaction remarks can be filled in this column and printed in the remarks column on the ECFA certificate of origin.")]
+		public ZString TW1_ECFAPrintedRemarks
+		{
+			get => TW1_ECFAPrintedRemarksNote.Text;
+			set => TW1_ECFAPrintedRemarksNote.SetNoteText(this, TW1_ECFAPrintedRemarksInfo, value);
+		}
+
+		public ZPropertyInfo TW1_ECFAPrintedRemarksInfo => GetZPropertyInfo(Schema.TW1_ECFAPrintedRemarks);
+
+		public CusEntryInstruction EntryInstruction => TW1_CEI.IsValid ? Factory.Load<CusEntryInstruction>(TW1_CEI) : null;
+
+		public JobDeclaration Declaration => EntryInstruction?.JobDeclaration;
+
+		public bool IsImport => Declaration?.IsImport ?? false;
+
+		public bool IsExport => Declaration?.IsExport ?? false;
+		#endregion
+
+		public ZString EntryNumberForSendingObject
+		{
+			get
+			{
+				var result = Declaration?.EntryHeader?.EntryNumberForSendingObject ?? ZString.Empty;
+				if (result.IsEmpty)
+				{
+					result = MessageConstants.EntryNumberPlaceHolder;
+				}
+				return result;
+			}
+		}
+
+		protected override void OnFactorySaving()
+		{
+			base.OnFactorySaving();
+			EthanolPermitNumbers.Cast<EthanolPermitNumberCusSupporting>().Where(x => x.IsRowEmpty).ToList().ForEach(EthanolPermitNumbers.RemoveAndDelete);
+			PreviousDocumentNumbers.Cast<PreviousDocumentNumberCusSupporting>().Where(x => x.IsRowEmpty).ToList().ForEach(PreviousDocumentNumbers.RemoveAndDelete);
+			CertificateOfOrigins.Cast<CMCertificateOfOriginCusSupporting>().Where(x => x.IsRowEmpty).ToList().ForEach(CertificateOfOrigins.RemoveAndDelete);
+		}
+
+		[ChildEditable(true)]
+		public CusTWProductLabelRangeCollection ProductLabelRanges
+		{
+			get
+			{
+				if (productLabelRanges == null)
+				{
+					productLabelRanges = GetProductLabelRanges();
+				}
+				productLabelRanges.SetReadOnlyIncludingChildren(ProductLabelRanges_ReadOnly);
+				return productLabelRanges;
+			}
+		}
+
+		CusTWProductLabelRangeCollection productLabelRanges;
+
+		CusTWProductLabelRangeCollection GetProductLabelRanges()
+		{
+			var result = new CusTWProductLabelRangeCollection(this);
+			result.Load();
+			RegisterEditableChildObject(result);
+			return result;
+		}
+
+		[ChildEditable(true)]
+		public EthanolPermitNumberCusSupportingCollection EthanolPermitNumbers
+		{
+			get
+			{
+				if (fEthanolPermitNumberCusSupportingCollection == null)
+				{
+					fEthanolPermitNumberCusSupportingCollection = new EthanolPermitNumberCusSupportingCollection(this);
+					fEthanolPermitNumberCusSupportingCollection.Load();
+					RegisterEditableChildObject(fEthanolPermitNumberCusSupportingCollection);
+				}
+
+				var isReadOnly = EthanolPermitNumbers_ReadOnly;
+				if (fEthanolPermitNumberCusSupportingCollection.ReadOnly != isReadOnly)
+				{
+					fEthanolPermitNumberCusSupportingCollection.SetReadOnlyIncludingChildren(isReadOnly);
+					if (isReadOnly)
+					{
+						fEthanolPermitNumberCusSupportingCollection.RemoveAndDeleteAll();
+					}
+				}
+
+				return fEthanolPermitNumberCusSupportingCollection;
+			}
+		}
+
+		EthanolPermitNumberCusSupportingCollection fEthanolPermitNumberCusSupportingCollection;
+
+		[ChildEditable(true)]
+		public PreviousDocumentNumberCusSupportingCollection PreviousDocumentNumbers
+		{
+			get
+			{
+				if (previousDocumentNumbers == null)
+				{
+					previousDocumentNumbers = new PreviousDocumentNumberCusSupportingCollection(this);
+					previousDocumentNumbers.Load();
+					RegisterEditableChildObject(previousDocumentNumbers);
+				}
+				return previousDocumentNumbers;
+			}
+		}
+
+		PreviousDocumentNumberCusSupportingCollection previousDocumentNumbers;
+
+		[ChildEditable(true)]
+		public CMCertificateOfOriginCusSupportingCollection CertificateOfOrigins
+		{
+			get
+			{
+				if (certificateOfOrigins == null)
+				{
+					certificateOfOrigins = new CMCertificateOfOriginCusSupportingCollection(this);
+					certificateOfOrigins.Load();
+					RegisterEditableChildObject(certificateOfOrigins);
+				}
+				return certificateOfOrigins;
+			}
+		}
+
+		CMCertificateOfOriginCusSupportingCollection certificateOfOrigins;
+
+		public TWJobDocAddress LocalProcessorAddress
+		{
+			get
+			{
+				if (fLocalProcessorAddress == null || fLocalProcessorAddress.IsDeleted)
+				{
+					var localProcessorAddressRequirement = new ControllingMessageHeaderLocalProcessorAddressRequirement(this, DocAddressType.LocalProcessorAddress);
+					fLocalProcessorAddress = (TWJobDocAddress)DocAddresses.FindOrCreateWithRequirement(localProcessorAddressRequirement);
+				}
+				fLocalProcessorAddress.ReadOnly = LocalProcessorAddress_ReadOnly;
+				return fLocalProcessorAddress;
+			}
+		}
+		TWJobDocAddress fLocalProcessorAddress;
+
+		public override void Delete()
+		{
+			if (!IsDeleted)
+			{
+				FetchForLoadChildEditableObjectsIfNeeded();
+				this.DeleteAllCusAddInfoCodeDataAndSupportingInfoChildrenIfSupported();
+				ProductLabelRanges.RemoveAndDeleteAll();
+				LocalProcessorAddress.Delete();
+				EthanolPermitNumbers.RemoveAndDeleteAll();
+				PreviousDocumentNumbers.RemoveAndDeleteAll();
+				CertificateOfOrigins.RemoveAndDeleteAll();
+				DeleteAllCusEntryNumbers();
+			}
+			base.Delete();
+		}
+
+		void DeleteAllCusEntryNumbers()
+		{
+			var filter = new ZQuery(CusEntryNumSchema.CE_ParentID, PK);
+			filter.AddToFilter(CusEntryNumSchema.CE_EntryType, new ZString[] { CusEntryNumberTypes.Taiwan.Permit, CusEntryNumberTypes.Taiwan.ProcessingNumber, CusEntryNumberTypes.Taiwan.CustomsMessageIdentifier });
+			Factory.Load<CusEntryNumber>(filter).DeleteAll();
+		}
+
+		#region ApplicantDocumentaryAddress
+
+		public TWJobDocAddress ApplicantDocumentaryAddress
+		{
+			get
+			{
+				SetupApplicantJobDocAddress();
+				return fApplicantDocumentaryAddress;
+			}
+		}
+		TWJobDocAddress fApplicantDocumentaryAddress;
+
+		void SetupApplicantJobDocAddress()
+		{
+			if (fApplicantDocumentaryAddress == null || fApplicantDocumentaryAddress.IsDeleted)
+			{
+				var applicantDocAddressRequirement = new ControllingMessageHeaderApplicantAddressRequirement(this, ContactType.Applicant);
+				fApplicantDocumentaryAddress = (TWJobDocAddress)DocAddresses.FindOrCreateWithRequirement(applicantDocAddressRequirement);
+				if (fApplicantDocumentaryAddress != null)
+				{
+					fApplicantDocumentaryAddress.DocAddressChanged += new EventHandler(ApplicantDocumentaryAddressChanged);
+				}
+			}
+		}
+
+		void ApplicantDocumentaryAddressChanged(object sender, EventArgs e)
+		{
+			var applicant = ZGuid.Empty;
+			if (ApplicantDocumentaryAddress is TWJobDocAddress applicantDocumentaryAddress && !applicantDocumentaryAddress.E2_AddressOverride)
+			{
+				applicant = applicantDocumentaryAddress.OrganisationPK;
+			}
+			if (TW1_OH_Applicant != applicant)
+			{
+				TW1_OH_Applicant = applicant;
+			}
+		}
+
+		#endregion
+
+		#region SupplierDocumentaryAddress
+
+		public TWJobDocAddress SupplierDocumentaryAddress
+		{
+			get
+			{
+				SetupSupplierJobDocAddress();
+				return fSupplierDocumentaryAddress;
+			}
+		}
+		TWJobDocAddress fSupplierDocumentaryAddress;
+
+		void SetupSupplierJobDocAddress()
+		{
+			if (fSupplierDocumentaryAddress == null || fSupplierDocumentaryAddress.IsDeleted)
+			{
+				var supplierDocAddressRequirement = new ControllingMessageHeaderSupplierAddressRequirement(this, DocAddressType.SupplierDocumentaryAddress, ContactType.Consignor);
+				fSupplierDocumentaryAddress = (TWJobDocAddress)DocAddresses.FindOrCreateWithRequirement(supplierDocAddressRequirement);
+				if (fSupplierDocumentaryAddress != null)
+				{
+					fSupplierDocumentaryAddress.DocAddressChanged += new EventHandler(SupplierDocumentaryAddressChanged);
+				}
+			}
+		}
+
+		void SupplierDocumentaryAddressChanged(object sender, EventArgs e)
+		{
+			var supplier = ZGuid.Empty;
+			if (SupplierDocumentaryAddress is TWJobDocAddress supplierDocumentaryAddress && !supplierDocumentaryAddress.E2_AddressOverride)
+			{
+				supplier = supplierDocumentaryAddress.OrganisationPK;
+			}
+			if (TW1_OH_Supplier != supplier)
+			{
+				TW1_OH_Supplier = supplier;
+			}
+		}
+
+		#endregion
+
+		#region ImporterDocumentaryAddress
+
+		public TWJobDocAddress ImporterDocumentaryAddress
+		{
+			get
+			{
+				SetupImporterJobDocAddress();
+				return fImporterDocumentaryAddress;
+			}
+		}
+		TWJobDocAddress fImporterDocumentaryAddress;
+
+		void SetupImporterJobDocAddress()
+		{
+			if (fImporterDocumentaryAddress == null || fImporterDocumentaryAddress.IsDeleted)
+			{
+				var importerDocAddressRequirement = new ControllingMessageHeaderImporterAddressRequirement(this, DocAddressType.ImporterDocumentaryAddress, ContactType.Importer);
+				fImporterDocumentaryAddress = (TWJobDocAddress)DocAddresses.FindOrCreateWithRequirement(importerDocAddressRequirement);
+				if (fImporterDocumentaryAddress != null)
+				{
+					fImporterDocumentaryAddress.DocAddressChanged += new EventHandler(ImporterDocumentaryAddressChanged);
+				}
+			}
+		}
+
+		void ImporterDocumentaryAddressChanged(object sender, EventArgs e)
+		{
+			var importer = ZGuid.Empty;
+			if (ImporterDocumentaryAddress is TWJobDocAddress importerDocumentaryAddress && !importerDocumentaryAddress.E2_AddressOverride)
+			{
+				importer = importerDocumentaryAddress.OrganisationPK;
+			}
+			if (TW1_OH_Importer != importer)
+			{
+				TW1_OH_Importer = importer;
+			}
+		}
+
+		#endregion
+
+		#region IDocAddresses
+
+		ZValidation IDocAddresses.PiggyBackedDocAddressValidation(JobDocAddress addressToValidate) => null;
+
+		SecurityCheckpoint IDocAddresses.GetCanOverrideCheckpoint(JobDocAddress docAddress) => Env.Security.None;
+
+		JobDocAddressRequirement IDocAddresses.GetDocAddressRequirement(DocAddressType addressType)
+		{
+			return null;
+		}
+
+		void IDocAddresses.DocAddressChanged(JobDocAddress docAddress)
+		{
+		}
+
+		void IDocAddresses.OrgAddressBeforeChange(JobDocAddress docAddress)
+		{
+		}
+
+		void IDocAddresses.OnBeforeDocAddressDeleted(JobDocAddress docAddress)
+		{
+		}
+
+		void IDocAddresses.AnyAddressFieldBeforeChange(JobDocAddress docAddress)
+		{
+		}
+
+		void IDocAddresses.OrgHeaderAfterChange(JobDocAddress docAddress)
+		{
+		}
+
+		bool IDocAddresses.CanDeleteAddress(JobDocAddress docAddress) => false;
+
+		OrgHeaderCollection IDocAddresses.GetOrgHeaderList(DocAddressType addressType) => null;
+
+		[ChildEditable]
+		public JobDocAddressDependentCollection DocAddresses
+		{
+			get
+			{
+				if (fDocAddresses == null)
+				{
+					fDocAddresses = new TWJobDocAddressDependentCollection(this);
+					fDocAddresses.Load();
+					RegisterEditableChildObject(fDocAddresses);
+				}
+
+				return fDocAddresses;
+			}
+		}
+		JobDocAddressDependentCollection fDocAddresses;
+
+		IReadOnlyList<DocAddressType> IDocAddresses.SupportedAddressTypes => new[]
+		{
+			DocAddressType.LocalProcessorAddress
+		};
+		#endregion
+
+		[ChildEditable(true)]
+		public TWMessageCollection Messages
+		{
+			get
+			{
+				if (fMessages == null)
+				{
+					fMessages = new TWMessageCollection(this);
+					fMessages.Load();
+					fMessages.SetReadOnlyIncludingChildren(true);
+					RegisterEditableChildObject(fMessages);
+				}
+				return fMessages;
+			}
+		}
+		TWMessageCollection fMessages;
+
+		#region ICusSupportingInfoTypeSupporter
+
+		IDictionary<ZString, Type> Integration.Customs.ICusSupportingInfoTypeSupporter.GetCusSupportingInfoTypes()
+		{
+			var result = new Dictionary<ZString, Type> {
+				{ CusSupportingInfoTypeList.Codes.EthanolPermitNumber, typeof(EthanolPermitNumberCusSupporting) },
+				{ CusSupportingInfoTypeList.Codes.CmCertificateOfOriginNumber, typeof(CMCertificateOfOriginCusSupporting) },
+				{ CusSupportingInfoTypeList.Codes.PreviousDocumentNumber, typeof(PreviousDocumentNumberCusSupporting) }
+			};
+			return result;
+		}
+
+		IEnumerable<IBusinessObjectFetchStrategy> IAdditionalBusinessObjectFetchStrategyProvider.GetFetchStrategies()
+		{
+			yield return new CusSupportingInfoTypeSupporterFetchStrategy(this);
+		}
+		#endregion
+
+		protected override bool IsLookupsCachedInBase => false;
+
+		protected override CusTWControllingMessageHeaderLookups GetNewLookups()
+		{
+			if (IsNX101)
+			{
+				return new CusTWControllingMessageHeaderNX101Lookups(this);
+			}
+			else
+			{
+				return new CusTWControllingMessageHeaderLookups(this);
+			}
+		}
+
+		protected override EnterpriseBusinessObjectFetchStrategy GetFetchStrategyCore()
+		{
+			return new CusTWControllingMessageHeaderFetchStrategy(this);
+		}
+
+		#region ControllingMessageHeaderLinkInvoiceLines
+		[ChildEditable]
+		public ControllingMessageHeaderLinkInvoiceLineCollection ControllingMessageHeaderLinkInvoiceLines => controllingMessageHeaderLinkInvoiceLines ??= GetControllingMessageHeaderLinkInvoiceLines();
+		ControllingMessageHeaderLinkInvoiceLineCollection controllingMessageHeaderLinkInvoiceLines;
+
+		ControllingMessageHeaderLinkInvoiceLineCollection GetControllingMessageHeaderLinkInvoiceLines()
+		{
+			var result = new ControllingMessageHeaderLinkInvoiceLineCollection(this);
+			result.Load();
+			RegisterEditableChildObject(result);
+			return result;
+		}
+
+		public bool IsControllingMessageHeaderLinkInvoiceLinesLoaded => controllingMessageHeaderLinkInvoiceLines != null;
+		#endregion
+
+		public void RefreshControllingMessageHeaderLinkInvoiceLineLinkIfNeeded(ZGuid invoiceLinePK, ZBool isLinked)
+		{
+			if (IsControllingMessageHeaderLinkInvoiceLinesLoaded)
+			{
+				var controllingMessageHeaderLinkInvoiceLines = ControllingMessageHeaderLinkInvoiceLines;
+				if (controllingMessageHeaderLinkInvoiceLines.Count > 0)
+				{
+					var theRelatedControllingMessageHeaderLinkInvoiceLine = controllingMessageHeaderLinkInvoiceLines.Cast<ControllingMessageHeaderLinkInvoiceLine>().FirstOrDefault(c => c.InvoicelinePK == invoiceLinePK && c.ControllingMessageHeader.PK == PK);
+					if (theRelatedControllingMessageHeaderLinkInvoiceLine != null)
+					{
+						theRelatedControllingMessageHeaderLinkInvoiceLine.Link = isLinked;
+					}
+				}
+			}
+		}
+
+		public override ZGuid TW1_CEI
+		{
+			get { return base.TW1_CEI; }
+			set
+			{
+				var oldEntryInstruction = EntryInstruction;
+				var oldValue = TW1_CEI;
+				base.TW1_CEI = value;
+				if (!IsCopying && TW1_CEI != oldValue)
+				{
+					oldEntryInstruction?.ControllingMessageHeaderNumberGenerator.RecalculateWhenAboutToBeDetachedOrDeleted(this);
+					SetDefaultValuesFromDeclaration();
+					EntryInstruction?.ControllingMessageHeaderNumberGenerator.RecalculateWhenAdded(this);
+				}
+			}
+		}
+
+		void SetDefaultValuesFromDeclaration()
+		{
+			var declaration = Declaration;
+			if (declaration != null)
+			{
+				var cloneArgs = new BusinessObjectCloneArgs(new[] { AutoJobDocAddress.Schema.E2_AddressType });
+				if (TryGetCanCloneDocumentaryAddress(declaration.SupplierDocumentaryAddress, out var supplier))
+				{
+					DefaultDocumentaryAddressFromDeclaration(supplier, SupplierDocumentaryAddress, cloneArgs);
+					if (IsExport)
+					{
+						DefaultDocumentaryAddressFromDeclaration(supplier, ApplicantDocumentaryAddress, cloneArgs);
+					}
+				}
+
+				if (TryGetCanCloneDocumentaryAddress(declaration.ImporterDocumentaryAddress, out var importer))
+				{
+					DefaultDocumentaryAddressFromDeclaration(importer, ImporterDocumentaryAddress, cloneArgs);
+					if (IsImport)
+					{
+						DefaultDocumentaryAddressFromDeclaration(importer, ApplicantDocumentaryAddress, cloneArgs);
+					}
+				}
+			}
+		}
+
+		bool TryGetCanCloneDocumentaryAddress(TWJobDocAddress checkAddress, out TWJobDocAddress result)
+		{
+			var isValidAddress = checkAddress is TWJobDocAddress source && (!source.IsEmpty || !source.IsOverridenButEmpty);
+			result = isValidAddress ? checkAddress : default;
+			return isValidAddress;
+		}
+
+		void DefaultDocumentaryAddressFromDeclaration(TWJobDocAddress sourceAddress, TWJobDocAddress destinationAddress, BusinessObjectCloneArgs cloneArgs)
+		{
+			destinationAddress.CopyPersistentValuesFrom(sourceAddress, cloneArgs);
+			if (sourceAddress?.LocalAddress is TWJobDocAddress localAddress)
+			{
+				destinationAddress.LocalAddress?.CopyPersistentValuesFrom(localAddress, cloneArgs);
+				destinationAddress.IDCode = sourceAddress.IDCode;
+			}
+		}
+
+		#region ITWMessageInfoProvider
+		ZString ITWMessageInfoProvider.StaffCode => ZString.Empty;
+
+		ZString ITWMessageInfoProvider.EntryNumberType => CusEntryNumberTypes.Taiwan.LicensingMessage;
+
+		ZString ITWMessageInfoProvider.EntryNumber => TW1_FunctionalReferenceId;
+
+		ZString ITWMessageInfoProvider.CompanyID => GlbCompany.CurrentCompany.GC_Code;
+
+		ZString ITWMessageInfoProvider.PasswordType => PasswordTypesList.Codes.NXM;
+		#endregion
+
+		public ZString AssignHeaderToInvoiceLines()
+		{
+			var linePKs = GetLinesHasLinkedToOtherSameTypeControllingMessageHeader();
+			Declaration?.FilteredInvoiceLines.Cast<JobComInvoiceLine>().Where(x => !linePKs.Contains(x.PK)).ForEach(x => x.AssignCMHeaderToInvoices(this));
+			var errorMessage = ZString.Empty;
+			if (linePKs.Any())
+			{
+				errorMessage = Res.GetString("4401DDE6-8592-4764-9066-7493869972AC", "Only assign Licensing Header to the Invoice Lines which does not link to {0} message type.", TW1_ControllingMessageType);
+			}
+			return errorMessage;
+		}
+
+		HashSet<ZGuid> GetLinesHasLinkedToOtherSameTypeControllingMessageHeader() => Declaration?.FilteredInvoiceLines.Cast<JobComInvoiceLine>().Where(x => x.HasLinkedToOtherSameTypeControllingMessageHeader(this)).Select(x => x.PK).ToHashSet() ?? new HashSet<ZGuid>();
+
+		bool IsNX101AndCertificateTypeIs15 => TW1_ControllingMessageType == ControllingMessageTypeList.Codes.NX101 && TW1_CertificateType == CertificateTypeList.Codes.Code15;
+
+		internal bool CheckAssignECFAHeaderToLines() => !IsNX101AndCertificateTypeIs15 || CountOfLinkedInvoiceLines <= 20;
+
+		public int CountOfLinkedInvoiceLines => Factory.GetCached(ref linkedInvoiceLinesCached, () => ControllingMessageHeaderLinkInvoiceLines.Cast<ControllingMessageHeaderLinkInvoiceLine>().Count(x => x.Link));
+		CachedProperty<int> linkedInvoiceLinesCached;
+
+		public ZString VATNumber => Factory.GetValue(ref vatNumberCached, () => EntryInstruction?.JobDeclaration?.DeclarantAddress?.Header?.GetCustomsRegNo(OrgCusCode.CodeTypes.VATCode) ?? ZString.Empty);
+
+		CachedProperty<ZString> vatNumberCached;
+
+		[MaxLength(512)]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|Notes", Caption = "Notes", FullDescription = "Indicates other additional details for certificates of origin.")]
+		public ZString TW_Notes
+		{
+			get
+			{
+				fTW_Notes ??= new HiddenTextNote(this, PredefinedNoteTypes.Instance.NX101Notes.Description);
+
+				return fTW_Notes.Text;
+			}
+			set
+			{
+				var oldValue = TW_Notes;
+				CheckMaximumLength(TW_NotesInfo, value);
+				if (oldValue != value)
+				{
+					fTW_Notes ??= new HiddenTextNote(this, PredefinedNoteTypes.Instance.NX101Notes.Description);
+					fTW_Notes.SetNoteText(this, TW_NotesInfo, value);
+				}
+			}
+		}
+		public ZPropertyInfo TW_NotesInfo => GetZPropertyInfo(nameof(TW_Notes));
+
+		HiddenTextNote fTW_Notes;
+
+		[ReadOnlyMember(nameof(BulkApplicationID_ReadOnly))]
+		[MaxLength(14)]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|BulkApplicationID", Caption = "Bulk Application ID")]
+		public ZString BulkApplicationID
+		{
+			get => this.GetSystemDefinedValue<ZString>(Constants.GenAddOnColumnFieldName.BulkApplicationID);
+			set
+			{
+				var oldValue = BulkApplicationID;
+				CheckMaximumLength(BulkApplicationIDInfo, value);
+				this.SetSystemDefinedValue(Constants.GenAddOnColumnFieldName.BulkApplicationID, value);
+				if (!IsValidationSuspended)
+				{
+					Validation.ValidateBulkApplicationID();
+				}
+				BulkApplicationIDInfo.RefreshBinding(oldValue);
+			}
+		}
+
+		public ZPropertyInfo BulkApplicationIDInfo => GetZPropertyInfo(nameof(BulkApplicationID));
+
+		[ReadOnlyMember(nameof(TW1_PortOfBulkCommodity_ReadOnly))]
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.PortOfBulkCommodityList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_PortOfBulkCommodity", Caption = "Port of bulk commodity")]
+		public override ZString TW1_PortOfBulkCommodity { get => base.TW1_PortOfBulkCommodity; set => base.TW1_PortOfBulkCommodity = value; }
+
+		[ReadOnlyMember(nameof(BulkPaymentID_ReadOnly))]
+		[MaxLength(14)]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|BulkPaymentID", Caption = "Bulk Payment ID")]
+		public ZString BulkPaymentID
+		{
+			get => this.GetSystemDefinedValue<ZString>(Constants.GenAddOnColumnFieldName.BulkPaymentID);
+			set
+			{
+				var oldValue = BulkPaymentID;
+				CheckMaximumLength(BulkPaymentIDInfo, value);
+				this.SetSystemDefinedValue(Constants.GenAddOnColumnFieldName.BulkPaymentID, value);
+				if (!IsValidationSuspended)
+				{
+					Validation.ValidateBulkPaymentID();
+				}
+				BulkPaymentIDInfo.RefreshBinding(oldValue);
+			}
+		}
+
+		public ZPropertyInfo BulkPaymentIDInfo => GetZPropertyInfo(nameof(BulkPaymentID));
+
+		#region ProcessingNumber
+
+		ZString ProcessingEntryNumberType => CusEntryNumberTypes.Taiwan.ProcessingNumber;
+
+		[ReadOnlyMember(nameof(ProcessingNumber_ReadOnly))]
+		[MaxLength(18)]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|ProcessingNumber", Caption = "Processing Number")]
+		public ZString ProcessingNumber
+		{
+			get => PRSEntryNumber?.CE_EntryNum ?? ZString.Empty;
+			set
+			{
+				if (ProcessingNumber != value)
+				{
+					if (value.IsEmpty)
+					{
+						PRSEntryNumber?.Delete();
+					}
+					else
+					{
+						CheckMaximumLength(ProcessingNumberInfo, value);
+						var entryNumber = PRSEntryNumber ?? CusEntryNumber.New(this, ProcessingEntryNumberType, Core.Constants.CountryCodes.Taiwan);
+						entryNumber.CE_EntryNum = value;
+						ProcessingNumberInfo.RefreshBinding();
+					}
+					if (!IsSettingHasChangesSuspended)
+					{
+						HasChanges = true;
+					}
+				}
+			}
+		}
+
+		public ZPropertyInfo ProcessingNumberInfo => GetZPropertyInfo(nameof(ProcessingNumber));
+
+		CusEntryNumber PRSEntryNumber
+		{
+			get
+			{
+				if (fPRSEntryNumber == null || fPRSEntryNumber.IsDeleted)
+				{
+					fPRSEntryNumber = CusEntryNumber.Load(this, ProcessingEntryNumberType, Core.Constants.CountryCodes.Taiwan);
+				}
+				return fPRSEntryNumber;
+			}
+		}
+		CusEntryNumber fPRSEntryNumber;
+
+		#endregion
+
+		#region CustomsMessageIdentifier
+
+		ZString CustomsMessageIdentifierEntryNumberType => CusEntryNumberTypes.Taiwan.CustomsMessageIdentifier;
+
+		[ReadOnlyMember(nameof(CustomsMessageIdentifier_ReadOnly))]
+		[MaxLength(19)]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|CustomsMessageIdentifier", Caption = "Customs Message Identifier")]
+		public ZString CustomsMessageIdentifier
+		{
+			get => CMIEntryNumber?.CE_EntryNum ?? ZString.Empty;
+			set
+			{
+				if (CustomsMessageIdentifier != value)
+				{
+					if (value.IsEmpty)
+					{
+						CMIEntryNumber?.Delete();
+					}
+					else
+					{
+						CheckMaximumLength(CustomsMessageIdentifierInfo, value);
+						var entryNumber = CMIEntryNumber ?? CusEntryNumber.New(this, CustomsMessageIdentifierEntryNumberType, Core.Constants.CountryCodes.Taiwan);
+						entryNumber.CE_EntryNum = value;
+						if (!IsValidationSuspended)
+						{
+							Validation.ValidateCustomsMessageIdentifier();
+						}
+						CustomsMessageIdentifierInfo.RefreshBinding();
+					}
+					if (!IsSettingHasChangesSuspended)
+					{
+						HasChanges = true;
+					}
+				}
+			}
+		}
+
+		public ZPropertyInfo CustomsMessageIdentifierInfo => GetZPropertyInfo(nameof(CustomsMessageIdentifier));
+
+		CusEntryNumber CMIEntryNumber
+		{
+			get
+			{
+				if (fCMIEntryNumber == null || fCMIEntryNumber.IsDeleted)
+				{
+					fCMIEntryNumber = CusEntryNumber.Load(this, CustomsMessageIdentifierEntryNumberType, Core.Constants.CountryCodes.Taiwan);
+				}
+				return fCMIEntryNumber;
+			}
+		}
+		CusEntryNumber fCMIEntryNumber;
+
+		#endregion
+
+		public DocumentSupporter DocumentSupporter => new CusTWControllingMessageHeaderDocumentSupporter(this);
+
+		#region ICusEntryNumberParent
+		bool ICusEntryNumberParent.CanBeChangedOrDeleted(Common.CusEntryNumber entryNumber, out string errMsg)
+		{
+			errMsg = string.Empty;
+			return true;
+		}
+
+		void ICusEntryNumberParent.EntryNumberChanged(ZString oldValue, ZString newValue)
+		{
+			HasChanges = true;
+			MarkAsNeedingValidation();
+		}
+
+		string ICusEntryNumberParent.EntryNumberChangedCallStack => ZString.Empty;
+		#endregion
+
+		#region ISequenceNumberLine
+		ZGuid ISequenceNumberLine.FKToHeader => TW1_CEI;
+
+		ZShort ISequenceNumberLine<ZShort>.SequenceNumber
+		{
+			get => TW1_Sequence;
+			set => TW1_Sequence = value;
+		}
+		#endregion
+
+		[ReadOnlyMember(nameof(TW1_RL_NKPortOfLoading_ReadOnly))]
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.PortList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_RL_NKPortOfLoading", Caption = "Loading Port")]
+		public override ZString TW1_RL_NKPortOfLoading
+		{
+			get => base.TW1_RL_NKPortOfLoading;
+			set
+			{
+				var oldValue = TW1_RL_NKPortOfLoading;
+				base.TW1_RL_NKPortOfLoading = value;
+				if (!IsCopying && TW1_RL_NKPortOfLoading != oldValue)
+				{
+					DefaultPortOfLoadingNameIfNeeded();
+				}
+			}
+		}
+
+		[ReadOnlyMember(nameof(TW1_PortOfLoadingName_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_PortOfLoadingName", Caption = "Loading Port Name")]
+		public override ZString TW1_PortOfLoadingName
+		{
+			get
+			{
+				var value = base.TW1_PortOfLoadingName;
+				if (value.IsEmpty)
+				{
+					if (IsCertificate15)
+					{
+						value = TWRefCusCodeListLoader.LoadTaiwanRefCusCodeListDescription(Factory, TW1_RL_NKPortOfLoading, Codes.ECFALoadingPort);
+					}
+					else if (PortOfLoading is RefUNLOCO port)
+					{
+						value = port.RL_PortName;
+					}
+				}
+				return value;
+			}
+			set => base.TW1_PortOfLoadingName = value;
+		}
+
+		[ReadOnlyMember(nameof(TW1_RL_NKPortOfUnloading_ReadOnly))]
+		[List(nameof(Lookups) + "." + nameof(CusTWControllingMessageHeaderLookups.PortList))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_RL_NKPortOfUnloading", Caption = "Unloading Port")]
+		public override ZString TW1_RL_NKPortOfUnloading
+		{
+			get => base.TW1_RL_NKPortOfUnloading;
+			set
+			{
+				var oldValue = TW1_RL_NKPortOfUnloading;
+				base.TW1_RL_NKPortOfUnloading = value;
+				if (!IsCopying && TW1_RL_NKPortOfUnloading != oldValue)
+				{
+					DefaultPortOfUnloadingNameIfNeeded();
+				}
+			}
+		}
+
+		[ReadOnlyMember(nameof(TW1_PortOfUnloadingName_ReadOnly))]
+		[ResourceStringData("Enterprise.Customs.TW.Business.CusTWControllingMessageHeader|TW1_PortOfUnloadingName", Caption = "Unloading Port Name")]
+		public override ZString TW1_PortOfUnloadingName
+		{
+			get
+			{
+				var value = base.TW1_PortOfUnloadingName;
+				if (value.IsEmpty)
+				{
+					if (IsCertificate15)
+					{
+						value = TWRefCusCodeListLoader.LoadTaiwanRefCusCodeListDescription(Factory, TW1_RL_NKPortOfUnloading, Codes.ECFAUnloadingPort);
+					}
+					else if (PortOfUnloading is RefUNLOCO port)
+					{
+						value = port.RL_PortName;
+					}
+				}
+				return value;
+			}
+			set => base.TW1_PortOfUnloadingName = value;
+		}
+
+		void DefaultPortsIfNeeded()
+		{
+			if (IsPortRequiredCertificateTypes && Declaration is JobDeclaration decl)
+			{
+				if (TW1_RL_NKPortOfLoading.IsEmpty)
+				{
+					TW1_RL_NKPortOfLoading = decl.JE_RL_NKOrigin;
+				}
+
+				if (TW1_RL_NKPortOfUnloading.IsEmpty)
+				{
+					TW1_RL_NKPortOfUnloading = decl.JE_RL_NKFinalDestination;
+				}
+			}
+		}
+
+		void DefaultPortOfLoadingNameIfNeeded()
+		{
+			if (IsPortNameRequired && Declaration is JobDeclaration decl && IsZ99PortOfLoading && TW1_PortOfLoadingName.IsEmpty && decl.IsZ99PortOfOrigin && !decl.JE_Z99PortOfOrigin.IsEmpty)
+			{
+				TW1_PortOfLoadingName = decl.JE_Z99PortOfOrigin.Left(AutoCusTWControllingMessageHeader.Schema.TW1_PortOfLoadingNameMaxLength);
+			}
+		}
+
+		void DefaultPortOfUnloadingNameIfNeeded()
+		{
+			if (IsPortNameRequired && Declaration is JobDeclaration decl && IsZ99PortOfUnloading && TW1_PortOfUnloadingName.IsEmpty && decl.IsZ99FinalDestination && !decl.JE_Z99FinalDestination.IsEmpty)
+			{
+				TW1_PortOfUnloadingName = decl.JE_Z99FinalDestination.Left(AutoCusTWControllingMessageHeader.Schema.TW1_PortOfUnloadingNameMaxLength);
+			}
+		}
+
+		bool IsZ99Port(ZString port) => port.EndsWith(Constants.Z99, StringComparison.OrdinalIgnoreCase);
+
+		internal bool IsZ99PortOfUnloading => IsZ99Port(TW1_RL_NKPortOfUnloading);
+
+		internal bool IsZ99PortOfLoading => IsZ99Port(TW1_RL_NKPortOfLoading);
+
+		public bool IsPortNameRequired => Factory.GetValue(ref isPortNameRequiredCached, () => IsNX101 && IsPortRequiredCertificateTypes);
+		CachedProperty<bool> isPortNameRequiredCached;
+
+		public bool IsPortRequiredCertificateTypes => Factory.GetValue(ref isPortRequiredCertificateTypesCached, () =>
+		{
+			return (string)TW1_CertificateType switch
+			{
+				CertificateTypeList.Codes.Code1 or CertificateTypeList.Codes.Code7 or CertificateTypeList.Codes.Code8 or CertificateTypeList.Codes.Code10 or CertificateTypeList.Codes.Code15 or CertificateTypeList.Codes.Code16 or CertificateTypeList.Codes.Code17 => true,
+				_ => false,
+			};
+		});
+		CachedProperty<bool> isPortRequiredCertificateTypesCached;
+
+		IEnumerable<IStorageDocsBaseCollection> GetAllEDocsView()
+		{
+			if (this is IDocManagerSupport docManagerSupport && docManagerSupport.DocManagerInfo is DocManagerInfo docManagerInfo)
+			{
+				yield return docManagerInfo.EDocsView;
+			}
+
+			if (Declaration is JobDeclaration declaration)
+			{
+				foreach (var doc in declaration.GetAllEDocs())
+				{
+					yield return doc;
+				}
+			}
+		}
+
+		internal HashSet<IStorageDocsBaseCollection> GetAllEDocs() => Factory.GetValue(ref allEDocsCached, () => GetAllEDocsView().ToHashSet());
+		CachedProperty<HashSet<IStorageDocsBaseCollection>> allEDocsCached;
+	}
+}

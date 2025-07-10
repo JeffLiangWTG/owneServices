@@ -1,0 +1,123 @@
+@using WinzorFramework
+@using WinzorFramework.Enums
+@using WinzorFramework.Extensions
+@using WinzorFramework.JSInterop
+@namespace System.Windows.Forms
+@inherits TextBoxBase
+
+@if (Multiline || HasDynamicExpandArrow)
+{
+    <textarea @attributes="DataAttributes" class="@(ClassName) textbox @(WebKitScrollBar) @(Expand) @(CharacterCasingCssClass) textbox--border-@(BorderStyle.BorderStyleClass())" type=@InputType data-client-side-event-handlers=@ClientSideEventHandlers disabled="@(!Enabled)" maxlength="@MaxLengthValue" readonly="@ReadOnly"
+			  style="@ControlStyleString @CSSVariablesStyleString @GetScrollBarStyleString()" @ref="ElementReference" @onwinzorfocusin="OnFocusInAsync" @onwinzorfocusin:stopPropagation @onwinzorfocusout="OnFocusOutAsync" @onwinzorfocusout:stopPropagation spellcheck="false"
+          @ontextboxselectionchange=OnTextBoxSelectionChangedAsync @ontextboxselectionchange:stopPropagation @bind="TextForBinding" @bind:after="UpdateTextAsync" @bind:event="oninput" tabindex="@this.TabIndexHtmlAttributeValue(c => c.CanFocus && c.CanSelect && !c.ReadOnly && c.TabStop)"
+          @oncontextmenu="OnContextMenuAsync" @oncontextmenu:stopPropagation @oncontextmenu:preventDefault @onclick="OnClickAsync" @onclick:stopPropagation @onmousedown="OnMouseDownAsync" @onmousedown:stopPropagation />
+    @if (HasDynamicExpandArrow && !IsDynamicMultilineTextBoxFormVisible)
+    {
+        <span class="textbox--dynamic-expand-arrow" style="top:@(Top + Height - 6)px; left: @(Left + Width - 6)px;" @onmouseup="ShowDynamicMultilineTextBoxFormAsync" @onmouseup:stopPropagation @onmousedown:stopPropagation></span>
+    }
+}
+else
+{
+    <input @attributes="DataAttributes" class="@(ClassName) textbox @(CharacterCasingCssClass) textbox--border-@(BorderStyle.BorderStyleClass())" type=@InputType data-client-side-event-handlers=@ClientSideEventHandlers
+		   placeholder="@PlaceholderText" disabled="@(!Enabled)" maxlength="@MaxLengthValue" readonly="@ReadOnly" style="@ControlStyleString @CSSVariablesStyleString" @onwinzorfocusout="OnFocusOutAsync" @onwinzorfocusout:stopPropagation spellcheck="false"
+       tabindex="@this.TabIndexHtmlAttributeValue(c => c.CanFocus && c.CanSelect && !c.ReadOnly && c.TabStop)"
+       @ref="ElementReference"
+       data-winzor-autocomplete="@AutoComplete"
+       @onwinzorfocusin="OnFocusInAsync" @onwinzorfocusin:stopPropagation
+       @ontextboxselectionchange=OnTextBoxSelectionChangedAsync @ontextboxselectionchange:stopPropagation
+       @bind="TextForBinding" @bind:after="UpdateTextAsync" @bind:event="oninput"
+       @oncontextmenu="OnContextMenuAsync" @oncontextmenu:stopPropagation @oncontextmenu:preventDefault
+       @onclick="OnClickAsync" @onclick:stopPropagation @onmousedown="OnMouseDownAsync" @onmousedown:stopPropagation
+       @onmouseover=OnMouseOverAsync @onmouseover:stopPropagation ondragstart="return @AllowDrag" />
+
+    if (InputType == "password")
+    {
+        <div class="popup popup--password">
+            <div class="balloon-tooltip">
+                <div class="notification balloon-tooltip__notification"></div>
+                <div class="balloon-tooltip__caption"></div>
+            </div>
+            <div class="balloon-tooltip__arrow"></div>
+        </div>
+    }
+    if (Suggestions != null)
+    {
+	    <datalist id="@WinzorControlId">
+		    @foreach (var suggestion in Suggestions)
+		    {
+			    <option value="@suggestion"></option>
+		    }
+	    </datalist>
+    }
+}
+@RenderControls()
+
+@code
+{
+	string AllowDrag => AllowDrop.ToString().ToLower();
+	string MaxLengthValue => MaxLength > 0 ? MaxLength.ToString() : string.Empty;
+
+	string CSSVariablesStyleString => $"--current-background-color:{BackColor.GetColorStyleValue()};";
+
+	string GetScrollBarStyleString() => ScrollBars switch
+	{
+		ScrollBars.None => "overflow-x:hidden;overflow-y:auto;",
+		ScrollBars.Vertical => "overflow-y:scroll;",
+		ScrollBars.Horizontal => !WordWrap && TextAlign == HorizontalAlignment.Left ? "overflow-x:scroll;" : string.Empty,
+		ScrollBars.Both => !WordWrap && TextAlign == HorizontalAlignment.Left ? "overflow:scroll;" : "overflow-y:scroll;",
+		_ => string.Empty
+	};
+
+	string WebKitScrollBar => ScrollBars switch
+	{
+		ScrollBars.None => "textbox--scrollbar",
+		ScrollBars.Vertical => Height <= 36 ? "textbox--scrollbar--small" : string.Empty,
+		_ => string.Empty
+	};
+
+	protected async Task UpdateTextAsync()
+	{
+		await OnInputAsync(textForBinding);
+	}
+
+	protected string TextForBinding
+	{
+		get => textForBinding;
+		set
+		{
+			if (!ReadOnly && Enabled)
+			{
+				textForBinding = value;
+			}
+		}
+	}
+	string textForBinding = string.Empty;
+
+	protected async Task ShowDynamicMultilineTextBoxFormAsync()
+	{
+		await InvokeWinzorDispatcherAsync(() => ShowDynamicMultilineTextBoxForm());
+	}
+
+	protected internal override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		Interop?.PreloadInterop();
+	}
+
+	protected internal override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			await (Interop?.ValidateTextOnKeyPressAsync(ElementReference, MatchExpression, ReplacementCharacters) ?? Task.CompletedTask);
+		}
+		await base.OnAfterRenderAsync(firstRender);
+	}
+
+    protected internal virtual int ClientSideEventHandlers
+	{
+		get
+		{
+			return (int)ElementEventHandlers.TextBoxDisableHomeEndKeyWhenSelectAll | (int)ElementEventHandlers.TextBoxStartTyping ;
+		}
+	}
+}

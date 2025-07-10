@@ -1,0 +1,93 @@
+@using WinzorFramework;
+@using WinzorFramework.JSInterop
+@using CargoWise.Blazor.Common
+@using CargoWise.Winzor.AppServer
+@using Enterprise.Winzor.Architecture
+@using Enterprise.ZArchitecture.Core
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Configuration
+@using Microsoft.Extensions.Hosting
+@using Microsoft.Extensions.Options;
+
+@inject IHostEnvironment environment
+@inject UserMonitorRegistry userMonitorRegistry
+@inject IHttpContextAccessor httpContextAccessor
+@inject IConfiguration Configuration
+@inject IOptions<CargoWiseOptions> CWOptions
+@inject IFileVersionHash fileVersionHash;
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    @if (environment.IsProduction())
+    {
+        <meta http-equiv="Content-Security-Policy"
+              content="base-uri 'self';
+                default-src 'self';
+                script-src 'self' 'unsafe-inline';
+                style-src 'self' 'unsafe-inline';
+                object-src 'none';
+                connect-src 'self' wss:;
+                img-src 'self' data: https:;
+                upgrade-insecure-requests;" />
+    }
+    else
+    {
+        <meta http-equiv="Content-Security-Policy"
+              content="base-uri 'self';
+                default-src 'self';
+                script-src 'self' 'unsafe-inline' 'unsafe-eval';
+                style-src 'self' 'unsafe-inline';
+                object-src 'none';
+                connect-src 'self' http://localhost:* ws://localhost:* wss: data:;
+                img-src 'self' data: https:;" />
+    }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <base href="/" />
+    <HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)" />
+    <link rel="stylesheet" href=@AppendVersion("CargoWise.Winzor.combined.css")>
+    <link rel="modulepreload" href=@AppendVersion("_content/WinzorFramework/js/module/form.js") />
+    <link rel="modulepreload" href=@AppendVersion("_content/WinzorFramework/js/module/overlay.js") />
+    <link rel="modulepreload" href=@AppendVersion("_content/WinzorFramework/js/module/clientEventService.js") />
+    <link rel="modulepreload" href=@AppendVersion("_content/WinzorFramework/js/module/richTextBox.js") />
+    <link rel="modulepreload" href=@AppendVersion("_content/WinzorFramework/js/module/textbox.js") />
+    <link rel="modulepreload" href=@AppendVersion("_content/WinzorFramework/js/module/grid.js") />
+    <link rel="preload" href=@AppendVersion("/fonts/inter.woff2") as="font" type="font/woff2" crossorigin>
+    @if (userMonitorRegistry.MonitoringEnabled.HasValue && userMonitorRegistry.MonitoringEnabled.Value && userMonitorRegistry.MonitoringURI != null)
+    {
+        var request = httpContextAccessor.HttpContext.Request;
+        var apmServerUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+        var serviceName = Configuration.GetSection("TelemetryOptions").GetValue<string>("ServiceName") ?? "CargoWise Winzor AppServer";
+        var serviceVersion = ReleaseInfo.Instance.VersionNumber;
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        <script src="/js/dist/bundles/elastic-apm-rum.umd.js"></script>
+        <script>
+            elasticApm.setCustomContext({ "appServerProcessCorrelationId": "@CWOptions.Value.AppServerProcessCorrelationId" });
+            elasticApm.init({
+                serviceName: '@serviceName',
+                serverUrl: '@apmServerUrl',
+                serverUrlPrefix: '/usermonitoring/events',
+                serviceVersion: '@serviceVersion',
+                environment: '@environment',
+                sendCredentials: true
+            })
+            elasticApm.addFilter(payload => {
+                if (payload.errors) {
+                    payload.errors = payload.errors.filter(error =>
+                        error.exception.message !== "Uncaught Error: No interop methods are registered for renderer 1"
+                    );
+                }
+                return payload
+            })
+        </script>
+    }
+</head>
+<body>
+    <Routes @rendermode="new InteractiveServerRenderMode(prerender: false)" HostFormGuid="@hostFormId" />
+    <ReconnectingDialog @rendermode="new InteractiveServerRenderMode(prerender: false)" />
+    <script src="_framework/blazor.web.js?version=8"></script>
+    <script src=@AppendVersion("_content/WTG.Z.Blazor.Diagrams/script.min.js")></script>
+    <script src=@AppendVersion("client.js")></script>
+</body>
+</html>

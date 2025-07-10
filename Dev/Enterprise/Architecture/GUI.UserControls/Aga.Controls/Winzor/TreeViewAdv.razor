@@ -1,0 +1,66 @@
+@namespace Aga.Controls.Tree
+@using System.Windows.Forms
+@using WinzorFramework.Extensions
+@using System.Drawing
+@using Microsoft.AspNetCore.Components.Web
+@using WebMouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs;
+@inherits Control
+
+@{
+	var columnHeaders = TreeViewAdvColumnHeadersToRender.ToList();
+	var numColumnHeaders = columnHeaders.Count;
+}
+
+<div class="treeviewadv treeviewadv--border-@(BorderStyle.BorderStyleClass())" style="@ControlStyleString" @onmousedown="OnMouseDownAsync" @onmousedown:stopPropagation>
+	@if (UseColumns)
+	{
+		<div class="treeviewadv__columnheaders" style="height:@(ColumnHeaderHeight)px;width:@(ContentWidth)px;">
+			@for (var i = 0; i < numColumnHeaders; i++)
+			{
+				var index = i;
+				var columnHeader = columnHeaders[index];
+				<div @ref="columnReferences[index]" class="treeviewadv__columnheader" style="@BoundsStyleString(columnHeader)" columnindex="@columnHeader.ColumnIndex" @onmousedown=columnHeader.OnMouseDown @onmousedown:stopPropagation @onmouseup=columnHeader.OnMouseUp @onmouseup:stopPropagation>
+					<p>@columnHeader.Text</p>
+					<span class="@ColumnHeaderSortClass(columnHeader.SortOrder)"></span>
+					<span class="treeviewadv__columnheader-resizer" @onmouseout="OnMouseLeaveAsync" @onmouseout:stopPropagation @onmousedown="async (args) => await MouseDownHandlerAsync(args, columnReferences[index])" @onmousedown:stopPropagation></span>
+				</div>
+			}
+		</div>
+	}
+	<ul @ref="rowsReference" class="treeviewadv__rows">
+		@foreach (var row in TreeViewAdvRowsToRender.ToList())
+		{
+			<TreeViewAdvRow Row=row />
+		}
+	</ul>
+</div>
+
+@code {
+	ElementReference rowsReference = new();
+
+	readonly Dictionary<int, ElementReference> columnReferences = new();
+
+	string BoundsStyleString(TreeViewAdvColumnHeaderData header)
+	{
+		var styleString = $"position:absolute;width:{header.Bounds.Width}px;height:{header.Bounds.Height}px;left:{header.Bounds.Left}px;top:{header.Bounds.Top}px;";
+
+		if (header.MinColumnWidth >= 0)
+		{
+			styleString += $"min-width:{header.MinColumnWidth}px;";
+		}
+
+		if (header.MaxColumnWidth > 0)
+		{
+			styleString += $"max-width:{header.MaxColumnWidth}px;";
+		}
+
+		return styleString;
+	}
+
+	string ColumnHeaderSortClass(SortOrder order) => order switch
+	{
+		SortOrder.Descending => "treeviewadv__columnheader-sortmark--descending",
+		SortOrder.Ascending => "treeviewadv__columnheader-sortmark--ascending",
+		_ => string.Empty
+	};
+}

@@ -1,0 +1,49 @@
+namespace Enterprise.Customs.US.Messaging.Business.MessageBuildingBlocks.Output
+{
+	using CargoWise.Types;
+
+	[OutputBlock("V3")]
+	public partial class HTSV3 : MessageBlock
+	{
+		public HTSV3()
+			: base("V3")
+		{
+		}
+
+		/// <summary>
+		/// A code located in the Harmonized Tariff Schedule of the United States Annotated (HTS) representing the tariff number. If this number is less than 10 positions, it is left justified. This number is the same as the number in Record Identifier V1.
+		/// </summary>
+		[MessageBlockString(10, 3, "M")]
+		public ZString TariffNumber;
+
+		/// <summary>
+		/// The International Organization for Standardization (ISO) country code that indicates countries not eligible for preferential treatment under GSP. Up to ten 2-position country codes can be reported. If countries are excluded from GSP, the Special Programs Indicator (SPI) Code contained in this record (positions 53-64) is A*. Valid ISO country codes are listed in Appendix B of this publication.
+		/// </summary>
+		[MessageBlockString(20, 13, "C")]
+		public ZString GeneralizedSystemOfPreferencesGSPExcludedCountries;
+
+		/// <summary>
+		/// A code of 1 indicating the tariff number is subject to an antidumping duty; otherwise, space fill.
+		/// </summary>
+		[MessageBlockString(1, 48, "C")]
+		public ZString AntidumpingDutyFlag;
+
+		/// <summary>
+		/// A code of 1 indicating the tariff number may be subject to quota. If the tariff number is not subject to quota, space fill.
+		/// </summary>
+		[MessageBlockString(1, 49, "C")]
+		public ZString QuotaIndicator;
+
+		/// <summary>
+		/// A code located in the HTS indicating the textile category assigned to the tariff number. If there is no textile category number, space fill.
+		/// </summary>
+		[MessageBlockString(3, 50, "C")]
+		public ZString CategoryNumber;
+
+		/// <summary>
+		/// A code indicating if a tariff number is subject to a special program. Up to fourteen 2-position codes can be reported. Left justify. The SPI codes are not reported in any particular sequence. If more than fourteen 2-position codes are required, they are reported on the VD record.
+		/// </summary>
+		[MessageBlockString(28, 53, "C")]
+		public ZString SpecialProgramsIndicatorSPICode;
+	}
+}

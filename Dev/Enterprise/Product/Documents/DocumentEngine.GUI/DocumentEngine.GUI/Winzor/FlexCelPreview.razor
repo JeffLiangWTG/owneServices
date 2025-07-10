@@ -1,0 +1,171 @@
+@namespace Enterprise.DocumentEngine.GUI
+@using WinzorFramework
+@using WinzorFramework.Extensions;
+@using System.Drawing.Drawing2D
+@using System.Windows.Forms
+@using Enterprise.RemotePrinting.Engine
+@using Microsoft.AspNetCore.Components.Web
+@using FontStyle = System.Drawing.FontStyle;
+@using System.Drawing;
+@using System.Text;
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@inherits UserControl
+
+<div class="document-preview" style="@ControlStyleString" @ref="previewReference" data-winzor-control-id="@WinzorControlId" tabindex="0" onkeydown="event.preventDefault();" @onthrottledwheel="OnWheelAsync">
+	
+	@{
+		<Virtualize Items="Pages" Context="page">
+			<div class="document-preview__outer" style="@OuterStyleString(page.PageNo)" @onmousedown="async (args) => await OnPageMouseDownAsync(args, page.PageNo)" @onmousedown:stopPropagation @onmouseup=OnMouseUpAsync @onmouseup:stopPropagation data-pageno="@(page.PageNo)">
+				<div class="document-preview__inner">
+					<div class="document-preview__page" style="@PageStyleString(page.PageNo)">
+						<img style="zoom: @Zoom;" draggable="false" loading="lazy" src="data:image/svg+xml;utf8,@(Uri.EscapeDataString(WaterMark != null ? AddWaterMarker(WaterMark, page.PageImg) : page.PageImg))"/>
+					</div>
+					@if (ThumbnailLarge != null && ShowThumbsPageNumber)
+					{
+						<span class="document-preview__pageno" style="@PageNumberStyleString(page.PageNo)">@(page.PageNo)</span>
+					}
+				</div>
+			</div>
+		</Virtualize>
+	}
+</div>
+
+@code {
+	string OuterStyleString(int pageNo)
+	{
+		string padding;
+
+		if (ThumbnailLarge != null)
+		{
+			var topPadding = pageNo == 1 ? PageYSeparationRes : 0;
+			padding = $"padding:{topPadding}px {PageXSeparationRes}px {2 * PageYSeparationRes}px {PageXSeparationRes}px;";
+		}
+		else
+		{
+			var bottomPadding = pageNo == TotalPages ? PageYSeparationRes + CalcEndWhitespace() : 0;
+			padding = $"padding:{PageYSeparationRes}px {PageXSeparationRes}px {bottomPadding}px {PageXSeparationRes}px;";
+		}
+
+		return padding;
+	}
+
+	string PageStyleString(int pageNo)
+	{
+		var border = $"border:{BorderStyleString} {PageBorderWidth}px {PageBorderColor.GetColorStyleValue()};";
+		var boxShadow = $"box-shadow:{PageShadowSize}px {PageShadowSize}px {PageShadowColor.GetColorStyleValue()};";
+		var outline = string.Empty;
+
+		if (ThumbnailLarge != null && pageNo == ThumbnailPos)
+		{
+			outline = $"outline:solid {PageShadowSize - 1}px {PageNumberSelectedBgColor.GetColorStyleValue()};";
+		}
+		return border + boxShadow + outline;
+	}
+
+	string PageNumberStyleString(int pageNo)
+	{
+		string top, color, backgroundColor;
+
+		if (pageNo == ThumbnailPos)
+		{
+			color = $"color:{PageNumberSelectedTextColor.GetColorStyleValue()};";
+			backgroundColor = $"background-color:{PageNumberSelectedBgColor.GetColorStyleValue()};";
+		}
+		else
+		{
+			color = $"color:{PageNumberTextColor.GetColorStyleValue()};";
+			backgroundColor = $"background-color:{PageNumberBgColor.GetColorStyleValue()};";
+		}
+
+		top = $"top:{PageShadowSize}px;";
+
+		return top + color + backgroundColor;
+	}
+
+	string AddWaterMarker(Watermark watermark, string page)
+	{
+		var pageSize = new SizeF(Convert.ToSingle(svgPageWidth), Convert.ToSingle(svgPageHeight));
+		if (watermark is not TextWatermark || pageSize.Height == 0 || pageSize.Width == 0) return page;
+		var watermarkContent = SvgDrawWaterMarker(watermark, pageSize);
+
+		var index = page.IndexOf("</svg>", StringComparison.Ordinal);
+
+		if (index != -1)
+		{
+			page = page.Insert(index, watermarkContent);
+		}
+		return page;
+	}
+
+	string BorderStyleString => PageBorderStyle switch
+	{
+		DashStyle.Solid => "solid",
+		DashStyle.Dash => "dashed",
+		DashStyle.Dot => "dotted",
+		_ => "solid"
+	};
+
+	string SvgFontStyleString(FontStyle fontStyle) => fontStyle switch
+	{
+		FontStyle.Bold => "font-weight=\"bold\"",
+		FontStyle.Italic => "font-style=\"italic\"",
+		FontStyle.Underline => "text-decoration=\"underline\"",
+		FontStyle.Strikeout => "text-decoration=\"line-through\"",
+		_ => string.Empty
+	};
+
+	float CalculateVerticalOffset(WatermarkVerticalAlign verticalAlign, int totalLinesNumber, float lineHeight, int lineSequenceNumber)
+	{
+		switch (verticalAlign)
+		{
+			case WatermarkVerticalAlign.Top:
+				return lineHeight * lineSequenceNumber;
+			case WatermarkVerticalAlign.Bottom:
+				return lineHeight * (lineSequenceNumber - totalLinesNumber + 1);
+			case WatermarkVerticalAlign.Middle:
+			default:
+				return lineHeight * 0.5f * (2 * lineSequenceNumber - totalLinesNumber + 1);
+		}
+	}
+
+	string GetSvgRotate(PointF objectPos, SizeF textSize, TextWatermark textWatermark)
+	{
+		var rotationCenterX = objectPos.X + textSize.Width / 2;
+		var rotationCenterY = objectPos.Y + textSize.Height / 2;
+
+		return $"rotate(-{textWatermark.Rotation}, {rotationCenterX}, {rotationCenterY})";
+	}
+
+	string SvgDrawWaterMarker(Watermark watermark, SizeF pageSize)
+	{
+		var watermarkContent = new StringBuilder();
+		TextWatermark textWatermark = watermark as TextWatermark;
+		var watermarkTextColor = textWatermark.TextColor;
+
+		var lines = textWatermark.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+		var textFont = new Font(textWatermark.FontName, textWatermark.FontSize, textWatermark.FontStyle, GraphicsUnit.Pixel);
+		var rotate = string.Empty;
+
+		watermarkContent.Append("<g>");
+		for (int i = 0; i < lines.Length; i++)
+		{
+			var lineTextSize = TextRenderer.MeasureText(lines[i], textFont);
+			var lineTextPos = watermark.GetAlign(lineTextSize, pageSize);
+			var verticalOffset = float.NegativeZero;
+			if (i == 0)
+			{
+				rotate = GetSvgRotate(lineTextPos, lineTextSize, textWatermark);
+			}
+			if (lines.Length > 1)
+			{
+				verticalOffset = CalculateVerticalOffset(watermark.VerticalAlign, lines.Length, lineTextSize.Height, i);
+			}
+			watermarkContent.Append($"<text x=\"{lineTextPos.X}\" y=\"{lineTextPos.Y + verticalOffset}\" font-family=\"{textWatermark.FontName}\" " +
+										$"dominant-baseline=\"hanging\" font-size=\"{textFont.Size}\" fill=\"rgba({watermarkTextColor.R}, {watermarkTextColor.G}, {watermarkTextColor.B}, {watermarkTextColor.A / 255d})\" " + $"{SvgFontStyleString(textWatermark.FontStyle)} transform=\"{rotate}\">");
+			watermarkContent.Append($"{lines[i]}");
+			watermarkContent.Append("</text>");
+		}
+		watermarkContent.Append("</g>");
+		return watermarkContent.ToString();
+	}
+}

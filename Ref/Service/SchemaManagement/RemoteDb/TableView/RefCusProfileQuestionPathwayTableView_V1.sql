@@ -1,0 +1,9 @@
+CREATE VIEW RefCusProfileQuestionPathwayTableView_V1 AS
+SELECT XQP_PK,
+XQP_XQ2_QuestionParent,
+XQP_XQ2_QuestionChild,
+XQP_Description,
+XQP_StartDate,
+XQP_EndDate,
+XQP_ConditionToProceedFormula
+FROM RefCusProfileQuestionPathway

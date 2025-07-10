@@ -1,0 +1,314 @@
+@import "variables";
+$grid-heading-border: 1px solid $grid-outer-border-color;
+$grid-cell-border: 1px solid $grid-inner-border-color;
+$grid-border: 1px solid $container-border-color;
+
+.datagrid {
+	border: $grid-heading-border;
+	width: calc(100% + 2px);
+	height: 100%;
+	overflow: auto;
+	isolation: isolate;
+	overflow-anchor: none;
+
+	table {
+		table-layout: fixed;
+		width: min-content;
+		border-collapse: separate;
+		border-spacing: 0;
+		position: sticky;
+		top: 0;
+	}
+
+	tr {
+		&:not(.datagrid__row--selected) {
+			td:has(.checkbox__input--editable):hover {
+				&[style*="background-color:#{$grid-cell-default-background-color}"] {
+					background-clip: content-box;
+					background-color: #99b4d1 !important;
+				}
+			}
+		}
+
+		&:not(.datagrid__column--dragged) .datagrid__column_resizer {
+			position: absolute;
+			top: 0;
+			right: 0;
+			cursor: ew-resize;
+			width: 6px;
+			user-select: none;
+			z-index: 10;
+			height: 100%;
+			border: none;
+		}
+	}
+
+	th {
+		border-left: $grid-heading-border;
+		border-bottom: $grid-heading-border;
+		background-color: $container-background-color;
+		font-size: 10px;
+		font-weight: normal;
+		color: var(--color-info-text);
+		padding-top: 1px;
+		padding-right: 1px;
+		padding-bottom: 1px;
+		padding-left: 3px;
+		position: relative;
+		text-overflow: clip;
+		overflow: hidden;
+		white-space: nowrap;
+		position: sticky;
+		top: 0;
+		z-index: 9;
+
+		&:first-child {
+			border-left: none;
+			width: 35px;
+			z-index: 10;
+			left: 0;
+		}
+
+		&:last-child {
+			border-right: $grid-heading-border;
+		}
+	}
+
+	th span {
+		display: inline-block;
+		width: 100%;
+		text-overflow: ellipsis;
+		overflow-x: clip;
+		font-size: 11px;
+		letter-spacing: 0.3px;
+	}
+
+	&__header {
+		&--ascending,
+		&--descending {
+			span {
+				padding-right: 18px;
+			}
+
+			& div:first-of-type {
+				width: 18px;
+				height: 100%;
+				position: absolute;
+				right: 0;
+				top: 0;
+				background-size: 7.5px 7.5px;
+				background-repeat: no-repeat;
+				background-position: 6.5px center;
+				background-color: $container-background-color;
+			}
+		}
+
+		&--ascending {
+			& div:first-of-type {
+				background-image: url($grid-sort-ascending);
+			}
+		}
+
+		&--descending {
+			& div:first-of-type {
+				background-image: url($grid-sort-descending);
+			}
+		}
+	}
+
+	&__row--hidden {
+		position: absolute;
+		right: 200%;
+	}
+
+	&__row-star--new td:first-child {
+		font-family: Tahoma;
+		padding: 3px 0 0 6px;
+	}
+
+	&__row-arrow--new td:first-child {
+		font-family: Tahoma;
+	}
+
+	td {
+		border-left: $grid-cell-border;
+		border-bottom: $grid-cell-border;
+		color: var(--color-info-text);
+		padding: 0 2px;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+		position: relative;
+
+		& > span {
+			padding-left: 3px;
+		}
+
+		&:first-child {
+			font-family: "Material Symbols Outlined";
+			font-size: 22px;
+			line-height: 0;
+			background-color: $container-background-color;
+			border-left: none;
+			border-bottom: $grid-heading-border;
+			left: 0;
+			position: sticky;
+			z-index: 9;
+
+			.notification {
+				top: 2px;
+				left: 20px;
+				position: absolute;
+
+				+ div .balloon {
+					left: 19px;
+				}
+			}
+
+			span {
+				margin-left: -8px;
+			}
+		}
+
+		&:last-child {
+			border-right: $grid-heading-border;
+		}
+
+		&.datagrid__cell--error:not(:has(.checkbox__input)) {
+			background-color: $grid-cell-error !important;
+			padding-left: 12px;
+
+			.notification {
+				background-position-y: 2px;
+				height: 15px;
+			}
+		}
+
+		&.datagrid__cell--error:has(.checkbox__input) {
+			padding-left: 12px;
+
+			.notification {
+				background-position-y: 2px;
+				height: 15px;
+			}
+		}
+
+		&.datagrid__cell--warning:not(:has(.checkbox__input)) {
+			background-color: $grid-cell-warning !important;
+			padding-left: 12px;
+		}
+
+		&.datagrid__cell--warning .notification {
+			background-position-y: 2px;
+			height: 15px;
+		}
+
+		&.datagrid__cell--information {
+			background-color: $grid-cell-information !important;
+			padding-left: 12px;
+
+			.notification {
+				background-position-y: 3.5px;
+				height: 15px;
+			}
+		}
+
+		&.datagrid__cell--message-error {
+			background-color: $grid-cell-message-error !important;
+			padding-left: 16px;
+
+			.notification {
+				height: 15px;
+				margin-left: 2px;
+			}
+		}
+	}
+
+	&__rows--selected td {
+		background-color: $grid-row-selected-background-color !important;
+	}
+
+	&__columns_dropdown {
+		background-image: url($grid-dropdown-arrow-rest);
+		background-repeat: no-repeat;
+		background-position: center;
+		float: right;
+		margin-top: 3px;
+		margin-bottom: -3px;
+		border: 0;
+		height: 16px;
+		width: 16px;
+
+		&:hover {
+			background-image: url($grid-dropdown-arrow-active);
+		}
+	}
+
+	&__row--edit {
+		overflow: visible;
+	}
+
+	&__row--selected td:not(:first-child) {
+		background-color: $grid-row-selected-background-color !important;
+
+		&:has(.checkbox__input--editable) {
+			background-clip: inherit;
+		}
+	}
+
+	&__cell--edit {
+		overflow: visible !important;
+		z-index: 1;
+	}
+
+	&__control--edit {
+		height: 100%;
+		width: 100%;
+	}
+
+	&__column--dragged th:not(:first-child):hover {
+		color: var(--column-header-color);
+		background-color: var(--column-header-backcolor);
+	}
+
+	.datagrid__notification .notification {
+		top: 4px;
+		left: 4px;
+		position: absolute;
+
+		+ div .balloon {
+			left: 12px;
+		}
+	}
+
+	.notification + div .balloon {
+		top: 27px;
+		left: 0;
+		line-height: initial;
+		white-space: initial;
+
+		&:before {
+			border-left: 0px solid transparent;
+			border-right: 10px solid transparent;
+			border-top: 5px solid transparent;
+			border-bottom: 10px solid #333;
+			top: -16px;
+			left: 10px;
+		}
+
+		&:after {
+			border-left: 0px solid transparent;
+			border-right: 10px solid transparent;
+			border-top: 5px solid transparent;
+			border-bottom: 10px solid var(--color-info);
+			top: -14px;
+			left: 11px;
+		}
+	}
+
+	&__indicator_small {
+		font-size: 12px !important;
+		font-variation-settings: "FILL" 1;
+		padding: 0 3px !important;
+	}
+}

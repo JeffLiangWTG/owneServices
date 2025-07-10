@@ -1,0 +1,568 @@
+using System;
+using System.IO;
+using System.Text;
+using System.Data;
+using System.ComponentModel;
+using System.Collections;
+using Enterprise.ZArchitecture;
+using Enterprise.ZArchitecture.Business;
+using Enterprise.MasterFiles.Business;
+using Enterprise.MailManager.Business;
+using Enterprise.Orders.Business;
+using NUnit.Framework;
+
+
+namespace Enterprise.Client.Wow
+{
+	public class DataImporter
+	{
+		public DataImporter(ISynchronizeInvoke SyncInvoke)
+		{
+			fSyncInvoke = SyncInvoke;
+		}
+
+		#region Process Messages
+
+		public void ProcessMailMessages()
+		{
+			BusinessObjectFactory Factory = new BusinessObjectFactory();
+			ZSQLFilter Filter = new ZSQLFilter();
+			StandardMailItemCollection MailItems = new StandardMailItemCollection(Factory, Filter);
+
+			foreach (MailItem Item in MailItems)
+			{
+				ProcessMailMessage(Factory, Item);
+				OnNotify(this, new NotifyEventArgs("Mail with subject '" + Item.MI_Subject + "' processed"));
+			}
+		}
+
+		public void ProcessMailMessage(BusinessObjectFactory Factory, MailItem Item)
+		{
+			foreach (MailAttachment Attachment in Item.MailAttachments)
+			{
+				ZString Data = Attachment.MA_Data.ToUTF8();
+				string[] Lines = Data.ToString().Split('\n');
+				if (Lines.Length > 0 && GetImportFileType(Lines[0]) != ImportFileType.Unknown)
+				{
+					ImportCsvToFactory(Factory, Lines);
+				}
+			}
+		}
+
+		#endregion
+
+		#region ImportCsv
+
+		public void ImportCsv(string[] Lines)
+		{
+			BusinessObjectFactory Factory = new BusinessObjectFactory();
+			bool Result = ImportCsvToFactory(Factory, Lines);
+			if (Result)
+			{
+				OnNotify(this, new NotifyEventArgs("Updating to database..."));
+				try
+				{
+					Factory.Save();
+				}
+				catch (Exception Ex)
+				{
+					OnNotify(this, new NotifyEventArgs(Ex.Message));
+					Result = false;
+				}
+				OnNotify(this, new NotifyEventArgs("Success!"));
+			}
+		}
+
+		public bool ImportCsvToFactory(BusinessObjectFactory Factory, string[] Lines)
+		{
+			Lines = TrimBlankLines(Lines);
+			VerifyCsvHeaderTrailerAndLineCountValid(Lines);
+
+			ImportFileType FileType = GetImportFileType(Lines[0]);
+			switch (FileType)
+			{
+				case ImportFileType.Products:
+					ImportProductsCsv(Factory, Lines);
+					break;
+				case ImportFileType.Orders:
+					throw new DataImporterException("Not yet implemented");
+			}
+			return true;
+		}
+
+		#endregion
+
+		#region Events
+
+		public delegate void NotifyEventHandler(object Sender, NotifyEventArgs E);
+		public class NotifyEventArgs
+		{
+			public NotifyEventArgs(string Msg)
+			{
+				this.Message = Msg;
+			}
+
+			public NotifyEventArgs(DataImporterException E)
+			{
+				this.Error = E;
+				this.Message = E.Message;
+			}
+
+			public readonly string Message;
+			public readonly DataImporterException Error;
+		}
+
+		public event NotifyEventHandler Notify;
+		protected void OnNotify(object Sender, NotifyEventArgs E)
+		{
+			if (Notify != null)
+			{
+				if (fSyncInvoke != null && fSyncInvoke.InvokeRequired)
+				{
+					fSyncInvoke.Invoke(Notify, new object[] { Sender, E });
+				}
+				else
+				{
+					Notify(Sender, E);
+				}
+			}
+		}
+
+		#endregion
+
+		#region Implementation
+
+		#region Constants
+
+		protected const string PartOrgHeaderCode = "WOWOW";
+		protected const string ProductsFileTypeID = "MI-PRODUCT";
+		protected const string DummyPartsOrgFullName = "Created by the Woolworths Data Importer";
+
+		protected const string MissingHeaderMessage = "Missing header record";
+		protected const string MissingTrailerMessage = "Missing trailer record";
+		protected const string ErrorParsingTrailerRecordCountMessage = "Error parsing record count in trailer";
+		protected const string RecordTotalInconsistent = "Total number of records inconsistent with trailer";
+
+		#endregion
+
+		#region Column Mapping Constants
+
+		protected static int PartNumValueIndex = 1;
+		internal static string[] ProductPropertyMappings = new string[]
+		{
+			"",											// Record type
+			OrgSupplierPart.Schema.OP_PartNum,			// Item Reference Number (NK)
+			OrgSupplierPart.Schema.OP_CustomAttrib1,	// Warehouse Code
+			OrgSupplierPart.Schema.OP_CustomDecimal1,	// Item Pack Size
+			OrgSupplierPart.Schema.OP_CustomDecimal2,	// Vendor Pack Size
+			OrgSupplierPart.Schema.OP_CustomAttrib2,	// Location No
+			OrgSupplierPart.Schema.OP_CustomAttrib3,	// Fine Department No
+			OrgSupplierPart.Schema.OP_Desc,				// Vendor Description of the item
+			OrgSupplierPart.Schema.OP_CustomAttrib4,	// Prefix
+			OrgSupplierPart.Schema.OP_QtyInStock,		// Sum of Stock on Hand for each location
+			OrgSupplierPart.Schema.OP_WeightedCost,		// Purchase cost by location
+			""											// Fine Dept Name (used for lookup)
+		};
+
+		internal static string[] OrderPropertyMappings = new string[]
+		{
+			"",						// Record type
+			Order.Schema.JD_OrderNumber,			// Order Number
+			"",						// Order Control Indicator: 'A' add, 'U' update, 'D' Delete
+			Order.Schema.JD_OH_Supplier,			// Item Reference Number (NK)
+			"",						// Supplier Name - Master file (Code Matching Only)
+			Order.Schema.JD_OH_Buyer,			// ediTrack
+			Order.Schema.JD_RX,				// Currency
+			Order.Schema.JD_OC_FirstBuyerContact,			// Item Reference Number (NK)
+		};
+
+		#endregion
+
+		protected ISynchronizeInvoke fSyncInvoke;
+
+		#region Enumerations
+
+		protected enum ImportFileType
+		{
+			Unknown,
+			Products,
+			Orders
+		}
+
+		protected enum ProductRecordType
+		{
+			FileHeader = 0,
+			Product = 1,
+			FileTrailer = 9
+		}
+
+		#endregion
+
+		#region GetImportFileType
+
+		protected ImportFileType GetImportFileType(string FileHeader)
+		{
+			ImportFileType Result = ImportFileType.Unknown;
+			string[] FileHeaderValues = SplitCsvLineValues(FileHeader);
+
+			if (FileHeaderValues.Length > 2)
+			{
+				string FileTypeID = FileHeaderValues[1].Trim();
+				if (FileTypeID == ProductsFileTypeID)
+				{
+					Result = ImportFileType.Products;
+				}
+				else
+				{
+					Result = ImportFileType.Unknown;
+				}
+			}
+			return Result;
+		}
+
+		#endregion
+
+		#region VerifyCsvHeaderTrailerAndLineCountValid
+
+		protected void VerifyCsvHeaderTrailerAndLineCountValid(string[] Lines)
+		{
+			string FileHeader = Lines[0];
+			string[] FileHeaderValues = SplitCsvLineValues(FileHeader);
+			string FileTrailer = Lines[Lines.Length - 1];
+			string[] FileTrailerValues = SplitCsvLineValues(FileHeader);
+
+			if (FileHeaderValues.Length < 4 || FileHeaderValues[0] != "0") throw new DataImporterException(MissingHeaderMessage);
+			if (FileTrailerValues.Length < 2 || FileTrailerValues[0] != "9") throw new DataImporterException(MissingTrailerMessage);
+
+			int TrailerRecordCount;
+			try
+			{
+				TrailerRecordCount = int.Parse(FileTrailerValues[1]);
+			}
+			catch (FormatException)
+			{
+				throw new DataImporterException(ErrorParsingTrailerRecordCountMessage);
+			}
+			int ActualRecordCount = Lines.Length;
+			if (TrailerRecordCount != ActualRecordCount)
+			{
+				throw new DataImporterException(RecordTotalInconsistent);
+			}
+		}
+
+		#endregion
+
+		#region ImportProductsCsv
+
+		protected void ImportProductsCsv(BusinessObjectFactory Factory, string[] Lines)
+		{
+			OrgHeader OrgForPart = GetOrCreatePartOrg(Factory);
+			int TotalCreated = 0;
+			int TotalUpdated = 0;
+			int TotalRecordsRead = 0;
+			foreach (string Line in Lines)
+			{
+				try
+				{
+					ImportProductsCsvLine(Factory, OrgForPart, Line, ref TotalCreated, ref TotalUpdated);
+				}
+				catch (DataImporterException E)
+				{
+					OnNotify(this, new NotifyEventArgs(E));
+				}
+			}
+			OnNotify(this, new NotifyEventArgs(
+				"Total Products Created: " + TotalCreated + ", Total Products Updated: " + TotalUpdated));
+		}
+
+		protected void ImportProductsCsvLine(BusinessObjectFactory Factory, OrgHeader OrgForPart, string Line, ref int TotalCreated, ref int TotalUpdated)
+		{
+			string[] LineValues = SplitCsvLineValues(Line);
+			string RecordTypeAsString = LineValues[0];
+			if (RecordTypeAsString != "")
+			{
+				ProductRecordType RecType = (ProductRecordType)int.Parse(RecordTypeAsString);
+
+				if (RecType == ProductRecordType.Product)
+				{
+					bool CreatedNew;
+					OrgSupplierPart NewPart = GetNewOrExistingPart(Factory, OrgForPart, LineValues[PartNumValueIndex], out CreatedNew);
+					CopyCsvValuesToBusinessObject(NewPart, ProductPropertyMappings, LineValues);
+					if (CreatedNew)
+					{
+						TotalCreated++;
+					}
+					else
+					{
+						TotalUpdated++;
+					}
+				}
+			}
+		}
+
+		protected OrgSupplierPart GetNewOrExistingPart(BusinessObjectFactory Factory, OrgHeader Org, ZString PartNum, out bool CreatedNew)
+		{
+			CreatedNew = false;
+			ZSQLFilter Filter = new ZSQLFilter(OrgSupplierPart.Schema.OP_PartNum, SQLComparisonOperator.Equals, PartNum);
+			OrgSupplierPart Result = (OrgSupplierPart)Factory.LoadTop1(typeof(OrgSupplierPart), Filter);
+			if (Result == null)
+			{
+				Result = (OrgSupplierPart)Factory.New(typeof(OrgSupplierPart));
+				Result.OP_OH = Org.PK;
+				Result.OP_BuyerPart = ZBool.True;
+				Result.SuspendValidation();
+				CreatedNew = true;
+			}
+			return Result;
+		}
+
+		protected OrgHeader GetOrCreatePartOrg(BusinessObjectFactory Factory)
+		{
+			ZSQLFilter Filter = new ZSQLFilter(OrgHeader.Schema.OH_Code, SQLComparisonOperator.Equals, PartOrgHeaderCode);
+			OrgHeader Result = (OrgHeader)Factory.LoadTop1(typeof(OrgHeader), Filter);
+			if (Result == null)
+			{
+				Result = (OrgHeader)Factory.New(typeof(OrgHeader));
+				Result.OH_Code = PartOrgHeaderCode;
+				Result.OH_FullName = DummyPartsOrgFullName;
+				Result.MainAddress.OA_Address1 = "-";
+				Result.OH_IsConsignee = true;
+			}
+			return Result;
+		}
+
+		#endregion
+
+		#region CopyCsvValuesToBusinessObject
+
+		protected void CopyCsvValuesToBusinessObject(BusinessObject BO, string[] PropertyNames, string[] LineValues)
+		{
+			for (int I = 0; I < PropertyNames.Length; I++)
+			{
+				string PropName = PropertyNames[I];
+				string Value = LineValues[I];
+
+				if (PropName != "")
+				{
+					SetBusinessObjectPropertyFromString(BO, PropName, Value);
+				}
+			}
+		}
+
+		protected void SetBusinessObjectPropertyFromString(BusinessObject BO, string PropName, string ValueAsString)
+		{
+			Type PropertyType = BO.ZPropertyInfoHash[PropName].PropertyType;
+			object Value;
+			if (PropertyType == typeof(ZString))
+			{
+				Value = new ZString(ValueAsString.Trim());
+			}
+			else if (PropertyType == typeof(ZInt))
+			{
+				try
+				{
+					Value = new ZInt(int.Parse(ValueAsString));
+				}
+				catch (FormatException E)
+				{
+					throw new DataImporterException(PropName + ": " + E.Message, E);
+				}
+			}
+			else if (PropertyType == typeof(ZDecimal))
+			{
+				try
+				{
+					ValueAsString = ValueAsString.Replace("..", "."); // some donkey thing in the sample file in the test
+					Value = new ZDecimal(decimal.Parse(ValueAsString));
+				}
+				catch (FormatException E)
+				{
+					throw new DataImporterException(PropName + ": " + E.Message, E);
+				}
+			}
+			else
+			{
+				throw new DataImporterException("Unsupported data type '" + PropertyType.FullName + "' on property '" + PropName + "'");
+			}
+
+			// make sure the business object isn't updated if it doesn't need to be
+			if (!BO[PropName].Equals(Value))
+			{
+				BO[PropName] = Value;
+			}
+		}
+
+		#endregion
+
+		#region String Manipulation Utility Methods
+
+		protected string[] SplitCsvLineValues(string Line)
+		{
+			string[] Result = Line.Split(',');
+			for (int I = 0; I < Result.Length; I++)
+			{
+				string Value = Result[I];
+
+				Value = Value.Trim();
+				if (Value.StartsWith("\"")) Value = Value.Substring(1);
+				if (Value.EndsWith("\"")) Value = Value.Substring(0, Value.Length - 1);
+
+				Result[I] = Value;
+			}
+			return Result;
+		}
+
+		protected string[] TrimBlankLines(string[] Lines)
+		{
+			ArrayList Result = new ArrayList();
+			foreach (string Line in Lines)
+			{
+				if (Line.Trim() != "")
+				{
+					Result.Add(Line);
+				}
+			}
+			return (string[])Result.ToArray(typeof(string));
+		}
+
+		#endregion
+
+		#endregion
+	}
+
+	#region TestCase
+
+	[IncompleteUnitTest("cv", "9-12-03")]
+	public class DataImporterTest : TestCase
+	{
+		protected DataImporter fImporter = new DataImporter(null);
+
+		public void TestImportProductsCsv()
+		{
+			BusinessObjectFactory Factory = new BusinessObjectFactory();
+			ZSQLFilter Filter = new ZSQLFilter();
+			Filter.OrderBy = OrgSupplierPart.Schema.OP_PartNum;
+			OrgSupplierPartCollection Parts = new OrgSupplierPartCollection(Factory, Filter);
+			Parts.Load();
+			Parts.RemoveAndDeleteAll();
+
+			string FileContents = ReadTestCsvFile("DataImportExport\\TestProducts.csv");
+			string[] Lines = FileContents.Split('\n');
+			fImporter.ImportCsvToFactory(Factory, Lines);
+
+			Parts.Load();
+			AssertEquals("Number of parts", 10, Parts.Count);
+			AssertBusinessFieldsEquals(Parts[0], DataImporter.ProductPropertyMappings,
+				null,
+				new ZString("000048"),
+				new ZString("1899"),
+				new ZDecimal(12),
+				new ZDecimal(12),
+				ZString.Empty,
+				new ZString("246"),
+				new ZString("DINNER PLATE 26CM   SEA & SUN"),
+				new ZString("S"),
+				new ZDecimal(6324),
+				new ZDecimal(1.79),
+				new ZString("LOOSE CROCKERY -  CUPS / SAUCERS"));
+			AssertBusinessFieldsEquals(Parts[9], DataImporter.ProductPropertyMappings,
+				null,
+				new ZString("902061"),
+				new ZString("1944"),
+				new ZDecimal(1),
+				new ZDecimal(12),
+				ZString.Empty,
+				new ZString("376"),
+				new ZString("HIGHLAND LEGEND     SCOTCH WHISKY 700ML"),
+				new ZString("S"),
+				new ZDecimal(0),
+				new ZDecimal(221.63),
+				new ZString("WHISKY"));
+		}
+
+		public void TestErrorParsingTrailerRecordCount()
+		{
+			TestInvalidCsvFile("TestErrorParsingTrailerRecordCount.csv", "parsing");
+		}
+
+		public void TestWrongTrailerRecordCount()
+		{
+			TestInvalidCsvFile("TestWrongTrailerRecordCount.csv", "record count");
+		}
+
+		public void TestInvalidHeader()
+		{
+			TestInvalidCsvFile("TestInvalidHeader.csv", "parsing");
+		}
+
+		public void TestInvalidTrailer()
+		{
+			TestInvalidCsvFile("TestInvalidTrailer.csv", "parsing");
+		}
+
+		public void TestJunkFiles()
+		{
+			TestInvalidCsvFile("TestJunkFile1.csv", "");
+		}
+
+		#region Implementation
+
+		protected string ReadTestCsvFile(string TestFileName)
+		{
+			using (FileStream Str = new FileStream(BaseSourcePath + @"Enterprise\Operations\Freight\ZOrders\Woolworths\Testing\" + TestFileName, FileMode.Open))
+			{
+				byte[] Bytes = new byte[Str.Length];
+				Str.Read(Bytes, 0, (int)Str.Length);
+				return Encoding.ASCII.GetString(Bytes);
+			}
+		}
+
+		protected void AssertBusinessFieldsEquals(BusinessObject BO, string[] PropertyMappings, params object[] Values)
+		{
+			AssertEquals("Property names count doesn't match value count", PropertyMappings.Length, Values.Length);
+			for (int I = 0; I < PropertyMappings.Length; I++)
+			{
+				string PropName = PropertyMappings[I];
+				if (PropName != "")
+				{
+					AssertEquals(PropName, Values[I], BO[PropName]);
+				}
+			}
+		}
+
+		protected void TestInvalidCsvFile(string TestFileName, string ExceptionMessageContains)
+		{
+			BusinessObjectFactory Factory = new BusinessObjectFactory();
+			string FileContents = ReadTestCsvFile(TestFileName);
+			string[] Lines = FileContents.Split('\n');
+			try
+			{
+				fImporter.ImportCsvToFactory(Factory, Lines);
+				Fail(TestFileName + ": Should have thrown an exception");
+			}
+			catch (DataImporterException E)
+			{
+				Assert(E.Message.IndexOf(ExceptionMessageContains.ToLower()) != -1);
+			}
+		}
+
+		#endregion
+	}
+
+#endif
+	#endregion
+}
+// first line of the test orders csv
+//				new ZString("P00078"),
+//				new ZString("U"),
+//				new ZString("000069"),
+//				new ZString("W.GREAT WORTH LTD"),
+//				new ZString("TT"),
+//				new ZString("USD"),
+//				new ZString("LI & FUNG (TRADING) LTD."),
+//				new ZString("000016"),
+//				new ZString("FOB"),
+//				new ZString("FOB"),
+//				new ZString("ADDITONAL DELIVERY TERM P5109 TEST"),
+//				new ZString("BEVAN CARSON","AILEEN RUNCIMAN"),
+//				new ZString("HONG KONG"));

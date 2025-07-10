@@ -1,0 +1,94 @@
+﻿Grid Column Layout is persisted in StmModuleFilter and StmData. StmModuleFilter is to have pre-configured layouts and 
+StmData is to indicate which layout is used by a user. If no preconfigured layout was used, 
+then StmData has the layout details in itself instead of merely pointing to StmModuleFilter. 
+A layout stored in StmData is called as 'Default'. StmData is per user. 
+StmModuleFilter can be private to a user or be published to all users for a current company.
+
+To persist a grid layout and retrieve it later, the following components are needed.
+
+-------------------------------------------------------------------------------------------------------------------------
+1.  A context key for a grid : StmData.SD_Name, StmModuleFilter.S9_ModuleID
+-------------------------------------------------------------------------------------------------------------------------
+
+There are two ways of generating this key at the moment. Legacy way will be phased out and won't be supported eventually. 
+DataGridLayoutContextKeyProvider is a class that is responsible for generating this key for a grid. 
+
+An organisation can have a set of custom attributes. If users define the meaning for columns, then the set of defined columns 
+are added to a related grid.  
+
+DataGridLayoutContextKeyProvider/LegacyDataGridLayoutContextKeyProvider (with the second parameter passed as 'true' are classes 
+that generates keys for a grid when an organisation has such configurations.
+
+ [For normal grid]
+						Without Org (General)			|	With Org (Specific to Org)			|		Note
+-------------------------------------------------------------------------------------------------------------------------------------------------------						
+StmData				|	[SD_Name] == 'Key'				|	[SD_Name] == 'Key + Org.PK'			|	A job with such an org and a job without org 
+					|	[SD_DepartmentGuid] == null		|	[SD_DepartmentGuid] == Org.PK		|	will have different StmData records for the same grid.
+-------------------------------------------------------------------------------------------------------------------------------------------------------	
+StmModuleFilter		|	[S9_ModuleID] == 'Key'			|	[S9_ModuleID] == 'Key'				|	Even if a job has such an org, general layouts 
+					|									|	if layout to be saved contain		|	saved only with 'Key' are available  
+					|									|	NO custom attributes.				|	in addition to layouts specific to the Org.
+					|									|										|
+					|									|	[S9_ModuleID] == 'Key + Org.PK'		|
+					|									|	if layout to be saved contain		|
+					|									|	at least one custom attribute.		|
+-------------------------------------------------------------------------------------------------------------------------------------------------------						
+
+[For module grid]
+														|		GridLayoutKey								|	GridLayout saved to
+-----------------------------------------------------------------------------------------------------------------------------------------------------						
+StmModuleFilter.S9_SaveColumnLayout = 'Y'				|[StmModuleFilter.S9_ModuleID] == module id			|	[StmModuleFilter.S9_ColumnLayoutData]
+														|[StmModuleFilter.S9_FilterName] ==					|
+														|				currently selected filter name		|
+-----------------------------------------------------------------------------------------------------------------------------------------------------						
+StmModuleFilter.S9_SaveColumnLayout = 'N'				|[StmData.SD_Name] == 'Key'							|	[StmData.SD_BinaryValue]
+-----------------------------------------------------------------------------------------------------------------------------------------------------						
+When no filter is selected								|[StmData.SD_Name] == 'Key'							|	[StmData.SD_BinaryValue]
+
+-------------------------------------------------------------------------------------------------------------------------
+2. Multiple context Keys for a grid: 
+-------------------------------------------------------------------------------------------------------------------------
+
+GridLayoutContextKeyProviderHelper is responsible for providing an array of relevant context keys for a grid. 
+Multiple context keys are relevant for a single grid for the following reasons.
+
+2.1. A legacy key should still be supported. Layouts previously saved with a legacy key should still be available for users 
+even if a grid has just started to have a guid id.
+2.2. When a job has an organisation that has custom attributes, then general layouts as well as specific layouts to the organisation should be retrieved. 
+eg. All US import jobs should have a system-defined layout called '[Quick 3461]' for an invoice line grid 
+even if an importer of an import job has custom attributes.
+
+-------------------------------------------------------------------------------------------------------------------------
+3.  Accessing db to retrieve and save layouts for a grid : 
+-------------------------------------------------------------------------------------------------------------------------
+
+DataGridLayoutDataAccessor is responsible for directly accessing factory to save and retrieve layouts for a grid. 
+And ZGrid interacts with DataGridLayoutManager which interacts with DataGridLayoutDataAccessor.  DataGridLayoutDataAccessor relies on 
+GridLayoutContextKeyProviderHelper to provide natural keys that should be used. If users have changed a layout on a grid 
+like adding a column or switching between preconfigured layouts , the last used layout details will be saved before the grid is disposed. 
+As a result, a StmData record is created or an existing record is updated. 
+
+						|	Switched to a pre-configured layout				|	Changed a layout or resized a column etc
+-------------------------------------------------------------------------------------------------------------------------
+StmData.SD_GuidValue	|	StmModuleFilter.S9_PK							|	Cleared to ZGuid.Empty
+-------------------------------------------------------------------------------------------------------------------------
+StmData.SD_BinaryValue	|	Does not change. StmData.SD_BinaryValue			|	Updated to a new layout
+						|	will be refered to as 'Default' layout	 
+
+
+-------------------------------------------------------------------------------------------------------------------------
+4.  Loaders for StmData/StmModuleFilter 
+-------------------------------------------------------------------------------------------------------------------------
+
+StmData and StmModuleFilter have a loader class that is used by DataGridLayoutDataAccessor. 
+
+4.1. StmData.Loader.LoadTop1 method takes three parameters, Grid ID, Current User PK, and Another Guid that is matched against StmData.SD_DepartmentGuid.
+Grid ID is a context key of a grid that is explained in 1 above. If ZGrid.LayoutCategoryPK is set to a valid Guid, then the value is passed into the third parameter.
+
+StmData is created to load the latest layout of a grid users customise before disposing a grid. It might point to a pre-configured layout (StmData.SD_GuidValue) or 
+it might have layout details in itself (StmData.SD_BinaryValue).
+
+4.2. StmModuleFilter.Loader.FindTop1ByIDAndName takes two parameters, Grid ID and a Layout Name. 
+Grid ID is a context key of a grid that is explained in 1 above. System changes ZGrid.CurrentColumnLayoutName when users switch to a pre-configured layout. 
+So ZGrid.CurrentColumnLayoutName is passed to the second parameter if loading to the layout name is intended.
+

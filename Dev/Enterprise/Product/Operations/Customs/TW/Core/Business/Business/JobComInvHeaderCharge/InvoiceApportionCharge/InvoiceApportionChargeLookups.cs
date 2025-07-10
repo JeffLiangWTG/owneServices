@@ -1,0 +1,15 @@
+namespace Enterprise.Customs.TW.Business
+{
+	public class InvoiceApportionChargeLookups : Customs.Business.JobComInvHeaderChargeLookups
+	{
+		public InvoiceApportionChargeLookups(InvoiceApportionCharge invoiceApportionCharge)
+			: base(invoiceApportionCharge)
+		{
+		}
+
+		public new InvoiceApportionCharge Parent
+		{
+			get { return (InvoiceApportionCharge)base.Parent; }
+		}
+	}
+}

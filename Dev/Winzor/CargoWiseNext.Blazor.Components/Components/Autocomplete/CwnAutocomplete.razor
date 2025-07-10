@@ -1,0 +1,60 @@
+@namespace CargoWiseNext.Blazor.Components
+
+<div @onfocusout="OnFocusOut">
+    <CwnInput
+        Class="@ClassnameInput"
+        Style="@StylenameInput"
+        Placeholder="@Placeholder"
+        StartIcon="@StartIcon"
+        EndIcon="@EndIcon"
+        IconSize="@IconSize"
+        MaxLength="@MaxLength"
+        OnFocus="@HandleOnFocus"
+        OnKeyDown="@HandleOnKeyDownAsync"
+        Disabled="@Disabled"
+        @bind-Value="SearchText" />
+
+    @if (ShowList)
+    {
+        <CwnPaper
+            Class="@ClassnameList"
+            Style="@StylenameList">
+            @if (FilteredItems.Any())
+            {
+                <CwnList>
+                    @foreach (var (index, item) in FilteredItems.Select((item, index) => (index, item)))
+                    {
+                        var id = GetOrCreateListItemId(index);
+                        <CwnListItem
+                            id="@id"
+                            Class="cwn-autocomplete__item"
+                            IsSelected="@(index == selectedIndex)"
+                            OnMouseDown="@(() => ChooseItemAsync(index))">
+                            @HighlightText(item, SearchText)
+                        </CwnListItem>
+                    }
+                </CwnList>
+            }
+            else
+            {
+                <div class="cwn-autocomplete__no-results">@NoResultsText</div>
+            }
+        </CwnPaper>
+    }
+</div>
+
+<script>
+    window.cwnAutocomplete = {
+
+        scrollElementIntoView: function(elementId) {
+            const el = document.getElementById(elementId);
+            if (el && typeof el.scrollIntoView === 'function') {
+                el.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+                return true;
+            }
+            return false;
+        }
+    };
+</script>
+
+

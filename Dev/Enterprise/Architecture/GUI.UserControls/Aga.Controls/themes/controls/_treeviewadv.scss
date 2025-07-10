@@ -1,0 +1,243 @@
+@import "variables";
+
+.treeviewadv {
+	overflow-x: auto;
+
+	&__columnheaders:not(&__columnheaders--no-hover) &__columnheader:hover {
+		background-color: $treeviewadv-header-hover-background-color;
+	}
+
+	&__columnheader {
+		display: flex;
+		align-items: center;
+		font-weight: normal;
+		background-color: $treeviewadv-column-background-color;
+		overflow: hidden;
+
+		&:first-child {
+			padding-left: 2px;
+		}
+
+		&:not(:first-child) {
+			border-left: 1px solid $subtle-border-color;
+			padding-left: 1px;
+		}
+
+		&:not(&-ghostimage):last-child {
+			border-right: 1px solid $subtle-border-color;
+			padding-right: 1px;
+		}
+
+		&:active {
+			background-color: $treeviewadv-header-active-background-color;
+		}
+
+		p {
+			text-indent: 4px;
+			line-height: 20px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		&:first-child p {
+			margin-left: 3px;
+		}
+	}
+
+	&__columnheaders#{&}__columnheaders--no-hover &__columnheader {
+		&:nth-last-child(2) {
+			border-right: 1px solid $subtle-border-color;
+			padding-right: 1px;
+		}
+
+		&-ghostimage {
+			position: absolute;
+			pointer-events: none;
+			font-weight: bold;
+			background-color: $treeviewadv-header-mask-background-color;
+			opacity: .5;
+			border: none;
+		}
+
+		&--border-left {
+			border-left: 2px solid $treeviewadv-replacer-border-color;
+			padding-left: 0;
+		}
+	}
+
+	&__columnheaders#{&}__columnheaders--no-hover &__columnheader#{&}__columnheader--border-right {
+		border-right: 2px solid $treeviewadv-replacer-border-color;
+		padding-right: 0;
+	}
+
+	&__rows {
+		position: relative;
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	&__columnheader-sortmark {
+		min-width: 25px;
+		height: 5px;
+		background-repeat: no-repeat;
+		background-position: center;
+
+		&--ascending {
+			@extend .treeviewadv__columnheader-sortmark;
+			background-image: url($treeviewadv-column-header-sortmark--ascending);
+		}
+
+		&--descending {
+			@extend .treeviewadv__columnheader-sortmark;
+			background-image: url($treeviewadv-column-header-sortmark--descending);
+		}
+	}
+
+	&__columnheader-resizer {
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 10px;
+		user-select: none;
+		cursor: url($treeviewadv-verticalsplit-cursor),ew-resize !important;
+		height: 100%;
+		border: none;
+	}
+
+	&__row {
+		position: relative;
+		min-width: 100%;
+		width: max-content;
+
+		&:before {
+			content: '';
+			position: absolute;
+			left: calc(var(--line-left) + 4px);
+			height: 100%;
+			z-index: 1;
+			border-right: $treeviewadv-connecting-line-border;
+		}
+
+		&:last-child:before {
+			height: calc(var(--row-height) / 2);
+		}
+	}
+
+	& > &__rows > &__row {
+
+		&:only-child:before {
+			height: 0;
+		}
+
+		&:first-child:not(:only-child):before {
+			top: calc(var(--row-height) / 2);
+			height: calc(100% - var(--row-height) / 2);
+		}
+	}
+
+	&__rowcontent {
+		position: relative;
+		background-color: inherit;
+
+		> div:not(:first-child) {
+			z-index: 1;
+		}
+	}
+
+	&__dropmark {
+		position: absolute;
+		height: 2px;
+		margin: 0 4px 0 -4px;
+		background-color: black;
+		pointer-events: none;
+
+		&:before, &:after {
+			content: "";
+			position: absolute;
+			top: -4px;
+			border: 5px solid transparent;
+		}
+
+		&:before {
+			border-left: 5px solid black;
+			left: 0;
+		}
+
+		&:after {
+			border-right: 5px solid black;
+			right: 0;
+		}
+	}
+
+	&__item {
+		background-color: inherit;
+		pointer-events: auto;
+
+		* {
+			pointer-events: none;
+		}
+
+		p {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			line-height: var(--row-height);
+			padding-left: 2px;
+		}
+	}
+
+	&__plusminus {
+		display: flex;
+		align-items: center;
+		overflow: hidden;
+
+		img {
+			z-index: 1;
+		}
+
+		&:before {
+			content: '';
+			position: absolute;
+			width: 12px;
+			left: 4px;
+			top: calc(var(--row-height) / 2);
+			border-bottom: $treeviewadv-connecting-line-border;
+		}
+	}
+
+	&:has(&__rowcontent--ondrag) {
+		.treeviewadv__rowcontent--selected {
+			.treeviewadv__item p {
+				color: $treeviewadv-row-drag-selected-color !important;
+			}
+
+			&.treeviewadv__rowcontent--ondragover:not(:has(.treeviewadv__dropmark)) .treeviewadv__item p {
+				color: $treeviewadv-row-drag-hover-color !important;
+			}
+		}
+
+		.treeviewadv__rowcontent--ondragover:not(:has(.treeviewadv__dropmark)) {
+			.treeviewadv__item p {
+				background-color: $treeviewadv-row-selected-background-color !important;
+			}
+
+			&:not([data-sales-relation]) .treeviewadv__item p {
+				color: $treeviewadv-row-drag-hover-color !important;
+			}
+		}
+	}
+
+	&--border {
+		&-fixedsingle {
+			border: 1px solid var(--color-window-frame);
+		}
+
+		&-fixed3d {
+			border: 2px ridge var(--color-button-shadow);
+			border-bottom: 2px groove var(--color-button-highlight);
+			border-right: 2px groove var(--color-button-highlight);
+		}
+	}
+}

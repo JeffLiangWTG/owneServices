@@ -1,0 +1,32 @@
+meta {
+  name: IntercompanyTariffs Endpint - Type is NOT valid
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/intercompanytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForIntercompanyTariffs();
+   query.PlannedLoad = { Type: "ABC", Value: "AUSYD" };
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided Type ('ABC') is not valid. It can only be one of these values: 'COUNTRY', 'UNLOCO', 'ZONE'.", function() {
+    expect(res.body.ModelState['PlannedLoad.Type'][0]).to.equal("Provided Type ('ABC') is not valid. It can only be one of these values: 'COUNTRY', 'UNLOCO', 'ZONE'.");
+  });
+  
+  
+  
+}

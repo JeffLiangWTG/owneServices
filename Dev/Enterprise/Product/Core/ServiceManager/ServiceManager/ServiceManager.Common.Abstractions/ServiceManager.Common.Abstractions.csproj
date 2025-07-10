@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(CWNetCoreTargetFramework);net48</TargetFrameworks>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ServiceManager.Integration.Abstractions\ServiceManager.Integration.Abstractions.csproj" />
+    <ProjectReference Include="..\ServiceManager.Shared.Abstractions\ServiceManager.Shared.Abstractions.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.CommandLine" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Google.Protobuf" />
+    <Reference Include="Grpc.Core.Api" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Collections.Immutable" />
+    <Reference Include="System.Memory" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Grpc.Tools">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Protobuf\" />
+    <Protobuf Include="Protobuf/ServiceRunnerRequests.proto" />
+  </ItemGroup>
+</Project>

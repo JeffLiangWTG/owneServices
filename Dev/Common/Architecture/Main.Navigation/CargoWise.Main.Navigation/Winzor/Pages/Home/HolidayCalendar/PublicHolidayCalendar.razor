@@ -1,0 +1,49 @@
+@using Microsoft.AspNetCore.Components.Web
+@using CargoWiseNext.Blazor.Components
+
+@namespace CargoWise.Main.Navigation.Pages
+@inherits CwnComponentBase
+
+<CwnCard Class="cwn-public-holiday-calendar">
+    <CwnCardHeader>
+        <CardHeaderContent>
+            <span class="cwn-public-holiday-calendar__title" @onclick="TitleClickAsync">
+                @Service?.Title
+            </span>
+        </CardHeaderContent>
+    </CwnCardHeader>
+    <CwnCardContent>
+        <div class="cwn-public-holiday-calendar__content">
+            @if (HasPublicHolidays)
+            {
+                string? lastMonth = null;
+
+                <ul class="cwn-public-holiday-calendar__list">
+                    @foreach (var item in PublicHolidays)
+                    {
+                        if (item.Month != lastMonth)
+                        {
+                            <span class="cwn-public-holiday-calendar__month">@item.Month</span>
+                            lastMonth = item.Month;
+                        }
+                        <li class="cwn-public-holiday-calendar__item" >
+                            <div class="cwn-public-holiday-calendar__item_date">
+                                <span class="cwn-public-holiday-calendar__item_date_header">@item.Weekday</span>
+                                <span class="cwn-public-holiday-calendar__item_date_day">@item.Date.ToString("dd")</span>
+                            </div>
+                            <div class="cwn-public-holiday-calendar__item_data">
+                                <span class="cwn-public-holiday-calendar__item_data_description" title="@item.Description">@item.Description</span>
+                                <span class="cwn-public-holiday-calendar__item_data_region" title="@item.RegionName">@item.RegionName</span>
+                            </div>
+                            <CwnRegionFlag Class="cwn-public-holiday-calendar__item_flag" RegionCode="@item.RegionCode.ToLower()" Size="@Size.Small" />
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <div class="cwn-public-holiday-calendar__empty">@Service?.NoPublicHolidaysLabel</div>
+            }
+        </div>
+    </CwnCardContent>
+</CwnCard>

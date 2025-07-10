@@ -1,0 +1,10 @@
+﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)..\..\..\..\'))" />
+
+  <!--
+  SAFEGUARD TO PREVENT ANY NEW REFERENCES FROM BEING ADDED TO ACCOUNTING PRODUCTION PROJECTS. SAFEGUARD DOES NOT CONSIDER TESTING ACCOUNTING PROJECTS.
+  THIS SHOULD NOT BE REMOVED AND ANY ATTEMPTS TO MODIFY THIS SHOULD BE APPROVED BY ANOTHER ACCOUNTING ASPECT REVIEWER.
+  Documentation and information can be found in the `AccountingReferenceSafeguard\AccountingReferenceSafeguard.targets` file.
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)\AccountingReferenceSafeguard\AccountingReferenceSafeguard.targets" Condition="$(AssemblyName.StartsWith('Enterprise.Accounting.')) AND !$(AssemblyName.Contains('.Testing'))" />
+</Project>

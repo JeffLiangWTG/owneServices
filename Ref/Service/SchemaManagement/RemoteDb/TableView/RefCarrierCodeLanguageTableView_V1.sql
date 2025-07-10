@@ -1,0 +1,6 @@
+CREATE VIEW RefCarrierCodeLanguageTableView_V1 AS
+SELECT ZCL_PK,
+ZCL_ZX6_NKLanguage,
+ZCL_ZZ4_CarrierCode,
+ZCL_Description
+FROM RefCarrierCodeLanguage

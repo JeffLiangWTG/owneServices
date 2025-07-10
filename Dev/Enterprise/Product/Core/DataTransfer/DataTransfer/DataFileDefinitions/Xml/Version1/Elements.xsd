@@ -1,0 +1,3000 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XML Spy v4.0.1 U (http://www.xmlspy.com) by Evgeniy.Ignatov (CargoWise) -->
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.edi.com.au/EnterpriseService/" targetNamespace="http://www.edi.com.au/EnterpriseService/" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:complexType name="AccountsPayable">
+		<xs:sequence>
+			<xs:element name="DefaultCurrency" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="AccountGroup" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="CreditLimit" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="GSTIsApplicable" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="WithholdingTaxIsApplicable" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="PaymentTerms" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="PaymentDays" type="xs:int" minOccurs="0"/>
+			<xs:element name="SettlementDetails" type="SettlementDetails" minOccurs="0"/>
+			<xs:element name="ExternalCreditorCode" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="CompanyCode" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="AccountsReceivable">
+		<xs:sequence>
+			<xs:element name="DefaultCurrency" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="AccountGroup" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="CreditLimit" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="UseSettlementGroupCreditLimit" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="CreditApproved" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="CreditOnHold" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="GSTIsApplicable" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="WithholdingTaxIsApplicable" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="SettlementDetails" type="SettlementDetails" minOccurs="0"/>
+			<xs:element name="AllowMultiCurrencyPayment" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="ExternalDebtorCode" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="CompanyCode" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="AdditionalCustomsInformation">
+		<xs:sequence>
+			<xs:element name="CustomsDetailType" type="xs:NMTOKEN"/>
+			<xs:element name="CustomsDetailValue" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AddressBase">
+		<xs:sequence>
+			<xs:element name="AddressLine1" type="xs:string" minOccurs="0"/>
+			<xs:element name="AddressLine2" type="xs:string" minOccurs="0"/>
+			<xs:element name="AddressCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="CityOrSuburb" type="xs:string" minOccurs="0"/>
+			<xs:element name="StateOrProvince" type="xs:string" minOccurs="0"/>
+			<xs:element name="PostCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="TelephoneNumbers" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="TelephoneNumber" type="TelephoneNumber" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Email" type="xs:string" minOccurs="0"/>
+			<xs:element name="Language" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AddressCapability">
+		<xs:attribute name="IsMainAddress" type="TrueFalse" use="optional"/>
+		<xs:attribute name="AddressType">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="MAIN"/>
+					<xs:enumeration value="OFC"/>
+					<xs:enumeration value="PST"/>
+					<xs:enumeration value="ARM"/>
+					<xs:enumeration value="APM"/>
+					<xs:enumeration value="PIC"/>
+					<xs:enumeration value="DLV"/>
+					<xs:enumeration value="PAD"/>
+					<xs:enumeration value="SQM"/>
+					<xs:enumeration value="MSC"/>
+					<xs:enumeration value="RSD"/>
+					<xs:enumeration value="CST"/>
+					<xs:enumeration value="AWB"/>
+					<xs:enumeration value="ECA"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="AddressReference">
+		<xs:sequence>
+			<xs:element name="AddressSequenceRef" type="xs:int"/>
+			<xs:element name="Organisation" type="Organisation"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AntiDumping">
+		<xs:sequence>
+			<xs:element name="CaseNo" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BondDetail">
+		<xs:sequence>
+			<xs:element name="ActivityCode" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="1"/>
+						<xs:enumeration value="1a"/>
+						<xs:enumeration value="1a1"/>
+						<xs:enumeration value="2"/>
+						<xs:enumeration value="3"/>
+						<xs:enumeration value="3a"/>
+						<xs:enumeration value="3a3"/>
+						<xs:enumeration value="4"/>
+						<xs:enumeration value="5"/>
+						<xs:enumeration value="6"/>
+						<xs:enumeration value="7"/>
+						<xs:enumeration value="8"/>
+						<xs:enumeration value="9"/>
+						<xs:enumeration value="10"/>
+						<xs:enumeration value="11"/>
+						<xs:enumeration value="12"/>
+						<xs:enumeration value="13"/>
+						<xs:enumeration value="14"/>
+						<xs:enumeration value="15"/>
+						<xs:enumeration value="16"/>
+						<xs:enumeration value="17"/>
+						<xs:enumeration value="18"/>
+						<xs:enumeration value="19"/>
+						<xs:enumeration value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Type" type="xs:string" minOccurs="0"/>
+			<xs:element name="Number" type="xs:string" minOccurs="0"/>
+			<xs:element name="SuretyCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="Amount" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Effective" type="xs:date" minOccurs="0"/>
+			<xs:element name="Expiry" type="xs:date" minOccurs="0"/>
+			<xs:element name="FiledPort" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Charges">
+		<xs:sequence>
+			<xs:element name="Charge" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ChargeType" type="xs:NMTOKEN"/>
+						<xs:element name="ChargeAmount" type="FinancialValue"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ContactReference">
+		<xs:sequence>
+			<xs:element name="ContactSequenceRef" type="xs:int"/>
+			<xs:element name="Organisation" type="Organisation"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Container">
+		<xs:sequence>
+			<xs:element name="ContainerNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Unique identifier for container.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ContainerCount" type="xs:int" default="1" minOccurs="0"/>
+			<xs:element name="ContainerType" type="ContainerType" minOccurs="0"/>
+			<xs:element name="Seal" type="xs:string" minOccurs="0"/>
+			<xs:element name="Seal2" type="xs:string" minOccurs="0"/>
+			<xs:element name="Seal3" type="xs:string" minOccurs="0"/>
+			<xs:element name="PackingMode" type="ContainerMode"/>
+			<xs:element name="DeliveryMode" type="xs:string" minOccurs="0"/>
+			<xs:element name="EstimatedDelivery" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="IsShipperOwnedContainer" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="LCLAvailable" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="Weight" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="GrossWeight" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="NetWeight" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="FCLAvailable" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="BookingReference" type="xs:string" minOccurs="0"/>
+			<xs:element name="ReleaseNumber" type="xs:string" minOccurs="0"/>
+			<xs:element name="IsArrivingAtCTOByRail" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="IsEmptyContainer" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="IsDamaged" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="CommodityCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="SetPointTemperature" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="SetPointTemperatureUnit" type="xs:string" minOccurs="0"/>
+			<xs:element name="HumidityPercent" type="xs:unsignedByte" minOccurs="0"/>
+			<xs:element name="AirVentFlow" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="AirVentFlowRateUnit" type="xs:string" minOccurs="0"/>
+			<xs:element name="ImportProcess" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="ContainerProcess">
+							<xs:sequence>
+								<xs:element name="ReleaseNumber" type="xs:string" minOccurs="0"/>
+								<xs:element name="WharfUnload" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="WharfGateOut" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="EstimatedDelivery" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="DeliverEmptyTo" type="AddressReference" minOccurs="0"/>
+								<xs:element name="EmptyReady" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="EmptyReturnRequiredBy" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="EmptyReturnedOn" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="DetentionCharge" type="xs:decimal" minOccurs="0"/>
+								<xs:element name="DetentionDays" type="xs:string" minOccurs="0"/>
+								<xs:element name="StorageCharge" type="xs:decimal" minOccurs="0"/>
+								<xs:element name="StorageDays" type="xs:string" minOccurs="0"/>
+								<xs:element name="PickupByRail" type="xs:boolean" minOccurs="0"/>
+								<xs:element name="HeldForFCLTransitStaging" type="xs:boolean" minOccurs="0"/>
+								<xs:element name="FCLAvailable" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="FCLStorage" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="LCLAvailable" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="LCLStorage" type="xs:dateTime" minOccurs="0"/>
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ExportProcess" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="ContainerProcess">
+							<xs:sequence>
+								<xs:element name="BookingReference" type="xs:string" minOccurs="0"/>
+								<xs:element name="ReleaseNumber" type="xs:string" minOccurs="0"/>
+								<xs:element name="EmptyRequiredBy" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="EstimatedFullPickup" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="PickupEmptyFrom" type="AddressReference" minOccurs="0"/>
+								<xs:element name="ContainerYardGateOut" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="WharfGateIn" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="ShippedOnboard" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="IsArrivingAtCTOByRail" type="xs:boolean" minOccurs="0"/>
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Custom" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="CustomAttribute1" type="xs:string" minOccurs="0"/>
+						<xs:element name="Date1" type="xs:dateTime" minOccurs="0"/>
+						<xs:element name="Decimal1" type="xs:decimal" minOccurs="0"/>
+						<xs:element name="Flag1" type="xs:boolean" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ContainerLeg">
+		<xs:sequence>
+			<xs:element name="LegType" type="ContainerLegType"/>
+			<xs:element name="GoodsRecBy" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ContainerProcess">
+		<xs:sequence>
+			<xs:element name="CartageAdvised" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="CartageComplete" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="CartageRef" type="xs:string" minOccurs="0"/>
+			<xs:element name="DemurrageCharge" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="DemurrageTime" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="SlotBookingRef" type="xs:string" minOccurs="0"/>
+			<xs:element name="SlotDate" type="xs:dateTime" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ContainerType">
+		<xs:sequence>
+			<xs:element name="USContainerCode" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="Length" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Width" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Height" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="ContainerCode" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="ISOCode" type="xs:NMTOKEN"/>
+	</xs:complexType>
+	<xs:complexType name="Countervailing">
+		<xs:sequence>
+			<xs:element name="CaseNo" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CustomsEntry">
+		<xs:sequence>
+			<xs:element name="CustomsEntryNumber" type="CustomsEntryNumber" minOccurs="0"/>
+			<xs:element name="EntryDate" type="xs:date" minOccurs="0"/>
+			<xs:element name="CustomsFactor" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="ExchangeRate" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="CustomsValue" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="TransportAndInsurance" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="Charges" type="Charges" minOccurs="0"/>
+			<xs:element name="CustomsEntryLines" type="CustomsEntryLines" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CustomsEntryLine">
+		<xs:sequence>
+			<xs:element name="Fees" type="Fees" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CustomsEntryLines">
+		<xs:sequence>
+			<xs:element name="CstomsEntryLine" type="CustomsEntryLine" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CustomsEntries">
+		<xs:sequence>
+			<xs:element name="CustomsEntry" type="CustomsEntry" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CustomsEntryNumber">
+		<xs:sequence>
+			<xs:element name="Country" type="CountryCode"/>
+			<xs:element name="Type" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="Number" type="xs:NMTOKEN" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CustomsEntryNumbers">
+		<xs:sequence>
+			<xs:element name="CustomsEntryNumber" type="CustomsEntryNumber" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CustomValue">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="Name" type="xs:string" use="required"/>
+				<xs:attribute name="Type" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="CustomValues">
+		<xs:sequence>
+			<xs:element name="CustomValue" type="CustomValue" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DimensionValue">
+		<xs:simpleContent>
+			<xs:extension base="xs:decimal">
+				<xs:attribute name="DimensionType" type="xs:NMTOKEN" use="optional"/>
+				<xs:attribute name="Description" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="DocAddress">
+		<xs:complexContent>
+			<xs:extension base="AddressBase">
+				<xs:sequence>
+					<xs:element name="AddressReference" type="AddressReference" minOccurs="0"/>
+					<xs:element name="CompanyName" type="xs:string" minOccurs="0"/>
+					<xs:element name="CountryCode" type="xs:string" minOccurs="0"/>
+					<xs:element name="ContactName" type="xs:string" minOccurs="0"/>
+					<xs:element name="IsResidential" type="xs:boolean" minOccurs="0"/>
+					<xs:element name="RegistrationNumber" type="RegistrationNumber" minOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute name="AddressType">
+					<xs:simpleType>
+						<xs:restriction base="xs:NMTOKEN">
+							<xs:enumeration value="CED"/>
+							<xs:enumeration value="CRG"/>
+							<xs:enumeration value="CEG"/>
+							<xs:enumeration value="CRD"/>
+							<xs:enumeration value="CRB"/>
+							<xs:enumeration value="SUD"/>
+							<xs:enumeration value="IMD"/>
+							<xs:enumeration value="SUG"/>
+							<xs:enumeration value="IMG"/>
+							<xs:enumeration value="CLP"/>
+							<xs:enumeration value="CLD"/>
+							<xs:enumeration value="CLW"/>
+							<xs:enumeration value="NPP"/>
+							<xs:enumeration value="N2D"/>
+							<xs:enumeration value="N3D"/>
+							<xs:enumeration value="LCT"/>
+							<xs:enumeration value="LCF"/>
+							<xs:enumeration value="LCY"/>
+							<xs:enumeration value="LCI"/>
+							<xs:enumeration value="LCE"/>
+							<xs:enumeration value="LC1"/>
+							<xs:enumeration value="LC2"/>
+							<xs:enumeration value="LC3"/>
+							<xs:enumeration value="LC4"/>
+							<xs:enumeration value="LCS"/>
+							<xs:enumeration value="LCM"/>
+							<xs:enumeration value="DUM"/>
+							<xs:enumeration value="NONE"/>
+							<xs:enumeration value="LCP"/>
+							<xs:enumeration value="LCD"/>
+							<xs:enumeration value="BKD"/>
+							<xs:enumeration value="CEA"/>
+							<xs:enumeration value="GBA"/>
+							<xs:enumeration value="PUA"/>
+							<xs:enumeration value="FWD"/>
+							<xs:enumeration value="ICD"/>
+							<xs:enumeration value="FSD"/>
+							<xs:enumeration value="OQP"/>
+							<xs:enumeration value="OQD"/>
+							<xs:enumeration value="ACF"/>
+							<xs:enumeration value="ACT"/>
+							<xs:enumeration value="ACY"/>
+							<xs:enumeration value="DCF"/>
+							<xs:enumeration value="DCT"/>
+							<xs:enumeration value="DCY"/>
+							<xs:enumeration value="DOA"/>
+							<xs:enumeration value="BUY"/>
+							<xs:enumeration value="INS"/>
+							<xs:enumeration value="ASS"/>
+							<xs:enumeration value="CPB"/>
+							<xs:enumeration value="SRO"/>
+							<xs:enumeration value="TRA"/>
+							<xs:enumeration value="TBT"/>
+							<xs:enumeration value="CCP"/>
+							<xs:enumeration value="CTO"/>
+							<xs:enumeration value="CDE"/>
+							<xs:enumeration value="CWA"/>
+							<xs:enumeration value="PRO"/>
+							<xs:enumeration value="SOF"/>
+							<xs:enumeration value="GOV"/>
+							<xs:enumeration value="LCA"/>
+							<xs:enumeration value="CPL"/>
+							<xs:enumeration value="SCP"/>
+							<xs:enumeration value="CON"/>
+							<xs:enumeration value="MAN"/>
+							<xs:enumeration value="SEP"/>
+							<xs:enumeration value="BYP"/>
+							<xs:enumeration value="STP"/>
+							<xs:enumeration value="CSL"/>
+							<xs:enumeration value="CTP"/>
+							<xs:enumeration value="LCW"/>
+							<xs:enumeration value="EXB"/>
+							<xs:enumeration value="ALT"/>
+							<xs:enumeration value="CAR"/>
+							<xs:enumeration value="CPP"/>
+							<xs:enumeration value="CPR"/>
+							<xs:enumeration value="CTR"/>
+							<xs:enumeration value="CEX"/>
+							<xs:enumeration value="CDT"/>
+							<xs:enumeration value="DLT"/>
+							<xs:enumeration value="LCN"/>
+							<xs:enumeration value="OSA"/>
+							<xs:enumeration value="LOC"/>
+							<xs:enumeration value="RFA"/>
+							<xs:enumeration value="SFA"/>
+							<xs:enumeration value="SLA"/>
+							<xs:enumeration value="ICA"/>
+							<xs:enumeration value="DVA"/>
+							<xs:enumeration value="EXR"/>
+							<xs:enumeration value="IMB"/>
+							<xs:enumeration value="DED"/>
+							<xs:enumeration value="DLM"/>
+							<xs:enumeration value="DLD"/>
+							<xs:enumeration value="PRC"/>
+							<xs:enumeration value="APE"/>
+							<xs:enumeration value="PAG"/>
+							<xs:enumeration value="WHS"/>
+							<xs:enumeration value="POC"/>
+							<xs:enumeration value="CIO"/>
+							<xs:enumeration value="ORN"/>
+							<xs:enumeration value="OCA"/>
+							<xs:enumeration value="FCA"/>
+							<xs:enumeration value="DCA"/>
+							<xs:enumeration value="ADA"/>
+							<xs:enumeration value="ADC"/>
+							<xs:enumeration value="OIL"/>
+							<xs:enumeration value="CFP"/>
+							<xs:enumeration value="CAG"/>
+							<xs:enumeration value="VGM"/>
+							<xs:enumeration value="IMR"/>
+							<xs:enumeration value="EXP"/>
+							<xs:enumeration value="MBI"/>
+							<xs:enumeration value="CLA"/>
+							<xs:enumeration value="COL"/>
+							<xs:enumeration value="HBI"/>
+							<xs:enumeration value="AGT"/>
+							<xs:enumeration value="DES"/>
+							<xs:enumeration value="DIS"/>
+							<xs:enumeration value="OWN"/>
+							<xs:enumeration value="TRP"/>
+							<xs:enumeration value="CTN"/>
+							<xs:enumeration value="DET"/>
+							<xs:enumeration value="WHC"/>
+							<xs:enumeration value="REP"/>
+							<xs:enumeration value="CBA"/>
+							<xs:enumeration value="CHA"/>
+							<xs:enumeration value="ACQ"/>
+							<xs:enumeration value="DLR"/>
+							<xs:enumeration value="OCT"/>
+							<xs:enumeration value="BOF"/>
+							<xs:enumeration value="ARP"/>
+							<xs:enumeration value="ATD"/>
+							<xs:enumeration value="AEC"/>
+							<xs:enumeration value="CBP"/>
+							<xs:enumeration value="GLC"/>
+							<xs:enumeration value="LCG"/>
+							<xs:enumeration value="CPK"/>
+							<xs:enumeration value="GAA"/>
+							<xs:enumeration value="GDT"/>
+							<xs:enumeration value="RFP"/>
+							<xs:enumeration value="ICT"/>
+							<xs:enumeration value="FDA"/>
+							<xs:enumeration value="UCE"/>
+							<xs:enumeration value="ICE"/>
+							<xs:enumeration value="PPI"/>
+							<xs:enumeration value="DFP"/>
+							<xs:enumeration value="IPP"/>
+							<xs:enumeration value="LPA"/>
+							<xs:enumeration value="MAA"/>
+							<xs:enumeration value="FFW"/>
+							<xs:enumeration value="STA"/>
+							<xs:enumeration value="ITA"/>
+							<xs:enumeration value="JCD"/>
+							<xs:enumeration value="ACW"/>
+							<xs:enumeration value="IWS"/>
+							<xs:enumeration value="CAP"/>
+							<xs:enumeration value="PYR"/>
+							<xs:enumeration value="BLD"/>
+							<xs:enumeration value="SVD"/>
+							<xs:enumeration value="APP"/>
+							<xs:enumeration value="HOL"/>
+							<xs:enumeration value="LTA"/>
+							<xs:enumeration value="SUP"/>
+							<xs:enumeration value="SEL"/>
+							<xs:enumeration value="APD"/>
+							<xs:enumeration value="MBC"/>
+							<xs:enumeration value="MBS"/>
+							<xs:enumeration value="CLR"/>
+							<xs:enumeration value="COA"/>
+							<xs:enumeration value="BTA"/>
+							<xs:enumeration value="CEC"/>
+							<xs:enumeration value="SDC"/>
+							<xs:enumeration value="CIC"/>
+							<xs:enumeration value="COS"/>
+							<xs:enumeration value="CES"/>
+							<xs:enumeration value="CDU"/>
+							<xs:enumeration value="CRP"/>
+							<xs:enumeration value="AAA"/>
+							<xs:enumeration value="IFP"/>
+							<xs:enumeration value="RET"/>
+							<xs:enumeration value="APC"/>
+							<xs:enumeration value="ATA"/>
+							<xs:enumeration value="FPY"/>
+							<xs:enumeration value="MTA"/>
+							<xs:enumeration value="OOG"/>
+							<xs:enumeration value="SHP"/>
+							<xs:enumeration value="FSI"/>
+							<xs:enumeration value="ITI"/>
+							<xs:enumeration value="SPS"/>
+							<xs:enumeration value="GRO"/>
+							<xs:enumeration value="LAB"/>
+							<xs:enumeration value="IVC"/>
+							<xs:enumeration value="FSP"/>
+							<xs:enumeration value="PEO"/>
+							<xs:enumeration value="TPL"/>
+							<xs:enumeration value="CAC"/>
+							<xs:enumeration value="DYP"/>
+							<xs:enumeration value="VAN"/>
+							<xs:enumeration value="HLD"/>
+							<xs:enumeration value="SRP"/>
+							<xs:enumeration value="CEB"/>
+							<xs:enumeration value="CRA"/>
+							<xs:enumeration value="ALE"/>
+							<xs:enumeration value="ICS"/>
+							<xs:enumeration value="EOU"/>
+							<xs:enumeration value="TOR"/>
+							<xs:enumeration value="ACP"/>
+							<xs:enumeration value="SDP"/>
+							<xs:enumeration value="TRS"/>
+							<xs:enumeration value="ACA"/>
+							<xs:enumeration value="AEO"/>
+							<xs:enumeration value="LLP"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="DocAddresses">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element name="DocAddress" type="DocAddress"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Document">
+		<xs:sequence>
+			<xs:element name="DataType" type="xs:string" minOccurs="0"/>
+			<xs:element name="DocumentType" type="xs:string"/>
+			<xs:element name="Description" type="xs:string" minOccurs="0"/>
+			<xs:element name="FileName" type="xs:string" minOccurs="0"/>
+			<xs:element name="Date" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="Data" type="xs:base64Binary"/>
+			<xs:element name="IsSystemGenerated" type="TrueFalse" minOccurs="0"/>
+			<xs:element name="IsPublished" type="TrueFalse" minOccurs="0"/>
+			<xs:element name="SaveVersions" type="TrueFalse" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DocumentLink">
+		<xs:sequence>
+			<xs:element name="Date" type="xs:dateTime"/>
+			<xs:element name="Description" type="xs:string"/>
+			<xs:element name="Link" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DocumentLinks">
+		<xs:sequence>
+			<xs:element name="DocumentLink" type="DocumentLink" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Documents">
+		<xs:sequence>
+			<xs:element name="Document" type="Document" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EDICodeMapping">
+		<xs:sequence>
+			<xs:element name="Relationship" type="xs:string"/>
+			<xs:element name="EDICode" type="xs:string"/>
+			<xs:element name="ForeignCode" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EntryHeader">
+		<xs:sequence>
+			<xs:element name="EntryReference" type="xs:string"/>
+			<xs:element name="EntryLines" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="EntryLine" type="EntryLine" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EntryLine">
+		<xs:sequence>
+			<xs:element name="EntryLineNumber" type="xs:string"/>
+			<xs:element name="EntryLineCharges" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="EntryLineCharge" type="EntryLineCharge" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EntryLineCharge">
+		<xs:sequence>
+			<xs:element name="ChargeType" type="xs:NMTOKEN"/>
+			<xs:element name="ChargeValue" type="FinancialValue"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Fees">
+		<xs:sequence>
+			<xs:element name="Fee" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="FeeType" type="xs:NMTOKEN"/>
+						<xs:element name="FeeAmount" type="FinancialValue"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FinancialValue">
+		<xs:simpleContent>
+			<xs:extension base="MonetaryAmount">
+				<xs:attribute name="CurrencyCode" type="xs:NMTOKEN" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="Flight">
+		<xs:complexContent>
+			<xs:extension base="SailingBase">
+				<xs:sequence>
+					<xs:element name="Dates" type="SailingDates" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="FlightWithFlightNumber">
+		<xs:complexContent>
+			<xs:extension base="Flight">
+				<xs:sequence>
+					<xs:element name="FlightNoJourneyNoTruckRegNo" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="FreightCharges">
+		<xs:sequence>
+			<xs:element name="ChargeCode">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:maxLength value="10"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Description">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="80"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PaymentType" type="PaymentType"/>
+			<xs:element name="RateChargeUnits" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="RateChargeAmount" type="MonetaryAmount" minOccurs="0"/>
+			<xs:element name="RateMinimum" type="MonetaryAmount" minOccurs="0"/>
+			<xs:element name="TotalAmount" type="FinancialValue"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="HazardousGoods">
+		<xs:sequence>
+			<xs:element name="UNDGCode" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="Standard" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="IMOClass" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="ProperShippingName" type="xs:string" minOccurs="0"/>
+			<xs:element name="FlashPoint" type="xs:string" minOccurs="0"/>
+			<xs:element name="TechnicalName" type="xs:string" minOccurs="0"/>
+			<xs:element name="MarinePollutant" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="PackingGroup" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="PackedInLimitedQuantity" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="Contact" type="ContactReference" minOccurs="0"/>
+			<xs:element name="Weight" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="Volume" type="DimensionValue" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InterchangeInfo">
+		<xs:sequence>
+			<xs:element name="Date" type="xs:dateTime"/>
+			<xs:element name="XmlType" type="XmlType" minOccurs="0"/>
+			<xs:element name="Source" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="EnterpriseCode" type="xs:string" minOccurs="0"/>
+						<xs:element name="CompanyCode" type="xs:string" minOccurs="0"/>
+						<xs:element name="OriginServer" type="xs:string" minOccurs="0"/>
+						<xs:element name="LoginName" type="xs:string" minOccurs="0"/>
+						<xs:element name="SenderCode" type="xs:string" minOccurs="0"/>
+						<xs:element name="Purpose" type="xs:string" minOccurs="0"/>
+						<xs:element name="LoginUserEmailAddress" type="xs:string" minOccurs="0"/>
+						<xs:element name="Custom" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="FieldLabel1" type="xs:string" minOccurs="0"/>
+									<xs:element name="Value1" type="xs:string" minOccurs="0"/>
+									<xs:element name="FieldLabel2" type="xs:string" minOccurs="0"/>
+									<xs:element name="Value2" type="xs:string" minOccurs="0"/>
+									<xs:element name="FieldLabel3" type="xs:string" minOccurs="0"/>
+									<xs:element name="Value3" type="xs:string" minOccurs="0"/>
+									<xs:element name="FieldLabel4" type="xs:string" minOccurs="0"/>
+									<xs:element name="Value4" type="xs:string" minOccurs="0"/>
+									<xs:element name="FieldLabel5" type="xs:string" minOccurs="0"/>
+									<xs:element name="Value5" type="xs:string" minOccurs="0"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ReferenceKeys" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ReferenceKey" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string">
+										<xs:attribute name="ReferenceKeyName" type="ReferenceType"/>
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Target" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="BranchCode" type="xs:string" minOccurs="0"/>
+						<xs:element name="CountryCode" type="CountryCode" minOccurs="0"/>
+						<xs:element name="ReceiverCode" type="xs:string" minOccurs="0"/>
+						<xs:element name="Type" minOccurs="0">
+							<xs:simpleType>
+								<xs:restriction base="xs:NMTOKEN">
+									<xs:enumeration value="Consol"/>
+									<xs:enumeration value="Declaration"/>
+									<xs:enumeration value="Order"/>
+									<xs:enumeration value="CommercialInvoice"/>
+									<xs:enumeration value="ClientSpecific"/>
+									<xs:enumeration value="Bookings"/>
+									<xs:enumeration value="LowValueDeclaration"/>
+									<xs:enumeration value="LocalCartageBooking"/>
+									<xs:enumeration value="LocalCartageStatus"/>
+									<xs:enumeration value="WarehouseJob"/>
+									<xs:enumeration value="CFSLoadList"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="EDIOrganisation" type="Organisation" minOccurs="0"/>
+			<xs:element name="Command" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="Add"/>
+						<xs:enumeration value="Edit"/>
+						<xs:enumeration value="Delete"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InvoiceLink">
+		<xs:sequence>
+			<xs:element name="InvoiceNumber" type="xs:string"/>
+			<xs:element name="IssuerName" type="xs:string"/>
+			<xs:element name="TransactionType" type="xs:string"/>
+			<xs:element name="InvoiceTerm" type="xs:string"/>
+			<xs:element name="InvoiceDate" type="xs:dateTime"/>
+			<xs:element name="DueDate" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="Currency" type="CurrencyType"/>
+			<xs:element name="TotalAmount" type="xs:decimal"/>
+			<xs:element name="OutstandingAmount" type="xs:decimal"/>
+			<xs:element name="FullyPaidDate" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="Link" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="InvoiceLinks">
+		<xs:sequence>
+			<xs:element name="InvoiceLink" type="InvoiceLink" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LandedCostingGroupHeader">
+		<xs:sequence>
+			<xs:element name="GroupID" type="xs:int"/>
+			<xs:element name="GroupDescription" type="xs:string"/>
+			<xs:element name="CostDistributionCode" type="LandedCostDistributionCode"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LandedCostingHeader">
+		<xs:sequence>
+			<xs:element name="LandedCostingDate" type="xs:dateTime"/>
+			<xs:element name="LandedCostingGroupHeaders">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="LandedCostingGroupHeader" type="LandedCostingGroupHeader" maxOccurs="6"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SpecialTaxHeadings">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="SpecialTaxHeadings" type="LandedCostingSpecialTaxHeading" maxOccurs="3"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="TransportAndLogisticsCosts">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="TransportAndLogisticsCost" type="TransportAndLogisticsCost" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LandedCostingSpecialTaxHeading">
+		<xs:sequence>
+			<xs:element name="Sequence" type="xs:int"/>
+			<xs:element name="Description" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ManufacturerType">
+		<xs:annotation>
+			<xs:documentation>This type can be used for all organizations, which required MID from address. For example Manufacturer, Supplier or Shipper.</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="Manufacturer" type="Organisation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Can be Manufacturer, Supplier or Shipper organization.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MID" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Manufacturer ID. This alone will not be imported if no organisation with this ID exists in CargoWise One.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="MonetaryAmount">
+		<xs:simpleContent>
+			<xs:extension base="MonetaryAmountSimpleType"/>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="Movement">
+		<xs:sequence>
+			<xs:element name="Port" type="UNLOCO"/>
+			<xs:element name="EstimatedDateTime" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="ActualDateTime" type="xs:dateTime" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Notes">
+		<xs:sequence>
+			<xs:element name="Note" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="NoteType">
+							<xs:simpleType>
+								<xs:restriction base="xs:NMTOKEN">
+									<xs:enumeration value="Custom"/>
+									<xs:enumeration value="AccountsPayableAccountManagementNotes"/>
+									<xs:enumeration value="AccountsReceivableAccountManagementNotes"/>
+									<xs:enumeration value="AccountsReceivableCreditManagementNote"/>
+									<xs:enumeration value="AllocationLog"/>
+									<xs:enumeration value="AutoRatingAuditLog"/>
+									<xs:enumeration value="AWBRatelineOvertypedNotes"/>
+									<xs:enumeration value="BookingNotes"/>
+									<xs:enumeration value="CarrierBookingRequest"/>
+									<xs:enumeration value="CertificateOfOriginNote"/>
+									<xs:enumeration value="ClientVisibleJobNotes"/>
+									<xs:enumeration value="ContainerReleaseNote"/>
+									<xs:enumeration value="CustomsMessageRemarks"/>
+									<xs:enumeration value="CustomsDeliveryInstructions"/>
+									<xs:enumeration value="DangerousGoodsAdditionalHandlingInformation"/>
+									<xs:enumeration value="DeliveryInstructions"/>
+									<xs:enumeration value="DeliveryInstructionsNote"/>
+									<xs:enumeration value="DeliveryOrderReceiptNotes"/>
+									<xs:enumeration value="UnloadLoadNotes"/>
+									<xs:enumeration value="CIN750MessageNotes"/>
+									<xs:enumeration value="CRESAMessageNotes"/>
+									<xs:enumeration value="DetailedGoodsDescription"/>
+									<xs:enumeration value="ExportCustomsHandlineNotes"/>
+									<xs:enumeration value="ExportReceivalAdviceRemarks"/>
+									<xs:enumeration value="ExtendedCommercialDescription"/>
+									<xs:enumeration value="ExtraOrderDetails"/>
+									<xs:enumeration value="FaxEmailTransmissionLog"/>
+									<xs:enumeration value="ForwardingInstructionNotes"/>
+									<xs:enumeration value="FullJobRoleDescription"/>
+									<xs:enumeration value="GatePassNotes"/>
+									<xs:enumeration value="HandlingInstructions"/>
+									<xs:enumeration value="ImportCustomsHandlingNotes"/>
+									<xs:enumeration value="InactiveRecordDetails"/>
+									<xs:enumeration value="InternalWorkNotes"/>
+									<xs:enumeration value="InvoiceDetails"/>
+									<xs:enumeration value="InvoicingPreferences"/>
+									<xs:enumeration value="ReceiveConfirmationInstructions"/>
+									<xs:enumeration value="IssueWorkingNotes"/>
+									<xs:enumeration value="IssueResolutionNotes"/>
+									<xs:enumeration value="LoadListInstructions"/>
+									<xs:enumeration value="ManifestGoodsDescription"/>
+									<xs:enumeration value="MarksAndNumbers"/>
+									<xs:enumeration value="MessageInterpretation"/>
+									<xs:enumeration value="OrderManagementNote"/>
+									<xs:enumeration value="OrderManagementUpdate"/>
+									<xs:enumeration value="OrderUpdateHistory"/>
+									<xs:enumeration value="OutturnNotes"/>
+									<xs:enumeration value="PaymentHandlingInstructions"/>
+									<xs:enumeration value="PickingInstructions"/>
+									<xs:enumeration value="PickupInstructions"/>
+									<xs:enumeration value="PickupInstructionsNote"/>
+									<xs:enumeration value="PrealertArrivalNoticeRemarks"/>
+									<xs:enumeration value="QuoteCoverPageText"/>
+									<xs:enumeration value="SpecialInstructions"/>
+									<xs:enumeration value="SurveyInstructions"/>
+									<xs:enumeration value="TranshipmentNotes"/>
+									<xs:enumeration value="TraxonLicenseNumbers"/>
+									<xs:enumeration value="UnmatchedOrgDetails"/>
+									<xs:enumeration value="WebUserNote"/>
+									<xs:enumeration value="TradeLaneChargeInformation"/>
+									<xs:enumeration value="CustomsInstructionNotes"/>
+									<xs:enumeration value="AdditionalSecurityInformation"/>
+									<xs:enumeration value="AdditionalBillClauses"/>
+									<xs:enumeration value="CountryRules"/>
+									<xs:enumeration value="HouseBillChargesOverride"/>
+									<xs:enumeration value="HouseBillFollowOnOverride"/>
+									<xs:enumeration value="HouseBillGoodsDetailsOverride"/>
+									<xs:enumeration value="OtherThingsToReport"/>
+									<xs:enumeration value="SupplierBookingRejectReason"/>
+									<xs:enumeration value="IncoTermsAgreedPlace"/>
+									<xs:enumeration value="DeliveryDueDateCalculationLog"/>
+									<xs:enumeration value="BillOfDischargeDetails"/>
+									<xs:enumeration value="PeriodForDischargeDetails"/>
+									<xs:enumeration value="DetailsOfPlannedActivities"/>
+									<xs:enumeration value="IdentificationofGoodsDetails"/>
+									<xs:enumeration value="ProcessedProductDescription"/>
+									<xs:enumeration value="ProcessingProcedureDetails"/>
+									<xs:enumeration value="EmissionsCalculationLog"/>
+									<xs:enumeration value="ReasonForCustoms"/>
+									<xs:enumeration value="MessageFromCustoms"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="CustomNoteTypeName" type="xs:string" minOccurs="0"/>
+						<xs:element name="NoteData" type="xs:string"/>
+						<xs:element name="NoteCreatedDateTime" type="xs:dateTime" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OrgAddress">
+		<xs:complexContent>
+			<xs:extension base="AddressBase">
+				<xs:sequence>
+					<xs:element name="CompanyName" type="xs:string" minOccurs="0"/>
+					<xs:element name="Location" type="UNLOCO" minOccurs="0"/>
+					<xs:element name="Sequence" type="xs:int" minOccurs="0"/>
+					<xs:element name="AddressCapabilities" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="AddressCapability" minOccurs="0" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:complexContent>
+											<xs:extension base="AddressCapability"/>
+										</xs:complexContent>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="AddressType">
+					<xs:simpleType>
+						<xs:restriction base="xs:NMTOKEN">
+							<xs:enumeration value="MAIN"/>
+							<xs:enumeration value="OFC"/>
+							<xs:enumeration value="PST"/>
+							<xs:enumeration value="ARM"/>
+							<xs:enumeration value="APM"/>
+							<xs:enumeration value="PIC"/>
+							<xs:enumeration value="DLV"/>
+							<xs:enumeration value="PAD"/>
+							<xs:enumeration value="SQM"/>
+							<xs:enumeration value="MSC"/>
+							<xs:enumeration value="AWB"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="Organisation">
+		<xs:sequence>
+			<xs:annotation>
+				<xs:documentation>The originator of the message must provide either the unique code for the organisation or sufficient detail for CargoWise One for uniquely identfy a new or exsiting organisation in the designated role.</xs:documentation>
+			</xs:annotation>
+			<xs:element name="OrganisationDetails" type="OrganisationDetail" minOccurs="0"/>
+			<xs:element name="Notes" type="Notes" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="EDICode" type="xs:string" use="optional"/>
+		<xs:attribute name="OwnerCode" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="OrganisationDetail">
+		<xs:sequence>
+			<xs:element name="Name" type="xs:string"/>
+			<xs:element name="Location" type="UNLOCO" minOccurs="0"/>
+			<xs:element name="Addresses">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Address" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="OrgAddress"/>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Contacts" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Contact" type="OrgContact" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="OrgWebURLs" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="URL" type="OrgWebURL" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="WebAddress" type="xs:string" minOccurs="0"/>
+			<xs:element name="Language" type="xs:string" minOccurs="0"/>
+			<xs:element name="RegistrationNumbers" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="RegistrationNumber" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:complexContent>
+									<xs:extension base="RegistrationNumber"/>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="EDITransmissionDetails" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Type">
+							<xs:simpleType>
+								<xs:restriction base="xs:NMTOKEN">
+									<xs:enumeration value="EMA"/>
+									<xs:enumeration value="EMT"/>
+									<xs:enumeration value="FIL"/>
+									<xs:enumeration value="FTP"/>
+									<xs:enumeration value="HUB"/>
+									<xs:enumeration value="XTT"/>
+									<xs:enumeration value="EDP"/>
+									<xs:enumeration value="UDB"/>
+									<xs:enumeration value="NXC"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="Address" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="OrganisationTypes" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="OrganisationType" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="OrganisationTypes">
+										<xs:attribute name="Status" type="xs:boolean" use="optional"/>
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="EDICodeMappings" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="EDICodeMapping" type="EDICodeMapping" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="BrandNames" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="BrandName" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string"/>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="AccountsReceivables" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AccountsReceivable" type="AccountsReceivable" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="AccountsPayables" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AccountsPayable" type="AccountsPayable" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="BondDetails" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Bond Details used for US Customs</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="BondDetail" type="BondDetail" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="IsActiveClient" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="CountrySpecificDetails" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="USOrganisationSpecificDetails" type="USOrganisationSpecificDetails" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="EDICode" type="xs:string" use="optional"/>
+		<xs:attribute name="OwnerCode" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="Organisations">
+		<xs:sequence>
+			<xs:element name="Organisation" type="Organisation" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OrgContact">
+		<xs:sequence>
+			<xs:element name="Name" type="xs:string"/>
+			<xs:element name="Salutation" type="xs:string" minOccurs="0"/>
+			<xs:element name="Language" type="xs:string" minOccurs="0"/>
+			<xs:element name="NotifyMode" type="xs:string" minOccurs="0"/>
+			<xs:element name="JobTitle" type="xs:string" minOccurs="0"/>
+			<xs:element name="Phone" type="xs:string" minOccurs="0"/>
+			<xs:element name="PhoneExtension" type="xs:string" minOccurs="0"/>
+			<xs:element name="Fax" type="xs:string" minOccurs="0"/>
+			<xs:element name="Mobile" type="xs:string" minOccurs="0"/>
+			<xs:element name="HomePhone" type="xs:string" minOccurs="0"/>
+			<xs:element name="Pager" type="xs:string" minOccurs="0"/>
+			<xs:element name="OtherPhone" type="xs:string" minOccurs="0"/>
+			<xs:element name="AttachmentType" type="xs:string" minOccurs="0"/>
+			<xs:element name="WebAccessEnable" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="WebContractSignDate" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="Birthday" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="EmailAddress" type="xs:string" minOccurs="0"/>
+			<xs:element name="Sequence" type="xs:int" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OrgWebURL">
+		<xs:sequence>
+			<xs:element name="URL" type="xs:string"/>
+			<xs:element name="Type">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="MAI"/>
+						<xs:enumeration value="CRT"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Description" type="xs:string" minOccurs="0"/>
+			<xs:element name="IsPrimary" type="xs:boolean"/>
+			<xs:element name="Sequence" type="xs:int" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Package">
+		<xs:complexContent>
+			<xs:extension base="PackageBase">
+				<xs:sequence>
+					<xs:element name="ContainerNumber" type="xs:string" minOccurs="0"/>
+					<xs:element name="Origin" type="CountryCode" minOccurs="0"/>
+					<xs:element name="DangerousGoods" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="UNDG" type="HazardousGoods" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="HazardousGoods" type="HazardousGoods" minOccurs="0"/>
+					<xs:element name="DGContact" type="ContactReference" minOccurs="0"/>
+					<xs:element name="MarksAndNumbers" type="xs:string" minOccurs="0"/>
+					<xs:element name="CommodityCode" type="xs:string" minOccurs="0"/>
+					<xs:element name="HarmonisedCode" type="xs:string" minOccurs="0"/>
+					<xs:element name="LoadingMeters" type="xs:decimal" minOccurs="0"/>
+					<xs:element name="PackageProducts" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="PackageProduct" type="PackageProduct" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="Custom" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="Date1" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="Date2" type="xs:dateTime" minOccurs="0"/>
+								<xs:element name="Text1" type="xs:string" minOccurs="0"/>
+								<xs:element name="Text2" type="xs:string" minOccurs="0"/>
+								<xs:element name="Text3" type="xs:string" minOccurs="0"/>
+								<xs:element name="Text4" type="xs:string" minOccurs="0"/>
+								<xs:element name="Decimal1" type="xs:decimal" minOccurs="0"/>
+								<xs:element name="Decimal2" type="xs:decimal" minOccurs="0"/>
+								<xs:element name="Flag1" type="TrueFalse" minOccurs="0"/>
+								<xs:element name="Flag2" type="TrueFalse" minOccurs="0"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PermitAndLicenceType">
+		<xs:sequence>
+			<xs:element name="AgricultureLicNo" type="xs:string" minOccurs="0"/>
+			<xs:element name="CAExportCertificate" type="xs:string" minOccurs="0"/>
+			<xs:element name="CBTPACertificate" type="xs:string" minOccurs="0"/>
+			<xs:element name="MiscPermitNo" type="xs:string" minOccurs="0"/>
+			<xs:element name="WoolLicenceNo" type="xs:string" minOccurs="0"/>
+			<xs:element name="SWPMIndicator" type="xs:string" minOccurs="0"/>
+			<xs:element name="CottonCertificateNo" type="xs:string" minOccurs="0"/>
+			<xs:element name="CottonFeeExemptIndicator" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PIRPRulingType">
+		<xs:sequence>
+			<xs:element name="Number" type="xs:string" minOccurs="0"/>
+			<xs:element name="Type" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="InnerPackage" type="PackageBase"/>
+	<xs:complexType name="PackageBase">
+		<xs:sequence>
+			<xs:element name="PackType">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PackageID" type="xs:string" minOccurs="0"/>
+			<xs:element name="TransportRef" type="xs:string" minOccurs="0"/>
+			<xs:element name="NumberOfPacks" type="xs:unsignedInt"/>
+			<xs:element name="Weight" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="Length" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="Width" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="Height" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="Volume" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="GoodsDescription" type="xs:string" minOccurs="0"/>
+			<xs:element name="RefNumber" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PackageProduct">
+		<xs:sequence>
+			<xs:element name="ProductCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="ProductQuantity" type="DimensionValue" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Payload">
+		<xs:sequence>
+			<xs:any namespace="##any" processContents="skip" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ReferenceNumber">
+		<xs:sequence>
+			<xs:element name="Type" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="Number" type="xs:string" minOccurs="0"/>
+			<xs:element name="Country" type="Country" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ReferenceNumbers">
+		<xs:sequence>
+			<xs:element name="ReferenceNumber" type="ReferenceNumber" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PlannedLeg">
+		<xs:sequence>
+			<xs:element name="TransportMode" type="TransportMode"/>
+			<xs:element name="PortOfLoading" type="Movement" minOccurs="0"/>
+			<xs:element name="PortOfDischarge" type="Movement" minOccurs="0"/>
+			<xs:element name="TransportType" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="Flight1"/>
+						<xs:enumeration value="Flight2"/>
+						<xs:enumeration value="Flight3"/>
+						<xs:enumeration value="MainVessel"/>
+						<xs:enumeration value="PreCarriage"/>
+						<xs:enumeration value="OnForwarding"/>
+						<xs:enumeration value="OnBoardCourier"/>
+						<xs:enumeration value="Unaccompanied"/>
+						<xs:enumeration value="Other"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="LegOrderNumber" type="xs:unsignedByte" minOccurs="0"/>
+			<xs:choice minOccurs="0">
+				<xs:sequence>
+					<xs:element name="RoadRailFlight" type="FlightWithFlightNumber"/>
+				</xs:sequence>
+				<xs:sequence>
+					<xs:element name="Vessel" type="SailingForPlannedLegs"/>
+				</xs:sequence>
+				<xs:sequence>
+					<xs:element name="Storage" type="Storage"/>
+				</xs:sequence>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RegistrationNumber">
+		<xs:sequence>
+			<xs:element name="CountryOfRegistration" type="CountryCode" minOccurs="0"/>
+			<xs:element name="NumberType" type="RegistrationNumberTypes"/>
+			<xs:element name="Number" type="xs:string"/>
+			<xs:element name="AddressCode" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>If the address code is specified, the xml import will populate the premisis with the matching address</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Sailing">
+		<xs:complexContent>
+			<xs:extension base="SailingBase">
+				<xs:sequence>
+					<xs:element name="LCLDates" type="SailingDates" minOccurs="0"/>
+					<xs:element name="FCLDates" type="SailingDates" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="SailingBase">
+		<xs:sequence>
+			<xs:element name="ETD" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="ETA" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="ATD" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="ATA" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="LoadPortETA" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="LoadPortATA" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="DepartureCTO" type="AddressReference" minOccurs="0"/>
+			<xs:element name="DepartureBerth" type="xs:string" minOccurs="0"/>
+			<xs:element name="ArrivalCTO" type="AddressReference" minOccurs="0"/>
+			<xs:element name="ArrivalBerth" type="xs:string" minOccurs="0"/>
+			<xs:element name="DocCutOffDate" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="IsTranshipment" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="IsPublished" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="DepartureReference" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SailingDates">
+		<xs:sequence>
+			<xs:element name="ReceivalCommencesDate" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="CutOffDate" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="AvailableDate" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="StorageDate" type="xs:dateTime" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SailingForPlannedLegs">
+		<xs:complexContent>
+			<xs:extension base="Sailing">
+				<xs:sequence>
+					<xs:element name="VesselName" type="xs:string" minOccurs="0"/>
+					<xs:element name="LloydsNo" type="xs:string" minOccurs="0"/>
+					<xs:element name="VoyageNo" type="xs:string" minOccurs="0"/>
+					<xs:element name="CargoCarrierCode" type="xs:string" minOccurs="0"/>
+					<xs:element name="Carrier" type="Organisation" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="SailingWithVesselVoyage">
+		<xs:complexContent>
+			<xs:extension base="Sailing">
+				<xs:sequence>
+					<xs:element name="VesselName" type="xs:string" minOccurs="0"/>
+					<xs:element name="VoyageNo" type="xs:string" minOccurs="0"/>
+					<xs:element name="LloydsNo" type="xs:string" minOccurs="0"/>
+					<xs:element name="CargoCarrierCode" type="xs:string" minOccurs="0"/>
+					<xs:element name="Carrier" type="Organisation" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="SettlementDetails">
+		<xs:sequence>
+			<xs:element name="StandardInvoiceTerms" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="StandardInvoiceDays" type="xs:int" minOccurs="0"/>
+			<xs:element name="DisbursementInvoiceTerms" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="DisbursementInvoiceDays" type="xs:int" minOccurs="0"/>
+			<xs:element name="SettlementGroup" type="OrganisationDetail" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SoftwoodLumberType">
+		<xs:sequence>
+			<xs:element name="ImporterDec" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="ExportPrice" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="ExportCharge" type="xs:decimal" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Storage">
+		<xs:complexContent>
+			<xs:extension base="SailingBase"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="TelephoneNumber">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="NumberType" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:NMTOKEN">
+							<xs:enumeration value="Business"/>
+							<xs:enumeration value="Fax"/>
+							<xs:enumeration value="Mobile"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="TransportAndLogisticsCost">
+		<xs:sequence>
+			<xs:element name="ChargeCode" type="xs:string"/>
+			<xs:element name="ChargeDescription" type="xs:string"/>
+			<xs:element name="ChargeGroup" type="xs:string"/>
+			<xs:element name="DistributionLevel" type="xs:string"/>
+			<xs:element name="DistributionBy" type="LandedCostDistributionCode"/>
+			<xs:element name="DistributionAmount" type="xs:decimal"/>
+			<xs:element name="Curr" type="CurrencyType"/>
+			<xs:element name="ExRate" type="xs:decimal"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="UNLOCO">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="Country" type="xs:string" use="optional"/>
+				<xs:attribute name="City" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="USAffirmationCode">
+		<xs:sequence>
+			<xs:element name="Code" type="xs:string"/>
+			<xs:element name="Value" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="USConstituentElementDetail">
+		<xs:sequence>
+			<xs:element name="Name" type="xs:string" minOccurs="0"/>
+			<xs:element name="Percent" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Quantity" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="UOM" type="xs:string" minOccurs="0"/>
+			<xs:element name="ScientificData" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ScientificData" type="USScientificData" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="USDOT">
+		<xs:sequence>
+			<xs:element name="BoxNumber" type="xs:string" minOccurs="0"/>
+			<xs:element name="Clarification" type="xs:string" minOccurs="0"/>
+			<xs:element name="CommercialDesc" type="xs:string" minOccurs="0"/>
+			<xs:element name="CountryOfOrigin" type="CountryCode" minOccurs="0"/>
+			<xs:element name="SuretyCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="Tire" minOccurs="0">
+				<xs:complexType>
+					<xs:attribute name="ID" type="xs:string" use="optional"/>
+					<xs:attribute name="BrandName" type="xs:string" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="PassportNo" type="xs:string" minOccurs="0"/>
+			<xs:element name="PriorApproved" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="ImporterStatement" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="VehicleDetails" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VehicleDetail" type="USDOTVehicleDetail" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="Indicator" type="OGAIndicator" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="USDOTVehicleDetail">
+		<xs:sequence>
+			<xs:element name="Make" type="xs:string" minOccurs="0"/>
+			<xs:element name="Model" type="xs:string" minOccurs="0"/>
+			<xs:element name="NHTSANumber" type="xs:string" minOccurs="0"/>
+			<xs:element name="Year" type="xs:int" minOccurs="0"/>
+			<xs:element name="EligibilityNo" type="xs:string" minOccurs="0"/>
+			<xs:element name="VIN" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="USFCC">
+		<xs:sequence>
+			<xs:element name="CommercialDesc" type="xs:string" minOccurs="0"/>
+			<xs:element name="ImportConditionNo" type="xs:string" minOccurs="0"/>
+			<xs:element name="ImportConditionQtyApproved" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="ID" type="xs:string" minOccurs="0"/>
+			<xs:element name="TradeName" type="xs:string" minOccurs="0"/>
+			<xs:element name="Model" type="xs:string" minOccurs="0"/>
+			<xs:element name="Qty" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Withhold" type="xs:boolean" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="Indicator" type="OGAIndicator" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="USFDA">
+		<xs:sequence>
+			<xs:element name="Manufacturer" type="ManufacturerType" minOccurs="0"/>
+			<xs:element name="Shipper" type="ManufacturerType" minOccurs="0"/>
+			<xs:element name="ManufacturerProducerData" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="USManufacturerProducerDataType">
+							<xs:sequence>
+								<xs:element name="FoodFacilityRegistrationNumber" type="xs:string" minOccurs="0"/>
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="EstablismentID" minOccurs="0">
+				<xs:complexType>
+					<xs:choice>
+						<xs:element name="FEI" type="Organisation" minOccurs="0"/>
+						<xs:element name="EstablismentID" type="xs:string" minOccurs="0"/>
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CountryOfProduction" type="CountryCode" minOccurs="0"/>
+			<xs:element name="OwnerFirmType" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="I"/>
+						<xs:enumeration value="C"/>
+						<xs:enumeration value="M"/>
+						<xs:enumeration value="U"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CountryOfShipping" type="CountryCode" minOccurs="0"/>
+			<xs:element name="CommercialDesc" type="xs:string" minOccurs="0"/>
+			<xs:element name="ProductCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="CargoStorageCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="Value" type="xs:decimal" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This field is obsolete. Use InvValue instead.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="InvValue" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="BrandName" type="xs:string" minOccurs="0"/>
+			<xs:element name="InnermostContainer" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Shape" type="xs:string" minOccurs="0"/>
+						<xs:element name="Dimension1" type="xs:decimal" minOccurs="0"/>
+						<xs:element name="Dimension2" type="xs:decimal" minOccurs="0"/>
+						<xs:element name="Dimension3" type="xs:decimal" minOccurs="0"/>
+						<xs:element name="DimensionUQ" minOccurs="0">
+							<xs:simpleType>
+								<xs:restriction base="xs:token">
+									<xs:enumeration value="C">
+										<xs:annotation>
+											<xs:documentation>Centimeters</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+									<xs:enumeration value="I">
+										<xs:annotation>
+											<xs:documentation>Inches with fractions in 1/16th of an inch</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+									<xs:enumeration value="D">
+										<xs:annotation>
+											<xs:documentation>Inches represented as a decimal</xs:documentation>
+										</xs:annotation>
+									</xs:enumeration>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Quantities" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Quantity1" type="DimensionValue" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Base Quantity</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Quantity2" type="DimensionValue" minOccurs="0"/>
+						<xs:element name="Quantity3" type="DimensionValue" minOccurs="0"/>
+						<xs:element name="Quantity4" type="DimensionValue" minOccurs="0"/>
+						<xs:element name="Quantity5" type="DimensionValue" minOccurs="0"/>
+						<xs:element name="Quantity6" type="DimensionValue" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="AffirmationCodes" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AffirmationCode" type="USAffirmationCode" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="RailCarNumber" type="xs:string" minOccurs="0"/>
+			<xs:element name="ShipperRegistrationNumber" type="xs:string" minOccurs="0"/>
+			<xs:element name="CO2e" type="xs:string" minOccurs="0"/>
+			<xs:element name="CompanyTariffLevelOverride" type="xs:string" minOccurs="0"/>
+			<xs:element name="FMCTariffID" type="xs:string" minOccurs="0"/>
+			<xs:element name="RateCommodity" type="xs:string" minOccurs="0"/>
+			<xs:element name="Bills" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Bill" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="MasterBill" type="xs:string" minOccurs="0"/>
+									<xs:element name="HouseBill" type="xs:string" minOccurs="0"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Containers" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Container" type="USOGAContainer" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="Indicator" type="OGAIndicator" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="USLaceyAct">
+		<xs:sequence>
+			<xs:element name="CommercialDescription" type="xs:string" minOccurs="0"/>
+			<xs:element name="ConstituentElements" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ConstituentElement" type="USConstituentElementDetail" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Value" type="xs:int" minOccurs="0"/>
+			<xs:element name="Containers" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Container" type="USOGAContainer" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="Indicator" type="OGAIndicator" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="USOGAContainer">
+		<xs:sequence>
+			<xs:element name="ContainerNumber" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="USScientificData">
+		<xs:sequence>
+			<xs:element name="GenusName" type="xs:string" minOccurs="0"/>
+			<xs:element name="SpeciesName" type="xs:string" minOccurs="0"/>
+			<xs:element name="Country" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Workflow">
+		<xs:sequence>
+			<xs:element name="Triggers">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Trigger" type="WorkflowTrigger" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="WorkflowTrigger">
+		<xs:sequence>
+			<xs:element name="Description">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:choice>
+				<xs:annotation>
+					<xs:documentation>A choice between Event and OnFieldChange. OnFieldChange will be implemented in the future</xs:documentation>
+				</xs:annotation>
+				<xs:element name="Event" type="WorkflowTriggerEvent"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="WorkflowTriggerAction">
+		<xs:sequence>
+			<xs:element name="Type">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="NTF"/>
+						<xs:enumeration value="NBT"/>
+						<xs:enumeration value="XML"/>
+						<xs:enumeration value="XMB"/>
+						<xs:enumeration value="XMF"/>
+						<xs:enumeration value="XMS"/>
+						<xs:enumeration value="XMN"/>
+						<xs:enumeration value="XFS"/>
+						<xs:enumeration value="XUA"/>
+						<xs:enumeration value="XUS"/>
+						<xs:enumeration value="XUE"/>
+						<xs:enumeration value="XUC"/>
+						<xs:enumeration value="XUL"/>
+						<xs:enumeration value="XUD"/>
+						<xs:enumeration value="DXL"/>
+						<xs:enumeration value="FXL"/>
+						<xs:enumeration value="EXL"/>
+						<xs:enumeration value="SAC"/>
+						<xs:enumeration value="SAO"/>
+						<xs:enumeration value="SCP"/>
+						<xs:enumeration value="XMA"/>
+						<xs:enumeration value="ISI"/>
+						<xs:enumeration value="RRV"/>
+						<xs:enumeration value="CAR"/>
+						<xs:enumeration value="CNC"/>
+						<xs:enumeration value="NAR"/>
+						<xs:enumeration value="REV"/>
+						<xs:enumeration value="COS"/>
+						<xs:enumeration value="PCO"/>
+						<xs:enumeration value="ATP"/>
+						<xs:enumeration value="PRV"/>
+						<xs:enumeration value="JIH"/>
+						<xs:enumeration value="PFC"/>
+						<xs:enumeration value="XUT"/>
+						<xs:enumeration value="VCM"/>
+						<xs:enumeration value="VAC"/>
+						<xs:enumeration value="ROT"/>
+						<xs:enumeration value="POA"/>
+						<xs:enumeration value="PCA"/>
+						<xs:enumeration value="PCC"/>
+						<xs:enumeration value="PAC"/>
+						<xs:enumeration value="SRN"/>
+						<xs:enumeration value="GAR"/>
+						<xs:enumeration value="APK"/>
+						<xs:enumeration value="IPS"/>
+						<xs:enumeration value="AFL"/>
+						<xs:enumeration value="XUB"/>
+						<xs:enumeration value="CTB"/>
+						<xs:enumeration value="CTC"/>
+						<xs:enumeration value="SB3"/>
+						<xs:enumeration value="AVS"/>
+						<xs:enumeration value="SBW"/>
+						<xs:enumeration value="TMA"/>
+						<xs:enumeration value="TMP"/>
+						<xs:enumeration value="PPL"/>
+						<xs:enumeration value="PCL"/>
+						<xs:enumeration value="CAE"/>
+						<xs:enumeration value="CLX"/>
+						<xs:enumeration value="CAH"/>
+						<xs:enumeration value="XUM"/>
+						<xs:enumeration value="XME"/>
+						<xs:enumeration value="SWM"/>
+						<xs:enumeration value="ECM"/>
+						<xs:enumeration value="ECI"/>
+						<xs:enumeration value="WTA"/>
+						<xs:enumeration value="SEM"/>
+						<xs:enumeration value="SRM"/>
+						<xs:enumeration value="SIM"/>
+						<xs:enumeration value="SSO"/>
+						<xs:enumeration value="CSD"/>
+						<xs:enumeration value="HIS"/>
+						<xs:enumeration value="HAM"/>
+						<xs:enumeration value="CNV"/>
+						<xs:enumeration value="PRE"/>
+						<xs:enumeration value="HAS"/>
+						<xs:enumeration value="SMM"/>
+						<xs:enumeration value="HAC"/>
+						<xs:enumeration value="ACR"/>
+						<xs:enumeration value="AAR"/>
+						<xs:enumeration value="ASR"/>
+						<xs:enumeration value="NAC"/>
+						<xs:enumeration value="NSC"/>
+						<xs:enumeration value="CH7"/>
+						<xs:enumeration value="SCD"/>
+						<xs:enumeration value="UTE"/>
+						<xs:enumeration value="CBK"/>
+						<xs:enumeration value="HAK"/>
+						<xs:enumeration value="SAN"/>
+						<xs:enumeration value="SNM"/>
+						<xs:enumeration value="TRE"/>
+						<xs:enumeration value="TRI"/>
+						<xs:enumeration value="TAG"/>
+						<xs:enumeration value="DLY"/>
+						<xs:enumeration value="SGM"/>
+						<xs:enumeration value="SCM"/>
+						<xs:enumeration value="ASE"/>
+						<xs:enumeration value="EID"/>
+						<xs:enumeration value="IRO"/>
+						<xs:enumeration value="TRA"/>
+						<xs:enumeration value="SCI"/>
+						<xs:enumeration value="CIN"/>
+						<xs:enumeration value="CGN"/>
+						<xs:enumeration value="GHG"/>
+						<xs:enumeration value="CTJ"/>
+						<xs:enumeration value="SC3"/>
+						<xs:enumeration value="EMG"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Recipient">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="COA"/>
+						<xs:enumeration value="CNE"/>
+						<xs:enumeration value="CNR"/>
+						<xs:enumeration value="BKP"/>
+						<xs:enumeration value="BTP"/>
+						<xs:enumeration value="BOR"/>
+						<xs:enumeration value="BRO"/>
+						<xs:enumeration value="BRI"/>
+						<xs:enumeration value="BRE"/>
+						<xs:enumeration value="PCA"/>
+						<xs:enumeration value="DCA"/>
+						<xs:enumeration value="RAG"/>
+						<xs:enumeration value="SAG"/>
+						<xs:enumeration value="CTP"/>
+						<xs:enumeration value="ORP"/>
+						<xs:enumeration value="CLI"/>
+						<xs:enumeration value="EML"/>
+						<xs:enumeration value="PRN"/>
+						<xs:enumeration value="TPC"/>
+						<xs:enumeration value="CAR"/>
+						<xs:enumeration value="NFP"/>
+						<xs:enumeration value="DTP"/>
+						<xs:enumeration value="PUP"/>
+						<xs:enumeration value="EDI"/>
+						<xs:enumeration value="ICE"/>
+						<xs:enumeration value="IDB"/>
+						<xs:enumeration value="DCF"/>
+						<xs:enumeration value="ACF"/>
+						<xs:enumeration value="PRC"/>
+						<xs:enumeration value="FOR"/>
+						<xs:enumeration value="ACR"/>
+						<xs:enumeration value="DCR"/>
+						<xs:enumeration value="DCT"/>
+						<xs:enumeration value="ACT"/>
+						<xs:enumeration value="DCY"/>
+						<xs:enumeration value="ACY"/>
+						<xs:enumeration value="WIN"/>
+						<xs:enumeration value="WAR"/>
+						<xs:enumeration value="WDO"/>
+						<xs:enumeration value="WWO"/>
+						<xs:enumeration value="BCO"/>
+						<xs:enumeration value="BCR"/>
+						<xs:enumeration value="BWI"/>
+						<xs:enumeration value="BWR"/>
+						<xs:enumeration value="ATW"/>
+						<xs:enumeration value="DTW"/>
+						<xs:enumeration value="HCA"/>
+						<xs:enumeration value="SPM"/>
+						<xs:enumeration value="AAD"/>
+						<xs:enumeration value="ARP"/>
+						<xs:enumeration value="PAG"/>
+						<xs:enumeration value="DAG"/>
+						<xs:enumeration value="CTG"/>
+						<xs:enumeration value="HSA"/>
+						<xs:enumeration value="AFR"/>
+						<xs:enumeration value="ASY"/>
+						<xs:enumeration value="SRP"/>
+						<xs:enumeration value="WHS"/>
+						<xs:enumeration value="PEM"/>
+						<xs:enumeration value="PER"/>
+						<xs:enumeration value="PIM"/>
+						<xs:enumeration value="PIR"/>
+						<xs:enumeration value="YER"/>
+						<xs:enumeration value="YIA"/>
+						<xs:enumeration value="WNS"/>
+						<xs:enumeration value="CYD"/>
+						<xs:enumeration value="CTO"/>
+						<xs:enumeration value="CTA"/>
+						<xs:enumeration value="CD4"/>
+						<xs:enumeration value="ADV"/>
+						<xs:enumeration value="SGA"/>
+						<xs:enumeration value="UAM"/>
+						<xs:enumeration value="NCT"/>
+						<xs:enumeration value="LCT"/>
+						<xs:enumeration value="JWG"/>
+						<xs:enumeration value="NGP"/>
+						<xs:enumeration value="CCA"/>
+						<xs:enumeration value="CBA"/>
+						<xs:enumeration value="STF"/>
+						<xs:enumeration value="STA"/>
+						<xs:enumeration value="CAP"/>
+						<xs:enumeration value="GRP"/>
+						<xs:enumeration value="PSE"/>
+						<xs:enumeration value="PWK"/>
+						<xs:enumeration value="PPW"/>
+						<xs:enumeration value="NVO"/>
+						<xs:enumeration value="CUR"/>
+						<xs:enumeration value="OWN"/>
+						<xs:enumeration value="ZAO"/>
+						<xs:enumeration value="BRX"/>
+						<xs:enumeration value="HVL"/>
+						<xs:enumeration value="CMD"/>
+						<xs:enumeration value="FAT"/>
+						<xs:enumeration value="OBE"/>
+						<xs:enumeration value="DEF"/>
+						<xs:enumeration value="GTM"/>
+						<xs:enumeration value="GDM"/>
+						<xs:enumeration value="PTM"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="EmailAddress" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Should only be used in conjuction with Recipient = 'EML'</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="128"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Purpose" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="APP"/>
+						<xs:enumeration value="EVT"/>
+						<xs:enumeration value="INV"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="EmailHtmlContent" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Should only be used in conjuction with Type = 'NTF' or 'NBT'</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="WorkflowTriggerEvent">
+		<xs:sequence>
+			<xs:element name="Code">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="3"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Reference" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="128"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Actions">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Action" type="WorkflowTriggerAction" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="ClassificationType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="IMP"/>
+			<xs:enumeration value="EXP"/>
+			<xs:enumeration value="BTH"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CommunicationAddressType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="EMA"/>
+			<xs:enumeration value="EMT"/>
+			<xs:enumeration value="EMS"/>
+			<xs:enumeration value="FTP"/>
+			<xs:enumeration value="HTT"/>
+			<xs:enumeration value="HTS"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ContainerLegType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="CDA"/>
+			<xs:enumeration value="CDD"/>
+			<xs:enumeration value="DLV"/>
+			<xs:enumeration value="CPA"/>
+			<xs:enumeration value="CPD"/>
+			<xs:enumeration value="PCU"/>
+			<xs:enumeration value="AEX"/>
+			<xs:enumeration value="AIM"/>
+			<xs:enumeration value="FIW"/>
+			<xs:enumeration value="DCD"/>
+			<xs:enumeration value="DCP"/>
+			<xs:enumeration value="DDL"/>
+			<xs:enumeration value="DPU"/>
+			<xs:enumeration value="FDY"/>
+			<xs:enumeration value="FIY"/>
+			<xs:enumeration value="FYD"/>
+			<xs:enumeration value="FYE"/>
+			<xs:enumeration value="FCE"/>
+			<xs:enumeration value="FCL"/>
+			<xs:enumeration value="FPE"/>
+			<xs:enumeration value="FUI"/>
+			<xs:enumeration value="FPD"/>
+			<xs:enumeration value="FUD"/>
+			<xs:enumeration value="FTL"/>
+			<xs:enumeration value="FDC"/>
+			<xs:enumeration value="FCD"/>
+			<xs:enumeration value="FCI"/>
+			<xs:enumeration value="FEC"/>
+			<xs:enumeration value="LED"/>
+			<xs:enumeration value="LDI"/>
+			<xs:enumeration value="LTE"/>
+			<xs:enumeration value="LTL"/>
+			<xs:enumeration value="RTC"/>
+			<xs:enumeration value="FEW"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ContainerMode">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="LCL"/>
+			<xs:enumeration value="FCL"/>
+			<xs:enumeration value="GRP"/>
+			<xs:enumeration value="BCN"/>
+			<xs:enumeration value="SCN"/>
+			<xs:enumeration value="LSE"/>
+			<xs:enumeration value="ULD"/>
+			<xs:enumeration value="BBK"/>
+			<xs:enumeration value="ROR"/>
+			<xs:enumeration value="CON"/>
+			<xs:enumeration value="LTL"/>
+			<xs:enumeration value="FTL"/>
+			<xs:enumeration value="OBC"/>
+			<xs:enumeration value="UNA"/>
+			<xs:enumeration value="OTH"/>
+			<xs:enumeration value="AIR"/>
+			<xs:enumeration value="BLK"/>
+			<xs:enumeration value="MAI"/>
+			<xs:enumeration value="FAK"/>
+			<xs:enumeration value="FCX"/>
+			<xs:enumeration value="EMP"/>
+			<xs:enumeration value="COM"/>
+			<xs:enumeration value="CNT"/>
+			<xs:enumeration value="NCT"/>
+			<xs:enumeration value="LQD"/>
+			<xs:enumeration value="ALL"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CountryCode">
+		<xs:restriction base="xs:NMTOKEN"/>
+	</xs:simpleType>
+	<xs:complexType name="Country">
+		<xs:simpleContent>
+			<xs:extension base="CountryCode">
+				<xs:attribute name="Name" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:simpleType name="CurrencyType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:length value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DeliveryModeType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="CYCY"/>
+			<xs:enumeration value="CFSCY"/>
+			<xs:enumeration value="CFSCFS"/>
+			<xs:enumeration value="CYCFS"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DepartmentActivity">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="Customs"/>
+			<xs:enumeration value="DepotCFS"/>
+			<xs:enumeration value="Forwarding"/>
+			<xs:enumeration value="Linehaul"/>
+			<xs:enumeration value="Cartage"/>
+			<xs:enumeration value="Warehouse"/>
+			<xs:enumeration value="Miscellaneous"/>
+			<xs:enumeration value="NotDefined"/>
+			<xs:enumeration value="Shipping"/>
+			<xs:enumeration value="Gateway"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Guid">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				The representation of a Guid, generally the id of an element.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="INCOTERM">
+		<xs:restriction base="xs:NMTOKEN"/>
+	</xs:simpleType>
+	<xs:simpleType name="LandedCostDistributionCode">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="AWV"/>
+			<xs:enumeration value="VOL"/>
+			<xs:enumeration value="WGT"/>
+			<xs:enumeration value="ITM"/>
+			<xs:enumeration value="VAV"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MonetaryAmountSimpleType">
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="OGAIndicator">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Declared"/>
+			<xs:enumeration value="Disclaimed"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="OrganisationTypes">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="ACT"/>
+			<xs:enumeration value="NAT"/>
+			<xs:enumeration value="GLB"/>
+			<xs:enumeration value="TMP"/>
+			<xs:enumeration value="A_R"/>
+			<xs:enumeration value="A_P"/>
+			<xs:enumeration value="CNR"/>
+			<xs:enumeration value="CNE"/>
+			<xs:enumeration value="EOR"/>
+			<xs:enumeration value="TRN"/>
+			<xs:enumeration value="WHS"/>
+			<xs:enumeration value="CAR"/>
+			<xs:enumeration value="FWD"/>
+			<xs:enumeration value="BRK"/>
+			<xs:enumeration value="SVS"/>
+			<xs:enumeration value="COM"/>
+			<xs:enumeration value="SAL"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PaymentType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="PPD"/>
+			<xs:enumeration value="CCX"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ReferenceType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="UniqueIdentifier"/>
+			<xs:enumeration value="HouseBill"/>
+			<xs:enumeration value="MasterBill"/>
+			<xs:enumeration value="OrderNumber"/>
+			<xs:enumeration value="ConsolNumber"/>
+			<xs:enumeration value="ShipmentJobNumber"/>
+			<xs:enumeration value="DeclarationJobNumber"/>
+			<xs:enumeration value="ProductNumber"/>
+			<xs:enumeration value="TariffLookup"/>
+			<xs:enumeration value="DebtorCode"/>
+			<xs:enumeration value="ConsignorCode"/>
+			<xs:enumeration value="ConsigneeCode"/>
+			<xs:enumeration value="OwnerReference"/>
+			<xs:enumeration value="BatchNumber"/>
+			<xs:enumeration value="CustomsEntryNumber"/>
+			<xs:enumeration value="AdditionalReferenceNumber"/>
+			<xs:enumeration value="CO2e"/>
+			<xs:enumeration value="CompanyTariffLevelOverride"/>
+			<xs:enumeration value="FMCTariffID"/>
+			<xs:enumeration value="RateCommodity"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="RegistrationNumberTypes">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="01"/>
+			<xs:enumeration value="03"/>
+			<xs:enumeration value="05"/>
+			<xs:enumeration value="06"/>
+			<xs:enumeration value="07"/>
+			<xs:enumeration value="08"/>
+			<xs:enumeration value="10"/>
+			<xs:enumeration value="LCO"/>
+			<xs:enumeration value="AEX"/>
+			<xs:enumeration value="1ST"/>
+			<xs:enumeration value="ABN"/>
+			<xs:enumeration value="ABR"/>
+			<xs:enumeration value="ACE"/>
+			<xs:enumeration value="ACL"/>
+			<xs:enumeration value="ACT"/>
+			<xs:enumeration value="ADC"/>
+			<xs:enumeration value="AEC"/>
+			<xs:enumeration value="AEO"/>
+			<xs:enumeration value="AFM"/>
+			<xs:enumeration value="AGT"/>
+			<xs:enumeration value="AID"/>
+			<xs:enumeration value="ALC"/>
+			<xs:enumeration value="ALT"/>
+			<xs:enumeration value="APC"/>
+			<xs:enumeration value="APE"/>
+			<xs:enumeration value="APH"/>
+			<xs:enumeration value="ARN"/>
+			<xs:enumeration value="ASC"/>
+			<xs:enumeration value="ASN"/>
+			<xs:enumeration value="ATF"/>
+			<xs:enumeration value="BHR"/>
+			<xs:enumeration value="BHT"/>
+			<xs:enumeration value="BID"/>
+			<xs:enumeration value="BIL"/>
+			<xs:enumeration value="BIR"/>
+			<xs:enumeration value="BNC"/>
+			<xs:enumeration value="BNO"/>
+			<xs:enumeration value="BPN"/>
+			<xs:enumeration value="BRB"/>
+			<xs:enumeration value="BRC"/>
+			<xs:enumeration value="BRM"/>
+			<xs:enumeration value="BRE"/>
+			<xs:enumeration value="BRL"/>
+			<xs:enumeration value="BRN"/>
+			<xs:enumeration value="BRP"/>
+			<xs:enumeration value="BRT"/>
+			<xs:enumeration value="BSN"/>
+			<xs:enumeration value="BST"/>
+			<xs:enumeration value="BTW"/>
+			<xs:enumeration value="BYR"/>
+			<xs:enumeration value="CAC"/>
+			<xs:enumeration value="CAI"/>
+			<xs:enumeration value="CAR"/>
+			<xs:enumeration value="CAT"/>
+			<xs:enumeration value="CAX"/>
+			<xs:enumeration value="CSA"/>
+			<xs:enumeration value="CBN"/>
+			<xs:enumeration value="CBR"/>
+			<xs:enumeration value="CBO"/>
+			<xs:enumeration value="CBP"/>
+			<xs:enumeration value="CBS"/>
+			<xs:enumeration value="CCA"/>
+			<xs:enumeration value="CCC"/>
+			<xs:enumeration value="CCD"/>
+			<xs:enumeration value="CCG"/>
+			<xs:enumeration value="CCN"/>
+			<xs:enumeration value="CCP"/>
+			<xs:enumeration value="CCR"/>
+			<xs:enumeration value="CCS"/>
+			<xs:enumeration value="CCT"/>
+			<xs:enumeration value="CEC"/>
+			<xs:enumeration value="SDC"/>
+			<xs:enumeration value="CEN"/>
+			<xs:enumeration value="CID"/>
+			<xs:enumeration value="CIJ"/>
+			<xs:enumeration value="CIQ"/>
+			<xs:enumeration value="DIM"/>
+			<xs:enumeration value="NIT"/>
+			<xs:enumeration value="CHB"/>
+			<xs:enumeration value="CFD"/>
+			<xs:enumeration value="CFS"/>
+			<xs:enumeration value="CJN"/>
+			<xs:enumeration value="CMM"/>
+			<xs:enumeration value="CMP"/>
+			<xs:enumeration value="CMT"/>
+			<xs:enumeration value="CNO"/>
+			<xs:enumeration value="CNP"/>
+			<xs:enumeration value="CIF"/>
+			<xs:enumeration value="COC"/>
+			<xs:enumeration value="COD"/>
+			<xs:enumeration value="COM"/>
+			<xs:enumeration value="CON"/>
+			<xs:enumeration value="CDP"/>
+			<xs:enumeration value="CPC"/>
+			<xs:enumeration value="CPD"/>
+			<xs:enumeration value="CPF"/>
+			<xs:enumeration value="CPT"/>
+			<xs:enumeration value="CPW"/>
+			<xs:enumeration value="CRB"/>
+			<xs:enumeration value="CRN"/>
+			<xs:enumeration value="CAN"/>
+			<xs:enumeration value="CSC"/>
+			<xs:enumeration value="CTR"/>
+			<xs:enumeration value="CEX"/>
+			<xs:enumeration value="SIN"/>
+			<xs:enumeration value="FSB"/>
+			<xs:enumeration value="NUC"/>
+			<xs:enumeration value="CIE"/>
+			<xs:enumeration value="CST"/>
+			<xs:enumeration value="CTP"/>
+			<xs:enumeration value="CUI"/>
+			<xs:enumeration value="CUL"/>
+			<xs:enumeration value="CUF"/>
+			<xs:enumeration value="CUU"/>
+			<xs:enumeration value="CVR"/>
+			<xs:enumeration value="CWC"/>
+			<xs:enumeration value="DAN"/>
+			<xs:enumeration value="DBC"/>
+			<xs:enumeration value="DDV"/>
+			<xs:enumeration value="DIP"/>
+			<xs:enumeration value="DIR"/>
+			<xs:enumeration value="DLV"/>
+			<xs:enumeration value="DN4"/>
+			<xs:enumeration value="DNI"/>
+			<xs:enumeration value="DOT"/>
+			<xs:enumeration value="DOY"/>
+			<xs:enumeration value="DRV"/>
+			<xs:enumeration value="DPH"/>
+			<xs:enumeration value="DUN"/>
+			<xs:enumeration value="EAC"/>
+			<xs:enumeration value="EAG"/>
+			<xs:enumeration value="EAN"/>
+			<xs:enumeration value="EAP"/>
+			<xs:enumeration value="EBS"/>
+			<xs:enumeration value="ECC"/>
+			<xs:enumeration value="ECN"/>
+			<xs:enumeration value="ECR"/>
+			<xs:enumeration value="EDR"/>
+			<xs:enumeration value="EEN"/>
+			<xs:enumeration value="NEN"/>
+			<xs:enumeration value="EEU"/>
+			<xs:enumeration value="EID"/>
+			<xs:enumeration value="EIN"/>
+			<xs:enumeration value="ELN"/>
+			<xs:enumeration value="ENE"/>
+			<xs:enumeration value="ENF"/>
+			<xs:enumeration value="ENP"/>
+			<xs:enumeration value="EOR"/>
+			<xs:enumeration value="EPL"/>
+			<xs:enumeration value="ESN"/>
+			<xs:enumeration value="ETI"/>
+			<xs:enumeration value="FAA"/>
+			<xs:enumeration value="FEI"/>
+			<xs:enumeration value="FMC"/>
+			<xs:enumeration value="FNL"/>
+			<xs:enumeration value="FPI"/>
+			<xs:enumeration value="FPB"/>
+			<xs:enumeration value="FPS"/>
+			<xs:enumeration value="FPW"/>
+			<xs:enumeration value="FRM"/>
+			<xs:enumeration value="FRN"/>
+			<xs:enumeration value="FSR"/>
+			<xs:enumeration value="FST"/>
+			<xs:enumeration value="FWE"/>
+			<xs:enumeration value="FZU"/>
+			<xs:enumeration value="GBR"/>
+			<xs:enumeration value="GCA"/>
+			<xs:enumeration value="GCC"/>
+			<xs:enumeration value="GCR"/>
+			<xs:enumeration value="GCT"/>
+			<xs:enumeration value="GEM"/>
+			<xs:enumeration value="GID"/>
+			<xs:enumeration value="GLN"/>
+			<xs:enumeration value="GMC"/>
+			<xs:enumeration value="GS1"/>
+			<xs:enumeration value="GST"/>
+			<xs:enumeration value="UDY"/>
+			<xs:enumeration value="ADH"/>
+			<xs:enumeration value="GTN"/>
+			<xs:enumeration value="GTX"/>
+			<xs:enumeration value="HID"/>
+			<xs:enumeration value="HRB"/>
+			<xs:enumeration value="IAG"/>
+			<xs:enumeration value="IBG"/>
+			<xs:enumeration value="ICE"/>
+			<xs:enumeration value="IDB"/>
+			<xs:enumeration value="IDM"/>
+			<xs:enumeration value="JBK"/>
+			<xs:enumeration value="JMB"/>
+			<xs:enumeration value="PDV"/>
+			<xs:enumeration value="IDN"/>
+			<xs:enumeration value="IDO"/>
+			<xs:enumeration value="IEC"/>
+			<xs:enumeration value="IEF"/>
+			<xs:enumeration value="RMD"/>
+			<xs:enumeration value="RSN"/>
+			<xs:enumeration value="RLR"/>
+			<xs:enumeration value="RLP"/>
+			<xs:enumeration value="IFU"/>
+			<xs:enumeration value="IGC"/>
+			<xs:enumeration value="IGI"/>
+			<xs:enumeration value="IGV"/>
+			<xs:enumeration value="IMF"/>
+			<xs:enumeration value="IMM"/>
+			<xs:enumeration value="IMK"/>
+			<xs:enumeration value="INT"/>
+			<xs:enumeration value="IOS"/>
+			<xs:enumeration value="IPC"/>
+			<xs:enumeration value="IPR"/>
+			<xs:enumeration value="IRS"/>
+			<xs:enumeration value="IST"/>
+			<xs:enumeration value="IVA"/>
+			<xs:enumeration value="IVE"/>
+			<xs:enumeration value="IVF"/>
+			<xs:enumeration value="IVI"/>
+			<xs:enumeration value="IVM"/>
+			<xs:enumeration value="IVN"/>
+			<xs:enumeration value="IVP"/>
+			<xs:enumeration value="IVR"/>
+			<xs:enumeration value="IVS"/>
+			<xs:enumeration value="IBL"/>
+			<xs:enumeration value="IBM"/>
+			<xs:enumeration value="IBS"/>
+			<xs:enumeration value="IBN"/>
+			<xs:enumeration value="MIP"/>
+			<xs:enumeration value="IVU"/>
+			<xs:enumeration value="IVX"/>
+			<xs:enumeration value="JNP"/>
+			<xs:enumeration value="JAS"/>
+			<xs:enumeration value="KBC"/>
+			<xs:enumeration value="KBT"/>
+			<xs:enumeration value="KCN"/>
+			<xs:enumeration value="KEN"/>
+			<xs:enumeration value="KPP"/>
+			<xs:enumeration value="LEI"/>
+			<xs:enumeration value="LSC"/>
+			<xs:enumeration value="LPC"/>
+			<xs:enumeration value="LID"/>
+			<xs:enumeration value="MID"/>
+			<xs:enumeration value="MED"/>
+			<xs:enumeration value="MST"/>
+			<xs:enumeration value="NFK"/>
+			<xs:enumeration value="NIN"/>
+			<xs:enumeration value="NCC"/>
+			<xs:enumeration value="NIU"/>
+			<xs:enumeration value="NUI"/>
+			<xs:enumeration value="MQE"/>
+			<xs:enumeration value="MVA"/>
+			<xs:enumeration value="MVG"/>
+			<xs:enumeration value="NAF"/>
+			<xs:enumeration value="NAO"/>
+			<xs:enumeration value="NAR"/>
+			<xs:enumeration value="NBO"/>
+			<xs:enumeration value="NEI"/>
+			<xs:enumeration value="NGA"/>
+			<xs:enumeration value="NGB"/>
+			<xs:enumeration value="MMR"/>
+			<xs:enumeration value="SMR"/>
+			<xs:enumeration value="NGC"/>
+			<xs:enumeration value="NIC"/>
+			<xs:enumeration value="NIF"/>
+			<xs:enumeration value="NIP"/>
+			<xs:enumeration value="NIS"/>
+			<xs:enumeration value="NMF"/>
+			<xs:enumeration value="NRC"/>
+			<xs:enumeration value="NRS"/>
+			<xs:enumeration value="FID"/>
+			<xs:enumeration value="NTN"/>
+			<xs:enumeration value="OGR"/>
+			<xs:enumeration value="OIB"/>
+			<xs:enumeration value="OLS"/>
+			<xs:enumeration value="OPR"/>
+			<xs:enumeration value="ORG"/>
+			<xs:enumeration value="OTH"/>
+			<xs:enumeration value="PAN"/>
+			<xs:enumeration value="PAS"/>
+			<xs:enumeration value="PES"/>
+			<xs:enumeration value="PFR"/>
+			<xs:enumeration value="PIC"/>
+			<xs:enumeration value="PIM"/>
+			<xs:enumeration value="PIN"/>
+			<xs:enumeration value="PNR"/>
+			<xs:enumeration value="PPN"/>
+			<xs:enumeration value="PP2"/>
+			<xs:enumeration value="PP3"/>
+			<xs:enumeration value="PST"/>
+			<xs:enumeration value="PTU"/>
+			<xs:enumeration value="PVM"/>
+			<xs:enumeration value="PVN"/>
+			<xs:enumeration value="PYM"/>
+			<xs:enumeration value="QST"/>
+			<xs:enumeration value="RAC"/>
+			<xs:enumeration value="RAI"/>
+			<xs:enumeration value="RAN"/>
+			<xs:enumeration value="RCM"/>
+			<xs:enumeration value="RCR"/>
+			<xs:enumeration value="REB"/>
+			<xs:enumeration value="REM"/>
+			<xs:enumeration value="REX"/>
+			<xs:enumeration value="RDT"/>
+			<xs:enumeration value="RFC"/>
+			<xs:enumeration value="RNC"/>
+			<xs:enumeration value="CUR"/>
+			<xs:enumeration value="RFG"/>
+			<xs:enumeration value="RGN"/>
+			<xs:enumeration value="RID"/>
+			<xs:enumeration value="RIF"/>
+			<xs:enumeration value="RNA"/>
+			<xs:enumeration value="ROB"/>
+			<xs:enumeration value="ROC"/>
+			<xs:enumeration value="RCC"/>
+			<xs:enumeration value="RTN"/>
+			<xs:enumeration value="RUC"/>
+			<xs:enumeration value="RUT"/>
+			<xs:enumeration value="REG"/>
+			<xs:enumeration value="RCS"/>
+			<xs:enumeration value="SAN">
+				<xs:annotation>
+					<xs:documentation>Special Address Notification is obsolete. Please use EIN, CBN, or SSN for Notify Party instead.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SEP"/>
+			<xs:enumeration value="SER"/>
+			<xs:enumeration value="SEZ"/>
+			<xs:enumeration value="SFC"/>
+			<xs:enumeration value="SFR"/>
+			<xs:enumeration value="SHD"/>
+			<xs:enumeration value="SID"/>
+			<xs:enumeration value="SOL"/>
+			<xs:enumeration value="SRF"/>
+			<xs:enumeration value="SRI"/>
+			<xs:enumeration value="SRN"/>
+			<xs:enumeration value="SRT"/>
+			<xs:enumeration value="SSN"/>
+			<xs:enumeration value="STR"/>
+			<xs:enumeration value="SVT"/>
+			<xs:enumeration value="TAH"/>
+			<xs:enumeration value="TAN"/>
+			<xs:enumeration value="TAO"/>
+			<xs:enumeration value="TAX"/>
+			<xs:enumeration value="TBN"/>
+			<xs:enumeration value="TCT"/>
+			<xs:enumeration value="TEN"/>
+			<xs:enumeration value="TGC"/>
+			<xs:enumeration value="TIC"/>
+			<xs:enumeration value="NCF"/>
+			<xs:enumeration value="TID"/>
+			<xs:enumeration value="TIN"/>
+			<xs:enumeration value="TMC"/>
+			<xs:enumeration value="TPC"/>
+			<xs:enumeration value="TPT"/>
+			<xs:enumeration value="TRN"/>
+			<xs:enumeration value="UKM"/>
+			<xs:enumeration value="TTD"/>
+			<xs:enumeration value="TVA"/>
+			<xs:enumeration value="TVS"/>
+			<xs:enumeration value="UBI"/>
+			<xs:enumeration value="UEN"/>
+			<xs:enumeration value="QCI"/>
+			<xs:enumeration value="QQS"/>
+			<xs:enumeration value="UID"/>
+			<xs:enumeration value="UIN"/>
+			<xs:enumeration value="UNC"/>
+			<xs:enumeration value="UOC"/>
+			<xs:enumeration value="USC"/>
+			<xs:enumeration value="UST"/>
+			<xs:enumeration value="VAG"/>
+			<xs:enumeration value="VAS"/>
+			<xs:enumeration value="VAT"/>
+			<xs:enumeration value="VDM"/>
+			<xs:enumeration value="VTE"/>
+			<xs:enumeration value="VTC"/>
+			<xs:enumeration value="TCK"/>
+			<xs:enumeration value="MER"/>
+			<xs:enumeration value="VTP"/>
+			<xs:enumeration value="VRN"/>
+			<xs:enumeration value="VSK"/>
+			<xs:enumeration value="ZAP"/>
+			<xs:enumeration value="DPC"/>
+			<xs:enumeration value="DBI"/>
+			<xs:enumeration value="PIB"/>
+			<xs:enumeration value="PID"/>
+			<xs:enumeration value="PBR"/>
+			<xs:enumeration value="PIG"/>
+			<xs:enumeration value="MCI"/>
+			<xs:enumeration value="CBF"/>
+			<xs:enumeration value="EPZ"/>
+			<xs:enumeration value="FTZ"/>
+			<xs:enumeration value="TIR"/>
+			<xs:enumeration value="CHP"/>
+			<xs:enumeration value="LOS"/>
+			<xs:enumeration value="TCU"/>
+			<xs:enumeration value="TTB"/>
+			<xs:enumeration value="TTI"/>
+			<xs:enumeration value="TTE"/>
+			<xs:enumeration value="DDT"/>
+			<xs:enumeration value="CFI"/>
+			<xs:enumeration value="NSL"/>
+			<xs:enumeration value="WMI"/>
+			<xs:enumeration value="AIN"/>
+			<xs:enumeration value="BIN"/>
+			<xs:enumeration value="LAB"/>
+			<xs:enumeration value="DEA"/>
+			<xs:enumeration value="AMS"/>
+			<xs:enumeration value="C1C"/>
+			<xs:enumeration value="DCC"/>
+			<xs:enumeration value="VGM"/>
+			<xs:enumeration value="NAI"/>
+			<xs:enumeration value="SIC"/>
+			<xs:enumeration value="IFT"/>
+			<xs:enumeration value="ATS"/>
+			<xs:enumeration value="API"/>
+			<xs:enumeration value="EPI"/>
+			<xs:enumeration value="CED"/>
+			<xs:enumeration value="TNP"/>
+			<xs:enumeration value="SAL"/>
+			<xs:enumeration value="WCA"/>
+			<xs:enumeration value="PEC"/>
+			<xs:enumeration value="CAG"/>
+			<xs:enumeration value="DOD"/>
+			<xs:enumeration value="QEN"/>
+			<xs:enumeration value="AAN"/>
+			<xs:enumeration value="ACA"/>
+			<xs:enumeration value="AMO"/>
+			<xs:enumeration value="WPI"/>
+			<xs:enumeration value="BGV"/>
+			<xs:enumeration value="CI5"/>
+			<xs:enumeration value="SON"/>
+			<xs:enumeration value="SOA"/>
+			<xs:enumeration value="SOW"/>
+			<xs:enumeration value="PSN"/>
+			<xs:enumeration value="DAT"/>
+			<xs:enumeration value="SII"/>
+			<xs:enumeration value="CIN"/>
+			<xs:enumeration value="FRI"/>
+			<xs:enumeration value="LFR"/>
+			<xs:enumeration value="CAD"/>
+			<xs:enumeration value="CAV"/>
+			<xs:enumeration value="PSR"/>
+			<xs:enumeration value="C1R"/>
+			<xs:enumeration value="ZMI"/>
+			<xs:enumeration value="STE"/>
+			<xs:enumeration value="GFR"/>
+			<xs:enumeration value="CGN"/>
+			<xs:enumeration value="ATP"/>
+			<xs:enumeration value="SPK"/>
+			<xs:enumeration value="NVO"/>
+			<xs:enumeration value="PYE"/>
+			<xs:enumeration value="ITX"/>
+			<xs:enumeration value="CGT"/>
+			<xs:enumeration value="TRI"/>
+			<xs:enumeration value="NAT"/>
+			<xs:enumeration value="RTC"/>
+			<xs:enumeration value="FOI"/>
+			<xs:enumeration value="YFK"/>
+			<xs:enumeration value="IMA"/>
+			<xs:enumeration value="CC1"/>
+			<xs:enumeration value="CBL"/>
+			<xs:enumeration value="MPC"/>
+			<xs:enumeration value="VFA"/>
+			<xs:enumeration value="VZR"/>
+			<xs:enumeration value="EMD"/>
+			<xs:enumeration value="TRA"/>
+			<xs:enumeration value="ROU"/>
+			<xs:enumeration value="SUF"/>
+			<xs:enumeration value="BAN"/>
+			<xs:enumeration value="AAL"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ReleaseType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="BRR"/>
+			<xs:enumeration value="BSD"/>
+			<xs:enumeration value="BTD"/>
+			<xs:enumeration value="EBL"/>
+			<xs:enumeration value="LOI"/>
+			<xs:enumeration value="OBR"/>
+			<xs:enumeration value="OBO"/>
+			<xs:enumeration value="CSH"/>
+			<xs:enumeration value="CAD"/>
+			<xs:enumeration value="NON"/>
+			<xs:enumeration value="SWB"/>
+			<xs:enumeration value="STD"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="StatusCode">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ShipmentType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="IMP"/>
+			<xs:enumeration value="EXP"/>
+			<xs:enumeration value="EXW"/>
+			<xs:enumeration value="MSC"/>
+			<xs:enumeration value="EXX"/>
+			<xs:enumeration value="IMX"/>
+			<xs:enumeration value="DRW"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TransportMode">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="SEA"/>
+			<xs:enumeration value="AIR"/>
+			<xs:enumeration value="ROA"/>
+			<xs:enumeration value="RAI"/>
+			<xs:enumeration value="MAI"/>
+			<xs:enumeration value="FSA"/>
+			<xs:enumeration value="FAS"/>
+			<xs:enumeration value="COU"/>
+			<xs:enumeration value="CHA"/>
+			<xs:enumeration value="CHS"/>
+			<xs:enumeration value="OTH"/>
+			<xs:enumeration value="UNK"/>
+			<xs:enumeration value="STO"/>
+			<xs:enumeration value="BWB"/>
+			<xs:enumeration value="TRK"/>
+			<xs:enumeration value="AUT"/>
+			<xs:enumeration value="PED"/>
+			<xs:enumeration value="PHC"/>
+			<xs:enumeration value="FIX"/>
+			<xs:enumeration value="HND"/>
+			<xs:enumeration value="OWN"/>
+			<xs:enumeration value="IWT"/>
+			<xs:enumeration value="ROR"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TariffCode">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="TrueFalse">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="false"/>
+			<xs:enumeration value="true"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Version">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="XmlType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Verbose"/>
+			<xs:enumeration value="LightWeight"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="USReconciliation">
+		<xs:sequence>
+			<xs:element name="Issue" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="98"/>
+						<xs:enumeration value="C9"/>
+						<xs:enumeration value="CL"/>
+						<xs:enumeration value="V9"/>
+						<xs:enumeration value="AL"/>
+						<xs:enumeration value="VC"/>
+						<xs:enumeration value="VL"/>
+						<xs:enumeration value="NA"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="NAFTA" type="TrueFalse" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="USManufacturerProducerDataType">
+		<xs:sequence>
+			<xs:element name="ProducerFirmType" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="M"/>
+						<xs:enumeration value="G"/>
+						<xs:enumeration value="C"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="FoodFacilityRegistrationExemption" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="A"/>
+						<xs:enumeration value="B"/>
+						<xs:enumeration value="C"/>
+						<xs:enumeration value="D"/>
+						<xs:enumeration value="E"/>
+						<xs:enumeration value="F"/>
+						<xs:enumeration value="G"/>
+						<xs:enumeration value="H"/>
+						<xs:enumeration value="I"/>
+						<xs:enumeration value="J"/>
+						<xs:enumeration value="K"/>
+						<xs:enumeration value="L"/>
+						<xs:enumeration value="M"/>
+						<xs:enumeration value="O"/>
+						<xs:enumeration value="Y"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="USImporterOfRecordDetails">
+		<xs:sequence>
+			<xs:element name="PaymentType" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="1"/>
+						<xs:enumeration value="2"/>
+						<xs:enumeration value="3"/>
+						<xs:enumeration value="5"/>
+						<xs:enumeration value="6"/>
+						<xs:enumeration value="7"/>
+						<xs:enumeration value="8"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TaxDeferredInd" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="0"/>
+						<xs:enumeration value="1"/>
+						<xs:enumeration value="2"/>
+						<xs:enumeration value="B"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Purchased" type="TrueFalse" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="USOrganisationSpecificDetails">
+		<xs:sequence>
+			<xs:element name="FDA" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="USManufacturerProducerDataType">
+							<xs:sequence>
+								<xs:element name="SubmitterFirmType" minOccurs="0">
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:enumeration value="C"/>
+											<xs:enumeration value="F"/>
+											<xs:enumeration value="I"/>
+											<xs:enumeration value="M"/>
+											<xs:enumeration value="S"/>
+											<xs:enumeration value="U"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:element>
+								<xs:element name="FirstName" type="xs:string" minOccurs="0"/>
+								<xs:element name="LastName" type="xs:string" minOccurs="0"/>
+								<xs:element name="PhoneNo" type="xs:string" minOccurs="0"/>
+								<xs:element name="FaxNo" type="xs:string" minOccurs="0"/>
+								<xs:element name="Email" type="xs:string" minOccurs="0"/>
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Reconciliation" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="USReconciliation">
+							<xs:sequence>
+								<xs:element name="FileTheirOwnRecon" type="TrueFalse" minOccurs="0"/>
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ImporterOfRecordDetails" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="USImporterOfRecordDetails">
+							<xs:sequence>
+								<xs:element name="PayersUnitNo" type="xs:string" minOccurs="0"/>
+								<xs:element name="StatementPrintDateWorkingDays" type="xs:int" minOccurs="0"/>
+								<xs:element name="DoNotAutoGenerateStmDayChangeRequest" type="TrueFalse" minOccurs="0"/>
+								<xs:element name="NotifyParty" minOccurs="0">
+									<xs:complexType>
+										<xs:choice>
+											<xs:element name="NotifyParty" type="Organisation" minOccurs="0"/>
+											<xs:element name="PartyIDNumber" type="xs:string" minOccurs="0">
+												<xs:annotation>
+													<xs:documentation>One of EIN or CBP Assigned Number or Social Security number. Format is known and should be adhered to</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+										</xs:choice>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="EntryDocumentPrinting" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ProductCode" type="TrueFalse" minOccurs="0"/>
+						<xs:element name="CustomAttribute1" type="TrueFalse" minOccurs="0"/>
+						<xs:element name="CustomAttribute2" type="TrueFalse" minOccurs="0"/>
+						<xs:element name="CustomAttribute3" type="TrueFalse" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Misc" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="BIRDDefaultBranch" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SystemDefinedDataType">
+		<xs:sequence>
+			<xs:element name="Category" type="xs:string" minOccurs="0"/>
+			<xs:element name="Name" type="xs:string" minOccurs="0"/>
+			<xs:element name="Value" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="UserDefinedDataType">
+		<xs:sequence>
+			<xs:element name="Name" type="xs:string" minOccurs="0"/>
+			<xs:element name="Value" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DocData">
+		<xs:sequence>
+			<xs:element name="SystemDefinedData" type="SystemDefinedDataType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="UserDefinedData" type="UserDefinedDataType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SubAccountType">
+		<xs:all>
+			<xs:element name="Code" type="xs:string" minOccurs="0"/>
+			<xs:element name="Description" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<xs:complexType name="SubAccount">
+		<xs:all>
+			<xs:element name="Code" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Type" type="SubAccountType" minOccurs="0" maxOccurs="1"/>
+		</xs:all>
+	</xs:complexType>
+</xs:schema>

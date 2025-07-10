@@ -1,0 +1,79 @@
+﻿<!--
+#################################################################################################################
+Documentation on this Accounting Reference Safeguard can be found here:
+https://devops.wisetechglobal.com/wtg/CargoWise/_wiki/wikis/CargoWise.wiki/10796/Accounting-Reference-Safeguard
+#################################################################################################################
+-->
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <CWAccountingSafeguardFilename Condition="'$(CWAccountingSafeguardFilename)' == ''">$(MSBuildThisFileDirectory)$(ProjectName).$(TargetFramework).BaselineReferences.txt</CWAccountingSafeguardFilename>
+  </PropertyGroup>
+  <Target Name="AccountingReferenceSafeguard" AfterTargets="ResolveAssemblyReferences">
+
+    <!-- Error if corresponding baseline txt file does not exist Accounting project -->
+    <Error Condition="!Exists('$(MSBuildThisFileDirectory)$(ProjectName).$(TargetFramework).BaselineReferences.txt')" Text="Accounting Reference Safeguard Error: Expected $(ProjectName).$(TargetFramework).BaselineReferences.txt file but did not find one. For more information see the `Accounting\AccountingReferenceSafeguard\AccountingReferenceSafeguard.targets` file for the link to official documentation."/>
+
+    <!-- Read lines from project specific baseline text file -->
+    <ReadLinesFromFile File="$(CWAccountingSafeguardFilename)">
+      <Output TaskParameter="Lines" ItemName="BaselineReferenceItem"/>
+    </ReadLinesFromFile>
+
+    <!-- Remove lines which are comments from BaselineReferenceItem -->
+    <ItemGroup>
+      <BaselineReferenceItem Remove="@(BaselineReferenceItem)" Condition="$([System.String]::Copy('%(BaselineReferenceItem.Identity)').StartsWith('#'))" />
+    </ItemGroup>
+
+    <!-- ###################################################################################################
+    REMOVE THE BELOW REGION OF CODE ONCE ALL DEBUG REFERENCES HAVE BEEN REMOVED FROM ACCOUNTING CSPROJ FILES
+    ################################################################################################### -->
+    <!-- If Debug build, for lines starting with 'DEBUG ' (including the space after), append new line to BaselineReferenceItem ItemGroup without 'DEBUG ' -->
+    <ItemGroup Condition="'$(IsDebugBuild)' == 'true'">
+      <BaselineReferenceItem Include="$([System.String]::Copy('%(BaselineReferenceItem.Identity)').Replace('DEBUG ', ''))" Condition="$([System.String]::Copy('%(BaselineReferenceItem.Identity)').StartsWith('DEBUG '))" />
+    </ItemGroup>
+
+    <!-- Remove whole lines starting with 'DEBUG ' from BaselineReferenceItem ItemGroup -->
+    <ItemGroup>
+      <BaselineReferenceItem Remove="@(BaselineReferenceItem)" Condition="$([System.String]::Copy('%(BaselineReferenceItem.Identity)').StartsWith('DEBUG '))" />
+    </ItemGroup>
+    <!-- ###################################################################################################
+    REMOVE THE ABOVE REGION OF CODE ONCE ALL DEBUG REFERENCES HAVE BEEN REMOVED FROM ACCOUNTING CSPROJ FILES
+    ################################################################################################### -->
+
+    <!-- Exclude implicit and externally resolved build references -->
+    <ItemGroup>
+      <ExplicitAssemblyReference Include="%(Reference.Identity)" Condition="%(Reference.IsImplicitlyDefined) != 'true' And %(Reference.ExternallyResolved) != 'true'"/>
+    </ItemGroup>
+
+    <!-- Exclude nuget project references -->
+    <ItemGroup>
+      <ExplicitProjectReference Include="%(ProjectReference.Identity)" Condition="%(ProjectReference.NuGetPackageId) == ''" />
+    </ItemGroup>
+
+    <!-- Combine assembly references and project references into one reference semicolon delimited list -->
+    <ItemGroup>
+      <ExplicitAssemblyAndProjectReferenceItem Include="@(ExplicitAssemblyReference);@(ExplicitProjectReference)" />
+    </ItemGroup>
+
+    <!-- Make each BaselineReferenceItem semicolon delimited -->
+    <PropertyGroup>
+      <BaselineReferencesProperty>
+        ;@(BaselineReferenceItem);
+      </BaselineReferencesProperty>
+    </PropertyGroup>
+
+    <!-- Error if BaselineReferencesProperty does NOT contain a certain ExplicitAssemblyAndProjectReference -->
+    <Error Condition="'@(ExplicitAssemblyAndProjectReferenceItem)' != '' And !$(BaselineReferencesProperty.Contains(';%(ExplicitAssemblyAndProjectReferenceItem.Identity);'))" Text="Accounting Reference Safeguard Error: Disallowed reference '%(ExplicitAssemblyAndProjectReferenceItem.Identity)' used in building '$(ProjectName)'. For more information see the `Accounting\AccountingReferenceSafeguard\AccountingReferenceSafeguard.targets` file for the link to official documentation. File: $(CWAccountingSafeguardFilename)"/>
+
+    <!-- Create ExplicitAssemblyAndProjectReferences PropertyGroup to check for extra unused references in baseline txt file -->
+    <PropertyGroup>
+      <ExplicitAssemblyAndProjectReferencesProperty>
+        ;@(ExplicitAssemblyAndProjectReferenceItem);
+      </ExplicitAssemblyAndProjectReferencesProperty>
+    </PropertyGroup>
+
+    <!-- Error if there are extra references in baseline txt file which are not used in the build -->
+    <Error Condition="'@(BaselineReferenceItem)' != '' And !$(ExplicitAssemblyAndProjectReferencesProperty.Contains(';%(BaselineReferenceItem.Identity);'))" Text="Accounting Reference Safeguard Error: Disallowed extra reference '%(BaselineReferenceItem.Identity)' found in '$(ProjectName).$(TargetFramework).BaselineReferences.txt'. For more information see the `Accounting\AccountingReferenceSafeguard\AccountingReferenceSafeguard.targets` file for the link to official documentation."/>
+
+  </Target>
+</Project>

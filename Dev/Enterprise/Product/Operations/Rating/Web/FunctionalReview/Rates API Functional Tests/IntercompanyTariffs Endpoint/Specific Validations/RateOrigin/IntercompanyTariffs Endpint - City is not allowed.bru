@@ -1,0 +1,32 @@
+meta {
+  name: IntercompanyTariffs Endpint - City is not allowed
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/intercompanytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForIntercompanyTariffs();
+   query.RateOrigin = { Type: "CITY", Value: "Sydney" };
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided Type ('CITY') is not valid. It only can be one of these values: 'COUNTRY', 'UNLOCO', 'ZONE'.", function() {
+    expect(res.body.ModelState['RateOrigin.Type'][0]).to.equal("Provided Type ('CITY') is not valid. It can only be one of these values: 'COUNTRY', 'UNLOCO', 'ZONE'.");
+  });
+  
+  
+  
+}

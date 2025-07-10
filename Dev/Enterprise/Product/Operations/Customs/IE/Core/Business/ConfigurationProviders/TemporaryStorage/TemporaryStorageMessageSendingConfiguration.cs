@@ -1,0 +1,11 @@
+using Enterprise.Customs.Business;
+
+namespace Enterprise.Customs.IE.Business.CusTempStorage
+{
+	public class TemporaryStorageMessageSendingConfiguration : EU.Business.CusTempStorage.TemporaryStorageMessageSendingConfiguration
+	{
+		protected override BaseMessageSendingObjectParent GetNewMessageSendingObjectParentCore(EU.Business.CusTempStorage.TemporaryStorageHeader header) => new TemporaryStorageMessageSendingObjectParent((TemporaryStorageHeader)header);
+
+		protected override EU.Business.CusTempStorage.TemporaryStorageMessageSendingObject GetNewMessageSendingObjectCore(EU.Business.CusTempStorage.TemporaryStorageHeader header) => new TemporaryStorageMessageSendingObject((TemporaryStorageHeader)header);
+	}
+}

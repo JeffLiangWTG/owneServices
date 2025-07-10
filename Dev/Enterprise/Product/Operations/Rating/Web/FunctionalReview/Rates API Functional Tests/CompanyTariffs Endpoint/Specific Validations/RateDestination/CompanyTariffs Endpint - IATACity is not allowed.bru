@@ -1,0 +1,29 @@
+meta {
+  name: CompanyTariffs Endpint - IATACity is not allowed
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/companytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForIntercompanyTariffs();
+   query.RateDestination = { Type: "IATACITY", Value: "SYD" };
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided Type ('IATACITY') is not valid. It only can be one of these values: 'COUNTRY', 'UNLOCO', 'ZONE'.", function() {
+    expect(res.body.ModelState['RateDestination.Type'][0]).to.equal("Provided Type ('IATACITY') is not valid. It can only be one of these values: 'COUNTRY', 'UNLOCO', 'ZONE'.");
+  });
+}

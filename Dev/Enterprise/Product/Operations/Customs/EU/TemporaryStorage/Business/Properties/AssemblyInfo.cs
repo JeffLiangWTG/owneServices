@@ -1,0 +1,37 @@
+using System.Reflection;
+
+[assembly: AssemblyTitle("EU.TemporaryStorage Customs Business")]
+[assembly: AssemblyDescription("EU.TemporaryStorage Customs Business")]
+[assembly: CargoWise.Common.PreventAssemblyReferences(
+	"Enterprise.ArchiveManager.Test",
+	"Enterprise.Customs.FR.Business",
+	"Enterprise.Customs.FR.Module",
+	"Enterprise.Customs.FR.NCTS.Test",
+	"Enterprise.Customs.ES.Business",
+	"Enterprise.Customs.ES.Business.Test",
+	"Enterprise.Customs.ES.DocumentWrappers",
+	"Enterprise.Customs.ES.DocumentWrappers.Test",
+	"Enterprise.Customs.ES.GUI.Test",
+	"Enterprise.Customs.ES.NCTS.Business",
+	"Enterprise.Customs.ES.NCTS.Business.Test",
+	"Enterprise.Customs.ES.NCTS.GUI.Test",
+	"Enterprise.Customs.ES.TemporaryStorage.Business",
+	"Enterprise.Customs.ES.TemporaryStorage.GUI",
+	"Enterprise.Customs.ES.TemporaryStorage.Module",
+	"Enterprise.Customs.ES.TemporaryStorage.Business.Test",
+	"Enterprise.Customs.ES.TemporaryStorage.GUI.Test",
+	"Enterprise.Customs.ES.TemporaryStorage.Module.Test",
+	"Enterprise.Customs.DE.Business",
+	"Enterprise.Customs.DE.Business.Test",
+	"Enterprise.Customs.DE.Module.Test",
+	"Enterprise.Customs.EU.NCTS.Business.Test",
+	"Enterprise.Customs.EU.TemporaryStorage.GUI",
+	"Enterprise.Customs.EU.TemporaryStorage.Module",
+	"Enterprise.Customs.EU.TemporaryStorage.Business.Test",
+	"Enterprise.Customs.EU.TemporaryStorage.GUI.Test",
+	"Enterprise.Customs.EU.TemporaryStorage.Module.Test",
+	"Enterprise.Customs.IT.TemporaryStorage.Business",
+	"Enterprise.Customs.IT.TemporaryStorage.Business.Test",
+	"Enterprise.Customs.IT.TemporaryStorage.GUI",
+	"Enterprise.Customs.IT.TemporaryStorage.GUI.Test",
+	"Enterprise.Customs.IT.TemporaryStorage.Module.Test")]

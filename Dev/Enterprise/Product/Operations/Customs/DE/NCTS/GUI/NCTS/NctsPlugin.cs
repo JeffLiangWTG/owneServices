@@ -1,0 +1,20 @@
+using Enterprise.Customs.Common;
+using Enterprise.Customs.EU.NCTS.Business;
+using Enterprise.Freight.Integration;
+
+namespace Enterprise.Customs.DE.NCTS.GUI
+{
+	public class NctsPlugin : EU.NCTS.GUI.NctsPlugin
+	{
+		public NctsPlugin(ICusInBondParent host) : base(host)
+		{
+		}
+
+		protected override void SetNCTSPhaseIfNeeded(NctsHeader header)
+		{
+			header.BH_ApplicationCode = ApplicationCode;
+		}
+
+		protected override string ApplicationCode => CusInBondApplicationCodeList.Codes.NCTS5;
+	}
+}

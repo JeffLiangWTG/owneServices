@@ -1,0 +1,6 @@
+CREATE VIEW RefCusCodeListAttributeTableView_V1 AS
+SELECT ZZE_PK,
+ZZE_ZZD_CodeList,
+ZZE_ZXE_NKName,
+ZZE_Value
+FROM RefCusCodeListAttribute

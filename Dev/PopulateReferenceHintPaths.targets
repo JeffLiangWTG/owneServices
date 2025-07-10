@@ -1,0 +1,129 @@
+﻿<Project>
+  <!--
+    This file is imported by Directory.Build.targets.
+
+    It populates the <HintPath> of <Reference> elements at msbuild evaluation time.
+
+    It uses the master list of <CWReferenceStatus> in Directory.CargoWiseReferences.props
+    to determine if an assembly is multi-targeted. Ie, does it have a winzor-specific version
+    or a .net core specific version? The final hint path will depend on that, plus
+    the target framework of the current compilation.
+
+    The reason this is outside of a target (ie at evaluation time) is that QuickGetLatest uses
+    the hint path to determine the build order. QGL uses MSBuild evaluation
+    but it does not execute any targets.
+
+    The references that have been automatically populated will have CWAutomaticHintPathSource
+    metadata set on it. This makes it easier to see how the final value was arrived at when
+    debugging using binary logs and structured log viewer.
+
+    For more information, see: https://github.com/WiseTechGlobal/Modernization.Content/blob/main/Controls/populate-reference-hint-path-automatically.md
+
+-->
+
+  <!-- contains all the CWReferenceStatus items. Including one of two files depending on regular/full core -->
+  <Import Condition="'$(CWEnableFullNetCoreBuild)' != 'true'" Project="Directory.CargoWiseReferences.props" />
+  <Import Condition="'$(CWEnableFullNetCoreBuild)' == 'true'" Project="$(MSBuildThisFileDirectory)NetCore\Temp_TransitionToNet8\Directory.CargoWiseReferences.props" />
+
+  <!--
+    update all <Reference> elements in this project with HasWinzor and HasNetCore from
+    the <CWReferenceStatus> elements in Directory.CargoWiseReferences.props file
+  -->
+  <ItemGroup>
+    <Reference Update="@(CWReferenceStatus)">
+      <CWHasCWReferenceStatus>true</CWHasCWReferenceStatus>
+      <CWHasNetFramework>%(CWReferenceStatus.HasNetFramework)</CWHasNetFramework>
+      <CWHasWinzor>%(CWReferenceStatus.HasWinzor)</CWHasWinzor>
+      <CWHasNetCore>%(CWReferenceStatus.HasNetCore)</CWHasNetCore>
+    </Reference>
+  </ItemGroup>
+
+  <!--
+    if this is a .net framework compilation
+    Order of resolution (first matched wins):
+    1. Original HintPath != '' -> Original HintPath
+    2. CWHasNetFramework != "false" -> Path in Bin
+  -->
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Update="*">
+      <CWAutomaticHintPathSource Condition="'%(HintPath)' != ''">[net framework] existing hintpath not overwritten</CWAutomaticHintPathSource>
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetFramework)' == 'false'  and '%(HintPath)' == ''">[net framework] hintpath is not generated due to HasNetFramework="false"</CWAutomaticHintPathSource>
+
+      <!-- set the HintPath to net framework output folder, only if the reference has a matching CWReferenceStatus with HasNetFramework property not 'false' and no existing hint path -->
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetFramework)' != 'false'  and '%(HintPath)' == ''">[net framework] net framework assembly</CWAutomaticHintPathSource>
+      <HintPath Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetFramework)' != 'false' and '%(HintPath)' == ''">$(CWNetFrameworkOutputPath)%(Reference.Identity).dll</HintPath>
+
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetFramework)' == 'false'  and '%(HintPath)' == ''">[net framework] hintpath not created</CWAutomaticHintPathSource>
+    </Reference>
+  </ItemGroup>
+
+  <!--
+    if this is a winzor compilation
+    Order of resolution (first matched wins):
+    1. Original HintPath != '' -> Original HintPath
+    2. HasWinzor == 'true' -> Path in Bin\winzor
+    3. HasNetCore == 'true' and CanNetCoreLibBeReferencedFromWinzor == 'true' -> Path in Bin\net8.0
+    4. CWHasNetFramework != "false" -> Path in Bin
+  -->
+  <ItemGroup Condition="'$(IsWinzorProject)' == 'true'">
+    <Reference Update="*">
+      <CWAutomaticHintPathSource Condition="'%(HintPath)' != ''">[winzor] existing hintpath not overwritten</CWAutomaticHintPathSource>
+
+      <!-- if the CWReferenceStatus HasWinzor="true", then set the HintPath to winzor output folder, only if the reference has no existing hint path -->
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasWinzor)' == 'true' and '%(HintPath)' == ''">[winzor] Winzor assembly</CWAutomaticHintPathSource>
+      <HintPath Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasWinzor)' == 'true' and '%(HintPath)' == ''">$(CWWinzorOutputPath)%(Reference.Identity).dll</HintPath>
+
+      <!-- if the CWReferenceStatus does not have HasWinzor, but has HasNetCore then set the HintPath to net core output folder, only if the reference has no existing hint path -->
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasWinzor)' != 'true' and '$(CanNetCoreLibBeReferencedFromWinzor)' == 'true' and '%(CWHasNetCore)' == 'true' and '%(HintPath)' == ''">[winzor] net core (not winzor) assembly</CWAutomaticHintPathSource>
+      <HintPath Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasWinzor)' != 'true' and '$(CanNetCoreLibBeReferencedFromWinzor)' == 'true' and '%(CWHasNetCore)' == 'true' and '%(HintPath)' == ''">$(CWNetCoreOutputPath)%(Reference.Identity).dll</HintPath>
+
+      <!-- if the CWReferenceStatus does not have HasWinzor or HasNetCore, then set the HintPath to net framework output folder, only if the reference has no existing hint path -->
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasWinzor)' != 'true' and ('$(CanNetCoreLibBeReferencedFromWinzor)' != 'true' or '%(CWHasNetCore)' != 'true') and %(CWHasNetFramework) != 'false' and '%(HintPath)' == ''">[winzor] net framework assembly</CWAutomaticHintPathSource>
+      <HintPath Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasWinzor)' != 'true' and ('$(CanNetCoreLibBeReferencedFromWinzor)' != 'true' or '%(CWHasNetCore)' != 'true') and %(CWHasNetFramework) != 'false' and '%(HintPath)' == ''">$(CWNetFrameworkOutputPath)%(Reference.Identity).dll</HintPath>
+
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasWinzor)' != 'true' and ('$(CanNetCoreLibBeReferencedFromWinzor)' != 'true' or '%(CWHasNetCore)' != 'true') and %(CWHasNetFramework) == 'false' and '%(HintPath)' == ''">[winzor] hintpath not created</CWAutomaticHintPathSource>
+    </Reference>
+  </ItemGroup>
+
+  <!--
+      if this is a net core compilation
+    Order of resolution (first matched wins):
+    1. Original HintPath != '' -> Original HintPath
+    2. HasNetCore == 'true' -> Path in Bin\net8.0
+    3. CWHasNetFramework != "false" -> Path in Bin
+  -->
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true' and '$(IsWinzorProject)' != 'true'">
+    <Reference Update="*">
+      <CWAutomaticHintPathSource Condition="'%(HintPath)' != ''">[net core] existing hintpath not overwritten</CWAutomaticHintPathSource>
+
+      <!-- if the CWReferenceStatus HasNetCore="true", then set the HintPath to net core output folder, only if the reference has no existing hint path -->
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetCore)' == 'true' and '%(HintPath)' == ''">[net core] net core assembly</CWAutomaticHintPathSource>
+      <HintPath Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetCore)' == 'true' and '%(HintPath)' == ''">$(CWNetCoreOutputPath)%(Reference.Identity).dll</HintPath>
+
+      <!-- if the CWReferenceStatus does not have HasNetCore, then set the HintPath to net framework output folder, only if the reference has no existing hint path -->
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetCore)' != 'true' and %(CWHasNetFramework) != 'false' and '%(HintPath)' == ''">[net core] net framework assembly</CWAutomaticHintPathSource>
+      <HintPath Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetCore)' != 'true' and '%(CWHasNetCore)' != 'true' and %(CWHasNetFramework) != 'false' and '%(HintPath)' == ''">$(CWNetFrameworkOutputPath)%(Reference.Identity).dll</HintPath>
+
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetCore)' != 'true' and %(CWHasNetFramework) == 'false' and '%(HintPath)' == ''">[net core] hintpath not created</CWAutomaticHintPathSource>
+    </Reference>
+  </ItemGroup>
+
+  <!--
+    if this is a .net standard compilation
+    Order of resolution (first matched wins):
+    1. Original HintPath != '' -> Original HintPath
+    2. CWHasNetFramework != "false" -> Path in Bin
+  -->
+  <ItemGroup Condition="'$(IsNetStandardTargetFramework)' == 'true'">
+    <Reference Update="*">
+      <CWAutomaticHintPathSource Condition="'%(HintPath)' != ''">[net standard] existing hintpath not overwritten</CWAutomaticHintPathSource>
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetFramework)' == 'false'  and '%(HintPath)' == ''">[net standard] hintpath is not generated due to HasNetFramework="false"</CWAutomaticHintPathSource>
+
+      <!-- set the HintPath to net framework output folder, only if the reference has a matching CWReferenceStatus with HasNetFramework property not 'false' and no existing hint path -->
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetFramework)' != 'false'  and '%(HintPath)' == ''">[net standard] net framework assembly</CWAutomaticHintPathSource>
+      <HintPath Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetFramework)' != 'false' and '%(HintPath)' == ''">$(CWNetFrameworkOutputPath)%(Reference.Identity).dll</HintPath>
+
+      <CWAutomaticHintPathSource Condition="'%(CWHasCWReferenceStatus)' == 'true' and '%(CWHasNetFramework)' == 'false'  and '%(HintPath)' == ''">[net standard] hintpath not created</CWAutomaticHintPathSource>
+    </Reference>
+  </ItemGroup>
+</Project>

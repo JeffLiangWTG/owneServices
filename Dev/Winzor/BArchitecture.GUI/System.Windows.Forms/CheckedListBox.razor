@@ -1,0 +1,72 @@
+@namespace System.Windows.Forms
+@using WinzorFramework;
+@using WinzorFramework.Extensions;
+@using System.Drawing;
+@using WebMouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs;
+@using Microsoft.AspNetCore.Components;
+@inherits ListBox
+
+@{
+    var localSelectedIndex = SelectedIndex;
+    var listItems = ListBoxItemsData?.ToArray() ?? Array.Empty<ListBoxItemData>();
+}
+
+<div class="checkedlistbox"
+     style="@CheckedListBoxAppearanceStyleString()"
+     ondragover="event.preventDefault();"
+     tabindex="@this.TabIndexHtmlAttributeValue()"
+     @onwinzorfocusin="OnFocusInAsync" @onwinzorfocusin:stopPropagation>
+    @if (listItems.Length > 0)
+    {
+        for (var i = 0; i < listItems.Length; i++)
+        {
+            var itemIndex = i;
+            var item = listItems[itemIndex];
+            <div class="checkedlistbox__item"
+				 @onmouseover=@(async(arg) => await MouseOverAsync(arg, itemIndex)) @onmouseover:stopPropagation @onmouseover:preventDefault
+				 onmouseout="event.preventDefault();" @onmouseout:stopPropagation>
+                <input @attributes="DataAttributes"
+                       type="checkbox"
+                       tabindex="-1"
+                       class="checkedlistbox__input"
+                       disabled="@(!Enabled)"
+                       checked="@item.IsSelected"
+                       @onclick="(e) => CheckedChangedAsync(e, itemIndex)"
+                       @onclick:preventDefault @onclick:stopPropagation
+                       @onkeydown:preventDefault @onkeydown:stopPropagation/>
+                <label class="checkedlistbox__label @GetItemClass(localSelectedIndex, itemIndex)"
+                       style="@ItemStyleString()"
+                       @onclick="(e) => CheckedChangedAsync(e, itemIndex)"
+                       @onclick:preventDefault @onclick:stopPropagation
+                       @oncontextmenu:stopPropagation @oncontextmenu:preventDefault>
+                    @if (!string.IsNullOrWhiteSpace(item.DisplayText))
+                    {
+                        <span class="checkedlistbox__text">@item.DisplayText</span>
+                    }
+                </label>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="checkedlistbox__item--tabstop">
+            <label class="checkedlistbox__label" style="@ItemStyleString()"></label>
+        </div>
+    }
+</div>
+
+@code
+{
+    static string GetItemClass(int localSelectedIndex, int itemIndex)
+    {
+        var itemClass = itemIndex == localSelectedIndex ? "checkedlistbox__item--selected" : string.Empty;
+        if (IsTabStop(localSelectedIndex, itemIndex))
+        {
+            itemClass += " checkedlistbox__item--tabstop";
+        }
+
+        return itemClass;
+    }
+
+    static bool IsTabStop(int localSelectedIndex, int itemIndex) => localSelectedIndex == -1 && itemIndex == 0 || localSelectedIndex > -1 && itemIndex == localSelectedIndex;
+}

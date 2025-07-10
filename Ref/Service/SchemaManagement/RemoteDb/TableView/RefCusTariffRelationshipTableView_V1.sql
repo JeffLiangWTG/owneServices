@@ -1,0 +1,6 @@
+CREATE VIEW RefCusTariffRelationshipTableView_V1 AS
+SELECT ZZH_PK,
+ZZH_ZZ1_Tariff,
+ZZH_ZZI_TariffType,
+ZZH_TariffCode
+FROM RefCusTariffRelationship

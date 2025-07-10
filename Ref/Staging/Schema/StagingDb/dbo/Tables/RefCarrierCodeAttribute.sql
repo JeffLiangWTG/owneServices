@@ -1,0 +1,10 @@
+CREATE TABLE RefCarrierCodeAttribute (
+	ZZG_PK UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_RefCarrierCodeAttribute_ZZG_PK DEFAULT (NEWID()),
+	ZZG_ZZ4_CarrierCode UNIQUEIDENTIFIER NOT NULL,
+	ZZG_Name VARCHAR(32) NOT NULL,
+	ZZG_Value NVARCHAR(100) NOT NULL,
+	CONSTRAINT PK_RefCarrierCodeAttribute PRIMARY KEY CLUSTERED( ZZG_PK ASC ),
+	CONSTRAINT FK_RefCarrierCodeAttribute_RefCarrierCode FOREIGN KEY(ZZG_ZZ4_CarrierCode) REFERENCES RefCarrierCode (ZZ4_PK),
+)
+GO
+CREATE NONCLUSTERED INDEX [IX_RefCarrierCodeAttribute_ZZG_ZZ4_CarrierCode] ON [RefCarrierCodeAttribute] ([ZZG_ZZ4_CarrierCode])

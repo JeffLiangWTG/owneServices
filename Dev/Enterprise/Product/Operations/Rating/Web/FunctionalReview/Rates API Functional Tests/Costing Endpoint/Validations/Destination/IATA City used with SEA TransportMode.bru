@@ -1,0 +1,31 @@
+meta {
+  name: IATA City used with SEA TransportMode
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.Destination = { Type: "IATACITY", Value: "SYD" };
+   query.TransportMode = "SEA";
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided Type ('IATACITY') is not valid. It can only be one of these values: 'COUNTRY', 'UNLOCO', 'POSTCODE', 'ZONE'.", function() {
+    expect(res.body.ModelState['Destination.Type'][0]).to.equal("Provided Type ('IATACITY') is not valid. It can only be one of these values: 'COUNTRY', 'UNLOCO', 'POSTCODE', 'ZONE'.");
+  });
+}

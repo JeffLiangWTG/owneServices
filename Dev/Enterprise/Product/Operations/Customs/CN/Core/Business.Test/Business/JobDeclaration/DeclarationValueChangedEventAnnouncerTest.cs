@@ -1,0 +1,28 @@
+using CargoWise.EntityFramework.Testing;
+
+namespace Enterprise.Customs.CN.Business.Testing
+{
+	class DeclarationValueChangedEventAnnouncerTest : TestCaseWithFactory
+	{
+		public void TestAnnounceValueChangedEvent()
+		{
+			var declaration = Factory.New<JobDeclaration>();
+			var changedEventCalled = 0;
+			using (var announcer = new DeclarationValueChangedAnnouncer(declaration))
+			{
+				announcer.OnValueChanged += delegate
+				{
+					changedEventCalled++;
+				};
+				declaration.JE_CustomsOffice = "12";
+				AssertEquals("should have been incremented", 1, changedEventCalled);
+				declaration.JE_CustomsOffice = "123";
+				AssertEquals("should have been incremented", 2, changedEventCalled);
+			}
+
+			changedEventCalled = 0;
+			declaration.JE_CustomsOffice = "1234";
+			AssertEquals("should not have been incremented as event should be unhooked on disposal of the announcer", 0, changedEventCalled);
+		}
+	}
+}

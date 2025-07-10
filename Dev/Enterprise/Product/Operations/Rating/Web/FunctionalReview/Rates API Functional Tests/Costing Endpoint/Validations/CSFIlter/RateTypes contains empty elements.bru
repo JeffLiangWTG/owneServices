@@ -1,0 +1,31 @@
+meta {
+  name: RateTypes contains empty elements
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.CSFilter = { RateTypes: [""] }
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided RateTypes is not valid. It shouldn't contain null or empty elements.", function() {
+    expect(res.body.ModelState['CSFilter.RateTypes'][0]).to.equal("Provided RateTypes is not valid. It shouldn't contain null or empty elements.");
+  });
+  
+  
+}

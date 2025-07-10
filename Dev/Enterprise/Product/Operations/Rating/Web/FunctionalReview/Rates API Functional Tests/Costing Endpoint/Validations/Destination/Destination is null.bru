@@ -1,0 +1,32 @@
+meta {
+  name: Destination is null
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.Destination = null;
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Destination is Mandatory.", function() {
+    expect(res.body.ModelState['Destination'][0]).to.equal("Destination is Mandatory.");
+  });
+  
+  
+  
+}

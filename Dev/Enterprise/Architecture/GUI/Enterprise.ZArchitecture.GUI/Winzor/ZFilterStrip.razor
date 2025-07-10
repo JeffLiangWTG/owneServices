@@ -1,0 +1,42 @@
+@using CargoWise.Integration
+@using System.Linq;
+@using System.Windows.Forms;
+@using WinzorFramework;
+@namespace Enterprise.ZArchitecture.GUI
+@using Enterprise.ZArchitecture.GUI.JSInterop
+@using Microsoft.AspNetCore.Components.Web
+@inherits ZUserControl
+
+<div class="zfilterstrip" style="@ControlStyleString" data-type="@GetType()" data-name="@(Name ?? string.Empty)" data-drag-winzor-id="@WinzorControlId" @ref="ElementReference"
+     @onwinzordrop="HandleItemDrop"
+     @ondragleave="OnDragLeaveAsync" @ondragleave:stopPropagation
+     @ondragover="OnDragOverAsync" @ondragover:stopPropagation
+     @onwinzordragend="HandleDragEnd" @onwinzordragend:stopPropagation>
+    @RenderControls()
+</div>
+
+@code {
+    public async Task HandleItemDrop(WinzorDragEventArgs arg)
+    {
+        if (!Enabled || !AllowDrop)
+        {
+            return;
+        }
+
+        var scrollTop = await (GetJSInterop<IFilterStripJSInterop>()?.GetFilterStripsPanelScrollTopAsync(ElementReference) ?? Task.FromResult(0));
+        arg.ClientY += scrollTop;
+
+        await OnDragDropAsync(arg);
+    }
+
+    private async Task HandleDragEnd(WinzorDragEndEventArgs arg)
+    {
+        if (!Enabled || !AllowDrop)
+        {
+            return;
+        }
+
+        RemoveDragAndDropEffect();
+        await Task.CompletedTask;
+    }
+}

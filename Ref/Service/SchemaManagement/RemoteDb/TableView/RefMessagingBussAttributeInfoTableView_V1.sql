@@ -1,0 +1,4 @@
+CREATE VIEW RefMessagingBussAttributeInfoTableView_V1 AS
+SELECT ZAI_PK,
+ZAI_AttributeName
+FROM RefMessagingBussAttributeInfo

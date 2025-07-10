@@ -1,0 +1,68 @@
+@using CargoWise.Main.Navigation
+@using CargoWiseNext.Blazor.Components
+@using Microsoft.AspNetCore.Components.Web
+
+@namespace CargoWise.Main.Navigation.Pages
+
+<div class="@Classname"
+     tabindex="0"
+     style="@Stylename"
+     @ref="ElementReference"
+     @onblur="OnBlurHandlerAsync" @onblur:stopPropagation
+     @onkeypress="OnKeyPress" @onkeypress:stopPropagation>
+    <div class="cwn-mainnav__categories">
+        <CwnList>
+            @if (Service?.MenuSections is not null)
+            {
+                @foreach (MenuSection menuSection in Service.MenuSections)
+                {
+                    <CwnListItem OnClick="() => Service.UpdateSelectedMenuSection(menuSection)" IsSelected="menuSection == Service.SelectedItem">
+                        <CwnIconButton Class="cwn-list-item__key" @onfocus="async ()=> await AccessKeyFocusCallback(menuSection)" AccessKey="@menuSection.Letter">@menuSection.Letter</CwnIconButton>
+                        <div class="cwn-list-item__text">
+                            @menuSection.DisplayName
+                        </div>
+                    </CwnListItem>
+                }
+            }
+        </CwnList>
+    </div>
+    <div class="cwn-mainnav__modules">
+        @{
+            var items = GetRenderItems();
+        }
+        @if (items?.Count > 0 && Service is not null)
+        {
+            foreach (var group in items)
+            {
+                <CwnList>
+                    @foreach (var item in group)
+                    {
+                        if (item is MenuSection subSection)
+                        {
+                            <CwnListItem Class="cwn-mainnav__section">@subSection.DisplayName</CwnListItem>
+                        }
+                        else if (item is MenuItem menuItem)
+                        {
+                            @if (string.IsNullOrEmpty(menuItem.Key))
+                            {
+                                <li Class="cwn-mainnav__menu--empty"></li>
+                            }
+                            else
+                            {
+                                <CwnListItem Class="cwn-mainnav__menu" OnClick="async () => await Service.PerformClickAsync(menuItem)">
+                                    <div>@menuItem.Name</div>
+                                    <CwnIconButton Class="cwn-mainnav__favourite--hidden"
+                                                   Icon="Icon.StarEmpty"
+                                                   HoverIcon="Icon.StarFilled"
+                                                   Color="Color.Default"
+                                                   OnMouseDown="() => isMouseDownOnButton = true"
+                                                   OnSingleClick="async () => await Service.PerformFavoriteClickAsync(menuItem)" />
+                                </CwnListItem>
+                            }
+                        }
+                    }
+                </CwnList>
+            }
+        }
+    </div>
+</div>

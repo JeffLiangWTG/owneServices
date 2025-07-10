@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="252FCAE1-21C5-42F5-A8E9-E73885677D9C"
+					 Language="1033"
+					 Manufacturer="WiseTech Global"
+					 Name="CargoWise One Client"
+					 UpgradeCode="BBAAF444-2DAD-4863-97DF-5468D17146E8"
+					 Version="14.0.0">
+		<Package Compressed="yes" InstallerVersion="300" />
+		<Media Id="1" Cabinet="CargoWiseOneSetup.cab" EmbedCab="yes" />
+
+		<Property Id="ALLUSERS" Value="1" />
+
+		<Property Id="ARPPRODUCTICON" Value="ApplicationIcon.ico" />
+		<Icon Id="ApplicationIcon.ico" SourceFile="..\..\..\..\..\Resources\CargoWiseOne.ico"/>
+
+		<PropertyRef Id="NETFRAMEWORK45" />
+		<Condition Message="This application requires .NET Framework 4.5.1. Please install the .NET Framework then run this installer again.">
+			NETFRAMEWORK45 >= "#378675"
+		</Condition>
+		<Condition Message="You must be an administrator on this computer to install or uninstall [ProductName].">Privileged</Condition>
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="CompanyProgramFilesFolder" Name="WiseTech Global">
+					<Directory Id="ProductProgramFilesFolder" Name="CargoWise One">
+						<Component Id="CargoWiseOneStartComponent" Guid="2A2865E2-F2E2-48F8-99AB-F3036F2AE29A" NeverOverwrite="yes">
+							<File Id="CargoWiseOneStartFile" KeyPath="yes" Name="CargoWiseOne.Start.exe" Source="..\..\..\..\..\Bin\CargoWiseOne.Start.exe" />
+							<File Id="CargoWiseOneStartConfigFile" Name="CargoWiseOne.Start.exe.config" Source="..\..\..\..\..\Bin\CargoWiseOne.Start.exe.config" />
+							<File Id="ApplicationLoggingConfigFile" Name="applog.json" Source="..\..\..\..\..\Enterprise\Product\Main\Enterprise.Main\CargoWiseOneProjects\applog.json" />
+						</Component>
+						<Component Id="ClientInstalledRegistry">
+							<RegistryValue Id="InstalledRegistryValue"
+									 Key="SOFTWARE\WiseTech Global\CargoWise One"
+									 Name="ClientInstalled"
+									 Root="HKLM"
+									 Type="integer"
+									 Value="1" />
+						</Component>
+					</Directory>
+				</Directory>
+			</Directory>
+		</Directory>
+
+		<Feature Id="ProductFeature" Level="1">
+			<ComponentRef Id="CargoWiseOneStartComponent" />
+			<ComponentRef Id="ClientInstalledRegistry" />
+		</Feature>
+
+		<CustomAction Id="RunCargoWiseOneStart" Directory="ProductProgramFilesFolder" ExeCommand="[ProductProgramFilesFolder]\CargoWiseOne.Start.exe -install" Execute="deferred" Impersonate="no" Return="ignore" />
+		<CustomAction Id="UnsintallCargoWiseOne" Directory="ProductProgramFilesFolder" ExeCommand="[ProductProgramFilesFolder]\CargoWiseOne.Start.exe -uninstall" Execute="deferred" Impersonate="no" />
+
+		<InstallExecuteSequence>
+			<Custom Action="RunCargoWiseOneStart" Before="InstallFinalize">(Not Installed OR REINSTALL) AND (INSTALLUILEVEL > INSTALLUILEVEL_NONE)</Custom>
+			<Custom Action="UnsintallCargoWiseOne" After="InstallInitialize">REMOVE~="ALL"</Custom>
+		</InstallExecuteSequence>
+	</Product>
+</Wix>

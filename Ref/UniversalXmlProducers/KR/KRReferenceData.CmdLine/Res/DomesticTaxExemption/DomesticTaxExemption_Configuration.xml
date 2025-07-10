@@ -1,0 +1,96 @@
+<EntityConfiguration>
+  <DataFileExtensions>xls, xlsx</DataFileExtensions>
+  <EntityTypes>
+    <EntityType Name="RefCusTariff" Data="true">
+      <Key>
+        <PropertyRef Name="ZZ1_TariffCode" />
+        <PropertyRef Name="ZZ1_ZZI_NKTariffType" />
+        <PropertyRef Name="ZZ1_ZZI_ZZZ_NKDataGrouping" />
+        <PropertyRef Name="ZZ1_ZZZ_NKDataGrouping" />
+      </Key>
+      <Properties>
+        <Property Name="RefCusRate" Type="RefCusRate" />
+        <Property Name="RefCusTariffUOM" Type="RefCusTariffUOM" />
+        <Property Name="RefCusTariffAttribute" Type="RefCusTariffAttribute" />
+        <Property Name="ZZ1_TariffCode" Type="varchar" MaxLength="35" />
+        <Property Name="ZZ1_Description" Type="nvarchar" />
+        <Property Name="ZZ1_StartDate" Type="datetime" />
+        <Property Name="ZZ1_EndDate" Type="datetime" />
+        <Property Name="ZZ1_ZZI_NKTariffType" Type="varchar" MaxLength="5" ConstantValue="DTE" />
+        <Property Name="ZZ1_ZZI_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+        <Property Name="ZZ1_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+      </Properties>
+    </EntityType>
+    <EntityType Name="RefCusRate" Data="true">
+      <Key>
+        <PropertyRef Name="ZZ2_ZY1_NKRateCode" />
+        <PropertyRef Name="ZZ2_ZZZ_NKDataGrouping" />
+      </Key>
+      <Properties>
+        <Property Name="ZZ2_RateFormula" Type="varchar" MaxLength="500" />
+        <Property Name="ZZ2_StartDate" Type="datetime" />
+        <Property Name="ZZ2_EndDate" Type="datetime" />
+        <Property Name="ZZ2_ZY1_NKRateCode" Type="varchar" MaxLength="5" ConstantValue="DTE" />
+        <Property Name="ZZ2_ZY1_ZZR_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+        <Property Name="ZZ2_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+      </Properties>
+    </EntityType>
+    <EntityType Name="RefCusTariffUOM" Data="true">
+      <Key>
+        <PropertyRef Name="ZZ8_Type" />
+      </Key>
+      <Properties>
+        <Property Name="ZZ8_Type" Type="varchar" MaxLength="3" ConstantValue="CU1" />
+        <Property Name="ZZ8_UOM" Type="varchar" MaxLength="10" />
+        <Property Name="ZZ8_ZZZ_NKDataGrouping" Type="varchar" MaxLength="3" ConstantValue="KR" />
+      </Properties>
+    </EntityType>
+    <EntityType Name="RefCusTariffAttribute" Data="true">
+      <Key>
+        <PropertyRef Name="ZZ3_Name"/>
+        <PropertyRef Name="ZZ3_Value"/>
+      </Key>
+      <Properties>
+        <Property Name="ZZ3_Name" Type="varchar" MaxLength="50" DefaultValue="TaxCode" />
+        <Property Name="ZZ3_Value" Type="nvarchar(max)" />
+      </Properties>
+    </EntityType>
+  </EntityTypes>
+  <EntityTypeExcelColumnMapping>
+    <SheetIndex>0</SheetIndex>
+    <StartRow>1</StartRow>
+    <EntityTypes>
+      <MappingEntityType Name="RefCusTariff">
+        <Properties>
+          <Property Name="ZZ1_TariffCode"  Type="varchar" ExcelColumn="0"/>
+          <Property Name="ZZ1_StartDate" Type="datetime" ExcelColumn="4" DateTimeFormat ="yyyyMMdd" />
+          <Property Name="ZZ1_EndDate" Type="datetime" ExcelColumn="5" IsEndDate="true" DateTimeFormat ="yyyyMMdd" />
+          <Property Name="ZZ1_Description" Type="varchar" ExcelColumn="1"/>
+        </Properties>
+      </MappingEntityType>>
+      <MappingEntityType Name="RefCusTariffAttribute">
+        <Properties>
+          <Property Name="ZZ3_Value" Type ="nvarchar(max)" ExcelColumn="2"/>
+        </Properties>
+      </MappingEntityType>
+    </EntityTypes>
+  </EntityTypeExcelColumnMapping>
+  <Rules>
+    <Rule Name="Exemption Codes" Relationship="OR">
+      <RuleValues>
+        <RuleValue Value="E109201" TaxReductionAmountPerUnit="1000000" QuantityUnit="U"/>
+        <RuleValue Value="E109202" TaxReductionAmountPerUnit="1000000" QuantityUnit="U"/>
+        <RuleValue Value="E109501" TaxReductionAmountPerUnit="3000000" QuantityUnit="U"/>
+        <RuleValue Value="E109502" TaxReductionAmountPerUnit="3000000" QuantityUnit="U"/>
+        <RuleValue Value="E109801" TaxReductionAmountPerUnit="4000000" QuantityUnit="U"/>
+        <RuleValue Value="E109802" TaxReductionAmountPerUnit="4000000" QuantityUnit="U"/>
+        <RuleValue Value="L180131" TaxReductionAmountPerUnit="5000000" QuantityUnit="U"/>
+      </RuleValues>
+    </Rule>
+    <Rule Name="Involves Installation Cost" Relationship="OR">
+      <RuleValues>
+        <RuleValue Value="L180131" />
+      </RuleValues>
+    </Rule>
+  </Rules>
+</EntityConfiguration>

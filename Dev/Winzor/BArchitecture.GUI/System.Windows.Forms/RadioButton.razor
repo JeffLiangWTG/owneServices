@@ -1,0 +1,81 @@
+@namespace System.Windows.Forms
+@inherits ButtonBase
+@using WinzorFramework.Extensions
+@using System.Drawing
+@using WinzorFramework
+
+@{
+	var layout = Adapter.CommonLayout().Layout();
+}
+<label class="@GetRadioButtonClasses()"
+		style="@ControlStyleString"
+		@ref="AnchorElement"
+		@onwinzorfocusin="OnFocusInAsync"
+		@onwinzorfocusin:stopPropagation
+		@onclick="OnClickAsync"
+		@onclick:preventDefault
+		@onclick:stopPropagation
+		tabindex="-1"
+		disabled="@(!Enabled)"
+		checked="@Checked">
+
+	<input type="radio"
+			@ref="ElementReference"
+			name="@Parent?.WinzorControlId"
+			checked="@Checked"
+			disabled="@(!Enabled)"
+			aria-disabled="@(!Enabled)"
+			tabindex="@this.TabIndexHtmlAttributeValue()"
+			@attributes="DataAttributes"
+			@onwinzorfocusout="OnFocusOutAsync"
+			@onwinzorfocusout:stopPropagation
+			style="@Adapter.GetCheckBoundsStyleString(layout)" />
+
+	<span class="radiobutton__text"
+			style="@Adapter.GetTextBoundsStyleString(layout)"
+			tabindex="-1">
+		@Text.ProcessMnemonicToHtml(UseMnemonic)
+	</span>
+</label>
+@RenderControls()
+
+@code
+{
+	protected internal override string ControlStyleString => base.ControlStyleString + (Appearance == Appearance.Button ? $" width: {Width - 2}px; height: {Height - 2}px;" : string.Empty);
+
+	string RadioButtonFlatStyleClass => FlatStyle switch
+	{
+		FlatStyle.Flat => "radiobutton--flat",
+		FlatStyle.Popup => "radiobutton--popup",
+		FlatStyle.Standard => "radiobutton--standard",
+		FlatStyle.System => "radiobutton--system",
+		_ => string.Empty
+	};
+
+	string GetRadioButtonClasses()
+	{
+		var radioButtonClasses = "radiobutton ";
+		if (Appearance == Appearance.Normal)
+		{
+			radioButtonClasses += "radiobutton--normal";
+			if (!Enabled)
+			{
+				radioButtonClasses += $" radiobutton--normal--disabled";
+			}
+		}
+		else if (Appearance == Appearance.Button)
+		{
+			radioButtonClasses += "radiobutton--button ";
+			radioButtonClasses += RadioButtonFlatStyleClass;
+			if (!Enabled)
+			{
+				radioButtonClasses += $" {RadioButtonFlatStyleClass}--disabled";
+			}
+			if (Checked)
+			{
+				radioButtonClasses += $" {RadioButtonFlatStyleClass}--checked";
+			}
+		}
+		return radioButtonClasses;
+	}
+}

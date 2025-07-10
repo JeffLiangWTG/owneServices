@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <ProjectReference Include="..\Business\ResourceStrings.Business.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.Definitions" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="NUnitCore" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="WTG.SpellCheck" />
+    <Reference Include="CargoWise.Tools.SpellCheck" />
+    <Reference Include="CargoWise.Integration" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.Types" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.IO.Compression" />
+  </ItemGroup>
+  <!-- Temporarily disable it in .NET 8 csproj as it conflicts with PostBuild in .NET Framework csproj -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Exec Command="$(TargetDir)ResourceStringsSpellCheckTestGenerator.exe $(TargetPath)" />
+  </Target>
+</Project>

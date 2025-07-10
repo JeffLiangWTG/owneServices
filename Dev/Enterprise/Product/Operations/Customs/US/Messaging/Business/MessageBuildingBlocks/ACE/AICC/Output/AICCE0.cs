@@ -1,0 +1,42 @@
+namespace Enterprise.Customs.US.Messaging.Business.MessageBuildingBlocks.ACE.Output
+{
+	using CargoWise.Types;
+
+	[OutputBlock("E0")]
+	public partial class AICCE0 : MessageBlock
+	{
+		public AICCE0()
+			: base("E0")
+		{
+		}
+
+		/// <summary>
+		/// An indication as to the type of reference information returned.
+		///
+		/// See Table 1 'Returned Importer Create/Update Reference Data' for a list of codes.
+		/// </summary>
+		[MessageBlockString(6, 4, "M")]
+		public ZString ReferenceDataTypeCode;
+
+		/// <summary>
+		/// If a repeating group, the relative position of the
+		/// submitted input detail within the grouping, otherwise zero.
+		/// </summary>
+		[MessageBlockInt(6, 11, "M")]
+		public ZInt OccurrencePosition;
+
+		/// <summary>
+		/// Always "REF ID:"
+		/// </summary>
+		[MessageBlockString(7, 18, "M")]
+		public ZString ReferenceIDConstant;
+
+		/// <summary>
+		/// Identifying data extracted from the submitted input that corresponds to the Reference Data Type Code.
+		///
+		/// See Table 1 'Returned Importer Create/Update Reference Data' for a list of codes.
+		/// </summary>
+		[MessageBlockString(55, 26, "M", ShouldTrimBegining = false)]
+		public ZString ReferenceDataText;
+	}
+}

@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  version="3">
+  <xs:element name="tariffMasterData">
+    <xs:annotation>
+      <xs:documentation>
+        Die Elementnamen entsprechen jenen im XML Schema edec und edecResponse. Die Wertelisten für die Elemente
+        befinden sich in den Attributen.
+        Falls die Werte historisiert sind, wird die Zeitspanne angegeben, für die die Werte gelten. Falls Elemente oder
+        deren Unterlemente nur für Import oder Export gelten, ist das mit Hilfe entsprechender Attribute gekennzeichnet.
+        Bei Texten sind die Werte jeweils auf Deutsch, Französisch und Italienisch aufgeführt.
+        Das Root Element enthält Angaben zu dem Erstellungsdatum der Stammdaten für Tarife.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="commodityCodes">
+          <xs:annotation>
+            <xs:documentation>Tarifnummern</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="commodityCode" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="controlCode" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:documentation>Schlüssel zur Warennummer; muss zur jeweiligen Tarifnummer in den Stammdaten existieren</xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="declarationRule" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:attribute name="weight" type="xs:string" use="required"/>
+                              <xs:attribute name="weightCalc" type="xs:string" use="required"/>
+                              <xs:attribute name="value" type="xs:short" use="required"/>
+                              <xs:attribute name="validFrom" type="xs:date" use="required"/>
+                              <xs:attribute name="validTo" type="xs:date" use="required"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="processingCode" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:attribute name="value" type="xs:byte" use="required"/>
+                              <xs:attribute name="validFrom" type="xs:date" use="required"/>
+                              <xs:attribute name="validTo" type="xs:date" use="required"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="permit" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element ref="countryGroupAssignment" minOccurs="0" maxOccurs="unbounded"/>
+                              </xs:sequence>
+                              <xs:attribute name="permitAuthority" type="xs:short" use="required"/>
+                              <xs:attribute name="toleranceCode" type="xs:byte" use="required"/>
+                              <xs:attribute name="grpObligation" type="xs:byte" use="optional"/>
+                              <xs:attribute name="optional" type="xs:boolean" use="required"/>
+                              <xs:attribute name="validFrom" type="xs:date" use="required"/>
+                              <xs:attribute name="validTo" type="xs:date" use="required"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="nonCustomsLaw" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element ref="countryGroupAssignment" minOccurs="0" maxOccurs="unbounded"/>
+                              </xs:sequence>
+                              <xs:attribute name="code" type="xs:short" use="required"/>
+                              <xs:attribute name="optional" type="xs:boolean" use="required"/>
+                              <xs:attribute name="grpObligation" type="xs:byte" use="optional"/>
+                              <xs:attribute name="validFrom" type="xs:date" use="required"/>
+                              <xs:attribute name="validTo" type="xs:date" use="required"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="value" type="xs:short" use="required"/>
+                        <xs:attribute name="scaleWeightCode" type="xs:byte" use="required"/>
+                        <xs:attribute name="storageType" type="xs:string" use="required"/>
+                        <xs:attribute name="validFrom" type="xs:date" use="required"/>
+                        <xs:attribute name="validTo" type="xs:date" use="required"/>
+                        <xs:attribute name="lowerScaleWeight" type="xs:string" use="optional"/>
+                        <xs:attribute name="upperScaleWeight" type="xs:string" use="optional"/>
+                        <xs:attribute name="validForImport" type="xs:boolean" use="required">
+                          <xs:annotation>
+                            <xs:documentation>Definiert ob dieser Eintrag für Import relevant ist (true oder false)</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="validForExport" type="xs:boolean" use="required">
+                          <xs:annotation>
+                            <xs:documentation>Definiert ob dieser Eintrag für Export relevant ist (true oder false)</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="value" type="xs:string" use="required"/>
+                  <xs:attribute name="validFrom" type="xs:date" use="required"/>
+                  <xs:attribute name="validTo" type="xs:date" use="required"/>
+                  <xs:attribute name="validForImport" type="xs:boolean" use="required">
+                    <xs:annotation>
+                      <xs:documentation>Definiert ob dieser Eintrag für Import relevant ist (true oder false)</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="validForExport" type="xs:boolean" use="required">
+                    <xs:annotation>
+                      <xs:documentation>Definiert ob dieser Eintrag für Export relevant ist (true oder false)</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="created" type="xs:dateTime" use="required">
+        <xs:annotation>
+          <xs:documentation>Erstellungszeitpunkt der Stammdaten XML-Datei</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="countryGroupAssignment">
+    <xs:annotation>
+      <xs:documentation>Zuweisung zu einer Ländergruppe</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="grpNr" type="xs:int" use="required">
+        <xs:annotation>
+          <xs:documentation>Nummer der Ländergruppe (Stammdaten: edecCountryCodes.xml/countryCodes/countryGroups/countryGroup/@grpNr)</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="type" use="required">
+        <xs:annotation>
+          <xs:documentation>Einschluss / Ausschluss der unter "grpNr" referenzierten Ländergruppe; das Attribut enthält
+            die Werte "include" oder "exclude". "Include" bedeutet, dass das Element für die referenzierte Ländergruppe
+            (Attribut "grpNr") gilt. "Exclude" bedeutet, dass die Länder in dieser Gruppe die entsprechenden
+            statistischen Zusatzinformationen nicht angeben dürfen
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="include"/>
+            <xs:enumeration value="exclude"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="validFrom" type="xs:date" use="required"/>
+      <xs:attribute name="validTo" type="xs:date" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

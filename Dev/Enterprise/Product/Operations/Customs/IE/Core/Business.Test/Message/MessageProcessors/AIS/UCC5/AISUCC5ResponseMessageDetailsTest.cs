@@ -1,0 +1,1 @@
+// No need to test AISResponseMessageDetailmapping directly as it is tested in \git\wtg\CargoWise\Dev\Enterprise\Product\Operations\Customs\IE\Core\Business.Test\Message\MessageProcessors\MessageAttacheeMessageProcessorAbstractTest.cs indirectly

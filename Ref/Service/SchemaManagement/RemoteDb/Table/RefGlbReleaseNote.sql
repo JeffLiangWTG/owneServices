@@ -1,0 +1,25 @@
+CREATE TABLE RefGlbReleaseNote
+(
+[ZGF_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefGlbReleaseNote_ZGF_PK] DEFAULT (NEWID()),
+[ZGF_IsValid] BIT NOT NULL CONSTRAINT [DF_RefGlbReleaseNote_ZGF_IsValid] DEFAULT 0,
+[ZGF_Category] VARCHAR(3) NOT NULL CONSTRAINT [DF_RefGlbReleaseNote_ZGF_Category] DEFAULT '',
+[ZGF_RN_NKCountryForReleaseNote] VARCHAR(2) NOT NULL CONSTRAINT [DF_RefGlbReleaseNote_ZGF_RN_NKCountryForReleaseNote] DEFAULT '',
+[ZGF_Summary] NVARCHAR(1024) NOT NULL CONSTRAINT [DF_RefGlbReleaseNote_ZGF_Summary] DEFAULT '',
+[ZGF_URL] VARCHAR(256) NOT NULL CONSTRAINT [DF_RefGlbReleaseNote_ZGF_URL] DEFAULT '',
+[ZGF_ReleaseNoteDate] DATETIME NOT NULL,
+[ZGF_Section] VARCHAR(3) NOT NULL CONSTRAINT [DF_RefGlbReleaseNote_ZGF_Section] DEFAULT 'C1U',
+[ZGF_MinVersion] VARCHAR(50) NOT NULL CONSTRAINT [DF_RefGlbReleaseNote_ZGF_MinVersion] DEFAULT '',
+[ZGF_QuickStartPK] UNIQUEIDENTIFIER NOT NULL,
+CONSTRAINT [PK_RefGlbReleaseNote] PRIMARY KEY CLUSTERED ( ZGF_PK ASC ),
+CONSTRAINT [CK_RefGlbReleaseNote_ZGF_URL] CHECK (ZGF_URL <> ''),
+CONSTRAINT [CK_RefGlbReleaseNote_ZGF_Summary] CHECK (DATALENGTH(ZGF_Summary) > 0),
+CONSTRAINT [CK_RefGlbReleaseNote_ZGF_Section] CHECK (ZGF_Section = 'BOR' OR ZGF_Section = 'C1U' OR ZGF_Section = 'WLU' OR ZGF_Section = 'WNS'),
+CONSTRAINT [CK_RefGlbReleaseNote_ZGF_MinVersion] CHECK ((ZGF_Section = 'C1U' AND ZGF_MinVersion <> '') OR (ZGF_Section <> 'C1U' AND ZGF_MinVersion = '')),
+)
+
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_RefGlbReleaseNote_ZGF_QuickStartPK ON RefGlbReleaseNote (ZGF_QuickStartPK)
+GO
+CREATE NONCLUSTERED INDEX IX_RefGlbReleaseNote_ZGF_Section_ZGF_RN_NKCountryForReleaseNote ON RefGlbReleaseNote (ZGF_Section, ZGF_RN_NKCountryForReleaseNote)
+GO
+

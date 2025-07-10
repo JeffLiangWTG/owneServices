@@ -1,0 +1,5 @@
+CREATE VIEW RefCusNomenclatureGroupTypeTableView_V1 AS
+SELECT ZZ9_PK,
+ZZ9_GroupType,
+ZZ9_Description
+FROM RefCusNomenclatureGroupType

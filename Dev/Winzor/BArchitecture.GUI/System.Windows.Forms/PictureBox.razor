@@ -1,0 +1,91 @@
+@namespace System.Windows.Forms
+@inherits Control
+
+<div class="picturebox @outerBorderClass" style="@pictureBoxStyle" @attributes="DataAttributes" @onmousedown="OnMouseDownAsync" @onmousedown:stopPropagation @oncontextmenu="OnContextMenuAsync" @oncontextmenu:stopPropagation @oncontextmenu:preventDefault @onclick="OnClickAsync" @onclick:stopPropagation @ref="ElementReference">
+    @if (Image != null)
+    {
+        <img src="@imageSrc" class="@innerBorderClass" style="@style" draggable="false" />
+    }
+</div>
+
+@code {
+    string style => width + height + aspectRatio;
+
+    string pictureBoxStyle => pictureBoxWidth + pictureBoxHeight + autoCenter;
+    string pictureBoxWidth => this.Width > 0 ? $"width:{this.Width - widthOverlap}px;" : string.Empty;
+    string pictureBoxHeight => this.Height > 0 ? $"height:{this.Height}px;" : string.Empty;
+
+    string autoCenter => this.SizeMode switch
+    {
+        PictureBoxSizeMode.CenterImage => "display: flex; " + (OverlapWidth ? autoCenterHideOverlap : "justify-content: center;"),
+        _ => string.Empty
+    };
+
+    const string autoCenterHideOverlap = "overflow: hidden; justify-content: right; right: 0px; position: absolute;";
+
+    string width => this.SizeMode switch
+    {
+        PictureBoxSizeMode.CenterImage => this.Width > 0 ? $"width:{this.imageWidth}px;" : string.Empty,
+        _ => this.Width > 0 ? $"width:{this.Width}px;" : string.Empty
+    };
+
+    string height => this.SizeMode switch
+    {
+        PictureBoxSizeMode.CenterImage => this.Height > 0 ? $"height:{this.imageHeight}px;" : string.Empty,
+        _ => this.Height > 0 ? $"height:{this.Height}px;" : string.Empty
+    };
+
+    string outerBorderClass => this.BorderStyle switch
+    {
+        BorderStyle.FixedSingle => string.Empty,
+        BorderStyle.Fixed3D => "picturebox-border--outer",
+        _ => string.Empty
+    };
+
+    string innerBorderClass => this.BorderStyle switch
+    {
+        BorderStyle.FixedSingle => "picturebox-border--static",
+        BorderStyle.Fixed3D => "picturebox-border--inner",
+        _ => string.Empty
+    };
+
+    string aspectRatio => this.SizeMode switch
+    {
+        PictureBoxSizeMode.StretchImage => "object-fit:fill;",
+        PictureBoxSizeMode.AutoSize => "object-fit:fill;",
+        PictureBoxSizeMode.Zoom => "object-fit:contain;",
+        PictureBoxSizeMode.CenterImage => (OverlapWidth && widthOverlap == 0) ? "position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" : "margin:auto; ",
+        _ => string.Empty
+    };
+
+    bool OverlapWidth => (SizeMode == PictureBoxSizeMode.CenterImage && imageWidth > Size.Width) || widthOverlap > 0;
+
+    int widthOverlap
+    {
+        get
+        {
+            if (Parent is TableLayoutPanel &&
+                SizeMode == PictureBoxSizeMode.CenterImage)
+            {
+                var parentPanel = (TableLayoutPanel)Parent;
+                var position = parentPanel.GetCellPosition(this);
+
+                if (parentPanel.ColumnCount > 1 &&
+                    position.Column > 0)
+                {
+                    var priorControl = parentPanel.GetControlFromPosition(position.Column - 1, position.Row);
+                    if (priorControl != null)
+                    {
+                        var overlap = priorControl.Right - this.Left;
+                        if (overlap > 0)
+                        {
+                            return overlap;
+                        }
+                    }
+                }
+            }
+
+            return 0;
+        }
+    }
+}

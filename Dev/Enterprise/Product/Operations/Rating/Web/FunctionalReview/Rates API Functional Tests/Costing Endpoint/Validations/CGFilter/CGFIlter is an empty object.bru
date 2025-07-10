@@ -1,0 +1,31 @@
+meta {
+  name: CGFIlter is an empty object
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   
+   query.TransportMode = "AIR";
+   query.ContainerMode = "LSE";
+   
+   
+   query.CGFilter = {};
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

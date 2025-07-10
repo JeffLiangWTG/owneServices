@@ -1,0 +1,750 @@
+<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="clr-namespace:CargoWise.GUI.TileBar"
+	xmlns:UI="clr-namespace:CargoWise.Main.Navigation.WPF;assembly=CargoWise.Main.Navigation"
+	xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"  
+	xmlns:nav="clr-namespace:CargoWise.Main.Navigation;assembly=CargoWise.Main.Navigation"
+	xmlns:converters="clr-namespace:CargoWise.Main.Navigation.Converters;assembly=CargoWise.Main.Navigation"
+	xmlns:dragdrop="clr-namespace:CargoWise.Main.Navigation.DragDrop;assembly=CargoWise.Main.Navigation"
+	xmlns:i="http://schemas.microsoft.com/xaml/behaviors">
+
+	<converters:MenuIndexVisibilityConverter x:Key="MenuIndexVisibilityConverter" />
+	<converters:ShortcutToolTipConverter x:Key="ShortcutToolTipConverter" />
+	<converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+	<converters:MaxHeightConverter x:Key="MaxHeightConverter" />
+	<converters:DrawingToMediaColorConverter x:Key="DrawingToMediaColorConverter" />
+	<converters:NotBooleanToVisibilityConverter x:Key="NotBooleanToVisibilityConverter" />
+	<converters:AndBooleanToVisibilityConverter x:Key="AndBooleanToVisibilityConverter" />
+	<converters:InvertVisibilityConverter x:Key="InvertVisibilityConverter" />
+	<local:ScrollBarVisibilityConverter x:Key="ScrollBarVisibilityConverter" />
+	<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+	<SolidColorBrush x:Key="BackgroundColor" Color="{Binding TileBackgroundColor, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:TileBarControl}}}" />
+	<SolidColorBrush x:Key="HoverColor" Color="{Binding TileSelectedColor, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:TileBarControl}}}" />
+	<SolidColorBrush x:Key="DetailsBackgroundColor" Color="{Binding GroupHeaderBackgroundColor, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:TileBarControl}}}" />
+	<SolidColorBrush x:Key="ModuleLetterColor" Color="{Binding TileTextColor, FallbackValue=White, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:TileBarControl}}}" />
+	<SolidColorBrush x:Key="DetailsSubsectionColor" Color="{Binding GroupBackgroundColor, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:TileBarControl}}}" />
+	<SolidColorBrush x:Key="FavoriteIndexBorderColor" Color="{Binding TileBackgroundColor, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:TileBarControl}}}" />
+	<SolidColorBrush x:Key="FavoriteIndexTextColor" Color="{Binding TileTextColor, FallbackValue=White, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:TileBarControl}}}" />
+	<SolidColorBrush x:Key="ShortcutIndexTextColor" Color="{Binding TileTextColor, FallbackValue=White, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:TileBarControl}}}" />
+	<SolidColorBrush x:Key="CategoryHighlightedBackgroundColor" Color="{Binding TileSelectedColor, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:TileBarControl}}}" />
+	<SolidColorBrush x:Key="RecentBackgroundColor" Color="{Binding RecentPanelBackgroundColor, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:TileBarControl}}}" />
+	<SolidColorBrush x:Key="ShortcutIndexBorderColor" Color="{Binding TileSelectedColor, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:TileBarControl}}}" />
+
+	<SolidColorBrush x:Key="RecentPanelBackgroundColor" Color="{Binding PanelBackgroundColor, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:RecentItemsControl}}}" />
+	<SolidColorBrush x:Key="RecentPanelBorderColor" Color="{Binding PanelBorderColor, IsAsync=True, Converter={StaticResource DrawingToMediaColorConverter}, RelativeSource={RelativeSource AncestorType={x:Type local:RecentItemsControl}}}" />
+
+	<SolidColorBrush Color="#FF000000" x:Key="DetailsTitleColor" />
+	<SolidColorBrush Color="#FF000000" x:Key="HyperlinkTextColor" />
+	<SolidColorBrush Color="#FF575A5D" x:Key="HyperlinkHoverColor" />
+	<SolidColorBrush Color="#FFC4C7C8" x:Key="DetailsBorderColor" />
+	<SolidColorBrush Color="#FF8B9093" x:Key="CategoryBottomBorderColor" />
+	<SolidColorBrush Color="#FF575A5D" x:Key="CategoryShortcutTextColor" />
+	<SolidColorBrush Color="#FF000000" x:Key="CategoryHighlightedTextColor" />
+	<SolidColorBrush Color="#FF000000" x:Key="CategoryTextColor" Opacity="0.8" />
+	<SolidColorBrush Color="#FF575A5D" x:Key="FavoriteHeaderTextColor" />
+
+	<Style x:Key="ButtonCaption" TargetType="{x:Type TextBlock}">
+		<Setter Property="FontSize" Value="12px" />
+		<Setter Property="Foreground" Value="{DynamicResource ModuleLetterColor}" />
+		<Setter Property="TextWrapping" Value="Wrap" />
+		<Setter Property="TextAlignment" Value="Center" />
+		<Setter Property="Margin" Value="1 -10 1 1" />
+		<Setter Property="LineHeight" Value="13px" />
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="LineStackingStrategy" Value="BlockLineHeight" />
+	</Style>
+
+	<Style x:Key="LetterCaption" TargetType="{x:Type TextBlock}">
+		<Setter Property="FontSize" Value="40px" />
+		<Setter Property="FontWeight" Value="Bold" />
+		<Setter Property="Foreground" Value="{DynamicResource ModuleLetterColor}" />
+	</Style>
+
+	<DataTemplate x:Key="TileBarItem">
+		<Border 
+			Name="Border"
+			Background="{StaticResource BackgroundColor}"
+			Margin="0"
+			Width="90px"
+			Height="90px"
+			SnapsToDevicePixels="true">
+			<Grid>
+				<UI:MultilingualTextLabel HorizontalAlignment="Center" HorizontalContentAlignment="Center" IsTranslatable="False">
+					<TextBlock
+						Margin="0 -2 0 0"
+						Text="{Binding Letter}"
+						Style="{StaticResource LetterCaption}" 
+						TextAlignment="Center" />
+				</UI:MultilingualTextLabel>
+				<UI:MultilingualTextLabel HorizontalAlignment="Center" VerticalContentAlignment="Center" IsTranslatable="{Binding IsTranslatable}" MultilingualText="{Binding MultilingualText}">
+					<TextBlock
+						Margin="1 42 1 1"
+						Text="{Binding DisplayName}"
+						Style="{StaticResource ButtonCaption}" />
+				</UI:MultilingualTextLabel>
+			</Grid>
+		</Border>
+
+		<DataTemplate.Triggers>
+			<DataTrigger Binding="{Binding IsSelected}" Value="true">
+				<Setter TargetName="Border" Property="Background" Value="{StaticResource HoverColor}"/>
+			</DataTrigger>
+			<DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" Value="true">
+				<Setter TargetName="Border" Property="Background" Value="{StaticResource HoverColor}"/>
+			</DataTrigger>
+		</DataTemplate.Triggers>
+	</DataTemplate>
+
+	<Style x:Key="RecentItemsNoRecords" TargetType="{x:Type TextBlock}">
+		<Setter Property="Margin" Value="20 0 0 0" />
+		<Setter Property="FontSize" Value="12px" />
+		<Setter Property="FontWeight" Value="Bold" />
+		<Setter Property="TextAlignment" Value="Center" />
+		<Setter Property="Foreground" Value="{StaticResource BackgroundColor}" />
+		<Setter Property="Visibility" Value="Collapsed" />
+		<Style.Triggers>
+			<DataTrigger Binding="{Binding Items.Count}" Value="0">
+				<Setter Property="Visibility" Value="Visible" />
+			</DataTrigger>
+		</Style.Triggers>
+	</Style>
+
+	<Style x:Key="StandaloneRecentItemsHeader" TargetType="{x:Type TextBlock}">
+		<Setter Property="FontSize" Value="14px" />
+		<Setter Property="FontWeight" Value="Normal" />
+		<Setter Property="Foreground" Value="{StaticResource DetailsTitleColor}" />
+	</Style>
+
+	<Style x:Key="SectionTitle" TargetType="{x:Type TextBlock}">
+		<Setter Property="FontSize" Value="14px" />
+		<Setter Property="FontWeight" Value="Normal" />
+		<Setter Property="Foreground" Value="{StaticResource DetailsTitleColor}" />
+	</Style>
+
+	<Style x:Key="CargoWiseHyperlink">
+		<Setter Property="TextBlock.Foreground" Value="{StaticResource HyperlinkTextColor}" />
+		<Setter Property="TextBlock.TextDecorations" Value="{x:Null}" />
+		<Setter Property="TextBlock.FontSize" Value="12px" />
+		<Setter Property="FrameworkElement.Cursor" Value="Hand" />
+		<Style.Triggers>
+			<Trigger Property="FrameworkElement.IsMouseOver" Value="True">
+				<Setter Property="TextBlock.Foreground" Value="{StaticResource HyperlinkHoverColor}" />
+				<Setter Property="TextBlock.TextDecorations" Value="Underline" />
+			</Trigger>
+		</Style.Triggers>
+	</Style>
+
+	<Style x:Key="NormalHyperlink">
+		<Setter Property="TextBlock.Foreground" Value="{StaticResource HyperlinkTextColor}" />
+		<Setter Property="TextBlock.FontSize" Value="12px" />
+		<Setter Property="FrameworkElement.Cursor" Value="Hand" />
+		<Style.Triggers>
+			<Trigger Property="FrameworkElement.IsMouseOver" Value="True">
+				<Setter Property="TextBlock.Foreground" Value="{StaticResource HyperlinkHoverColor}" />
+			</Trigger>
+		</Style.Triggers>
+	</Style>
+
+	<DataTemplate x:Key="MenuItem">
+		<UI:MultilingualTextLabel IsTranslatable="False">
+			<Hyperlink
+				Style="{StaticResource CargoWiseHyperlink}"
+				Command="{Binding LinkAction}">
+				<i:Interaction.Triggers>
+					<i:EventTrigger EventName="MouseRightButtonDown">
+						<i:InvokeCommandAction Command="{Binding LinkRightClickAction}" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+				<UI:MultilingualTextLabel IsTranslatable="{Binding IsTranslatable}" MultilingualText="{Binding MultilingualText}" />
+				<Hyperlink.ToolTip>
+					<TextBlock Text="{Binding Name}" />
+				</Hyperlink.ToolTip>
+			</Hyperlink>
+		</UI:MultilingualTextLabel>
+	</DataTemplate>
+    
+    <DataTemplate x:Key="FavoriteMenuItem">
+		<TextBlock>
+			<Hyperlink
+				Style="{StaticResource CargoWiseHyperlink}"
+				Command="{Binding LinkAction}">
+				<i:Interaction.Triggers>
+					<i:EventTrigger EventName="MouseRightButtonDown">
+						<i:InvokeCommandAction Command="{Binding LinkRightClickAction}" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+				<UI:MultilingualTextLabel IsTranslatable="{Binding IsTranslatable}" MultilingualText="{Binding MultilingualText}" />
+				<Hyperlink.ToolTip>
+					<StackPanel>
+                        <TextBlock Text="{Binding Name}" Margin="0 0 0 10" />
+						<TextBlock Text="{Binding Index, IsAsync=True, Converter={StaticResource ShortcutToolTipConverter}}" FontStyle="Italic" />
+					</StackPanel>
+				</Hyperlink.ToolTip>
+			</Hyperlink>
+		</TextBlock>
+	</DataTemplate>
+
+	<DataTemplate x:Key="StandaloneMenuItem">
+		<TextBlock>
+			<Hyperlink Style="{StaticResource NormalHyperlink}" Command="{Binding LinkAction}">
+				<i:Interaction.Triggers>
+					<i:EventTrigger EventName="MouseRightButtonDown">
+						<i:InvokeCommandAction Command="{Binding LinkRightClickAction}" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+				<TextBlock Text="{Binding Name}" />
+				<Hyperlink.ToolTip>
+					<TextBlock Text="{Binding Name}" />
+				</Hyperlink.ToolTip>
+			</Hyperlink>
+		</TextBlock>
+	</DataTemplate>
+
+	<Style x:Key="FavoriteIndex" TargetType="{x:Type TextBlock}">
+		<Setter Property="TextAlignment" Value="Center" />
+		<Setter Property="Foreground" Value="{DynamicResource FavoriteIndexTextColor}" />
+	</Style>
+
+	<Style x:Key="ImageHyperlink" TargetType="{x:Type Hyperlink}">
+		<Setter Property="OverridesDefaultStyle" Value="True" />
+		<Style.Triggers>
+			<Trigger Property="FrameworkElement.IsMouseOver" Value="True">
+				<Setter Property="Cursor" Value="Hand" />
+			</Trigger>
+		</Style.Triggers>
+	</Style>
+
+	<Style x:Key="ButtonHyperlink">
+		<Setter Property="TextBlock.Margin" Value="0" />
+		<Setter Property="TextBlock.Padding" Value="0" />
+		<Setter Property="TextBlock.HorizontalAlignment" Value="Right" />
+		<Setter Property="TextBlock.Foreground" Value="{StaticResource FavoriteIndexBorderColor}" />
+		<Setter Property="TextBlock.FontSize" Value="9px" />
+		<Setter Property="FrameworkElement.Cursor" Value="Hand" />
+		<Setter Property="TextBlock.TextDecorations" Value="{x:Null}" />
+		<Style.Triggers>
+			<Trigger Property="FrameworkElement.IsMouseOver" Value="True">
+				<Setter Property="TextBlock.Foreground" Value="{StaticResource HyperlinkHoverColor}" />
+			</Trigger>
+		</Style.Triggers>
+	</Style>
+
+	<DataTemplate x:Key="FavoritesItem">
+		<Grid Width="275" Margin="2 -2 2 -2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="20" />
+				<ColumnDefinition Width="222" />
+				<ColumnDefinition Width="33" />
+			</Grid.ColumnDefinitions>
+			<i:Interaction.Behaviors>
+				<dragdrop:FrameworkElementDragBehavior />
+			</i:Interaction.Behaviors>
+			<Border
+				VerticalAlignment="Center"
+				Margin="0 6 4 6"
+				Name="FavoriteBorder">
+				<UI:MultilingualTextLabel IsTranslatable="False">
+					<Hyperlink
+						Command="{Binding FavoriteAction}"
+						ToolTip="{Binding RemoveFromFavoritesTooltip}"
+						Style="{StaticResource ImageHyperlink}">
+						<Image
+							Name="FavoriteImage"
+							Opacity="0.8"
+							Height="12"
+							SnapsToDevicePixels="True"
+							Source="Images/favorite-selected.png" />
+					</Hyperlink>
+				</UI:MultilingualTextLabel>
+			</Border>
+			<ContentPresenter
+				VerticalAlignment="Center"
+				Grid.Column="1"
+				Margin="0"
+				ContentTemplate="{StaticResource FavoriteMenuItem}">
+			</ContentPresenter>
+			<Border
+				VerticalAlignment="Center"
+				Grid.Column="2"
+				Margin="0 0 15 0"
+				Background="{StaticResource FavoriteIndexBorderColor}"
+				Width="16px">
+				<Border.ToolTip>
+					<StackPanel>
+						<UI:MultilingualTextLabel Content="{Binding DragToChangeOrderTooltip}" Margin="0 0 0 10" />
+						<UI:MultilingualTextLabel IsTranslatable="False">
+							<TextBlock Text="{Binding Index, IsAsync=True, Converter={StaticResource ShortcutToolTipConverter}}" FontStyle="Italic" />
+						</UI:MultilingualTextLabel>
+					</StackPanel>
+				</Border.ToolTip>
+				<UI:MultilingualTextLabel HorizontalAlignment="Center" HorizontalContentAlignment="Center" IsTranslatable="False">
+					<TextBlock
+					Grid.RowSpan="2"
+					Style="{StaticResource FavoriteIndex}"
+					Text="{Binding Index, IsAsync=True}" />
+				</UI:MultilingualTextLabel>
+			</Border>
+			<Grid
+				Opacity="0.5"
+				x:Name="DragThumb"
+				HorizontalAlignment="Right"
+				Margin="0 3 -4 -4"
+				ToolTip="{Binding DragToChangeOrderTooltip}"
+				Grid.Column="2">
+				<UI:MultilingualTextLabel IsTranslatable="False">
+					<TextBlock FontSize="12" FontWeight="Normal">┇</TextBlock>
+				</UI:MultilingualTextLabel>
+			</Grid>
+		</Grid>
+		<DataTemplate.Triggers>
+			<DataTrigger Binding="{Binding IsMouseOver, ElementName=FavoriteBorder}" Value="True">
+				<Setter TargetName="FavoriteImage" Property="Source" Value="Images/favorite-unselected.png" />
+				<Setter TargetName="FavoriteImage" Property="Opacity" Value="1" />
+			</DataTrigger>
+
+			<DataTrigger Binding="{Binding IsMouseOver, ElementName=DragThumb}" Value="True">
+				<Setter TargetName="DragThumb" Property="Opacity" Value="1" />
+			</DataTrigger>
+
+			<Trigger Property="IsMouseOver" Value="False">
+				<Setter TargetName="DragThumb" Property="Opacity" Value="0" />
+			</Trigger>
+		</DataTemplate.Triggers>
+	</DataTemplate>
+
+	<DataTemplate x:Key="RecentItem">
+		<Grid Margin="2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="20" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="0" />
+			</Grid.ColumnDefinitions>
+			<ContentPresenter
+				VerticalAlignment="Center"
+				Grid.Column="1"
+				Margin="0"
+				ContentTemplate="{StaticResource MenuItem}" />
+			<Border
+				VerticalAlignment="Center"
+				Grid.Column="0"
+				Name="ImageBorder">
+				<UI:MultilingualTextLabel IsTranslatable="False">
+					<TextBlock>
+					<Hyperlink
+						Command="{Binding FavoriteAction}"
+						ToolTip="{Binding AddToFavoriteTooltip}"
+						Style="{StaticResource ImageHyperlink}">
+						<Image
+							Name="Image"
+							Opacity="0.25"
+							Height="12"
+							SnapsToDevicePixels="True"
+							Source="Images/favorite-unselected.png" />
+					</Hyperlink>
+					</TextBlock>
+				</UI:MultilingualTextLabel>
+			</Border>
+		</Grid>
+		<DataTemplate.Triggers>
+			<DataTrigger Binding="{Binding IsMouseOver, ElementName=ImageBorder}" Value="true">
+				<Setter TargetName="Image" Property="Source" Value="Images/favorite-selected.png" />
+				<Setter TargetName="Image" Property="Opacity" Value="1" />
+			</DataTrigger>
+		</DataTemplate.Triggers>
+	</DataTemplate>
+
+	<DataTemplate x:Key="StandaloneRecentItem">
+		<Grid Margin="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="20" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Border
+				VerticalAlignment="Center"
+				Name="ImageBorder">
+				<UI:MultilingualTextLabel IsTranslatable="False">
+					<Hyperlink
+						Name="Link"
+						Command="{Binding FavoriteAction}"
+						ToolTip="{Binding AddToFavoriteTooltip}"
+						Style="{StaticResource ImageHyperlink}">
+						<Image
+							Name="Image"
+							Opacity="0.25"
+							Height="12"
+							SnapsToDevicePixels="True"
+							Source="Images/favorite-unselected.png">
+						</Image>
+					</Hyperlink>
+				</UI:MultilingualTextLabel>
+			</Border>
+			<ContentPresenter
+				VerticalAlignment="Center"
+				Grid.Column="1"
+				Margin="0"
+				ContentTemplate="{StaticResource StandaloneMenuItem}" />
+		</Grid>
+		<DataTemplate.Triggers>
+			<MultiDataTrigger>
+				<MultiDataTrigger.Conditions>
+					<Condition Binding="{Binding IsMouseOver, ElementName=ImageBorder}" Value="True" />
+					<Condition Binding="{Binding IsInFavorites, IsAsync=True}" Value="False" />
+				</MultiDataTrigger.Conditions>
+				<Setter TargetName="Image" Property="Source" Value="Images/favorite-selected.png" />
+				<Setter TargetName="Image" Property="Opacity" Value="1" />
+			</MultiDataTrigger>
+			<DataTrigger Binding="{Binding IsInFavorites, IsAsync=True}" Value="True">
+				<Setter TargetName="Image" Property="Source" Value="Images/favorite-selected.png" />
+				<Setter TargetName="Image" Property="Opacity" Value="1" />
+				<Setter TargetName="Link" Property="ToolTip" Value="Remove from Favorites" />
+			</DataTrigger>
+		</DataTemplate.Triggers>
+	</DataTemplate>
+
+	<DataTemplate x:Key="ButtonDetailsItem">
+		<Border
+			x:Name="ButtonDetailsItemBorder"
+			FocusVisualStyle="{StaticResource {x:Static SystemParameters.FocusVisualStyleKey}}"
+			Width="275"
+			MinHeight="20"
+			Background="{StaticResource DetailsBackgroundColor}"
+            Margin="0"
+			Padding="0 1 0 2"
+			DataContext="{Binding DataContext.SelectedCategory.SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+			SnapsToDevicePixels="true">
+			<Border.MaxHeight>
+				<MultiBinding Converter="{StaticResource MaxHeightConverter}" ConverterParameter="95" >
+					<Binding Path="DataContext.DetailRows" RelativeSource="{RelativeSource AncestorType={x:Type ListBox}}" />
+					<Binding Path="ActualHeight" RelativeSource="{RelativeSource AncestorType={x:Type ListBox}}" />
+				</MultiBinding>
+			</Border.MaxHeight>
+			<ScrollViewer
+				CanContentScroll="True"
+				HorizontalScrollBarVisibility="Hidden"
+				VerticalScrollBarVisibility="Auto"
+				Margin="0"
+				Focusable="False">
+				<ItemsControl
+					Focusable="False"
+					ItemsSource="{Binding Subsections}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<StackPanel>
+								<Border
+									Visibility="{Binding DataContext.Subsections.Count, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, Converter={StaticResource CountToVisibilityConverter}, ConverterParameter=2}"
+									BorderThickness="0 0 0 1"
+									BorderBrush="{StaticResource DetailsBorderColor}"
+									Margin="0 2 0 0">
+									<UI:MultilingualTextLabel MultilingualText="{Binding MultilingualText}">
+										<TextBlock
+											Style="{StaticResource SectionTitle}"
+											Text="{Binding DisplayName}" />
+									</UI:MultilingualTextLabel>
+								</Border>
+								<ItemsControl
+									Padding="0 0 0 3"
+									Focusable="False"
+									Background="{StaticResource DetailsSubsectionColor}"
+									ItemTemplate="{StaticResource MenuItem}"
+									ItemsSource="{Binding Items}">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<StackPanel />
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+								</ItemsControl>
+							</StackPanel>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</ScrollViewer>
+		</Border>
+	</DataTemplate>
+
+	<Style x:Key="FavoritesHeader" TargetType="{x:Type TextBlock}">
+		<Setter Property="FontSize" Value="18px" />
+		<Setter Property="Foreground" Value="{StaticResource FavoriteHeaderTextColor}" />
+	</Style>
+
+	<Style x:Key="StandaloneRecentHeader" TargetType="{x:Type TextBlock}">
+		<Setter Property="FontSize" Value="14px" />
+		<Setter Property="Foreground" Value="{StaticResource FavoriteHeaderTextColor}" />
+	</Style>
+    
+	<DataTemplate x:Key="FavoritesSection">
+		<Border
+			Width="275"
+			Margin="0 0 3 5"
+			BorderBrush="{StaticResource CategoryBottomBorderColor}"
+			BorderThickness="0 0 0 2">
+			<StackPanel Margin="0">
+				<StackPanel
+					Margin="2"
+					Orientation="Horizontal">
+					<UI:MultilingualTextLabel IsTranslatable="{Binding IsTranslatable}" MultilingualText="{Binding MultilingualText}">
+						<TextBlock
+							Style="{StaticResource FavoritesHeader}"
+							Margin="0 -1 0 0"
+							Text="{Binding DisplayName}">
+							<TextBlock.ContextMenu>
+								<ContextMenu>
+									<MenuItem Header="{Binding RemoveAllLinksText}" Command="{Binding RemoveAllLinksAction}" />
+								</ContextMenu>
+							</TextBlock.ContextMenu>
+						</TextBlock>
+					</UI:MultilingualTextLabel>
+				</StackPanel>
+				<ItemsControl
+					Background="{StaticResource RecentBackgroundColor}"
+					Padding="2 2 0 2"
+					ItemTemplate="{StaticResource FavoritesItem}"
+					ItemsSource="{Binding Items}">
+					<i:Interaction.Behaviors>
+						<dragdrop:ListBoxDropBehavior AdornerBrush="{StaticResource BackgroundColor}" />
+					</i:Interaction.Behaviors>
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				</ItemsControl>
+			</StackPanel>
+		</Border>
+	</DataTemplate>
+
+	<DataTemplate x:Key="RecentSection">
+		<Border
+			Width="275"
+			Margin="0 0 3 5"
+			BorderBrush="{StaticResource CategoryBottomBorderColor}"
+			BorderThickness="0 0 0 2">
+			<StackPanel Margin="0">
+				<StackPanel
+					Margin="2"
+					Orientation="Horizontal">
+					<UI:MultilingualTextLabel IsTranslatable="{Binding IsTranslatable}"  MultilingualText="{Binding MultilingualText}">
+						<TextBlock
+							Style="{StaticResource FavoritesHeader}"
+							Margin="0 -1 0 0"
+							Text="{Binding DisplayName}">
+							<TextBlock.ContextMenu>
+								<ContextMenu>
+									<MenuItem Header="{Binding RemoveAllLinksText}" Command="{Binding RemoveAllLinksAction}" />
+								</ContextMenu>
+							</TextBlock.ContextMenu>
+						</TextBlock>
+					</UI:MultilingualTextLabel>
+				</StackPanel>
+				<ItemsControl
+					Background="{StaticResource RecentBackgroundColor}"
+					Padding="2"
+					ItemTemplate="{StaticResource RecentItem}"
+					ItemsSource="{Binding Items, IsAsync=True}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				</ItemsControl>
+			</StackPanel>
+		</Border>
+	</DataTemplate>
+
+	<UI:MenuTemplateSelector
+		x:Key="MenuTemplateSelector"
+		SectionTemplate="{StaticResource TileBarItem}"
+		DetailsTemplate="{StaticResource ButtonDetailsItem}"
+		FavoritesTemplate="{StaticResource FavoritesSection}"
+		RecentTemplate="{StaticResource RecentSection}"
+		RecentItemsTemplate="{StaticResource RecentSection}" />
+
+	<Style x:Key="TileListBoxItem" TargetType="ListBoxItem">
+		<Setter Property="SnapsToDevicePixels" Value="true"/>
+		<Setter Property="OverridesDefaultStyle" Value="true"/>
+		<Setter Property="UI:ListBoxExtension.ParentListBox" Value="{Binding RelativeSource={RelativeSource AncestorType=ListBox}, Mode=OneTime}" />
+		<Setter Property="Visibility">
+			<Setter.Value>
+				<MultiBinding Converter="{StaticResource MenuIndexVisibilityConverter}">
+					<Binding Path="SelectedIndex" RelativeSource="{RelativeSource AncestorType=ListBox}" />
+					<Binding Path="Index" />
+					<Binding Path="DataContext.Columns" RelativeSource="{RelativeSource AncestorType={x:Type ListBox}}" />
+				</MultiBinding>
+			</Setter.Value>
+		</Setter>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="ListBoxItem">
+					<Border
+						Padding="2"
+						SnapsToDevicePixels="true">
+						<ContentPresenter />
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="CategoryName" TargetType="{x:Type TextBlock}">
+		<Setter Property="FontSize" Value="13px" />
+		<Setter Property="TextAlignment" Value="Center" />
+	</Style>
+
+	<Style x:Key="CategoryShortcut" TargetType="{x:Type TextBlock}">
+		<Setter Property="FontSize" Value="10px" />
+		<Setter Property="Foreground" Value="{StaticResource CategoryShortcutTextColor}" />
+	</Style>
+
+	<Style x:Key="CategoryListBoxItem" TargetType="ListBoxItem">
+		<Setter Property="SnapsToDevicePixels" Value="true"/>
+		<Setter Property="FocusVisualStyle" Value="{x:Null}" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="ListBoxItem">
+					<Border
+						Padding="2"
+						SnapsToDevicePixels="true">
+						<ContentPresenter />
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="ShortcutIndexText" TargetType="{x:Type TextBlock}">
+		<Setter Property="FontSize" Value="12px" />
+		<Setter Property="Foreground" Value="{DynamicResource ShortcutIndexTextColor}" />
+	</Style>
+
+	<DataTemplate x:Key="CategoryTemplate">
+		<StackPanel>
+			<Border
+				Name="Border"
+				Padding="0" 
+				Margin="0" 
+				BorderThickness="0 0 0 2"
+				BorderBrush="{StaticResource CategoryBottomBorderColor}"
+				SnapsToDevicePixels="True">
+				<UI:MultilingualTextLabel IsTranslatable="{Binding IsTranslatable}" MultilingualText="{Binding MultilingualText}">
+					<TextBlock
+						Name="Name"
+						Style="{StaticResource CategoryName}"
+						Margin="5 0 5 0"
+						Foreground="{StaticResource CategoryTextColor}" />
+				</UI:MultilingualTextLabel>
+			</Border>
+			<Border
+				Name="SelectedBorder"
+				Padding="0"
+				Margin="0"
+				BorderBrush="Transparent"
+				BorderThickness="0 0 0 2" />
+			<StackPanel.ToolTip>
+				<ToolTip
+					Name="ToolTip"
+					Placement="Bottom"
+					BorderThickness="0"
+					Padding="1 3 1 3"
+					HorizontalContentAlignment="Center"
+					Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+					Background="{StaticResource ShortcutIndexBorderColor}">
+					<StackPanel
+						Orientation="Horizontal">
+						<UI:MultilingualTextLabel IsTranslatable="False">
+							<TextBlock Text="Ctrl+" Style="{StaticResource ShortcutIndexText}" Foreground="{DynamicResource ShortcutIndexTextColor}"/>
+						</UI:MultilingualTextLabel>
+						<UI:MultilingualTextLabel IsTranslatable="False">
+							<TextBlock Text="{Binding ShortcutIndex}" Style="{StaticResource ShortcutIndexText}" Foreground="{DynamicResource ShortcutIndexTextColor}"/>
+						</UI:MultilingualTextLabel>
+					</StackPanel>
+				</ToolTip>
+			</StackPanel.ToolTip>
+		</StackPanel>
+		<DataTemplate.Triggers>
+			<DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" Value="true">
+				<Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource CategoryHighlightedBackgroundColor}"/>
+				<Setter TargetName="SelectedBorder" Property="BorderBrush" Value="{StaticResource CategoryHighlightedBackgroundColor}"/>
+				<Setter TargetName="Name" Property="Foreground" Value="{StaticResource CategoryHighlightedTextColor}"/>
+			</DataTrigger>
+			<DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" Value="true">
+				<Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource CategoryHighlightedBackgroundColor}"/>
+				<Setter TargetName="Name" Property="Foreground" Value="{StaticResource CategoryHighlightedTextColor}"/>
+			</DataTrigger>
+		</DataTemplate.Triggers>
+	</DataTemplate>
+	
+	<Style x:Key="TileBarListBox" TargetType="{x:Type ListBox}">
+		<Setter Property="SnapsToDevicePixels" Value="true"/>
+		<Setter Property="OverridesDefaultStyle" Value="true"/>
+		<Setter Property="MinWidth" Value="275"/>
+		<Setter Property="Margin" Value="0" />
+		<Setter Property="Padding" Value="0" />
+		<Setter Property="FocusVisualStyle" Value="{x:Null}" />
+		<Setter Property="ItemContainerStyle" Value="{StaticResource TileListBoxItem}" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="ListBox">
+					<Border 
+						Name="Border" 
+						BorderThickness="0">
+						<WrapPanel Margin="0" IsItemsHost="True" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="ImageButton" TargetType="{x:Type Button}">
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="HorizontalContentAlignment" Value="Center" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="Margin" Value="1" />
+		<Setter Property="Opacity" Value="0.7" />
+		<Setter Property="FocusVisualStyle" Value="{x:Null}" />
+	</Style>
+
+	<DataTemplate x:Key="SearchResultSection">
+		<StackPanel>
+			<Border
+				BorderThickness="0 0 0 1"
+				BorderBrush="{StaticResource DetailsBorderColor}"
+				Margin="0 2 0 0">
+				<UI:MultilingualTextLabel IsTranslatable="false">
+					<TextBlock
+						Text="{Binding DisplayName}"
+						Style="{StaticResource SectionTitle}"
+						Opacity="0.6" />
+				</UI:MultilingualTextLabel>
+			</Border>
+			<ItemsControl
+				Padding="1"
+				Focusable="False"
+				Background="{StaticResource DetailsSubsectionColor}"
+				ItemTemplate="{StaticResource MenuItem}"
+				ItemsSource="{Binding Items}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<StackPanel />
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+			</ItemsControl>
+		</StackPanel>
+	</DataTemplate>
+
+	<Style x:Key="ImageForButton" TargetType="{x:Type Image}">
+		<Setter Property="Opacity" Value="0.5" />
+		<Setter Property="Height" Value="20" />
+		<Setter Property="SnapsToDevicePixels" Value="True" />
+	</Style>
+
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary Source="/CargoWise.Main.Navigation;component/WPF/MultilingualTextLabelResources.xaml" />
+	</ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

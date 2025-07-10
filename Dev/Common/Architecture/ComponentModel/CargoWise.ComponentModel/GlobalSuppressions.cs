@@ -1,0 +1,43 @@
+using System.Diagnostics.CodeAnalysis;
+// This file is used by Code Analysis to maintain SuppressMessage 
+// attributes that are applied to this project. 
+// Project-level suppressions either have no target or are given 
+// a specific target and scoped to a namespace, type, member, etc. 
+//
+// To add a suppression to this file, right-click the message in the 
+// Error List, point to "Suppress Message(s)", and click 
+// "In Project Suppression File". 
+// You do not need to add suppressions to this file manually. 
+
+[assembly: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "CargoWise.ComponentModel.NotificationExtensions")]
+[assembly: SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetAttributes()")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetClassName()")]
+[assembly: SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetClassName()")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetComponentName()")]
+[assembly: SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetComponentName()")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetConverter()")]
+[assembly: SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetConverter()")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetDefaultEvent()")]
+[assembly: SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetDefaultEvent()")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetDefaultProperty()")]
+[assembly: SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetDefaultProperty()")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetEditor(System.Type)")]
+[assembly: SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetEditor(System.Type)")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetEvents()")]
+[assembly: SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetEvents()")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetEvents(System.Attribute[])")]
+[assembly: SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetEvents(System.Attribute[])")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetProperties()")]
+[assembly: SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetProperties()")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetProperties(System.Attribute[])")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetPropertyOwner(System.ComponentModel.PropertyDescriptor)")]
+[assembly: SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetPropertyOwner(System.ComponentModel.PropertyDescriptor)")]
+[assembly: SuppressMessage("Microsoft.Security", "CA2123:OverrideLinkDemandsShouldBeIdenticalToBase", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetProperties(System.Attribute[])")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Design.KDesignerActionList.#System.ComponentModel.ICustomTypeDescriptor.GetAttributes()")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "CargoWise.ComponentModel.Testing")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Testing.KBindingList`1.#CargoWise.ComponentModel.ICollectionAlwaysReturnElementsForBinding.InAlwaysReturnElementsForBinding")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.Testing.KBindingList`1.#CargoWise.ComponentModel.ICollectionAlwaysReturnElementsForBinding.AlwaysReturnElementsForBinding()")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.ListAttribute.#CargoWise.ComponentModel.INotificationProvidingAttribute.Validate(System.Object,System.ComponentModel.PropertyDescriptor)")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.ListAttribute.#CargoWise.ComponentModel.INotificationProvidingAttribute.ProvidesNotifications(System.ComponentModel.PropertyDescriptor)")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible", Scope = "type", Target = "CargoWise.ComponentModel.PropertyDescriptorCollectionFactory`1+GetNewCollectionMethod")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "CargoWise.ComponentModel.CalculatedFromAttributeBase.#CargoWise.ComponentModel.IFilteredAttributeForWrappingPropertyDescriptor.GetAttributeOnOuterProperty(CargoWise.ComponentModel.WrappingPropertyDescriptor)")]

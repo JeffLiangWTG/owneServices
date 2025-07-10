@@ -1,0 +1,31 @@
+meta {
+  name: Incoterm is not correct
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.Incoterm = "ZZZ";
+   
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided Incoterm ('ZZZ') is not valid. It can only be one of these values: 'FCA', 'DES', 'FAS', 'XXX', 'DAF', 'CIF', 'DDP', 'DAP', 'CIP', 'DDU', 'DPU', 'FC2', 'CFR', 'FOB', 'EXW', 'DAT', 'CPT', 'FC1', 'DEQ'.", function() {
+    expect(res.body.ModelState['Incoterm'][0]).to.equal("Provided Incoterm ('ZZZ') is not valid. It can only be one of these values: 'FCA', 'DES', 'FAS', 'XXX', 'DAF', 'CIF', 'DDP', 'DAP', 'CIP', 'DDU', 'DPU', 'FC2', 'CFR', 'FOB', 'EXW', 'DAT', 'CPT', 'FC1', 'DEQ'.");
+  });
+}

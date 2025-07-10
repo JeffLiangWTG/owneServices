@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <AssemblyName>Enterprise.DocumentEngine.GUI</AssemblyName>
+    <RootNamespace>Enterprise.DocumentEngine.GUI</RootNamespace>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <EmbeddedResource Include="Testing\DocumentsSaveAsTif.tif" />
+    <EmbeddedResource Include="Testing\TooLongFormulaForXls.xlsx" />
+    <EmbeddedResource Include="Testing\TooManyRowsForXls.xlsx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise.RemoteDesktopServices.Server" />
+    <Reference Include="Enterprise.RemoteDesktopServices.Shared" />
+    <Reference Include="Excel" />
+    <Reference Include="FlexCelWinforms" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Collections.Immutable" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Memory" />
+    <Reference Include="System.Resources.Extensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DocBuilder\Preview.xls" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Winzor\**" />
+    <Compile Remove="wwwroot\**" />
+    <EmbeddedResource Remove="Winzor\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="Winzor\**" />
+    <None Remove="wwwroot\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="ReflectiveFieldMap\MapTreeRightPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

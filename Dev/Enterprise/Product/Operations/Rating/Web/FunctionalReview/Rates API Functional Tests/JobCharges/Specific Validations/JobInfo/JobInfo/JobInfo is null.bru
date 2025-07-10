@@ -1,0 +1,31 @@
+meta {
+  name: JobInfo is null
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.JobInfo = null;
+   
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: JobInfo is Mandatory.", function() {
+    expect(res.body.ModelState['JobInfo'][0]).to.equal("JobInfo is Mandatory.");
+  });
+}

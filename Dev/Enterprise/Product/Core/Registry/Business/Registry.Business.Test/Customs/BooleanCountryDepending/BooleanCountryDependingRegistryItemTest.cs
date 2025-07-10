@@ -1,0 +1,41 @@
+using System;
+using CargoWise.EntityFramework;
+using Enterprise.Integration;
+using Enterprise.MasterFiles.Business;
+using Enterprise.ZArchitecture.Environment;
+using Enterprise.ZArchitecture.Environment.Testing;
+using NUnit.Framework;
+
+namespace Enterprise.Registry.Business.Customs.Testing
+{
+	[TestedType(typeof(BooleanCountryDependingRegistryItem))]
+	sealed class BooleanCountryDependingRegistryItemTest : StronglyTypedRegistryItemTestCase<bool>
+	{
+		public void TestDefaultValue()
+		{
+			var factory = new BusinessObjectFactory();
+			var chCompany = factory.New<GlbCompany>();
+			chCompany.GC_Code = "123";
+			chCompany.GC_RN_NKCountryCode = Core.Constants.CountryCodes.Switzerland;
+			factory.Save();
+
+			var registry = GetNewRegistryItem();
+			AssertEquals("Default value for a non CH company", true, registry.GetValueWithoutFallback(GlbCompany.CurrentCompany.PK.ToGuid(), Guid.Empty, Guid.Empty));
+			using (registry.SetTemporaryValue(GlbCompany.CurrentCompany.PK.ToGuid(), Guid.Empty, Guid.Empty, false))
+			{
+				AssertEquals("Get value for a non CH company", false, registry.GetValueWithoutFallback(GlbCompany.CurrentCompany.PK.ToGuid(), Guid.Empty, Guid.Empty));
+			}
+
+			AssertEquals("Default value for a CH company", false, registry.GetValueWithoutFallback(chCompany.PK.ToGuid(), Guid.Empty, Guid.Empty));
+			using (registry.SetTemporaryValue(chCompany.PK.ToGuid(), Guid.Empty, Guid.Empty, true))
+			{
+				AssertEquals("Get value for a non CH company", true, registry.GetValueWithoutFallback(chCompany.PK.ToGuid(), Guid.Empty, Guid.Empty));
+			}
+		}
+
+		protected override StronglyTypedRegistryItem<bool, bool> GetNewRegistryItem()
+		{
+			return new BooleanCountryDependingRegistryItem("", null, null, null, RegistryStorageFlags.Company, true, new[] { Core.Constants.CountryCodes.Switzerland });
+		}
+	}
+}

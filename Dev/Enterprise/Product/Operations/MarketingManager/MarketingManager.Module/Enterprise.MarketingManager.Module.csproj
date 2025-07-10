@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.UniversalCopy" />
+    <Reference Include="Enterprise.Freight.Integration" />
+    <Reference Include="Enterprise.ProcessManagement.Integration" />
+    <Reference Include="WTG.SecurityRights" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Design" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MarketingManager.GUI\Enterprise.MarketingManager.GUI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="ValueAnalysis\ValueAnalysisTradeStatusList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ValueAnalysisTradeStatusList.xml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="ValueAnalysis\ValueAnalysisTradeStatusList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ValueAnalysisTradeStatusList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.MarketingManager.Module</CustomToolNamespace>
+    </None>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

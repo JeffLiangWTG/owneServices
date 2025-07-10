@@ -1,0 +1,5 @@
+namespace Enterprise.Customs.EU.NCTS.Business;
+
+public sealed class CommonPreviousDocumentArrivalValidationDecider : CommonPreviousDocumentValidationDecider, ICommonPreviousDocumentArrivalValidationDecider
+{
+}

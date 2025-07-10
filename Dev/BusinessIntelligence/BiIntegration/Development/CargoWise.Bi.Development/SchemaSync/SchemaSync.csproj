@@ -1,0 +1,87 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <RootNamespace>CargoWise.Bi.Development.SchemaSync</RootNamespace>
+    <AssemblyName>CargoWise.Bi.Development.SchemaSync</AssemblyName>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+    <NoWarn>$(NoWarn);SYSLIB0051</NoWarn>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="BuildTools" />
+    <Reference Include="CargoWise.Bi.Common" />
+    <Reference Include="CargoWise.Bi.Configuration" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Database.Abstractions" />
+    <Reference Include="CargoWise.Database.Shared" />
+    <Reference Include="CargoWise.DataProtection" />
+    <Reference Include="CargoWise.DbUpgrader.Foundation" />
+    <Reference Include="CargoWise.DbUpgrader.Schema.Synchronisers" />
+    <Reference Include="CargoWise.DbUpgrader.Scripts.Abstractions" />
+    <Reference Include="CargoWise.DbUpgrader.Scripts.Definitions" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="Enterprise.DbUpgrader.Assemblies" />
+    <Reference Include="Enterprise.DbUpgrader.Resource" />
+    <Reference Include="Enterprise.DbUpgrader.Shared" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Microsoft.SqlServer.TransactSql.ScriptDom" />
+    <Reference Include="System.Collections.Immutable" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+    <Reference Include="ZClientEDI" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="DataSets\CdcConfigDataSet.cs">
+      <DependentUpon>CdcConfigDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataSets\CdcConfigDataSet.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CdcConfigDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="DataSets\SchemaDataSet.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SchemaDataSet.xsd</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="DataSets\CdcConfigDataSet.xsc">
+      <DependentUpon>CdcConfigDataSet.xsd</DependentUpon>
+    </None>
+    <None Update="DataSets\CdcConfigDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CdcConfigDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Update="DataSets\CdcConfigDataSet.xss">
+      <DependentUpon>CdcConfigDataSet.xsd</DependentUpon>
+    </None>
+    <None Update="DataSets\SchemaDataSet.xsc">
+      <DependentUpon>SchemaDataSet.xsd</DependentUpon>
+    </None>
+    <None Update="DataSets\SchemaDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SchemaDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Update="DataSets\SchemaDataSet.xss">
+      <DependentUpon>SchemaDataSet.xsd</DependentUpon>
+    </None>
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <OutputPath>bin\x64\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+</Project>

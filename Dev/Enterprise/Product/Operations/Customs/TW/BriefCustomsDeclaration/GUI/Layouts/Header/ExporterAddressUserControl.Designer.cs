@@ -1,0 +1,451 @@
+namespace Enterprise.Customs.TW.BriefCustomsDeclaration.GUI
+{
+	partial class ExporterAddressUserControl
+	{
+		/// <summary> 
+		/// Required designer variable.
+		/// </summary>
+		private System.ComponentModel.IContainer components = null;
+
+		/// <summary> 
+		/// Clean up any resources being used.
+		/// </summary>
+		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				Extensions.Dispose();
+				if (components != null)
+				{
+					components.Dispose();
+				}
+			}
+			base.Dispose(disposing);
+		}
+
+		#region Component Designer generated code
+
+		/// <summary> 
+		/// Required method for Designer support - do not modify 
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{
+			this.components = new System.ComponentModel.Container();
+			this.MainGroupBox = new Enterprise.ZArchitecture.GUI.ZGroupBox();
+			this.DetailsTabControl = new Enterprise.ZArchitecture.GUI.ZTabControl();
+			this.AddressTabPage = new Enterprise.ZArchitecture.GUI.ZTabPage();
+			this.CityTextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.Street1TextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.Street2TextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.PostCodeTextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.NameTextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.StateTextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.CountryFindBox = new Enterprise.MasterFiles.GUI.Internal.ZCodeFindBoxFixedPreBoundMaxLength();
+			this.LocalAddressTabPage = new Enterprise.ZArchitecture.GUI.ZTabPage();
+			this.LocalCityTextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.LocalStreet1TextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.LocalStreet2TextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.LocalPostCodeTextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.LocalNameTextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.LocalStateTextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.LocalCountryCodeFindBox = new Enterprise.MasterFiles.GUI.Internal.ZCodeFindBoxFixedPreBoundMaxLength();
+			this.CodeTabPage = new Enterprise.ZArchitecture.GUI.ZTabPage();
+			this.RegNoTextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.RegNoTypeDropEdit = new Enterprise.ZArchitecture.GUI.ZDropEdit();
+			this.OrganisationPanel = new Enterprise.ZArchitecture.GUI.ZPanel();
+			this.ShipperAddressControl = new Enterprise.ZArchitecture.GUI.ZAddressControl();
+			this.ShipperBondedIDTextBox = new Enterprise.ZArchitecture.ZTextBox();
+			this.ShipperBondedIDTypeDropEdit = new Enterprise.ZArchitecture.GUI.ZDropEdit();
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).BeginInit();
+			this.MainGroupBox.SuspendLayout();
+			this.DetailsTabControl.SuspendLayout();
+			this.AddressTabPage.SuspendLayout();
+			this.CountryFindBox.SuspendLayout();
+			this.LocalAddressTabPage.SuspendLayout();
+			this.LocalCountryCodeFindBox.SuspendLayout();
+			this.CodeTabPage.SuspendLayout();
+			this.RegNoTypeDropEdit.SuspendLayout();
+			this.OrganisationPanel.SuspendLayout();
+			this.ShipperAddressControl.SuspendLayout();
+			this.ShipperBondedIDTypeDropEdit.SuspendLayout();
+			this.SuspendLayout();
+			// 
+			// BindingSource
+			// 
+			this.BindingSource.DataSourceType = typeof(Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader);
+			// 
+			// MainGroupBox
+			// 
+			this.MainGroupBox.Controls.Add(this.DetailsTabControl);
+			this.MainGroupBox.Controls.Add(this.OrganisationPanel);
+			this.MainGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.MainGroupBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(0, 0, true);
+			this.MainGroupBox.Name = "MainGroupBox";
+			this.MainGroupBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(416, 240, true);
+			this.MainGroupBox.TabIndex = 2;
+			this.MainGroupBox.TabStop = false;
+			// 
+			// DetailsTabControl
+			// 
+			this.DetailsTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
+			this.DetailsTabControl.Controls.Add(this.AddressTabPage);
+			this.DetailsTabControl.Controls.Add(this.LocalAddressTabPage);
+			this.DetailsTabControl.Controls.Add(this.CodeTabPage);
+			this.DetailsTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.DetailsTabControl.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(3, 55, true);
+			this.DetailsTabControl.Name = "DetailsTabControl";
+			this.DetailsTabControl.ShowToolTips = true;
+			this.DetailsTabControl.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(410, 182, true);
+			this.DetailsTabControl.TabIndex = 0;
+			// 
+			// AddressTabPage
+			// 
+			this.AddressTabPage.BackColor = System.Drawing.SystemColors.Control;
+			this.AddressTabPage.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("000d1dd4-b1b1-4fda-a540-9b9d2d1c59ba", "Address");
+			this.AddressTabPage.Controls.Add(this.CityTextBox);
+			this.AddressTabPage.Controls.Add(this.Street1TextBox);
+			this.AddressTabPage.Controls.Add(this.Street2TextBox);
+			this.AddressTabPage.Controls.Add(this.PostCodeTextBox);
+			this.AddressTabPage.Controls.Add(this.NameTextBox);
+			this.AddressTabPage.Controls.Add(this.StateTextBox);
+			this.AddressTabPage.Controls.Add(this.CountryFindBox);
+			this.AddressTabPage.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(4, 34, true);
+			this.AddressTabPage.Name = "AddressTabPage";
+			this.AddressTabPage.Padding = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPadding(3, true);
+			this.AddressTabPage.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(402, 144, true);
+			this.AddressTabPage.TabIndex = 0;
+			// 
+			// CityTextBox
+			// 
+			this.BindingSource.SetBindingMember(this.CityTextBox, "MasterBill.ABL_ShipperCity");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperCity)));
+			this.CityTextBox.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("d9cd8dd1-d0d1-4e41-aaa0-9290d53497d2", "City");
+			this.CityTextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(69, 75, true);
+			this.CityTextBox.Name = "CityTextBox";
+			this.CityTextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(300, 31, true);
+			this.CityTextBox.TabIndex = 10;
+			// 
+			// Street1TextBox
+			// 
+			this.BindingSource.SetBindingMember(this.Street1TextBox, "MasterBill.ABL_ShipperStreet1");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperStreet1)));
+			this.Street1TextBox.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("a40de15f-2aff-4b6f-ad58-d6ce1fb0c3ed", "Address");
+			this.Street1TextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(69, 29, true);
+			this.Street1TextBox.Name = "Street1TextBox";
+			this.Street1TextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(300, 31, true);
+			this.Street1TextBox.TabIndex = 8;
+			// 
+			// Street2TextBox
+			// 
+			this.BindingSource.SetBindingMember(this.Street2TextBox, "MasterBill.ABL_ShipperStreet2");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperStreet2)));
+			this.LabelCaptionRenderProvider.SetLabelCaptionVisible(this.Street2TextBox, false);
+			this.Street2TextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(69, 52, true);
+			this.Street2TextBox.Name = "Street2TextBox";
+			this.Street2TextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(300, 31, true);
+			this.Street2TextBox.TabIndex = 9;
+			// 
+			// PostCodeTextBox
+			// 
+			this.BindingSource.SetBindingMember(this.PostCodeTextBox, "MasterBill.ABL_ShipperPostcode");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperPostcode)));
+			this.PostCodeTextBox.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("72dac506-3965-4987-a285-963ae97c8b09", "Post Code");
+			this.PostCodeTextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(69, 122, true);
+			this.PostCodeTextBox.Name = "PostCodeTextBox";
+			this.PostCodeTextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(171, 31, true);
+			this.PostCodeTextBox.TabIndex = 12;
+			// 
+			// NameTextBox
+			// 
+			this.BindingSource.SetBindingMember(this.NameTextBox, "MasterBill.ABL_ShipperName");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperName)));
+			this.NameTextBox.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("e09c9713-ebd5-4e00-ba87-19426126ab8d", "Name");
+			this.NameTextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(69, 6, true);
+			this.NameTextBox.Name = "NameTextBox";
+			this.NameTextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(300, 31, true);
+			this.NameTextBox.TabIndex = 7;
+			// 
+			// StateTextBox
+			// 
+			this.BindingSource.SetBindingMember(this.StateTextBox, "MasterBill.ABL_ShipperState");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperState)));
+			this.StateTextBox.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("8f816e03-3942-4a10-b60d-ca57c13f9820", "State");
+			this.StateTextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(69, 98, true);
+			this.StateTextBox.Name = "StateTextBox";
+			this.StateTextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(300, 31, true);
+			this.StateTextBox.TabIndex = 11;
+			// 
+			// CountryFindBox
+			// 
+			this.CountryFindBox.AllowDrop = true;
+			this.BindingSource.SetBindingMember(this.CountryFindBox, "MasterBill.ABL_RN_NKShipperCountry");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_RN_NKShipperCountry)));
+			this.CountryFindBox.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("9117d4cc-a798-420c-868c-f9bb74d2de6b", "Country");
+			this.CountryFindBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(313, 122, true);
+			this.CountryFindBox.Name = "CountryFindBox";
+			this.CountryFindBox.ParentModuleID = Enterprise.ZArchitecture.Modules.ModuleIDs.NotAssigned;
+			this.CountryFindBox.ParentType = null;
+			this.CountryFindBox.PreBoundMaxLength = 3;
+			this.CountryFindBox.ShowDescriptionBox = false;
+			this.CountryFindBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(24, 31, true);
+			this.CountryFindBox.TabIndex = 13;
+			// 
+			// LocalAddressTabPage
+			// 
+			this.LocalAddressTabPage.BackColor = System.Drawing.SystemColors.Control;
+			this.LocalAddressTabPage.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("8e7418dd-229e-4b9e-9e0a-b2f24d726061", "Local Address");
+			this.LocalAddressTabPage.Controls.Add(this.LocalCityTextBox);
+			this.LocalAddressTabPage.Controls.Add(this.LocalStreet1TextBox);
+			this.LocalAddressTabPage.Controls.Add(this.LocalStreet2TextBox);
+			this.LocalAddressTabPage.Controls.Add(this.LocalPostCodeTextBox);
+			this.LocalAddressTabPage.Controls.Add(this.LocalNameTextBox);
+			this.LocalAddressTabPage.Controls.Add(this.LocalStateTextBox);
+			this.LocalAddressTabPage.Controls.Add(this.LocalCountryCodeFindBox);
+			this.LocalAddressTabPage.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(4, 34, true);
+			this.LocalAddressTabPage.Name = "LocalAddressTabPage";
+			this.LocalAddressTabPage.Padding = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPadding(3, true);
+			this.LocalAddressTabPage.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(402, 144, true);
+			this.LocalAddressTabPage.TabIndex = 1;
+			// 
+			// LocalCityTextBox
+			// 
+			this.BindingSource.SetBindingMember(this.LocalCityTextBox, "MasterBill.ABL_ShipperLocalCity");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperLocalCity)));
+			this.LocalCityTextBox.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("8d156317-e49b-4fe0-9e3d-97f3c0b1674d", "City");
+			this.LocalCityTextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(69, 75, true);
+			this.LocalCityTextBox.Name = "LocalCityTextBox";
+			this.LocalCityTextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(300, 31, true);
+			this.LocalCityTextBox.TabIndex = 3;
+			// 
+			// LocalStreet1TextBox
+			// 
+			this.BindingSource.SetBindingMember(this.LocalStreet1TextBox, "MasterBill.ABL_ShipperLocalStreet1");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperLocalStreet1)));
+			this.LocalStreet1TextBox.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("f7ee6413-4724-42ca-87b8-d77943e5436c", "Address");
+			this.LocalStreet1TextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(69, 29, true);
+			this.LocalStreet1TextBox.Name = "LocalStreet1TextBox";
+			this.LocalStreet1TextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(300, 31, true);
+			this.LocalStreet1TextBox.TabIndex = 1;
+			// 
+			// LocalStreet2TextBox
+			// 
+			this.BindingSource.SetBindingMember(this.LocalStreet2TextBox, "MasterBill.ABL_ShipperLocalStreet2");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperLocalStreet2)));
+			this.LabelCaptionRenderProvider.SetLabelCaptionVisible(this.LocalStreet2TextBox, false);
+			this.LocalStreet2TextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(69, 52, true);
+			this.LocalStreet2TextBox.Name = "LocalStreet2TextBox";
+			this.LocalStreet2TextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(300, 31, true);
+			this.LocalStreet2TextBox.TabIndex = 2;
+			// 
+			// LocalPostCodeTextBox
+			// 
+			this.BindingSource.SetBindingMember(this.LocalPostCodeTextBox, "MasterBill.ABL_ShipperPostcode");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperPostcode)));
+			this.LocalPostCodeTextBox.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("1a2c6d4a-a93b-42d3-9551-360d60b456f3", "Post Code");
+			this.LocalPostCodeTextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(69, 122, true);
+			this.LocalPostCodeTextBox.Name = "LocalPostCodeTextBox";
+			this.LocalPostCodeTextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(171, 31, true);
+			this.LocalPostCodeTextBox.TabIndex = 5;
+			// 
+			// LocalNameTextBox
+			// 
+			this.BindingSource.SetBindingMember(this.LocalNameTextBox, "MasterBill.ABL_ShipperLocalName");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperLocalName)));
+			this.LocalNameTextBox.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("c26dd7b2-dcd8-4a9a-90e8-68d6df4d2341", "Name");
+			this.LocalNameTextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(69, 6, true);
+			this.LocalNameTextBox.Name = "LocalNameTextBox";
+			this.LocalNameTextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(300, 31, true);
+			this.LocalNameTextBox.TabIndex = 0;
+			// 
+			// LocalStateTextBox
+			// 
+			this.BindingSource.SetBindingMember(this.LocalStateTextBox, "MasterBill.ABL_ShipperLocalState");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperLocalState)));
+			this.LocalStateTextBox.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("3fa8a41c-cd85-4fd6-9f7f-50a7cfb89b59", "State");
+			this.LocalStateTextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(69, 98, true);
+			this.LocalStateTextBox.Name = "LocalStateTextBox";
+			this.LocalStateTextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(300, 31, true);
+			this.LocalStateTextBox.TabIndex = 4;
+			// 
+			// LocalCountryCodeFindBox
+			// 
+			this.LocalCountryCodeFindBox.AllowDrop = true;
+			this.BindingSource.SetBindingMember(this.LocalCountryCodeFindBox, "MasterBill.ABL_RN_NKShipperCountry");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_RN_NKShipperCountry)));
+			this.LocalCountryCodeFindBox.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("277f0824-0698-42a0-b59e-f082c3ccf701", "Country");
+			this.LocalCountryCodeFindBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(313, 122, true);
+			this.LocalCountryCodeFindBox.Name = "LocalCountryCodeFindBox";
+			this.LocalCountryCodeFindBox.ParentModuleID = Enterprise.ZArchitecture.Modules.ModuleIDs.NotAssigned;
+			this.LocalCountryCodeFindBox.ParentType = null;
+			this.LocalCountryCodeFindBox.PreBoundMaxLength = 3;
+			this.LocalCountryCodeFindBox.ShowDescriptionBox = false;
+			this.LocalCountryCodeFindBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(57, 31, true);
+			this.LocalCountryCodeFindBox.TabIndex = 6;
+			// 
+			// CodeTabPage
+			// 
+			this.CodeTabPage.BackColor = System.Drawing.SystemColors.Control;
+			this.CodeTabPage.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("61e387e8-552b-40cb-870e-614aad9e8e35", "Code");
+			this.CodeTabPage.Controls.Add(this.ShipperBondedIDTextBox);
+			this.CodeTabPage.Controls.Add(this.ShipperBondedIDTypeDropEdit);
+			this.CodeTabPage.Controls.Add(this.RegNoTextBox);
+			this.CodeTabPage.Controls.Add(this.RegNoTypeDropEdit);
+			this.CodeTabPage.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(4, 34, true);
+			this.CodeTabPage.Name = "CodeTabPage";
+			this.CodeTabPage.Padding = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPadding(3, true);
+			this.CodeTabPage.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(402, 144, true);
+			this.CodeTabPage.TabIndex = 2;
+			// 
+			// RegNoTextBox
+			// 
+			this.BindingSource.SetBindingMember(this.RegNoTextBox, "MasterBill.ABL_ShipperRegNo");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperRegNo)));
+			this.LabelCaptionRenderProvider.SetLabelCaptionVisible(this.RegNoTextBox, false);
+			this.RegNoTextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(130, 6, true);
+			this.RegNoTextBox.Name = "RegNoTextBox";
+			this.RegNoTextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(245, 31, true);
+			this.RegNoTextBox.TabIndex = 1;
+			// 
+			// RegNoTypeDropEdit
+			// 
+			this.RegNoTypeDropEdit.AllowDrop = true;
+			this.BindingSource.SetBindingMember(this.RegNoTypeDropEdit, "MasterBill.ABL_ShipperRegNoType");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((object)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_ShipperRegNoType)));
+			this.RegNoTypeDropEdit.CaptionResourceString = Enterprise.Customs.TW.BriefCustomsDeclaration.GUI.Res.GetData("e7135e9e-7b20-40e3-a1bc-47dbe42803c3", "ID");
+			this.RegNoTypeDropEdit.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(71, 6, true);
+			this.RegNoTypeDropEdit.Name = "RegNoTypeDropEdit";
+			this.RegNoTypeDropEdit.PreBoundMaxLength = 3;
+			this.RegNoTypeDropEdit.ShouldResizeByMaxLength = false;
+			this.RegNoTypeDropEdit.ShowDescriptionBox = false;
+			this.RegNoTypeDropEdit.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(43, 31, true);
+			this.RegNoTypeDropEdit.TabIndex = 0;
+			// 
+			// OrganisationPanel
+			// 
+			this.OrganisationPanel.Controls.Add(this.ShipperAddressControl);
+			this.OrganisationPanel.Dock = System.Windows.Forms.DockStyle.Top;
+			this.OrganisationPanel.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(3, 27, true);
+			this.OrganisationPanel.Name = "OrganisationPanel";
+			this.OrganisationPanel.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(410, 28, true);
+			this.OrganisationPanel.TabIndex = 1;
+			// 
+			// ShipperAddressControl
+			// 
+			this.ShipperAddressControl.AllowDrop = true;
+			this.BindingSource.SetBindingMember(this.ShipperAddressControl, "MasterBill.ABL_OA_Shipper");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZGuid)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ABL_OA_Shipper)));
+			this.ShipperAddressControl.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(10, 4, true);
+			this.ShipperAddressControl.Name = "ShipperAddressControl";
+			this.ShipperAddressControl.PopupCaption = "";
+			this.ShipperAddressControl.ShowAddress = false;
+			this.ShipperAddressControl.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(293, 31, true);
+			this.ShipperAddressControl.TabIndex = 2;
+			// 
+			// ShipperBondedIDTextBox
+			// 
+			this.BindingSource.SetBindingMember(this.ShipperBondedIDTextBox, "MasterBill.ShipperBondedID");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((string)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ShipperBondedID)));
+			this.LabelCaptionRenderProvider.SetLabelCaptionVisible(this.ShipperBondedIDTextBox, false);
+			this.ShipperBondedIDTextBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(130, 29, true);
+			this.ShipperBondedIDTextBox.Name = "ShipperBondedIDTextBox";
+			this.ShipperBondedIDTextBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(245, 31, true);
+			this.ShipperBondedIDTextBox.TabIndex = 3;
+			// 
+			// ShipperBondedIDTypeDropEdit
+			// 
+			this.ShipperBondedIDTypeDropEdit.AllowDrop = true;
+			this.BindingSource.SetBindingMember(this.ShipperBondedIDTypeDropEdit, "MasterBill.ShipperBondedIDType");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((object)(((Enterprise.Customs.TW.BriefCustomsDeclaration.Business.AsycudaManifestHeader)(null)).MasterBill.ShipperBondedIDType)));
+			this.ShipperBondedIDTypeDropEdit.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(71, 29, true);
+			this.ShipperBondedIDTypeDropEdit.Name = "ShipperBondedIDTypeDropEdit";
+			this.ShipperBondedIDTypeDropEdit.PreBoundMaxLength = 3;
+			this.ShipperBondedIDTypeDropEdit.ShouldResizeByMaxLength = false;
+			this.ShipperBondedIDTypeDropEdit.ShowDescriptionBox = false;
+			this.ShipperBondedIDTypeDropEdit.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(43, 31, true);
+			this.ShipperBondedIDTypeDropEdit.TabIndex = 2;
+			// 
+			// ExporterAddressUserControl
+			// 
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+			this.CaptionRenderingEnabled = true;
+			this.Controls.Add(this.MainGroupBox);
+			this.Name = "ExporterAddressUserControl";
+			this.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(416, 240, true);
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).EndInit();
+			this.MainGroupBox.ResumeLayout(false);
+			this.MainGroupBox.PerformLayout();
+			this.DetailsTabControl.ResumeLayout(false);
+			this.DetailsTabControl.PerformLayout();
+			this.AddressTabPage.ResumeLayout(false);
+			this.AddressTabPage.PerformLayout();
+			this.CountryFindBox.ResumeLayout(true);
+			this.CountryFindBox.PerformLayout();
+			this.LocalAddressTabPage.ResumeLayout(false);
+			this.LocalAddressTabPage.PerformLayout();
+			this.LocalCountryCodeFindBox.ResumeLayout(true);
+			this.LocalCountryCodeFindBox.PerformLayout();
+			this.CodeTabPage.ResumeLayout(false);
+			this.CodeTabPage.PerformLayout();
+			this.RegNoTypeDropEdit.ResumeLayout(true);
+			this.RegNoTypeDropEdit.PerformLayout();
+			this.OrganisationPanel.ResumeLayout(false);
+			this.OrganisationPanel.PerformLayout();
+			this.ShipperAddressControl.ResumeLayout(true);
+			this.ShipperAddressControl.PerformLayout();
+			this.ShipperBondedIDTypeDropEdit.ResumeLayout(true);
+			this.ShipperBondedIDTypeDropEdit.PerformLayout();
+			this.ResumeLayout(false);
+			this.PerformLayout();
+
+		}
+
+		#endregion
+
+		private ZArchitecture.GUI.ZGroupBox MainGroupBox;
+		private ZArchitecture.GUI.ZTabControl DetailsTabControl;
+		private ZArchitecture.GUI.ZPanel OrganisationPanel;
+		internal ZArchitecture.GUI.ZAddressControl ShipperAddressControl;
+		private ZArchitecture.GUI.ZTabPage AddressTabPage;
+		private ZArchitecture.GUI.ZTabPage LocalAddressTabPage;
+		private ZArchitecture.GUI.ZTabPage CodeTabPage;
+		private ZArchitecture.ZTextBox LocalCityTextBox;
+		private ZArchitecture.ZTextBox LocalStreet1TextBox;
+		private ZArchitecture.ZTextBox LocalStreet2TextBox;
+		private ZArchitecture.ZTextBox LocalPostCodeTextBox;
+		private ZArchitecture.ZTextBox LocalNameTextBox;
+		private ZArchitecture.ZTextBox LocalStateTextBox;
+		private MasterFiles.GUI.Internal.ZCodeFindBoxFixedPreBoundMaxLength LocalCountryCodeFindBox;
+		protected ZArchitecture.ZTextBox RegNoTextBox;
+		protected ZArchitecture.GUI.ZDropEdit RegNoTypeDropEdit;
+		private ZArchitecture.ZTextBox CityTextBox;
+		private ZArchitecture.ZTextBox Street1TextBox;
+		private ZArchitecture.ZTextBox Street2TextBox;
+		private ZArchitecture.ZTextBox PostCodeTextBox;
+		private ZArchitecture.ZTextBox NameTextBox;
+		private ZArchitecture.ZTextBox StateTextBox;
+		private MasterFiles.GUI.Internal.ZCodeFindBoxFixedPreBoundMaxLength CountryFindBox;
+		protected ZArchitecture.ZTextBox ShipperBondedIDTextBox;
+		protected ZArchitecture.GUI.ZDropEdit ShipperBondedIDTypeDropEdit;
+	}
+}

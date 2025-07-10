@@ -1,0 +1,54 @@
+@namespace System.Windows.Forms
+@inherits ContainerControl
+@using WinzorFramework
+@using WinzorFramework.Extensions
+
+<div class="splitcontainer" style="@ControlStyleString" @attributes="DataAttributes">
+    @if (Panel1.Visible)
+    {
+        <ControlProxyComponent Control="@Panel1" @key=Panel1.WinzorControlGuid />
+    }
+    @if (SplitterWidthInternal > 0)
+    {
+		<div style="@SplitterStyleString" class="@SplitterClasses" @ref="SplitterReference" @onmouseenter=OnMouseEnterAsync @onmouseleave=OnMouseLeaveAsync @onwinzorfocusin=BeginSplitterMoveAsync @onwinzorfocusin:stopPropagation @onmousedown:stopPropagation @onmouseup:stopPropagation @onsplittermoved="HandleSplitterMoveAsync" @onsplittermoved:stopPropagation tabindex="@this.TabIndexHtmlAttributeValue(c => SplitContainerTabStopFunc(c))"></div>
+    }
+    @if (Panel2.Visible)
+    {
+        <ControlProxyComponent Control="@Panel2" @key=Panel2.WinzorControlGuid />
+    }
+</div>
+
+@code
+{
+    string SplitterClasses
+    {
+        get
+        {
+            var splitterClasses = "splitter";
+            if (!IsSplitterFixed && IsSplitterMovable)
+            {
+                splitterClasses += Orientation == Orientation.Horizontal ? " splitter--draggable--horizontal" : " splitter--draggable--vertical";
+            }
+
+            if (EnableSplitterHoverEffect)
+            {
+				splitterClasses += " splitter--effect";
+            }
+
+            return splitterClasses;
+        }
+    }
+
+    protected virtual bool EnableSplitterHoverEffect => false;
+
+    public virtual bool SplitContainerTabStopFunc(SplitContainer c) => !c.IsSplitterFixed && c.TabStop;
+
+    protected internal override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            await BeginSplitterMoveAsync(new WinzorFocusInEventArgs());
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

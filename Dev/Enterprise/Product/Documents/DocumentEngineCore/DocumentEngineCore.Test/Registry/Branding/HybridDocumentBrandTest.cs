@@ -1,0 +1,92 @@
+using System;
+using Enterprise.Environment;
+using Enterprise.Integration;
+using Enterprise.ZArchitecture.Core;
+using Enterprise.ZArchitecture.Environment;
+using NUnit.Framework;
+
+namespace Enterprise.DocumentEngineCore.Registry.Testing
+{
+	[TestedType(typeof(HybridDocumentBrand))]
+	public class HybridDocumentBrandTest : ClientAndAgentBrandingBusinessObjectTestCase
+	{
+		public void TestAgentBrandingCodeList()
+		{
+			AssertEquals("precondition:", true, BizObj.IsAgentBranded);
+			CodeDescriptionPairList list = new CodeDescriptionPairList();
+
+			list.AddPair("ABC", "ABC Desc");
+			list.AddPair("XYZ", "XYZ Desc");
+			list.AddPair("123", "123 Desc");
+
+			Env.Registry.AgentCategoryList = list;
+
+			AssertEquals("CodeList.Count", 3, BizObj.CodeList.Count);
+			AssertEquals("CodeList.GetDescriptionFromCode(\"ABC\")", "ABC Desc", BizObj.CodeList.GetDescriptionFromCode("ABC"));
+			AssertEquals("CodeList.GetDescriptionFromCode(\"XYZ\")", "XYZ Desc", BizObj.CodeList.GetDescriptionFromCode("XYZ"));
+			AssertEquals("CodeList.GetDescriptionFromCode(\"123\")", "123 Desc", BizObj.CodeList.GetDescriptionFromCode("123"));
+		}
+
+		[ExpectNoExceptions]
+		public void TestClientBrandingCodeListDoesNotBlowUp()
+		{
+			Guid companyGuid = Guid.NewGuid();
+			BizObj.CurrentFallbackLevel = new FallbackLevel(companyGuid, Guid.Empty, Guid.Empty);
+			DocumentsDataRegistry.Instance.HBLAndHAWBBrandingOption.SetValue(companyGuid, Guid.Empty, Guid.Empty, HBLAndHAWBBrandingOptionEditorInfo.ClientBranded);
+			AssertEquals("precondition:", false, BizObj.IsAgentBranded);
+
+			CodeDescriptionPairList list = BizObj.CodeList;
+		}
+
+		public void TestIsAgentBranded()
+		{
+			Guid companyGuid = Guid.NewGuid();
+
+			DocumentsDataRegistry.Instance.HBLAndHAWBBrandingOption.SetValue(companyGuid, Guid.Empty, Guid.Empty, HBLAndHAWBBrandingOptionEditorInfo.AgentBranded);
+			AssertEquals("IsAgentBranded", true, BizObj.IsAgentBranded);
+			AssertEquals("BrandingOptionTitle", "Agent Branding", BizObj.BrandingOptionTitleInternal);
+			AssertEquals("BrandingOptionRegistryItem", DocumentsDataRegistry.Instance.EnableAgentBranding, BizObj.BrandingOptionRegistryItemInternal);
+
+			DocumentsDataRegistry.Instance.HBLAndHAWBBrandingOption.SetValue(companyGuid, Guid.Empty, Guid.Empty, HBLAndHAWBBrandingOptionEditorInfo.ClientBranded);
+			AssertEquals("IsAgentBranded", true, BizObj.IsAgentBranded);
+			AssertEquals("BrandingOptionTitle", "Agent Branding", BizObj.BrandingOptionTitleInternal);
+			AssertEquals("BrandingOptionRegistryItem", DocumentsDataRegistry.Instance.EnableAgentBranding, BizObj.BrandingOptionRegistryItemInternal);
+
+			BizObj.CurrentFallbackLevel = new FallbackLevel(companyGuid, Guid.Empty, Guid.Empty);
+
+			DocumentsDataRegistry.Instance.HBLAndHAWBBrandingOption.SetValue(companyGuid, Guid.Empty, Guid.Empty, HBLAndHAWBBrandingOptionEditorInfo.AgentBranded);
+			AssertEquals("IsAgentBranded", true, BizObj.IsAgentBranded);
+			AssertEquals("BrandingOptionTitle", "Agent Branding", BizObj.BrandingOptionTitleInternal);
+			AssertEquals("BrandingOptionRegistryItem", DocumentsDataRegistry.Instance.EnableAgentBranding, BizObj.BrandingOptionRegistryItemInternal);
+
+			DocumentsDataRegistry.Instance.HBLAndHAWBBrandingOption.SetValue(companyGuid, Guid.Empty, Guid.Empty, HBLAndHAWBBrandingOptionEditorInfo.ClientBranded);
+			AssertEquals("IsAgentBranded", false, BizObj.IsAgentBranded);
+			AssertEquals("BrandingOptionTitle", "Client Branding", BizObj.BrandingOptionTitleInternal);
+			AssertEquals("BrandingOptionRegistryItem", DocumentsDataRegistry.Instance.EnableClientBranding, BizObj.BrandingOptionRegistryItemInternal);
+		}
+
+		#region Implementation
+
+		protected override byte[] GetSerializedValueThatDoesNotHaveReplaceDomain()
+		{
+			return new byte[] { 60, 63, 120, 109, 108, 32, 118, 101, 114, 115, 105, 111, 110, 61, 34, 49, 46, 48, 34, 63, 62, 13, 10, 60, 72, 121, 98, 114, 105, 100, 68, 111, 99, 117, 109, 101, 110, 116, 66, 114, 97, 110, 100, 62, 13, 10, 32, 32, 60, 67, 111, 100, 101, 77, 97, 120, 76, 101, 110, 103, 116, 104, 62, 51, 60, 47, 67, 111, 100, 101, 77, 97, 120, 76, 101, 110, 103, 116, 104, 62, 13, 10, 32, 32, 60, 67, 111, 100, 101, 62, 65, 66, 67, 60, 47, 67, 111, 100, 101, 62, 13, 10, 32, 32, 60, 68, 101, 115, 99, 114, 105, 112, 116, 105, 111, 110, 62, 68, 101, 115, 99, 60, 47, 68, 101, 115, 99, 114, 105, 112, 116, 105, 111, 110, 62, 13, 10, 32, 32, 60, 73, 109, 97, 103, 101, 62, 82, 48, 108, 71, 79, 68, 108, 104, 67, 103, 65, 75, 65, 80, 99, 65, 65, 65, 65, 65, 65, 65, 65, 65, 77, 119, 65, 65, 90, 103, 65, 65, 109, 81, 65, 65, 122, 65, 65, 65, 47, 119, 65, 114, 65, 65, 65, 114, 77, 119, 65, 114, 90, 103, 65, 114, 109, 81, 65, 114, 122, 65, 65, 114, 47, 119, 66, 86, 65, 65, 66, 86, 77, 119, 66, 86, 90, 103, 66, 86, 109, 81, 66, 86, 122, 65, 66, 86, 47, 119, 67, 65, 65, 65, 67, 65, 77, 119, 67, 65, 90, 103, 67, 65, 109, 81, 67, 65, 122, 65, 67, 65, 47, 119, 67, 113, 65, 65, 67, 113, 77, 119, 67, 113, 90, 103, 67, 113, 109, 81, 67, 113, 122, 65, 67, 113, 47, 119, 68, 86, 65, 65, 68, 86, 77, 119, 68, 86, 90, 103, 68, 86, 109, 81, 68, 86, 122, 65, 68, 86, 47, 119, 68, 47, 65, 65, 68, 47, 77, 119, 68, 47, 90, 103, 68, 47, 109, 81, 68, 47, 122, 65, 68, 47, 47, 122, 77, 65, 65, 68, 77, 65, 77, 122, 77, 65, 90, 106, 77, 65, 109, 84, 77, 65, 122, 68, 77, 65, 47, 122, 77, 114, 65, 68, 77, 114, 77, 122, 77, 114, 90, 106, 77, 114, 109, 84, 77, 114, 122, 68, 77, 114, 47, 122, 78, 86, 65, 68, 78, 86, 77, 122, 78, 86, 90, 106, 78, 86, 109, 84, 78, 86, 122, 68, 78, 86, 47, 122, 79, 65, 65, 68, 79, 65, 77, 122, 79, 65, 90, 106, 79, 65, 109, 84, 79, 65, 122, 68, 79, 65, 47, 122, 79, 113, 65, 68, 79, 113, 77, 122, 79, 113, 90, 106, 79, 113, 109, 84, 79, 113, 122, 68, 79, 113, 47, 122, 80, 86, 65, 68, 80, 86, 77, 122, 80, 86, 90, 106, 80, 86, 109, 84, 80, 86, 122, 68, 80, 86, 47, 122, 80, 47, 65, 68, 80, 47, 77, 122, 80, 47, 90, 106, 80, 47, 109, 84, 80, 47, 122, 68, 80, 47, 47, 50, 89, 65, 65, 71, 89, 65, 77, 50, 89, 65, 90, 109, 89, 65, 109, 87, 89, 65, 122, 71, 89, 65, 47, 50, 89, 114, 65, 71, 89, 114, 77, 50, 89, 114, 90, 109, 89, 114, 109, 87, 89, 114, 122, 71, 89, 114, 47, 50, 90, 86, 65, 71, 90, 86, 77, 50, 90, 86, 90, 109, 90, 86, 109, 87, 90, 86, 122, 71, 90, 86, 47, 50, 97, 65, 65, 71, 97, 65, 77, 50, 97, 65, 90, 109, 97, 65, 109, 87, 97, 65, 122, 71, 97, 65, 47, 50, 97, 113, 65, 71, 97, 113, 77, 50, 97, 113, 90, 109, 97, 113, 109, 87, 97, 113, 122, 71, 97, 113, 47, 50, 98, 86, 65, 71, 98, 86, 77, 50, 98, 86, 90, 109, 98, 86, 109, 87, 98, 86, 122, 71, 98, 86, 47, 50, 98, 47, 65, 71, 98, 47, 77, 50, 98, 47, 90, 109, 98, 47, 109, 87, 98, 47, 122, 71, 98, 47, 47, 53, 107, 65, 65, 74, 107, 65, 77, 53, 107, 65, 90, 112, 107, 65, 109, 90, 107, 65, 122, 74, 107, 65, 47, 53, 107, 114, 65, 74, 107, 114, 77, 53, 107, 114, 90, 112, 107, 114, 109, 90, 107, 114, 122, 74, 107, 114, 47, 53, 108, 86, 65, 74, 108, 86, 77, 53, 108, 86, 90, 112, 108, 86, 109, 90, 108, 86, 122, 74, 108, 86, 47, 53, 109, 65, 65, 74, 109, 65, 77, 53, 109, 65, 90, 112, 109, 65, 109, 90, 109, 65, 122, 74, 109, 65, 47, 53, 109, 113, 65, 74, 109, 113, 77, 53, 109, 113, 90, 112, 109, 113, 109, 90, 109, 113, 122, 74, 109, 113, 47, 53, 110, 86, 65, 74, 110, 86, 77, 53, 110, 86, 90, 112, 110, 86, 109, 90, 110, 86, 122, 74, 110, 86, 47, 53, 110, 47, 65, 74, 110, 47, 77, 53, 110, 47, 90, 112, 110, 47, 109, 90, 110, 47, 122, 74, 110, 47, 47, 56, 119, 65, 65, 77, 119, 65, 77, 56, 119, 65, 90, 115, 119, 65, 109, 99, 119, 65, 122, 77, 119, 65, 47, 56, 119, 114, 65, 77, 119, 114, 77, 56, 119, 114, 90, 115, 119, 114, 109, 99, 119, 114, 122, 77, 119, 114, 47, 56, 120, 86, 65, 77, 120, 86, 77, 56, 120, 86, 90, 115, 120, 86, 109, 99, 120, 86, 122, 77, 120, 86, 47, 56, 121, 65, 65, 77, 121, 65, 77, 56, 121, 65, 90, 115, 121, 65, 109, 99, 121, 65, 122, 77, 121, 65, 47, 56, 121, 113, 65, 77, 121, 113, 77, 56, 121, 113, 90, 115, 121, 113, 109, 99, 121, 113, 122, 77, 121, 113, 47, 56, 122, 86, 65, 77, 122, 86, 77, 56, 122, 86, 90, 115, 122, 86, 109, 99, 122, 86, 122, 77, 122, 86, 47, 56, 122, 47, 65, 77, 122, 47, 77, 56, 122, 47, 90, 115, 122, 47, 109, 99, 122, 47, 122, 77, 122, 47, 47, 47, 56, 65, 65, 80, 56, 65, 77, 47, 56, 65, 90, 118, 56, 65, 109, 102, 56, 65, 122, 80, 56, 65, 47, 47, 56, 114, 65, 80, 56, 114, 77, 47, 56, 114, 90, 118, 56, 114, 109, 102, 56, 114, 122, 80, 56, 114, 47, 47, 57, 86, 65, 80, 57, 86, 77, 47, 57, 86, 90, 118, 57, 86, 109, 102, 57, 86, 122, 80, 57, 86, 47, 47, 43, 65, 65, 80, 43, 65, 77, 47, 43, 65, 90, 118, 43, 65, 109, 102, 43, 65, 122, 80, 43, 65, 47, 47, 43, 113, 65, 80, 43, 113, 77, 47, 43, 113, 90, 118, 43, 113, 109, 102, 43, 113, 122, 80, 43, 113, 47, 47, 47, 86, 65, 80, 47, 86, 77, 47, 47, 86, 90, 118, 47, 86, 109, 102, 47, 86, 122, 80, 47, 86, 47, 47, 47, 47, 65, 80, 47, 47, 77, 47, 47, 47, 90, 118, 47, 47, 109, 102, 47, 47, 122, 80, 47, 47, 47, 119, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 67, 72, 53, 66, 65, 69, 65, 65, 80, 119, 65, 76, 65, 65, 65, 65, 65, 65, 75, 65, 65, 111, 65, 65, 65, 103, 83, 65, 65, 69, 73, 72, 69, 105, 119, 111, 77, 71, 68, 67, 66, 77, 113, 88, 77, 105, 119, 89, 99, 75, 65, 65, 68, 115, 61, 60, 47, 73, 109, 97, 103, 101, 62, 13, 10, 60, 47, 72, 121, 98, 114, 105, 100, 68, 111, 99, 117, 109, 101, 110, 116, 66, 114, 97, 110, 100, 62 };
+		}
+
+		protected new HybridDocumentBrand BizObj
+		{
+			get { return (HybridDocumentBrand)base.BizObj; }
+		}
+
+		protected override string ExpectedBrandingRegistryItemName
+		{
+			get { return "Agent Branding"; }
+		}
+
+		protected override IRegistryItem ExpectedEnableBrandingRegistryItem
+		{
+			get { return DocumentsDataRegistry.Instance.EnableAgentBranding; }
+		}
+
+		#endregion
+	}
+}

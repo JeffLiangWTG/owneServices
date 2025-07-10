@@ -1,0 +1,8 @@
+using CargoWise.EntityFramework.Testing;
+
+namespace Enterprise.Client.EDI.IssueManager.Business.Test
+{
+	class HelpErrorLogKeyValidationTest : BusinessObjectValidationTestCase
+	{
+	}
+}

@@ -1,0 +1,36 @@
+{
+	"serilog:using:Kafka": "CargoWise.RefDbRepo.Common.Utils",
+	"serilog:write-to:Kafka.batchSizeLimit": "100",
+	"serilog:write-to:Kafka.period": "2",
+	"serilog:write-to:Kafka.brokers": "1.au1-test-1.kafka.wtg.ws:9093,2.au1-test-1.kafka.wtg.ws:9093,3.au1-test-1.kafka.wtg.ws:9093",
+	"serilog:write-to:Kafka.topic": "topic-au1-test-refdatarepo-xmlproducer-test",
+	"serilog:write-to:Kafka.protocol": "Ssl",
+	"serilog:write-to:Kafka.messageTimeoutMs": "60000",
+
+	"QuartzPanelPort": "9006",
+	"SafeUpdateServiceUri": "https://***updateService***/UpdateZeta/odata/",
+	"CheckAuthorization": "true",
+	"PortalUri": "https://***updateService***",
+
+	"quartz": {
+		"quartz.server.serviceName": "RefDbRepoZetaQuartzServer",
+		"quartz.server.serviceDisplayName": "RefDbRepoZeta Quartz Server",
+		"quartz.server.serviceDescription": "RefDbRepoZeta Quartz Job Scheduling Server",
+		"quartz.scheduler.instanceName": "RefDbRepoZetaQuartzServer",
+		"quartz.scheduler.instanceId": "auto",
+		"quartz.threadPool.maxConcurrency": "10",
+		"quartz.jobStore.misfireThreshold": "60000",
+		"quartz.jobStore.type": "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz",
+		"quartz.jobStore.useProperties": "false",
+		"quartz.jobStore.dataSource": "default",
+		"quartz.jobStore.tablePrefix": "QRTZ_",
+		"quartz.jobStore.clustered": "true",
+		"quartz.jobStore.driverDelegateType": "Quartz.Impl.AdoJobStore.SqlServerDelegate, Quartz",
+		"quartz.dataSource.default.connectionString": "data source=***refDbRepoDbServer***;initial catalog=***refDbRepoStagingDbName***;User Id=***dbWriterUsername***;Password=***dbWriterPasswordJson***;TrustServerCertificate=True",
+		"quartz.dataSource.default.provider": "SqlServer",
+		"quartz.plugin.jobInitializer.type": "Quartz.Plugin.Xml.XMLSchedulingDataProcessorPlugin, Quartz.Plugins",
+		"quartz.plugin.jobInitializer.fileNames": "~\\Configuration\\QuartzAppRunnerJobs.xml,~\\Configuration\\QuartzProcessorRunnerJobs.xml,~\\Configuration\\SingleInstanceQuartzProcessorRunnerJobs.xml,~\\Configuration\\QuartzDataUpdaterJobs.xml",
+		"quartz.plugin.jobInitializer.failOnFileNotFound": "true",
+		"quartz.serializer.type": "json"
+	}
+}

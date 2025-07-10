@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Native xmlns="http://www.cargowise.com/Schemas/Native/2011/11" version="2.0">
+  <Header>
+    <OwnerCode>EDICUS</OwnerCode>
+    <EnableCodeMapping>true</EnableCodeMapping>
+  </Header>
+  <Body>
+    <Rate version="2.0">
+      <RatingHeader Action="INSERT">
+        <RateType>SAL</RateType>
+        <OrgHeader><Code>QUETUB</Code></OrgHeader>
+        <GlbCompany><Code>EDI</Code></GlbCompany>
+        <RateEntryCollection>
+          <!-- Entry with two lines - insert for later merging -->
+          <RateEntry Action="INSERT">
+            <Mode>SEA</Mode>
+            <RateCategory>FCL</RateCategory>
+            <RateStartDate>2016-01-01T00:00:00</RateStartDate>
+            <RateEndDate></RateEndDate>
+            <OriginLRC Relationship="PTC">AUSYD</OriginLRC>
+            <DestinationLRC></DestinationLRC>
+            <Currency TableName="RefCurrency"><Code>AUD</Code></Currency>
+            <RefContainer><Code>40GP</Code></RefContainer>
+            <CommodityCode TableName="RefCommodityCode"><Code>GEN</Code></CommodityCode>
+            <Publisher TableName="GlbCompany"><Code>EDI</Code></Publisher>
+            <RateLinesCollection>
+              <RateLines Action="INSERT">
+                <!-- Line 1 BAF with item FRT -->
+                <AccChargeCode><Code>BAF</Code><GlbCompany><Code>EDI</Code></GlbCompany></AccChargeCode>
+                <RateCalculator>PER</RateCalculator>
+                <Currency TableName="RefCurrency"><Code>AUD</Code></Currency>
+                <RateLineItemsCollection>
+                  <RateLineItems Action="INSERT">
+                    <Type>APP</Type>
+                    <AccChargeCode><Code>FRT</Code><GlbCompany><Code>EDI</Code></GlbCompany></AccChargeCode>
+                  </RateLineItems>
+                </RateLineItemsCollection>
+              </RateLines>
+              <RateLines Action="INSERT">
+                <!-- Line 2 CAF with item WAR -->
+                <AccChargeCode><Code>CAF</Code><GlbCompany><Code>EDI</Code></GlbCompany></AccChargeCode>
+                <RateCalculator>PER</RateCalculator>
+                <Currency TableName="RefCurrency"><Code>AUD</Code></Currency>
+                <RateLineItemsCollection>
+                  <RateLineItems Action="INSERT">
+                    <Type>APP</Type>
+                    <AccChargeCode><Code>WAR</Code><GlbCompany><Code>EDI</Code></GlbCompany></AccChargeCode>
+                  </RateLineItems>
+                </RateLineItemsCollection>
+              </RateLines>
+            </RateLinesCollection>
+          </RateEntry>
+          <!-- Entry 2 merges with Entry 1 plus merge/insert RateLines -->
+          <RateEntry Action="MERGE">
+            <Mode>SEA</Mode>
+            <RateCategory>FCL</RateCategory>
+            <RateStartDate>2016-01-01T00:00:00</RateStartDate>
+            <RateEndDate></RateEndDate>
+            <OriginLRC Relationship="PTC">AUSYD</OriginLRC>
+            <DestinationLRC></DestinationLRC>
+            <Currency TableName="RefCurrency"><Code>AUD</Code></Currency>
+            <RefContainer><Code>40GP</Code></RefContainer>
+            <CommodityCode TableName="RefCommodityCode"><Code>GEN</Code></CommodityCode>
+            <Publisher TableName="GlbCompany"><Code>EDI</Code></Publisher>
+            <RateLinesCollection>
+              <RateLines Action="MERGE">
+                <!-- merge with Line 1 BAF -->
+                <AccChargeCode><Code>BAF</Code><GlbCompany><Code>EDI</Code></GlbCompany></AccChargeCode>
+                <RateLineItemsCollection>
+                  <!-- merge with item FRT using signature 1 - update Value to 1 -->
+                  <RateLineItems Action="MERGE">
+                    <AccChargeCode><Code>FRT</Code><GlbCompany><Code>EDI</Code></GlbCompany></AccChargeCode>
+                    <Value>1</Value>
+                  </RateLineItems>
+                </RateLineItemsCollection>
+              </RateLines>
+              <RateLines Action="MERGE">
+                <!-- merge with Line 2 CAF -->
+                <AccChargeCode><Code>CAF</Code><GlbCompany><Code>EDI</Code></GlbCompany></AccChargeCode>
+                <RateLineItemsCollection>
+                  <!-- insert new item FSC using signature 2 -->
+                  <RateLineItems Action="INSERT">
+                    <Type>APP</Type>
+                    <AccChargeCode><Code>FSC</Code><GlbCompany><Code>EDI</Code></GlbCompany></AccChargeCode>
+                  </RateLineItems>
+                  <!-- merge with the new item FSC using signature 1 - to update the Value -->
+                  <RateLineItems Action="MERGE">
+                    <AccChargeCode><Code>FSC</Code><GlbCompany><Code>EDI</Code></GlbCompany></AccChargeCode>
+                    <Value>2</Value>
+                  </RateLineItems>
+                </RateLineItemsCollection>
+              </RateLines>
+            </RateLinesCollection>
+          </RateEntry>
+        </RateEntryCollection>
+      </RatingHeader>
+    </Rate>
+  </Body>
+</Native>

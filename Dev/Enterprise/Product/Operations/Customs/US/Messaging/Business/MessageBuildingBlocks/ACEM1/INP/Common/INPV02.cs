@@ -1,0 +1,32 @@
+namespace Enterprise.Customs.US.Messaging.Business.MessageBuildingBlocks.ACE.Common
+{
+	using CargoWise.Types;
+
+	[InputBlock("V02")]
+	[OutputBlock("V02")]
+	public partial class INPV02 : MessageBlock
+	{
+		public INPV02()
+			: base("V02")
+		{
+		}
+
+		/// <summary>
+		/// A value representing the lowest temperature at which the vapor of a hazardous combustible liquid will ignite in the air. When provided, the Flashpoint Temperature must be a whole number. No decimals.
+		/// </summary>
+		[MessageBlockInt(3, 4, "C")]
+		public ZInt FlashpointTemperature; //spec is wrong, should be whole value.
+
+		/// <summary>
+		/// A code representing the basic unit of measurement (UOM) for the flashpoint temperature. This is always CE = Degrees Centigrade/Celsius.
+		/// </summary>
+		[MessageBlockString(2, 7, "C")]
+		public ZString UnitOfMeasureCode;
+
+		/// <summary>
+		/// A code of N is used when a flashpoint temperature is negative, that is, below 0 degrees Centigrade/Celsius.
+		/// </summary>
+		[MessageBlockString(1, 9, "C")]
+		public ZString NegativeIndicator;
+	}
+}

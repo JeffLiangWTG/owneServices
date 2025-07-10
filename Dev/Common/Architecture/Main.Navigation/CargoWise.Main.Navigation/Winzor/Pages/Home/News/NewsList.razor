@@ -1,0 +1,28 @@
+@namespace CargoWise.Main.Navigation.Pages
+@using CargoWiseNext.Blazor.Components
+
+<CwnList>
+    @if (Items != null)
+    {
+        @foreach (var item in Items)
+        {
+            <CwnListItem>
+                <div class="cwn-list-item__info">
+                    <div class="cwn-list-item__info-time">
+                        @item.ReleaseDateAsText
+                    </div>
+                    <div class="cwn-list-item__info-link">
+                        <CwnElement OnSingleClick="async (e) => {
+                            await ItemClickAsync(item);
+                        }" HtmlTag="a">@item.Summary</CwnElement>
+                    </div>
+                </div>
+                @if (item.ThumbnailData != null && item.ThumbnailData.Length > 0)
+                {
+                    <CwnImage Class="cwn-list-item__thumbnail" Src="@item.ThumbnailUrl" />
+                }
+            </CwnListItem>
+            <CwnDivider />
+        }
+    }
+</CwnList>

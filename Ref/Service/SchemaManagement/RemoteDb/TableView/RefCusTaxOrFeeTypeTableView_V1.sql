@@ -1,0 +1,5 @@
+CREATE VIEW RefCusTaxOrFeeTypeTableView_V1 AS
+SELECT ZX0_PK,
+ZX0_TaxOrFeeType,
+ZX0_Description
+FROM RefCusTaxOrFeeType

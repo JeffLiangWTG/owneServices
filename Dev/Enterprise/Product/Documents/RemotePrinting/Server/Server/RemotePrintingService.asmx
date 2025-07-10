@@ -1,0 +1,1 @@
+<%@ WebService Language="C#" CodeBehind="RemotePrintingService.cs" Class="Enterprise.RemotePrinting.Server.RemotePrintingService, RemotePrinting.Server"%>

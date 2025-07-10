@@ -1,0 +1,12 @@
+using System;
+using NUnit.Framework;
+
+namespace Enterprise.Customs.ES.TemporaryStorage.GUI.Testing;
+
+[TestedType(typeof(G5V1TemporaryStorageGridColumnLayoutProviderFactory))]
+sealed class G5V1TemporaryStorageGridColumnLayoutProviderFactoryTest : EU.TemporaryStorage.GUI.Testing.UCC6TemporaryStorageGridColumnLayoutProviderFactoryTest
+{
+	protected override EU.TemporaryStorage.GUI.ITemporaryStorageGridColumnLayoutProviderFactory GridColumnLayoutProviderFactory => new G5V1TemporaryStorageGridColumnLayoutProviderFactory();
+
+	protected override Type ExpectedCreateTemporaryStorageGridColumnLayoutProviderForPreviousDocumentsDetailsType => typeof(G5V1TemporaryStoragePreviousDocumentsDetailsGridColumnLayout);
+}

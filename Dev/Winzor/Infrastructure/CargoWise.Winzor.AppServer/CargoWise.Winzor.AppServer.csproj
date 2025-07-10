@@ -1,0 +1,166 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>CargoWise.Winzor.AppServer</RootNamespace>
+    <UserSecretsId>071a4da1-b89b-4f67-89a1-d5bfd2a51fb6</UserSecretsId>
+    <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
+    <DockerfileContext>.</DockerfileContext>
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+    <RuntimeIdentifier Condition="'$(IsReleaseBuild)' == 'true'">win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <PublishDir>$(WTGBinPath)AppServer\</PublishDir>
+    <PublishUrl>$(WTGBinPath)AppServer\</PublishUrl>
+    <PublishProvider>FileSystem</PublishProvider>
+    <DeployOnBuild>true</DeployOnBuild>
+    <PublishReadyToRun Condition="'$(IsReleaseBuild)' == 'true'">false</PublishReadyToRun>
+    <NoWarn>$(NoWarn);NU1701;</NoWarn>
+    <Company>WiseTech Global</Company>
+    <Product>CargoWise Blazor</Product>
+    <Authors>WiseTech Global</Authors>
+    <Copyright>WiseTech Global</Copyright>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <UseLegacyRsa>false</UseLegacyRsa>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>NET5</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(IsReleaseBuild)' == 'true'">
+    <Content Remove="appsettings.json" />
+    <Content Remove="appsettings.DAT.json" />
+    <Content Remove="appsettings.Development.json" />
+    <Content Remove="appsettings.IntegrationTest.json" />
+    <None Include="appsettings.json" CopyToOutputDirectory="Never" />
+    <None Include="appsettings.DAT.json" CopyToOutputDirectory="Never" />
+    <None Include="appsettings.Development.json" CopyToOutputDirectory="Never" />
+    <None Include="appsettings.IntegrationTest.json" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+  <Import Project="Convert.Indirect.References.With.ReadyToRun.props" />
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" />
+    <PackageReference Include="MessagePack" />
+    <PackageReference Include="MessagePackAnalyzer" />
+    <PackageReference Include="Microsoft.SqlServer.Types" >
+      <IncludeAssets>native</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Expressions" />
+    <PackageReference Include="Serilog.Formatting.Elasticsearch" />
+    <PackageReference Include="Serilog.Sinks.Async" />
+    <PackageReference Include="Serilog.Sinks.PeriodicBatching" />
+    <PackageReference Include="QuickGetLatest.SignTool" GeneratePathProperty="true" />
+    <PackageReference Include="WTG.DevTools.CodeSigning" />
+    <PackageReference Include="WTG.Z.Blazor.Diagrams" />
+    <PackageReference Include="WTG.ErrorReporting.Extensions.Logging" />
+    <PackageReference Include="Yarp.ReverseProxy" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsReleaseBuild)' != 'true'">
+    <None Update="kafkaCertificate.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="NOTICE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.Blazor.Client.Integration" />
+    <Reference Include="CargoWise.Blazor.Client.Integration.Server" />
+    <Reference Include="CargoWise.Common">
+      <!-- We set this to false to prevent the Publish process from compiling this DLL with ReadyToRun format. Otherwise, it causes the program to load DLLs and resources from incorrect folders. -->
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="CargoWise.ComponentModel" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.Blazor.Client.Integration" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="CargoWiseNext.Infrastructure.ConfigurationManager" />
+    <Reference Include="Enterprise.BlazorWinFormsInterop" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Enterprise.DocumentScanning.Business" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="WTG.Logging" />
+    <Reference Include="WTG.Logging.Extensions" />
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="Enterprise.Registry.Business" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="machine.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="appsettings.Production.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.DAT.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Architecture\Main.Navigation\CargoWise.Main.Navigation\CargoWise.Main.Navigation.Winzor.csproj" />
+    <ProjectReference Include="..\..\..\Enterprise\ClientExtensions\EDI\ZClientEDI\ZClientEDI\ZClientEDI.Winzor.csproj" />
+    <ProjectReference Include="..\..\..\Enterprise\Product\Documents\DocumentEngine.GUI\DocumentEngine.GUI\DocumentEngine.GUI.Winzor.csproj" />
+    <ProjectReference Include="..\..\..\Enterprise\Product\Documents\DocumentScanning\DocumentScanning.GUI\DocumentScanning.GUI.Winzor.csproj" />
+    <ProjectReference Include="..\..\..\Enterprise\Product\Operations\BufferManagement\NetworkVisualisation\NCN.GUI\BufferManagement.NetworkVisualisation.GUI.Winzor.csproj" />
+    <ProjectReference Include="..\..\BArchitecture.GUI\WinzorFramework.csproj" />
+    <ProjectReference Include="..\..\CargoWise.Winzor.Telemetry\CargoWise.Winzor.Telemetry.csproj" />
+    <ProjectReference Include="..\..\CargoWiseNext.Blazor.Components\CargoWiseNext.Blazor.Components.csproj" />
+    <ProjectReference Include="..\..\Enterprise.Winzor.Architecture\Enterprise.Winzor.Architecture.csproj" />
+    <ProjectReference Include="..\..\NetworkVisualisation.GUI.Winzor\NetworkVisualisation.GUI.Winzor.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\CargoWise.Blazor.HostedAppRuntime\CargoWise.Blazor.HostedAppRuntime.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scripts\" />
+  </ItemGroup>
+  <Target Name="CssBuild" AfterTargets="AfterPublish">
+    <Exec Command="powershell.exe -ExecutionPolicy Bypass -File Scripts\CssBuild.ps1 $(PublishIntermediateOutputPath)" StandardErrorImportance="high" />
+    <ItemGroup>
+      <CssFiles Include="$(PublishIntermediateOutputPath)\wwwroot\CargoWise.Winzor.combined.css" />
+    </ItemGroup>
+  </Target>
+  <Target Name="CssPublish" AfterTargets="CssBuild">
+    <Copy SourceFiles="@(CssFiles)" DestinationFolder="$(WTGBinPath)AppServer\wwwroot" />
+  </Target>
+  <Target Name="CopyConfigFile" BeforeTargets="Build">
+    <MakeDir Directories="$(WTGBinPath)winzor\Config" />
+    <Copy SourceFiles="machine.config" DestinationFolder="$(WTGBinPath)winzor\Config" />
+    <MakeDir Directories="$(WTGBinPath)AppServer\Config" />
+    <Copy SourceFiles="machine.config" DestinationFolder="$(WTGBinPath)AppServer\Config" />
+  </Target>
+  <Target Name="CopyJs" BeforeTargets="Build">
+    <Copy SourceFiles="$(WTGBinPath)winzor\wwwroot\client.js" DestinationFolder="wwwroot" />
+  </Target>
+
+  <Target Name="QGLSignFiles" AfterTargets="Publish" Condition="'$(DAT_IS_BUILDING)' == 'true'">
+    <Exec Command="powershell -Command &quot;Get-ChildItem $(PublishDir) -Recurse -Include *.dll,*.exe,*.msi | ForEach-Object { if ((Get-AuthenticodeSignature $_.FullName).Status -ne 'Valid') { &amp; &quot;$(PkgQuickGetLatest_SignTool)\tools\QuickGetLatest.SignTool.exe&quot; $_.FullName } }&quot;" />
+  </Target>
+  <!-- Validation occurs only in DAT builds with Release configuration -->
+  <Target Name="ValidateSignedFiles" AfterTargets="QGLSignFiles"  Condition="'$(Configuration)' == 'Release' And '$(DAT_IS_BUILDING)' == 'true'">
+    <Exec Command="powershell -Command &quot;Get-ChildItem $(PublishDir) -Recurse -Include *.dll,*.exe,*.msi | ForEach-Object { if ((Get-AuthenticodeSignature $_.FullName).Status -ne 'Valid') { $_.FullName } }&quot;"
+          ConsoleToMSBuild="true"
+          >
+      <Output TaskParameter="ConsoleOutput" PropertyName="NotAssignedFiles" />
+    </Exec>
+
+    <Error Condition=" '$(NotAssignedFiles)' != '' "
+             Text="The following files are not signed:&#xA; $(NotAssignedFiles.Replace(';','&#xA;'))" />
+  </Target>
+
+  <!-- To reduce the Release build output size, delete the PDB files in the bin\AppServer\ folder that are copied from the bin\winzor\ and bin\ folders during publishing. -->
+  <Target Name="RemoveDuplicatePdbFiles" AfterTargets="AfterPublish" Condition="'$(Configuration)' == 'Release' And '$(DAT_IS_BUILDING)' == 'true'">
+    <ItemGroup>
+      <CopiedPdbFiles Include="$(WTGBinRoot)AppServer\*.pdb" />
+    </ItemGroup>
+    <Delete Files="@(CopiedPdbFiles)" />
+  </Target>
+</Project>

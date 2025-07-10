@@ -1,0 +1,62 @@
+@using WinzorFramework.Extensions
+@using Microsoft.AspNetCore.Components.Web
+@using Winform = System.Windows.Forms;
+@namespace Enterprise.ZArchitecture.GUI.Internal
+@inherits ZDropButton
+
+<div class="zdropbutton @disabledClass">
+    <button class="zdropbutton__button zdropbutton__button--no-hover" data-winzor-control-id="@WinzorControlId" style="@buttonStyleString" disabled="@IsDisabled" tabindex="@this.TabIndexHtmlAttributeValue()" @onmousedown=OnDropButtonClickAsync @onmousedown:stopPropagation @onmousedown:preventDefault>
+        @if (!toggleIcon)
+        {
+            <svg class="zdropbutton__image @imgDisabledClass" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="15" height="16" alt="search icon"
+                 viewBox="0 0 32 31.3" enable-background="new 0 0 32 31.3" xml:space="preserve">
+                <line fill="none" stroke="#000000" stroke-width="5" stroke-miterlimit="10" x1="18.93" y1="18.6" x2="29.98" y2="29.22" />
+                <line fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" x1="17.14" y1="16.92" x2="19.49" y2="19.1" />
+                <circle fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" cx="10.38" cy="10.38" r="8.48" />
+            </svg>
+        }
+        else
+        {
+            <svg class="zdropbutton__image @imgDisabledClass" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="15" height="16" alt="close icon"
+                 viewBox="0 0 25.98 25.98" enable-background="new 0 0 25.98 25.98" xml:space="preserve">
+                <line fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" x1="4.86" y1="4.86" x2="21.11" y2="21.11" />
+                <line fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" x1="4.86" y1="21.11" x2="21.11" y2="4.86" />
+            </svg>
+        }
+    </button>
+</div>
+
+@code
+{
+    string disabledClass => IsDisabled ? "zdropbutton--disabled" : string.Empty;
+
+    string imgDisabledClass => IsDisabled ? "zdropbutton__image--disabled" : string.Empty;
+
+    bool IsDisabled => !Enabled || ReadOnly;
+
+    bool toggleIcon { get; set; } = false;
+
+    string buttonStyleString => $"left:{ButtonBounds.Left}px;width:{ButtonBounds.Width}px;height:{ButtonBounds.Height}px;";
+
+    internal override async Task OnDropButtonClickAsync(MouseEventArgs e)
+    {
+		if (!IsDisabled)
+		{
+			await InvokeWinzorDispatcherAsync(() => OnMouseDown(new Winform.MouseEventArgs(e.GetMouseButtons(), (int)e.Detail, (int)e.ClientX, (int)e.ClientY, 0)));
+		}
+	}
+
+    protected override bool ShouldRender => base.ShouldRender && ButtonSize.Width > 0 && ButtonSize.Height > 0;
+
+    protected internal override void HideDropDown()
+    {
+        toggleIcon = false;
+        base.HideDropDown();
+    }
+
+    protected internal override void ShowDropDown(bool lButtonDown)
+    {
+        toggleIcon = true;
+        base.ShowDropDown(lButtonDown);
+    }
+}

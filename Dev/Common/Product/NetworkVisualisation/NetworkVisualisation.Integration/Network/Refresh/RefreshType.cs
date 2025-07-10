@@ -1,0 +1,33 @@
+namespace CargoWise.NetworkVisualisation.Integration
+{
+	public enum RefreshType
+	{
+		None,
+		Affinities,
+		AffinitiesRefreshRequired,
+		EntityAdded,
+		EntityRemoved,
+		EntityEdited,
+		EntityCoordinates,
+		EntitySize,
+		EntityPinnedOrUnpinned,
+		EntityStatusChanged,
+		Scale,
+		RedrawDiagram,
+		Saving,
+		Saved,
+		RefreshButton,
+		EntitiesReloaded,
+		RelationshipAdded,
+		RelationshipRemoved,
+		Close,
+		ConnectionAdded,
+		ResourceDependencyAdded,
+		EntitiesMovedToDiagramSection,
+		TextColorUpdated,
+		EntityApprovedOrUnapproved,
+		ShapeInspectorVisibilityChanged,
+		ToogleFreezeChannelHeadersAndTimeLabels,
+		ChannelView
+	}
+}

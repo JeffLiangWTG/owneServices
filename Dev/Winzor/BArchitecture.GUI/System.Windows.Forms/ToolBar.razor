@@ -1,0 +1,58 @@
+@namespace System.Windows.Forms
+@inherits Control
+@using WinzorFramework.Extensions
+
+<div class="toolbar" style="@ControlStyleString" @ref="ElementReference" @attributes="DataAttributes">
+    @{
+        var imageList = ImageList;
+    }
+    @foreach (var button in Buttons)
+    {
+        button.Refresh = () => RefreshToolbarButton();
+        @if (button.Visible)
+        {
+            @if (button.Style == ToolBarButtonStyle.Separator)
+            {
+	            <div class="toolbar__separator @(Enabled ? string.Empty : "toolbar__separator--disabled")">
+		            <div></div>
+	            </div>
+            }
+            else
+            {
+                <button class="toolbar__button@(button.Style == ToolBarButtonStyle.ToggleButton && button.Pushed ? " toolbar__button-pushed" : string.Empty)" @onclick="() => OnButtonClickAsync(new ToolBarButtonClickEventArgs(button))" @onclick:stopPropagation disabled="@(!Enabled)" title="@button.ToolTipText">
+                    @if (!string.IsNullOrEmpty(button.Text))
+                    {
+                        <div>@button.Text</div>
+                    }
+                    @if (button.ImageIndex > -1 && imageList != null)
+                    {
+                        <img src="@imageList.Images[button.ImageIndex].ToBase64DataUrl()" draggable="false">
+                    }
+                </button>
+            }
+        }
+    }
+</div>
+
+@code {
+    void RefreshToolbarButton()
+    {
+        NotifyRenderRequired();
+    }
+
+    async Task OnButtonClickAsync(ToolBarButtonClickEventArgs args)
+    {
+        if (!Enabled)
+        {
+            return;
+        }
+        await InvokeWinzorDispatcherAsync(() =>
+         {
+             if (args.Button.Style == ToolBarButtonStyle.ToggleButton)
+             {
+                 args.Button.Pushed = !args.Button.Pushed;
+             }
+             OnButtonClick(args);
+         });
+    }
+}

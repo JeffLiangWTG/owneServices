@@ -1,0 +1,19 @@
+CREATE TABLE RefCusRateType
+(
+	ZZR_PK UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_RefCusRateType_ZZR_PK DEFAULT (NEWID()),
+	ZZR_RateType VARCHAR(3) NOT NULL,
+	ZZR_Description NVARCHAR(50) NOT NULL,
+	ZZR_IsPayable BIT NOT NULL CONSTRAINT DF_RefCusRateType_ZZR_IsPayable DEFAULT (0),
+	ZZR_ZZZ_NKDataGrouping VARCHAR(3) NOT NULL,
+	ZZR_RX_NKFormulaCurrency VARCHAR(3) NOT NULL CONSTRAINT DF_RefCusRateType_ZZR_RX_NKFormulaCurrency DEFAULT '',
+	ZZR_CustomsValueFormula VARCHAR(200) NOT NULL CONSTRAINT DF_RefCusRateType_ZZR_CustomsValueFormula DEFAULT '',
+	ZZR_IsExport BIT NOT NULL CONSTRAINT DF_RefCusRateType_ZZR_IsExport DEFAULT(0),
+	CONSTRAINT PK_RefCusRateType PRIMARY KEY CLUSTERED( ZZR_PK ASC ),
+	CONSTRAINT CK_RefCusRateType_ZZR_RateType CHECK (ZZR_RateType <>''),
+	CONSTRAINT CK_RefCusRateType_ZZR_Description CHECK (ZZR_Description <>''),
+	CONSTRAINT CK_RefCusRateType_ZZR_ZZZ_NKDataGrouping CHECK (ZZR_ZZZ_NKDataGrouping <>''),
+	CONSTRAINT FK_RefCusRateType_RefDataGrouping FOREIGN KEY (ZZR_ZZZ_NKDataGrouping) references RefDataGrouping(ZZZ_DataGrouping)
+)
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_RefCusRateType_ZZR_ZZZ_NKDataGrouping_ZZR_RateType ON RefCusRateType (ZZR_ZZZ_NKDataGrouping ASC, ZZR_RateType ASC)
+GO

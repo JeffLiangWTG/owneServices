@@ -1,0 +1,16 @@
+CREATE TABLE [RefDocOrgCusCode] (
+	[DOC_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_RefDocOrgCusCode_DOC_PK DEFAULT (NEWID()),
+	[DOC_RN_NKRegulatingCountry] VARCHAR(2) NOT NULL CONSTRAINT DF_RefDocOrgCusCode_DOC_RN_NKRegulatingCountry DEFAULT '',
+	[DOC_RN_NKCodeCountry] VARCHAR(2) NOT NULL CONSTRAINT DF_RefDocOrgCusCode_DOC_RN_NKCodeCountry DEFAULT '',
+	[DOC_CodeType] CHAR(3) NOT NULL CONSTRAINT DF_RefDocOrgCusCode_DOC_CodeType DEFAULT '',
+	[DOC_DocumentType] VARCHAR(3) NOT NULL CONSTRAINT DF_RefDocOrgCusCode_DOC_DocumentType DEFAULT '',
+	[DOC_ShortLabel] VARCHAR(10) NOT NULL CONSTRAINT DF_RefDocOrgCusCode_DOC_ShortLabel DEFAULT '',
+	[DOC_LongLabel] VARCHAR(35) NOT NULL CONSTRAINT DF_RefDocOrgCusCode_DOC_LongLabel DEFAULT '',
+	[DOC_Description] VARCHAR(50) NOT NULL CONSTRAINT DF_RefDocOrgCusCode_DOC_Description DEFAULT '',
+	[DOC_Priority] TINYINT NOT NULL CONSTRAINT DF_RefDocOrgCusCode_DOC_Priority DEFAULT 0,
+	[DOC_Notes] VARCHAR(128) NOT NULL CONSTRAINT DF_RefDocOrgCusCode_DOC_Notes DEFAULT '',
+	[DOC_Direction] VARCHAR(3) NOT NULL CONSTRAINT DF_RefDocOrgCusCode_DOC_Direction DEFAULT 'BTH',
+
+	CONSTRAINT PK_RefDocOrgCusCode PRIMARY KEY CLUSTERED( DOC_PK ASC ),
+	CONSTRAINT CK_RefDocOrgCusCode_DOC_DocumentType Check  ([DOC_DocumentType]='HAW' OR [DOC_DocumentType]='AWB' OR [DOC_DocumentType]='ESI' OR [DOC_DocumentType] = 'HBL')
+)

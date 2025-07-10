@@ -1,0 +1,32 @@
+meta {
+  name: Origin - A Zone that does not exist in CW1 is provided
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.Origin = { Type: "ZONE", Value: "ZONE" };
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Response would be 200.", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("A Warning should be returned with message : Provided RateQuery.Origin.Value (ZONE) is not a valid Location in CW1.", function() {
+  
+  
+    expect(res.body.Warnings).to.include("Provided RateQuery.Origin.Value (ZONE) is not a valid Location in CW1.");
+  });
+}

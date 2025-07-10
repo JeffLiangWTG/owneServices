@@ -1,0 +1,57 @@
+meta {
+  name: Both DGSubstance and DGClass are provided
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.TransportMode = "SEA";
+   query.ContainerMode = "FCL";
+   
+   query.JobInfo = {
+       Containers: [
+           {
+               ContainerTypeCWCode : "20GP",
+               Number : "2983743874",
+               Unit: 2,
+               Commodity: "GEN",
+               Ownership: "CAR",
+               Packlines: [
+                   {
+                       PackageType : "PLT",
+                       Unit: 2,
+                       Commodity: null, 
+                       Weight: 3400,
+                       WeightUnit: "KG",
+                       Volume: 4.32,
+                       VolumeUnit: "M3",
+                       DGSubstance: "1200S",
+                       DGClass: "1.42"
+                   },
+               ]
+           },
+       ]
+   };
+   
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: You should set either DGClass or DGSubstance.", function() {
+    expect(res.body.ModelState['JobInfo.Containers[0].PackLines[0].DGClass'][0]).to.equal("You should set either DGClass or DGSubstance.");
+  });
+}

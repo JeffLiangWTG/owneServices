@@ -1,0 +1,20 @@
+// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~M:Enterprise.Tracking.Business.Testing.TrackingWhsOrderLineTest.GetNewWhsDocket~Enterprise.Tracking.Business.TrackingWhsOrder")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~M:Enterprise.Tracking.Business.Testing.TrackingWhsOrderValidationTest.GetNewBusinessObject~Enterprise.Tracking.Business.TrackingWhsOrder")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~M:Enterprise.Tracking.Business.Testing.TrackingWhsReceiveLineCollectionTest.TestLocationSortedProperlyCore(System.String)")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~M:Enterprise.Tracking.Business.Testing.TrackingWhsReceiveValidationTest.GetNewBusinessObject~Enterprise.Tracking.Business.TrackingWhsReceive")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~P:Enterprise.Tracking.Business.Data.Testing.TrackingOrderFilterValueObjectDataAdapterTest.TestOrg")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~P:Enterprise.Tracking.Business.Data.Testing.TrackingOrderFilterValueObjectDataAdapterTest.Vessel")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~P:Enterprise.Tracking.Business.Testing.TrackingDeclarationTestCase.WebFactory")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~P:Enterprise.Tracking.Business.Testing.TrackingShipmentTest.TestContact")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~P:Enterprise.Tracking.Business.Testing.TrackingSupplierPartIWebDocumentsSupportTest.BizObj")]
+[assembly: SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Auto generated baseline suppressions - WI00637618", Scope = "member", Target = "~F:Enterprise.Tracking.Business.Testing.TrackingContainerFilterStripBusinessObjectTest.TestPackPivot")]
+[assembly: SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Auto generated baseline suppressions - WI00637618", Scope = "member", Target = "~F:Enterprise.Tracking.Business.Testing.TrackingContainerFilterStripBusinessObjectTest.TestVoyageOrigin")]
+[assembly: SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Auto generated baseline suppressions - WI00637618", Scope = "member", Target = "~F:Enterprise.Tracking.Business.Testing.TrackingContainerFilterStripBusinessObjectTest.TestVoyageDestination")]
+[assembly: SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Auto generated baseline suppressions - WI00637618", Scope = "member", Target = "~F:Enterprise.Tracking.Business.Testing.TrackingContainerFilterStripBusinessObjectTest.TestTransport")]

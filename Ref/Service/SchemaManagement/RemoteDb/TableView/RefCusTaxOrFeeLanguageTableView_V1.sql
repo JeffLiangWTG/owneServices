@@ -1,0 +1,6 @@
+CREATE VIEW RefCusTaxOrFeeLanguageTableView_V1 AS
+SELECT ZXU_PK,
+ZXU_ZZF_TaxOrFee,
+ZXU_ZX6_NKLanguage,
+ZXU_Description
+FROM RefCusTaxOrFeeLanguage

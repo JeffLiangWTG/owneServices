@@ -1,0 +1,49 @@
+using System.Linq;
+using System.Threading;
+using Enterprise.AuditDataServices.Subscription;
+using Enterprise.Environment;
+using Enterprise.MasterFiles.Business;
+using ServiceManager.Integration.ServiceTasks.CW;
+
+[assembly:
+	HostedService(
+		Enterprise.AuditDataServices.DeviceManagement.DeviceManagementSubscriberServiceTask.Code,
+		Enterprise.AuditDataServices.DeviceManagement.DeviceManagementSubscriberServiceTask.Description,
+		"BI",
+		typeof(Enterprise.AuditDataServices.DeviceManagement.DeviceManagementSubscriberServiceTask),
+		CanRunInAnyBranch = true,
+		IsMandatory = true,
+		AllowsMultipleInstances = false,
+		MinimumPeriod = "1minute",
+		MaximumPeriod = "30minutes",
+		DefaultScheduleRunEvery = "5minutes",
+		ActiveByDefault = true
+	)
+]
+
+namespace Enterprise.AuditDataServices.DeviceManagement
+{
+	public class DeviceManagementSubscriberServiceTask : ClientSpecificAuditSubscriberTask
+	{
+		public const string Code = "DVM";
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("CargoWiseOne", "CW1161:ResGetStringAnalyzer", Justification = "Service task name")]
+		public const string Description = "Device Management subscriber service task";
+
+		public override string ServiceTaskCode => Code;
+		public override string ServiceTaskDescription => Description;
+		public override string AssemblyName => SubscriberLoader.ZClientEdiBusinessAssemblyName;
+		public override string SubscriberNamespace => SubscriberLoader.DeviceManagementSubscriberNamespace;
+
+		public override void RunTask(CancellationToken token)
+		{
+			var branch = GlbBranch.GetOneActiveBranchPerCompany().FirstOrDefault();
+			if (branch != null)
+			{
+				using (DisposableEnvironment.ForBranch(branch.PK.ToGuid()))
+				{
+					base.RunTask(token);
+				}
+			}
+		}
+	}
+}

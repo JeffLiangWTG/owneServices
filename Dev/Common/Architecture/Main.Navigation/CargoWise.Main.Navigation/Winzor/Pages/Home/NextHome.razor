@@ -1,0 +1,61 @@
+@using CargoWiseNext.Blazor.Components
+
+@namespace CargoWise.Main.Navigation.Pages
+
+@inherits CwnComponentBase
+
+<CwnLayout Class="@Classname" Theme="@Theme">
+    <CwnNavBar Class="cwn-navbar">
+        <NextAppBar NavigationViewModel="@MainPageModelService?.NavigationViewModel" />
+    </CwnNavBar>
+    <CwnMainContent Class="cwn-home__wrapper">
+        <div class="cwn-home__left-sidebar">
+            <Favorites />
+            <RecentModules Class="cwn-home__recent-modules" />
+        </div>
+        <div class="cwn-home__main">
+            @if (MainPageModelService?.IsSnapshotsEnabled == true)
+            {
+                <Snapshots />
+            }
+            <div class="cwn-home__main__content cwn-home__top">
+                <RecentItems Class="cwn-home__widget" NavigationViewModel=@MainPageModelService?.NavigationViewModel />
+                <RecentMessages Class="cwn-home__widget" />
+            </div>
+            <div class="cwn-home__main__content cwn-home__bottom">
+                <MyTasks Class="cwn-home__widget" MyTasksViewModel=@MainPageModelService?.MyTasksViewModel />
+                <PublicHolidayCalendar Class="cwn-home__widget" />
+            </div>
+        </div>
+        <div class="@(RightContainerClassName)">
+            @if (IsRightContentVisible)
+            {
+                <div class="cwn-home__right-sidebar">
+                    <News Class="cwn-home__widget" NewsViewModel=@MainPageModelService?.NewsViewModelTop />
+                    <News Class="cwn-home__widget" NewsViewModel=@MainPageModelService?.NewsViewModelBottom />
+                </div>
+            }
+            <div class="cwn-home__right-toggle-button-bar">
+                <CwnIconButton title="@(ToggleRightContentVisibilityButtonToolTip)"
+                               Variant="@(Variant.Text)"
+                               Color="@(Color.Default)"
+                               Size="@(Size.Medium)"
+                               Class="cwn-toggle-button"
+                               OnSingleClick="async () => await ToggleView()">
+                    @if (IsRightContentVisible)
+                    {
+                        <text>⟫</text>
+                    }
+                    else
+                    {
+                        <text>⟪</text>
+                    }
+                </CwnIconButton>
+            </div>
+        </div>
+    </CwnMainContent>
+    <CwnFooter>
+        <LoginDetails />
+        <CwnImage Src="/_content/CargoWiseNext.Blazor.Components/images/cw-next-brand.svg" Height="24" />
+    </CwnFooter>
+</CwnLayout>

@@ -1,0 +1,13 @@
+using CargoWise.EntityFramework.Testing;
+using Enterprise.Customs.GB.EMCS.Messaging;
+
+namespace Enterprise.Customs.GB.EMCS.Business.Testing
+{
+	sealed class EMCSOutboundEDIMessageLookupsTest : TestCaseWithFactory
+	{
+		public void TestMessageTypeList()
+		{
+			AssertSame("MessageTypeList", Factory.GetCachedValue<EMCSGBOutgoingMessageTypeList>(), Factory.New<EMCSOutboundEDIMessage>().Lookups.MessageTypeList);
+		}
+	}
+}

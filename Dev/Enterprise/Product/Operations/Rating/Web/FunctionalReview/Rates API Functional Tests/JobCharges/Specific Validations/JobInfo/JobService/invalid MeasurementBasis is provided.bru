@@ -1,0 +1,72 @@
+meta {
+  name: invalid MeasurementBasis is provided
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+           query.JobInfo = {
+               JobServices :[
+                   {
+                       Type: "FUM",
+                       Contractor: {
+                           SCAC: "MAEU"
+                       },
+                       Location: {
+                           Type: "UNLOCO",
+                           Value:  "AUSYD"
+                       },
+                       Booked: null,
+                       Completed: "2022-06-16T00:31:42.000Z",
+                       Count: 2,
+                       Duration: 1600,
+                       Rate: 10,
+                       RateCurrency: "AUD",
+                       MeasurementBasis: "XYZ"
+                   }
+   
+               ],
+               Containers: [
+                   {
+                       ContainerTypeCWCode : "20GP",
+                       Number : "2983743874",
+                       Unit: 2,
+                       Commodity: "GEN",
+                       Ownership: "CAR",
+                       Packlines: [
+                           {
+                               PackageType : "PLT",
+                               Unit: 2,
+                               Commodity: null, 
+                               Weight: 3400,
+                               WeightUnit: "KG",
+                               Volume: 4.32,
+                               VolumeUnit: "M3"
+                           },
+                       ]
+                   },
+               ]
+           };
+   
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided MeasurementBasis ('XYZ') is not valid. It can only be one of these values: 'HR', 'DY', 'SV', 'FR', 'CN', 'PD', 'DD', 'CH'.", function() {
+    expect(res.body.ModelState['JobInfo.JobServices[0].MeasurementBasis'][0]).to.equal("Provided MeasurementBasis ('XYZ') is not valid. It can only be one of these values: 'HR', 'DY', 'SV', 'FR', 'CN', 'PD', 'DD', 'CH'.");
+  });
+}

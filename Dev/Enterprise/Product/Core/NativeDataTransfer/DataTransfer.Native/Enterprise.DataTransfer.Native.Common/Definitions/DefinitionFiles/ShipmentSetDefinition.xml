@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<NativeSchemaSet Name="Shipment" Root="JobShipment">
+  <Entities>
+    <Entity Name="JobShipment"/>
+
+    <Entity Name="JobPackLines"/>
+    <Entity Name="JobPackLoc"/>
+    <Entity Name="JobPackProduct"/>
+
+    <Entity Name="JobConsol"/>
+    <Entity Name="JobConsolCost"/>
+
+    <Entity Name="ProcessTasks">
+      <ExcludedProperty Name="P9_FJ_ReplenishmentItem" />
+    </Entity>
+    <Entity Name="JobDocAddress">
+      <ExcludedProperty Name="E2_ValidationStatus" />
+      <ExcludedProperty Name="E2_GeoLocation" />
+			<ExcludedProperty Name="E2_AutoVersion" />
+    </Entity>
+    <Entity Name="CusEntryNum"/>
+    <Entity Name="JobDocsAndCartage"/>
+    <Entity Name="JobOrderItem"/>
+    <Entity Name="JobOrderHeader"/>
+
+    <Entity Name="GenCustomAddOnValue"/>
+  </Entities>
+  <Associations>
+    <Association From="JobPackLines" To="JobShipment" Key="JL_JS"/>
+    <Association From="JobPackLoc" To="JobPackLines" Key="JQ_JL"/>
+    <Association From="JobPackProduct" To="JobPackLines" Key="D2_JL"/>
+
+    <Association From="JobConsol" To="JobShipment" Key="JN_JS" Through="JobConShipLink" ChildFK="JN_JK"/>
+    <Association From="JobConsolCost" To="JobShipment" Key="E6_ParentID"/>
+
+    <Association From="ProcessTasks" To="JobShipment" Key="P9_ParentID"/>
+    <Association From="JobDocAddress" To="JobShipment" Key="E2_ParentID"/>
+    <Association From="CusEntryNum" To="JobShipment" Key="CE_ParentID"/>
+    <Association From="JobDocsAndCartage" To="JobShipment" Key="JP_ParentID"/>
+    <Association From="JobOrderItem" To="JobDocsAndCartage" Key="JT_JP"/>
+    <Association From="JobOrderHeader" To="JobShipment" Key="JD_JS"/>
+
+    <Association From="GenCustomAddOnValue" To="JobShipment" Key="XV_ParentID"/>
+  </Associations>
+</NativeSchemaSet>

@@ -1,0 +1,165 @@
+<UserControl x:Class="CargoWise.Main.Navigation.NextAppBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CargoWise.Main.Navigation"
+             xmlns:ui="clr-namespace:CargoWise.Main.Navigation.WPF;assembly=CargoWise.Main.Navigation"
+			  xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:vm="clr-namespace:CargoWise.Main.Navigation.ViewModels;assembly=CargoWise.Main.Navigation"
+             mc:Ignorable="d"
+			 d:DesignHeight="60" d:DesignWidth="800">
+	<UserControl.Resources>
+		<ResourceDictionary >
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="NextHomeResources.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+			<local:MenuTextConverter x:Key="MenuTextConverter" />
+		</ResourceDictionary>
+	</UserControl.Resources>
+	<UserControl.CommandBindings>
+		<CommandBinding Command="{x:Static local:NextAppBar.CloseSearchWindowCommand}" Executed="CloseSearchWindow" />
+		<CommandBinding Command="{x:Static local:NextAppBar.NavigateSearchResultsCommand}" Executed="NavigateSearchResults" />
+		<CommandBinding Command="{x:Static local:NextAppBar.ExecuteSearchItemHyperlinkCommand}" Executed="ExecuteSearchItemHyperlink" />
+        <CommandBinding Command="{x:Static local:NextHomeNavigation.CloseMainMenuCommand}" Executed="CloseMainMenu" />
+	</UserControl.CommandBindings>
+	<Grid>
+		<Grid Grid.Row="0" Grid.ColumnSpan="3" x:Name="TopPanel"
+	Background="{StaticResource MenuBackgroundColorBrush}">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="1*" />
+				<ColumnDefinition Width="1.89*" />
+				<ColumnDefinition Width="1*" />
+			</Grid.ColumnDefinitions>
+			<Grid Grid.Column="0" x:Name="MainMenuGrid">
+				<Grid.InputBindings>
+					<KeyBinding Key="Escape" Command="{x:Static local:NextHomeNavigation.CloseMainMenuCommand}" />
+				</Grid.InputBindings>
+				<Grid Margin="20,8,0,0">
+					<ListBox
+				Margin="0,0"
+				VerticalAlignment="Center"
+				HorizontalAlignment="Left"
+				TextSearch.TextPath="Name"
+				DockPanel.Dock="Top"
+				Style="{StaticResource MenuBarListBoxStyle}"
+				ItemContainerStyle="{StaticResource MenuCategoryListBoxItemStyle}"
+				Background="Transparent"
+				ItemsSource="{Binding MainMenuCategories}"
+				SelectedItem="{Binding SelectedCategory}"
+				ItemTemplate="{StaticResource MenuCategoryTemplate}"
+				x:Name="MainCategoryMenuListBox">
+						<ListBox.ItemsPanel>
+							<ItemsPanelTemplate>
+								<StackPanel Orientation="Horizontal"  />
+							</ItemsPanelTemplate>
+						</ListBox.ItemsPanel>
+					</ListBox>
+				</Grid>
+			</Grid>
+			<Grid Grid.Column="1">
+				<Border Background="White" x:Name="SearchBoxBorder" MinWidth="450" MaxWidth="950" Height="36" BorderBrush="{StaticResource BorderBrush}"
+			CornerRadius="8" BorderThickness="1">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+						<Image Grid.Column="0" Margin="10 0" Height="13" Stretch="Uniform" VerticalAlignment="Center" Source="{StaticResource SearchDrawingImage}" />
+						<Grid  Grid.Column="1" VerticalAlignment="Center">
+							<TextBox
+								BorderThickness="0"
+								BorderBrush="Transparent"
+								Height="30"
+								Padding="0"
+								Margin="0 -5"
+								FontSize="13"
+								FontWeight="Normal"
+								x:Name="QuickSearch"
+								ToolTip="{Binding SearchHint}"
+								VerticalContentAlignment="Center"
+								Text="{Binding SearchViewModel.SearchValue, UpdateSourceTrigger=PropertyChanged, Delay=200}" >
+								<behaviors:Interaction.Triggers>
+									<behaviors:EventTrigger EventName="GotFocus" >
+										<behaviors:InvokeCommandAction Command="Search"  />
+									</behaviors:EventTrigger>
+									<behaviors:EventTrigger EventName="TextChanged" >
+										<behaviors:InvokeCommandAction Command="Search"  />
+									</behaviors:EventTrigger>
+								</behaviors:Interaction.Triggers>
+								<TextBox.InputBindings>
+									<KeyBinding Key="Enter" Command="{x:Static local:NextAppBar.ExecuteSearchItemHyperlinkCommand}" />
+									<KeyBinding Key="Escape" Command="{x:Static  local:NextAppBar.CloseSearchWindowCommand}" CommandParameter="Escape" />
+									<KeyBinding Key="Tab" Command="{x:Static local:NextAppBar.CloseSearchWindowCommand}" />
+									<KeyBinding Key="Down" Command="{x:Static local:NextAppBar.NavigateSearchResultsCommand}" CommandParameter="{x:Static vm:SearchResultNavigateDirection.Down}" />
+									<KeyBinding Key="Up" Command="{x:Static local:NextAppBar.NavigateSearchResultsCommand}" CommandParameter="{x:Static vm:SearchResultNavigateDirection.Up}" />
+								</TextBox.InputBindings>
+							</TextBox>
+							<ui:MultilingualTextLabel Name="Placeholder" IsTranslatable="True" Padding="0" Margin="0" MultilingualText="{Binding SearchPlaceHolderText}">
+								<ui:MultilingualTextLabel.Style>
+									<Style TargetType="{x:Type ui:MultilingualTextLabel}">
+										<Setter Property="Visibility" Value="Collapsed" />
+										<Style.Triggers>
+											<MultiDataTrigger>
+												<MultiDataTrigger.Conditions>
+													<Condition Binding="{Binding ElementName=QuickSearch, Path=Text}" Value="" />
+													<Condition Binding="{Binding ElementName=QuickSearch, Path=IsFocused}" Value="false" />
+												</MultiDataTrigger.Conditions>
+												<MultiDataTrigger.Setters>
+													<Setter Property="Visibility" Value="Visible" />
+												</MultiDataTrigger.Setters>
+											</MultiDataTrigger>
+										</Style.Triggers>
+									</Style>
+								</ui:MultilingualTextLabel.Style>
+								<TextBlock x:Name="PlaceholderText" Style="{StaticResource TextForButtonStyle}" Text="{Binding SearchPlaceHolderText}"
+               VerticalAlignment="Top" Margin="0" IsHitTestVisible="False"/>
+							</ui:MultilingualTextLabel>
+							<Grid.Style>
+								<Style>
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding IsInSearchMode, IsAsync=True}" Value="True">
+											<Setter Property="FocusManager.FocusedElement" Value="{Binding ElementName=QuickSearch}" />
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</Grid.Style>
+						</Grid>
+						<StackPanel  Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="2" VerticalAlignment="Center">
+							<ui:ShortcutKeyControl ShortCutKeyStyle="{StaticResource ShortcutForButtonStyle}" ShortcutKey="Ctrl+Q"/>
+						</StackPanel>
+					</Grid>
+					<Border.InputBindings>
+						<MouseBinding MouseAction="LeftClick" Command="Search" />
+					</Border.InputBindings>
+				</Border>
+			</Grid>
+			<Menu Grid.Column="2" x:Name="PopupMenu" HorizontalAlignment="Right" Background="Transparent" VerticalAlignment="Bottom"
+		  Margin="0,0,20,0" ItemsSource="{Binding PopupMenus}" ItemContainerStyle="{StaticResource PopupMainMenuItemStyle}">
+				<Menu.ItemTemplate>
+					<DataTemplate>
+						<StackPanel x:Name="MenuItemStack" Style="{StaticResource PopupMenuTitleStackStyle}">
+							<Path x:Name="IconPath"
+						  Margin="4,0,0,0"
+						  Fill="{StaticResource FavoriteIndexBackgroundBrush}" Data="{Binding IconGeometry}" Stretch="Uniform" Height="16" Width="16" />
+							<ui:MultilingualTextLabel IsTranslatable="False" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="2">
+								<TextBlock x:Name="ButtonTextLabel" Style="{StaticResource NavigationListStyle}" Text="{Binding Title, Converter={StaticResource MenuTextConverter}}"/>
+							</ui:MultilingualTextLabel>
+						</StackPanel>
+						<DataTemplate.Triggers>
+							<DataTrigger Binding="{Binding IsMouseOver, ElementName=MenuItemStack}" Value="true">
+								<Setter Property="Background" TargetName="MenuItemStack" Value="{StaticResource CategoryBackgroundMouseOverBrush}" />
+							</DataTrigger>
+							<DataTrigger Binding="{Binding IsSelected}" Value="true">
+								<Setter Property="Background" TargetName="MenuItemStack" Value="{StaticResource CategoryBackgroundBrush}" />
+								<Setter Property="Foreground" TargetName="ButtonTextLabel" Value="{StaticResource NeutralTextDefaultBrush}" />
+								<Setter Property="Fill" TargetName="IconPath" Value="{StaticResource NeutralTextDefaultBrush}" />
+							</DataTrigger>
+						</DataTemplate.Triggers>
+					</DataTemplate>
+				</Menu.ItemTemplate>
+			</Menu>
+		</Grid>
+	</Grid>
+</UserControl>

@@ -1,0 +1,26 @@
+meta {
+  name: Call endpoint using NamedAccounts with CW1 Code
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/companytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetRateQueryWithMandatoryFieldsForProvidedVariables(false);
+   query.NamedAccounts = RatesAPIsHelper.GetNamedAccountsWithCW1Codes();
+   
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

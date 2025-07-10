@@ -1,0 +1,30 @@
+meta {
+  name: NAC is provided for NamedAccounts in RateQuery for intercompanytariffs
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/intercompanytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForIntercompanyTariffs();
+   query.NamedAccounts = [ { Type: "NAC", Value:"NAC0093843" }];
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided Type ('NAC') is not valid. It can only be used for querying Costings or calculating charges.", function() {
+    expect(res.body.ModelState['NamedAccounts[0].Type'][0]).to.equal("Provided Type ('NAC') is not valid. It can only be used for querying Costings or calculating charges.");
+  });
+}

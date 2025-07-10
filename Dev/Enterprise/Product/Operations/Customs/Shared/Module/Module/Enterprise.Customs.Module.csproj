@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="System.Resources.Extensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="GoodsCatalog\GoodsCatalogFilterStripControl.cs" />
+    <Compile Update="CodeDescriptionPairLists\CurrentStatusList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CurrentStatusList.xml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="CodeDescriptionPairLists\CurrentStatusList.xml">
+      <CustomToolNamespace>Enterprise.Customs.Module</CustomToolNamespace>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>CurrentStatusList.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Collections.Immutable" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

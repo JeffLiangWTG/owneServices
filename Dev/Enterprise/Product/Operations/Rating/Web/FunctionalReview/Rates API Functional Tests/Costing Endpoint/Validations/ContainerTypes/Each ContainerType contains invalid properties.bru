@@ -1,0 +1,33 @@
+meta {
+  name: Each ContainerType contains invalid properties
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.ContainerTypes = [{ Prop1: "ABCD", Prop2: "", Prop3: null }];
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Type is Mandatory.", function() {
+    expect(res.body.ModelState['ContainerTypes[0].Type'][0]).to.equal("Type is Mandatory.");
+  });
+  
+  test("Should return: Value is Mandatory.", function() {
+    expect(res.body.ModelState['ContainerTypes[0].Value'][0]).to.equal("Value is Mandatory.");
+  });
+}

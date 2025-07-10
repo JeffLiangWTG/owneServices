@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Styles\core\" />
+    <Folder Include="wwwroot\fonts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BArchitecture.GUI\WinzorFramework.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.Async" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Enterprise.ZArchitecture.Favorites" />
+    <Reference Include="Enterprise.ZArchitecture.Modules" />
+    <Reference Include="Enterprise.Registry.Business" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+    <Reference Include="Enterprise.Registry.Business" />
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <ItemGroup>
+      <CssFiles Include="$(MSBuildProjectDirectory)\Styles\*.css" />
+    </ItemGroup>
+    <Delete Files="@(CssFiles)" />
+    <Exec Command="dotnet tool run webcompiler -- -r Styles -z disable -p disable -c webcompiler.config.json" StandardOutputImportance="high" />
+  </Target>
+
+  <ItemGroup Condition="!Exists('wwwroot\css\_gen\cargowise.blazor.components.css')">
+    <Content Include="wwwroot\css\_gen\cargowise.blazor.components.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\fonts\inter.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

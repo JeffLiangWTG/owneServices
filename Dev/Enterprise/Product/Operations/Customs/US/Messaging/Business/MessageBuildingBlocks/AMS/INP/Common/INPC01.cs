@@ -1,0 +1,92 @@
+namespace Enterprise.Customs.US.Messaging.Business.MessageBuildingBlocks.AMS.Common
+{
+	using CargoWise.Types;
+
+	[InputBlock("C01")]
+	[OutputBlock("C01")]
+	public partial class INPC01 : MessageBlock
+	{
+		public INPC01()
+			: base("C01")
+		{
+		}
+
+		/// <summary>
+		/// A valid container/equipment number associated with a bill of lading. This container/equipment number must reflect the number exactly as it physically appears on the container. Indicate NC for non-containerized freight. Neither an identical container/equipment number nor the designation NC should be repeated within the same bill.
+		/// </summary>
+		[MessageBlockString(14, 4, "M")]
+		public ZString ContainerEquipmentNo;
+
+		/// <summary>
+		/// A valid exporter/carrier seal number associated with the container/equipment.
+		/// </summary>
+		[MessageBlockString(15, 18, "C", OnLengthViolation = LengthViolationAction.SetInvalidValue)] // It should be less than 15 (MaxLength) even user enter 20 characters to avoid an error.
+		public ZString SealNumber1;
+
+		/// <summary>
+		/// A valid exporter/carrier seal number associated with the container/equipment.
+		/// </summary>
+		[MessageBlockString(15, 33, "C", OnLengthViolation = LengthViolationAction.SetInvalidValue)]
+		public ZString SealNumber2;
+
+		/// <summary>
+		/// A code for describing the type of container or equipment used for shipment. Refer to Appendix I of this publication for a complete listing of codes.
+		/// </summary>
+		[MessageBlockString(2, 48, "C")]
+		public ZString ContainerEquipmentDescriptionCode;
+
+		/// <summary>
+		/// Length (in feet and inches) of container/ equipment ordered or used to transport shipment. The formula is FFFII, where FFF is feet and II is inches. The range for II is 00 through 11.
+		/// </summary>
+		[MessageBlockInt(5, 50, "C")]
+		public ZInt ContainerEquipmentLength;
+
+		/// <summary>
+		/// Vertical dimension of an object when object is in upright position.
+		/// </summary>
+		[MessageBlockString(8, 55, "C")]
+		public ZString Height;
+
+		/// <summary>
+		/// A shorter measurement of the two horizontal dimensions measured with the object in the upright position.
+		/// </summary>
+		[MessageBlockString(8, 63, "C")]
+		public ZString Width;
+
+		/// <summary>
+		/// A code identifying the type of container/ equipment. A container/equipment type code alone may be used in lieu of the container/equipment length, height and width. Refer to Appendix M of this publication for valid codes.
+		/// </summary>
+		[MessageBlockString(4, 71, "C")]
+		public ZString ContainerEquipmentType;
+
+		/// <summary>
+		/// A code which specifies the loaded condition of the transportation equipment. Valid status codes are:
+		/// 
+		/// E = Empty
+		/// L = Loaded
+		/// T = Total (rail)
+		/// </summary>
+		[MessageBlockString(1, 75, "O")]
+		public ZString LoadEmptyStatusCode;
+
+		/// <summary>
+		/// A code specifying the extent of transportation service required. Valid codes are:
+		/// 
+		/// BB = Break Bulk
+		/// CS = Container Station
+		/// CY = Container Yard
+		/// HH = House-to-House
+		/// HL = Headload or Devanning
+		/// HP = House-to-Pier
+		/// MD = Mixed Delivery
+		/// NC = Non-Containerized
+		/// PH = Pier-to-House
+		/// PP = Pier-to-Pier
+		/// RR = Roll on - Roll Off
+		/// 
+		/// For participants in the paperless manifest program, this field is mandatory.
+		/// </summary>
+		[MessageBlockString(2, 76, "C")]
+		public ZString TypeOfServiceCode;
+	}
+}

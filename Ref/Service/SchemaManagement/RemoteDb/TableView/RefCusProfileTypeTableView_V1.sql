@@ -1,0 +1,9 @@
+CREATE VIEW RefCusProfileTypeTableView_V1
+WITH SCHEMABINDING AS
+SELECT XXX_PK,
+XXX_ProfileType,
+XXX_ZZI_TariffType = ISNULL(PT.XXX_ZZI_TariffType, '00000000-0000-0000-0000-000000000000'),
+XXX_Description,
+XXX_ZZZ_NKDataGrouping
+FROM dbo.RefCusProfileType AS PT
+WHERE XXX_ZZI_TariffType IS NOT NULL

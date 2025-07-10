@@ -1,0 +1,91 @@
+@namespace System.Windows.Forms
+@inherits ListControl
+@using System.Windows.Forms
+@using WinzorFramework
+@using WinzorFramework.Extensions;
+
+@{
+    var itemList = Items.ToList();
+    var localSelectedIndex = selectedIndex;
+    var suggestionItemList = suggestionItems.ToList();
+}
+
+<div class="combobox @ComboBoxModifier" @attributes="DataAttributes" style="@ControlStyleString" title="@GetSelectedItemText(itemList, localSelectedIndex)" disabled="@(!Enabled)" @onwinzorfocusin="OnFocusInAsync" @onwinzorfocusin:stopPropagation @onwinzorfocusout="OnFocusOutAsync" @onwinzorfocusout:stopPropagation>
+    @if (DropDownStyle == ComboBoxStyle.DropDownList && Enabled)
+    {
+        <div class="combobox__input" @ref=inputReference tabindex=@(this.TabIndexHtmlAttributeValue() ?? "0") @onclick=OnDropdownButtonClickAsync @onclick:stopPropagation>
+            <div class="combobox__input-text">
+                @Text
+            </div>
+        </div>
+    }
+    else
+    {
+        <input type="text" disabled="@(!Enabled)" tabindex=@this.TabIndexHtmlAttributeValue() class="combobox__input" value=@Text @ref=inputReference @oninput=OnInputAsync />
+    }
+    <button class="combobox__button" disabled="@(!Enabled)" tabindex="-1" @onclick=OnDropdownButtonClickAsync @onclick:stopPropagation>keyboard_arrow_down</button>
+    <Portal>
+        @if (DroppedDown)
+        {
+            <Popup AnchorElement="inputReference">
+                <div data-desired-height="@(CalculateHeight() + 2)" style="--dropdown-width: @(Width)px;@(FontStyleString())" class="combobox__dropdown" onmousedown="event.preventDefault()">
+                    @for (var i = 0; i < itemList.Count; i++)
+                    {
+                        var index = i;
+                        var item = itemList[index];
+                        <button class="combobox__dropdown-item @(UpdateDropDownItemTag(index))" style="min-height: @(ItemHeight)px;" @ref="ElementReferencesDict[index]" @onmouseover="async () => await OnDropdownItemMouseOverAsync(index)" @onmouseover:stopPropagation @onmousedown="async (args) => await OnDropdownItemClickAsync(args, index)" @onmousedown:stopPropagation>@GetItemText(item)</button>
+                    }
+                    @if (itemList.Count == 0)
+                    {
+                        <div class="combobox__dropdown-blank-item" style="min-height: @(ItemHeight)px;"></div>
+                    }
+                </div>
+            </Popup>
+        }
+        @if (suggestionItemList.Count > 0)
+        {
+            <Popup AnchorElement="inputReference">
+                <div style="--dropdown-height: @(DropDownHeight)px;--dropdown-width: @(Width)px;" class="combobox__suggestion" onmousedown="event.preventDefault()">
+                    @foreach (var item in suggestionItemList)
+                    {
+                        <button class="combobox__suggestion-item" @onmousedown="async (args) => await OnSuggestionItemClickAsync(args, item)" @onmousedown:stopPropagation>@item</button>
+                    }
+                </div>
+            </Popup>
+        }
+    </Portal>
+</div>
+
+@code
+{
+    Dictionary<int, ElementReference> ElementReferencesDict = new();
+
+    string? GetSelectedItemText(IReadOnlyList<object> itemList, int localSelectedIndex)
+    {
+        var itemText = "";
+        if (localSelectedIndex >= 0 && localSelectedIndex < itemList.Count)
+        {
+            var item = itemList[localSelectedIndex];
+            itemText = GetItemText(item);
+        }
+        return itemText;
+    }
+
+    string ComboBoxModifier
+    {
+        get
+        {
+            if (this.DropDownStyle == ComboBoxStyle.DropDownList)
+            {
+                return "combobox--style-dropdownlist";
+            }
+
+            return "";
+        }
+    }
+
+    string FontStyleString()
+    {
+        return $"font-size:{Font.Size}pt;";
+    }
+}

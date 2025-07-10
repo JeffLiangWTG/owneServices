@@ -1,0 +1,107 @@
+using System.Security.Cryptography;
+
+namespace CargoWise.RefDbRepo.Common.Utils;
+
+#if DEBUG
+class RsaCipherKeyPairInfoManager_Debug : ICipherKeyPairInfoManager
+{
+	public RsaCipherKeyPairInfoManager_Debug()
+	{
+		using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+		{
+			rsa.ImportFromPem(PUBLIC_KEY_DEBUG);
+			publicKey = rsa.ExportParameters(false);
+		}
+		using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
+		{
+			rsa.ImportFromPem(PRIVATE_KEY_DEBUG);
+			privateKey = rsa.ExportParameters(true);
+		}
+	}
+
+	public RSAParameters GetPublicKey() => publicKey;
+
+	public RSAParameters GetPrivateKey() => privateKey;
+
+	public byte[] GetAeskey() => AES_KEY_DEBUG;
+
+	readonly RSAParameters publicKey;
+	readonly RSAParameters privateKey;
+
+	const string PRIVATE_KEY_DEBUG = @"-----BEGIN PRIVATE KEY-----
+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
+oNUTOQ63IEZJ+VqUMMgYaw0qOCYt580=
+-----END PRIVATE KEY-----
+";
+
+	const string PUBLIC_KEY_DEBUG = @"-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAssDR82+OyJ5ZRVIS959+
+X3PSEeU59p/UpLwet9JyIkJ5Y4/ahEr8s8jghK0vsvUXOFgh3ZpSi9DFOF74eKMT
+ZrcmE/qblVNQBJgEHvjyBU3a5a6zWiXaAoRr70DphOe9cGDvkPg9s4W5rjeCRKyr
+lDb8eKJU884BxjZJpz7rcgvzBgg0SRxdGUaX1A2SuSvQKs1SxxBDGb6xIQufSmi1
+OmAJs/3fLBiE2GbbxSFs3geDMu0CU7to8ktq4HDAnUc0a5faff9oVrHKfsh7/wCY
+V39N/JeMWBzRhcTsQHOFPh7Cte5h3ASgjUfV7Twycy7qpgV7R+nauxV8WpswjUDA
+Dd9y+9LyB1U5/X8KAJst3YcuWnhOe8qWLrdWjaQ7U0sA2PTrr/bM7OcfWN+YiFDt
+fRyASd1mifxk+4EgXE7TqH8Zvo7qHnEIkH9ahGn6yXRRn6EuxI1Zg4VXWBH/aJQz
+xA+/lqo9I+6+JhMgGJCO+5GY4QbGQ4e3bs3J1azoYpgEjivZZ5bj0RLH1exC/X7l
+6X0OnhMpEAVFG24esxU6HLpCFnJJ5ZXPd7lh3cqY+wXG9eqJcNcPO4XYNs1aIJaz
+KU9Cnc+8t2IMU1nupHQ/qRt1OH1/fgEGmlAqHZIh3KAgP6aKWo0l5qMMz82HYGwk
+Afcr5qYnzssXHOD7m8I3F9ECAwEAAQ==
+-----END PUBLIC KEY-----
+";
+
+	static byte[] AES_KEY_DEBUG =
+	[
+		0x7E, 0xBA, 0x9F, 0x06, 0x88, 0x26, 0x87, 0xDA, 0x35, 0xA3, 0x0F, 0x3B, 0xF0, 0xA3, 0x09, 0xD1,
+		0xCA, 0x82, 0xCA, 0x9A, 0x5D, 0xF2, 0x63, 0x14, 0x2B, 0x92, 0x15, 0x74, 0xE3, 0x80, 0xCB, 0xB5
+	];
+}
+#endif

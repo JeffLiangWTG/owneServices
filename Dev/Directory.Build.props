@@ -1,0 +1,219 @@
+﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Condition="$(QGL_IS_BUILDING) == 'True' And Exists('$(MSBuildThisFileDirectory)BuildFlags.props')" Project="$(MSBuildThisFileDirectory)BuildFlags.props" />
+
+  <PropertyGroup>
+    <WTGBranchRoot>$(MSBuildThisFileDirectory)</WTGBranchRoot>
+    <BranchBuildSettingsDirectory>$(WTGBranchRoot)build\</BranchBuildSettingsDirectory>
+    <WTGPaketPackagesRoot>$(WTGBranchRoot)packages\</WTGPaketPackagesRoot>
+    <WTGBinRoot>$(WTGBranchRoot)Bin\</WTGBinRoot>
+    <WTGPaketBuildItemsGroupName>Build</WTGPaketBuildItemsGroupName>
+    <IsDebugBuild Condition="'$(Configuration)' == '' or '$(Configuration)' == 'Debug' or '$(Configuration)' == 'DEBUGFAST'">true</IsDebugBuild>
+    <IsThirdParty Condition="$(MSBuildProjectFullPath.Contains('ThirdParty')) Or $(MSBuildProjectFullPath.Contains('FlexCel')) Or $(MSBuildProjectName.StartsWith('Aga.'))">true</IsThirdParty>
+    <CodeAnalysisEnabled Condition="($(QGL_IS_BUILDING) != 'True' Or '$(CW_BUILD_FLAG_ENABLE_ROSLYN_ANALYZERS)' == 'true') And '$(IsDebugBuild)' == 'true' And !$(MSBuildProjectFullPath.Contains('EdiFact')) And '$(IsThirdParty)' != 'true'">true</CodeAnalysisEnabled>
+    <RunAnalyzers Condition="'$(CodeAnalysisEnabled)' != 'true'">false</RunAnalyzers>
+    <RunAnalyzersDuringBuild Condition="'$(Configuration)' == 'DEBUGFAST' Or '$(WTG_DISABLE_ROSLYN_ANALYZERS_DURING_BUILD)' == '1'">false</RunAnalyzersDuringBuild>
+    <LangVersion>default</LangVersion>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <CentralPackageVersionOverrideEnabled>false</CentralPackageVersionOverrideEnabled>
+    <DebugSymbols>true</DebugSymbols>
+    <DisableResourceStringsProcessing Condition="'$(CW_BUILD_FLAG_DISABLE_RESOURCE_STRINGS)' == 'true'">true</DisableResourceStringsProcessing>
+
+    <!-- WI00875883 - Disable refs subfolders in Dev repo -->
+    <PreserveCompilationReferences>false</PreserveCompilationReferences>
+
+    <ReleaseInfo>$([System.IO.File]::ReadAllText("$(WTGBranchRoot)ReleaseInfo.xml"))</ReleaseInfo>
+
+    <CWNetCoreVersion>net8.0</CWNetCoreVersion>
+    <CWNetCoreTargetFramework>$(CWNetCoreVersion)</CWNetCoreTargetFramework>
+    <CWNetCoreWindowsTargetFramework>$(CWNetCoreVersion)-windows</CWNetCoreWindowsTargetFramework>
+
+    <!-- Set this to true to enable full build including Temp_CWNetCoreTargetFramework and Temp_CWNetCoreWindowsTargetFramework targets -->
+    <CWEnableFullNetCoreBuild>false</CWEnableFullNetCoreBuild>
+    <Temp_CWNetCoreTargetFramework Condition="'$(CWEnableFullNetCoreBuild)' == 'true'" >$(CWNetCoreTargetFramework)</Temp_CWNetCoreTargetFramework>
+    <Temp_CWNetCoreWindowsTargetFramework Condition="'$(CWEnableFullNetCoreBuild)' == 'true'">$(CWNetCoreWindowsTargetFramework)</Temp_CWNetCoreWindowsTargetFramework>
+    <!-- Set this to false to disable safeguard that checks if Directory.CargoWiseReferences.props has correct values -->
+    <CWEnableReferenceStatusSafeGuard>true</CWEnableReferenceStatusSafeGuard>
+
+    <!--
+      SDK hook for importing custom target framework parsing.
+      This is required to be able to set output properties (AppendTargetFrameworkToOutputPath, OutputPath, etc.) before FinalOutputPath is assigned.
+    -->
+    <BeforeTargetFrameworkInferenceTargets>$(WTGBranchRoot)NetCore\AutoImportNetCoreProps.targets</BeforeTargetFrameworkInferenceTargets>
+
+    <CWNetFrameworkOutputPath>$(WTGBinRoot)</CWNetFrameworkOutputPath>
+    <CWWinzorOutputPath>$(WTGBinRoot)winzor\</CWWinzorOutputPath>
+    <CWNetCoreOutputPath>$(WTGBinRoot)$(CWNetCoreTargetFramework)\</CWNetCoreOutputPath>
+    <OutputPath>$(CWNetFrameworkOutputPath)</OutputPath>
+
+    <!--
+      Winzor projects are projects with .Winzor in their name, or projects under the Dev/Winzor directory.
+      However, projects under the Dev/Winzor directory which do not have .Winzor in their name are omitted from some configuration.
+    -->
+    <IsWinzorProjectByName Condition="$(MSBuildProjectName.Contains('.Winzor'))">true</IsWinzorProjectByName>
+    <IsWinzorProject Condition="'$(IsWinzorProjectByName)' == 'true' Or ($(MSBuildProjectFullPath.StartsWith('$(WTGBranchRoot)Winzor')) and $(MSBuildProjectName) != 'WinzorFramework.Samples')">true</IsWinzorProject>
+
+    <IsCwTestProject Condition="$([System.Text.RegularExpressions.Regex]::Match($(MSBuildProjectName), `.*\.Test(?:ing|s)?(?:$|\..*)`).Success)">true</IsCwTestProject>
+
+    <!-- Workaround for https://github.com/dotnet/roslyn/issues/41640 -->
+    <EnforceCodeStyleInBuild Condition="'$(CodeAnalysisEnabled)' == 'true'">true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsWinzorProject)' == 'true'">
+    <!--
+      Global variable to enable refs resolution to NetCore libs in Winzor projects.
+    -->
+    <!-- Enable when net8.0 libs are properly tested -->
+    <CanNetCoreLibBeReferencedFromWinzor>false</CanNetCoreLibBeReferencedFromWinzor>
+  </PropertyGroup>
+
+  <!--
+    Automatically use Microsoft.Data.SqlClient for .net core projects.
+    This is achieved by making System.Data.SqlClient a global using for net 48.
+
+    Projects which use SqlClient need to add this flag to the csproj (in PropertyGroup element):
+      <CWUsesSqlClient>true</CWUsesSqlClient>
+  -->
+  <ItemGroup Condition="'$(CWUsesSqlClient)' == 'true'">
+
+    <Using Include="System.Data.SqlTypes"/>
+
+    <!-- net framework only: make System.Data.SqlClient a global using -->
+    <PackageReference Condition="'$(IsWinzorProject)' == 'true' and '$(CanNetCoreLibBeReferencedFromWinzor)' != 'true'" Include="System.Data.SqlClient"/>
+    <Using Condition="'$(IsNetFrameworkTargetFramework)' == 'true' or ('$(IsWinzorProject)' == 'true' and '$(CanNetCoreLibBeReferencedFromWinzor)' != 'true')" Include="System.Data.SqlClient"/>
+    <Using Condition="'$(IsNetFrameworkTargetFramework)' == 'true' or ('$(IsWinzorProject)' == 'true' and '$(CanNetCoreLibBeReferencedFromWinzor)' != 'true')" Include="Microsoft.SqlServer.Server"/>
+
+    <!-- net core only: add package to Microsoft.Data.SqlClient and make Microsoft.Data.SqlClient a global using-->
+    <PackageReference Condition="(('$(IsWinzorProject)' != 'true' or '$(CanNetCoreLibBeReferencedFromWinzor)' == 'true') and '$(IsNetCoreTargetFramework)' == 'true')" Include="Microsoft.Data.SqlClient"/>
+
+    <!--
+      transitional package reference, while multi-targeting. CargoWise.Data and Enteprise.ZArchitecture.Core expose some overloads that support
+      both System.Data.SqlClient.SqlException and Microsoft.Data.SqlClient.SqlException. This solves a lot of "overload not found" errors
+      when a net48 business assembly is loaded by a net8 gui project. When multi-targeting is complete, we can drop System.Data.SqlClient
+      across the codebase
+    -->
+    <PackageReference Condition="(('$(IsWinzorProject)' != 'true' or '$(CanNetCoreLibBeReferencedFromWinzor)' == 'true') and '$(IsNetCoreTargetFramework)' == 'true')" Include="System.Data.SqlClient"/>
+
+    <Using Condition="(('$(IsWinzorProject)' != 'true' or '$(CanNetCoreLibBeReferencedFromWinzor)' == 'true') and '$(IsNetCoreTargetFramework)' == 'true')" Include="Microsoft.Data.SqlClient"/>
+    <Using Condition="(('$(IsWinzorProject)' != 'true' or '$(CanNetCoreLibBeReferencedFromWinzor)' == 'true') and '$(IsNetCoreTargetFramework)' == 'true')" Include="Microsoft.Data.SqlClient.Server"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsWinzorProject)' == 'true' AND '$(CWUsesDesignRef)' == 'true'">
+    <Reference Include="System.Design" Condition="'$(CanNetCoreLibBeReferencedFromWinzor)' != 'true'">
+      <HintPath>$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Design.dll</HintPath>
+    </Reference>
+   <Reference Include="System.Windows.Forms.Design" Condition="'$(CanNetCoreLibBeReferencedFromWinzor)' == 'true'" />
+  </ItemGroup>
+
+  <!-- Add condition to apply Test.editorconfig only to test projects -->
+  <ItemGroup Condition="!$(AssemblyName.Contains('.Test'))">
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\build\Production.editorconfig" />
+  </ItemGroup>
+  <ItemGroup Condition="$(AssemblyName.Contains('.Test'))">
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)\build\Test.editorconfig" />
+  </ItemGroup>
+
+  <!--
+    Project.CommonReferences.Props is used to share <Reference> and <ProjectReference> elements
+    between Winzor.csproj and the corresponding WinForms .csproj file
+  -->
+  <Import Condition="Exists('$(MSBuildProjectDirectory)\Project.CommonReferences.props')" Project="$(MSBuildProjectDirectory)\Project.CommonReferences.props" />
+  <ItemGroup>
+    <None Condition="Exists('Project.CommonReferences.props')" Include="Project.CommonReferences.props" />
+  </ItemGroup>
+
+  <Import Project="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\WTG.BuildConfiguration.Analysis\build\WTG.BuildConfiguration.Analysis.props" Condition="'$(CodeAnalysisEnabled)' == 'true' And Exists('$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\WTG.BuildConfiguration.Analysis\build\WTG.BuildConfiguration.Analysis.props')"/>
+  <ItemGroup Condition="'$(CodeAnalysisEnabled)' == 'true' OR '$(DEV_BUILD_WITH_ANALYZERS)' == '1'">
+    <!--
+      some of these references do not contain any analyzers but are dependent assemblies.
+      these references cannot be removed, otherwise Visual Studio complains about not being
+      able to find these assemblies.
+    -->
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\Microsoft.CodeQuality.Analyzers\analyzers\dotnet\cs\Humanizer.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\Microsoft.CodeQuality.Analyzers\analyzers\dotnet\cs\Microsoft.CodeQuality.Analyzers.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\Microsoft.CodeQuality.Analyzers\analyzers\dotnet\cs\Microsoft.CodeQuality.CSharp.Analyzers.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\Microsoft.NetFramework.Analyzers\analyzers\dotnet\cs\Microsoft.NetFramework.Analyzers.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\Microsoft.NetFramework.Analyzers\analyzers\dotnet\cs\Microsoft.NetFramework.CSharp.Analyzers.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\Microsoft.CodeAnalysis.BannedApiAnalyzers\analyzers\dotnet\cs\Microsoft.CodeAnalysis.BannedApiAnalyzers.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\Microsoft.CodeAnalysis.BannedApiAnalyzers\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.BannedApiAnalyzers.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\NUnit.Analyzers\analyzers\dotnet\cs\nunit.analyzers.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\CargoWise.Analyzers\analyzers\dotnet\cs\CargoWise.Analyzers.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\CargoWise.Analyzers\analyzers\dotnet\cs\Microsoft.Extensions.FileSystemGlobbing.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\CargoWise.Analyzers\analyzers\dotnet\cs\Microsoft.SqlServer.TransactSql.ScriptDom.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\WTG.Analyzers\analyzers\dotnet\cs\WTG.Analyzers.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\WTG.Analyzers\analyzers\dotnet\cs\WTG.Analyzers.Utils.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\StyleCop.Analyzers.Unstable\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+    <Analyzer Include="$(WTGPaketPackagesRoot)$(WTGPaketBuildItemsGroupName)\StyleCop.Analyzers.Unstable\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+  </ItemGroup>
+
+  <!-- Add CommonAssemblyInfo.cs -->
+  <PropertyGroup Condition="'$(IsThirdParty)' != 'true' and $(MSBuildProjectFullPath.EndsWith('.csproj'))">
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(IsThirdParty)' != 'true' and $(MSBuildProjectFullPath.EndsWith('.csproj'))">
+    <Compile Include="$(WTGBranchRoot)CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(IsThirdParty)' != 'true' Or '$(IsWinzorProjectByName)' == 'true'">
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsWinzorProject)' == 'true'">
+    <DisableWinzor Condition="'$(CW_BUILD_FLAG_DISABLE_WINZOR)' == 'true'">true</DisableWinzor>
+    <QglSkipBuild Condition="'$(DisableWinzor)' == 'true'">true</QglSkipBuild>
+    <CustomAfterMicrosoftCommonTargets Condition="'$(DisableWinzor)' == 'true'">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)NoBuild.targets'))</CustomAfterMicrosoftCommonTargets>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <OutputPath>$(CWWinzorOutputPath)</OutputPath>
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+    <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <CommonDefineConstants>WINZOR</CommonDefineConstants>
+    <PlaywrightPlatform>none</PlaywrightPlatform>
+
+    <!-- If you need to suppress more in csproj file use <NoWarn>$(NoWarn);WTG1234</NoWarn> -->
+    <NoWarn>$(NoWarn);1701;1702;NU1702;NU1504;IDE0005;CW1158;</NoWarn>
+
+    <!--
+      (WI00883445) MSB3277: Found conflicts between different versions of "WindowsBase" (as well as other assemblies)
+      NU1702: ProjectReference 'C:\Code\Project2.csproj' was resolved using '.NETFramework' instead of the project target framework '.NETCore'
+    -->
+    <MSBuildWarningsAsMessages>MSB3277;NU1702</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(IsWinzorProjectByName)' == 'true'">
+    <BaseIntermediateOutputPath>$(MSBuildProjectDirectory)\Winzor-obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <CommonDefineConstants>$(CommonDefineConstants);CODE_ANALYSIS;TRACE</CommonDefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'DEBUGFAST'">
+    <CommonDefineConstants>$(CommonDefineConstants);CODE_ANALYSIS;TRACE;DEBUG</CommonDefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(CWNetCoreVersion)' == 'net8.0'">
+    <CommonDefineConstants>$(CommonDefineConstants);CWNet8</CommonDefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(OutputPathOverrideForTest)' != ''">
+    <OutDir Condition="$(IsWinzorProject) != 'true'">$(OutputPathOverrideForTest)</OutDir>
+    <OutDir Condition="$(IsWinzorProject) == 'true'">$(OutputPathOverrideForTest)/winzor</OutDir>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)\ProjectSafeguards\BannedSymbols.txt" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(CWGenerateXmlSerializationAssemblies)' == 'true'">
+    <PackageReference Include="CargoWise.XmlSerializer.Generator" />
+  </ItemGroup>
+</Project>

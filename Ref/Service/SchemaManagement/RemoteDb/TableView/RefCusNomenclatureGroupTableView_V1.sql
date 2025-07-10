@@ -1,0 +1,10 @@
+CREATE VIEW RefCusNomenclatureGroupTableView_V1 AS
+SELECT ZZ5_PK,
+ZZ5_ZZ9_NKNomenclatureGroupType,
+ZZ5_Value,
+ZZ5_Description,
+ZZ5_StartDate,
+ZZ5_EndDate,
+ZZ5_CompositeKey,
+ZZ5_ZZZ_NKDataGrouping
+FROM RefCusNomenclatureGroup

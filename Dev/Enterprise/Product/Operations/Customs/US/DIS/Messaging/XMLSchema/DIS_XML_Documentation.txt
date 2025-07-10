@@ -1,0 +1,75 @@
+
+
+
+NOTE: ONLY DOCUMENTS THAT ARE EXPLICITLY LISTED IN THE FEDERAL REGISTER NOTICE (FRN) 
+           FOR TRANSMISSION BY TRADE SHOULD BE SUBMITTED TO CBP VIA DIS. THE DOCUMENT-LABEL 
+           LIST IN THIS DIS XSD ONLY INDICATES A TECHNICAL ABILITY TO SUPPORT A PARTICULAR DOCUMENT TYPE TO 
+           FACILITATE PILOT TESTING. THE FRN IS THE SOLE AND FORMAL AUTHORITY THAT IDENTIFIES THE DOCUMENTS THAT CAN BE
+           TRANSIMITTED TO CBP VIA DIS IN THE OPERATIONAL PRODUCTION ENVIRONMENT.
+
+        MOST ENUMERATED VALUES HAVE DELIBERATELY BEEN DEFINED AS XS:STRING TO AVOID CHANGE IMPACT. 
+        ENUMERATIONS (i.e. LIST OF POSSIBLE VALUES) ARE INSTEAD SPECIFIED IN THE DIS IMPLEMENTATION GUIDE.
+
+         NOTE: Please see the DIS Implementation guide published on CBP.GOV for supporting documentation regarding this XSD.
+        specifically, please use the guide to identify all enumerated values for elements in this XSD and for the list of documents supported by DIS at any given time.
+
+NOTE: CBP recommends that XSD validation not be performed on XML instances in order to accomodate multiple versions of code running between several different trade partners. i.e. typically CBP only adds elements to the XSD and does not remove or change element names, thus allowing parsers to extract information of interest to them and ignore what they do not need. exceptions to this are highlighted in this change log.
+
+THIS IS DIS XML SCHEMA VERSION 2.6 (Expected : June/July 2018)
+======================================================
+Elements <VesselData> and <ContactInfo> were added as optional elements within <DocumentData> element
+Element <VesselData> was added to allow Vessel related data.
+Element <ContactInfo> allows POC(point of contact) of Filer/ Broker to be added.
+
+PREVIOUS VERSIONS
+======================================================
+DIS XML SCHEMA VERSION 2.5 (Published on October 07 2016)
+======================================================
+Elements <ITN>, <XTN> were added to TradeTransaction to support Export Transactions.
+Element <FTZAdmissionsNbr> was added to TradeTransaction to support FTZ Functionality
+Element <OtherTransaction> was added in CommonData.xsd to allow additional Transaction Types to be supported
+Element <TradeTransaction> was added to the MessageValidationResponse
+
+DIS XML SCHEMA VERSION 2.4 (Published on January 20 2016)
+This version (2.4) is backward compatible when used as a producer of XML (i.e. if you are a trade partner sending XML to CBP). 
+
+DIS XML SCHEMA VERSION 2.3 (Published on December 27 2015)
+Removed enumerations from XSD and used strings instead. Enumerations were moved to documentation in the DIS implementation Guide.
+
+DIS XML SCHEMA VERSION 2.2 (Published in November 1 2014)
+Element ReferenceNumber was added to Entry, Summary and Bill Identifiers in CommonData.xsdto allow a more granular cross-reference to specific contexts within an Entry/Summary/Bill  (ReferenceNumber is currently being supported in Cargo Release Entries). Reference Number in Entry Summary and Bill are for suture compatibility.
+
+DIS XML SCHEMA VERSION 2.1 (Published in June 2014)
+Additional Documents are being supported as indicated in enumDocumentLabel in CommonData.xsd
+
+DIS XML SCHEMA VERSION 2.0 (Published in February 2013)
+*** The following are the key changes in this DIS XML Schema version 2.0 from the prior version 1.x
+
+Notes:
+Per feedback received from Trade, the number of mandatory (i.e. always required) data elements have been considerably reduced. Any detailed data elements to be submitted to specific PGAs can be submitted via the PGA Message Set. DIS facilitates the transmission of documents and images to CBP and should be treated as a complimentary component to the data sent via mandated transactions (Entry/Summary/Bill etc.) and the PGA Message Set.    
+
+Baisc Guidance for Schema Navigation
+=============================
+Please start with the <MessageEnvelope> element and drill down for further details about each message payload type.
+Sample XMLs are provided in the SAMPLE_XML folder. Double-click to open them in IE, or save the whole folder staructure in this XSD package in order to open/validate the xml in tools such as Xmlspy.
+
+At a high level, the elements are as follows (required under the conditions indicated below):
+-- Message Envelope logistics: i.e. What kind of Message, Who Sent it (A + B identifiers) and When. (Condition: Required always)
+-- The Port Code that the document is intended for if applicable (optional)
+-- The intended ActionCode (ADD or REPLACE during submission.. ADD will be used as default value)
+-- The specific Transaction that the document submission should be associated with (Entry/Bill etc. or the word ‘CONTINUOUS’ in the TransactioCategory element to indicate yearly permits, licenses etc. that may not be associated with a specific Entry/Bill)
+-- The CBP request that the document submission should be associated with. (..or the word ‘UNSOLICITED’ or 'UNKNOWN')
+-- The List of PGA Codes that the document is intended for.
+-- The <Document Header> which is a set of simple elements that describe the submitted document. i.e  the document-label (from documentLabel enum),  file type (.pdf or .jpg etc), the actual file name (abcInvoice.pdf) etc.
+-- The document itself (i.e. the actual pdf file encoded as a base64 string)
+-- An optional <Comment> to facilitate any clarification of special instructions.
+-- An element called <OptionalData> that contains a reduced set of the more ‘common’ document specific elements. Trade can provide these if they want to provide more context of the submitted document. This element is optional.  
+
+
+NOTE: ONLY DOCUMENTS THAT ARE EXPLICITLY APPROVED FOR TRANSMISSION BY TRADE IN THE 
+           FEDERAL REGISTER NOTICE (FRN) SHOULD BE SUBMITTED TO CBP VIA DIS. THE DOCUMENT LIST 
+           IN THE DIS XSD IS TO INDICATE TECHNICAL SUPPORT FOR EACH DOCUMENT TYPE.  
+
+
+
+ 

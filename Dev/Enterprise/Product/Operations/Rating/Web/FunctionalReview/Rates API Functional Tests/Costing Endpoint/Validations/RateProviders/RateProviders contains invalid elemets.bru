@@ -1,0 +1,30 @@
+meta {
+  name: RateProviders contains invalid elemets
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.RateProviders = ["CW", "XXX"];
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided Rate Provider ('XXX') is not valid. It can only be one of these values: 'CW', 'CG/CS'.", function() {
+    expect(res.body.ModelState['RateProviders[1]'][0]).to.equal("Provided Rate Provider ('XXX') is not valid. It can only be one of these values: 'CW', 'CG/CS'.");
+  });
+}

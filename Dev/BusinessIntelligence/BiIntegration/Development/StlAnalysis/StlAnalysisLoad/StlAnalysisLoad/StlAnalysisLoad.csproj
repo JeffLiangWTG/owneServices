@@ -1,0 +1,74 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Enterprise.StlAnalysis.Load</RootNamespace>
+    <AssemblyName>Enterprise.StlAnalysis.Load</AssemblyName>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <ApplicationManifest>..\..\..\..\..\..\main.manifest</ApplicationManifest>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+    <NoWarn>$(NoWarn);CW1161</NoWarn>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.Data.Providers.Common" />
+    <Reference Include="CargoWise.DataProtection" />
+    <Reference Include="CargoWise.DataProtection.SqlExtensions" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="Enterprise.ZArchitecture.Core.Encryption" />
+    <Reference Include="Enterprise.ZArchitecture.GUI" />
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <Reference Include="Resources" />
+    <Reference Include="System.Resources.Extensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="..\..\..\..\..\..\main.manifest">
+      <Link>main.manifest</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Scripts\Schema\SetupSecurity.sql" />
+    <EmbeddedResource Include="Scripts\ETL\Dimensions\PopulateDimDate.sql" />
+    <Content Include="Scripts\ETL\Dimensions\InsertNewFeature.sql" />
+    <EmbeddedResource Include="Scripts\ETL\Dimensions\ClearFeatureDataToForceReload.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\ediComplianceManager\Embargo_DeniedPartyScreening.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\ediComplianceManager\Embargo_ImporterSecurityFiling.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\ediElements\Messaging_OceanBookingInttra.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\Fax\FaxGateway_Billing.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\ediCustomsCommunication\Export_Quarantine.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\ediCustomsExtensions\Forwarder_ImportQuarantine.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\ediCustomsExtensions\Forwarder_PreReceivalAdvice.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\ediCustomsExtensions\Shipping_PortAuthorityMessaging.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\ediCustomsExtensions\Shipping_ImportDeliveryOrder.sql" />
+    <EmbeddedResource Include="Scripts\ETL\Dimensions\LoadHostedClientsFromEdiProd.sql" />
+    <EmbeddedResource Include="Scripts\ETL\Dimensions\MergeDimHostedClientCompany.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\ediElements\ElectronicSchedules_GlobalAirline.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\ediElements\DistanceCalculations_DistanceCalculator.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\ediElements\Messaging_AirlineViaSpecificNetwork.sql" />
+    <Content Include="Scripts\ETL\FactTransactions\ediElements\Stage_eHub_BillingReportForAirMessaging.sql" />
+    <Content Include="Scripts\ETL\FactActiveUsers\MonthlyActiveUsers.sql" />
+    <Content Include="Scripts\Schema\BackupStlAnalysisDb.sql" />
+    <Content Include="Scripts\Schema\ControlLastLoad.sql" />
+    <Content Include="Scripts\Schema\DimHostedClientCompany.sql" />
+    <Content Include="Scripts\Schema\DimLicensedFeature.sql" />
+    <Content Include="Scripts\Schema\DimDate.sql" />
+    <Content Include="Scripts\Schema\FactActiveUsers.sql" />
+    <Content Include="Scripts\Schema\FactTransaction.sql" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">    
+    <Reference Include="Microsoft.Data.SqlClient" />
+  </ItemGroup>
+</Project>

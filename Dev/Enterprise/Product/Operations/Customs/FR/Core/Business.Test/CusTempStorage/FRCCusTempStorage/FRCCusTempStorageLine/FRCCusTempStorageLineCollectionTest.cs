@@ -1,0 +1,24 @@
+using CargoWise.EntityFramework;
+using CargoWise.EntityFramework.Testing;
+using NUnit.Framework;
+
+namespace Enterprise.Customs.FR.Business.CusTempStorage.Testing
+{
+	[TestedType(typeof(FRCCusTempStorageLineCollection))]
+	class FRCCusTempStorageLineCollectionTest : BusinessObjectCollectionTestCase
+	{
+		protected override BusinessObject GetNewElementToAddToTheCollection() => Factory.New<FRCCusTempStorageLine>();
+
+		protected override BusinessObjectCollection GetCollectionToTest()
+		{
+			var storageDec = Factory.New<FRCCusTempStorageDec>();
+			return storageDec.CusTempStorageLines;
+		}
+
+		public void TestDefaultTSL_GrossWeightUQ()
+		{
+			var line = ((FRCCusTempStorageLineCollection)GetCollectionToTest()).AddNew();
+			AssertEquals("The default value of TSL_GrossWeightUQ is Kilograms.", Core.Constants.Weight.Kilograms, line.TSL_GrossWeightUQ);
+		}
+	}
+}

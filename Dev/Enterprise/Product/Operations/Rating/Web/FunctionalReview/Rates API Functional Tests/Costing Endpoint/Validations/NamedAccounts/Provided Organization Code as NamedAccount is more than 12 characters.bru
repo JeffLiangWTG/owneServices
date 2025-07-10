@@ -1,0 +1,29 @@
+meta {
+  name: Provided Organization Code as NamedAccount is more than 12 characters
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.NamedAccounts = [{ Type: "CW", Value: "ABCDEFGHIJKLM" }];
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided named account ('ABCDEFGHIJKLM') is not valid. It can be a string of maximum 12 characters.", function() {
+    expect(res.body.ModelState['NamedAccounts[0].Value'][0]).to.equal("Provided named account ('ABCDEFGHIJKLM') is not valid. It can be a string of maximum 12 characters.");
+  });
+}

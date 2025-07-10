@@ -1,0 +1,85 @@
+	<xs:schema id="EdwTableConfig" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xs:element name="EdwTableConfig" msdata:IsDataSet="true" msdata:Locale="">
+			<xs:complexType>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="EdwTableConfig" msdata:CaseSensitive="False" msdata:Locale="">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="EdwColumnConfig" msdata:CaseSensitive="False" msdata:Locale="" minOccurs="0" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:attribute name="TableName" type="xs:string" />
+										<xs:attribute name="TransformId" type="xs:int" default="1" />
+										<xs:attribute name="DataType" use="required">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255" />
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+										<xs:attribute name="MaxLength" type="xs:int" msdata:DefaultValue="0" use="required" />
+										<xs:attribute name="Precision" type="xs:int" default="0" />
+										<xs:attribute name="Scale" type="xs:int" default="0" />
+										<xs:attribute name="Name" msdata:Caption="EDWModelColumn" use="required">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255" />
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+										<xs:attribute name="Expression" msdata:Caption="EDWModelSchema">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="8000" />
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+										<xs:attribute name="IsPartitionKey" type="xs:boolean" default="false" />
+										<xs:attribute name="UsesFunction" type="xs:boolean" default="false" />
+										<xs:attribute name="Message" type="xs:string" use="prohibited" />
+										<xs:attribute name="ParentTable" type="xs:string" />
+										<xs:attribute name="ParentColumn" type="xs:string" />
+										<xs:attribute name="TargetColumn" type="xs:string" />
+										<xs:attribute name="Condition" type="xs:string" />
+										<xs:attribute name="KeepAs" type="xs:string" />
+										<xs:attribute name="EnableIndex" type="xs:boolean" default="false" />
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+							<xs:attribute name="Schema" msdata:Caption="EDWModelSchema">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
+							<xs:attribute name="Name" msdata:Caption="EDWModelTable">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
+							<xs:attribute name="Message" type="xs:string" use="prohibited" />
+							<xs:attribute name="SourceSchema" type="xs:string" />
+							<xs:attribute name="StagingTable" type="xs:string" />
+							<xs:attribute name="WhereClause" type="xs:string" />
+							<xs:attribute name="TransformId" type="xs:int" default="1" />
+							<xs:attribute name="IsPartitioned" type="xs:boolean" default="false" />
+							<xs:attribute name="DependencyOrder" type="xs:int" msdata:DefaultValue="-1" use="prohibited" />
+							<xs:attribute name="CustomIndex" type="xs:string" />
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+			</xs:complexType>
+			<xs:unique name="Constraint1">
+				<xs:selector xpath=".//EdwTableConfig" />
+				<xs:field xpath="@Name" />
+				<xs:field xpath="@TransformId" />
+			</xs:unique>
+			<xs:keyref name="FK_EdwTableConfig_EdwColumnConfig" refer="Constraint1" msdata:IsNested="true">
+				<xs:selector xpath=".//EdwColumnConfig" />
+				<xs:field xpath="@TableName" />
+				<xs:field xpath="@TransformId" />
+			</xs:keyref>
+		</xs:element>
+	</xs:schema>

@@ -1,0 +1,26 @@
+@namespace System.Windows.Forms
+@inherits Control
+<div class="statusbar" style="@ControlStyleString" @attributes="DataAttributes" @onmousedown="OnMouseDownAsync" @onmousedown:stopPropagation @oncontextmenu="OnContextMenuAsync" @oncontextmenu:stopPropagation @oncontextmenu:preventDefault>
+    <div class="statusbar__border" style="@StatusBarBorderStyleString @AddMarginWhenSizable()">
+        @foreach (var panel in Panels)
+        {
+            <ControlProxyComponent Control="panel" @key=panel.WinzorControlGuid />
+        }
+    </div>
+    @if (SizingGrip)
+    {
+        <div class="sizing-grip"></div>
+    }
+</div>
+
+@code {
+    string AddMarginWhenSizable()
+    {
+        if (SizingGrip)
+        {
+            return "margin-right: 15px";
+        }
+        return String.Empty;
+    }
+}
+

@@ -1,0 +1,56 @@
+@using WinzorFramework
+@using WinzorFramework.Extensions
+@using System.Drawing;
+@namespace System.Windows.Forms
+@inherits ButtonBase
+
+@{
+	var layout = Adapter.CommonLayout().Layout();
+}
+<label @attributes="DataAttributes"
+       title="@ToolTipText"
+       style="@ControlStyleString"
+       class="checkbox @(!Enabled ? " checkbox--disabled" : string.Empty) @(ReadOnlyAttributeValue ? "checkbox--readonly" : string.Empty)"
+       @onwinzorfocusin="OnFocusInAsync"
+       @onwinzorfocusin:stopPropagation
+       @onwinzorfocusout="OnFocusOutAsync"
+       @onwinzorfocusout:stopPropagation
+       @oncontextmenu="OnContextMenuAsync"
+       @oncontextmenu:stopPropagation
+       @oncontextmenu:preventDefault
+       @onmouseover=OnMouseOverAsync
+       @onmouseover:stopPropagation>
+
+    <input type="checkbox"
+           class="checkbox__input"
+           disabled="@(!Enabled)"
+           aria-disabled="@(ReadOnlyAttributeValue)"
+           readonly="@(ReadOnlyAttributeValue ? "true" : "false")"
+           onclick="return @(ReadOnlyAttributeValue ? "false" : "true");"
+           checked="@Checked"
+           @onchange="CheckedChangedAsync"
+           tabindex="@(InputTabIndex())"
+           style="@Adapter.GetCheckBoundsStyleString(layout)"
+           @ref="ElementReference" />
+    @if (Image is not null)
+	{
+		<div class="checkbox__image @CheckboxImageGrayOutClass(!Enabled)" style="@Adapter.GetImageBoundsStyleString(layout)">
+            <img src="@Image.ToBase64DataUrl()" width="@ImageWidth" height="@ImageHeight" />
+		</div>
+	}
+	@if (!string.IsNullOrWhiteSpace(Text))
+	{
+		<span class="checkbox__label" style="@Adapter.GetTextBoundsStyleString(layout)">@Text.ProcessMnemonicToHtml(UseMnemonic)</span>
+	}
+</label>
+
+@code {
+	string CheckboxImageGrayOutClass(bool disable)
+	{
+		return disable ? "checkbox__image-gray-out" : string.Empty;
+	}
+    string InputTabIndex()
+    {
+        return ReadOnlyAttributeValue ? "-1" : this.TabIndexHtmlAttributeValue();
+    }
+}

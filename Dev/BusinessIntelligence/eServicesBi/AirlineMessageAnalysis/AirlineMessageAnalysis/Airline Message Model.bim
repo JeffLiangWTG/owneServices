@@ -1,0 +1,999 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1200,
+  "model": {
+    "culture": "en-AU",
+    "dataSources": [
+      {
+        "name": "eHubArchiveOnline",
+        "connectionString": "Provider=SQLNCLI11;Data Source=wg1-vsql-1.wg.cargowise.com;User ID=ehubreader;Persist Security Info=true;Initial Catalog=eHubArchiveOnline",
+        "impersonationMode": "impersonateServiceAccount",
+        "annotations": [
+          {
+            "name": "ConnectionEditUISource",
+            "value": "SqlServer"
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "name": "Message",
+        "columns": [
+          {
+            "name": "Client System Code",
+            "dataType": "string",
+            "isHidden": true,
+            "sourceColumn": "Client System Code"
+          },
+          {
+            "name": "Client Licence Code",
+            "dataType": "string",
+            "isHidden": true,
+            "sourceColumn": "Client Licence Code"
+          },
+          {
+            "name": "Client Licence Name",
+            "dataType": "string",
+            "isHidden": true,
+            "sourceColumn": "Client Licence Name"
+          },
+          {
+            "name": "Service Provider",
+            "dataType": "string",
+            "sourceColumn": "Service Provider"
+          },
+          {
+            "type": "calculated",
+            "name": "Client Licence Combined",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "expression": "CONCATENATE(CONCATENATE([Client Licence Code], \" / \"), [Client Licence Name])"
+          },
+          {
+            "name": "Sent UTC",
+            "dataType": "dateTime",
+            "isHidden": true,
+            "sourceColumn": "Sent UTC"
+          },
+          {
+            "name": "AWB Serial #",
+            "dataType": "string",
+            "sourceColumn": "AWB Serial #"
+          },
+          {
+            "name": "AWB Prefix",
+            "dataType": "string",
+            "sourceColumn": "AWB Prefix"
+          },
+          {
+            "name": "Airline Code",
+            "dataType": "string",
+            "sourceColumn": "Airline Code"
+          },
+          {
+            "name": "Origin City",
+            "dataType": "string",
+            "isHidden": true,
+            "sourceColumn": "Origin City"
+          },
+          {
+            "name": "Origin Country",
+            "dataType": "string",
+            "isHidden": true,
+            "sourceColumn": "Origin Country"
+          },
+          {
+            "name": "Type",
+            "dataType": "string",
+            "isHidden": true,
+            "sourceColumn": "Type"
+          },
+          {
+            "name": "Sub-Type",
+            "dataType": "string",
+            "isHidden": true,
+            "sourceColumn": "Sub-Type"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Query",
+            "source": {
+              "query": "SELECT * FROM AirMessaging",
+              "dataSource": "eHubArchiveOnline"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT * FROM AirMessaging</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+              }
+            ]
+          }
+        ],
+        "measures": [
+          {
+            "name": "FWB Count",
+            "expression": "COUNTROWS(FILTER('Message', 'Message'[Type] = \"FWB\"))",
+            "formatString": "#,0",
+            "isHidden": true
+          },
+          {
+            "name": "FSU-FUL Count",
+            "expression": "CALCULATE( COUNTROWS(FILTER(RELATEDTABLE('Message'),  [Response Count] && 'Message'[Sub-Type] = \"FUL\")) )",
+            "isHidden": true
+          },
+          {
+            "name": "Response Count",
+            "expression": "COUNTROWS(FILTER('Message', 'Message'[Type] <> \"FWB\"))",
+            "formatString": "#,0"
+          },
+          {
+            "name": "FSU-BKC Count",
+            "expression": [
+              "CALCULATE( COUNTROWS(FILTER(RELATEDTABLE('Message'),  [Response Count] && 'Message'[Sub-Type] = \"BKC\")) )",
+              ""
+            ],
+            "isHidden": true
+          },
+          {
+            "name": "FSU-DLV Count",
+            "expression": [
+              "CALCULATE( COUNTROWS(FILTER(RELATEDTABLE('Message'),  [Response Count] && 'Message'[Sub-Type] = \"DLV\")) )",
+              ""
+            ],
+            "isHidden": true
+          },
+          {
+            "name": "FSU-FLO Count",
+            "expression": [
+              "CALCULATE( COUNTROWS(FILTER(RELATEDTABLE('Message'),  [Response Count] && 'Message'[Sub-Type] = \"FLO\")) )",
+              ""
+            ],
+            "isHidden": true
+          },
+          {
+            "name": "FSU-RCV Count",
+            "expression": [
+              "CALCULATE( COUNTROWS(FILTER(RELATEDTABLE('Message'),  [Response Count] && 'Message'[Sub-Type] = \"RCV\")) )",
+              ""
+            ],
+            "isHidden": true
+          },
+          {
+            "name": "FSU-SCM Count",
+            "expression": [
+              "CALCULATE( COUNTROWS(FILTER(RELATEDTABLE('Message'),  [Response Count] && 'Message'[Sub-Type] = \"SCM\")) )",
+              ""
+            ],
+            "isHidden": true
+          },
+          {
+            "name": "FSU-STU Count",
+            "expression": [
+              "CALCULATE( COUNTROWS(FILTER(RELATEDTABLE('Message'),  [Response Count] && 'Message'[Sub-Type] = \"STU\")) )",
+              ""
+            ],
+            "isHidden": true
+          },
+          {
+            "name": "FMA Count",
+            "expression": "COUNTROWS(FILTER('Message', 'Message'[Type] = \"FMA\"))",
+            "isHidden": true
+          },
+          {
+            "name": "FNA Count",
+            "expression": "COUNTROWS(FILTER('Message', 'Message'[Type] = \"FNA\"))",
+            "isHidden": true
+          },
+          {
+            "name": "FSU Count",
+            "expression": "COUNTROWS(FILTER('Message', 'Message'[Type] = \"FSU\"))",
+            "isHidden": true
+          },
+          {
+            "name": "Message Count",
+            "expression": "COUNTROWS()"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Country-City",
+            "levels": [
+              {
+                "name": "Origin Country",
+                "ordinal": 0,
+                "column": "Origin Country"
+              },
+              {
+                "name": "Origin City",
+                "ordinal": 1,
+                "column": "Origin City"
+              }
+            ]
+          },
+          {
+            "name": "Client",
+            "levels": [
+              {
+                "name": "Client System Code",
+                "ordinal": 0,
+                "column": "Client System Code"
+              },
+              {
+                "name": "Client Licence Combined",
+                "ordinal": 1,
+                "column": "Client Licence Combined"
+              }
+            ]
+          },
+          {
+            "name": "Type-Subtype",
+            "levels": [
+              {
+                "name": "Type",
+                "ordinal": 0,
+                "column": "Type"
+              },
+              {
+                "name": "Sub-Type",
+                "ordinal": 1,
+                "column": "Sub-Type"
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "Query"
+          },
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": "SELECT * FROM AirMessaging"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT * FROM AirMessaging</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+          }
+        ]
+      },
+      {
+        "name": "Message Sent Date",
+        "columns": [
+          {
+            "type": "calculatedTableColumn",
+            "name": "Date",
+            "dataType": "dateTime",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "sourceColumn": "[Date]",
+            "formatString": "General Date"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Year Date",
+            "dataType": "dateTime",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "sourceColumn": "[Year Date]",
+            "formatString": "General Date"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Message Sent Year",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "sourceColumn": "[Message Sent Year]",
+            "sortByColumn": "Year Date"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Quarter Date",
+            "dataType": "dateTime",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "sourceColumn": "[Quarter Date]",
+            "formatString": "General Date"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Message Sent Quarter",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "sourceColumn": "[Message Sent Quarter]",
+            "sortByColumn": "Quarter Date"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Month Date",
+            "dataType": "dateTime",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "sourceColumn": "[Month Date]",
+            "formatString": "General Date"
+          },
+          {
+            "type": "calculatedTableColumn",
+            "name": "Message Sent Month",
+            "dataType": "string",
+            "isNameInferred": true,
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "sourceColumn": "[Message Sent Month]",
+            "sortByColumn": "Month Date"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CalculatedTable 1",
+            "source": {
+              "type": "calculated",
+              "expression": [
+                "",
+                "VAR DateName = \"Message Sent\"",
+                "RETURN",
+                "    ADDCOLUMNS (",
+                "        ADDCOLUMNS (",
+                "            CALENDAR ( MIN ( 'Message'[Sent UTC] ), MAX ( 'Message'[Sent UTC] ) ),",
+                "            \"Year Date\", DATE ( YEAR ( [Date] ), 1, 1 ),",
+                "            \"Message Sent Year\", FORMAT ( [Date], \"YYYY\" ) & \" \"",
+                "                & DateName",
+                "        ),",
+                "        \"Quarter Date\", DATE ( YEAR ( [Date] ), ( ( FORMAT ( [Date], \"Q\" ) - 1 ) * 3 ) + 1, 1 ),",
+                "        \"Message Sent Quarter\", \"Q\" & FORMAT ( [Date], \"Q\" )",
+                "            & \" \"",
+                "            & [Message Sent Year],",
+                "        \"Month Date\", DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 ),",
+                "        \"Message Sent Month\", FORMAT ( [Date], \"MMM\" ) & \" \"",
+                "            & [Message Sent Year]",
+                "    )"
+              ]
+            }
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Message Sent Date",
+            "levels": [
+              {
+                "name": "Message Sent Year",
+                "ordinal": 0,
+                "column": "Message Sent Year"
+              },
+              {
+                "name": "Message Sent Quarter",
+                "ordinal": 1,
+                "column": "Message Sent Quarter"
+              },
+              {
+                "name": "Message Sent Month",
+                "ordinal": 2,
+                "column": "Message Sent Month"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Sending Message",
+        "columns": [
+          {
+            "name": "AWB Serial #",
+            "dataType": "string",
+            "sourceColumn": "AWB Serial #",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "AWB Prefix",
+            "dataType": "string",
+            "sourceColumn": "AWB Prefix",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "Airline Code",
+            "dataType": "string",
+            "sourceColumn": "Airline Code",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "Origin City",
+            "dataType": "string",
+            "sourceColumn": "Origin City",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "Origin Country",
+            "dataType": "string",
+            "sourceColumn": "Origin Country",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "Type",
+            "dataType": "string",
+            "sourceColumn": "Type",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "Sub-Type",
+            "dataType": "string",
+            "sourceColumn": "Sub-Type",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "Sent UTC",
+            "dataType": "dateTime",
+            "sourceColumn": "Sent UTC",
+            "formatString": "General Date",
+            "sourceProviderType": "Date"
+          },
+          {
+            "name": "AM_CC_SenderOutbox",
+            "dataType": "string",
+            "sourceColumn": "AM_CC_SenderOutbox",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "AM_CC_RecipientOutbox",
+            "dataType": "string",
+            "sourceColumn": "AM_CC_RecipientOutbox",
+            "sourceProviderType": "VarChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Send Message",
+            "dataView": "full",
+            "source": {
+              "query": [
+                "DECLARE @dt0 DATETIME = '2016-09-06 0:0:0';",
+                "DECLARE @dt1 DATETIME = DATEADD(DAY, - 365, @dt0);",
+                "",
+                "\tSELECT SUBSTRING([MAWBNumber], 4, 8) [AWB Serial #]",
+                "\t\t,SUBSTRING([MAWBNumber], 1, 3) [AWB Prefix]",
+                "\t\t,[Airline Code] [Airline Code]",
+                "\t\t,SUBSTRING(MessageBody, 21, 3) [Origin City]",
+                "\t\t,SUBSTRING(MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10) + 'SHP' + CHAR(10), MessageBody, 1) + 5) + 1) + 1) + 2, 2) [Origin Country]",
+                "\t\t,'FWB' [Type]",
+                "\t\t,'No Sub-Type' [Sub-Type]",
+                "\t\t,[Sent UTC] [Sent UTC]",
+                "\t\t,AM_CC_SenderOutbox",
+                "\t\t,AM_CC_RecipientOutbox",
+                "\tFROM (",
+                "\t\tSELECT SenderMessage.value('(/*:CargoIMP/*:Carrier)[1]', 'NVARCHAR(MAX)') AS [Airline Code]",
+                "\t\t\t,SenderMessage.value('(/*:CargoIMP/*:MAWB)[1]', 'NVARCHAR(MAX)') AS [MAWBNumber]",
+                "\t\t\t,SenderMessage.value('(/*:CargoIMP/*:Body)[1]', 'NVARCHAR(MAX)') AS 'MessageBody'",
+                "\t\t\t,[Sent UTC]",
+                "\t\t\t,AM_CC_SenderOutbox",
+                "\t\t\t,AM_CC_RecipientOutbox",
+                "\t\tFROM (",
+                "\t\t\tSELECT m.AM_ReceivedFromSenderUTC AS [Sent UTC]",
+                "\t\t\t\t,CONVERT(XML, [eHubTransactions].dbo.DecodeAndDecompress(m.AM_SenderMessageRaw)) AS [SenderMessage]",
+                "\t\t\t\t,m.AM_CC_SenderOutbox AM_CC_SenderOutbox",
+                "\t\t\t\t,m.AM_CC_RecipientOutbox AM_CC_RecipientOutbox",
+                "\t\t\tFROM eHubArchiveMessage m WITH (NOLOCK)",
+                "\t\t\tWHERE m.AM_CC_RecipientInbox = '9819EFF9-9CD8-4622-B58E-32A251115722' -- ri.CC_ID = 'eHubAirService'",
+                "\t\t\t\tAND m.AM_DT_RecipientMessageType = '16C507EE-68BE-4D1F-9888-BE865204A388' -- rt.DT_Code = 'http://www.cargowise.com/ehub/clients/edi/2010/06#FWB'",
+                "\t\t\t\tAND m.AM_SenderMessageRaw IS NOT NULL",
+                "\t\t\t\tAND m.AM_ReceivedFromSenderUTC >= @dt1",
+                "\t\t\t\tAND m.AM_ReceivedFromSenderUTC < @dt0",
+                "\t\t\t) MyTable1",
+                "\t\t) MyTable2"
+              ],
+              "dataSource": "eHubArchiveOnline"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>DECLARE @dt0 DATETIME = '2016-09-06 0:0:0';",
+                  "DECLARE @dt1 DATETIME = DATEADD(DAY, - 365, @dt0);",
+                  "",
+                  "\tSELECT SUBSTRING([MAWBNumber], 4, 8) [AWB Serial #]",
+                  "\t\t,SUBSTRING([MAWBNumber], 1, 3) [AWB Prefix]",
+                  "\t\t,[Airline Code] [Airline Code]",
+                  "\t\t,SUBSTRING(MessageBody, 21, 3) [Origin City]",
+                  "\t\t,SUBSTRING(MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10) + 'SHP' + CHAR(10), MessageBody, 1) + 5) + 1) + 1) + 2, 2) [Origin Country]",
+                  "\t\t,'FWB' [Type]",
+                  "\t\t,'No Sub-Type' [Sub-Type]",
+                  "\t\t,[Sent UTC] [Sent UTC]",
+                  "\t\t,AM_CC_SenderOutbox",
+                  "\t\t,AM_CC_RecipientOutbox",
+                  "\tFROM (",
+                  "\t\tSELECT SenderMessage.value('(/*:CargoIMP/*:Carrier)[1]', 'NVARCHAR(MAX)') AS [Airline Code]",
+                  "\t\t\t,SenderMessage.value('(/*:CargoIMP/*:MAWB)[1]', 'NVARCHAR(MAX)') AS [MAWBNumber]",
+                  "\t\t\t,SenderMessage.value('(/*:CargoIMP/*:Body)[1]', 'NVARCHAR(MAX)') AS 'MessageBody'",
+                  "\t\t\t,[Sent UTC]",
+                  "\t\t\t,AM_CC_SenderOutbox",
+                  "\t\t\t,AM_CC_RecipientOutbox",
+                  "\t\tFROM (",
+                  "\t\t\tSELECT m.AM_ReceivedFromSenderUTC AS [Sent UTC]",
+                  "\t\t\t\t,CONVERT(XML, [eHubTransactions].dbo.DecodeAndDecompress(m.AM_SenderMessageRaw)) AS [SenderMessage]",
+                  "\t\t\t\t,m.AM_CC_SenderOutbox AM_CC_SenderOutbox",
+                  "\t\t\t\t,m.AM_CC_RecipientOutbox AM_CC_RecipientOutbox",
+                  "\t\t\tFROM eHubArchiveMessage m WITH (NOLOCK)",
+                  "\t\t\tWHERE m.AM_CC_RecipientInbox = '9819EFF9-9CD8-4622-B58E-32A251115722' -- ri.CC_ID = 'eHubAirService'",
+                  "\t\t\t\tAND m.AM_DT_RecipientMessageType = '16C507EE-68BE-4D1F-9888-BE865204A388' -- rt.DT_Code = 'http://www.cargowise.com/ehub/clients/edi/2010/06#FWB'",
+                  "\t\t\t\tAND m.AM_SenderMessageRaw IS NOT NULL",
+                  "\t\t\t\tAND m.AM_ReceivedFromSenderUTC >= @dt1",
+                  "\t\t\t\tAND m.AM_ReceivedFromSenderUTC < @dt0",
+                  "\t\t\t) MyTable1",
+                  "\t\t) MyTable2</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": [
+              "DECLARE @dt0 DATETIME = '2016-09-06 0:0:0';",
+              "DECLARE @dt1 DATETIME = DATEADD(DAY, - 365, @dt0);",
+              "",
+              "\tSELECT SUBSTRING([MAWBNumber], 4, 8) [AWB Serial #]",
+              "\t\t,SUBSTRING([MAWBNumber], 1, 3) [AWB Prefix]",
+              "\t\t,[Airline Code] [Airline Code]",
+              "\t\t,SUBSTRING(MessageBody, 21, 3) [Origin City]",
+              "\t\t,SUBSTRING(MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10) + 'SHP' + CHAR(10), MessageBody, 1) + 5) + 1) + 1) + 2, 2) [Origin Country]",
+              "\t\t,'FWB' [Type]",
+              "\t\t,'No Sub-Type' [Sub-Type]",
+              "\t\t,[Sent UTC] [Sent UTC]",
+              "\t\t,AM_CC_SenderOutbox",
+              "\t\t,AM_CC_RecipientOutbox",
+              "\tFROM (",
+              "\t\tSELECT SenderMessage.value('(/*:CargoIMP/*:Carrier)[1]', 'NVARCHAR(MAX)') AS [Airline Code]",
+              "\t\t\t,SenderMessage.value('(/*:CargoIMP/*:MAWB)[1]', 'NVARCHAR(MAX)') AS [MAWBNumber]",
+              "\t\t\t,SenderMessage.value('(/*:CargoIMP/*:Body)[1]', 'NVARCHAR(MAX)') AS 'MessageBody'",
+              "\t\t\t,[Sent UTC]",
+              "\t\t\t,AM_CC_SenderOutbox",
+              "\t\t\t,AM_CC_RecipientOutbox",
+              "\t\tFROM (",
+              "\t\t\tSELECT m.AM_ReceivedFromSenderUTC AS [Sent UTC]",
+              "\t\t\t\t,CONVERT(XML, [eHubTransactions].dbo.DecodeAndDecompress(m.AM_SenderMessageRaw)) AS [SenderMessage]",
+              "\t\t\t\t,m.AM_CC_SenderOutbox AM_CC_SenderOutbox",
+              "\t\t\t\t,m.AM_CC_RecipientOutbox AM_CC_RecipientOutbox",
+              "\t\t\tFROM eHubArchiveMessage m WITH (NOLOCK)",
+              "\t\t\tWHERE m.AM_CC_RecipientInbox = '9819EFF9-9CD8-4622-B58E-32A251115722' -- ri.CC_ID = 'eHubAirService'",
+              "\t\t\t\tAND m.AM_DT_RecipientMessageType = '16C507EE-68BE-4D1F-9888-BE865204A388' -- rt.DT_Code = 'http://www.cargowise.com/ehub/clients/edi/2010/06#FWB'",
+              "\t\t\t\tAND m.AM_SenderMessageRaw IS NOT NULL",
+              "\t\t\t\tAND m.AM_ReceivedFromSenderUTC >= @dt1",
+              "\t\t\t\tAND m.AM_ReceivedFromSenderUTC < @dt0",
+              "\t\t\t) MyTable1",
+              "\t\t) MyTable2"
+            ]
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "Send Message"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>DECLARE @dt0 DATETIME = '2016-09-06 0:0:0';",
+              "DECLARE @dt1 DATETIME = DATEADD(DAY, - 365, @dt0);",
+              "",
+              "\tSELECT SUBSTRING([MAWBNumber], 4, 8) [AWB Serial #]",
+              "\t\t,SUBSTRING([MAWBNumber], 1, 3) [AWB Prefix]",
+              "\t\t,[Airline Code] [Airline Code]",
+              "\t\t,SUBSTRING(MessageBody, 21, 3) [Origin City]",
+              "\t\t,SUBSTRING(MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10) + 'SHP' + CHAR(10), MessageBody, 1) + 5) + 1) + 1) + 2, 2) [Origin Country]",
+              "\t\t,'FWB' [Type]",
+              "\t\t,'No Sub-Type' [Sub-Type]",
+              "\t\t,[Sent UTC] [Sent UTC]",
+              "\t\t,AM_CC_SenderOutbox",
+              "\t\t,AM_CC_RecipientOutbox",
+              "\tFROM (",
+              "\t\tSELECT SenderMessage.value('(/*:CargoIMP/*:Carrier)[1]', 'NVARCHAR(MAX)') AS [Airline Code]",
+              "\t\t\t,SenderMessage.value('(/*:CargoIMP/*:MAWB)[1]', 'NVARCHAR(MAX)') AS [MAWBNumber]",
+              "\t\t\t,SenderMessage.value('(/*:CargoIMP/*:Body)[1]', 'NVARCHAR(MAX)') AS 'MessageBody'",
+              "\t\t\t,[Sent UTC]",
+              "\t\t\t,AM_CC_SenderOutbox",
+              "\t\t\t,AM_CC_RecipientOutbox",
+              "\t\tFROM (",
+              "\t\t\tSELECT m.AM_ReceivedFromSenderUTC AS [Sent UTC]",
+              "\t\t\t\t,CONVERT(XML, [eHubTransactions].dbo.DecodeAndDecompress(m.AM_SenderMessageRaw)) AS [SenderMessage]",
+              "\t\t\t\t,m.AM_CC_SenderOutbox AM_CC_SenderOutbox",
+              "\t\t\t\t,m.AM_CC_RecipientOutbox AM_CC_RecipientOutbox",
+              "\t\t\tFROM eHubArchiveMessage m WITH (NOLOCK)",
+              "\t\t\tWHERE m.AM_CC_RecipientInbox = '9819EFF9-9CD8-4622-B58E-32A251115722' -- ri.CC_ID = 'eHubAirService'",
+              "\t\t\t\tAND m.AM_DT_RecipientMessageType = '16C507EE-68BE-4D1F-9888-BE865204A388' -- rt.DT_Code = 'http://www.cargowise.com/ehub/clients/edi/2010/06#FWB'",
+              "\t\t\t\tAND m.AM_SenderMessageRaw IS NOT NULL",
+              "\t\t\t\tAND m.AM_ReceivedFromSenderUTC >= @dt1",
+              "\t\t\t\tAND m.AM_ReceivedFromSenderUTC < @dt0",
+              "\t\t\t) MyTable1",
+              "\t\t) MyTable2</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Response Message",
+        "columns": [
+          {
+            "name": "AWB Serial#",
+            "dataType": "string",
+            "sourceColumn": "AWB Serial#",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "AWB Prefix",
+            "dataType": "string",
+            "sourceColumn": "AWB Prefix",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "Type",
+            "dataType": "string",
+            "sourceColumn": "Type",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "Sub-Type",
+            "dataType": "string",
+            "sourceColumn": "Sub-Type",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "Sent UTC",
+            "dataType": "dateTime",
+            "sourceColumn": "Sent UTC",
+            "formatString": "General Date",
+            "sourceProviderType": "Date"
+          },
+          {
+            "name": "AM_CC_SenderOutbox",
+            "dataType": "string",
+            "sourceColumn": "AM_CC_SenderOutbox",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "AM_CC_RecipientOutbox",
+            "dataType": "string",
+            "sourceColumn": "AM_CC_RecipientOutbox",
+            "sourceProviderType": "VarChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Response Message",
+            "dataView": "full",
+            "source": {
+              "query": [
+                "DECLARE @dt0 DATETIME = '2016-09-06 0:0:0';",
+                "DECLARE @dt2 DATETIME = DATEADD(DAY, -30, @dt0);",
+                "",
+                "SELECT SUBSTRING(MAWBNumber, 4, 8)    [AWB Serial#]",
+                "       ,SUBSTRING([MAWBNumber], 1, 3) [AWB Prefix]",
+                "       ,CASE ",
+                "              WHEN EventType = 'FMA'",
+                "                      OR EventType = 'FNA'",
+                "                      THEN EventType",
+                "              ELSE 'FSU'",
+                "              END                     [Type]",
+                "       ,CASE ",
+                "              WHEN EventType = 'FMA'",
+                "                      OR EventType = 'FNA'",
+                "                      THEN 'No Sub-Type'",
+                "              ELSE EventType",
+                "              END                     [Sub-Type]",
+                "       ,[Sent UTC]                    [Sent UTC]",
+                "\t,AM_CC_SenderOutbox",
+                "\t,AM_CC_RecipientOutbox",
+                "FROM (",
+                "       SELECT m.AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:EventType)[1]', 'NVARCHAR(MAX)') AS EventType",
+                "       ,REPLACE(m.AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:ContextCollection/*:Context/*:Value)[1]', 'NVARCHAR(MAX)'), '-', '') AS [MAWBNumber]",
+                "              ,m.AM_ReceivedFromSenderUTC AS [Sent UTC]",
+                "\t\t\t  ,m.AM_CC_SenderOutbox AM_CC_SenderOutbox",
+                "\t\t\t  ,m.AM_CC_RecipientOutbox AM_CC_RecipientOutbox",
+                "       FROM eHubArchiveMessage m WITH (NOLOCK)",
+                "       WHERE  m.AM_RecipientMessageUncompressedLength > 100",
+                "              AND m.AM_ReceivedFromSenderUTC >= @dt2",
+                "              AND m.AM_ReceivedFromSenderUTC < @dt0",
+                "       ) MyTable"
+              ],
+              "dataSource": "eHubArchiveOnline"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>DECLARE @dt0 DATETIME = '2016-09-06 0:0:0';",
+                  "DECLARE @dt2 DATETIME = DATEADD(DAY, -30, @dt0);",
+                  "",
+                  "SELECT SUBSTRING(MAWBNumber, 4, 8)    [AWB Serial#]",
+                  "       ,SUBSTRING([MAWBNumber], 1, 3) [AWB Prefix]",
+                  "       ,CASE ",
+                  "              WHEN EventType = 'FMA'",
+                  "                      OR EventType = 'FNA'",
+                  "                      THEN EventType",
+                  "              ELSE 'FSU'",
+                  "              END                     [Type]",
+                  "       ,CASE ",
+                  "              WHEN EventType = 'FMA'",
+                  "                      OR EventType = 'FNA'",
+                  "                      THEN 'No Sub-Type'",
+                  "              ELSE EventType",
+                  "              END                     [Sub-Type]",
+                  "       ,[Sent UTC]                    [Sent UTC]",
+                  "\t,AM_CC_SenderOutbox",
+                  "\t,AM_CC_RecipientOutbox",
+                  "FROM (",
+                  "       SELECT m.AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:EventType)[1]', 'NVARCHAR(MAX)') AS EventType",
+                  "       ,REPLACE(m.AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:ContextCollection/*:Context/*:Value)[1]', 'NVARCHAR(MAX)'), '-', '') AS [MAWBNumber]",
+                  "              ,m.AM_ReceivedFromSenderUTC AS [Sent UTC]",
+                  "\t\t\t  ,m.AM_CC_SenderOutbox AM_CC_SenderOutbox",
+                  "\t\t\t  ,m.AM_CC_RecipientOutbox AM_CC_RecipientOutbox",
+                  "       FROM eHubArchiveMessage m WITH (NOLOCK)",
+                  "       WHERE  m.AM_RecipientMessageUncompressedLength > 100",
+                  "              AND m.AM_ReceivedFromSenderUTC >= @dt2",
+                  "              AND m.AM_ReceivedFromSenderUTC < @dt0",
+                  "       ) MyTable</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": [
+              "DECLARE @dt0 DATETIME = '2016-09-06 0:0:0';",
+              "DECLARE @dt2 DATETIME = DATEADD(DAY, -30, @dt0);",
+              "",
+              "SELECT SUBSTRING(MAWBNumber, 4, 8)    [AWB Serial#]",
+              "       ,SUBSTRING([MAWBNumber], 1, 3) [AWB Prefix]",
+              "       ,CASE ",
+              "              WHEN EventType = 'FMA'",
+              "                      OR EventType = 'FNA'",
+              "                      THEN EventType",
+              "              ELSE 'FSU'",
+              "              END                     [Type]",
+              "       ,CASE ",
+              "              WHEN EventType = 'FMA'",
+              "                      OR EventType = 'FNA'",
+              "                      THEN 'No Sub-Type'",
+              "              ELSE EventType",
+              "              END                     [Sub-Type]",
+              "       ,[Sent UTC]                    [Sent UTC]",
+              "\t,AM_CC_SenderOutbox",
+              "\t,AM_CC_RecipientOutbox",
+              "FROM (",
+              "       SELECT m.AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:EventType)[1]', 'NVARCHAR(MAX)') AS EventType",
+              "       ,REPLACE(m.AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:ContextCollection/*:Context/*:Value)[1]', 'NVARCHAR(MAX)'), '-', '') AS [MAWBNumber]",
+              "              ,m.AM_ReceivedFromSenderUTC AS [Sent UTC]",
+              "\t\t\t  ,m.AM_CC_SenderOutbox AM_CC_SenderOutbox",
+              "\t\t\t  ,m.AM_CC_RecipientOutbox AM_CC_RecipientOutbox",
+              "       FROM eHubArchiveMessage m WITH (NOLOCK)",
+              "       WHERE  m.AM_RecipientMessageUncompressedLength > 100",
+              "              AND m.AM_ReceivedFromSenderUTC >= @dt2",
+              "              AND m.AM_ReceivedFromSenderUTC < @dt0",
+              "       ) MyTable"
+            ]
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "Response Message"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>DECLARE @dt0 DATETIME = '2016-09-06 0:0:0';",
+              "DECLARE @dt2 DATETIME = DATEADD(DAY, -30, @dt0);",
+              "",
+              "SELECT SUBSTRING(MAWBNumber, 4, 8)    [AWB Serial#]",
+              "       ,SUBSTRING([MAWBNumber], 1, 3) [AWB Prefix]",
+              "       ,CASE ",
+              "              WHEN EventType = 'FMA'",
+              "                      OR EventType = 'FNA'",
+              "                      THEN EventType",
+              "              ELSE 'FSU'",
+              "              END                     [Type]",
+              "       ,CASE ",
+              "              WHEN EventType = 'FMA'",
+              "                      OR EventType = 'FNA'",
+              "                      THEN 'No Sub-Type'",
+              "              ELSE EventType",
+              "              END                     [Sub-Type]",
+              "       ,[Sent UTC]                    [Sent UTC]",
+              "\t,AM_CC_SenderOutbox",
+              "\t,AM_CC_RecipientOutbox",
+              "FROM (",
+              "       SELECT m.AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:EventType)[1]', 'NVARCHAR(MAX)') AS EventType",
+              "       ,REPLACE(m.AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:ContextCollection/*:Context/*:Value)[1]', 'NVARCHAR(MAX)'), '-', '') AS [MAWBNumber]",
+              "              ,m.AM_ReceivedFromSenderUTC AS [Sent UTC]",
+              "\t\t\t  ,m.AM_CC_SenderOutbox AM_CC_SenderOutbox",
+              "\t\t\t  ,m.AM_CC_RecipientOutbox AM_CC_RecipientOutbox",
+              "       FROM eHubArchiveMessage m WITH (NOLOCK)",
+              "       WHERE  m.AM_RecipientMessageUncompressedLength > 100",
+              "              AND m.AM_ReceivedFromSenderUTC >= @dt2",
+              "              AND m.AM_ReceivedFromSenderUTC < @dt0",
+              "       ) MyTable</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Client",
+        "columns": [
+          {
+            "name": "Client System Code",
+            "dataType": "string",
+            "sourceColumn": "Client System Code",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "Client Licence Code",
+            "dataType": "string",
+            "sourceColumn": "Client Licence Code",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "Client Licence Name",
+            "dataType": "string",
+            "sourceColumn": "Client Licence Name",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "CC_PK",
+            "dataType": "string",
+            "sourceColumn": "CC_PK",
+            "sourceProviderType": "VarChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Client",
+            "dataView": "full",
+            "source": {
+              "query": [
+                "SELECT LEFT(rs.CC_ID, 3) + RIGHT(rs.CC_ID, 3) AS [Client System Code]",
+                "       ,rs.CC_ID AS [Client Licence Code]",
+                "       ,rs.CC_FriendlyName AS [Client Licence Name]",
+                "       ,rs.CC_PK CC_PK",
+                "FROM [eHubTransactions].dbo.eHubClient rs"
+              ],
+              "dataSource": "eHubArchiveOnline"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT LEFT(rs.CC_ID, 3) + RIGHT(rs.CC_ID, 3) AS [Client System Code]",
+                  "       ,rs.CC_ID AS [Client Licence Code]",
+                  "       ,rs.CC_FriendlyName AS [Client Licence Name]",
+                  "       ,rs.CC_PK CC_PK",
+                  "FROM [eHubTransactions].dbo.eHubClient rs</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": [
+              "SELECT LEFT(rs.CC_ID, 3) + RIGHT(rs.CC_ID, 3) AS [Client System Code]",
+              "       ,rs.CC_ID AS [Client Licence Code]",
+              "       ,rs.CC_FriendlyName AS [Client Licence Name]",
+              "       ,rs.CC_PK CC_PK",
+              "FROM [eHubTransactions].dbo.eHubClient rs"
+            ]
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "Client"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT LEFT(rs.CC_ID, 3) + RIGHT(rs.CC_ID, 3) AS [Client System Code]",
+              "       ,rs.CC_ID AS [Client Licence Code]",
+              "       ,rs.CC_FriendlyName AS [Client Licence Name]",
+              "       ,rs.CC_PK CC_PK",
+              "FROM [eHubTransactions].dbo.eHubClient rs</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Service Provider",
+        "columns": [
+          {
+            "name": "Service Provider",
+            "dataType": "string",
+            "sourceColumn": "Service Provider",
+            "sourceProviderType": "VarChar"
+          },
+          {
+            "name": "CC_PK",
+            "dataType": "string",
+            "sourceColumn": "CC_PK",
+            "sourceProviderType": "VarChar"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Service Provider",
+            "dataView": "full",
+            "source": {
+              "query": [
+                "SELECT CASE ",
+                "              WHEN CHARINDEX('_', rs.CC_ID) = 0",
+                "                      THEN rs.CC_ID",
+                "              ELSE LEFT(rs.CC_ID, CHARINDEX('_', rs.CC_ID) - 1)",
+                "              END AS [Service Provider]",
+                "       ,rs.CC_PK CC_PK",
+                "FROM [eHubTransactions].dbo.eHubClient rs"
+              ],
+              "dataSource": "eHubArchiveOnline"
+            },
+            "annotations": [
+              {
+                "name": "QueryEditorSerialization",
+                "value": [
+                  "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT CASE ",
+                  "              WHEN CHARINDEX('_', rs.CC_ID) = 0",
+                  "                      THEN rs.CC_ID",
+                  "              ELSE LEFT(rs.CC_ID, CHARINDEX('_', rs.CC_ID) - 1)",
+                  "              END AS [Service Provider]",
+                  "       ,rs.CC_PK CC_PK",
+                  "FROM [eHubTransactions].dbo.eHubClient rs</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+                ]
+              }
+            ]
+          }
+        ],
+        "annotations": [
+          {
+            "name": "_TM_ExtProp_QueryDefinition",
+            "value": [
+              "SELECT CASE ",
+              "              WHEN CHARINDEX('_', rs.CC_ID) = 0",
+              "                      THEN rs.CC_ID",
+              "              ELSE LEFT(rs.CC_ID, CHARINDEX('_', rs.CC_ID) - 1)",
+              "              END AS [Service Provider]",
+              "       ,rs.CC_PK CC_PK",
+              "FROM [eHubTransactions].dbo.eHubClient rs"
+            ]
+          },
+          {
+            "name": "_TM_ExtProp_DbTableName",
+            "value": "Service Provider"
+          },
+          {
+            "name": "QueryEditorSerialization",
+            "value": [
+              "<?xml version=\"1.0\" encoding=\"UTF-16\"?><Gemini xmlns=\"QueryEditorSerialization\"><AnnotationContent><![CDATA[<RSQueryCommandText>SELECT CASE ",
+              "              WHEN CHARINDEX('_', rs.CC_ID) = 0",
+              "                      THEN rs.CC_ID",
+              "              ELSE LEFT(rs.CC_ID, CHARINDEX('_', rs.CC_ID) - 1)",
+              "              END AS [Service Provider]",
+              "       ,rs.CC_PK CC_PK",
+              "FROM [eHubTransactions].dbo.eHubClient rs</RSQueryCommandText><RSQueryCommandType>Text</RSQueryCommandType><RSQueryDesignState></RSQueryDesignState>]]></AnnotationContent></Gemini>"
+            ]
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "f0997bfd-7275-4ddc-8472-c7f31c8b6add",
+        "fromTable": "Message",
+        "fromColumn": "Sent UTC",
+        "toTable": "Message Sent Date",
+        "toColumn": "Date"
+      }
+    ]
+  },
+  "id": "SemanticModel"
+}

@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Elements.xsd"/>
+	<xs:include schemaLocation="Invoice.xsd"/>
+	<xs:complexType name="Declaration">
+		<xs:annotation>
+			<xs:documentation>Declaration specific information</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Importer" type="Organisation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This is only required if the Importer is different to the consignee on the shipment</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ManifestID" type="xs:string" minOccurs="0"/>
+			<xs:element name="AddCustomsDetails" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AddCustomsDetail" type="AdditionalCustomsInformation" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="BillContainerPacks" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="BillContainerPack" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="BillNumber" type="xs:string" minOccurs="0"/>
+									<xs:element name="MasterbillNumber" type="xs:string" minOccurs="0"/>
+									<xs:element name="ContainerNumber" type="xs:string" minOccurs="0"/>
+									<xs:element name="PackQty" type="DimensionValue" minOccurs="0"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GoodsOrigin" type="CountryCode" minOccurs="0"/>
+			<xs:element name="IsDocuments" type="TrueFalse" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Specify whether the goods are documents or non-documents.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsFumigationCert" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="IsPerishableGoods" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="IsPersonalEffects" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="IsHazardousGoods" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="IsTimber" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="IsSAC" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="IsSurplus" type="TrueFalse" minOccurs="0"/>
+			<xs:element name="PaymentTerms" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="BondedWarehouse" type="AddressReference" minOccurs="0"/>
+			<xs:element name="LandedCostingHeader" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="LandedCostingHeader"/>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CountryPayload" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element ref="USDeclaration" minOccurs="0"/>
+						<xs:element name="ZADeclaration" type="ZADeclarationData" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Branch" minOccurs="0">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="Name" type="xs:string" use="optional">
+								<xs:annotation>
+									<xs:documentation>Only use for exporting data</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Broker" minOccurs="0">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="Name" type="xs:string" use="optional">
+								<xs:annotation>
+									<xs:documentation>Only use for exporting data</xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:sequence>
+				<xs:element name="EntryHeader" type="EntryHeader" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="USDeclaration">
+		<xs:annotation>
+			<xs:documentation>US Specific Declaration Level Data</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="EntryType" minOccurs="0">
+					<xs:complexType>
+						<xs:attribute name="EntryType" type="xs:string" use="optional"/>
+						<xs:attribute name="CertifyCargoRelease" type="TrueFalse" use="optional"/>
+						<xs:attribute name="EnableCargoRelease" type="TrueFalse" use="optional"/>
+						<xs:attribute name="EnableElectronicInvoice" type="TrueFalse" use="optional"/>
+						<xs:attribute name="EnableInBond" type="TrueFalse" use="optional"/>
+						<xs:attribute name="EnableEntrySummary" type="TrueFalse" use="optional"/>
+						<xs:attribute name="Mode" use="optional">
+							<xs:simpleType>
+								<xs:restriction base="xs:NMTOKEN">
+									<xs:enumeration value="PAI"/>
+									<xs:enumeration value="RLF"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="LocationOfGoods" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Firms Code</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="CarrierSCAC" type="xs:string" minOccurs="0"/>
+				<xs:element name="Organisations" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Buyer" type="Organisation" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>AII</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="BuyingAgent" type="Organisation" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>AII</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="CBPBroker" type="Organisation" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>AII</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Exporter" type="Organisation" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>AII</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Invoicer" type="Organisation" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>AII</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Seller" type="Organisation" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>AII</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="SellingAgent" type="Organisation" minOccurs="0"/>
+							<xs:element name="Manufacturer" type="ManufacturerType" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>AII</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="UltimateConsignee" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>AII and ENS</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:choice>
+										<xs:element name="UltimateConsignee" type="Organisation" minOccurs="0"/>
+										<xs:element name="PartyIDNumber" type="xs:string" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>One of EIN or CBP Assigned Number or Social Security number. Format is known and should be adhered to</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:choice>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="ImporterOfRecord" minOccurs="0">
+								<xs:complexType>
+									<xs:choice>
+										<xs:element name="ImporterOfRecord" type="Organisation" minOccurs="0"/>
+										<xs:element name="PartyIDNumber" type="xs:string" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>One of EIN or CBP Assigned Number or Social Security number. Format is known and should be adhered to</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:choice>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="NotifyParty" minOccurs="0">
+								<xs:complexType>
+									<xs:choice>
+										<xs:element name="NotifyParty" type="Organisation" minOccurs="0"/>
+										<xs:element name="PartyIDNumber" type="xs:string" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>One of EIN or CBP Assigned Number or Social Security number. Format is known and should be adhered to</xs:documentation>
+											</xs:annotation>
+										</xs:element>
+									</xs:choice>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Ports" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Loading" type="xs:string" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Shedule D/K</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Discharge" type="xs:string" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Shedule D/K</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="PortOfEntry" type="xs:string" minOccurs="0"/>
+							<xs:element name="PreparerDistrictPort" type="xs:string" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Shedule D</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="DesignatedExamPort" type="xs:string" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Shedule D</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Export" type="xs:string" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Shedule D Port Of Export </xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="EstimatedEntryDate" type="xs:date" minOccurs="0"/>
+				<xs:element name="PresentationDate" type="xs:date" minOccurs="0"/>
+				<xs:element name="ITDate" type="xs:date" minOccurs="0"/>
+				<xs:element name="Bond" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Type" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="0"/>
+										<xs:enumeration value="8"/>
+										<xs:enumeration value="9"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="Amount" type="xs:decimal" minOccurs="0"/>
+							<xs:element name="AccountNumber" type="xs:string" minOccurs="0"/>
+							<xs:element name="SuretyCode" type="xs:string" minOccurs="0"/>
+							<xs:element name="ADDCVDSuretyCode" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="ImporterOfRecordDetails" type="USImporterOfRecordDetails" minOccurs="0"/>
+				<xs:element name="Payment" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="PreliminaryStatementPrintDate" type="xs:date" minOccurs="0"/>
+							<xs:element name="PreliminaryStatementMonth" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="01"/>
+										<xs:enumeration value="02"/>
+										<xs:enumeration value="03"/>
+										<xs:enumeration value="04"/>
+										<xs:enumeration value="05"/>
+										<xs:enumeration value="06"/>
+										<xs:enumeration value="07"/>
+										<xs:enumeration value="08"/>
+										<xs:enumeration value="09"/>
+										<xs:enumeration value="10"/>
+										<xs:enumeration value="11"/>
+										<xs:enumeration value="12"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="ClientBranchDesignation" type="xs:string" minOccurs="0"/>
+							<xs:element name="CheckNo" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Recon" type="USReconciliation" minOccurs="0"/>
+				<xs:element name="MissingDocument1" type="xs:string" minOccurs="0"/>
+				<xs:element name="MissingDocument2" type="xs:string" minOccurs="0"/>
+				<xs:element name="TeamNo" type="xs:string" minOccurs="0"/>
+				<xs:element name="OGALineReleaseIndicator" minOccurs="0">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="Y"/>
+							<xs:enumeration value="N"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="EntryDateElectionCode" minOccurs="0">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="A"/>
+							<xs:enumeration value="P"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="LiveEntry" type="TrueFalse" minOccurs="0"/>
+				<xs:element name="ConsolidatedInformal" minOccurs="0">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="C"/>
+							<xs:enumeration value="P"/>
+							<xs:enumeration value="X"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="GeneralOrderNumber" type="xs:string" minOccurs="0"/>
+				<xs:element name="HMFApplicable" type="TrueFalse" minOccurs="0"/>
+				<xs:element name="PreparerOfficeCode" type="xs:string" minOccurs="0"/>
+				<xs:element name="CentralizedExamSite" type="xs:string" minOccurs="0"/>
+				<xs:element name="BillsOfLading" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="BillOfLading" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="IssuerSCAC" type="xs:string" minOccurs="0"/>
+										<xs:element name="AMSCarrier" type="xs:string" minOccurs="0"/>
+										<xs:element name="ITNumber" type="xs:string" minOccurs="0"/>
+										<xs:element name="ManifestQty" type="DimensionValue" minOccurs="0"/>
+									</xs:sequence>
+									<xs:attribute name="ParentBillNumber" type="xs:string" use="optional"/>
+									<xs:attribute name="BillNumber" type="xs:string" use="optional"/>
+									<xs:attribute name="BillType" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="DateOfArrival" type="xs:date" minOccurs="0"/>
+				<xs:element name="Warehouse" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FinalWHS" type="xs:boolean" minOccurs="0"/>
+							<xs:element name="Port" type="xs:string" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>K or D code</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="EntryFilerCode" type="xs:string" minOccurs="0"/>
+							<xs:element name="EntryNumber" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="EntryFilerCode" type="xs:string" minOccurs="0"/>
+				<xs:element name="PriorNotice" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Submitter" type="Organisation" minOccurs="0"/>
+							<xs:element name="ActualTimeOfArrival" type="xs:dateTime" minOccurs="0"/>
+							<xs:element name="ContactName" type="xs:string" minOccurs="0"/>
+							<xs:element name="ContactPhoneNo" type="xs:string" minOccurs="0"/>
+							<xs:element name="PortOfCrossing" type="xs:string" minOccurs="0"/>
+							<xs:element name="Carrier" minOccurs="0">
+								<xs:complexType>
+									<xs:choice>
+										<xs:element name="Carrier" type="USPriorNoticeCarrierType" minOccurs="0"/>
+										<xs:element name="PrivatelyOwnedUSVehicle" type="USPriorNoticePrivatelyOwnVehicleType" minOccurs="0"/>
+										<xs:element name="PrivatelyOwnedFNVehicle" type="USPriorNoticePrivatelyOwnFNVehicleType" minOccurs="0"/>
+									</xs:choice>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Status" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>This is for data export only</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Dispositions" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Disposition" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="DateTime" type="xs:dateTime"/>
+													<xs:element name="ActionCode" type="xs:string"/>
+													<xs:element name="Narrative" type="xs:string" minOccurs="0"/>
+													<xs:element name="ReleaseDateTime" type="xs:dateTime" minOccurs="0"/>
+													<xs:element name="ReleaseOrigin" type="xs:string" minOccurs="0"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="OGADispositions" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="OGADisposition" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="Qualifier" type="xs:string"/>
+													<xs:element name="DateTime" type="xs:dateTime"/>
+													<xs:element name="EntryLevelCode" type="xs:string" minOccurs="0"/>
+													<xs:element name="Message" type="xs:string" minOccurs="0"/>
+													<xs:element name="LineLevelCode" type="xs:string" minOccurs="0"/>
+													<xs:element name="BeginCBPLine" type="xs:string" minOccurs="0"/>
+													<xs:element name="BeginOGALine" type="xs:string" minOccurs="0"/>
+													<xs:element name="RangeIndicator" type="xs:string" minOccurs="0"/>
+													<xs:element name="EndOGALine" type="xs:string" minOccurs="0"/>
+													<xs:element name="EndCBPLine" type="xs:string" minOccurs="0"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="DutyDueDate" type="xs:date" minOccurs="0"/>
+							<xs:element name="EntryDate" type="xs:date" minOccurs="0"/>
+							<xs:element name="LiquidationDate" type="xs:date" minOccurs="0"/>
+							<xs:element name="LiquidationType" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="ExportDate" type="xs:date" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>US Exports</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="TransportReference" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>US Exports</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="CountryOfUltimateDestination" type="CountryCode" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>US Exports</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="FilingOption" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>US Exports</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="4"/>
+							<xs:enumeration value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="SoldEnRoute" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>US Exports</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="FirstCountry" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>US Exports</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="FirstCity" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>US Exports</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="CountryOfExport" type="CountryCode" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>US Exports</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="USPriorNoticeCarrierType">
+		<xs:sequence>
+			<xs:element name="Country" type="CountryCode" minOccurs="0"/>
+			<xs:element name="Name" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="USPriorNoticePrivatelyOwnFNVehicleType">
+		<xs:sequence>
+			<xs:element name="Country" type="CountryCode" minOccurs="0"/>
+			<xs:element name="Province" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="USPriorNoticePrivatelyOwnVehicleType">
+		<xs:sequence>
+			<xs:element name="State" type="xs:string" minOccurs="0"/>
+			<xs:element name="License" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ZADeclarationData">
+		<xs:sequence>
+			<xs:element name="DistrictOffice" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="PortOfExitOrDestination" type="xs:NMTOKEN" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

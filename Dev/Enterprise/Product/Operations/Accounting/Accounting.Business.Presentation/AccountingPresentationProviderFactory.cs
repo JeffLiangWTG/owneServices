@@ -1,0 +1,48 @@
+using Enterprise.Accounting.Business.AccountingPresentationProviders;
+using Enterprise.Accounting.Business.JobInvoicing;
+using Enterprise.Accounting.Business.Presentation.GUI;
+
+namespace Enterprise.Accounting.Business.Presentation
+{
+	public interface IAccountingPresentationProviderFactory
+	{
+		IJobInvoicePrintingControlPresentationProvider GetJobInvoicePrintingControlPresentationProvider();
+
+		ITransactionFilterStripControlPresentationProvider GetTransactionFilterStripControlPresentationProvider();
+
+		ITransactionModuleStripPresentationProvider GetTransactionModuleStripPresentationProvider();
+
+		IInvoiceFormPresentationProvider GetInvoiceFormPresentationProvider();
+
+		IEnquiryFilterControlPresentationProvider GetEnquiryFilterControlPresentationProvider();
+
+		IInvoicePrintingControlPresentationProvider GetInvoicePrintingControlPresentationProvider();
+
+		IAPInvoicePrintingUserControlPresentationProvider GetAPJobInvoicePrintingUserControlPresentationProvider();
+
+		IInvoicingPluginToFreightPresentationProvider GetInvoicingPluginToFreightPresentationProvider(IClosedJobReopener closedJobReopener, IJobRevRecognitionDataRetriever jobRevRecognitionDataRetriever);
+
+		ITransactionReasonFormPresentationProvider GetTransactionReasonFormPresentationProvider();
+	}
+
+	class AccountingPresentationProviderFactory : IAccountingPresentationProviderFactory
+	{
+		IJobInvoicePrintingControlPresentationProvider IAccountingPresentationProviderFactory.GetJobInvoicePrintingControlPresentationProvider() => new JobInvoicePrintingControlPresentationProvider();
+
+		ITransactionFilterStripControlPresentationProvider IAccountingPresentationProviderFactory.GetTransactionFilterStripControlPresentationProvider() => new TransactionFilterStripControlPresentationProvider();
+
+		ITransactionModuleStripPresentationProvider IAccountingPresentationProviderFactory.GetTransactionModuleStripPresentationProvider() => new TransactionModuleStripPresentationProvider();
+
+		IInvoiceFormPresentationProvider IAccountingPresentationProviderFactory.GetInvoiceFormPresentationProvider() => new InvoiceFormPresentationProvider();
+
+		IEnquiryFilterControlPresentationProvider IAccountingPresentationProviderFactory.GetEnquiryFilterControlPresentationProvider() => new EnquiryFilterControlPresentationProvider();
+
+		IInvoicePrintingControlPresentationProvider IAccountingPresentationProviderFactory.GetInvoicePrintingControlPresentationProvider() => new InvoicePrintingControlPresentationProvider();
+
+		IAPInvoicePrintingUserControlPresentationProvider IAccountingPresentationProviderFactory.GetAPJobInvoicePrintingUserControlPresentationProvider() => new APInvoicePrintingUserControlPresentationProvider();
+
+		IInvoicingPluginToFreightPresentationProvider IAccountingPresentationProviderFactory.GetInvoicingPluginToFreightPresentationProvider(IClosedJobReopener closedJobReopener, IJobRevRecognitionDataRetriever jobRevRecognitionDataRetriever) => new InvoicingPluginToFreightPresentationProvider(closedJobReopener, jobRevRecognitionDataRetriever);
+
+		ITransactionReasonFormPresentationProvider IAccountingPresentationProviderFactory.GetTransactionReasonFormPresentationProvider() => new TransactionReasonFormPresentationProvider();
+	}
+}

@@ -1,0 +1,98 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RuntimeIdentifier Condition="'$(IsReleaseBuild)' == 'true'">win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <UseCommonOutputDirectory>false</UseCommonOutputDirectory>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+    <!--- Disabling reference status check since output path is not bin\winzor -->
+    <CWEnableReferenceStatusSafeGuard>false</CWEnableReferenceStatusSafeGuard>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutputPath>$(WTGBinPath)SessionBroker\</OutputPath>
+    <PublishDir>$(WTGBinPath)SessionBroker\</PublishDir>
+    <PublishUrl>$(WTGBinPath)SessionBroker\</PublishUrl>
+    <PublishProvider>FileSystem</PublishProvider>
+    <DeployOnBuild>true</DeployOnBuild>
+    <PublishReadyToRun Condition="'$(IsReleaseBuild)' == 'true'">false</PublishReadyToRun>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MessagePack" />
+    <PackageReference Include="MessagePackAnalyzer" />
+    <PackageReference Include="Confluent.Kafka" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Expressions" />
+    <PackageReference Include="Serilog.Formatting.Elasticsearch" />
+    <PackageReference Include="Serilog.Sinks.PeriodicBatching" />
+    <PackageReference Include="System.Drawing.Common" />
+    <PackageReference Include="System.Security.Permissions" />
+    <PackageReference Include="QuickGetLatest.SignTool" GeneratePathProperty="true" />
+    <PackageReference Include="WTG.DevTools.CodeSigning" />
+    <PackageReference Include="Yarp.ReverseProxy" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CargoWise.Blazor.Common\CargoWise.Blazor.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsReleaseBuild)' != 'true'">
+    <None Update="kafkaCertificate.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="NOTICE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="wwwroot\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="Enterprise.Upgrades" />
+    <Reference Include="CargoWiseNext.Infrastructure.Installations" />
+    <Reference Include="Enterprise.Security.Shared" />
+    <Reference Include="CargoWise.Blazor.Client.Integration" />
+    <Reference Include="CargoWise.Blazor.Client.Integration.Server" />
+    <Reference Include="CargoWise.Data.Providers.Common" />
+    <Reference Include="CargoWise.DataProtection" />
+    <Reference Include="CargoWise.DataProtection.SqlExtensions" />
+    <Reference Include="CargoWise.Schema" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="CargoWiseNext.Infrastructure.Instance.Management" />
+    <Reference Include="CargoWiseNext.Infrastructure.ConfigurationManager" />
+    <Reference Include="CargoWiseNext.Infrastructure.Authentication" />
+    <Reference Include="CargoWiseNext.Infrastructure.Installations" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="WTG.OpenIDConnect.Token" />
+    <Reference Include="WTG.Logging" />
+    <Reference Include="System.IdentityModel.Tokens.Jwt" />
+    <Reference Include="WTG.Logging.Extensions" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsReleaseBuild)' == 'true'">
+    <Content Remove="appsettings.json" />
+    <Content Remove="appsettings.DAT.json" />
+    <Content Remove="appsettings.Development.json" />
+    <Content Remove="appsettings.IntegrationTest.json" />
+    <None Include="appsettings.json" CopyToOutputDirectory="Never" />
+    <None Include="appsettings.DAT.json" CopyToOutputDirectory="Never" />
+    <None Include="appsettings.Development.json" CopyToOutputDirectory="Never" />
+    <None Include="appsettings.IntegrationTest.json" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
+  <Target Name="QGLSignFiles" AfterTargets="Publish" Condition="'$(DAT_IS_BUILDING)' == 'true'">
+    <Exec Command="powershell -Command &quot;Get-ChildItem $(PublishDir) -Recurse -Include *.dll,*.exe,*.msi | ForEach-Object { if ((Get-AuthenticodeSignature $_.FullName).Status -ne 'Valid') { &amp; &quot;$(PkgQuickGetLatest_SignTool)\tools\QuickGetLatest.SignTool.exe&quot; $_.FullName } }&quot;" />
+  </Target>
+  <!-- Validation occurs only in DAT builds with Release configuration -->
+  <Target Name="ValidateSignedFiles" AfterTargets="QGLSignFiles" Condition="'$(Configuration)' == 'Release' And '$(DAT_IS_BUILDING)' == 'true'">
+    <Exec Command="powershell -Command &quot;Get-ChildItem $(PublishDir) -Recurse -Include *.dll,*.exe,*.msi | ForEach-Object { if ((Get-AuthenticodeSignature $_.FullName).Status -ne 'Valid') { $_.FullName } }&quot;" IgnoreExitCode="true" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="NotAssignedFiles" />
+    </Exec>
+
+    <Error Condition=" '$(NotAssignedFiles)' != '' " Text="The following files are not signed:&#xA; $(NotAssignedFiles.Replace(';','&#xA;'))" />
+  </Target>
+</Project>

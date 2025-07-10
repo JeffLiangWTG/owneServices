@@ -1,0 +1,33 @@
+meta {
+  name: RateParties is provided for NON jobcharges endpoint
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.RateParties = [
+       {Code: "ABCD", Role: "SAG"},
+       {Code: "EFGH", Role: "RAG"},
+   ];
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: RateParties is only applicable for job charges calculation endpoint.", function() {
+    expect(res.body.ModelState['RateParties'][0]).to.equal("RateParties is only applicable for job charges calculation endpoint.");
+  });
+}

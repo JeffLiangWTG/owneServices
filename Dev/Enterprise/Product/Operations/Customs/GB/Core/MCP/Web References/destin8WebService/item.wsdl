@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WL5G3N0:definitions xmlns:WL5G3N1="http://www.destin8.co.uk/Chief" xmlns:WL5G3N2="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="" name="EDIWebServiceClient" targetNamespace="http://www.destin8.co.uk/Chief" xmlns:WL5G3N0="http://schemas.xmlsoap.org/wsdl/">
+  <WL5G3N0:types>
+    <xsd:schema xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.destin8.co.uk/Chief" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" attributeFormDefault="qualified" elementFormDefault="unqualified" targetNamespace="http://www.destin8.co.uk/Chief" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <xsd:import namespace="http://www.destin8.co.uk/ChiefEDI" />
+      <xsd:complexType name="EDIMessageBatch">
+        <xsd:sequence>
+          <xsd:element minOccurs="1" maxOccurs="1" name="batch" nillable="true" type="tns:Batch" />
+          <xsd:element minOccurs="1" maxOccurs="1" name="errorNo" type="xsd:int" />
+          <xsd:element minOccurs="1" maxOccurs="1" name="errorText" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="Batch">
+        <xsd:sequence>
+          <xsd:element minOccurs="1" maxOccurs="1" name="batchID" type="xsd:int" />
+          <xsd:element minOccurs="1" maxOccurs="1" name="messageCount" type="xsd:int" />
+          <xsd:element minOccurs="1" maxOccurs="1" name="messages" nillable="true" type="tns:Messages" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="Messages">
+        <xsd:sequence>
+          <xsd:element minOccurs="1" maxOccurs="unbounded" name="PrintMessage" type="tns:PrintMessage" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="PrintMessage">
+        <xsd:sequence>
+          <xsd:element minOccurs="1" maxOccurs="1" name="message" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="EDIAcknowledgeVO">
+        <xsd:sequence>
+          <xsd:element minOccurs="1" maxOccurs="1" name="messageCode" type="xsd:int" />
+          <xsd:element minOccurs="1" maxOccurs="1" name="messageText" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="acknowledgeEdifactPrints" type="tns:AcknowledgeEdifactPrints" />
+      <xsd:complexType name="AcknowledgeEdifactPrints">
+        <xsd:sequence>
+          <xsd:element name="CompanyCode" type="xsd:string" />
+          <xsd:element name="Device" type="xsd:string" />
+          <xsd:element name="BatchID" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="acknowledgeEdifactPrintsResponse" type="tns:AcknowledgeEdifactPrintsResponse" />
+      <xsd:complexType name="AcknowledgeEdifactPrintsResponse">
+        <xsd:sequence>
+          <xsd:element name="Response" type="tns:EDIAcknowledgeVO" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getAvailableEdifactPrints" type="tns:GetAvailableEdifactPrints" />
+      <xsd:complexType name="GetAvailableEdifactPrints">
+        <xsd:sequence>
+          <xsd:element name="CompanyCode" type="xsd:string" />
+          <xsd:element name="Device" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="getAvailableEdifactPrintsResponse" type="tns:GetAvailableEdifactPrintsResponse" />
+      <xsd:complexType name="GetAvailableEdifactPrintsResponse">
+        <xsd:sequence>
+          <xsd:element name="result" type="tns:EDIMessageBatch" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="processEDIMessage" type="tns:ProcessEDIMessage" />
+      <xsd:complexType name="ProcessEDIMessage">
+        <xsd:sequence>
+          <xsd:element name="EDI" type="xsd:string" />
+          <xsd:element name="CompanyCode" type="xsd:string" />
+          <xsd:element name="Operational" type="xsd:boolean" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="processEDIMessageResponse" type="tns:ProcessEDIMessageResponse" />
+      <xsd:complexType name="ProcessEDIMessageResponse">
+        <xsd:sequence>
+          <xsd:element name="Response" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
+  </WL5G3N0:types>
+  <WL5G3N0:message name="acknowledgeEdifactPrints">
+    <WL5G3N0:part name="parameters" element="WL5G3N1:acknowledgeEdifactPrints" />
+  </WL5G3N0:message>
+  <WL5G3N0:message name="acknowledgeEdifactPrintsResponse">
+    <WL5G3N0:part name="parameters" element="WL5G3N1:acknowledgeEdifactPrintsResponse" />
+  </WL5G3N0:message>
+  <WL5G3N0:message name="getAvailableEdifactPrints">
+    <WL5G3N0:part name="parameters" element="WL5G3N1:getAvailableEdifactPrints" />
+  </WL5G3N0:message>
+  <WL5G3N0:message name="getAvailableEdifactPrintsResponse">
+    <WL5G3N0:part name="parameters" element="WL5G3N1:getAvailableEdifactPrintsResponse" />
+  </WL5G3N0:message>
+  <WL5G3N0:message name="processEDIMessage">
+    <WL5G3N0:part name="parameters" element="WL5G3N1:processEDIMessage" />
+  </WL5G3N0:message>
+  <WL5G3N0:message name="processEDIMessageResponse">
+    <WL5G3N0:part name="parameters" element="WL5G3N1:processEDIMessageResponse" />
+  </WL5G3N0:message>
+  <WL5G3N0:portType name="ChiefEDIPort">
+    <WL5G3N0:operation name="acknowledgeEdifactPrints">
+      <WL5G3N0:input message="WL5G3N1:acknowledgeEdifactPrints" />
+      <WL5G3N0:output message="WL5G3N1:acknowledgeEdifactPrintsResponse" />
+    </WL5G3N0:operation>
+    <WL5G3N0:operation name="getAvailableEdifactPrints">
+      <WL5G3N0:input message="WL5G3N1:getAvailableEdifactPrints" />
+      <WL5G3N0:output message="WL5G3N1:getAvailableEdifactPrintsResponse" />
+    </WL5G3N0:operation>
+    <WL5G3N0:operation name="processEDIMessage">
+      <WL5G3N0:input message="WL5G3N1:processEDIMessage" />
+      <WL5G3N0:output message="WL5G3N1:processEDIMessageResponse" />
+    </WL5G3N0:operation>
+  </WL5G3N0:portType>
+  <WL5G3N0:binding name="ChiefEDIPort" type="WL5G3N1:ChiefEDIPort">
+    <WL5G3N2:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <WL5G3N0:operation name="acknowledgeEdifactPrints">
+      <WL5G3N2:operation soapAction="" style="document" />
+      <WL5G3N0:input>
+        <WL5G3N2:body use="literal" />
+      </WL5G3N0:input>
+      <WL5G3N0:output>
+        <WL5G3N2:body use="literal" />
+      </WL5G3N0:output>
+    </WL5G3N0:operation>
+    <WL5G3N0:operation name="getAvailableEdifactPrints">
+      <WL5G3N2:operation soapAction="" style="document" />
+      <WL5G3N0:input>
+        <WL5G3N2:body use="literal" />
+      </WL5G3N0:input>
+      <WL5G3N0:output>
+        <WL5G3N2:body use="literal" />
+      </WL5G3N0:output>
+    </WL5G3N0:operation>
+    <WL5G3N0:operation name="processEDIMessage">
+      <WL5G3N2:operation soapAction="" style="document" />
+      <WL5G3N0:input>
+        <WL5G3N2:body use="literal" />
+      </WL5G3N0:input>
+      <WL5G3N0:output>
+        <WL5G3N2:body use="literal" />
+      </WL5G3N0:output>
+    </WL5G3N0:operation>
+  </WL5G3N0:binding>
+  <WL5G3N0:service name="ChiefEDI">
+    <WL5G3N0:port name="ChiefEDIPort" binding="WL5G3N1:ChiefEDIPort">
+      <WL5G3N2:address location="http://www.destin8.co.uk:80/ChiefEDI/ChiefEDI" />
+    </WL5G3N0:port>
+  </WL5G3N0:service>
+</WL5G3N0:definitions>

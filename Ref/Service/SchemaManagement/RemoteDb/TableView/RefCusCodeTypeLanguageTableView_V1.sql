@@ -1,0 +1,6 @@
+CREATE VIEW RefCusCodeTypeLanguageTableView_V1 AS
+SELECT ZXI_PK,
+ZXI_ZX6_NKLanguage,
+ZXI_ZZK_CodeType,
+ZXI_Description
+FROM RefCusCodeTypeLanguage

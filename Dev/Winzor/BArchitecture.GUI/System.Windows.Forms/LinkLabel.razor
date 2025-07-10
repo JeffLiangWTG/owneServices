@@ -1,0 +1,160 @@
+@namespace System.Windows.Forms
+@using WinzorFramework
+@using WinzorFramework.Extensions
+@inherits Label
+@using static System.Web.HttpUtility
+
+<div @attributes="DataAttributes" class="linklabel @LinkLabelLinkBehaviorClass @LinkLabelDockStyleClass" tabindex="@this.TabIndexHtmlAttributeValue()" style="@ControlStyleString;@LinkLabelStyle()" @onclick="OnClickAsync" @onclick:stopPropagation @oncontextmenu="OnContextMenuAsync" @oncontextmenu:stopPropagation @oncontextmenu:preventDefault @onmouseenter="OnMouseEnterAsync" @onmouseleave="OnMouseLeaveAsync" @onwinzorfocusin="OnFocusInAsync" @onwinzorfocusin:stopPropagation @onwinzorfocusout="OnFocusOutAsync" @onwinzorfocusout:stopPropagation>
+    @if (Image is not null)
+    {
+        <div class="linklabel__image @LinkLabelImageStyle()">
+            <img src="@Image.ToBase64DataUrl()" width="@ImageWidth" height="@ImageHeight" />
+        </div>
+    }
+    @if (Links.Count == 1 && Links[0].Start == 0 && Links[0].Length == -1)
+    {
+        if (Links[0].Enabled && Enabled)
+        {
+            <a style="@ContentStyleString" @onclick="async (args) => await OnLinkClickAsync(args, Links[0])" allowNoStopPropagation>@FormatText(Text)</a>
+        }
+        else
+        {
+            <a style="@ContentStyleString" class="disabled">@FormatText(Text)</a>
+        }
+    }
+    else if (Links.Count > 0)
+    {
+        //Add text before first link.
+        if (Links[0].Start > 0 && Links[0].Start < Text.Length)
+        {
+            @FormatText(Text.Substring(0, Links[0].Start))
+        }
+
+        //Add text for each link.
+        int linkIndex = 0;
+        @foreach (var current in Links)
+        {
+            var formattedText = FormatText(Text.Substring(current.Start < Text.Length ? current.Start : 0, current.Length <= Text.Length ? current.Length : Text.Length));
+            if (current.Enabled && Enabled)
+            {
+                <a @onclick="async (args) => await OnLinkClickAsync(args, current)" allowNoStopPropagation>@formattedText</a>
+            }
+            else
+            {
+                <a class="disabled">@formattedText</a>
+            }
+            
+            //Add text between/after ranges.
+            var end = current.Start + current.Length;
+            if (end < Text.Length)
+            {
+                if (linkIndex + 1 < Links.Count)
+                {
+                    @FormatText(Text.Substring(end, Links[linkIndex + 1].Start - end));
+                }
+                else
+                {
+                    @FormatText(Text.Substring(end));
+                }
+            }
+
+            linkIndex++;
+        }
+    }
+    else
+    {
+        @FormatText(@Text)
+    }
+</div>
+
+@code {
+	string LinkLabelImageStyle()
+	{
+		var labelImageClass = string.Empty;
+
+		if (!Enabled)
+		{
+			labelImageClass += $"linklabel__image--disabled";
+		}
+
+		return labelImageClass;
+	}
+
+	MarkupString FormatText(string text)
+	{
+		return new MarkupString(HtmlEncode(text).Replace("\r\n", "<br>"));
+	}
+
+	static Dictionary<Drawing.ContentAlignment, string> TextAlignStyleString = new Dictionary<Drawing.ContentAlignment, string>()
+    {
+        // not need set align-items for TopXXX, and not need set justify-content for XXXLeft
+        // so not need anything for TopLeft
+        {Drawing.ContentAlignment.TopLeft, string.Empty},
+        {Drawing.ContentAlignment.TopCenter, "justify-content: center;"},
+        {Drawing.ContentAlignment.TopRight, "justify-content: right;"},
+
+        {Drawing.ContentAlignment.MiddleLeft, "align-items: center;"},
+        {Drawing.ContentAlignment.MiddleCenter, "align-items: center; justify-content: center;"},
+        {Drawing.ContentAlignment.MiddleRight, "align-items: center; justify-content: right;"},
+
+        {Drawing.ContentAlignment.BottomLeft, "align-items: end;"},
+        {Drawing.ContentAlignment.BottomCenter, "align-items: end; justify-content: center;"},
+        {Drawing.ContentAlignment.BottomRight, "align-items: end; justify-content: right;"},
+    };
+
+	static Dictionary<Drawing.ContentAlignment, string> TextAlignStyleString_ContentOverflowed = new Dictionary<Drawing.ContentAlignment, string>()
+    {
+        // not need set align-items for all
+        {Drawing.ContentAlignment.TopLeft, string.Empty},
+        {Drawing.ContentAlignment.TopCenter, "justify-content: center;"},
+        {Drawing.ContentAlignment.TopRight, "justify-content: right;"},
+
+        {Drawing.ContentAlignment.MiddleLeft, string.Empty},
+        {Drawing.ContentAlignment.MiddleCenter, "justify-content: center;"},
+        {Drawing.ContentAlignment.MiddleRight, "justify-content: right;"},
+
+        {Drawing.ContentAlignment.BottomLeft, string.Empty},
+        {Drawing.ContentAlignment.BottomCenter, "justify-content: center;"},
+        {Drawing.ContentAlignment.BottomRight, "justify-content: right;"},
+    };
+
+	string ContentStyleString { get; set; } = string.Empty;
+
+	string LinkLabelStyle()
+	{
+		string textAlignStyleString = string.Empty;
+		if (!AutoSize)
+		{
+			(var overflowed, int maximumLineCount) = TextRenderer.MeasureMaximumLineCount(Text, Font, ClientSize, TextFormatFlags.WordBreak);
+			if (overflowed)
+			{
+				ContentStyleString = $"-webkit-line-clamp: {maximumLineCount};overflow: hidden;-webkit-box-orient: vertical;display: -webkit-box;";
+				textAlignStyleString = TextAlignStyleString_ContentOverflowed[TextAlign];
+			}
+			else
+			{
+				ContentStyleString = string.Empty;
+				textAlignStyleString = TextAlignStyleString[TextAlign];
+			}
+		}
+
+		return $"--linkcolor:{LinkColor.GetColorStyleValue()};--disabled-linkcolor:{DisabledLinkColor.GetColorStyleValue()};--visited-linkcolor:{VisitedLinkColor.GetColorStyleValue()};--active-linkcolor:{ActiveLinkColor.GetColorStyleValue()};{textAlignStyleString}";
+	}
+
+	async Task OnLinkClickAsync(Microsoft.AspNetCore.Components.Web.MouseEventArgs args, Link link)
+	{
+		await InvokeWinzorDispatcherAsync(() =>
+		{
+			FocusLink = link;
+			OnLinkClicked(new LinkLabelLinkClickedEventArgs(link));
+		});
+	}
+
+	string LinkLabelDockStyleClass
+	{
+		get
+		{
+			return Dock == DockStyle.Fill ? "linklabel--dock-fill" : string.Empty;
+		}
+	}
+}

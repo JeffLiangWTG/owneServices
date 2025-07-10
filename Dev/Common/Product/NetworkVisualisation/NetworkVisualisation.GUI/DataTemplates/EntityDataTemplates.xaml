@@ -1,0 +1,228 @@
+<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:networkModel="clr-namespace:CargoWise.NetworkVisualisation.Business;assembly=CargoWise.NetworkVisualisation.Business"
+	xmlns:local="clr-namespace:CargoWise.NetworkVisualisation.GUI">
+
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary Source="LinkedEntity/LinkedEntityTemplateDictionary.xaml" />
+		<ResourceDictionary Source="NonLinkedEntity/NonLinkedEntityTemplateDictionary.xaml" />
+		<ResourceDictionary Source="../SharedVisualTemplates.xaml" />
+	</ResourceDictionary.MergedDictionaries>
+
+	<local:IsOnCriticalPathBorderColorConverter x:Key="isOnCriticalPathBorderColorConverter" />
+
+	<local:IsOnCriticalPathBorderThicknessConverter x:Key="isOnCriticalPathBorderThicknessConverter" />
+
+	<local:HasNotificationsBrushConverter x:Key="hasNotificationsBrushConverter" />
+
+	<local:HasNotificationsTooltipConverter x:Key="hasNotificationsTooltipConverter" />
+
+	<local:EntityStateImageConverter x:Key="entityStateImageConverter" />
+
+	<local:EntityStateTooltipConverter x:Key="entityStateTooltipConverter" />
+
+	<local:NodeStatusImageConverter x:Key="nodeStatusImageConverter" />
+
+	<local:ProgressBrushConverter x:Key="progressBrushConverter" />
+
+	<local:StatusBrushConverter x:Key="statusBrushConverter" />
+
+	<local:LinkedEntityContentTemplateSelector
+		x:Key="linkedEntityContentSelector"
+		LeafNodeTemplate="{StaticResource leafNodeDataTemplate}" />
+
+	<DataTemplate x:Key="LinkedEntityDataTemplate">
+		<Grid>
+			<!--  This rectangle is the main visual for the linked node.  -->
+			<Rectangle
+				RadiusX="4"
+				RadiusY="4"
+				Fill="{Binding StatusColors, Converter={StaticResource statusBrushConverter}}"
+				Stroke="{Binding Entity.IsOnCriticalPath, Converter={StaticResource isOnCriticalPathBorderColorConverter}}"
+				StrokeThickness="{Binding Entity.IsOnCriticalPath, Converter={StaticResource isOnCriticalPathBorderThicknessConverter}}"
+				Visibility="{Binding IsEntityDecorationVisible, Converter={StaticResource booleanToVisibilityConverter}}" />
+
+			<!--
+				This grid contains the node's connectors.
+				The margin is negative so that the connectors overlap the body of the node and it's selection border.
+			-->
+			<Grid Margin="-6,4,-6,4">
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" MinWidth="10" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="*" />
+					<RowDefinition Height="14" />
+					<RowDefinition Height="{Binding LowerBarHeight}" />
+				</Grid.RowDefinitions>
+
+				<!--  The status indicator of the node.  -->
+				<Rectangle
+					Grid.Row="0"
+					Grid.Column="0"
+					Width="12"
+					Height="12"
+					HorizontalAlignment="Right"
+					ToolTip="{Binding Path=StatusTooltip,
+				                             Converter={StaticResource TooltipTextConverter}}">
+					<Rectangle.Fill>
+						<ImageBrush ImageSource="{Binding Status, Converter={StaticResource nodeStatusImageConverter}}" />
+					</Rectangle.Fill>
+				</Rectangle>
+
+				<!--  The notification bar  -->
+				<Rectangle
+					Grid.Row="1"
+					Grid.RowSpan="3"
+					Grid.Column="0"
+					Width="5"
+					Height="Auto"
+					HorizontalAlignment="Center"
+					Visibility="{Binding Entity.HasNotifications,
+				                                Converter={StaticResource booleanToVisibilityConverter}}">
+					<Rectangle.Style>
+						<Style TargetType="{x:Type Rectangle}">
+							<Setter Property="Fill">
+								<Setter.Value>
+									<MultiBinding Converter="{StaticResource hasNotificationsBrushConverter}">
+										<Binding Path="Entity.HasNotifications" />
+										<Binding Path="Entity" />
+									</MultiBinding>
+								</Setter.Value>
+							</Setter>
+							<Setter Property="ToolTip">
+								<Setter.Value>
+									<MultiBinding Converter="{StaticResource hasNotificationsTooltipConverter}">
+										<Binding Path="Entity.HasNotifications" />
+										<Binding Path="Entity" />
+									</MultiBinding>
+								</Setter.Value>
+							</Setter>
+						</Style>
+					</Rectangle.Style>
+				</Rectangle>
+
+				<ContentControl
+					Grid.Row="0"
+					Grid.RowSpan="4"
+					Grid.Column="1"
+					Grid.ColumnSpan="1"
+					Content="{Binding}"
+					ContentTemplateSelector="{StaticResource linkedEntityContentSelector}" />
+
+				<!--  The right-hand status image  -->
+				<Rectangle
+					Grid.Row="0"
+					Grid.Column="2"
+					Width="16"
+					Height="16"
+					Margin="2,0,10,0"
+					>
+					<Rectangle.ToolTip>
+						<MultiBinding Converter="{StaticResource entityStateTooltipConverter}">
+							<Binding Path="Entity.EntityState" />
+							<Binding Path="Entity" />
+						</MultiBinding>
+					</Rectangle.ToolTip>
+					<Rectangle.Fill>
+						<ImageBrush ImageSource="{Binding Entity.EntityState, Converter={StaticResource entityStateImageConverter}}" />
+					</Rectangle.Fill>
+				</Rectangle>
+
+				<!--  Displays the node's input connectors.  -->
+				<ItemsControl
+					Grid.Row="1"
+					Grid.Column="0"
+					Focusable="False"
+					ItemTemplate="{StaticResource inputConnectorTemplate}"
+					ItemsSource="{Binding InputConnectors}" />
+
+				<!--  Displays the node's output connectors.  -->
+				<ItemsControl
+					Grid.Row="1"
+					Grid.Column="2"
+					Focusable="False"
+					ItemTemplate="{StaticResource outputConnectorTemplate}"
+					ItemsSource="{Binding OutputConnectors}" />
+				
+				<!-- The node's completeness fade -->
+				<Rectangle
+					Grid.Row="5"
+					Grid.Column="0"
+					Grid.ColumnSpan="3"
+					Fill="{Binding LowerBar, Converter={StaticResource progressBrushConverter}}"
+					Margin="8,0,8,-2"
+					RadiusX="4"
+					RadiusY="4"
+					ToolTip="{Binding LowerBarTooltip}"
+					>
+					
+				</Rectangle>
+			</Grid>
+		</Grid>
+	</DataTemplate>
+
+	<local:NonLinkedEntityContentTemplateSelector x:Key="nonLinkedEntityContentSelector" AnnotationNodeTemplate="{StaticResource annotationNodeDataTemplate}" />
+
+	<DataTemplate x:Key="NonLinkedEntityDataTemplate">
+		<Grid>
+			<!--  This Rectangle is the main visual for the nonlinked node.  -->
+			<Rectangle
+				RadiusX="4"
+				RadiusY="4"
+				Fill="{Binding StatusColors, Converter={StaticResource statusBrushConverter}}"
+				Stroke="{Binding BorderColor}"
+				StrokeThickness="{Binding BorderThickness}" />
+
+			<!--
+				This grid contains the node's connectors.
+				The margin is negative so that the connectors overlap the body of the node and it's selection border.
+			-->
+			<Grid Margin="-6,4,-6,4">
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" MinWidth="10" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="*" />
+					<RowDefinition Height="14" />
+				</Grid.RowDefinitions>
+
+				<ContentControl
+					Grid.Row="0"
+					Grid.RowSpan="4"
+					Grid.Column="1"
+					Grid.ColumnSpan="1"
+					Content="{Binding}"
+					ContentTemplateSelector="{StaticResource nonLinkedEntityContentSelector}" />
+
+				<!--  The pinned status image  -->
+				<Rectangle
+					Grid.Row="0"
+					Grid.Column="2"
+					Width="16"
+					Height="16">
+					<Rectangle.ToolTip>
+						<MultiBinding Converter="{StaticResource entityStateTooltipConverter}">
+							<Binding Path="Entity.EntityState" />
+							<Binding Path="Entity" />
+						</MultiBinding>
+					</Rectangle.ToolTip>
+					<Rectangle.Fill>
+						<ImageBrush ImageSource="{Binding Entity.EntityState, Converter={StaticResource entityStateImageConverter}}" />
+					</Rectangle.Fill>
+				</Rectangle>
+			</Grid>
+		</Grid>
+	</DataTemplate>
+</ResourceDictionary>

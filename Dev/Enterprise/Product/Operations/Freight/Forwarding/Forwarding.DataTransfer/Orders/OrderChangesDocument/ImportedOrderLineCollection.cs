@@ -1,0 +1,29 @@
+using System;
+using CargoWise.EntityFramework;
+
+namespace Enterprise.Freight.Forwarding.DataTransfer
+{
+	public class ImportedOrderLineCollection : NonPersistentBusinessObjectCollection<ImportedOrderLine>
+	{
+		public ImportedOrderLineCollection() { }
+
+		public ImportedOrderLineCollection(ImportedOrderCollection importedOrders)
+		{
+			foreach (ImportedOrder importedOrder in importedOrders)
+			{
+				AddRange(importedOrder.OrderLines);
+			}
+		}
+
+		protected override bool AllowNewCore
+		{
+			get { return false; }
+		}
+
+		protected override BusinessObject CreateNonPersistentBusinessObject()
+		{
+			throw new NotSupportedException("AddNew not supported");
+		}
+	}
+}
+

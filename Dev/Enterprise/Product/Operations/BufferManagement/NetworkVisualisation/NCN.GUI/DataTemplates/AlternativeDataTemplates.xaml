@@ -1,0 +1,82 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Enterprise.BufferManagement.NetworkVisualisation.GUI"
+    xmlns:netvis="clr-namespace:CargoWise.NetworkVisualisation.GUI;assembly=CargoWise.NetworkVisualisation.GUI">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/CargoWise.NetworkVisualisation.GUI;component/SharedVisualTemplates.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <DataTemplate x:Key="bufferNodeDataTemplate">
+        <StackPanel
+            Grid.Row="0"
+            Grid.RowSpan="4"
+            Grid.Column="1"
+            Grid.ColumnSpan="1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Orientation="Vertical">
+
+            <netvis:EntityDetails
+                HeadingFontSize="14"
+                HeadingFontWeight="{Binding StatusTextWeight}"
+                ShowJobDetails="{Binding Path=Entity.CanHaveChildren}"
+                TextAlignment="{Binding Path=TextAlignment}" />
+
+            <!--  The buffer penetration percent label.  -->
+            <TextBlock
+                MinWidth="100"
+                Margin="20 0 0 0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                FontSize="13"
+                FontWeight="Bold"
+                Text="{Binding PenetrationPercentLabel}"
+                TextAlignment="Center" />
+
+            <StackPanel
+                Orientation="Horizontal">
+
+                <!--  The description of the node. This is used for non-accepted buffers.  -->
+                <TextBlock
+                    Margin="6 0 6 0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    FontSize="13"
+                    Text="{Binding Description}"
+                    TextAlignment="Center" />
+
+                <!--  The Additional Detail of the entity.  -->
+                <TextBlock
+                    MinWidth="100"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    Padding="5 0 0 0"
+                    Text="{Binding Entity.AdditionalDetail}"
+                    ToolTip="{Binding Entity.AdditionalDetailTooltip}"
+                    Visibility="{Binding IsAdditionalDetailShown,
+												Converter={StaticResource booleanToVisibilityConverter}}" />
+
+            </StackPanel>
+
+            <TextBox
+                Grid.Column="1"
+                MinWidth="100"
+                Margin="0 0 0 0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                AcceptsReturn="True"
+                Background="Transparent"
+                BorderThickness="0"
+                Foreground="Black"
+                Padding="10 0 10 10"
+                Text="{Binding Notes}"
+                TextWrapping="Wrap" />
+
+        </StackPanel>
+    </DataTemplate>
+</ResourceDictionary>

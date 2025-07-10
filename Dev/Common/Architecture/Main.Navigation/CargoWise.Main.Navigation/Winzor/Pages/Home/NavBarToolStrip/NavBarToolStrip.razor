@@ -1,0 +1,30 @@
+@using CargoWiseNext.Blazor.Components
+@namespace CargoWise.Main.Navigation.Pages
+@inherits CwnComponentBase
+
+<CwnButtonGroup Class="cwn-navbar__toolstrip" Variant="@(Variant.Text)">
+	@if (Service?.PopupMenus is not null)
+	{
+		foreach (var popupMenu in Service.PopupMenus)
+		{
+			<CwnList Class="cwn-menu">
+				<CwnListItem Class="dropdown">
+                    <CwnButton Class="cwn-navbar__toolstrip-btn"
+					           StartIcon="@GetStripIcon(popupMenu)"
+					           IconSize="@(Size.Large)">
+						@GetStripTitle(popupMenu)
+					</CwnButton>
+					@if (popupMenu.SubMenuItems.Count > 0)
+					{
+						<CwnList Class="cwn-submenu">
+							@foreach (var submenu in popupMenu.SubMenuItems)
+							{
+								<NavBarMenuItem Item="submenu"></NavBarMenuItem>
+							}
+						</CwnList>
+					}
+				</CwnListItem>
+			</CwnList>
+		}
+	}
+</CwnButtonGroup>

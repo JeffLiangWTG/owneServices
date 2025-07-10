@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+	<DataSet Name="TrialBalanceOverviewDataset">
+		<Query>
+			<DataSourceReference>FinanceModel</DataSourceReference>
+			<DataSetParameters>
+				<DataSetParameter Name="Company">
+					<DefaultValue>[ZBI] ANOTHER BI TESTING COMPANY</DefaultValue>
+					<ReadOnly>false</ReadOnly>
+					<Nullable>false</Nullable>
+					<OmitFromQuery>false</OmitFromQuery>
+					<rd:UserDefined>true</rd:UserDefined>
+					<rd:DbType>String</rd:DbType>
+				</DataSetParameter>
+				<DataSetParameter Name="ShowZeroBalance">
+					<DefaultValue>No</DefaultValue>
+					<ReadOnly>false</ReadOnly>
+					<Nullable>false</Nullable>
+					<OmitFromQuery>false</OmitFromQuery>
+					<rd:UserDefined>true</rd:UserDefined>
+					<rd:DbType>String</rd:DbType>
+				</DataSetParameter>
+				<DataSetParameter Name="PresentationJournal">
+					<DefaultValue>None</DefaultValue>
+					<ReadOnly>false</ReadOnly>
+					<Nullable>false</Nullable>
+					<OmitFromQuery>false</OmitFromQuery>
+					<rd:UserDefined>true</rd:UserDefined>
+					<rd:DbType>String</rd:DbType>
+				</DataSetParameter>
+				<DataSetParameter Name="Language">
+					<DefaultValue>English</DefaultValue>
+					<ReadOnly>false</ReadOnly>
+					<Nullable>false</Nullable>
+					<OmitFromQuery>false</OmitFromQuery>
+					<rd:UserDefined>true</rd:UserDefined>
+					<rd:DbType>String</rd:DbType>
+				</DataSetParameter>
+				<DataSetParameter Name="StartPeriod">
+					<DefaultValue>200101</DefaultValue>
+					<ReadOnly>false</ReadOnly>
+					<Nullable>false</Nullable>
+					<OmitFromQuery>false</OmitFromQuery>
+					<rd:UserDefined>true</rd:UserDefined>
+					<rd:DbType>String</rd:DbType>
+				</DataSetParameter>
+				<DataSetParameter Name="EndPeriod">
+					<DefaultValue>202308</DefaultValue>
+					<ReadOnly>false</ReadOnly>
+					<Nullable>false</Nullable>
+					<OmitFromQuery>false</OmitFromQuery>
+					<rd:UserDefined>true</rd:UserDefined>
+					<rd:DbType>String</rd:DbType>
+				</DataSetParameter>
+			</DataSetParameters>
+			<CommandText>
+				//DAX Query
+				DEFINE
+				MEASURE 'Report Measures'[Name] =
+				(/* USER DAX BEGIN */
+				//Account name
+				var translationKey =
+				SWITCH(
+				TRUE(),
+				ISFILTERED(GLAccount[Level 1]) &amp;&amp; ISFILTERED(GLAccount[Level 2]) &amp;&amp; ISFILTERED(GLAccount[Level 3]), VALUES(GLAccount[Translation Key]),
+				ISFILTERED(GLAccount[Level 1]) &amp;&amp; ISFILTERED(GLAccount[Level 2]),CALCULATE(FIRSTNONBLANK(GLAccount[Translation Key],TRUE()),FILTER(GLAccount,GLAccount[Account No.]=GLAccount[Level 2])),
+				CALCULATE(FIRSTNONBLANK(GLAccount[Translation Key],TRUE()),FILTER(GLAccount,GLAccount[Account No.]=GLAccount[Level 1]))
+				)
+				VAR translation = CALCULATE(
+				FIRSTNONBLANK('Translation Lookup'[Translation Text],TRUE()),
+				FILTER('Translation Lookup','Translation Lookup'[Translation Key]=translationKey))
+				return
+				SWITCH (
+				TRUE(),
+				COUNTROWS(VALUES(GLAccount[Level 1]))&gt;1 , BLANK(),
+				[Actual Closing Credit]+[Actual Closing Debit]+[Actual Period  Credit]+[Actual Period  Debit]+[Budget Closing Credit]+[Budget Closing Debit]+[Budget Period  Credit]+[Budget Period  Debit]&lt;&gt;0,translation,
+				OR(OR([Closing Credit]=0,[Closing Debit]=0),[Closing Debit]=[Closing Credit]) &amp;&amp; VALUES('Include Zero Balance'[Include Zero Balance])="Yes",translation)
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[Actual Closing Credit] =
+				(/* USER DAX BEGIN */
+
+				var x = [__Actual Closing Debit] - [__Actual Closing Credit]
+				return IF([__IsTotalRow],SUMX(FILTER(GLAccount,GLAccount[Account Type]&lt;&gt;"NTE"),var cr= [__Actual Closing Credit] var db = [__Actual Closing Debit] return IF(cr-db&gt;0,cr-db)),IF(x&lt;0,-x))
+
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[__Actual Closing Debit] =
+				(/* USER DAX BEGIN */
+
+				VAR __accType = SWITCH(
+				TRUE(),
+				ISFILTERED(GLAccount[Level 1]) &amp;&amp; ISFILTERED(GLAccount[Level 2]) &amp;&amp; ISFILTERED(GLAccount[Level 3]), VALUES(GLAccount[Account Type]),
+				ISFILTERED(GLAccount[Level 1]) &amp;&amp; ISFILTERED(GLAccount[Level 2]),CALCULATE(FIRSTNONBLANK(GLAccount[Account Type],TRUE()),FILTER(GLAccount,GLAccount[Account No.]=GLAccount[Level 2])),
+				CALCULATE(FIRSTNONBLANK(GLAccount[Account Type],TRUE()),FILTER(GLAccount,GLAccount[Account No.]=GLAccount[Level 1]))
+				)
+				VAR mn =    IF( __accType = "BSH", 190001, MAX ( 'Period Management'[Current Year Begin Period] ))
+				VAR mx =    MAX ( 'Period'[Period] )
+				RETURN
+				SWITCH (
+				TRUE (),
+				FIRSTNONBLANK(GLAccount[IsAppropriationAccount],1)=1,
+				CALCULATE ([Current Debit],
+				FILTER ( ALL ( Period[Period] ), Period[Period] &lt; MAX ( 'Period Management'[Current Year Begin Period] ) ),Filter(All(GLAccount),GLAccount[Account Type]="P&amp;L")),
+				LEN(VALUES('Presentation Journal'[Code] ))=0,
+				CALCULATE (
+				[Current Debit],FILTER (
+				ALL (
+				GLTransaction[Mapped  GLAccount Key]
+				),
+				IF( [__IsCFXAccountForCurrentCompany]= 0, GLTransaction[Mapped  GLAccount Key]&lt;&gt;-1, 1) ),
+				FILTER(ALL(Period), Period[Period]&gt;= mn &amp;&amp; Period[Period] &lt;= mx)
+				),
+				IF( [__IsCFXAccountForCurrentCompany]= 0,
+				CALCULATE (
+				[Current Debit],
+				FILTER ( ALL ( Period[Period] ), Period[Period] &gt;= mn &amp;&amp; Period[Period] &lt;= mx ),
+				FILTER (
+				ALL (
+				GLTransaction[Transaction Category],
+				GLTransaction[Transaction Type],
+				GLTransaction[Mapped  GLAccount Key]
+				),
+				GLTransaction[Mapped  GLAccount Key]&lt;&gt;-1 &amp;&amp;
+				(
+				((  GLTransaction[Transaction Type]="AJL"||
+				GLTransaction[Transaction Type]="RJL"||
+				GLTransaction[Transaction Type]="GJL" )
+				&amp;&amp; (SEARCH ( GLTransaction[Transaction Category], FIRSTNONBLANK ('Presentation Journal'[Code],1),,0) &gt; 0 ||
+				GLTransaction[Transaction Category] = ""))
+				||
+				(GLTransaction[Transaction Type]&lt;&gt;"AJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"RJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"GJL"))
+				)),
+				CALCULATE (
+				[Current Debit],
+				FILTER ( ALL ( Period[Period] ), Period[Period] &gt;= mn &amp;&amp; Period[Period] &lt;= mx ),
+				FILTER (
+				ALL (
+				GLTransaction[Transaction Category],
+				GLTransaction[Transaction Type],
+				GLTransaction[Mapped  GLAccount Key]
+				),
+				(
+				((  GLTransaction[Transaction Type]="AJL"||
+				GLTransaction[Transaction Type]="RJL"||
+				GLTransaction[Transaction Type]="GJL" )
+				&amp;&amp; (SEARCH ( GLTransaction[Transaction Category], FIRSTNONBLANK ('Presentation Journal'[Code],1),,0) &gt; 0 ||
+				GLTransaction[Transaction Category] = ""))
+				||
+				(GLTransaction[Transaction Type]&lt;&gt;"AJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"RJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"GJL"))
+				))
+				)
+				)
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[__IsCFXAccountForCurrentCompany] =
+				(/* USER DAX BEGIN */
+
+				COUNTROWS (
+				FILTER (
+				'ControllingAccount ReportSubCode Mapping',
+				'ControllingAccount ReportSubCode Mapping'[Report SubCode] = "*JC*JNL*CFX*"
+				&amp;&amp; 'ControllingAccount ReportSubCode Mapping'[Controlling Account Key] = [__Acckey]
+				&amp;&amp; (  ISBLANK('ControllingAccount ReportSubCode Mapping'[Company Key]) ||  'ControllingAccount ReportSubCode Mapping'[Company Key]
+				= FIRSTNONBLANK ( VALUES ( 'Company Branch'[Company Key] ), 1 ))
+				)
+
+				)
+
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[__Acckey] =
+				(/* USER DAX BEGIN */
+
+				SWITCH (
+				TRUE (),
+				ISFILTERED ( GLAccount[Level 1] ) &amp;&amp; ISFILTERED ( GLAccount[Level 2] )
+				&amp;&amp; ISFILTERED ( GLAccount[Level 3] ), VALUES ( GLAccount[Account Key] ),
+				ISFILTERED ( GLAccount[Level 1] ) &amp;&amp; ISFILTERED ( GLAccount[Level 2] ),
+				CALCULATE (
+				FIRSTNONBLANK ( GLAccount[Account Key], TRUE () ),
+				FILTER ( GLAccount, GLAccount[Account No.] = GLAccount[Level 2] )
+				),
+				CALCULATE (
+				FIRSTNONBLANK ( GLAccount[Account Key], TRUE () ),
+				FILTER ( GLAccount, GLAccount[Account No.] = GLAccount[Level 1] )
+				)
+				)
+
+
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[__Actual Closing Credit] =
+				(/* USER DAX BEGIN */
+
+				VAR __accType = SWITCH(
+				TRUE(),
+				ISFILTERED(GLAccount[Level 1]) &amp;&amp; ISFILTERED(GLAccount[Level 2]) &amp;&amp; ISFILTERED(GLAccount[Level 3]), VALUES(GLAccount[Account Type]),
+				ISFILTERED(GLAccount[Level 1]) &amp;&amp; ISFILTERED(GLAccount[Level 2]),CALCULATE(FIRSTNONBLANK(GLAccount[Account Type],TRUE()),FILTER(GLAccount,GLAccount[Account No.]=GLAccount[Level 2])),
+				CALCULATE(FIRSTNONBLANK(GLAccount[Account Type],TRUE()),FILTER(GLAccount,GLAccount[Account No.]=GLAccount[Level 1]))
+				)
+				VAR mn =    IF( __accType = "BSH", 190001, MAX ( 'Period Management'[Current Year Begin Period] ))
+				VAR mx =    MAX ( 'Period'[Period] )
+				RETURN
+				SWITCH (
+				TRUE (),
+				FIRSTNONBLANK(GLAccount[IsAppropriationAccount],1)=1,
+				CALCULATE ([Current Credit],
+				FILTER ( ALL ( Period[Period] ), Period[Period] &lt; MAX ( 'Period Management'[Current Year Begin Period] ) ),Filter(All(GLAccount),GLAccount[Account Type]="P&amp;L")),
+				LEN(VALUES('Presentation Journal'[Code] ))=0,
+				CALCULATE (
+				[Current Credit],
+				FILTER (
+				ALL (
+				GLTransaction[Mapped  GLAccount Key]
+				),
+				IF( [__IsCFXAccountForCurrentCompany]= 0, GLTransaction[Mapped  GLAccount Key]&lt;&gt;-1, 1) ),
+				FILTER(ALL(Period),
+				Period[Period]&gt;= mn &amp;&amp;
+				Period[Period] &lt;= mx)
+				),
+				IF( [__IsCFXAccountForCurrentCompany]= 0,
+				CALCULATE (
+				[Current Credit],
+				FILTER ( ALL ( Period[Period] ), Period[Period] &gt;= mn &amp;&amp; Period[Period] &lt;= mx ),
+				FILTER (
+				ALL (
+				GLTransaction[Transaction Category],
+				GLTransaction[Transaction Type],
+				GLTransaction[Mapped  GLAccount Key]
+				),
+				GLTransaction[Mapped  GLAccount Key]&lt;&gt;-1 &amp;&amp;
+				(
+				((  GLTransaction[Transaction Type]="AJL"||
+				GLTransaction[Transaction Type]="RJL"||
+				GLTransaction[Transaction Type]="GJL" )
+				&amp;&amp; (SEARCH ( GLTransaction[Transaction Category], FIRSTNONBLANK ('Presentation Journal'[Code],1),,0) &gt; 0 ||
+				GLTransaction[Transaction Category] = ""))
+				||
+				(GLTransaction[Transaction Type]&lt;&gt;"AJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"RJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"GJL"))
+				)
+				),
+				CALCULATE (
+				[Current Credit],
+				FILTER ( ALL ( Period[Period] ), Period[Period] &gt;= mn &amp;&amp; Period[Period] &lt;= mx ),
+				FILTER (
+				ALL (
+				GLTransaction[Transaction Category],
+				GLTransaction[Transaction Type],
+				GLTransaction[Mapped  GLAccount Key]
+				),
+				(
+				((  GLTransaction[Transaction Type]="AJL"||
+				GLTransaction[Transaction Type]="RJL"||
+				GLTransaction[Transaction Type]="GJL" )
+				&amp;&amp; (SEARCH ( GLTransaction[Transaction Category], FIRSTNONBLANK ('Presentation Journal'[Code],1),,0) &gt; 0 ||
+				GLTransaction[Transaction Category] = ""))
+				||
+				(GLTransaction[Transaction Type]&lt;&gt;"AJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"RJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"GJL"))
+				))
+				))
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[__IsTotalRow] =
+				(/* USER DAX BEGIN */
+				COUNTROWS(VALUES(GLAccount[Level 1]))&gt;1
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[Actual Closing Debit] =
+				(/* USER DAX BEGIN */
+
+				var x = [__Actual Closing Debit] - [__Actual Closing Credit]
+				return IF([__IsTotalRow],SUMX(FILTER(GLAccount,GLAccount[Account Type]&lt;&gt;"NTE"),var cr= [__Actual Closing Credit] var db = [__Actual Closing Debit] return IF(db-cr&gt;0,db-cr)),IF(x&gt;0,x))
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[Actual Period  Credit] =
+				(/* USER DAX BEGIN */
+
+				var x = [__Actual Period Debit] - [__Actual Period Credit]
+				return IF([__IsTotalRow],SUMX(FILTER(GLAccount,GLAccount[Account Type]&lt;&gt;"NTE"),var cr= [__Actual Period Credit] var db = [__Actual Period Debit] return IF(cr-db&gt;0,cr-db)),IF(x&lt;0,-x))
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[__Actual Period Debit] =
+				(/* USER DAX BEGIN */
+				SWITCH (
+				TRUE (),
+				LEN(VALUES('Presentation Journal'[Code] ))=0, IF( [__IsCFXAccountForCurrentCompany]= 0, CALCULATE([Current Debit], GLTransaction[Mapped  GLAccount Key]&lt;&gt;-1), [Current Debit]),
+				IF( [__IsCFXAccountForCurrentCompany]= 0,
+				CALCULATE (
+				[Current Debit],
+				FILTER (
+				ALL (
+				GLTransaction[Transaction Category],
+				GLTransaction[Transaction Type],
+				GLTransaction[Mapped  GLAccount Key]
+				),
+				GLTransaction[Mapped  GLAccount Key]&lt;&gt;-1 &amp;&amp;
+				(
+				((  GLTransaction[Transaction Type]="AJL"||
+				GLTransaction[Transaction Type]="RJL"||
+				GLTransaction[Transaction Type]="GJL" )
+				&amp;&amp; (SEARCH ( GLTransaction[Transaction Category], FIRSTNONBLANK ('Presentation Journal'[Code],1),,0) &gt; 0 ||
+				GLTransaction[Transaction Category] = ""))
+				||
+				(GLTransaction[Transaction Type]&lt;&gt;"AJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"RJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"GJL"))
+
+				)
+				),
+				CALCULATE (
+				[Current Debit],
+				FILTER (
+				ALL (
+				GLTransaction[Transaction Category],
+				GLTransaction[Transaction Type],
+				GLTransaction[Mapped  GLAccount Key]
+				),
+				(
+				((  GLTransaction[Transaction Type]="AJL"||
+				GLTransaction[Transaction Type]="RJL"||
+				GLTransaction[Transaction Type]="GJL" )
+				&amp;&amp; (SEARCH ( GLTransaction[Transaction Category], FIRSTNONBLANK ('Presentation Journal'[Code],1),,0) &gt; 0 ||
+				GLTransaction[Transaction Category] = ""))
+				||
+				(GLTransaction[Transaction Type]&lt;&gt;"AJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"RJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"GJL"))
+				)
+				))  )
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[__Actual Period Credit] =
+				(/* USER DAX BEGIN */
+				SWITCH (
+				TRUE (),
+				LEN(VALUES('Presentation Journal'[Code] ))=0, IF( [__IsCFXAccountForCurrentCompany]= 0, CALCULATE([Current Credit], GLTransaction[Mapped  GLAccount Key]&lt;&gt;-1), [Current Credit]),
+				IF( [__IsCFXAccountForCurrentCompany]= 0,
+				CALCULATE (
+				[Current Credit],
+				FILTER (
+				ALL (
+				GLTransaction[Transaction Category],
+				GLTransaction[Transaction Type] ,
+				GLTransaction[Mapped  GLAccount Key]
+				),
+				GLTransaction[Mapped  GLAccount Key]&lt;&gt;-1 &amp;&amp;
+				(
+				((  GLTransaction[Transaction Type]="AJL"||
+				GLTransaction[Transaction Type]="RJL"||
+				GLTransaction[Transaction Type]="GJL" )
+				&amp;&amp; (SEARCH ( GLTransaction[Transaction Category], FIRSTNONBLANK ('Presentation Journal'[Code],1),,0) &gt; 0 ||
+				GLTransaction[Transaction Category] = ""))
+				||
+				(GLTransaction[Transaction Type]&lt;&gt;"AJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"RJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"GJL"))
+				)),
+				CALCULATE (
+				[Current Credit],
+				FILTER (
+				ALL (
+				GLTransaction[Transaction Category],
+				GLTransaction[Transaction Type] ,
+				GLTransaction[Mapped  GLAccount Key]
+				),
+				(
+				((  GLTransaction[Transaction Type]="AJL"||
+				GLTransaction[Transaction Type]="RJL"||
+				GLTransaction[Transaction Type]="GJL" )
+				&amp;&amp; (SEARCH ( GLTransaction[Transaction Category], FIRSTNONBLANK ('Presentation Journal'[Code],1),,0) &gt; 0 ||
+				GLTransaction[Transaction Category] = ""))
+				||
+				(GLTransaction[Transaction Type]&lt;&gt;"AJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"RJL"&amp;&amp;
+				GLTransaction[Transaction Type]&lt;&gt;"GJL"))
+				)))
+				)
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[Actual Period  Debit] =
+				(/* USER DAX BEGIN */
+
+				var x = [__Actual Period Debit] - [__Actual Period Credit]
+				return IF([__IsTotalRow],SUMX(FILTER(GLAccount,GLAccount[Account Type]&lt;&gt;"NTE"),var cr= [__Actual Period Credit] var db = [__Actual Period Debit] return IF(db-cr&gt;0,db-cr)),IF(x&gt;0,x))
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[Budget Period  Credit] =
+				(/* USER DAX BEGIN */
+
+				var x = [__Budget Period Debit] - [__Budget Period Credit]
+				return IF(x&lt;0,-x)
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[__Budget Period Debit] =
+				(/* USER DAX BEGIN */
+				GLBudget[Budget Period Range Current Debit]
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[__Budget Period Credit] =
+				(/* USER DAX BEGIN */
+				[Budget Period Range Current Credit]
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[Budget Period  Debit] =
+				(/* USER DAX BEGIN */
+
+				var x = [__Budget Period Debit] - [__Budget Period Credit]
+				return IF(x&gt;0,x)
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[Type ] =
+				(/* USER DAX BEGIN */
+				//Account Type
+				var __accType = SWITCH(
+				TRUE(),
+				ISFILTERED(GLAccount[Level 1]) &amp;&amp; ISFILTERED(GLAccount[Level 2]) &amp;&amp; ISFILTERED(GLAccount[Level 3]), VALUES(GLAccount[Account Type]),
+				ISFILTERED(GLAccount[Level 1]) &amp;&amp; ISFILTERED(GLAccount[Level 2]),CALCULATE(FIRSTNONBLANK(GLAccount[Account Type],TRUE()),FILTER(GLAccount,GLAccount[Account No.]=GLAccount[Level 2])),
+				CALCULATE(FIRSTNONBLANK(GLAccount[Account Type],TRUE()),FILTER(GLAccount,GLAccount[Account No.]=GLAccount[Level 1]))
+				)
+				return
+				SWITCH (
+				TRUE(),
+				COUNTROWS(VALUES(GLAccount[Level 1]))&gt;1 , BLANK(),
+				[Actual Closing Credit]+[Actual Closing Debit]+[Actual Period  Credit]+[Actual Period  Debit]+[Budget Closing Credit]+[Budget Closing Debit]+[Budget Period  Credit]+[Budget Period  Debit]&lt;&gt;0,__accType,
+				OR(OR([Closing Credit]=0,[Closing Debit]=0),[Closing Debit]=[Closing Credit])  &amp;&amp;  VALUES('Include Zero Balance'[Include Zero Balance])="Yes",__accType)
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[Budget Closing Debit ] =
+				(/* USER DAX BEGIN */
+
+				var x = [__Budget Closing Debit] - [__Budget Closing Credit]
+				return IF(x&gt;0,x)
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[__Budget Closing Debit] =
+				(/* USER DAX BEGIN */
+				GLBudget[Budget Closing Debit]
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[__Budget Closing Credit] =
+				(/* USER DAX BEGIN */
+				GLBudget[Budget Closing Credit]
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[Budget Closing Credit ] =
+				(/* USER DAX BEGIN */
+
+				var x = [__Budget Closing Debit] - [__Budget Closing Credit]
+				return IF(x&lt;0,-x)
+				/* USER DAX END */)
+
+				MEASURE 'Report Measures'[Unit] =
+				(/* USER DAX BEGIN */
+				//Account Type
+				var __accUnit = SWITCH(
+				TRUE(),
+				ISFILTERED(GLAccount[Level 1]) &amp;&amp; ISFILTERED(GLAccount[Level 2]) &amp;&amp; ISFILTERED(GLAccount[Level 3]), VALUES(GLAccount[Units]),
+				ISFILTERED(GLAccount[Level 1]) &amp;&amp; ISFILTERED(GLAccount[Level 2]),CALCULATE(FIRSTNONBLANK(GLAccount[Units],TRUE()),FILTER(GLAccount,GLAccount[Account No.]=GLAccount[Level 2])),
+				CALCULATE(FIRSTNONBLANK(GLAccount[Units],TRUE()),FILTER(GLAccount,GLAccount[Account No.]=GLAccount[Level 1]))
+				)
+				return
+				SWITCH (
+				TRUE(),
+				COUNTROWS(VALUES(GLAccount[Level 1]))&gt;1 , BLANK(),
+				[Actual Closing Credit]+[Actual Closing Debit]+[Actual Period  Credit]+[Actual Period  Debit]+[Budget Closing Credit]+[Budget Closing Debit]+[Budget Period  Credit]+[Budget Period  Debit]&lt;&gt;0,__accUnit,
+				OR(OR([Closing Credit]=0,[Closing Debit]=0),[Closing Debit]=[Closing Credit])  &amp;&amp;  VALUES('Include Zero Balance'[Include Zero Balance])="Yes",__accUnit)
+				/* USER DAX END */)
+
+				VAR __DS0FilterTable =
+				FILTER(
+				KEEPFILTERS(VALUES('GLAccount'[Level 1])),
+				NOT(ISBLANK('GLAccount'[Level 1]))
+				)
+
+				VAR __DS0FilterTable2 =
+				FILTER(
+				KEEPFILTERS(VALUES('Period'[Period])),
+				AND('Period'[Period] &gt;= VALUE(@StartPeriod), 'Period'[Period] &lt;= VALUE(@EndPeriod))
+				)
+
+				VAR __DS0FilterTable3 =
+				FILTER(KEEPFILTERS(VALUES('Language'[Description])), 'Language'[Description] = @Language)
+
+				VAR __DS0FilterTable4 =
+				FILTER(
+				KEEPFILTERS(VALUES('Presentation Journal'[Code])),
+				'Presentation Journal'[Code] = @PresentationJournal
+				)
+
+				VAR __DS0FilterTable5 =
+				FILTER(
+				KEEPFILTERS(VALUES('Include Zero Balance'[Include Zero Balance])),
+				'Include Zero Balance'[Include Zero Balance] = @ShowZeroBalance
+
+				)
+
+				VAR __DS0FilterTable6 =
+				FILTER(
+				KEEPFILTERS(VALUES('Company Branch'[Company])),
+				'Company Branch'[Company] = @Company
+				)
+
+				VAR __DS0Core =
+				SUMMARIZECOLUMNS(
+				ROLLUPADDISSUBTOTAL(
+				'GLAccount'[Level 1], "IsGrandTotalRowTotal",
+				'GLAccount'[Level 2], "IsDM1Total",
+				'GLAccount'[Level 3], "IsDM3Total"
+				),
+				__DS0FilterTable,
+				__DS0FilterTable2,
+				__DS0FilterTable3,
+				__DS0FilterTable4,
+				__DS0FilterTable5,
+				__DS0FilterTable6,
+				"Name", 'Report Measures'[Name],
+				"Type ", 'Report Measures'[Type ],
+				"Actual Period  Debit", 'Report Measures'[Actual Period  Debit],
+				"Actual Period  Credit", 'Report Measures'[Actual Period  Credit],
+				"Actual Closing Debit", 'Report Measures'[Actual Closing Debit],
+				"Actual Closing Credit", 'Report Measures'[Actual Closing Credit],
+				"Budget Period  Debit", 'Report Measures'[Budget Period  Debit],
+				"Budget Period  Credit", 'Report Measures'[Budget Period  Credit],
+				"Budget Closing Debit ", 'Report Measures'[Budget Closing Debit ],
+				"Budget Closing Credit ", 'Report Measures'[Budget Closing Credit ],
+				"Unit", 'Report Measures'[Unit]
+				)
+
+				VAR __DS0PrimaryWindowed =
+				TOPN(
+				1000000,
+				__DS0Core,
+				[IsGrandTotalRowTotal],
+				0,
+				'GLAccount'[Level 1],
+				1,
+				[IsDM1Total],
+				0,
+				'GLAccount'[Level 2],
+				1,
+				[IsDM3Total],
+				0,
+				'GLAccount'[Level 3],
+				1
+				)
+
+				EVALUATE
+				__DS0PrimaryWindowed
+
+				ORDER BY
+				[IsGrandTotalRowTotal] DESC,
+				'GLAccount'[Level 1],
+				[IsDM1Total] DESC,
+				'GLAccount'[Level 2],
+				[IsDM3Total] DESC,
+				'GLAccount'[Level 3]
+			</CommandText>
+		</Query>
+		<Fields>
+			<Field Name="GLAccount_Level_1_">
+				<DataField>GLAccount[Level 1]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GLAccount_Level_2_">
+				<DataField>GLAccount[Level 2]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GLAccount_Level_3_">
+				<DataField>GLAccount[Level 3]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="ID_IsGrandTotalRowTotal_">
+				<DataField>[IsGrandTotalRowTotal]</DataField>
+				<rd:TypeName>System.Boolean</rd:TypeName>
+			</Field>
+			<Field Name="ID_IsDM1Total_">
+				<DataField>[IsDM1Total]</DataField>
+				<rd:TypeName>System.Boolean</rd:TypeName>
+			</Field>
+			<Field Name="ID_IsDM3Total_">
+				<DataField>[IsDM3Total]</DataField>
+				<rd:TypeName>System.Boolean</rd:TypeName>
+			</Field>
+			<Field Name="ID_Name_">
+				<DataField>[Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="ID_Type__">
+				<DataField>[Type ]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="ID_Actual_Period__Debit_">
+				<DataField>[Actual Period  Debit]</DataField>
+				<rd:TypeName>System.Double</rd:TypeName>
+			</Field>
+			<Field Name="ID_Actual_Period__Credit_">
+				<DataField>[Actual Period  Credit]</DataField>
+				<rd:TypeName>System.Double</rd:TypeName>
+			</Field>
+			<Field Name="ID_Actual_Closing_Debit_">
+				<DataField>[Actual Closing Debit]</DataField>
+				<rd:TypeName>System.Double</rd:TypeName>
+			</Field>
+			<Field Name="ID_Actual_Closing_Credit_">
+				<DataField>[Actual Closing Credit]</DataField>
+				<rd:TypeName>System.Double</rd:TypeName>
+			</Field>
+			<Field Name="ID_Budget_Period__Debit_">
+				<DataField>[Budget Period  Debit]</DataField>
+				<rd:TypeName>System.Decimal</rd:TypeName>
+			</Field>
+			<Field Name="ID_Budget_Period__Credit_">
+				<DataField>[Budget Period  Credit]</DataField>
+				<rd:TypeName>System.Decimal</rd:TypeName>
+			</Field>
+			<Field Name="ID_Budget_Closing_Debit__">
+				<DataField>[Budget Closing Debit ]</DataField>
+				<rd:TypeName>System.Decimal</rd:TypeName>
+			</Field>
+			<Field Name="ID_Budget_Closing_Credit__">
+				<DataField>[Budget Closing Credit ]</DataField>
+				<rd:TypeName>System.Decimal</rd:TypeName>
+			</Field>
+			<Field Name="ID_Unit_">
+				<DataField>[Unit]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+		</Fields>
+	</DataSet>
+</SharedDataSet>

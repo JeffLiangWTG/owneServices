@@ -1,0 +1,36 @@
+meta {
+  name: PickupPostcode for CTZ calculator
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.RateParties = RatesAPIsHelper.GetRateParties();
+   
+    Requirement: setup client rate / costing in CW1 matching the below request values to have rates
+    Transport zone settings to be used in CTZ calculator
+   query.PickupPostcode = "2005"
+   query.Origin.Value = "AUSYD"  default is AUSYD
+   query.Destination.Value = "AUMEL"  default is USLAX
+   query.TransportMode = "AIR"  default is SEA
+   query.ContainerMode = "LSE"  default is FCL
+   
+    autorating log may contain
+    Matched 'SYD' for RateLine ECCLR-CTZ-KG-Client Rate ITISYS
+     - Pickup Distance: empty
+     - Distance Calculation Service: empty (registry disabled)
+     - Lat/Long Postcode Distance: empty (Consignor Pickup Address to CTO/Wharf)
+     - No transport zone could be matched by distance (0)
+     - 'SYD' transport zone matched by Consignor Pickup/Delivery Address fallback
+   
+   req.setBody(query);
+}

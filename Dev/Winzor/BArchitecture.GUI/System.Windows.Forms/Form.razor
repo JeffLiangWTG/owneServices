@@ -1,0 +1,24 @@
+@namespace System.Windows.Forms
+@using WinzorFramework
+@using WinzorFramework.Extensions
+@inherits ContainerControl
+
+<PageTitle>@WindowText</PageTitle>
+<div class="form @ClassName" style="@FormStyleString" @attributes="DataAttributes" ondrop="window.form.dragFileUpload(event)" ondragover="event.preventDefault();window.trackWinzorDragEndPosition(event);" ondragend="window.fireWinzorDragEnd(event)"
+    @ref=ElementReference tabindex="-1" >
+    @if (@RenderSizeGrip())
+    {
+        <div class="sizing-grip"></div>
+    }
+    <PortalProvider>
+        @RenderControls()
+        <PortalOutlet></PortalOutlet>
+    </PortalProvider>
+</div>
+<NotRespondingOverlayComponent @ref="NotRespondingOverlay" />
+
+@code {
+    string FormStyleString => $"position:absolute;{ScrollStyleString}{SizeStyleString}{LookStyleString}{ControlStyleExtension.MnemonicStyleVars(showMnemonicKeys)}{Cursor.CursorStyleVars()}";
+
+    string SizeStyleString => $"width:{ClientSize.Width}px;height:{ClientSize.Height}px;";
+}

@@ -1,0 +1,30 @@
+meta {
+  name: Type is mandatory when the Value is specified
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/intercompanytariffs/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForIntercompanyTariffs();
+   query.RateOrigin = { Value: "IN" };
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Type is mandatory when the Value is specified.", function() {
+    expect(res.body.ModelState['RateOrigin.Type'][0]).to.equal("Type is mandatory when the Value is specified.");
+  });
+  
+}

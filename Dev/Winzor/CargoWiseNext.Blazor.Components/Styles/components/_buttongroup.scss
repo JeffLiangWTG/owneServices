@@ -1,0 +1,112 @@
+@import '../abstracts/variables';
+@import '../abstracts/mixins';
+
+.cwn-button-group {
+	display: inline-flex;
+}
+
+.cwn-button-group--vertical {
+	flex-direction: column;
+}
+
+.cwn-button-group--outlined.cwn-button-group--override-styles {
+	.cwn-button {
+		padding: 5px 15px;
+		border: 1px solid var(--s-palette-text-primary);
+	}
+
+	@each $color in $palette-colors {
+		&.cwn-button-group--#{$color} .cwn-button {
+			color: var(--s-palette-#{$color});
+			border: 1px solid var(--s-palette-#{$color});
+
+			@media(hover: hover) and (pointer: fine) {
+				&:hover {
+					background-color: var(--s-palette-#{$color}-hover);
+				}
+			}
+
+			&:focus-visible, &:active {
+				background-color: var(--s-palette-#{$color}-hover);
+			}
+		}
+	}
+}
+
+.cwn-button-group--filled {
+	box-shadow: var(--s-elevation-2);
+
+	.cwn-button {
+		box-shadow: none;
+
+		@media(hover: hover) and (pointer: fine) {
+			&:hover {
+				box-shadow: var(--s-elevation-4);
+			}
+		}
+
+		&:focus-visible, &:active {
+			box-shadow: var(--s-elevation-4);
+		}
+	}
+
+	&.cwn-button-group--override-styles {
+		.cwn-button {
+			padding: 6px 16px;
+		}
+
+		&.cwn-button-group--horizontal {
+			.cwn-button:not(:first-child), > :not(:first-child) .cwn-button {
+				border-left: 1px solid var(--s-palette-divider);
+			}
+		}
+
+		&.cwn-button-group--vertical {
+			.cwn-button:not(:first-child), > :not(:first-child) .cwn-button {
+				border-top: 1px solid var(--s-palette-divider);
+			}
+		}
+
+		@each $color in $palette-colors {
+			&.cwn-button-group--#{$color} {
+				.cwn-button {
+					color: var(--s-#{$color}-txt-inv-default, var(--s-neutral-txt-inv-default));
+					background-color: var(--s-#{$color}-bg-default, var(--s-neutral-bg-default));
+
+					@media(hover: hover) and (pointer: fine) {
+						&:hover {
+							color: var(--s-#{$color}-txt-inv-hover, var(--s-neutral-txt-inv-hover));
+							background-color: var(--s-#{$color}-bg-hover, var(--s-neutral-bg-hover));
+						}
+					}
+
+					&:focus-visible, &:active {
+						color: var(--s-#{$color}-txt-inv-active, var(--s-neutral-txt-inv-active));
+						background-color: var(--s-#{$color}-bg-active, var(--s-neutral-bg-active));
+					}
+				}
+
+				&.cwn-button-group--horizontal {
+
+					.cwn-button:not(:first-child), > :not(:first-child) .cwn-button {
+						border-left: 1px solid var(--s-palette-#{$color}-lighten);
+					}
+				}
+
+				&.cwn-button-group--vertical {
+					.cwn-button:not(:first-child), > :not(:first-child) .cwn-button {
+						border-top: 1px solid var(--s-palette-#{$color}-lighten);
+					}
+				}
+			}
+		}
+	}
+}
+
+.cwn-button-group--disable-elevation {
+	box-shadow: none;
+}
+
+.cwn-button-group--full-width {
+	@include cwn-full-width;
+}

@@ -1,0 +1,52 @@
+namespace Enterprise.Customs.IT.NCTS.GUI
+{
+	partial class DepartureDetailsUserControl
+	{
+		#region Component Designer generated code
+
+		/// <summary> 
+		/// Required method for Designer support - do not modify 
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{
+			this.LocationOfGoodsUserControl = new Enterprise.Customs.IT.GUI.LocationOfGoodsUserControl();
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).BeginInit();
+			this.LocationOfGoodsUserControl.SuspendLayout();
+			this.SuspendLayout();
+			// 
+			// BindingSource
+			// 
+			this.BindingSource.DataSourceType = typeof(Enterprise.Customs.IT.NCTS.Business.NctsHeader);
+			// 
+			// LocationOfGoodsUserControl
+			// 
+			this.LocationOfGoodsUserControl.AllowDrop = true;
+			this.BindingSource.SetBindingMember(this.LocationOfGoodsUserControl, "MovementHeader");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((Enterprise.Customs.IT.Business.ICusGoodsLocationProvider)(((Enterprise.Customs.IT.NCTS.Business.NctsHeader)(null)).MovementHeader)));
+			this.LocationOfGoodsUserControl.CusGoodsLocationProviderType = null;
+			this.LocationOfGoodsUserControl.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(3, 3, true);
+			this.LocationOfGoodsUserControl.Name = "LocationOfGoodsUserControl";
+			this.LocationOfGoodsUserControl.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(208, 21, true);
+			this.LocationOfGoodsUserControl.TabIndex = 0;
+			// 
+			// DepartureDetailsUserControl
+			// 
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+			this.Controls.Add(this.LocationOfGoodsUserControl);
+			this.Name = "DepartureDetailsUserControl";
+			this.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(237, 36, true);
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).EndInit();
+			this.LocationOfGoodsUserControl.ResumeLayout(true);
+			this.LocationOfGoodsUserControl.PerformLayout();
+			this.ResumeLayout(false);
+			this.PerformLayout();
+
+		}
+
+		#endregion
+
+		internal Enterprise.Customs.IT.GUI.LocationOfGoodsUserControl LocationOfGoodsUserControl;
+	}
+}

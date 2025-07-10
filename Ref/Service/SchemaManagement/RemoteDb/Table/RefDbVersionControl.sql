@@ -1,0 +1,13 @@
+CREATE TABLE [RefDbVersionControl](
+[RVC_PK] [UNIQUEIDENTIFIER] NOT NULL CONSTRAINT [DF_RefDbVersionControl_RVC_PK] DEFAULT (NEWID()),
+[RVC_DataSet] [NVARCHAR](50) NOT NULL,  
+[RVC_LastUpdatedUtc] [DATETIME2](7) NULL, 
+[RVC_DataSetGet] [NVARCHAR](400) NOT NULL CONSTRAINT [DF_RefDbVersionControl_RVC_DataSetGet] DEFAULT '',
+[RVC_ClientID] VARCHAR(7) NOT NULL CONSTRAINT [DF_RefDbVersionControl_RVC_ClientID] DEFAULT '',
+[RVC_UpdaterVersion] [INT] NOT NULL CONSTRAINT [DF_RefDbVersionControl_RVC_UpdaterVersion] DEFAULT 1,
+
+CONSTRAINT [PK_RefDbVersionControl] PRIMARY KEY CLUSTERED( [RVC_PK] ASC )
+)
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_RefDbVersionControl_RVC_DataSet_RVC_ClientID ON RefDbVersionControl (RVC_DataSet ASC, RVC_ClientID ASC)
+GO

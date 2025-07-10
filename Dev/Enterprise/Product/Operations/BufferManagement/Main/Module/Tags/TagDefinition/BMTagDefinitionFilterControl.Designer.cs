@@ -1,0 +1,50 @@
+using CargoWise.EntityFramework;
+using Enterprise.ZArchitecture.Business;
+using Enterprise.ZArchitecture.GUI;
+
+namespace Enterprise.BufferManagement.Module
+{
+	public partial class BMTagDefinitionFilterControl
+	{
+		#region Component Designer generated code
+
+		void InitializeComponent()
+		{
+			ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo1 = new ZArchitecture.ZTextBoxColumnStyleInfo();
+			ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo2 = new ZArchitecture.ZTextBoxColumnStyleInfo();
+			((System.ComponentModel.ISupportInitialize)(this.grid)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).BeginInit();
+			this.SuspendLayout();
+			// 
+			// grid
+			// 
+			this.BindingSource.SetBindingMember(this.grid, ".");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((System.Collections.IList)(((Business.TagDefinition)(null)))));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Business.TagDefinition)(null)).TGD_Code)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Business.TagDefinition)(null)).TGD_DescriptionMultilingual)));
+			zTextBoxColumnStyleInfo1.ColumnName = "TGD_Code";
+			zTextBoxColumnStyleInfo2.ColumnName = "TGD_DescriptionMultilingual";
+			zTextBoxColumnStyleInfo2.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(660);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo1);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo2);
+			this.grid.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(736, 264, true);
+			// 
+			// BindingSource
+			// 
+			this.BindingSource.DataSourceType = typeof(Business.TagDefinition);
+			// 
+			// TagDefinitionFilterControl
+			// 
+			this.CaptionRenderingEnabled = true;
+			this.Name = "TagDefinitionFilterControl";
+			this.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(736, 416, true);
+			((System.ComponentModel.ISupportInitialize)(this.grid)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).EndInit();
+			this.ResumeLayout(false);
+			this.PerformLayout();
+		}
+
+		#endregion
+	}
+}

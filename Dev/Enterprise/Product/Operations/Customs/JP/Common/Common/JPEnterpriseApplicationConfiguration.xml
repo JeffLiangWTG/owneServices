@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<objects xmlns="http://www.springframework.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cargowise="http://www.cargowise.com/2008/spring-extensions" xsi:schemaLocation="http://www.springframework.net http://www.springframework.net/xsd/spring-objects.xsd" default-lazy-init="true">
+  <!-- Avoid using use singleton=true as this causes Spring to cache the object without the developer understanding the effects of this -->
+  <!-- The xmlns:cargowise namespace works in conjunction with LazyConfiguredApplicationContext to prevent types being loaded unnecessarily on startup -->
+  <!-- JP Manifest Business -->
+  <object id="JP.IManifestHeaderMessageProcessor" type="Enterprise.Customs.JP.Manifest.Business.MessageProcessors.ManifestNACCSMessageProcessor, Enterprise.Customs.JP.Manifest.Business" singleton="false" />
+
+  <object id="GlobalManifestApplicationBusinessProvider" type="CargoWise.Application.ListObject, CargoWise.ApplicationContext">
+    <property name="SourceList" enableParallelInit="true" isSubSet="true">
+      <list>
+        <ref object="JP.Manifest.ApplicationBusinessProvider" />
+      </list>
+    </property>
+  </object>
+  <object id="JP.Manifest.ApplicationBusinessProvider" type="Enterprise.Customs.JP.Manifest.Business.ApplicationBusinessProvider, Enterprise.Customs.JP.Manifest.Business" singleton="false" />
+  
+  <object id="JPManifest.IAsycudaManifestHeader" type="Enterprise.Customs.JP.Manifest.Business.AsycudaManifestHeader, Enterprise.Customs.JP.Manifest.Business" singleton="false" />
+  <object id="JPManifest.IAsycudaContainer" type="Enterprise.Customs.JP.Manifest.Business.AsycudaContainer, Enterprise.Customs.JP.Manifest.Business" singleton="false" />
+
+  <!-- JP Manifest GUI -->
+  <object id="GlobalManifestApplicationGuiProvider" type="CargoWise.Application.ListObject, CargoWise.ApplicationContext">
+    <property name="SourceList" isSubSet="true">
+      <list>
+        <ref object="JP.Manifest.ApplicationGUIProvider" />
+      </list>
+    </property>
+  </object>
+  <object id="JP.Manifest.ApplicationGUIProvider" type="Enterprise.Customs.JP.Manifest.GUI.ApplicationGUIProvider, Enterprise.Customs.JP.Manifest.GUI" singleton="false" />
+</objects>

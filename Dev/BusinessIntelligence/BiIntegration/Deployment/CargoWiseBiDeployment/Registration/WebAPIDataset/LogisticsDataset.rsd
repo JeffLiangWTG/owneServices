@@ -1,0 +1,2972 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+	<DataSet Name="DataSet1">
+		<Query>
+			<DataSourceReference>LogisticsModel</DataSourceReference>
+			<DataSetParameters>
+				<DataSetParameter Name="Company">
+					<DefaultValue>DAU</DefaultValue>
+					<ReadOnly>false</ReadOnly>
+					<Nullable>false</Nullable>
+					<OmitFromQuery>false</OmitFromQuery>
+					<rd:DbType>Object</rd:DbType>
+				</DataSetParameter>
+				<DataSetParameter Name="Country">
+					<DefaultValue>AU</DefaultValue>
+					<ReadOnly>false</ReadOnly>
+					<Nullable>false</Nullable>
+					<OmitFromQuery>false</OmitFromQuery>
+					<rd:DbType>Object</rd:DbType>
+				</DataSetParameter>
+				<DataSetParameter Name="StartDate">
+					<DefaultValue>2015/01/01</DefaultValue>
+					<ReadOnly>false</ReadOnly>
+					<Nullable>false</Nullable>
+					<OmitFromQuery>false</OmitFromQuery>
+					<rd:DbType>Text</rd:DbType>
+				</DataSetParameter>
+				<DataSetParameter Name="EndDate">
+					<DefaultValue>2021/12/31</DefaultValue>
+					<ReadOnly>false</ReadOnly>
+					<Nullable>false</Nullable>
+					<OmitFromQuery>false</OmitFromQuery>
+					<rd:DbType>Text</rd:DbType>
+				</DataSetParameter>
+			</DataSetParameters>
+			<CommandText>
+				// DAX Query
+				DEFINE
+				MEASURE 'Shipment'[Shipment Customs Info] =
+				(/* USER DAX BEGIN */
+				CONCATENATEX(DISTINCT('Shipment Customs Info'), 'Shipment Customs Info'[Customs Info] ,",")
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[GL Branch] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Branch],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[GL Department] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Department],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[GL Local Agent Name] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Local Agent Name],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[GL Representative Operator] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Representative Operator],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[GL Overseas Agent Code] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Overseas Agent Code],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[GL Overseas Agent Name] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Overseas Agent Name],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[GL Representative Sales] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Representative Sales],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[GL Status] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Status],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[GL Create Date] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Job Header Create Date Utc],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[GL Revenue Recognition Date] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Revenue Recognition Date],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[GL Local Agent Code] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Local Agent Code],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[Job Branch] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Branch Code],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Shipment'[Job Department] =
+				(/* USER DAX BEGIN */
+				FIRSTNONBLANK('GL Transaction'[Department Code],TRUE())
+				/* USER DAX END */)
+
+				MEASURE 'Local Agent AR Settlement'[Local Client AR Settlement Group Code] =
+				(/* USER DAX BEGIN */
+				IF (COUNTROWS('GL Transaction') &gt; 0, FIRSTNONBLANK('Local Agent AR Settlement'[Local Agent AR Settlement Related Party Code],TRUE()))
+				/* USER DAX END */)
+
+				MEASURE 'Local Agent AR Settlement'[Local Client AR Settlement Group Name] =
+				(/* USER DAX BEGIN */
+				IF (COUNTROWS('GL Transaction') &gt; 0, FIRSTNONBLANK('Local Agent AR Settlement'[Local Agent AR Settlement Related Party Name],TRUE()))
+				/* USER DAX END */)
+
+				MEASURE 'Overseas Agent AR Settlement'[Overseas Agent AR Settlement Group Code] =
+				(/* USER DAX BEGIN */
+				IF (COUNTROWS('GL Transaction') &gt; 0, FIRSTNONBLANK('Overseas Agent AR Settlement'[Overseas Agent AR Settlement Related Party Code],TRUE()))
+				/* USER DAX END */)
+
+				MEASURE 'Overseas Agent AR Settlement'[Overseas Agent AR Settlement Group Name] =
+				(/* USER DAX BEGIN */
+				IF (COUNTROWS('GL Transaction') &gt; 0, FIRSTNONBLANK('Overseas Agent AR Settlement'[Overseas Agent AR Settlement Related Party Name],TRUE()))
+				/* USER DAX END */)
+
+				VAR __DS0FilterTable =
+				FILTER(
+				KEEPFILTERS(VALUES('Shipment'[Shipment Create Date])),
+				AND(
+				'Shipment'[Shipment Create Date] &gt;= DATEVALUE(@StartDate),
+				'Shipment'[Shipment Create Date] &lt; DATEVALUE(@EndDate)
+				)
+				)
+
+				VAR __DS0FilterTable2 =
+				FILTER(
+				KEEPFILTERS(VALUES('Shipment Coload Type'[Coload Type])),
+				'Shipment Coload Type'[Coload Type] = "All Shipments"
+				)
+
+				VAR __DS0FilterTable3 =
+				FILTER(KEEPFILTERS(VALUES('Shipment'[Is Active])), 'Shipment'[Is Active] = TRUE)
+
+				VAR __DS0FilterTable4 =
+				FILTER(
+				KEEPFILTERS(VALUES('Company Branch'[Company Code])),
+				'Company Branch'[Company Code] = @Company
+				)
+
+				VAR __DS0FilterTable5 =
+				FILTER(
+				KEEPFILTERS(VALUES('Company Branch Helper'[Company Code])),
+				'Company Branch Helper'[Company Code] = @Company
+				)
+
+				VAR __DS0FilterTable6 =
+				FILTER(
+				KEEPFILTERS(VALUES('Company Country'[Country Code])),
+				'Company Country'[Country Code] = @Country
+				)
+
+				EVALUATE
+				TOPN(
+				1000000,
+				SUMMARIZECOLUMNS(
+				'Shipment'[Job Number],
+				'Shipment'[Transport Mode],
+				'Shipment'[Container Mode],
+				'Port Of Origin'[Port Of Origin Code],
+				'Port Of Origin'[Port Of Origin Country Code],
+				'Port Of Destination'[Port Of Destination Code],
+				'Port Of Destination'[Port Of Destination Country Code],
+				'Shipment'[Way Bill Number],
+				'Shipment'[Shipment Inco Term],
+				'Shipment'[Additional Terms],
+				'Shipment'[Shipment PPD CCX Term],
+				'Shipment'[Goods Description],
+				'Shipment'[Weight Unit],
+				'Shipment'[Volume Unit],
+				'Shipment'[Total No Of Packs Package Type],
+				'Shipment'[Outer Packs Package Type],
+				'Shipment'[Shipment Create Date],
+				'Shipment'[Shipment Status],
+				'Consolidation'[Job No.],
+				'Consolidation'[Master Bill No.],
+				'Service Level'[Service Level],
+				'Shipment'[Interim Receipt Number],
+				'Shipment'[Booking Confirmation Reference],
+				'Shipment'[House Bill Type],
+				'Shipment'[Is Transport Job],
+				'Shipment'[Estimated Pickup],
+				'Shipment'[Pickup Required By],
+				'Shipment'[Delivery Cartage Completed],
+				'Shipment'[Delivery Required By],
+				'Shipment'[FCL Delivery Equipment Needed],
+				'Shipment'[Estimated Delivery],
+				'Shipment'[Pickup Cartage Completed],
+				'Shipment'[FCL Pickup Equipment Needed],
+				'Shipment'[Pickup Cartage Advised],
+				'Shipment'[Chargeable Unit],
+				'Shipment'[Is Master / Lead],
+				'Shipment'[Is Brokerage],
+				'Shipment'[Coload Master],
+				'Shipment'[Container 20F],
+				'Shipment'[Container 20H],
+				'Shipment'[Container 20R],
+				'Shipment'[Container 40F],
+				'Shipment'[Container 40H],
+				'Shipment'[Container 40R],
+				'Shipment'[Container 45F],
+				'Shipment'[Container GEN],
+				'Shipment'[Container Other],
+				'Discharge Port'[Discharge Port Code],
+				'Load Port'[Load Port Code],
+				'Shipment'[Is Active],
+				'Consolidation'[Coload],
+				'Shipment'[Received Date],
+				'Shipment'[Delivery Cartage Advised],
+				'Shipment'[Loading Meters],
+				'Shipment'[Arrival Date],
+				'Shipment'[Departure Date],
+				'Shipment'[Container TEU],
+				'Shipment'[Container Count],
+				'Carrier Address'[Carrier Code],
+				'Carrier Address'[Carrier Name],
+				'Receiving Agent Address'[Receiving Agent Code],
+				'Sending Agent Address'[Sending Agent Code],
+				'Consignor Address'[Consignor Code],
+				'Consignee Address'[Consignee Code],
+				'Export Broker'[Export Broker Code],
+				'Export Broker'[Export Broker Name],
+				'Import Broker'[Import Broker Code],
+				'Import Broker'[Import Broker Name],
+				'Receiving Agent Address'[Receiving Agent Name],
+				'Sending Agent Address'[Sending Agent Name],
+				'Consolidation'[First Load],
+				'Consolidation'[Last Discharge],
+				'Consolidation'[ETD First Load],
+				'Consolidation'[ETA Last Discharge],
+				'Consolidation'[First Vessel],
+				'Consolidation'[First Voyage Flight],
+				'Main Consol Shipment'[ETA Discharge],
+				'Main Consol Shipment'[ETD Load],
+				'Consolidation'[Contract No],
+				'Main Consol Shipment'[Consol ATD],
+				'Main Consol Shipment'[Consol ATA],
+				'Main Consol Shipment'[Direction],
+				'Consignor Address'[Consignor Address Name],
+				'Consignor Address'[Consignor Address City],
+				'Consignor Address'[Consignor Address State],
+				'Consignor Address'[Consignor Address Post Code],
+				'Consignee Address'[Consignee Address Name],
+				'Consignee Address'[Consignee Address City],
+				'Consignee Address'[Consignee Address State],
+				'Consignee Address'[Consignee Address Post Code],
+				'Controlling Agent Address'[Controlling Agent Code],
+				'Controlling Agent Address'[Controlling Agent Name],
+				'Controlling Customer Address'[Controlling Customer Code],
+				'Controlling Customer Address'[Controlling Customer Name],
+				__DS0FilterTable,
+				__DS0FilterTable2,
+				__DS0FilterTable3,
+				__DS0FilterTable4,
+				__DS0FilterTable5,
+				__DS0FilterTable6,
+				"Shipment_Weight", 'Shipment'[Shipment Weight],
+				"Shipment_Volume", 'Shipment'[Shipment Volume],
+				"Actual_Chargeable", 'Shipment'[Actual Chargeable],
+				"Total_No__Of_Packs", 'Shipment'[Total No. Of Packs],
+				"Shipment_Outer_Packs", 'Shipment'[Shipment Outer Packs],
+				"Shipment Customs Info", 'Shipment'[Shipment Customs Info],
+				"GL Branch", 'Shipment'[GL Branch],
+				"GL Department", 'Shipment'[GL Department],
+				"GL Local Agent Name", 'Shipment'[GL Local Agent Name],
+				"GL Representative Operator", 'Shipment'[GL Representative Operator],
+				"GL Overseas Agent Code", 'Shipment'[GL Overseas Agent Code],
+				"GL Overseas Agent Name", 'Shipment'[GL Overseas Agent Name],
+				"GL Representative Sales", 'Shipment'[GL Representative Sales],
+				"Sum_of_Revenue", 'GL Transaction'[Sum of Revenue],
+				"Sum_of_Cost", 'GL Transaction'[Sum of Cost],
+				"Sum_of_Job_Profit", 'GL Transaction'[Sum of Job Profit],
+				"Sum_of_Accrual", 'GL Transaction'[Sum of Accrual],
+				"Sum_of_Unrecognised_Cost", 'GL Transaction'[Sum of Unrecognised Cost],
+				"Sum_of_Unrecognised_Revenue", 'GL Transaction'[Sum of Unrecognised Revenue],
+				"Sum_Total_of_Cost", 'GL Transaction'[Sum Total of Cost],
+				"Sum_of_Recognised_Expense", 'GL Transaction'[Sum of Recognised Expense],
+				"Sum_of_Unrecognised_Income", 'GL Transaction'[Sum of Unrecognised Income],
+				"Sum_Total_of_Income", 'GL Transaction'[Sum Total of Income],
+				"Sum_Total_of_Expense", 'GL Transaction'[Sum Total of Expense],
+				"Sum_Total_of_Accrual", 'GL Transaction'[Sum Total of Accrual],
+				"Sum_of_Recognised_Income", 'GL Transaction'[Sum of Recognised Income],
+				"Sum_of_Unrecognised_Expense", 'GL Transaction'[Sum of Unrecognised Expense],
+				"Sum_Total_of_WIP", 'GL Transaction'[Sum Total of WIP],
+				"GL Status", 'Shipment'[GL Status],
+				"GL Create Date", 'Shipment'[GL Create Date],
+				"Sum_Total_of_Revenue", 'GL Transaction'[Sum Total of Revenue],
+				"GL Revenue Recognition Date", 'Shipment'[GL Revenue Recognition Date],
+				"Sum_of_Unrecognised_WIP", 'GL Transaction'[Sum of Unrecognised WIP],
+				"Sum_of_WIP", 'GL Transaction'[Sum of WIP],
+				"Sum_of_Unrecognised_Accrual", 'GL Transaction'[Sum of Unrecognised Accrual],
+				"Local Client AR Settlement Group Code", 'Local Agent AR Settlement'[Local Client AR Settlement Group Code],
+				"Local Client AR Settlement Group Name", 'Local Agent AR Settlement'[Local Client AR Settlement Group Name],
+				"Overseas Agent AR Settlement Group Code", 'Overseas Agent AR Settlement'[Overseas Agent AR Settlement Group Code],
+				"Overseas Agent AR Settlement Group Name", 'Overseas Agent AR Settlement'[Overseas Agent AR Settlement Group Name],
+				"GL Local Agent Code", 'Shipment'[GL Local Agent Code],
+				"Job Branch", 'Shipment'[Job Branch],
+				"Job Department", 'Shipment'[Job Department]
+				),
+				'Shipment'[Job Number],
+				1,
+				'Shipment'[Transport Mode],
+				1,
+				'Shipment'[Container Mode],
+				1,
+				'Port Of Origin'[Port Of Origin Code],
+				1,
+				'Port Of Origin'[Port Of Origin Country Code],
+				1,
+				'Port Of Destination'[Port Of Destination Code],
+				1,
+				'Port Of Destination'[Port Of Destination Country Code],
+				1,
+				'Shipment'[Way Bill Number],
+				1,
+				'Shipment'[Shipment Inco Term],
+				1,
+				'Shipment'[Additional Terms],
+				1,
+				'Shipment'[Shipment PPD CCX Term],
+				1,
+				'Shipment'[Goods Description],
+				1,
+				'Shipment'[Weight Unit],
+				1,
+				'Shipment'[Volume Unit],
+				1,
+				'Shipment'[Total No Of Packs Package Type],
+				1,
+				'Shipment'[Outer Packs Package Type],
+				1,
+				'Shipment'[Shipment Create Date],
+				1,
+				'Shipment'[Shipment Status],
+				1,
+				'Consolidation'[Job No.],
+				1,
+				'Consolidation'[Master Bill No.],
+				1,
+				'Service Level'[Service Level],
+				1,
+				'Shipment'[Interim Receipt Number],
+				1,
+				'Shipment'[Booking Confirmation Reference],
+				1,
+				'Shipment'[House Bill Type],
+				1,
+				'Shipment'[Is Transport Job],
+				1,
+				'Shipment'[Estimated Pickup],
+				1,
+				'Shipment'[Pickup Required By],
+				1,
+				'Shipment'[Delivery Cartage Completed],
+				1,
+				'Shipment'[Delivery Required By],
+				1,
+				'Shipment'[FCL Delivery Equipment Needed],
+				1,
+				'Shipment'[Estimated Delivery],
+				1,
+				'Shipment'[Pickup Cartage Completed],
+				1,
+				'Shipment'[FCL Pickup Equipment Needed],
+				1,
+				'Shipment'[Pickup Cartage Advised],
+				1,
+				'Shipment'[Chargeable Unit],
+				1,
+				'Shipment'[Is Master / Lead],
+				1,
+				'Shipment'[Is Brokerage],
+				1,
+				'Shipment'[Coload Master],
+				1,
+				'Shipment'[Container 20F],
+				1,
+				'Shipment'[Container 20H],
+				1,
+				'Shipment'[Container 20R],
+				1,
+				'Shipment'[Container 40F],
+				1,
+				'Shipment'[Container 40H],
+				1,
+				'Shipment'[Container 40R],
+				1,
+				'Shipment'[Container 45F],
+				1,
+				'Shipment'[Container GEN],
+				1,
+				'Shipment'[Container Other],
+				1,
+				'Discharge Port'[Discharge Port Code],
+				1,
+				'Load Port'[Load Port Code],
+				1,
+				'Shipment'[Is Active],
+				1,
+				'Consolidation'[Coload],
+				1,
+				'Shipment'[Received Date],
+				1,
+				'Shipment'[Delivery Cartage Advised],
+				1,
+				'Shipment'[Loading Meters],
+				1,
+				'Shipment'[Arrival Date],
+				1,
+				'Shipment'[Departure Date],
+				1,
+				'Shipment'[Container TEU],
+				1,
+				'Shipment'[Container Count],
+				1,
+				'Carrier Address'[Carrier Code],
+				1,
+				'Carrier Address'[Carrier Name],
+				1,
+				'Receiving Agent Address'[Receiving Agent Code],
+				1,
+				'Sending Agent Address'[Sending Agent Code],
+				1,
+				'Consignor Address'[Consignor Code],
+				1,
+				'Consignee Address'[Consignee Code],
+				1,
+				'Export Broker'[Export Broker Code],
+				1,
+				'Export Broker'[Export Broker Name],
+				1,
+				'Import Broker'[Import Broker Code],
+				1,
+				'Import Broker'[Import Broker Name],
+				1,
+				'Receiving Agent Address'[Receiving Agent Name],
+				1,
+				'Sending Agent Address'[Sending Agent Name],
+				1,
+				'Consolidation'[First Load],
+				1,
+				'Consolidation'[Last Discharge],
+				1,
+				'Consolidation'[ETD First Load],
+				1,
+				'Consolidation'[ETA Last Discharge],
+				1,
+				'Consolidation'[First Vessel],
+				1,
+				'Consolidation'[First Voyage Flight],
+				1,
+				'Main Consol Shipment'[ETA Discharge],
+				1,
+				'Main Consol Shipment'[ETD Load],
+				1,
+				'Consolidation'[Contract No],
+				1,
+				'Main Consol Shipment'[Consol ATD],
+				1,
+				'Main Consol Shipment'[Consol ATA],
+				1,
+				'Main Consol Shipment'[Direction],
+				1,
+				'Consignor Address'[Consignor Address Name],
+				1,
+				'Consignor Address'[Consignor Address City],
+				1,
+				'Consignor Address'[Consignor Address State],
+				1,
+				'Consignor Address'[Consignor Address Post Code],
+				1,
+				'Consignee Address'[Consignee Address Name],
+				1,
+				'Consignee Address'[Consignee Address City],
+				1,
+				'Consignee Address'[Consignee Address State],
+				1,
+				'Consignee Address'[Consignee Address Post Code],
+				1,
+				'Controlling Agent Address'[Controlling Agent Code],
+				1,
+				'Controlling Agent Address'[Controlling Agent Name],
+				1,
+				'Controlling Customer Address'[Controlling Customer Code],
+				1,
+				'Controlling Customer Address'[Controlling Customer Name],
+				1
+				)
+
+				ORDER BY
+				'Shipment'[Job Number],
+				'Shipment'[Transport Mode],
+				'Shipment'[Container Mode],
+				'Port Of Origin'[Port Of Origin Code],
+				'Port Of Origin'[Port Of Origin Country Code],
+				'Port Of Destination'[Port Of Destination Code],
+				'Port Of Destination'[Port Of Destination Country Code],
+				'Shipment'[Way Bill Number],
+				'Shipment'[Shipment Inco Term],
+				'Shipment'[Additional Terms],
+				'Shipment'[Shipment PPD CCX Term],
+				'Shipment'[Goods Description],
+				'Shipment'[Weight Unit],
+				'Shipment'[Volume Unit],
+				'Shipment'[Total No Of Packs Package Type],
+				'Shipment'[Outer Packs Package Type],
+				'Shipment'[Shipment Create Date],
+				'Shipment'[Shipment Status],
+				'Consolidation'[Job No.],
+				'Consolidation'[Master Bill No.],
+				'Service Level'[Service Level],
+				'Shipment'[Interim Receipt Number],
+				'Shipment'[Booking Confirmation Reference],
+				'Shipment'[House Bill Type],
+				'Shipment'[Is Transport Job],
+				'Shipment'[Estimated Pickup],
+				'Shipment'[Pickup Required By],
+				'Shipment'[Delivery Cartage Completed],
+				'Shipment'[Delivery Required By],
+				'Shipment'[FCL Delivery Equipment Needed],
+				'Shipment'[Estimated Delivery],
+				'Shipment'[Pickup Cartage Completed],
+				'Shipment'[FCL Pickup Equipment Needed],
+				'Shipment'[Pickup Cartage Advised],
+				'Shipment'[Chargeable Unit],
+				'Shipment'[Is Master / Lead],
+				'Shipment'[Is Brokerage],
+				'Shipment'[Coload Master],
+				'Shipment'[Container 20F],
+				'Shipment'[Container 20H],
+				'Shipment'[Container 20R],
+				'Shipment'[Container 40F],
+				'Shipment'[Container 40H],
+				'Shipment'[Container 40R],
+				'Shipment'[Container 45F],
+				'Shipment'[Container GEN],
+				'Shipment'[Container Other],
+				'Discharge Port'[Discharge Port Code],
+				'Load Port'[Load Port Code],
+				'Shipment'[Is Active],
+				'Consolidation'[Coload],
+				'Shipment'[Received Date],
+				'Shipment'[Delivery Cartage Advised],
+				'Shipment'[Loading Meters],
+				'Shipment'[Arrival Date],
+				'Shipment'[Departure Date],
+				'Shipment'[Container TEU],
+				'Shipment'[Container Count],
+				'Carrier Address'[Carrier Code],
+				'Carrier Address'[Carrier Name],
+				'Receiving Agent Address'[Receiving Agent Code],
+				'Sending Agent Address'[Sending Agent Code],
+				'Consignor Address'[Consignor Code],
+				'Consignee Address'[Consignee Code],
+				'Export Broker'[Export Broker Code],
+				'Export Broker'[Export Broker Name],
+				'Import Broker'[Import Broker Code],
+				'Import Broker'[Import Broker Name],
+				'Receiving Agent Address'[Receiving Agent Name],
+				'Sending Agent Address'[Sending Agent Name],
+				'Consolidation'[First Load],
+				'Consolidation'[Last Discharge],
+				'Consolidation'[ETD First Load],
+				'Consolidation'[ETA Last Discharge],
+				'Consolidation'[First Vessel],
+				'Consolidation'[First Voyage Flight],
+				'Main Consol Shipment'[ETA Discharge],
+				'Main Consol Shipment'[ETD Load],
+				'Consolidation'[Contract No],
+				'Main Consol Shipment'[Consol ATD],
+				'Main Consol Shipment'[Consol ATA],
+				'Main Consol Shipment'[Direction],
+				'Consignor Address'[Consignor Address Name],
+				'Consignor Address'[Consignor Address City],
+				'Consignor Address'[Consignor Address State],
+				'Consignor Address'[Consignor Address Post Code],
+				'Consignee Address'[Consignee Address Name],
+				'Consignee Address'[Consignee Address City],
+				'Consignee Address'[Consignee Address State],
+				'Consignee Address'[Consignee Address Post Code],
+				'Controlling Agent Address'[Controlling Agent Code],
+				'Controlling Agent Address'[Controlling Agent Name],
+				'Controlling Customer Address'[Controlling Customer Code],
+				'Controlling Customer Address'[Controlling Customer Name]
+			</CommandText>
+			<rd:DesignerState>
+				<QueryDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/AnalysisServices/QueryDefinition">
+					<CommandType>DAX</CommandType>
+					<Type>Query</Type>
+					<QuerySpecification xsi:type="MDXQuerySpecification">
+						<Select>
+							<Items>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Job Number</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Job Number]</HierarchyUniqueName>
+										<LevelName>Job Number</LevelName>
+										<UniqueName>[Shipment].[Job Number].[Job Number]</UniqueName>
+									</ID>
+									<ItemCaption>Job Number</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Transport Mode</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Transport Mode]</HierarchyUniqueName>
+										<LevelName>Transport Mode</LevelName>
+										<UniqueName>[Shipment].[Transport Mode].[Transport Mode]</UniqueName>
+									</ID>
+									<ItemCaption>Transport Mode</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Container Mode</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Container Mode]</HierarchyUniqueName>
+										<LevelName>Container Mode</LevelName>
+										<UniqueName>[Shipment].[Container Mode].[Container Mode]</UniqueName>
+									</ID>
+									<ItemCaption>Container Mode</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Port Of Origin</DimensionName>
+										<HierarchyName>Port Of Origin Code</HierarchyName>
+										<HierarchyUniqueName>[Port Of Origin].[Port Of Origin Code]</HierarchyUniqueName>
+										<LevelName>Port Of Origin Code</LevelName>
+										<UniqueName>[Port Of Origin].[Port Of Origin Code].[Port Of Origin Code]</UniqueName>
+									</ID>
+									<ItemCaption>Port Of Origin Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Port Of Origin</DimensionName>
+										<HierarchyName>Port Of Origin Country Code</HierarchyName>
+										<HierarchyUniqueName>[Port Of Origin].[Port Of Origin Country Code]</HierarchyUniqueName>
+										<LevelName>Port Of Origin Country Code</LevelName>
+										<UniqueName>[Port Of Origin].[Port Of Origin Country Code].[Port Of Origin Country Code]</UniqueName>
+									</ID>
+									<ItemCaption>Port Of Origin Country Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Port Of Destination</DimensionName>
+										<HierarchyName>Port Of Destination Code</HierarchyName>
+										<HierarchyUniqueName>[Port Of Destination].[Port Of Destination Code]</HierarchyUniqueName>
+										<LevelName>Port Of Destination Code</LevelName>
+										<UniqueName>[Port Of Destination].[Port Of Destination Code].[Port Of Destination Code]</UniqueName>
+									</ID>
+									<ItemCaption>Port Of Destination Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Port Of Destination</DimensionName>
+										<HierarchyName>Port Of Destination Country Code</HierarchyName>
+										<HierarchyUniqueName>[Port Of Destination].[Port Of Destination Country Code]</HierarchyUniqueName>
+										<LevelName>Port Of Destination Country Code</LevelName>
+										<UniqueName>[Port Of Destination].[Port Of Destination Country Code].[Port Of Destination Country Code]</UniqueName>
+									</ID>
+									<ItemCaption>Port Of Destination Country Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Way Bill Number</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Way Bill Number]</HierarchyUniqueName>
+										<LevelName>Way Bill Number</LevelName>
+										<UniqueName>[Shipment].[Way Bill Number].[Way Bill Number]</UniqueName>
+									</ID>
+									<ItemCaption>Way Bill Number</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Shipment Inco Term</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Shipment Inco Term]</HierarchyUniqueName>
+										<LevelName>Shipment Inco Term</LevelName>
+										<UniqueName>[Shipment].[Shipment Inco Term].[Shipment Inco Term]</UniqueName>
+									</ID>
+									<ItemCaption>Shipment Inco Term</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Additional Terms</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Additional Terms]</HierarchyUniqueName>
+										<LevelName>Additional Terms</LevelName>
+										<UniqueName>[Shipment].[Additional Terms].[Additional Terms]</UniqueName>
+									</ID>
+									<ItemCaption>Additional Terms</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Shipment PPD CCX Term</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Shipment PPD CCX Term]</HierarchyUniqueName>
+										<LevelName>Shipment PPD CCX Term</LevelName>
+										<UniqueName>[Shipment].[Shipment PPD CCX Term].[Shipment PPD CCX Term]</UniqueName>
+									</ID>
+									<ItemCaption>Shipment PPD CCX Term</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Goods Description</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Goods Description]</HierarchyUniqueName>
+										<LevelName>Goods Description</LevelName>
+										<UniqueName>[Shipment].[Goods Description].[Goods Description]</UniqueName>
+									</ID>
+									<ItemCaption>Goods Description</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Weight Unit</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Weight Unit]</HierarchyUniqueName>
+										<LevelName>Weight Unit</LevelName>
+										<UniqueName>[Shipment].[Weight Unit].[Weight Unit]</UniqueName>
+									</ID>
+									<ItemCaption>Weight Unit</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Volume Unit</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Volume Unit]</HierarchyUniqueName>
+										<LevelName>Volume Unit</LevelName>
+										<UniqueName>[Shipment].[Volume Unit].[Volume Unit]</UniqueName>
+									</ID>
+									<ItemCaption>Volume Unit</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Total No Of Packs Package Type</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Total No Of Packs Package Type]</HierarchyUniqueName>
+										<LevelName>Total No Of Packs Package Type</LevelName>
+										<UniqueName>[Shipment].[Total No Of Packs Package Type].[Total No Of Packs Package Type]</UniqueName>
+									</ID>
+									<ItemCaption>Total No Of Packs Package Type</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Outer Packs Package Type</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Outer Packs Package Type]</HierarchyUniqueName>
+										<LevelName>Outer Packs Package Type</LevelName>
+										<UniqueName>[Shipment].[Outer Packs Package Type].[Outer Packs Package Type]</UniqueName>
+									</ID>
+									<ItemCaption>Outer Packs Package Type</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Shipment Create Date</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Shipment Create Date]</HierarchyUniqueName>
+										<LevelName>Shipment Create Date</LevelName>
+										<UniqueName>[Shipment].[Shipment Create Date].[Shipment Create Date]</UniqueName>
+									</ID>
+									<ItemCaption>Shipment Create Date</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Shipment Status</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Shipment Status]</HierarchyUniqueName>
+										<LevelName>Shipment Status</LevelName>
+										<UniqueName>[Shipment].[Shipment Status].[Shipment Status]</UniqueName>
+									</ID>
+									<ItemCaption>Shipment Status</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consolidation</DimensionName>
+										<HierarchyName>Job No.</HierarchyName>
+										<HierarchyUniqueName>[Consolidation].[Job No.]</HierarchyUniqueName>
+										<LevelName>Job No.</LevelName>
+										<UniqueName>[Consolidation].[Job No.].[Job No.]</UniqueName>
+									</ID>
+									<ItemCaption>Job No.</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consolidation</DimensionName>
+										<HierarchyName>Master Bill No.</HierarchyName>
+										<HierarchyUniqueName>[Consolidation].[Master Bill No.]</HierarchyUniqueName>
+										<LevelName>Master Bill No.</LevelName>
+										<UniqueName>[Consolidation].[Master Bill No.].[Master Bill No.]</UniqueName>
+									</ID>
+									<ItemCaption>Master Bill No.</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Service Level</DimensionName>
+										<HierarchyName>Service Level</HierarchyName>
+										<HierarchyUniqueName>[Service Level].[Service Level]</HierarchyUniqueName>
+										<LevelName>Service Level</LevelName>
+										<UniqueName>[Service Level].[Service Level].[Service Level]</UniqueName>
+									</ID>
+									<ItemCaption>Service Level</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Interim Receipt Number</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Interim Receipt Number]</HierarchyUniqueName>
+										<LevelName>Interim Receipt Number</LevelName>
+										<UniqueName>[Shipment].[Interim Receipt Number].[Interim Receipt Number]</UniqueName>
+									</ID>
+									<ItemCaption>Interim Receipt Number</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Booking Confirmation Reference</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Booking Confirmation Reference]</HierarchyUniqueName>
+										<LevelName>Booking Confirmation Reference</LevelName>
+										<UniqueName>[Shipment].[Booking Confirmation Reference].[Booking Confirmation Reference]</UniqueName>
+									</ID>
+									<ItemCaption>Booking Confirmation Reference</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>House Bill Type</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[House Bill Type]</HierarchyUniqueName>
+										<LevelName>House Bill Type</LevelName>
+										<UniqueName>[Shipment].[House Bill Type].[House Bill Type]</UniqueName>
+									</ID>
+									<ItemCaption>House Bill Type</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Is Transport Job</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Is Transport Job]</HierarchyUniqueName>
+										<LevelName>Is Transport Job</LevelName>
+										<UniqueName>[Shipment].[Is Transport Job].[Is Transport Job]</UniqueName>
+									</ID>
+									<ItemCaption>Is Transport Job</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Estimated Pickup</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Estimated Pickup]</HierarchyUniqueName>
+										<LevelName>Estimated Pickup</LevelName>
+										<UniqueName>[Shipment].[Estimated Pickup].[Estimated Pickup]</UniqueName>
+									</ID>
+									<ItemCaption>Estimated Pickup</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Pickup Required By</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Pickup Required By]</HierarchyUniqueName>
+										<LevelName>Pickup Required By</LevelName>
+										<UniqueName>[Shipment].[Pickup Required By].[Pickup Required By]</UniqueName>
+									</ID>
+									<ItemCaption>Pickup Required By</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Delivery Cartage Completed</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Delivery Cartage Completed]</HierarchyUniqueName>
+										<LevelName>Delivery Cartage Completed</LevelName>
+										<UniqueName>[Shipment].[Delivery Cartage Completed].[Delivery Cartage Completed]</UniqueName>
+									</ID>
+									<ItemCaption>Delivery Cartage Completed</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Delivery Required By</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Delivery Required By]</HierarchyUniqueName>
+										<LevelName>Delivery Required By</LevelName>
+										<UniqueName>[Shipment].[Delivery Required By].[Delivery Required By]</UniqueName>
+									</ID>
+									<ItemCaption>Delivery Required By</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>FCL Delivery Equipment Needed</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[FCL Delivery Equipment Needed]</HierarchyUniqueName>
+										<LevelName>FCL Delivery Equipment Needed</LevelName>
+										<UniqueName>[Shipment].[FCL Delivery Equipment Needed].[FCL Delivery Equipment Needed]</UniqueName>
+									</ID>
+									<ItemCaption>FCL Delivery Equipment Needed</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Estimated Delivery</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Estimated Delivery]</HierarchyUniqueName>
+										<LevelName>Estimated Delivery</LevelName>
+										<UniqueName>[Shipment].[Estimated Delivery].[Estimated Delivery]</UniqueName>
+									</ID>
+									<ItemCaption>Estimated Delivery</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Pickup Cartage Completed</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Pickup Cartage Completed]</HierarchyUniqueName>
+										<LevelName>Pickup Cartage Completed</LevelName>
+										<UniqueName>[Shipment].[Pickup Cartage Completed].[Pickup Cartage Completed]</UniqueName>
+									</ID>
+									<ItemCaption>Pickup Cartage Completed</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>FCL Pickup Equipment Needed</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[FCL Pickup Equipment Needed]</HierarchyUniqueName>
+										<LevelName>FCL Pickup Equipment Needed</LevelName>
+										<UniqueName>[Shipment].[FCL Pickup Equipment Needed].[FCL Pickup Equipment Needed]</UniqueName>
+									</ID>
+									<ItemCaption>FCL Pickup Equipment Needed</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Pickup Cartage Advised</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Pickup Cartage Advised]</HierarchyUniqueName>
+										<LevelName>Pickup Cartage Advised</LevelName>
+										<UniqueName>[Shipment].[Pickup Cartage Advised].[Pickup Cartage Advised]</UniqueName>
+									</ID>
+									<ItemCaption>Pickup Cartage Advised</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Chargeable Unit</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Chargeable Unit]</HierarchyUniqueName>
+										<LevelName>Chargeable Unit</LevelName>
+										<UniqueName>[Shipment].[Chargeable Unit].[Chargeable Unit]</UniqueName>
+									</ID>
+									<ItemCaption>Chargeable Unit</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Is Master / Lead</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Is Master / Lead]</HierarchyUniqueName>
+										<LevelName>Is Master / Lead</LevelName>
+										<UniqueName>[Shipment].[Is Master / Lead].[Is Master / Lead]</UniqueName>
+									</ID>
+									<ItemCaption>Is Master / Lead</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Is Brokerage</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Is Brokerage]</HierarchyUniqueName>
+										<LevelName>Is Brokerage</LevelName>
+										<UniqueName>[Shipment].[Is Brokerage].[Is Brokerage]</UniqueName>
+									</ID>
+									<ItemCaption>Is Brokerage</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Coload Master</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Coload Master]</HierarchyUniqueName>
+										<LevelName>Coload Master</LevelName>
+										<UniqueName>[Shipment].[Coload Master].[Coload Master]</UniqueName>
+									</ID>
+									<ItemCaption>Coload Master</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Container 20F</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Container 20F]</HierarchyUniqueName>
+										<LevelName>Container 20F</LevelName>
+										<UniqueName>[Shipment].[Container 20F].[Container 20F]</UniqueName>
+									</ID>
+									<ItemCaption>Container 20F</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Container 20H</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Container 20H]</HierarchyUniqueName>
+										<LevelName>Container 20H</LevelName>
+										<UniqueName>[Shipment].[Container 20H].[Container 20H]</UniqueName>
+									</ID>
+									<ItemCaption>Container 20H</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Container 20R</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Container 20R]</HierarchyUniqueName>
+										<LevelName>Container 20R</LevelName>
+										<UniqueName>[Shipment].[Container 20R].[Container 20R]</UniqueName>
+									</ID>
+									<ItemCaption>Container 20R</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Container 40F</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Container 40F]</HierarchyUniqueName>
+										<LevelName>Container 40F</LevelName>
+										<UniqueName>[Shipment].[Container 40F].[Container 40F]</UniqueName>
+									</ID>
+									<ItemCaption>Container 40F</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Container 40H</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Container 40H]</HierarchyUniqueName>
+										<LevelName>Container 40H</LevelName>
+										<UniqueName>[Shipment].[Container 40H].[Container 40H]</UniqueName>
+									</ID>
+									<ItemCaption>Container 40H</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Container 40R</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Container 40R]</HierarchyUniqueName>
+										<LevelName>Container 40R</LevelName>
+										<UniqueName>[Shipment].[Container 40R].[Container 40R]</UniqueName>
+									</ID>
+									<ItemCaption>Container 40R</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Container 45F</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Container 45F]</HierarchyUniqueName>
+										<LevelName>Container 45F</LevelName>
+										<UniqueName>[Shipment].[Container 45F].[Container 45F]</UniqueName>
+									</ID>
+									<ItemCaption>Container 45F</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Container GEN</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Container GEN]</HierarchyUniqueName>
+										<LevelName>Container GEN</LevelName>
+										<UniqueName>[Shipment].[Container GEN].[Container GEN]</UniqueName>
+									</ID>
+									<ItemCaption>Container GEN</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Container Other</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Container Other]</HierarchyUniqueName>
+										<LevelName>Container Other</LevelName>
+										<UniqueName>[Shipment].[Container Other].[Container Other]</UniqueName>
+									</ID>
+									<ItemCaption>Container Other</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Discharge Port</DimensionName>
+										<HierarchyName>Discharge Port Code</HierarchyName>
+										<HierarchyUniqueName>[Discharge Port].[Discharge Port Code]</HierarchyUniqueName>
+										<LevelName>Discharge Port Code</LevelName>
+										<UniqueName>[Discharge Port].[Discharge Port Code].[Discharge Port Code]</UniqueName>
+									</ID>
+									<ItemCaption>Discharge Port Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Load Port</DimensionName>
+										<HierarchyName>Load Port Code</HierarchyName>
+										<HierarchyUniqueName>[Load Port].[Load Port Code]</HierarchyUniqueName>
+										<LevelName>Load Port Code</LevelName>
+										<UniqueName>[Load Port].[Load Port Code].[Load Port Code]</UniqueName>
+									</ID>
+									<ItemCaption>Load Port Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Is Active</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Is Active]</HierarchyUniqueName>
+										<LevelName>Is Active</LevelName>
+										<UniqueName>[Shipment].[Is Active].[Is Active]</UniqueName>
+									</ID>
+									<ItemCaption>Is Active</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consolidation</DimensionName>
+										<HierarchyName>Coload</HierarchyName>
+										<HierarchyUniqueName>[Consolidation].[Coload]</HierarchyUniqueName>
+										<LevelName>Coload</LevelName>
+										<UniqueName>[Consolidation].[Coload].[Coload]</UniqueName>
+									</ID>
+									<ItemCaption>Coload</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Received Date</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Received Date]</HierarchyUniqueName>
+										<LevelName>Received Date</LevelName>
+										<UniqueName>[Shipment].[Received Date].[Received Date]</UniqueName>
+									</ID>
+									<ItemCaption>Received Date</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Delivery Cartage Advised</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Delivery Cartage Advised]</HierarchyUniqueName>
+										<LevelName>Delivery Cartage Advised</LevelName>
+										<UniqueName>[Shipment].[Delivery Cartage Advised].[Delivery Cartage Advised]</UniqueName>
+									</ID>
+									<ItemCaption>Delivery Cartage Advised</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Loading Meters</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Loading Meters]</HierarchyUniqueName>
+										<LevelName>Loading Meters</LevelName>
+										<UniqueName>[Shipment].[Loading Meters].[Loading Meters]</UniqueName>
+									</ID>
+									<ItemCaption>Loading Meters</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Arrival Date</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Arrival Date]</HierarchyUniqueName>
+										<LevelName>Arrival Date</LevelName>
+										<UniqueName>[Shipment].[Arrival Date].[Arrival Date]</UniqueName>
+									</ID>
+									<ItemCaption>Arrival Date</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Departure Date</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Departure Date]</HierarchyUniqueName>
+										<LevelName>Departure Date</LevelName>
+										<UniqueName>[Shipment].[Departure Date].[Departure Date]</UniqueName>
+									</ID>
+									<ItemCaption>Departure Date</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Container TEU</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Container TEU]</HierarchyUniqueName>
+										<LevelName>Container TEU</LevelName>
+										<UniqueName>[Shipment].[Container TEU].[Container TEU]</UniqueName>
+									</ID>
+									<ItemCaption>Container TEU</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Shipment</DimensionName>
+										<HierarchyName>Container Count</HierarchyName>
+										<HierarchyUniqueName>[Shipment].[Container Count]</HierarchyUniqueName>
+										<LevelName>Container Count</LevelName>
+										<UniqueName>[Shipment].[Container Count].[Container Count]</UniqueName>
+									</ID>
+									<ItemCaption>Container Count</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Carrier Address</DimensionName>
+										<HierarchyName>Carrier Code</HierarchyName>
+										<HierarchyUniqueName>[Carrier Address].[Carrier Code]</HierarchyUniqueName>
+										<LevelName>Carrier Code</LevelName>
+										<UniqueName>[Carrier Address].[Carrier Code].[Carrier Code]</UniqueName>
+									</ID>
+									<ItemCaption>Carrier Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Carrier Address</DimensionName>
+										<HierarchyName>Carrier Name</HierarchyName>
+										<HierarchyUniqueName>[Carrier Address].[Carrier Name]</HierarchyUniqueName>
+										<LevelName>Carrier Name</LevelName>
+										<UniqueName>[Carrier Address].[Carrier Name].[Carrier Name]</UniqueName>
+									</ID>
+									<ItemCaption>Carrier Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Receiving Agent Address</DimensionName>
+										<HierarchyName>Receiving Agent Code</HierarchyName>
+										<HierarchyUniqueName>[Receiving Agent Address].[Receiving Agent Code]</HierarchyUniqueName>
+										<LevelName>Receiving Agent Code</LevelName>
+										<UniqueName>[Receiving Agent Address].[Receiving Agent Code].[Receiving Agent Code]</UniqueName>
+									</ID>
+									<ItemCaption>Receiving Agent Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Sending Agent Address</DimensionName>
+										<HierarchyName>Sending Agent Code</HierarchyName>
+										<HierarchyUniqueName>[Sending Agent Address].[Sending Agent Code]</HierarchyUniqueName>
+										<LevelName>Sending Agent Code</LevelName>
+										<UniqueName>[Sending Agent Address].[Sending Agent Code].[Sending Agent Code]</UniqueName>
+									</ID>
+									<ItemCaption>Sending Agent Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consignor Address</DimensionName>
+										<HierarchyName>Consignor Code</HierarchyName>
+										<HierarchyUniqueName>[Consignor Address].[Consignor Code]</HierarchyUniqueName>
+										<LevelName>Consignor Code</LevelName>
+										<UniqueName>[Consignor Address].[Consignor Code].[Consignor Code]</UniqueName>
+									</ID>
+									<ItemCaption>Consignor Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consignee Address</DimensionName>
+										<HierarchyName>Consignee Code</HierarchyName>
+										<HierarchyUniqueName>[Consignee Address].[Consignee Code]</HierarchyUniqueName>
+										<LevelName>Consignee Code</LevelName>
+										<UniqueName>[Consignee Address].[Consignee Code].[Consignee Code]</UniqueName>
+									</ID>
+									<ItemCaption>Consignee Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Export Broker</DimensionName>
+										<HierarchyName>Export Broker Code</HierarchyName>
+										<HierarchyUniqueName>[Export Broker].[Export Broker Code]</HierarchyUniqueName>
+										<LevelName>Export Broker Code</LevelName>
+										<UniqueName>[Export Broker].[Export Broker Code].[Export Broker Code]</UniqueName>
+									</ID>
+									<ItemCaption>Export Broker Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Export Broker</DimensionName>
+										<HierarchyName>Export Broker Name</HierarchyName>
+										<HierarchyUniqueName>[Export Broker].[Export Broker Name]</HierarchyUniqueName>
+										<LevelName>Export Broker Name</LevelName>
+										<UniqueName>[Export Broker].[Export Broker Name].[Export Broker Name]</UniqueName>
+									</ID>
+									<ItemCaption>Export Broker Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Import Broker</DimensionName>
+										<HierarchyName>Import Broker Code</HierarchyName>
+										<HierarchyUniqueName>[Import Broker].[Import Broker Code]</HierarchyUniqueName>
+										<LevelName>Import Broker Code</LevelName>
+										<UniqueName>[Import Broker].[Import Broker Code].[Import Broker Code]</UniqueName>
+									</ID>
+									<ItemCaption>Import Broker Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Import Broker</DimensionName>
+										<HierarchyName>Import Broker Name</HierarchyName>
+										<HierarchyUniqueName>[Import Broker].[Import Broker Name]</HierarchyUniqueName>
+										<LevelName>Import Broker Name</LevelName>
+										<UniqueName>[Import Broker].[Import Broker Name].[Import Broker Name]</UniqueName>
+									</ID>
+									<ItemCaption>Import Broker Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Receiving Agent Address</DimensionName>
+										<HierarchyName>Receiving Agent Name</HierarchyName>
+										<HierarchyUniqueName>[Receiving Agent Address].[Receiving Agent Name]</HierarchyUniqueName>
+										<LevelName>Receiving Agent Name</LevelName>
+										<UniqueName>[Receiving Agent Address].[Receiving Agent Name].[Receiving Agent Name]</UniqueName>
+									</ID>
+									<ItemCaption>Receiving Agent Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Sending Agent Address</DimensionName>
+										<HierarchyName>Sending Agent Name</HierarchyName>
+										<HierarchyUniqueName>[Sending Agent Address].[Sending Agent Name]</HierarchyUniqueName>
+										<LevelName>Sending Agent Name</LevelName>
+										<UniqueName>[Sending Agent Address].[Sending Agent Name].[Sending Agent Name]</UniqueName>
+									</ID>
+									<ItemCaption>Sending Agent Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consolidation</DimensionName>
+										<HierarchyName>First Load</HierarchyName>
+										<HierarchyUniqueName>[Consolidation].[First Load]</HierarchyUniqueName>
+										<LevelName>First Load</LevelName>
+										<UniqueName>[Consolidation].[First Load].[First Load]</UniqueName>
+									</ID>
+									<ItemCaption>First Load</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consolidation</DimensionName>
+										<HierarchyName>Last Discharge</HierarchyName>
+										<HierarchyUniqueName>[Consolidation].[Last Discharge]</HierarchyUniqueName>
+										<LevelName>Last Discharge</LevelName>
+										<UniqueName>[Consolidation].[Last Discharge].[Last Discharge]</UniqueName>
+									</ID>
+									<ItemCaption>Last Discharge</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consolidation</DimensionName>
+										<HierarchyName>ETD First Load</HierarchyName>
+										<HierarchyUniqueName>[Consolidation].[ETD First Load]</HierarchyUniqueName>
+										<LevelName>ETD First Load</LevelName>
+										<UniqueName>[Consolidation].[ETD First Load].[ETD First Load]</UniqueName>
+									</ID>
+									<ItemCaption>ETD First Load</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consolidation</DimensionName>
+										<HierarchyName>ETA Last Discharge</HierarchyName>
+										<HierarchyUniqueName>[Consolidation].[ETA Last Discharge]</HierarchyUniqueName>
+										<LevelName>ETA Last Discharge</LevelName>
+										<UniqueName>[Consolidation].[ETA Last Discharge].[ETA Last Discharge]</UniqueName>
+									</ID>
+									<ItemCaption>ETA Last Discharge</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consolidation</DimensionName>
+										<HierarchyName>First Vessel</HierarchyName>
+										<HierarchyUniqueName>[Consolidation].[First Vessel]</HierarchyUniqueName>
+										<LevelName>First Vessel</LevelName>
+										<UniqueName>[Consolidation].[First Vessel].[First Vessel]</UniqueName>
+									</ID>
+									<ItemCaption>First Vessel</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consolidation</DimensionName>
+										<HierarchyName>First Voyage Flight</HierarchyName>
+										<HierarchyUniqueName>[Consolidation].[First Voyage Flight]</HierarchyUniqueName>
+										<LevelName>First Voyage Flight</LevelName>
+										<UniqueName>[Consolidation].[First Voyage Flight].[First Voyage Flight]</UniqueName>
+									</ID>
+									<ItemCaption>First Voyage Flight</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Main Consol Shipment</DimensionName>
+										<HierarchyName>ETA Discharge</HierarchyName>
+										<HierarchyUniqueName>[Main Consol Shipment].[ETA Discharge]</HierarchyUniqueName>
+										<LevelName>ETA Discharge</LevelName>
+										<UniqueName>[Main Consol Shipment].[ETA Discharge].[ETA Discharge]</UniqueName>
+									</ID>
+									<ItemCaption>ETA Discharge</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Main Consol Shipment</DimensionName>
+										<HierarchyName>ETD Load</HierarchyName>
+										<HierarchyUniqueName>[Main Consol Shipment].[ETD Load]</HierarchyUniqueName>
+										<LevelName>ETD Load</LevelName>
+										<UniqueName>[Main Consol Shipment].[ETD Load].[ETD Load]</UniqueName>
+									</ID>
+									<ItemCaption>ETD Load</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consolidation</DimensionName>
+										<HierarchyName>Contract No</HierarchyName>
+										<HierarchyUniqueName>[Consolidation].[Contract No]</HierarchyUniqueName>
+										<LevelName>Contract No</LevelName>
+										<UniqueName>[Consolidation].[Contract No].[Contract No]</UniqueName>
+									</ID>
+									<ItemCaption>Contract No</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Main Consol Shipment</DimensionName>
+										<HierarchyName>Consol ATD</HierarchyName>
+										<HierarchyUniqueName>[Main Consol Shipment].[Consol ATD]</HierarchyUniqueName>
+										<LevelName>Consol ATD</LevelName>
+										<UniqueName>[Main Consol Shipment].[Consol ATD].[Consol ATD]</UniqueName>
+									</ID>
+									<ItemCaption>Consol ATD</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Main Consol Shipment</DimensionName>
+										<HierarchyName>Consol ATA</HierarchyName>
+										<HierarchyUniqueName>[Main Consol Shipment].[Consol ATA]</HierarchyUniqueName>
+										<LevelName>Consol ATA</LevelName>
+										<UniqueName>[Main Consol Shipment].[Consol ATA].[Consol ATA]</UniqueName>
+									</ID>
+									<ItemCaption>Consol ATA</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Main Consol Shipment</DimensionName>
+										<HierarchyName>Direction</HierarchyName>
+										<HierarchyUniqueName>[Main Consol Shipment].[Direction]</HierarchyUniqueName>
+										<LevelName>Direction</LevelName>
+										<UniqueName>[Main Consol Shipment].[Direction].[Direction]</UniqueName>
+									</ID>
+									<ItemCaption>Direction</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consignor Address</DimensionName>
+										<HierarchyName>Consignor Address Name</HierarchyName>
+										<HierarchyUniqueName>[Consignor Address].[Consignor Address Name]</HierarchyUniqueName>
+										<LevelName>Consignor Address Name</LevelName>
+										<UniqueName>[Consignor Address].[Consignor Address Name].[Consignor Address Name]</UniqueName>
+									</ID>
+									<ItemCaption>Consignor Address Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consignor Address</DimensionName>
+										<HierarchyName>Consignor Address City</HierarchyName>
+										<HierarchyUniqueName>[Consignor Address].[Consignor Address City]</HierarchyUniqueName>
+										<LevelName>Consignor Address City</LevelName>
+										<UniqueName>[Consignor Address].[Consignor Address City].[Consignor Address City]</UniqueName>
+									</ID>
+									<ItemCaption>Consignor Address City</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consignor Address</DimensionName>
+										<HierarchyName>Consignor Address State</HierarchyName>
+										<HierarchyUniqueName>[Consignor Address].[Consignor Address State]</HierarchyUniqueName>
+										<LevelName>Consignor Address State</LevelName>
+										<UniqueName>[Consignor Address].[Consignor Address State].[Consignor Address State]</UniqueName>
+									</ID>
+									<ItemCaption>Consignor Address State</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consignor Address</DimensionName>
+										<HierarchyName>Consignor Address Post Code</HierarchyName>
+										<HierarchyUniqueName>[Consignor Address].[Consignor Address Post Code]</HierarchyUniqueName>
+										<LevelName>Consignor Address Post Code</LevelName>
+										<UniqueName>[Consignor Address].[Consignor Address Post Code].[Consignor Address Post Code]</UniqueName>
+									</ID>
+									<ItemCaption>Consignor Address Post Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consignee Address</DimensionName>
+										<HierarchyName>Consignee Address Name</HierarchyName>
+										<HierarchyUniqueName>[Consignee Address].[Consignee Address Name]</HierarchyUniqueName>
+										<LevelName>Consignee Address Name</LevelName>
+										<UniqueName>[Consignee Address].[Consignee Address Name].[Consignee Address Name]</UniqueName>
+									</ID>
+									<ItemCaption>Consignee Address Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consignee Address</DimensionName>
+										<HierarchyName>Consignee Address City</HierarchyName>
+										<HierarchyUniqueName>[Consignee Address].[Consignee Address City]</HierarchyUniqueName>
+										<LevelName>Consignee Address City</LevelName>
+										<UniqueName>[Consignee Address].[Consignee Address City].[Consignee Address City]</UniqueName>
+									</ID>
+									<ItemCaption>Consignee Address City</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consignee Address</DimensionName>
+										<HierarchyName>Consignee Address State</HierarchyName>
+										<HierarchyUniqueName>[Consignee Address].[Consignee Address State]</HierarchyUniqueName>
+										<LevelName>Consignee Address State</LevelName>
+										<UniqueName>[Consignee Address].[Consignee Address State].[Consignee Address State]</UniqueName>
+									</ID>
+									<ItemCaption>Consignee Address State</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Consignee Address</DimensionName>
+										<HierarchyName>Consignee Address Post Code</HierarchyName>
+										<HierarchyUniqueName>[Consignee Address].[Consignee Address Post Code]</HierarchyUniqueName>
+										<LevelName>Consignee Address Post Code</LevelName>
+										<UniqueName>[Consignee Address].[Consignee Address Post Code].[Consignee Address Post Code]</UniqueName>
+									</ID>
+									<ItemCaption>Consignee Address Post Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Controlling Agent Address</DimensionName>
+										<HierarchyName>Controlling Agent Code</HierarchyName>
+										<HierarchyUniqueName>[Controlling Agent Address].[Controlling Agent Code]</HierarchyUniqueName>
+										<LevelName>Controlling Agent Code</LevelName>
+										<UniqueName>[Controlling Agent Address].[Controlling Agent Code].[Controlling Agent Code]</UniqueName>
+									</ID>
+									<ItemCaption>Controlling Agent Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Controlling Agent Address</DimensionName>
+										<HierarchyName>Controlling Agent Name</HierarchyName>
+										<HierarchyUniqueName>[Controlling Agent Address].[Controlling Agent Name]</HierarchyUniqueName>
+										<LevelName>Controlling Agent Name</LevelName>
+										<UniqueName>[Controlling Agent Address].[Controlling Agent Name].[Controlling Agent Name]</UniqueName>
+									</ID>
+									<ItemCaption>Controlling Agent Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Controlling Customer Address</DimensionName>
+										<HierarchyName>Controlling Customer Code</HierarchyName>
+										<HierarchyUniqueName>[Controlling Customer Address].[Controlling Customer Code]</HierarchyUniqueName>
+										<LevelName>Controlling Customer Code</LevelName>
+										<UniqueName>[Controlling Customer Address].[Controlling Customer Code].[Controlling Customer Code]</UniqueName>
+									</ID>
+									<ItemCaption>Controlling Customer Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Level">
+										<DimensionName>Controlling Customer Address</DimensionName>
+										<HierarchyName>Controlling Customer Name</HierarchyName>
+										<HierarchyUniqueName>[Controlling Customer Address].[Controlling Customer Name]</HierarchyUniqueName>
+										<LevelName>Controlling Customer Name</LevelName>
+										<UniqueName>[Controlling Customer Address].[Controlling Customer Name].[Controlling Customer Name]</UniqueName>
+									</ID>
+									<ItemCaption>Controlling Customer Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Shipment_Weight]</ColumnName>
+									</ID>
+									<ItemCaption>Shipment_Weight</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Shipment_Volume]</ColumnName>
+									</ID>
+									<ItemCaption>Shipment_Volume</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Actual_Chargeable]</ColumnName>
+									</ID>
+									<ItemCaption>Actual_Chargeable</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Total_No__Of_Packs]</ColumnName>
+									</ID>
+									<ItemCaption>Total_No__Of_Packs</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Shipment_Outer_Packs]</ColumnName>
+									</ID>
+									<ItemCaption>Shipment_Outer_Packs</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Shipment Customs Info]</ColumnName>
+									</ID>
+									<ItemCaption>Shipment Customs Info</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[GL Branch]</ColumnName>
+									</ID>
+									<ItemCaption>GL Branch</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[GL Department]</ColumnName>
+									</ID>
+									<ItemCaption>GL Department</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[GL Local Agent Name]</ColumnName>
+									</ID>
+									<ItemCaption>GL Local Agent Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[GL Representative Operator]</ColumnName>
+									</ID>
+									<ItemCaption>GL Representative Operator</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[GL Overseas Agent Code]</ColumnName>
+									</ID>
+									<ItemCaption>GL Overseas Agent Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[GL Overseas Agent Name]</ColumnName>
+									</ID>
+									<ItemCaption>GL Overseas Agent Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[GL Representative Sales]</ColumnName>
+									</ID>
+									<ItemCaption>GL Representative Sales</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_Revenue]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_Revenue</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_Cost]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_Cost</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_Job_Profit]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_Job_Profit</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_Accrual]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_Accrual</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_Unrecognised_Cost]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_Unrecognised_Cost</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_Unrecognised_Revenue]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_Unrecognised_Revenue</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_Total_of_Cost]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_Total_of_Cost</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_Recognised_Expense]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_Recognised_Expense</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_Unrecognised_Income]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_Unrecognised_Income</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_Total_of_Income]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_Total_of_Income</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_Total_of_Expense]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_Total_of_Expense</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_Total_of_Accrual]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_Total_of_Accrual</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_Recognised_Income]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_Recognised_Income</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_Unrecognised_Expense]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_Unrecognised_Expense</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_Total_of_WIP]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_Total_of_WIP</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[GL Status]</ColumnName>
+									</ID>
+									<ItemCaption>GL Status</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[GL Create Date]</ColumnName>
+									</ID>
+									<ItemCaption>GL Create Date</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_Total_of_Revenue]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_Total_of_Revenue</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[GL Revenue Recognition Date]</ColumnName>
+									</ID>
+									<ItemCaption>GL Revenue Recognition Date</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_Unrecognised_WIP]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_Unrecognised_WIP</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_WIP]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_WIP</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Sum_of_Unrecognised_Accrual]</ColumnName>
+									</ID>
+									<ItemCaption>Sum_of_Unrecognised_Accrual</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Local Client AR Settlement Group Code]</ColumnName>
+									</ID>
+									<ItemCaption>Local Client AR Settlement Group Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Local Client AR Settlement Group Name]</ColumnName>
+									</ID>
+									<ItemCaption>Local Client AR Settlement Group Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Overseas Agent AR Settlement Group Code]</ColumnName>
+									</ID>
+									<ItemCaption>Overseas Agent AR Settlement Group Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Overseas Agent AR Settlement Group Name]</ColumnName>
+									</ID>
+									<ItemCaption>Overseas Agent AR Settlement Group Name</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[GL Local Agent Code]</ColumnName>
+									</ID>
+									<ItemCaption>GL Local Agent Code</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Job Branch]</ColumnName>
+									</ID>
+									<ItemCaption>Job Branch</ItemCaption>
+								</Item>
+								<Item>
+									<ID xsi:type="Column">
+										<ColumnName>[Job Department]</ColumnName>
+									</ID>
+									<ItemCaption>Job Department</ItemCaption>
+								</Item>
+							</Items>
+						</Select>
+						<AutoExecute>false</AutoExecute>
+						<From>Model</From>
+						<Filter>
+							<FilterItems />
+						</Filter>
+						<Calculations />
+						<Aggregates />
+						<QueryProperties />
+					</QuerySpecification>
+					<Query>
+						<Statement>
+							// DAX Query
+							DEFINE
+							MEASURE 'Shipment'[Shipment Customs Info] =
+							(/* USER DAX BEGIN */
+							CONCATENATEX(DISTINCT('Shipment Customs Info'), 'Shipment Customs Info'[Customs Info] ,",")
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[GL Branch] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Branch],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[GL Department] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Department],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[GL Local Agent Name] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Local Agent Name],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[GL Representative Operator] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Representative Operator],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[GL Overseas Agent Code] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Overseas Agent Code],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[GL Overseas Agent Name] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Overseas Agent Name],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[GL Representative Sales] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Representative Sales],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[GL Status] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Status],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[GL Create Date] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Job Header Create Date Utc],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[GL Revenue Recognition Date] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Revenue Recognition Date],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[GL Local Agent Code] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Local Agent Code],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[Job Branch] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Branch Code],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Shipment'[Job Department] =
+							(/* USER DAX BEGIN */
+							FIRSTNONBLANK('GL Transaction'[Department Code],TRUE())
+							/* USER DAX END */)
+
+							MEASURE 'Local Agent AR Settlement'[Local Client AR Settlement Group Code] =
+							(/* USER DAX BEGIN */
+							IF (COUNTROWS('GL Transaction') &gt; 0, FIRSTNONBLANK('Local Agent AR Settlement'[Local Agent AR Settlement Related Party Code],TRUE()))
+							/* USER DAX END */)
+
+							MEASURE 'Local Agent AR Settlement'[Local Client AR Settlement Group Name] =
+							(/* USER DAX BEGIN */
+							IF (COUNTROWS('GL Transaction') &gt; 0, FIRSTNONBLANK('Local Agent AR Settlement'[Local Agent AR Settlement Related Party Name],TRUE()))
+							/* USER DAX END */)
+
+							MEASURE 'Overseas Agent AR Settlement'[Overseas Agent AR Settlement Group Code] =
+							(/* USER DAX BEGIN */
+							IF (COUNTROWS('GL Transaction') &gt; 0, FIRSTNONBLANK('Overseas Agent AR Settlement'[Overseas Agent AR Settlement Related Party Code],TRUE()))
+							/* USER DAX END */)
+
+							MEASURE 'Overseas Agent AR Settlement'[Overseas Agent AR Settlement Group Name] =
+							(/* USER DAX BEGIN */
+							IF (COUNTROWS('GL Transaction') &gt; 0, FIRSTNONBLANK('Overseas Agent AR Settlement'[Overseas Agent AR Settlement Related Party Name],TRUE()))
+							/* USER DAX END */)
+
+							VAR __DS0FilterTable =
+							FILTER(
+							KEEPFILTERS(VALUES('Shipment'[Shipment Create Date])),
+							AND(
+							'Shipment'[Shipment Create Date] &gt;= DATEVALUE(@StartDate),
+							'Shipment'[Shipment Create Date] &lt; DATEVALUE(@EndDate)
+							)
+							)
+
+							VAR __DS0FilterTable2 =
+							FILTER(
+							KEEPFILTERS(VALUES('Shipment Coload Type'[Coload Type])),
+							'Shipment Coload Type'[Coload Type] = "All Shipments"
+							)
+
+							VAR __DS0FilterTable3 =
+							FILTER(KEEPFILTERS(VALUES('Shipment'[Is Active])), 'Shipment'[Is Active] = TRUE)
+
+							VAR __DS0FilterTable4 =
+							FILTER(
+							KEEPFILTERS(VALUES('Company Branch'[Company Code])),
+							'Company Branch'[Company Code] = @Company
+							)
+
+							VAR __DS0FilterTable5 =
+							FILTER(
+							KEEPFILTERS(VALUES('Company Branch Helper'[Company Code])),
+							'Company Branch Helper'[Company Code] = @Company
+							)
+
+							VAR __DS0FilterTable6 =
+							FILTER(
+							KEEPFILTERS(VALUES('Company Country'[Country Code])),
+							'Company Country'[Country Code] = @Country
+							)
+
+							EVALUATE
+							TOPN(
+							1000000,
+							SUMMARIZECOLUMNS(
+							'Shipment'[Job Number],
+							'Shipment'[Transport Mode],
+							'Shipment'[Container Mode],
+							'Port Of Origin'[Port Of Origin Code],
+							'Port Of Origin'[Port Of Origin Country Code],
+							'Port Of Destination'[Port Of Destination Code],
+							'Port Of Destination'[Port Of Destination Country Code],
+							'Shipment'[Way Bill Number],
+							'Shipment'[Shipment Inco Term],
+							'Shipment'[Additional Terms],
+							'Shipment'[Shipment PPD CCX Term],
+							'Shipment'[Goods Description],
+							'Shipment'[Weight Unit],
+							'Shipment'[Volume Unit],
+							'Shipment'[Total No Of Packs Package Type],
+							'Shipment'[Outer Packs Package Type],
+							'Shipment'[Shipment Create Date],
+							'Shipment'[Shipment Status],
+							'Consolidation'[Job No.],
+							'Consolidation'[Master Bill No.],
+							'Service Level'[Service Level],
+							'Shipment'[Interim Receipt Number],
+							'Shipment'[Booking Confirmation Reference],
+							'Shipment'[House Bill Type],
+							'Shipment'[Is Transport Job],
+							'Shipment'[Estimated Pickup],
+							'Shipment'[Pickup Required By],
+							'Shipment'[Delivery Cartage Completed],
+							'Shipment'[Delivery Required By],
+							'Shipment'[FCL Delivery Equipment Needed],
+							'Shipment'[Estimated Delivery],
+							'Shipment'[Pickup Cartage Completed],
+							'Shipment'[FCL Pickup Equipment Needed],
+							'Shipment'[Pickup Cartage Advised],
+							'Shipment'[Chargeable Unit],
+							'Shipment'[Is Master / Lead],
+							'Shipment'[Is Brokerage],
+							'Shipment'[Coload Master],
+							'Shipment'[Container 20F],
+							'Shipment'[Container 20H],
+							'Shipment'[Container 20R],
+							'Shipment'[Container 40F],
+							'Shipment'[Container 40H],
+							'Shipment'[Container 40R],
+							'Shipment'[Container 45F],
+							'Shipment'[Container GEN],
+							'Shipment'[Container Other],
+							'Discharge Port'[Discharge Port Code],
+							'Load Port'[Load Port Code],
+							'Shipment'[Is Active],
+							'Consolidation'[Coload],
+							'Shipment'[Received Date],
+							'Shipment'[Delivery Cartage Advised],
+							'Shipment'[Loading Meters],
+							'Shipment'[Arrival Date],
+							'Shipment'[Departure Date],
+							'Shipment'[Container TEU],
+							'Shipment'[Container Count],
+							'Carrier Address'[Carrier Code],
+							'Carrier Address'[Carrier Name],
+							'Receiving Agent Address'[Receiving Agent Code],
+							'Sending Agent Address'[Sending Agent Code],
+							'Consignor Address'[Consignor Code],
+							'Consignee Address'[Consignee Code],
+							'Export Broker'[Export Broker Code],
+							'Export Broker'[Export Broker Name],
+							'Import Broker'[Import Broker Code],
+							'Import Broker'[Import Broker Name],
+							'Receiving Agent Address'[Receiving Agent Name],
+							'Sending Agent Address'[Sending Agent Name],
+							'Consolidation'[First Load],
+							'Consolidation'[Last Discharge],
+							'Consolidation'[ETD First Load],
+							'Consolidation'[ETA Last Discharge],
+							'Consolidation'[First Vessel],
+							'Consolidation'[First Voyage Flight],
+							'Main Consol Shipment'[ETA Discharge],
+							'Main Consol Shipment'[ETD Load],
+							'Consolidation'[Contract No],
+							'Main Consol Shipment'[Consol ATD],
+							'Main Consol Shipment'[Consol ATA],
+							'Main Consol Shipment'[Direction],
+							'Consignor Address'[Consignor Address Name],
+							'Consignor Address'[Consignor Address City],
+							'Consignor Address'[Consignor Address State],
+							'Consignor Address'[Consignor Address Post Code],
+							'Consignee Address'[Consignee Address Name],
+							'Consignee Address'[Consignee Address City],
+							'Consignee Address'[Consignee Address State],
+							'Consignee Address'[Consignee Address Post Code],
+							'Controlling Agent Address'[Controlling Agent Code],
+							'Controlling Agent Address'[Controlling Agent Name],
+							'Controlling Customer Address'[Controlling Customer Code],
+							'Controlling Customer Address'[Controlling Customer Name],
+							__DS0FilterTable,
+							__DS0FilterTable2,
+							__DS0FilterTable3,
+							__DS0FilterTable4,
+							__DS0FilterTable5,
+							__DS0FilterTable6,
+							"Shipment_Weight", 'Shipment'[Shipment Weight],
+							"Shipment_Volume", 'Shipment'[Shipment Volume],
+							"Actual_Chargeable", 'Shipment'[Actual Chargeable],
+							"Total_No__Of_Packs", 'Shipment'[Total No. Of Packs],
+							"Shipment_Outer_Packs", 'Shipment'[Shipment Outer Packs],
+							"Shipment Customs Info", 'Shipment'[Shipment Customs Info],
+							"GL Branch", 'Shipment'[GL Branch],
+							"GL Department", 'Shipment'[GL Department],
+							"GL Local Agent Name", 'Shipment'[GL Local Agent Name],
+							"GL Representative Operator", 'Shipment'[GL Representative Operator],
+							"GL Overseas Agent Code", 'Shipment'[GL Overseas Agent Code],
+							"GL Overseas Agent Name", 'Shipment'[GL Overseas Agent Name],
+							"GL Representative Sales", 'Shipment'[GL Representative Sales],
+							"Sum_of_Revenue", 'GL Transaction'[Sum of Revenue],
+							"Sum_of_Cost", 'GL Transaction'[Sum of Cost],
+							"Sum_of_Job_Profit", 'GL Transaction'[Sum of Job Profit],
+							"Sum_of_Accrual", 'GL Transaction'[Sum of Accrual],
+							"Sum_of_Unrecognised_Cost", 'GL Transaction'[Sum of Unrecognised Cost],
+							"Sum_of_Unrecognised_Revenue", 'GL Transaction'[Sum of Unrecognised Revenue],
+							"Sum_Total_of_Cost", 'GL Transaction'[Sum Total of Cost],
+							"Sum_of_Recognised_Expense", 'GL Transaction'[Sum of Recognised Expense],
+							"Sum_of_Unrecognised_Income", 'GL Transaction'[Sum of Unrecognised Income],
+							"Sum_Total_of_Income", 'GL Transaction'[Sum Total of Income],
+							"Sum_Total_of_Expense", 'GL Transaction'[Sum Total of Expense],
+							"Sum_Total_of_Accrual", 'GL Transaction'[Sum Total of Accrual],
+							"Sum_of_Recognised_Income", 'GL Transaction'[Sum of Recognised Income],
+							"Sum_of_Unrecognised_Expense", 'GL Transaction'[Sum of Unrecognised Expense],
+							"Sum_Total_of_WIP", 'GL Transaction'[Sum Total of WIP],
+							"GL Status", 'Shipment'[GL Status],
+							"GL Create Date", 'Shipment'[GL Create Date],
+							"Sum_Total_of_Revenue", 'GL Transaction'[Sum Total of Revenue],
+							"GL Revenue Recognition Date", 'Shipment'[GL Revenue Recognition Date],
+							"Sum_of_Unrecognised_WIP", 'GL Transaction'[Sum of Unrecognised WIP],
+							"Sum_of_WIP", 'GL Transaction'[Sum of WIP],
+							"Sum_of_Unrecognised_Accrual", 'GL Transaction'[Sum of Unrecognised Accrual],
+							"Local Client AR Settlement Group Code", 'Local Agent AR Settlement'[Local Client AR Settlement Group Code],
+							"Local Client AR Settlement Group Name", 'Local Agent AR Settlement'[Local Client AR Settlement Group Name],
+							"Overseas Agent AR Settlement Group Code", 'Overseas Agent AR Settlement'[Overseas Agent AR Settlement Group Code],
+							"Overseas Agent AR Settlement Group Name", 'Overseas Agent AR Settlement'[Overseas Agent AR Settlement Group Name],
+							"GL Local Agent Code", 'Shipment'[GL Local Agent Code],
+							"Job Branch", 'Shipment'[Job Branch],
+							"Job Department", 'Shipment'[Job Department]
+							),
+							'Shipment'[Job Number],
+							1,
+							'Shipment'[Transport Mode],
+							1,
+							'Shipment'[Container Mode],
+							1,
+							'Port Of Origin'[Port Of Origin Code],
+							1,
+							'Port Of Origin'[Port Of Origin Country Code],
+							1,
+							'Port Of Destination'[Port Of Destination Code],
+							1,
+							'Port Of Destination'[Port Of Destination Country Code],
+							1,
+							'Shipment'[Way Bill Number],
+							1,
+							'Shipment'[Shipment Inco Term],
+							1,
+							'Shipment'[Additional Terms],
+							1,
+							'Shipment'[Shipment PPD CCX Term],
+							1,
+							'Shipment'[Goods Description],
+							1,
+							'Shipment'[Weight Unit],
+							1,
+							'Shipment'[Volume Unit],
+							1,
+							'Shipment'[Total No Of Packs Package Type],
+							1,
+							'Shipment'[Outer Packs Package Type],
+							1,
+							'Shipment'[Shipment Create Date],
+							1,
+							'Shipment'[Shipment Status],
+							1,
+							'Consolidation'[Job No.],
+							1,
+							'Consolidation'[Master Bill No.],
+							1,
+							'Service Level'[Service Level],
+							1,
+							'Shipment'[Interim Receipt Number],
+							1,
+							'Shipment'[Booking Confirmation Reference],
+							1,
+							'Shipment'[House Bill Type],
+							1,
+							'Shipment'[Is Transport Job],
+							1,
+							'Shipment'[Estimated Pickup],
+							1,
+							'Shipment'[Pickup Required By],
+							1,
+							'Shipment'[Delivery Cartage Completed],
+							1,
+							'Shipment'[Delivery Required By],
+							1,
+							'Shipment'[FCL Delivery Equipment Needed],
+							1,
+							'Shipment'[Estimated Delivery],
+							1,
+							'Shipment'[Pickup Cartage Completed],
+							1,
+							'Shipment'[FCL Pickup Equipment Needed],
+							1,
+							'Shipment'[Pickup Cartage Advised],
+							1,
+							'Shipment'[Chargeable Unit],
+							1,
+							'Shipment'[Is Master / Lead],
+							1,
+							'Shipment'[Is Brokerage],
+							1,
+							'Shipment'[Coload Master],
+							1,
+							'Shipment'[Container 20F],
+							1,
+							'Shipment'[Container 20H],
+							1,
+							'Shipment'[Container 20R],
+							1,
+							'Shipment'[Container 40F],
+							1,
+							'Shipment'[Container 40H],
+							1,
+							'Shipment'[Container 40R],
+							1,
+							'Shipment'[Container 45F],
+							1,
+							'Shipment'[Container GEN],
+							1,
+							'Shipment'[Container Other],
+							1,
+							'Discharge Port'[Discharge Port Code],
+							1,
+							'Load Port'[Load Port Code],
+							1,
+							'Shipment'[Is Active],
+							1,
+							'Consolidation'[Coload],
+							1,
+							'Shipment'[Received Date],
+							1,
+							'Shipment'[Delivery Cartage Advised],
+							1,
+							'Shipment'[Loading Meters],
+							1,
+							'Shipment'[Arrival Date],
+							1,
+							'Shipment'[Departure Date],
+							1,
+							'Shipment'[Container TEU],
+							1,
+							'Shipment'[Container Count],
+							1,
+							'Carrier Address'[Carrier Code],
+							1,
+							'Carrier Address'[Carrier Name],
+							1,
+							'Receiving Agent Address'[Receiving Agent Code],
+							1,
+							'Sending Agent Address'[Sending Agent Code],
+							1,
+							'Consignor Address'[Consignor Code],
+							1,
+							'Consignee Address'[Consignee Code],
+							1,
+							'Export Broker'[Export Broker Code],
+							1,
+							'Export Broker'[Export Broker Name],
+							1,
+							'Import Broker'[Import Broker Code],
+							1,
+							'Import Broker'[Import Broker Name],
+							1,
+							'Receiving Agent Address'[Receiving Agent Name],
+							1,
+							'Sending Agent Address'[Sending Agent Name],
+							1,
+							'Consolidation'[First Load],
+							1,
+							'Consolidation'[Last Discharge],
+							1,
+							'Consolidation'[ETD First Load],
+							1,
+							'Consolidation'[ETA Last Discharge],
+							1,
+							'Consolidation'[First Vessel],
+							1,
+							'Consolidation'[First Voyage Flight],
+							1,
+							'Main Consol Shipment'[ETA Discharge],
+							1,
+							'Main Consol Shipment'[ETD Load],
+							1,
+							'Consolidation'[Contract No],
+							1,
+							'Main Consol Shipment'[Consol ATD],
+							1,
+							'Main Consol Shipment'[Consol ATA],
+							1,
+							'Main Consol Shipment'[Direction],
+							1,
+							'Consignor Address'[Consignor Address Name],
+							1,
+							'Consignor Address'[Consignor Address City],
+							1,
+							'Consignor Address'[Consignor Address State],
+							1,
+							'Consignor Address'[Consignor Address Post Code],
+							1,
+							'Consignee Address'[Consignee Address Name],
+							1,
+							'Consignee Address'[Consignee Address City],
+							1,
+							'Consignee Address'[Consignee Address State],
+							1,
+							'Consignee Address'[Consignee Address Post Code],
+							1,
+							'Controlling Agent Address'[Controlling Agent Code],
+							1,
+							'Controlling Agent Address'[Controlling Agent Name],
+							1,
+							'Controlling Customer Address'[Controlling Customer Code],
+							1,
+							'Controlling Customer Address'[Controlling Customer Name],
+							1
+							)
+
+							ORDER BY
+							'Shipment'[Job Number],
+							'Shipment'[Transport Mode],
+							'Shipment'[Container Mode],
+							'Port Of Origin'[Port Of Origin Code],
+							'Port Of Origin'[Port Of Origin Country Code],
+							'Port Of Destination'[Port Of Destination Code],
+							'Port Of Destination'[Port Of Destination Country Code],
+							'Shipment'[Way Bill Number],
+							'Shipment'[Shipment Inco Term],
+							'Shipment'[Additional Terms],
+							'Shipment'[Shipment PPD CCX Term],
+							'Shipment'[Goods Description],
+							'Shipment'[Weight Unit],
+							'Shipment'[Volume Unit],
+							'Shipment'[Total No Of Packs Package Type],
+							'Shipment'[Outer Packs Package Type],
+							'Shipment'[Shipment Create Date],
+							'Shipment'[Shipment Status],
+							'Consolidation'[Job No.],
+							'Consolidation'[Master Bill No.],
+							'Service Level'[Service Level],
+							'Shipment'[Interim Receipt Number],
+							'Shipment'[Booking Confirmation Reference],
+							'Shipment'[House Bill Type],
+							'Shipment'[Is Transport Job],
+							'Shipment'[Estimated Pickup],
+							'Shipment'[Pickup Required By],
+							'Shipment'[Delivery Cartage Completed],
+							'Shipment'[Delivery Required By],
+							'Shipment'[FCL Delivery Equipment Needed],
+							'Shipment'[Estimated Delivery],
+							'Shipment'[Pickup Cartage Completed],
+							'Shipment'[FCL Pickup Equipment Needed],
+							'Shipment'[Pickup Cartage Advised],
+							'Shipment'[Chargeable Unit],
+							'Shipment'[Is Master / Lead],
+							'Shipment'[Is Brokerage],
+							'Shipment'[Coload Master],
+							'Shipment'[Container 20F],
+							'Shipment'[Container 20H],
+							'Shipment'[Container 20R],
+							'Shipment'[Container 40F],
+							'Shipment'[Container 40H],
+							'Shipment'[Container 40R],
+							'Shipment'[Container 45F],
+							'Shipment'[Container GEN],
+							'Shipment'[Container Other],
+							'Discharge Port'[Discharge Port Code],
+							'Load Port'[Load Port Code],
+							'Shipment'[Is Active],
+							'Consolidation'[Coload],
+							'Shipment'[Received Date],
+							'Shipment'[Delivery Cartage Advised],
+							'Shipment'[Loading Meters],
+							'Shipment'[Arrival Date],
+							'Shipment'[Departure Date],
+							'Shipment'[Container TEU],
+							'Shipment'[Container Count],
+							'Carrier Address'[Carrier Code],
+							'Carrier Address'[Carrier Name],
+							'Receiving Agent Address'[Receiving Agent Code],
+							'Sending Agent Address'[Sending Agent Code],
+							'Consignor Address'[Consignor Code],
+							'Consignee Address'[Consignee Code],
+							'Export Broker'[Export Broker Code],
+							'Export Broker'[Export Broker Name],
+							'Import Broker'[Import Broker Code],
+							'Import Broker'[Import Broker Name],
+							'Receiving Agent Address'[Receiving Agent Name],
+							'Sending Agent Address'[Sending Agent Name],
+							'Consolidation'[First Load],
+							'Consolidation'[Last Discharge],
+							'Consolidation'[ETD First Load],
+							'Consolidation'[ETA Last Discharge],
+							'Consolidation'[First Vessel],
+							'Consolidation'[First Voyage Flight],
+							'Main Consol Shipment'[ETA Discharge],
+							'Main Consol Shipment'[ETD Load],
+							'Consolidation'[Contract No],
+							'Main Consol Shipment'[Consol ATD],
+							'Main Consol Shipment'[Consol ATA],
+							'Main Consol Shipment'[Direction],
+							'Consignor Address'[Consignor Address Name],
+							'Consignor Address'[Consignor Address City],
+							'Consignor Address'[Consignor Address State],
+							'Consignor Address'[Consignor Address Post Code],
+							'Consignee Address'[Consignee Address Name],
+							'Consignee Address'[Consignee Address City],
+							'Consignee Address'[Consignee Address State],
+							'Consignee Address'[Consignee Address Post Code],
+							'Controlling Agent Address'[Controlling Agent Code],
+							'Controlling Agent Address'[Controlling Agent Name],
+							'Controlling Customer Address'[Controlling Customer Code],
+							'Controlling Customer Address'[Controlling Customer Name]
+						</Statement>
+						<ParameterDefinitions>
+							<ParameterDefinition>
+								<Name>Company</Name>
+								<DefaultValues>
+									<DefaultValue>DAU</DefaultValue>
+								</DefaultValues>
+								<Caption>Company</Caption>
+								<ParameterValuesQuery>
+									<ParameterizedStatement>
+										<ReferencedParameters />
+									</ParameterizedStatement>
+								</ParameterValuesQuery>
+							</ParameterDefinition>
+							<ParameterDefinition>
+								<Name>Country</Name>
+								<DefaultValues>
+									<DefaultValue>AU</DefaultValue>
+								</DefaultValues>
+								<Caption>Country</Caption>
+								<ParameterValuesQuery>
+									<ParameterizedStatement>
+										<ReferencedParameters />
+									</ParameterizedStatement>
+								</ParameterValuesQuery>
+							</ParameterDefinition>
+							<ParameterDefinition>
+								<Name>StartDate</Name>
+								<DefaultValues>
+									<DefaultValue>2015/01/01)</DefaultValue>
+								</DefaultValues>
+								<Caption>StartDate</Caption>
+								<ParameterValuesQuery>
+									<ParameterizedStatement>
+										<ReferencedParameters />
+									</ParameterizedStatement>
+								</ParameterValuesQuery>
+							</ParameterDefinition>
+							<ParameterDefinition>
+								<Name>EndDate</Name>
+								<DefaultValues>
+									<DefaultValue>2021/12/31</DefaultValue>
+								</DefaultValues>
+								<Caption>EndDate</Caption>
+								<ParameterValuesQuery>
+									<ParameterizedStatement>
+										<ReferencedParameters />
+									</ParameterizedStatement>
+								</ParameterValuesQuery>
+							</ParameterDefinition>
+						</ParameterDefinitions>
+					</Query>
+				</QueryDefinition>
+			</rd:DesignerState>
+		</Query>
+		<Fields>
+			<Field Name="Job_Number">
+				<DataField>Shipment[Job Number]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Transport_Mode">
+				<DataField>Shipment[Transport Mode]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Container_Mode">
+				<DataField>Shipment[Container Mode]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Port_Of_Origin_Code">
+				<DataField>Port Of Origin[Port Of Origin Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Port_Of_Origin_Country_Code">
+				<DataField>Port Of Origin[Port Of Origin Country Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Port_Of_Destination_Code">
+				<DataField>Port Of Destination[Port Of Destination Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Port_Of_Destination_Country_Code">
+				<DataField>Port Of Destination[Port Of Destination Country Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Way_Bill_Number">
+				<DataField>Shipment[Way Bill Number]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Shipment_Inco_Term">
+				<DataField>Shipment[Shipment Inco Term]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Additional_Terms">
+				<DataField>Shipment[Additional Terms]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Shipment_PPD_CCX_Term">
+				<DataField>Shipment[Shipment PPD CCX Term]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Goods_Description">
+				<DataField>Shipment[Goods Description]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Weight_Unit">
+				<DataField>Shipment[Weight Unit]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Volume_Unit">
+				<DataField>Shipment[Volume Unit]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Total_No_Of_Packs_Package_Type">
+				<DataField>Shipment[Total No Of Packs Package Type]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Outer_Packs_Package_Type">
+				<DataField>Shipment[Outer Packs Package Type]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Shipment_Create_Date">
+				<DataField>Shipment[Shipment Create Date]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Shipment_Status">
+				<DataField>Shipment[Shipment Status]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Job_No_">
+				<DataField>Consolidation[Job No.]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Master_Bill_No_">
+				<DataField>Consolidation[Master Bill No.]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Service_Level">
+				<DataField>Service Level[Service Level]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Interim_Receipt_Number">
+				<DataField>Shipment[Interim Receipt Number]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Booking_Confirmation_Reference">
+				<DataField>Shipment[Booking Confirmation Reference]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="House_Bill_Type">
+				<DataField>Shipment[House Bill Type]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Is_Transport_Job">
+				<DataField>Shipment[Is Transport Job]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Estimated_Pickup">
+				<DataField>Shipment[Estimated Pickup]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Pickup_Required_By">
+				<DataField>Shipment[Pickup Required By]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Delivery_Cartage_Completed">
+				<DataField>Shipment[Delivery Cartage Completed]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Delivery_Required_By">
+				<DataField>Shipment[Delivery Required By]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="FCL_Delivery_Equipment_Needed">
+				<DataField>Shipment[FCL Delivery Equipment Needed]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Estimated_Delivery">
+				<DataField>Shipment[Estimated Delivery]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Pickup_Cartage_Completed">
+				<DataField>Shipment[Pickup Cartage Completed]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="FCL_Pickup_Equipment_Needed">
+				<DataField>Shipment[FCL Pickup Equipment Needed]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Pickup_Cartage_Advised">
+				<DataField>Shipment[Pickup Cartage Advised]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Chargeable_Unit">
+				<DataField>Shipment[Chargeable Unit]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Is_Master___Lead">
+				<DataField>Shipment[Is Master / Lead]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Is_Brokerage">
+				<DataField>Shipment[Is Brokerage]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Coload_Master">
+				<DataField>Shipment[Coload Master]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Container_20F">
+				<DataField>Shipment[Container 20F]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Container_20H">
+				<DataField>Shipment[Container 20H]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Container_20R">
+				<DataField>Shipment[Container 20R]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Container_40F">
+				<DataField>Shipment[Container 40F]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Container_40H">
+				<DataField>Shipment[Container 40H]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Container_40R">
+				<DataField>Shipment[Container 40R]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Container_45F">
+				<DataField>Shipment[Container 45F]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Container_GEN">
+				<DataField>Shipment[Container GEN]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Container_Other">
+				<DataField>Shipment[Container Other]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Discharge_Port_Code">
+				<DataField>Discharge Port[Discharge Port Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Load_Port_Code">
+				<DataField>Load Port[Load Port Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Is_Active">
+				<DataField>Shipment[Is Active]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Coload">
+				<DataField>Consolidation[Coload]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Received_Date">
+				<DataField>Shipment[Received Date]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Delivery_Cartage_Advised">
+				<DataField>Shipment[Delivery Cartage Advised]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Loading_Meters">
+				<DataField>Shipment[Loading Meters]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Arrival_Date">
+				<DataField>Shipment[Arrival Date]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Departure_Date">
+				<DataField>Shipment[Departure Date]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Container_TEU">
+				<DataField>Shipment[Container TEU]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Container_Count">
+				<DataField>Shipment[Container Count]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Carrier_Code">
+				<DataField>Carrier Address[Carrier Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Carrier_Name">
+				<DataField>Carrier Address[Carrier Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Receiving_Agent_Code">
+				<DataField>Receiving Agent Address[Receiving Agent Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sending_Agent_Code">
+				<DataField>Sending Agent Address[Sending Agent Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Consignor_Code">
+				<DataField>Consignor Address[Consignor Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Consignee_Code">
+				<DataField>Consignee Address[Consignee Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Export_Broker_Code">
+				<DataField>Export Broker[Export Broker Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Export_Broker_Name">
+				<DataField>Export Broker[Export Broker Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Import_Broker_Code">
+				<DataField>Import Broker[Import Broker Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Import_Broker_Name">
+				<DataField>Import Broker[Import Broker Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Receiving_Agent_Name">
+				<DataField>Receiving Agent Address[Receiving Agent Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sending_Agent_Name">
+				<DataField>Sending Agent Address[Sending Agent Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="First_Load">
+				<DataField>Consolidation[First Load]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Last_Discharge">
+				<DataField>Consolidation[Last Discharge]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="ETD_First_Load">
+				<DataField>Consolidation[ETD First Load]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="ETA_Last_Discharge">
+				<DataField>Consolidation[ETA Last Discharge]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="First_Vessel">
+				<DataField>Consolidation[First Vessel]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="First_Voyage_Flight">
+				<DataField>Consolidation[First Voyage Flight]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="ETA_Discharge">
+				<DataField>Main Consol Shipment[ETA Discharge]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="ETD_Load">
+				<DataField>Main Consol Shipment[ETD Load]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Contract_No">
+				<DataField>Consolidation[Contract No]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Consol_ATD">
+				<DataField>Main Consol Shipment[Consol ATD]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Consol_ATA">
+				<DataField>Main Consol Shipment[Consol ATA]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Direction">
+				<DataField>Main Consol Shipment[Direction]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Consignor_Address_Name">
+				<DataField>Consignor Address[Consignor Address Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Consignor_Address_City">
+				<DataField>Consignor Address[Consignor Address City]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Consignor_Address_State">
+				<DataField>Consignor Address[Consignor Address State]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Consignor_Address_Post_Code">
+				<DataField>Consignor Address[Consignor Address Post Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Consignee_Address_Name">
+				<DataField>Consignee Address[Consignee Address Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Consignee_Address_City">
+				<DataField>Consignee Address[Consignee Address City]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Consignee_Address_State">
+				<DataField>Consignee Address[Consignee Address State]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Consignee_Address_Post_Code">
+				<DataField>Consignee Address[Consignee Address Post Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Controlling_Agent_Code">
+				<DataField>Controlling Agent Address[Controlling Agent Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Controlling_Agent_Name">
+				<DataField>Controlling Agent Address[Controlling Agent Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Controlling_Customer_Code">
+				<DataField>Controlling Customer Address[Controlling Customer Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Controlling_Customer_Name">
+				<DataField>Controlling Customer Address[Controlling Customer Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Shipment_Weight">
+				<DataField>[Shipment_Weight]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Shipment_Volume">
+				<DataField>[Shipment_Volume]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Actual_Chargeable">
+				<DataField>[Actual_Chargeable]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Total_No__Of_Packs">
+				<DataField>[Total_No__Of_Packs]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Shipment_Outer_Packs">
+				<DataField>[Shipment_Outer_Packs]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Shipment_Customs_Info">
+				<DataField>[Shipment Customs Info]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GL_Branch">
+				<DataField>[GL Branch]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GL_Department">
+				<DataField>[GL Department]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GL_Local_Agent_Name">
+				<DataField>[GL Local Agent Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GL_Representative_Operator">
+				<DataField>[GL Representative Operator]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GL_Overseas_Agent_Code">
+				<DataField>[GL Overseas Agent Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GL_Overseas_Agent_Name">
+				<DataField>[GL Overseas Agent Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GL_Representative_Sales">
+				<DataField>[GL Representative Sales]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_Revenue">
+				<DataField>[Sum_of_Revenue]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_Cost">
+				<DataField>[Sum_of_Cost]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_Job_Profit">
+				<DataField>[Sum_of_Job_Profit]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_Accrual">
+				<DataField>[Sum_of_Accrual]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_Unrecognised_Cost">
+				<DataField>[Sum_of_Unrecognised_Cost]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_Unrecognised_Revenue">
+				<DataField>[Sum_of_Unrecognised_Revenue]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_Total_of_Cost">
+				<DataField>[Sum_Total_of_Cost]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_Recognised_Expense">
+				<DataField>[Sum_of_Recognised_Expense]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_Unrecognised_Income">
+				<DataField>[Sum_of_Unrecognised_Income]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_Total_of_Income">
+				<DataField>[Sum_Total_of_Income]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_Total_of_Expense">
+				<DataField>[Sum_Total_of_Expense]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_Total_of_Accrual">
+				<DataField>[Sum_Total_of_Accrual]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_Recognised_Income">
+				<DataField>[Sum_of_Recognised_Income]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_Unrecognised_Expense">
+				<DataField>[Sum_of_Unrecognised_Expense]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_Total_of_WIP">
+				<DataField>[Sum_Total_of_WIP]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GL_Status">
+				<DataField>[GL Status]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GL_Create_Date">
+				<DataField>[GL Create Date]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_Total_of_Revenue">
+				<DataField>[Sum_Total_of_Revenue]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GL_Revenue_Recognition_Date">
+				<DataField>[GL Revenue Recognition Date]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_Unrecognised_WIP">
+				<DataField>[Sum_of_Unrecognised_WIP]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_WIP">
+				<DataField>[Sum_of_WIP]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Sum_of_Unrecognised_Accrual">
+				<DataField>[Sum_of_Unrecognised_Accrual]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Local_Client_AR_Settlement_Group_Code">
+				<DataField>[Local Client AR Settlement Group Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Local_Client_AR_Settlement_Group_Name">
+				<DataField>[Local Client AR Settlement Group Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Overseas_Agent_AR_Settlement_Group_Code">
+				<DataField>[Overseas Agent AR Settlement Group Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Overseas_Agent_AR_Settlement_Group_Name">
+				<DataField>[Overseas Agent AR Settlement Group Name]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="GL_Local_Agent_Code">
+				<DataField>[GL Local Agent Code]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Job_Branch">
+				<DataField>[Job Branch]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+			<Field Name="Job_Department">
+				<DataField>[Job Department]</DataField>
+				<rd:TypeName>System.String</rd:TypeName>
+			</Field>
+		</Fields>
+	</DataSet>
+</SharedDataSet>

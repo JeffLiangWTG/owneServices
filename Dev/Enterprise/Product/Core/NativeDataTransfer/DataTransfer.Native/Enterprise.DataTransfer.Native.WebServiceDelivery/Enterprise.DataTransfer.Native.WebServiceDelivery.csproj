@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.ComponentModel" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="Enterprise.Billing.Integration" />
+    <Reference Include="Enterprise.DataTransfer.Native.Integration" />
+    <Reference Include="Enterprise.Environment" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.MasterFiles.Business" />
+    <Reference Include="Enterprise.MasterFiles.Integration" />
+    <Reference Include="Enterprise.Messaging.Integration" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Resources" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Service References\LocalService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\LocalService\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Service References\LocalService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Enterprise.DataTransfer.Native.Common\Enterprise.DataTransfer.Native.Common.csproj" />
+    <ProjectReference Include="..\Enterprise.DataTransfer.Native.Utils\Enterprise.DataTransfer.Native.Utils.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.ServiceModel" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="System.ServiceModel.Primitives" />
+    <PackageReference Include="System.ServiceModel.Web" />
+    <PackageReference Include="System.ServiceModel.Http" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

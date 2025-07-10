@@ -1,0 +1,3113 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+<script type="text/javascript">
+	$(function() {
+	      
+	});
+</script>
+
+<script type="text/javascript" src="/rita-encyclopedie/js/jquery.tablesorter.min.js" ></script>
+<script type="text/javascript" src="/rita-encyclopedie/js/jquery.tablesorter.widgets.min.js" ></script>
+<script type="text/javascript">
+$(function() {
+	afficherDivElement("resultat");
+	$(".resultatTable:last").tablesorter({
+        headers: {
+            0: {lockedOrder: 'asc', sorter: 'text'},
+            1: {lockedOrder: 'asc', sorter: 'text'},
+            2: {lockedOrder: 'asc', sorter: 'text'},
+            3: {lockedOrder: 'asc', sorter: 'text'},
+            4: {lockedOrder: 'asc', sorter: 'text'},
+            5: {lockedOrder: 'asc', sorter: 'text'},
+            6: {sorter: false}
+        },
+        widgets: ["zebra", "columns"],
+        widgetOptions: {
+            zebra: ["ligne1", "ligne2"],
+            columns : ["primary", "secondary", "tertiary", ""],
+            columns_thead : true
+        },
+        sortList: [[0,0]],
+        textExtraction : "complex"
+        
+    });
+});
+
+ function rechercheColonneType(paramTypeZone) {
+     
+     $('#radTYPE_ZONE_' +  paramTypeZone).prop('checked', true);
+     
+     var idListeDeroulante =  "divSelGR_PAYS";
+     
+     $("#" + idListeDeroulante + " option").filter(function() {
+         return $(this).text().trim() == ""; 
+     }).prop('selected', true);
+     
+     idListeDeroulante = "divSelMEMBRE_PAYS";
+     
+     $("#" + idListeDeroulante + " option").filter(function() {
+         return $(this).text().trim() == ""; 
+     }).prop('selected', true);
+     
+     $('#inpIDENTIFIANT').val('');
+     $('#inpMOT_CLE').val('');
+     $('#typeRecherche').val('PAYS_REGION_GROUPE');
+     $("#btnRECHERCHE").trigger('click');
+
+}
+
+function rechercheColonneRechDispo(paramTypeZone, codeListe, libelleListe) {
+  
+  $('#radTYPE_ZONE_TOUS').prop('checked', true);
+ 
+  var idListeDeroulante,idListeNonChoisie;
+  if(paramTypeZone == "Z" ) {
+      idListeDeroulante = "divSelMEMBRE_PAYS";
+      idListeNonChoisie = "divSelGR_PAYS";
+  }
+  else {
+      idListeDeroulante =  "divSelGR_PAYS";
+      idListeNonChoisie = "divSelMEMBRE_PAYS";
+  }
+  
+  $("#" + idListeDeroulante + " option").filter(function() {
+      return $(this).val().trim() == codeListe + ":" +  libelleListe; 
+  }).prop('selected', true);
+  
+  $("#" + idListeNonChoisie + " option").filter(function() {
+      return $(this).val().trim() == ""; 
+  }).prop('selected', true);
+  
+  $('#inpIDENTIFIANT').val('');
+  $('#inpMOT_CLE').val('');
+  $('#typeRecherche').val('PAYS_REGION_GROUPE');
+  $("#btnRECHERCHE").trigger('click');
+}
+
+</script>
+<title></title>
+</head>
+<body>
+    
+<form id="formTelecharger" name="formTelecharger" action="/rita-encyclopedie/public/experts/reference/ajaxRecherchePaysRegGr.action" method="post"><div id="divTelecharger"
+           >
+            <span class="libelle">T�l�charger&nbsp;:</span>
+            <a href="/rita-encyclopedie/public/experts/reference/exporter.action?expertsReferenceConversation.formatExport=XLS&expertsReferenceConversation.typeExport=CODES_GEOGRAPHIQUES_VALIDES" style="margin:0 0.2em"><img src="/rita-encyclopedie/img/bouton/B_ExportXlsP_1.gif"/></a><a href="/rita-encyclopedie/public/experts/reference/exporter.action?expertsReferenceConversation.formatExport=XML&expertsReferenceConversation.typeExport=CODES_GEOGRAPHIQUES_VALIDES" style="margin:0 0.2em"><img src="/rita-encyclopedie/img/bouton/B_ExportXmlP_1.gif"/></a><a href="/rita-encyclopedie/public/experts/reference/exporter.action?expertsReferenceConversation.formatExport=CSV&expertsReferenceConversation.typeExport=CODES_GEOGRAPHIQUES_VALIDES" style="margin:0 0.2em"><img src="/rita-encyclopedie/img/bouton/B_ExportCsvP_1.gif"/></a></div>
+        </form>
+
+
+<table id="recapitulatifPaysGroupe" class="recapitulatif" style="margin: 1em;">
+		<thead>
+			<tr>
+				<th colspan="2">R�capitulatif des crit�res saisis</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr>
+				<th>Type de donn�es&nbsp;:</th>
+				<td>Pays, r&eacute;gion ou groupe</td>
+			</tr>
+			
+			<tr>
+				<th>Groupe&nbsp;:</th>
+				<td>UE + pays tiers + DOM</td>
+			</tr>
+			<tr>
+				<th>Date&nbsp;:</th>
+				<td>24/02/2022</td>
+			</tr>
+			<tr>
+				<th>Type&nbsp;:</th>
+				<td>
+				Pays ou r�gion</td>
+			</tr>
+			</tbody>
+	</table>
+	
+<div style="margin: 0.5em">
+        <span style="font-weight: bolder;">Pays, r&eacute;gion ou groupe</span>:
+        211r�sultats.
+        </div><table id="tabPaysRegion" class="resultat tablesorter tablesorter-default hasSaveSort resultatTable" style="width:100%;table-layout:auto;">
+			<thead> 
+				<tr>
+					<th id="tabResulTr1" style="cursor: pointer;" onclick="triTableau('tabPaysRegion', 'th.primary', 'th.secondary', 'th.tertiary', this);" title='Cliquez ici pour trier sur cette colonne.'>Code</th>
+                    <th id="tabResulTr2" style="cursor: pointer;" onclick="triTableau('tabPaysRegion', 'th.primary', 'th.secondary', 'th.tertiary', this);" title='Cliquez ici pour trier sur cette colonne.'>Description</th>
+                    <th id="tabResulTr3" style="cursor: pointer;" onclick="triTableau('tabPaysRegion', 'th.primary', 'th.secondary', 'th.tertiary', this);" title='Cliquez ici pour trier sur cette colonne.'>Type</th>
+                    <th id="tabResulTr4" style="cursor: pointer;" onclick="triTableau('tabPaysRegion', 'th.primary', 'th.secondary', 'th.tertiary', this);" title='Cliquez ici pour trier sur cette colonne.'>D�but</th>
+                    <th id="tabResulTr5" style="cursor: pointer;" onclick="triTableau('tabPaysRegion', 'th.primary', 'th.secondary', 'th.tertiary', this);" title='Cliquez ici pour trier sur cette colonne.'>Fin</th>
+					<th id="tabResulTr6" >Recherches disponibles</th>
+				</tr>
+			</thead>
+			
+			<tbody>
+				<tr>
+					<td>AD</td>
+					<td style="text-align:left">Andorre</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/07/1991</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AD', 'Andorre')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AE</td>
+					<td style="text-align:left">Emirats arabes unis</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AE', 'Emirats arabes unis')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AF</td>
+					<td style="text-align:left">Afghanistan</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AF', 'Afghanistan')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AG</td>
+					<td style="text-align:left">Antigua-et-Barbuda</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AG', 'Antigua-et-Barbuda')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AI</td>
+					<td style="text-align:left">Anguilla</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AI', 'Anguilla')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AL</td>
+					<td style="text-align:left">Albanie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1988</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AL', 'Albanie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AM</td>
+					<td style="text-align:left">Arm&eacute;nie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/06/1992</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AM', 'Arm&eacute;nie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AO</td>
+					<td style="text-align:left">Angola</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AO', 'Angola')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AQ</td>
+					<td style="text-align:left">Antarctique</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AQ', 'Antarctique')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AR</td>
+					<td style="text-align:left">Argentine</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AR', 'Argentine')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AS</td>
+					<td style="text-align:left">Samoa am&eacute;ricaines</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AS', 'Samoa am&eacute;ricaines')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AU</td>
+					<td style="text-align:left">Australie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1988</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AU', 'Australie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AW</td>
+					<td style="text-align:left">Aruba</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AW', 'Aruba')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>AZ</td>
+					<td style="text-align:left">Azerba&iuml;djan</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/06/1992</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'AZ', 'Azerba&iuml;djan')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BA</td>
+					<td style="text-align:left">Bosnie-et-Herz&eacute;govine</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>15/11/1991</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BA', 'Bosnie-et-Herz&eacute;govine')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BB</td>
+					<td style="text-align:left">Barbade</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BB', 'Barbade')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BD</td>
+					<td style="text-align:left">Bangladesh</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BD', 'Bangladesh')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BF</td>
+					<td style="text-align:left">Burkina Faso</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BF', 'Burkina Faso')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BH</td>
+					<td style="text-align:left">Bahrein</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BH', 'Bahrein')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BI</td>
+					<td style="text-align:left">Burundi</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BI', 'Burundi')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BJ</td>
+					<td style="text-align:left">B&eacute;nin</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BJ', 'B&eacute;nin')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BL</td>
+					<td style="text-align:left">Saint-Barth&eacute;lemy</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2013</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BL', 'Saint-Barth&eacute;lemy')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BM</td>
+					<td style="text-align:left">Bermudes</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BM', 'Bermudes')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BN</td>
+					<td style="text-align:left">Brunei</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BN', 'Brunei')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BO</td>
+					<td style="text-align:left">Bolivie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BO', 'Bolivie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BQ</td>
+					<td style="text-align:left">Bonaire, Saint-Eustache et Saba</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2013</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BQ', 'Bonaire, Saint-Eustache et Saba')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BR</td>
+					<td style="text-align:left">Br&eacute;sil</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BR', 'Br&eacute;sil')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BS</td>
+					<td style="text-align:left">Bahamas</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BS', 'Bahamas')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BT</td>
+					<td style="text-align:left">Bhoutan</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BT', 'Bhoutan')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BV</td>
+					<td style="text-align:left">Ile Bouvet</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BV', 'Ile Bouvet')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BW</td>
+					<td style="text-align:left">Botswana</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BW', 'Botswana')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BY</td>
+					<td style="text-align:left">Bi&eacute;lorussie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1972</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BY', 'Bi&eacute;lorussie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>BZ</td>
+					<td style="text-align:left">Belize</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'BZ', 'Belize')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CA</td>
+					<td style="text-align:left">Canada</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1988</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CA', 'Canada')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CC</td>
+					<td style="text-align:left">Iles Cocos (ou &icirc;les Keeling)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CC', 'Iles Cocos (ou &icirc;les Keeling)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CD</td>
+					<td style="text-align:left">Congo (R&eacute;publique d&eacute;mocratique du)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1998</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CD', 'Congo (R&eacute;publique d&eacute;mocratique du)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CF</td>
+					<td style="text-align:left">R&eacute;publique Centrafricaine</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CF', 'R&eacute;publique Centrafricaine')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CG</td>
+					<td style="text-align:left">Congo</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CG', 'Congo')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CH</td>
+					<td style="text-align:left">Suisse</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>20/12/1972</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CH', 'Suisse')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CI</td>
+					<td style="text-align:left">C&ocirc;te d'Ivoire</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CI', 'C&ocirc;te d'Ivoire')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CK</td>
+					<td style="text-align:left">Cook (&Icirc;les)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CK', 'Cook (&Icirc;les)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CL</td>
+					<td style="text-align:left">Chili</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CL', 'Chili')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CM</td>
+					<td style="text-align:left">Cameroun</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CM', 'Cameroun')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CN</td>
+					<td style="text-align:left">Chine</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CN', 'Chine')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CO</td>
+					<td style="text-align:left">Colombie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CO', 'Colombie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CR</td>
+					<td style="text-align:left">Costa Rica</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CR', 'Costa Rica')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CU</td>
+					<td style="text-align:left">Cuba</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CU', 'Cuba')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CV</td>
+					<td style="text-align:left">Cap-Vert</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CV', 'Cap-Vert')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CW</td>
+					<td style="text-align:left">Cura&ccedil;ao</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2013</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CW', 'Cura&ccedil;ao')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>CX</td>
+					<td style="text-align:left">Christmas (Ile)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'CX', 'Christmas (Ile)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>DJ</td>
+					<td style="text-align:left">Djibouti</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'DJ', 'Djibouti')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>DM</td>
+					<td style="text-align:left">Dominique</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'DM', 'Dominique')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>DO</td>
+					<td style="text-align:left">R&eacute;publique dominicaine</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'DO', 'R&eacute;publique dominicaine')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>DZ</td>
+					<td style="text-align:left">Alg&eacute;rie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1978</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'DZ', 'Alg&eacute;rie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>EC</td>
+					<td style="text-align:left">Equateur</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'EC', 'Equateur')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>EG</td>
+					<td style="text-align:left">Egypte</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/11/1978</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'EG', 'Egypte')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>EH</td>
+					<td style="text-align:left">Sahara occidental</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2013</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'EH', 'Sahara occidental')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>ER</td>
+					<td style="text-align:left">Erythr&eacute;e</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1995</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'ER', 'Erythr&eacute;e')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>ET</td>
+					<td style="text-align:left">Ethiopie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'ET', 'Ethiopie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>EU</td>
+					<td style="text-align:left">Union europ&eacute;enne</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/06/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'EU', 'Union europ&eacute;enne')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FJ</td>
+					<td style="text-align:left">Fidji</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'FJ', 'Fidji')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FK</td>
+					<td style="text-align:left">Falkland (Iles)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'FK', 'Falkland (Iles)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FM</td>
+					<td style="text-align:left">Micron&eacute;sie, Etats f&eacute;d&eacute;r&eacute;s de</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'FM', 'Micron&eacute;sie, Etats f&eacute;d&eacute;r&eacute;s de')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FO</td>
+					<td style="text-align:left">F&eacute;ro&eacute; (Iles)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/09/1974</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'FO', 'F&eacute;ro&eacute; (Iles)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GA</td>
+					<td style="text-align:left">Gabon</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GA', 'Gabon')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GB</td>
+					<td style="text-align:left">Royaume-Uni</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1973</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GB', 'Royaume-Uni')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GD</td>
+					<td style="text-align:left">Grenade</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GD', 'Grenade')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GE</td>
+					<td style="text-align:left">G&eacute;orgie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/06/1992</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GE', 'G&eacute;orgie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GH</td>
+					<td style="text-align:left">Ghana</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GH', 'Ghana')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GI</td>
+					<td style="text-align:left">Gibraltar</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GI', 'Gibraltar')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GL</td>
+					<td style="text-align:left">Groenland</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GL', 'Groenland')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GM</td>
+					<td style="text-align:left">Gambie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GM', 'Gambie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GN</td>
+					<td style="text-align:left">Guin&eacute;e</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GN', 'Guin&eacute;e')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GQ</td>
+					<td style="text-align:left">Guin&eacute;e &eacute;quatoriale</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GQ', 'Guin&eacute;e &eacute;quatoriale')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GS</td>
+					<td style="text-align:left">G&eacute;orgie du Sud et Sandwich du Sud (Iles)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GS', 'G&eacute;orgie du Sud et Sandwich du Sud (Iles)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GT</td>
+					<td style="text-align:left">Guatemala</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GT', 'Guatemala')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GU</td>
+					<td style="text-align:left">Guam</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GU', 'Guam')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GW</td>
+					<td style="text-align:left">Guin&eacute;e-Bissau</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GW', 'Guin&eacute;e-Bissau')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>GY</td>
+					<td style="text-align:left">Guyana</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'GY', 'Guyana')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>HK</td>
+					<td style="text-align:left">Hong Kong</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'HK', 'Hong Kong')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>HM</td>
+					<td style="text-align:left">Heard et McDonald, &icirc;les</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'HM', 'Heard et McDonald, &icirc;les')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>HN</td>
+					<td style="text-align:left">Honduras</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'HN', 'Honduras')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>HT</td>
+					<td style="text-align:left">Ha&iuml;ti</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'HT', 'Ha&iuml;ti')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>ID</td>
+					<td style="text-align:left">Indon&eacute;sie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'ID', 'Indon&eacute;sie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>IL</td>
+					<td style="text-align:left">Isra&euml;l</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/07/1975</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'IL', 'Isra&euml;l')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>IN</td>
+					<td style="text-align:left">Inde</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>18/07/1975</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'IN', 'Inde')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>IO</td>
+					<td style="text-align:left">Territoire britannique de l'oc&eacute;an Indien</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'IO', 'Territoire britannique de l'oc&eacute;an Indien')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>IQ</td>
+					<td style="text-align:left">Iraq</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'IQ', 'Iraq')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>IR</td>
+					<td style="text-align:left">Iran (R&eacute;publique islamique d')</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'IR', 'Iran (R&eacute;publique islamique d')')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>IS</td>
+					<td style="text-align:left">Islande</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>20/12/1972</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'IS', 'Islande')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>JM</td>
+					<td style="text-align:left">Jama&iuml;que</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'JM', 'Jama&iuml;que')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>JO</td>
+					<td style="text-align:left">Jordanie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/11/1978</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'JO', 'Jordanie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>JP</td>
+					<td style="text-align:left">Japon</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1972</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'JP', 'Japon')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>KE</td>
+					<td style="text-align:left">Kenya</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'KE', 'Kenya')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>KG</td>
+					<td style="text-align:left">Kirghistan</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/06/1992</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'KG', 'Kirghistan')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>KH</td>
+					<td style="text-align:left">Cambodge</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'KH', 'Cambodge')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>KI</td>
+					<td style="text-align:left">Kiribati</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'KI', 'Kiribati')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>KM</td>
+					<td style="text-align:left">Comores (non compris Mayotte)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'KM', 'Comores (non compris Mayotte)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>KN</td>
+					<td style="text-align:left">Saint-Christophe-et-Ni&eacute;ves</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'KN', 'Saint-Christophe-et-Ni&eacute;ves')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>KP</td>
+					<td style="text-align:left">Cor&eacute;e du Nord (R&eacute;publique populaire d&eacute;mocratique de Cor&eacute;e)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1988</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'KP', 'Cor&eacute;e du Nord (R&eacute;publique populaire d&eacute;mocratique de Cor&eacute;e)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>KR</td>
+					<td style="text-align:left">Cor&eacute;e du Sud (R&eacute;publique de Cor&eacute;e)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'KR', 'Cor&eacute;e du Sud (R&eacute;publique de Cor&eacute;e)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>KW</td>
+					<td style="text-align:left">Kowe&iuml;t</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'KW', 'Kowe&iuml;t')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>KY</td>
+					<td style="text-align:left">Ca&iuml;mans (&Icirc;les)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'KY', 'Ca&iuml;mans (&Icirc;les)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>KZ</td>
+					<td style="text-align:left">Kazakhstan</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/06/1992</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'KZ', 'Kazakhstan')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>LA</td>
+					<td style="text-align:left">Laos</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'LA', 'Laos')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>LB</td>
+					<td style="text-align:left">Liban</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/11/1978</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'LB', 'Liban')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>LC</td>
+					<td style="text-align:left">Sainte-Lucie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'LC', 'Sainte-Lucie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>LI</td>
+					<td style="text-align:left">Liechtenstein</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1995</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'LI', 'Liechtenstein')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>LK</td>
+					<td style="text-align:left">Sri Lanka</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1983</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'LK', 'Sri Lanka')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>LR</td>
+					<td style="text-align:left">Lib&eacute;ria</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'LR', 'Lib&eacute;ria')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>LS</td>
+					<td style="text-align:left">Lesotho</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'LS', 'Lesotho')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>LY</td>
+					<td style="text-align:left">Libye</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'LY', 'Libye')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MA</td>
+					<td style="text-align:left">Maroc</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/11/1978</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MA', 'Maroc')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MD</td>
+					<td style="text-align:left">Moldavie, R&eacute;publique de</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/06/1992</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MD', 'Moldavie, R&eacute;publique de')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>ME</td>
+					<td style="text-align:left">Mont&eacute;n&eacute;gro</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2007</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'ME', 'Mont&eacute;n&eacute;gro')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MG</td>
+					<td style="text-align:left">Madagascar</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MG', 'Madagascar')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MH</td>
+					<td style="text-align:left">Marshall (&Icirc;les)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MH', 'Marshall (&Icirc;les)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MK</td>
+					<td style="text-align:left">Mac&eacute;doine du Nord</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2000</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MK', 'Mac&eacute;doine du Nord')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>ML</td>
+					<td style="text-align:left">Mali</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'ML', 'Mali')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MM</td>
+					<td style="text-align:left">Myanmar</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/07/1999</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MM', 'Myanmar')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MN</td>
+					<td style="text-align:left">Mongolie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1988</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MN', 'Mongolie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MO</td>
+					<td style="text-align:left">Macao</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MO', 'Macao')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MP</td>
+					<td style="text-align:left">Mariannes du Nord (&Icirc;les)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1995</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MP', 'Mariannes du Nord (&Icirc;les)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MR</td>
+					<td style="text-align:left">Mauritanie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MR', 'Mauritanie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MS</td>
+					<td style="text-align:left">Montserrat</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1995</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MS', 'Montserrat')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MU</td>
+					<td style="text-align:left">Maurice</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MU', 'Maurice')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MV</td>
+					<td style="text-align:left">Maldives</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MV', 'Maldives')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MW</td>
+					<td style="text-align:left">Malawi</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MW', 'Malawi')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MX</td>
+					<td style="text-align:left">Mexique</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MX', 'Mexique')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MY</td>
+					<td style="text-align:left">Malaisie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MY', 'Malaisie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>MZ</td>
+					<td style="text-align:left">Mozambique</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'MZ', 'Mozambique')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>NA</td>
+					<td style="text-align:left">Namibie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1990</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'NA', 'Namibie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>NC</td>
+					<td style="text-align:left">Nouvelle-Cal&eacute;donie et d&eacute;pendances</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'NC', 'Nouvelle-Cal&eacute;donie et d&eacute;pendances')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>NE</td>
+					<td style="text-align:left">Niger</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'NE', 'Niger')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>NF</td>
+					<td style="text-align:left">Norfolk (&icirc;le)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'NF', 'Norfolk (&icirc;le)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>NG</td>
+					<td style="text-align:left">Nigeria</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'NG', 'Nigeria')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>NI</td>
+					<td style="text-align:left">Nicaragua</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'NI', 'Nicaragua')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>NO</td>
+					<td style="text-align:left">Norv&egrave;ge</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>20/12/1972</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'NO', 'Norv&egrave;ge')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>NP</td>
+					<td style="text-align:left">N&eacute;pal</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'NP', 'N&eacute;pal')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>NR</td>
+					<td style="text-align:left">Nauru</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'NR', 'Nauru')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>NU</td>
+					<td style="text-align:left">Niue</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'NU', 'Niue')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>NZ</td>
+					<td style="text-align:left">Nouvelle-Z&eacute;lande</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1988</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'NZ', 'Nouvelle-Z&eacute;lande')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>OM</td>
+					<td style="text-align:left">Oman</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'OM', 'Oman')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>PA</td>
+					<td style="text-align:left">Panama</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'PA', 'Panama')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>PE</td>
+					<td style="text-align:left">P&eacute;rou</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'PE', 'P&eacute;rou')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>PF</td>
+					<td style="text-align:left">Polyn&eacute;sie fran&ccedil;aise</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'PF', 'Polyn&eacute;sie fran&ccedil;aise')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>PG</td>
+					<td style="text-align:left">Papouasie - Nouvelle-Guin&eacute;e</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'PG', 'Papouasie - Nouvelle-Guin&eacute;e')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>PH</td>
+					<td style="text-align:left">Philippines</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'PH', 'Philippines')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>PK</td>
+					<td style="text-align:left">Pakistan</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'PK', 'Pakistan')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>PM</td>
+					<td style="text-align:left">Saint-Pierre-et-Miquelon</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'PM', 'Saint-Pierre-et-Miquelon')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>PN</td>
+					<td style="text-align:left">Pitcairn</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'PN', 'Pitcairn')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>PS</td>
+					<td style="text-align:left">Territoire palestinien occup&eacute;</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'PS', 'Territoire palestinien occup&eacute;')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>PW</td>
+					<td style="text-align:left">Palau</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1995</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'PW', 'Palau')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>PY</td>
+					<td style="text-align:left">Paraguay</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'PY', 'Paraguay')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>QA</td>
+					<td style="text-align:left">Qatar</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'QA', 'Qatar')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>QU</td>
+					<td style="text-align:left">Pays et territoires non d&eacute;termin&eacute;s</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'QU', 'Pays et territoires non d&eacute;termin&eacute;s')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>RU</td>
+					<td style="text-align:left">Russie, F&eacute;d&eacute;ration de</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/06/1992</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'RU', 'Russie, F&eacute;d&eacute;ration de')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>RW</td>
+					<td style="text-align:left">Rwanda</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'RW', 'Rwanda')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SA</td>
+					<td style="text-align:left">Arabie saoudite</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SA', 'Arabie saoudite')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SB</td>
+					<td style="text-align:left">Salomon (&Icirc;les)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SB', 'Salomon (&Icirc;les)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SC</td>
+					<td style="text-align:left">Seychelles et d&eacute;pendances</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SC', 'Seychelles et d&eacute;pendances')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SD</td>
+					<td style="text-align:left">Soudan</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SD', 'Soudan')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SG</td>
+					<td style="text-align:left">Singapour</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SG', 'Singapour')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SH</td>
+					<td style="text-align:left">Sainte-H&eacute;l&egrave;ne, Ascension et Tristan da Cunha</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SH', 'Sainte-H&eacute;l&egrave;ne, Ascension et Tristan da Cunha')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SL</td>
+					<td style="text-align:left">Sierra Leone</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SL', 'Sierra Leone')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SM</td>
+					<td style="text-align:left">Saint-Marin</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/12/1992</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SM', 'Saint-Marin')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SN</td>
+					<td style="text-align:left">S&eacute;n&eacute;gal</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SN', 'S&eacute;n&eacute;gal')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SO</td>
+					<td style="text-align:left">Somalie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SO', 'Somalie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SR</td>
+					<td style="text-align:left">Suriname</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SR', 'Suriname')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SS</td>
+					<td style="text-align:left">Soudan du Sud</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2013</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SS', 'Soudan du Sud')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>ST</td>
+					<td style="text-align:left">Sao Tom&eacute;-et-Principe</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'ST', 'Sao Tom&eacute;-et-Principe')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SV</td>
+					<td style="text-align:left">El Salvador</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SV', 'El Salvador')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SX</td>
+					<td style="text-align:left">Sint-Maarten (partie n&eacute;erlandaise)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2013</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SX', 'Sint-Maarten (partie n&eacute;erlandaise)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SY</td>
+					<td style="text-align:left">Syrie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/11/1978</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SY', 'Syrie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>SZ</td>
+					<td style="text-align:left">Eswatini</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'SZ', 'Eswatini')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TC</td>
+					<td style="text-align:left">Turks-et-Ca&iuml;cos (&Icirc;les)</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TC', 'Turks-et-Ca&iuml;cos (&Icirc;les)')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TD</td>
+					<td style="text-align:left">Tchad</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TD', 'Tchad')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TF</td>
+					<td style="text-align:left">Terres australes fran&ccedil;aises</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TF', 'Terres australes fran&ccedil;aises')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TG</td>
+					<td style="text-align:left">Togo</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TG', 'Togo')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TH</td>
+					<td style="text-align:left">Tha&iuml;lande</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TH', 'Tha&iuml;lande')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TJ</td>
+					<td style="text-align:left">Tadjikistan</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/06/1992</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TJ', 'Tadjikistan')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TK</td>
+					<td style="text-align:left">Tokelau</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TK', 'Tokelau')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TL</td>
+					<td style="text-align:left">Timor-Oriental</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2003</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TL', 'Timor-Oriental')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TM</td>
+					<td style="text-align:left">Turkm&eacute;nistan</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/06/1992</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TM', 'Turkm&eacute;nistan')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TN</td>
+					<td style="text-align:left">Tunisie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/11/1978</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TN', 'Tunisie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TO</td>
+					<td style="text-align:left">Tonga</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TO', 'Tonga')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TR</td>
+					<td style="text-align:left">Turquie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1973</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TR', 'Turquie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TT</td>
+					<td style="text-align:left">Trinit&eacute;-et-Tobago</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TT', 'Trinit&eacute;-et-Tobago')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TV</td>
+					<td style="text-align:left">Tuvalu</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TV', 'Tuvalu')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TW</td>
+					<td style="text-align:left">Ta&iuml;wan</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TW', 'Ta&iuml;wan')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>TZ</td>
+					<td style="text-align:left">Tanzanie, R&eacute;publique unie de</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'TZ', 'Tanzanie, R&eacute;publique unie de')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>UA</td>
+					<td style="text-align:left">Ukraine</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1972</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'UA', 'Ukraine')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>UG</td>
+					<td style="text-align:left">Ouganda</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'UG', 'Ouganda')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>UM</td>
+					<td style="text-align:left">Iles mineures &eacute;loign&eacute;es des Etats-Unis</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'UM', 'Iles mineures &eacute;loign&eacute;es des Etats-Unis')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>US</td>
+					<td style="text-align:left">Etats-Unis</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>21/06/1986</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'US', 'Etats-Unis')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>UY</td>
+					<td style="text-align:left">Uruguay</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'UY', 'Uruguay')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>UZ</td>
+					<td style="text-align:left">Ouzb&eacute;kistan</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/06/1992</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'UZ', 'Ouzb&eacute;kistan')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>VC</td>
+					<td style="text-align:left">Saint-Vincent-et-les-Grenadines</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'VC', 'Saint-Vincent-et-les-Grenadines')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>VE</td>
+					<td style="text-align:left">Venezuela</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'VE', 'Venezuela')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>VG</td>
+					<td style="text-align:left">Iles Vierges britanniques</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'VG', 'Iles Vierges britanniques')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>VI</td>
+					<td style="text-align:left">Iles Vierges des Etats-Unis</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'VI', 'Iles Vierges des Etats-Unis')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>VN</td>
+					<td style="text-align:left">Vi&ecirc;t Nam</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'VN', 'Vi&ecirc;t Nam')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>VU</td>
+					<td style="text-align:left">Vanuatu</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'VU', 'Vanuatu')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>WF</td>
+					<td style="text-align:left">Wallis-et-Futuna</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'WF', 'Wallis-et-Futuna')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>WS</td>
+					<td style="text-align:left">Samoa</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'WS', 'Samoa')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>XK</td>
+					<td style="text-align:left">Kosovo</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">R&eacute;gion</a>
+					</td>
+					<td>01/11/2000</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'XK', 'Kosovo')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>XS</td>
+					<td style="text-align:left">Serbie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">R&eacute;gion</a>
+					</td>
+					<td>01/06/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'XS', 'Serbie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>YE</td>
+					<td style="text-align:left">Y&eacute;men</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'YE', 'Y&eacute;men')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>ZA</td>
+					<td style="text-align:left">Afrique du Sud</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>27/09/1986</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'ZA', 'Afrique du Sud')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>ZM</td>
+					<td style="text-align:left">Zambie</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'ZM', 'Zambie')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				<tr>
+					<td>ZW</td>
+					<td style="text-align:left">Zimbabwe</td>
+					<td>
+					<a href="#" onclick="rechercheColonneType('Z')">Pays</a>
+					</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des groupes contenant."
+					  onclick="rechercheColonneRechDispo('Z', 'ZW', 'Zimbabwe')">
+					       groupes contenant</a>
+					</td>
+					</tr>
+				</tbody>
+			
+			
+		</table>
+	
+	<script type="text/javascript">
+	$(".recapitulatif").hide();
+	$('#btnCriteres').removeClass("fermer");
+	$('#btnCriteres').addClass("visu");
+</script>
+
+</body>
+</html>

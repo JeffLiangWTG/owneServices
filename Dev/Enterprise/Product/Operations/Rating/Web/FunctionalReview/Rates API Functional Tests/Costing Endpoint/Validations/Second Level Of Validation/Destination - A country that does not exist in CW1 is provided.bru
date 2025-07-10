@@ -1,0 +1,33 @@
+meta {
+  name: Destination - A country that does not exist in CW1 is provided
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.Destination = { Type: "COUNTRY", Value: "X7" };
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Response would be 200.", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("A Warning should be returned with message : Provided RateQuery.Destination.Value (X7) is not a valid Location in CW1.", function() {
+  
+  
+    expect(res.body.Warnings).to.include("Provided RateQuery.Destination.Value (X7) is not a valid Location in CW1.");
+  });
+  
+}

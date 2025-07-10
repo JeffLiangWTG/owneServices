@@ -1,0 +1,40 @@
+@using WinzorFramework
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using System.Windows.Forms
+@inherits Control
+@namespace Enterprise.ZArchitecture.GUI.Internal
+
+@if (ListToRender != null)
+{
+    <Popup AnchorElement="ParentDropEdit.ElementReference">
+        <div data-winzor-control-id="@WinzorControlId" class="zdropform" @ref="ElementReference" style="@ZDropFormSizeStyleString" tabindex="0">
+            @if (ExtraControl is not null)
+            {
+                <div class="@ExtraControlClass">
+                    <ControlProxyComponent Control="ExtraControl" @key=ExtraControl.WinzorControlGuid />
+                </div>
+            }
+            <table>
+                @if (RenderItemsWithVirtualize)
+                {
+                    <Virtualize Items="ListToRender" Context="item">
+                        <ZDropFormItem Item="@item" />
+                    </Virtualize>
+                }
+                else
+                {
+                    foreach (var item in ListToRender)
+                    {
+                        <ZDropFormItem Item="@item" />
+                    }
+                }
+            </table>
+        </div>
+    </Popup>
+}
+
+@code
+{
+    string ExtraControlClass => GetType().Name == "ZAddressDropForm" ? "addresstypefilter" : string.Empty;
+}

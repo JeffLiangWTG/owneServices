@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Upload Service</title>
+</head>
+<body>
+	<h2>Uploads</h2>
+	<div>
+		<label for="fileToUpload">Select a File to Upload (Max 10mb)</label><br />
+		<input type="file" id="fileToUpload" /> <br /><br />
+		<label for="txtContacts">Email contacts (use ";" to separate emails)</label><br />
+		<input type="email" id="txtContacts" style="width:400px" /><br /><br />
+
+		<input type="button" id="uploadButton" value="Upload file" />
+	</div>
+	<script>
+		document.getElementById('uploadButton').onclick = function () {
+			var contactQueryString = "contacts";
+			var contacts = document.getElementById('txtContacts').value;
+			if (contacts) {
+				var split = contacts.split(';');
+				var result = true;
+				split.forEach(function (email) {
+					if (!validateEmail(email)) {
+						alert('Email ' + email + ' is an invalid email adddress');
+						result = false;
+					}
+				});
+
+				if (!result)
+					return;
+
+				contactQueryString += "=" + contacts;
+			}
+
+			var locationUrl = location.href.endsWith('/') ? location.href.slice(0, -1) : location.href;
+			var uri = locationUrl + '/upload/send?source=UPL&fileType={fileType}&contentType=URD&' + contactQueryString;
+
+			postRequest(uri, null, function (response) {
+				if (response.status == 201)
+					alert('Upload completed');
+				else if (response.status == 412)
+					alert('Error! The server returned that the email entered is invalid or the file type is not supported');
+				else if (response.status == 500)
+					alert('Error! ' + response.responseText);
+				else
+					alert('Error! Upload limit exceed');
+
+				location.reload(true);
+			}, function (xhr, status) {
+				switch (status) {
+					case 404:
+						alert('File not found');
+						break;
+					case 500:
+						alert('Server error');
+						break;
+					case 0:
+						alert('Request aborted');
+						break;
+					default:
+						alert('Unknown error ' + status);
+				}
+			});
+		};
+
+		function validateEmail(email) {
+			var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+			return re.test(String(email).toLowerCase());
+		}
+
+		function postRequest(url, success, error) {
+			var fd = new FormData();
+			var fileUploadComponent = document.getElementById('fileToUpload');
+			var uploadButton = document.getElementById('uploadButton');
+			if (fileUploadComponent.files) {
+				uploadButton.disabled = true;
+				fd.append("uploadedFile", fileUploadComponent.files[0]);
+
+				var fileExtension = fileUploadComponent.files[0].name.split('.').pop().toLowerCase();
+				if (fileExtension == "xml") {
+					url = url.replace("{fileType}", "XML");
+				} else if (fileExtension == "zip" || fileExtension == "gz") {
+					url = url.replace("{fileType}", "COM");
+				}
+				else {
+					alert("Unsupported file format, please check if your file is an xml or a compressed file (zip or gz).")
+					uploadButton.disabled = false;
+					return;
+				}
+
+				var xhr = XMLHttpRequest ? new XMLHttpRequest() :
+					new ActiveXObject("Microsoft.XMLHTTP");
+				xhr.open("POST", url, true);
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState == 4) {
+						if (xhr.status == 200) {
+							success(xhr.responseText);
+						} else {
+							error(xhr, xhr.status);
+						}
+					}
+				};
+				xhr.onerror = function () {
+					error(xhr, xhr.status);
+				};
+				xhr.send(fd);
+			}
+		}
+		
+	</script>
+</body>
+</html>

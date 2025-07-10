@@ -1,0 +1,55 @@
+@using WinzorFramework.Extensions
+@using WinzorFramework
+@using System.Globalization;
+@namespace System.Windows.Forms
+@inherits UpDownBase
+
+<div class="numericupdown" style="@ControlStyleString" @attributes="DataAttributes" @onwinzorfocusin="OnFocusInAsync" @onwinzorfocusin:stopPropagation tabindex="@this.TabIndexHtmlAttributeValue()">
+	<input @ref="ElementReference" @bind:get="valueText" @bind:set="SetValueAsync" class="numericupdown__input" type="number" min="@Minimum" max="@Maximum" step="@Increment" disabled="@(!AllowTextChangeFromClient)" readonly="@ReadOnly" tabindex="@this.TabIndexHtmlAttributeValue()" />
+    <div>
+        <button class="numericupdown__upbutton" @onclick=UpButtonAsync @onclick:stopPropagation disabled="@(!AllowTextChangeFromClient)" tabindex="-1">keyboard_arrow_up</button>
+        <button class="numericupdown__downbutton" @onclick=DownButtonAsync @onclick:stopPropagation disabled="@(!AllowTextChangeFromClient)" tabindex="-1">keyboard_arrow_down</button>
+    </div>
+</div>
+
+@code {
+    string? valueText;
+
+    async Task SetValueAsync(string? value)
+    {
+        if (AllowTextChangeFromClient)
+        {
+            await InvokeWinzorDispatcherAsync(() =>
+            {
+                if (decimal.TryParse(value, out var parsedValue))
+                {
+                    Value = parsedValue;
+                }
+                else
+                {
+                    valueText = Value.ToString($"{(ThousandsSeparator ? "N" : "F")}{DecimalPlaces}", CultureInfo.CurrentCulture);
+                }
+            });
+        }
+    }
+
+    async Task UpButtonAsync()
+    {
+        if (!AllowTextChangeFromClient)
+        {
+            return;
+        }
+        await InvokeWinzorDispatcherAsync(() => UpButton());
+		await ElementReference.FocusAsync();
+    }
+
+    async Task DownButtonAsync()
+    {
+        if (!AllowTextChangeFromClient)
+        {
+            return;
+        }
+        await InvokeWinzorDispatcherAsync(() => DownButton());
+		await ElementReference.FocusAsync();
+    }
+}

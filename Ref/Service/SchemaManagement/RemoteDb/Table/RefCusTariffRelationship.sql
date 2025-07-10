@@ -1,0 +1,17 @@
+CREATE TABLE RefCusTariffRelationship
+(
+	ZZH_PK UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_RefCusTariffRelationship_ZZH_PK DEFAULT (NEWID()),
+	ZZH_ZZ1_Tariff UNIQUEIDENTIFIER NOT NULL,
+	ZZH_ZZI_TariffType UNIQUEIDENTIFIER NOT NULL,
+	ZZH_TariffCode VARCHAR(35) NOT NULL CONSTRAINT DF_RefCusTariffRelationship_ZZH_TariffCode DEFAULT (''),
+
+	CONSTRAINT PK_RefCusTariffRelationship PRIMARY KEY CLUSTERED( ZZH_PK ASC ),
+	CONSTRAINT FK_RefCusTariffRelationship_RefCusTariff FOREIGN KEY(ZZH_ZZ1_Tariff) REFERENCES RefCusTariff (ZZ1_PK) ON DELETE CASCADE,
+	CONSTRAINT FK_RefCusTariffRelationship_RefCusTariffType FOREIGN KEY(ZZH_ZZI_TariffType) REFERENCES RefCusTariffType (ZZI_PK) ON DELETE NO ACTION
+)
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_RefCusTariffRelationship_ZZH_ZZ1_Tariff_ZZH_ZZI_TariffType_ZZH_TariffCode ON RefCusTariffRelationship (ZZH_ZZ1_Tariff ASC, ZZH_ZZI_TariffType ASC, ZZH_TariffCode ASC)
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusTariffRelationship_ZZH_ZZI_TariffType ON RefCusTariffRelationship (ZZH_ZZI_TariffType ASC)
+GO
+ALTER TABLE RefCusTariffRelationship SET (LOCK_ESCALATION = DISABLE);

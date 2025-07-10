@@ -1,0 +1,71 @@
+@using System.Drawing
+@using WinzorFramework.Extensions
+@using WinzorFramework
+@namespace System.Windows.Forms
+@inherits Control
+
+@{
+    var visibleTabs = GetVisibleTabs();
+}
+
+<div class="tabcontrol" style="@LayoutStyleString" @ref="ElementReference" @attributes="DataAttributes">
+    <div class="tabcontrol__navigation" style="@TabControlNavigationHeightStyle">
+		<div class="@TabAlignmentString()" style="@TabControlNavigationStyleString">
+            @for (var i = 0; i < visibleTabs.Count; i++)
+            {
+                var tabPage = visibleTabs[i];
+                var activeClass = SelectedTab == tabPage ? " active" : "";
+				<button class="tabcontrol__button@(activeClass)" @onclick="@(c => TabChangedAsync(tabPage))" @onclick:stopPropagation @onwinzorfocusin="OnFocusInAsync" @onwinzorfocusin:stopPropagation
+                        tabindex="@this.TabIndexHtmlAttributeValue(c => c.TabStop && c.SelectedTab == tabPage)" @onmouseover=OnMouseOverAsync @onmouseover:stopPropagation
+                        @onmousedown=OnMouseDownAsync @onmousedown:stopPropagation @onmouseup=OnMouseUpAsync @onmouseup:stopPropagation style="@TabStyle(tabPage)" @ref="tabPage.ElementReference" @key="tabPage.WinzorControlId">
+                    @if (tabPage.ImageIndex > -1 && ImageList is not null)
+                    {
+                        <div class="tabcontrol__tabimage"><img src="@ImageList.Images.GetImageSrc(tabPage.ImageIndex)" style="@ImageStyleString" draggable="false" /></div>
+                    }
+                    @if (!string.IsNullOrEmpty(tabPage.Text))
+                    {
+                        <div class="tabcontrol__tabtext">@tabPage.Text.WithoutMnemonic()</div>
+                    }
+                    @if (tabPage.IconIndex > -1 && ImageList is not null)
+                    {
+                        <div class="tabcontrol__tabicon"><img src="@ImageList.Images.GetImageSrc(tabPage.IconIndex)" style="@ImageStyleString" draggable="false" /></div>
+                    }
+                </button>
+            }
+        </div>
+        @if (ShowTabSlider)
+        {
+            <TabSlider TabControl="this"></TabSlider>
+        }
+    </div>
+    <div class="tabcontrol__content">
+        @if (SelectedTab != null)
+        {
+            <ControlProxyComponent Control="SelectedTab" @key=SelectedTab.WinzorControlGuid Style="@TabControlTabPageStyleString" />
+        }
+    </div>
+</div>
+
+@code {
+	string TabStyle(TabPage tabPage)
+	{
+		var widthString = GetTabRect(tabPage).Size.Width + "px";
+		var tabControlButtonStyleString = DrawMode == TabDrawMode.OwnerDrawFixed ? TabControlButtonStyleString : string.Empty;
+
+		return $"width:{widthString}; min-width:{widthString}; {tabControlButtonStyleString} {tabPage.CaptionBackgroundStyleString}";
+	}
+
+    string TabAlignmentString()
+    {
+        if (DrawMode == TabDrawMode.OwnerDrawFixed && TabControlAlignment != null)
+        {
+            return "tabcontrol__tabs--" + TabControlAlignment;
+        }
+
+        return "tabcontrol__tabs";
+    }
+
+    string TabControlNavigationHeightStyle => $"height:{tabControlNavigationHeight + AdditionalStyleHeight}px;";
+
+    const int AdditionalStyleHeight = 3;
+}

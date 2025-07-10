@@ -1,0 +1,29 @@
+meta {
+  name: TransportMode is not valid
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.TransportMode = "AAA";
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided TransportMode ('AAA') is not valid. It can only be one of these values: 'ALL', 'AIR', 'SEA', 'ROA', 'RAI'.", function() {
+    expect(res.body.ModelState['TransportMode'][0]).to.equal("Provided TransportMode ('AAA') is not valid. It can only be one of these values: 'ALL', 'AIR', 'SEA', 'ROA', 'RAI'.");
+  });
+}

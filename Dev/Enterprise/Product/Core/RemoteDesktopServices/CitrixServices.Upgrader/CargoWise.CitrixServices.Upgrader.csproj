@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>CargoWise.CitrixServices.Upgrader.Unmerged</AssemblyName>
+    <RootNamespace>CargoWise.CitrixServices.Upgrader</RootNamespace>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ApplicationManifest>..\..\..\..\..\main.manifest</ApplicationManifest>
+    <PostBuildEvent Condition="'$(TargetFramework)' == 'net48'">cd $(TargetDir)
+      echo $(FrameworkDir)
+      ILMerge.exe /closed /targetplatform:"v4" /keyfile:..\EDI-Release-private.snk /out:CargoWise.CitrixServices.Upgrader.exe CargoWise.CitrixServices.Upgrader.Unmerged.exe CargoWise.BrandManager.dll CargoWise.Shared.40.dll CargoWise.ActiveDirectory.dll CargoWise.Loader.Common.dll CargoWise.RemoteDesktopServices.Upgrader.Common.dll
+    </PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.ApplicationManager.Common" />
+    <Reference Include="CargoWise.Loader.Common" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="Enterprise.RemoteDesktopServices.Shared" />
+  </ItemGroup>
+  <ItemGroup Label="Not referenced explicitly">
+    <Reference Include="CargoWise.ApplicationManager.Common" />
+    <Reference Include="Microsoft.Graph" />
+    <Reference Include="Microsoft.Graph.Core" />
+    <Reference Include="MimeKit" />
+    <Reference Include="Outlook" />
+    <Reference Include="WTG.Authenticode" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\main.manifest">
+      <Link>main.manifest</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\..\..\..\bin\CargoWiseCitrixServicesSetup.exe">
+      <LogicalName>CargoWiseCitrixServicesSetup.exe</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RemoteDesktopServices.Upgrader.Common\CargoWise.RemoteDesktopServices.Upgrader.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Design" />
+  </ItemGroup>
+</Project>

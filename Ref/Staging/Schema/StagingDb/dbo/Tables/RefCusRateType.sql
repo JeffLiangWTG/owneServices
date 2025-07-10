@@ -1,0 +1,12 @@
+CREATE TABLE [dbo].[RefCusRateType](
+	[ZZR_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefCusRateType_ZZR_PK]  DEFAULT (newid()),
+	[ZZR_RateType] VARCHAR(3) NOT NULL,
+	[ZZR_Description] NVARCHAR(50) NOT NULL,
+	[ZZR_IsPayable] BIT NOT NULL CONSTRAINT [DF_RefCusRateType_ZZR_IsPayable]  DEFAULT ((0)),
+	[ZZR_ZZZ_NKDataGrouping] VARCHAR(3) NOT NULL,
+	[ZZR_CustomsValueFormula] VARCHAR(200) NOT NULL CONSTRAINT DF_RefCusRateType_ZZR_CustomsValueFormula DEFAULT (''),
+	[ZZR_IsExport] BIT NOT NULL CONSTRAINT [DF_RefCusRateType_ZZR_IsExport] DEFAULT (0),
+	[ZZR_RX_NKFormulaCurrency] VARCHAR(3) NOT NULL CONSTRAINT DF_RefCusRateType_ZZR_RX_NKFormulaCurrency DEFAULT ('')
+CONSTRAINT [PK_RefCusRateType] PRIMARY KEY CLUSTERED ([ZZR_PK] ASC),
+)
+GO

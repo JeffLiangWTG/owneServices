@@ -1,0 +1,17 @@
+using System;
+using System.Globalization;
+using System.IO;
+using CargoWise.RefDbRepo.KRReferenceData.Business;
+using CargoWise.RefDbRepo.KRReferenceData.Services;
+
+namespace CargoWise.RefDbRepo.KRReferenceData.CmdLine
+{
+	class TariffsProgram
+	{
+		public static void Run(string outputPath)
+		{
+			var hsCodePublicationDate = DateTime.ParseExact(ApplicationConfig.HSCodePublicationDate, Constants.PublicationDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).Date;
+			new TariffParser(ApplicationConfig.TariffConfigFileInputPath, ApplicationConfig.TariffDataFileInputPath).ConvertToXMLFile(Path.Combine(outputPath, Constants.OutputFileName.Tariffs), hsCodePublicationDate);
+		}
+	}
+}

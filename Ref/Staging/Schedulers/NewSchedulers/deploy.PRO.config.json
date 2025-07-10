@@ -1,0 +1,41 @@
+{
+	"serilog:using:Kafka": "CargoWise.RefDbRepo.Common.Utils",
+	"serilog:write-to:Kafka.batchSizeLimit": "100",
+	"serilog:write-to:Kafka.period": "2",
+	"serilog:write-to:Kafka.brokers": "1.au2-prod-1.kafka.wtg.ws:9093,2.au2-prod-1.kafka.wtg.ws:9093,3.au2-prod-1.kafka.wtg.ws:9093,4.au2-prod-1.kafka.wtg.ws:9093,5.au2-prod-1.kafka.wtg.ws:9093",
+	"serilog:write-to:Kafka.topic": "topic-au2-prod-refdatarepo-xmlproducer-prod",
+	"serilog:write-to:Kafka.protocol": "Ssl",
+	"serilog:write-to:Kafka.messageTimeoutMs": "60000",
+
+	"SafeUpdateServiceUri": "https://***updateService***/Update/odata/",
+	"CheckAuthorization": "true",
+	"PortalUri": "https://***updateService***",
+
+	"TenantId": "1b20b87e-cebd-43cc-97bd-bdd41a2f5cf1",
+	"ClientId": "ce1cab81-fe30-4e64-9243-976fdbea6613",
+	"ServiceId": "efd5f646-751f-4465-b445-f2f4c14c2597",
+	"PrivateKeyFileName": "private_prod.key",
+	"CertificateFileName": "quartzscheduler_prod.cer",
+
+	"quartz": {
+		"quartz.server.serviceName": "RefDbRepoQuartzServer",
+		"quartz.server.serviceDisplayName": "RefDbRepo Quartz Server",
+		"quartz.server.serviceDescription": "RefDbRepo Quartz Job Scheduling Server",
+		"quartz.scheduler.instanceName": "RefDbRepoQuartzServer",
+		"quartz.scheduler.instanceId": "auto",
+		"quartz.threadPool.maxConcurrency": "10",
+		"quartz.jobStore.misfireThreshold": "60000",
+		"quartz.jobStore.type": "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz",
+		"quartz.jobStore.useProperties": "false",
+		"quartz.jobStore.dataSource": "default",
+		"quartz.jobStore.tablePrefix": "QRTZ_",
+		"quartz.jobStore.clustered": "true",
+		"quartz.jobStore.driverDelegateType": "Quartz.Impl.AdoJobStore.SqlServerDelegate, Quartz",
+		"quartz.dataSource.default.connectionString": "data source=refdbrepostage.db.wisegrid.net;initial catalog=RefDbRepoStage;User Id=refdbrepowriter;Password=***dbWriterPasswordJson***;TrustServerCertificate=True",
+		"quartz.dataSource.default.provider": "SqlServer",
+		"quartz.plugin.jobInitializer.type": "Quartz.Plugin.Xml.XMLSchedulingDataProcessorPlugin, Quartz.Plugins",
+		"quartz.plugin.jobInitializer.fileNames": "~\\Configuration\\QuartzAppRunnerJobs.xml,~\\Configuration\\QuartzProcessorRunnerJobs.xml,~\\Configuration\\SingleInstanceQuartzProcessorRunnerJobs.xml,~\\Configuration\\QuartzDataUpdaterJobs.xml",
+		"quartz.plugin.jobInitializer.failOnFileNotFound": "true",
+		"quartz.serializer.type": "json"
+	}
+}

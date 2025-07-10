@@ -1,0 +1,19 @@
+// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CargoWiseOne", "CW1124:new CachedProperty", Scope = "namespaceanddescendants", Target = "~N:Enterprise.Customs.BR.Business", Justification = "Properties using CachedProperty should use CachedValueHelper.")]
+[assembly: SuppressMessage("Style", "IDE0001:Simplify Names", Justification = "Simplification hides desired base class", Scope = "type", Target = "~T:Enterprise.Customs.BR.Business.DeclarationMessageSendingObject.Schema")]
+[assembly: SuppressMessage("Style", "IDE0001:Simplify Names", Justification = "Simplification hides desired base class", Scope = "type", Target = "~T:Enterprise.Customs.BR.Business.MercosulForeignDeclaration.Schema")]
+[assembly: SuppressMessage("Style", "IDE0001:Simplify Names", Justification = "Simplification hides desired base class", Scope = "type", Target = "~T:Enterprise.Customs.BR.Business.PreviousDocument.Schema")]
+[assembly: SuppressMessage("Style", "IDE0001:Simplify Names", Justification = "Simplification hides desired base class", Scope = "type", Target = "~T:Enterprise.Customs.BR.Business.ReferenceInvoiceManual.Schema")]
+[assembly: SuppressMessage("Style", "IDE0001:Simplify Names", Justification = "Simplification hides desired base class", Scope = "type", Target = "~T:Enterprise.Customs.BR.Business.SuspensionDrawback.Schema")]
+[assembly: SuppressMessage("Style", "IDE0001:Simplify Names", Justification = "Simplification hides desired base class", Scope = "type", Target = "~T:Enterprise.Customs.BR.Business.SuspensionDrawbackImportEntryDocument.Schema")]
+[assembly: SuppressMessage("Style", "IDE0001:Simplify Names", Justification = "Simplification hides desired base class", Scope = "type", Target = "~T:Enterprise.Customs.BR.Business.SuspensionDrawbackInvoice.Schema")]
+[assembly: SuppressMessage("CargoWiseOne", "EDI003:Business Object Property Max Length Validation", Justification = "Baseline WI00752625", Scope = "member", Target = "~M:Enterprise.Customs.BR.Business.NFEImportObjectParent.CreateInvoiceLines(Enterprise.Customs.BR.Business.NFEImportObject,Enterprise.Customs.BR.Business.JobComInvoiceHeader,CargoWise.Types.ZGuid)")] // Enterprise/Product/Operations/Customs/BR/Business/Business/NFEImport/NFEImportObjectParent.cs:197,28
+[assembly: SuppressMessage("CargoWiseOne", "EDI003:Business Object Property Max Length Validation", Justification = "Baseline WI00752625", Scope = "member", Target = "~M:Enterprise.Customs.BR.Business.ImportLicenseLoadingObjectParent.CreateInvoiceLine(Enterprise.Customs.BR.Business.ImportLicenseLoadingObject,Enterprise.Customs.BR.Business.ImportLicenseLoadingObjectNcmDetails,Enterprise.Customs.BR.Business.CusEntryInstruction,Enterprise.Customs.BR.Business.JobComInvoiceHeader)")] // Enterprise/Product/Operations/Customs/BR/Business/Business/ImportLicenseLoading/ImportLicenseLoadingObjectParent.cs:224,27
+[assembly: SuppressMessage("CargoWiseOne", "EDI003:Business Object Property Max Length Validation", Justification = "Baseline WI00752625", Scope = "member", Target = "~M:Enterprise.Customs.BR.Business.ImportLicenseEntryInstructionSplitter.ToggleSplitDescription(Enterprise.Customs.BR.Business.CusEntryInstruction,CargoWise.Types.ZString)")] // Enterprise/Product/Operations/Customs/BR/Business/Business/CusEntryInstruction/AutoSplitting/ImportLicenseEntryInstructionSplitter.cs:100,33
+[assembly: SuppressMessage("CargoWiseOne", "CW1194:Usafe BusinessObjectCollection Creation", Justification = "Baseline WI00842925", Scope = "member", Target = "~P:Enterprise.Customs.BR.Business.CusEntryHeader.SiscomexUsageFees")]

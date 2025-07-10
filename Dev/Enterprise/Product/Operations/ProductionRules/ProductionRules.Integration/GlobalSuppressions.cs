@@ -1,0 +1,2 @@
+using System.Diagnostics.CodeAnalysis;
+[assembly: SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Scope = "member", Target = "Enterprise.ProductionRules.Integration.IUserHaltableProductionRulesEngineService.#RunRulesEngine(CargoWise.EntityFramework.BusinessObjectFactory,WTG.ProductionRules.Core.RulesContextType,System.Func`1<System.Collections.Generic.IEnumerable`1<WTG.ProductionRules.Core.IInputFact>>,System.Action`1<WTG.ProductionRules.Service.ProductionRulesEngineResult>)")]

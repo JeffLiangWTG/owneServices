@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema
+	targetNamespace="http://www.edi.com.au/EnterpriseService/"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://www.edi.com.au/EnterpriseService/"
+	xmlns:NS="http://www.edi.com.au/EnterpriseService/"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xs:include schemaLocation="Elements.xsd" />
+
+	<xs:element name="Billing" type="Billing"/>
+
+	<xs:simpleType name="ChargesSpecified">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="AllCharges" />
+			<xs:enumeration value="UpdatedCharges" />
+			<xs:enumeration value="NewCharges" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="PostedChargeHandling">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Abort">
+				<xs:annotation>
+					<xs:documentation>Do not import charges if any charges are posted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Ignore">
+				<xs:annotation>
+					<xs:documentation>Ignore posted charges (update non-posted charges or create new charges).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Billing">
+		<xs:sequence>
+			<xs:element name="ChargeLines">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ChargeLine" type="ChargeLine" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="LocalClient" type="Organisation" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute name="SpecifiedCharges" type="ChargesSpecified" default="AllCharges" use="optional" />
+		<xs:attribute name="PostedChargesHandling" type="PostedChargeHandling" default="Abort" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="BillingWithExchangeRates">
+		<xs:complexContent>
+			<xs:extension base="Billing">
+				<xs:sequence>
+					<xs:element name="ExchangeRates" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="ExchangeRate" type="ExchangeRate" maxOccurs="unbounded"/>
+							</xs:sequence>
+							<xs:attribute name="BaseCurrency" type="xs:NMTOKEN" use="required" />
+							<xs:attribute name="IsReciprocal" type="xs:boolean" use="required" />
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ChargeLine">
+		<xs:sequence>
+			<xs:element name="ChargeCode" type="xs:NMTOKEN" />
+			<xs:element name="Description" type="xs:string" minOccurs="0" />
+			<xs:element name="Collect" type="xs:boolean" minOccurs="0" />
+			<xs:element name="OSSellAmount" type="FinancialValue" minOccurs="0" />
+			<xs:element name="OSCostAmount" type="FinancialValue" minOccurs="0" />
+			<xs:element name="Debtor" type="Organisation" minOccurs="0" />
+			<xs:element name="Creditor" type="Organisation" minOccurs="0"/>
+			<xs:element name="Branch" type="xs:string" minOccurs="0" />
+			<xs:element name="Department" type="xs:string" minOccurs="0" />
+			<xs:element name="LocalSellAmount" type="FinancialValue" minOccurs="0" />
+			<xs:element name="LocalCostAmount" type="FinancialValue" minOccurs="0" />
+			<xs:element name="SellExchangeRate" type="xs:decimal" minOccurs="0" />
+			<xs:element name="CostExchangeRate" type="xs:decimal" minOccurs="0" />
+			<xs:element name="InvoiceNumber" type="xs:string" minOccurs="0" />
+			<xs:element name="InvoiceDate" type="xs:date" minOccurs="0" />
+      <xs:element name="SellRatingOverride" type="xs:string" minOccurs="0" />
+      <xs:element name="RevenueIsPosted" type="xs:boolean" minOccurs="0" />
+      <xs:element name="CostIsPosted" type="xs:boolean" minOccurs="0" />
+      <xs:element name="ARInvoiceNumber" type="xs:string" minOccurs="0" />
+      <xs:element name="SupplierReference" type="xs:string" minOccurs="0" />
+    </xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ExchangeRate">
+		<xs:simpleContent>
+			<xs:extension base="xs:decimal">
+				<xs:attribute name="CurrencyCode" type="xs:NMTOKEN" use="required" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+</xs:schema>

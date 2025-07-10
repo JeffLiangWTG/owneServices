@@ -1,0 +1,29 @@
+meta {
+  name: Zone is more than 4 characters
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.Origin = { Type: "ZONE", Value: "AUZNE" };
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided International Zone ('AUZNE') is not valid. It should be a string of 4 characters.", function() {
+    expect(res.body.ModelState['Origin.Value'][0]).to.equal("Provided International Zone ('AUZNE') is not valid. It should be a string of 4 characters.");
+  });
+}

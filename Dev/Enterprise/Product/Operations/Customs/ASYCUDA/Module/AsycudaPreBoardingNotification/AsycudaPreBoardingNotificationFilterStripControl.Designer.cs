@@ -1,0 +1,298 @@
+namespace Enterprise.Customs.ASYCUDA.Module
+{
+	partial class AsycudaPreBoardingNotificationFilterStripControl
+	{
+		#region Component Designer generated code
+
+		/// <summary> 
+		/// Required method for Designer support - do not modify 
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo1 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo2 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo3 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo4 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo1 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo5 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo6 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo7 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo8 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo2 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo9 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo3 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo10 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo11 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo12 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo13 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo4 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo14 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo15 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo16 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo17 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo18 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo19 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo5 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo20 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo21 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo6 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo22 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo23 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo24 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo25 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo26 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo27 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			((System.ComponentModel.ISupportInitialize)(this.grid)).BeginInit();
+			this.grid.SuspendLayout();
+			this.AddStripButton.SuspendLayout();
+			this.RecentItemsPanel.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).BeginInit();
+			this.SuspendLayout();
+			// 
+			// grid
+			// 
+			this.BindingSource.SetBindingMember(this.grid, ".");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((System.Collections.IList)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)))));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).ManifestApplicationType)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_JobReference)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_TransportMode)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_RL_NKPortOfDischarge)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZDateTime)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_E_ARV)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_RN_NKConveyanceNationality)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_VesselName)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_Voyage)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_SystemCreateUser)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZDateTime)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_SystemCreateTimeUtc)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_SystemLastEditUser)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZDateTime)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_SystemLastEditTimeUtc)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_RN_NKCountry)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).MessageStatus)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_Nature)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).RegistrationStatus)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZDateTime)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_E_DEP)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_RL_NKPortOfLoading)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_AgentType)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_MasterBill)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_ContainerMode)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_Voyage)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_VehicleRegistration)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZDate)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_MasterBillIssueDate)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_ManifestType)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).RegistrationNumber)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZDateTime)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).RegistrationDate)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_CustomsOffice)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_RL_NKPortOfFirstArrival)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).ShippingAgentName)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).ShippingAgentAddress)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_CarrierCode)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader)(null)).AMA_GS_NKCustomsAgent)));
+			zTextBoxColumnStyleInfo1.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("22F96CED-2647-4EB2-B070-0AEE852ADED5", "", "Application Type", "Manifest Application Type", "");
+			zTextBoxColumnStyleInfo1.ColumnName = "ManifestApplicationType";
+			zTextBoxColumnStyleInfo1.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(95);
+			zTextBoxColumnStyleInfo2.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("214ECF1F-8193-42CE-BCEB-BD221DB386ED", "Job Ref", "Job Reference", "");
+			zTextBoxColumnStyleInfo2.ColumnName = "AMA_JobReference";
+			zTextBoxColumnStyleInfo2.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo2.IsMandatory = true;
+			zTextBoxColumnStyleInfo2.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo3.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("1A441425-6CC5-491A-9341-C2C2FA473AB8", "Transport Mode");
+			zTextBoxColumnStyleInfo3.ColumnName = "AMA_TransportMode";
+			zTextBoxColumnStyleInfo3.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo3.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo4.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("AF88609D-BEEC-4619-B865-0DEC2F79F0EA", "Port of Discharge");
+			zTextBoxColumnStyleInfo4.ColumnName = "AMA_RL_NKPortOfDischarge";
+			zTextBoxColumnStyleInfo4.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo4.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zDateEditColumnStyleInfo1.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("E2DDE02F-D1BB-4A32-99DD-12196AB1DAD2", "ETA");
+			zDateEditColumnStyleInfo1.ColumnName = "AMA_E_ARV";
+			zDateEditColumnStyleInfo1.DefaultCollectionIndex = 0;
+			zDateEditColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zTextBoxColumnStyleInfo5.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("3330166C-6EDB-43BF-BB24-C111ABA0EE61", "Conveyance Ctry/Rgn.");
+			zTextBoxColumnStyleInfo5.ColumnName = "AMA_RN_NKConveyanceNationality";
+			zTextBoxColumnStyleInfo5.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo5.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo6.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("41E9FACE-457E-400B-89FB-0BF8CFBF975B", "Vessel");
+			zTextBoxColumnStyleInfo6.ColumnName = "AMA_VesselName";
+			zTextBoxColumnStyleInfo6.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo6.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo7.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("70C3C17A-136E-48C1-A4C0-98E4F28781C4", "Voyage");
+			zTextBoxColumnStyleInfo7.ColumnName = "AMA_Voyage";
+			zTextBoxColumnStyleInfo7.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo7.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo8.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("32E79131-37A7-4C40-A2CD-785660965634", "Created By");
+			zTextBoxColumnStyleInfo8.ColumnName = "AMA_SystemCreateUser";
+			zTextBoxColumnStyleInfo8.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo8.IsMandatory = true;
+			zTextBoxColumnStyleInfo8.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zDateEditColumnStyleInfo2.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("6931153A-EAD8-4002-8E44-5855B9A305B7", "Created Time");
+			zDateEditColumnStyleInfo2.ColumnName = "AMA_SystemCreateTimeUtc";
+			zDateEditColumnStyleInfo2.DefaultCollectionIndex = 0;
+			zDateEditColumnStyleInfo2.IsMandatory = true;
+			zDateEditColumnStyleInfo2.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo9.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("84D1B4A0-049C-4EF9-ABF5-5514F008FF28", "Last Edit");
+			zTextBoxColumnStyleInfo9.ColumnName = "AMA_SystemLastEditUser";
+			zTextBoxColumnStyleInfo9.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo9.IsMandatory = true;
+			zTextBoxColumnStyleInfo9.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zDateEditColumnStyleInfo3.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("FEA343B2-790D-43DC-A726-496FCB43FBEA", "Last Edit Time");
+			zDateEditColumnStyleInfo3.ColumnName = "AMA_SystemLastEditTimeUtc";
+			zDateEditColumnStyleInfo3.DefaultCollectionIndex = 0;
+			zDateEditColumnStyleInfo3.IsMandatory = true;
+			zDateEditColumnStyleInfo3.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo10.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("952C2618-2A76-4E3D-99DE-F9D82FC2A7E6", "Country/Region");
+			zTextBoxColumnStyleInfo10.ColumnName = "AMA_RN_NKCountry";
+			zTextBoxColumnStyleInfo10.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo10.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo11.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("BD14AE30-239D-43EF-8C6B-FB59BD4638F1", "Msg. Status");
+			zTextBoxColumnStyleInfo11.ColumnName = "MessageStatus";
+			zTextBoxColumnStyleInfo11.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo11.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo12.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("AF3B875C-9A09-470B-B545-AF4FBDE45448", "Nature");
+			zTextBoxColumnStyleInfo12.ColumnName = "AMA_Nature";
+			zTextBoxColumnStyleInfo12.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo12.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo13.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("16BFB254-F5A1-444D-888F-318FDF5C9084", "Customs Status");
+			zTextBoxColumnStyleInfo13.ColumnName = "RegistrationStatus";
+			zTextBoxColumnStyleInfo13.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo13.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zDateEditColumnStyleInfo4.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("C3176D29-D8AD-4E42-B3B4-C49CEB1A7F53", "Est. Departure");
+			zDateEditColumnStyleInfo4.ColumnName = "AMA_E_DEP";
+			zDateEditColumnStyleInfo4.DefaultCollectionIndex = 0;
+			zDateEditColumnStyleInfo4.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo14.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("BC9E2140-B1B9-4134-9341-08905A14EEE5", "Port of Loading");
+			zTextBoxColumnStyleInfo14.ColumnName = "AMA_RL_NKPortOfLoading";
+			zTextBoxColumnStyleInfo14.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo14.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo15.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("7861F034-48E9-4B2A-9B97-F78D0A53B426", "Agent Type");
+			zTextBoxColumnStyleInfo15.ColumnName = "AMA_AgentType";
+			zTextBoxColumnStyleInfo15.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo15.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo16.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("E2AA3418-E59C-4D6F-95AD-008A0CF80EDD", "Manifest No.", "Manifest Number", "");
+			zTextBoxColumnStyleInfo16.ColumnName = "AMA_MasterBill";
+			zTextBoxColumnStyleInfo16.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo16.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo17.Caption = "";
+			zTextBoxColumnStyleInfo17.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("A057E5EA-9F14-4F0D-98CB-B24E98B07994", "", "Cont. Mode", "Container Mode", "");
+			zTextBoxColumnStyleInfo17.ColumnName = "AMA_ContainerMode";
+			zTextBoxColumnStyleInfo17.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo17.IsVisible = false;
+			zTextBoxColumnStyleInfo17.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(146);
+			zTextBoxColumnStyleInfo18.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("E7B42359-C50D-489F-B1F7-9C09C7EF0917", "", "Flight No.", "Flight Number", "");
+			zTextBoxColumnStyleInfo18.ColumnName = "AMA_Voyage";
+			zTextBoxColumnStyleInfo18.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo18.IsVisible = false;
+			zTextBoxColumnStyleInfo18.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(98);
+			zTextBoxColumnStyleInfo19.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("F69CD360-78A2-4513-A78C-F3B5DD1914A3", "", "Vehicle Reg", "Vehicle Registration", "");
+			zTextBoxColumnStyleInfo19.ColumnName = "AMA_VehicleRegistration";
+			zTextBoxColumnStyleInfo19.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo19.IsVisible = false;
+			zTextBoxColumnStyleInfo19.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(121);
+			zDateEditColumnStyleInfo5.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("2A647A28-9B11-43F6-AC9B-5BB0D5D876A1", "Issue Date");
+			zDateEditColumnStyleInfo5.ColumnName = "AMA_MasterBillIssueDate";
+			zDateEditColumnStyleInfo5.DefaultCollectionIndex = 0;
+			zDateEditColumnStyleInfo5.IsVisible = false;
+			zDateEditColumnStyleInfo5.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo20.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("6F555AE5-650F-4CA6-959E-027D4C9FE23A", "Manifest Type");
+			zTextBoxColumnStyleInfo20.ColumnName = "AMA_ManifestType";
+			zTextBoxColumnStyleInfo20.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo20.IsVisible = false;
+			zTextBoxColumnStyleInfo20.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo21.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("4B71C2D6-7216-4C17-8250-FFC579B817C8", "", "Reg Number", "Registration Number", "");
+			zTextBoxColumnStyleInfo21.ColumnName = "RegistrationNumber";
+			zTextBoxColumnStyleInfo21.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo21.IsVisible = false;
+			zTextBoxColumnStyleInfo21.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(126);
+			zDateEditColumnStyleInfo6.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("1F57CE8D-498F-4AB3-BDE7-6569EE50173F", "", "Reg Date", "Registration Date", "");
+			zDateEditColumnStyleInfo6.ColumnName = "RegistrationDate";
+			zDateEditColumnStyleInfo6.DefaultCollectionIndex = 0;
+			zDateEditColumnStyleInfo6.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(99);
+			zTextBoxColumnStyleInfo22.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("1F61A445-4339-4EC0-88DB-0C96955DCD07", "Customs Office");
+			zTextBoxColumnStyleInfo22.ColumnName = "AMA_CustomsOffice";
+			zTextBoxColumnStyleInfo22.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo22.IsVisible = false;
+			zTextBoxColumnStyleInfo22.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(110);
+			zTextBoxColumnStyleInfo23.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("68B521E2-E8FD-417E-B4B3-6694C908AFE6", "", "First Arr Port", "First Arrival Port", "");
+			zTextBoxColumnStyleInfo23.ColumnName = "AMA_RL_NKPortOfFirstArrival";
+			zTextBoxColumnStyleInfo23.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo23.IsVisible = false;
+			zTextBoxColumnStyleInfo23.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(110);
+			zTextBoxColumnStyleInfo24.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("32767BC6-8794-49CD-AE39-67B8CE7171A4", "", "Shipping Agent", "Shipping Agent Name", "");
+			zTextBoxColumnStyleInfo24.ColumnName = "ShippingAgentName";
+			zTextBoxColumnStyleInfo24.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo24.IsVisible = false;
+			zTextBoxColumnStyleInfo24.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zTextBoxColumnStyleInfo25.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("BDDD9F91-262F-4D9C-AA5F-F630D3A5C10D", "Shipping Add", "Shipping Address", "Shipping Agent Address", "");
+			zTextBoxColumnStyleInfo25.ColumnName = "ShippingAgentAddress";
+			zTextBoxColumnStyleInfo25.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo25.IsVisible = false;
+			zTextBoxColumnStyleInfo25.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(101);
+			zTextBoxColumnStyleInfo26.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("E59E0528-49D3-4027-97F1-79C0972C2C94", "Carrier Code");
+			zTextBoxColumnStyleInfo26.ColumnName = "AMA_CarrierCode";
+			zTextBoxColumnStyleInfo26.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo26.IsVisible = false;
+			zTextBoxColumnStyleInfo26.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(120);
+			zTextBoxColumnStyleInfo27.CaptionResourceString = Enterprise.Customs.ASYCUDA.Module.Res.GetData("47D59E8F-2F9A-49B1-A7B5-E20E6659587F", "Registered User");
+			zTextBoxColumnStyleInfo27.ColumnName = "AMA_GS_NKCustomsAgent";
+			zTextBoxColumnStyleInfo27.DefaultCollectionIndex = 0;
+			zTextBoxColumnStyleInfo27.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo1);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo2);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo3);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo4);
+			this.grid.ColumnStyles.Add(zDateEditColumnStyleInfo1);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo5);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo6);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo7);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo8);
+			this.grid.ColumnStyles.Add(zDateEditColumnStyleInfo2);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo9);
+			this.grid.ColumnStyles.Add(zDateEditColumnStyleInfo3);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo10);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo11);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo12);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo13);
+			this.grid.ColumnStyles.Add(zDateEditColumnStyleInfo4);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo14);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo15);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo16);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo17);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo18);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo19);
+			this.grid.ColumnStyles.Add(zDateEditColumnStyleInfo5);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo20);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo21);
+			this.grid.ColumnStyles.Add(zDateEditColumnStyleInfo6);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo22);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo23);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo24);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo25);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo26);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo27);
+			// 
+			// BindingSource
+			// 
+			this.BindingSource.DataSourceType = typeof(Enterprise.Customs.ASYCUDA.Business.AsycudaManifestHeader);
+			// 
+			// AsycudaPreBoardingNotificationFilterStripControl
+			// 
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+			this.CaptionRenderingEnabled = true;
+			this.Name = "AsycudaPreBoardingNotificationFilterStripControl";
+			((System.ComponentModel.ISupportInitialize)(this.grid)).EndInit();
+			this.grid.ResumeLayout(false);
+			this.grid.PerformLayout();
+			this.AddStripButton.ResumeLayout(true);
+			this.AddStripButton.PerformLayout();
+			this.RecentItemsPanel.ResumeLayout(false);
+			this.RecentItemsPanel.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).EndInit();
+			this.ResumeLayout(false);
+			this.PerformLayout();
+
+		}
+
+		#endregion
+	}
+}

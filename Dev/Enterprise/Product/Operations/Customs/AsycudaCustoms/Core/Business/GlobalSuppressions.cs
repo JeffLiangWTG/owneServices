@@ -1,0 +1,11 @@
+// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CargoWiseOne", "CW1123:new CachedValue", Scope = "namespaceanddescendants", Target = "~N:Enterprise.Customs.AsycudaCustoms.Business", Justification = "Properties using CachedValue should use CachedValueHelper.")]
+[assembly: SuppressMessage("CargoWiseOne", "CW1121:Do Not Include Column Values Or Names In Error Reporter Keys", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~P:Enterprise.Customs.AsycudaCustoms.Business.SecondCusBondDetail.PW_ApplicationCode")] // C:\git\wtg\CargoWise\Dev\Enterprise\Product\Operations\Customs\AsycudaCustoms\Core\Business\Business\CusBondDetail\ReleaseGuarantee\SecondCusBondDetail.cs:27:30
+[assembly: SuppressMessage("CargoWiseOne", "CW1121:Do Not Include Column Values Or Names In Error Reporter Keys", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~P:Enterprise.Customs.AsycudaCustoms.Business.SecondCusBondDetail.PW_ActivityCode")] // C:\git\wtg\CargoWise\Dev\Enterprise\Product\Operations\Customs\AsycudaCustoms\Core\Business\Business\CusBondDetail\ReleaseGuarantee\SecondCusBondDetail.cs:42:30
+[assembly: SuppressMessage("CargoWiseOne", "CW1107:Do Not Use Db.Connection Methods", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~M:Enterprise.Customs.AsycudaCustoms.Business.JobDeclaration.GetBGMReferenceCounter(System.Int32)")] // C:\git\wtg\CargoWise\Dev\Enterprise\Product\Operations\Customs\AsycudaCustoms\Core\Business\Business\JobDeclaration\JobDeclaration.cs:340:21
+[assembly: SuppressMessage("CargoWiseOne", "CW1021:Static Fields Are Thread Static Rule", Justification = "Baseline WI00605045", Scope = "member", Target = "~F:Enterprise.Customs.AsycudaCustoms.Business.CommonCusBondDetail.TypeDecider")] // Enterprise/Product/Operations/Customs/AsycudaCustoms/Core/Business/Business/CusBondDetail/CommonGuarantee/CommonCusBondDetail.cs:21,50

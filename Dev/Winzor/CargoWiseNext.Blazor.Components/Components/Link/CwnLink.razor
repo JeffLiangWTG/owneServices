@@ -1,0 +1,19 @@
+@namespace CargoWiseNext.Blazor.Components
+@inherits CwnComponentBase
+
+<CwnElement HtmlTag="span" Class="@Classname" OnSingleClick="HandleOnClickAsync">
+    @ChildContent
+</CwnElement>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter] public EventCallback<WebMouseEventArgs> OnClick { get; set; }
+
+    string Classname => new CssBuilder()
+        .AddClass("cwn-link")
+        .AddClass(Class)
+        .Build();
+
+    Task HandleOnClickAsync(WebMouseEventArgs args) => OnClick.InvokeAsync(args);
+}

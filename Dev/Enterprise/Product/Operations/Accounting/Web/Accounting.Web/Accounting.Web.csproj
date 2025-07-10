@@ -1,0 +1,151 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>Enterprise.Accounting.Web</RootNamespace>
+    <AssemblyName>Enterprise.Accounting.Web</AssemblyName>
+    <OverwriteReadOnlyOutputFiles>true</OverwriteReadOnlyOutputFiles>
+    <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+    <TargetFrameworks>$(CWNetCoreTargetFramework);net48</TargetFrameworks>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+    <PublishForWebDeploy>AccountingWebService</PublishForWebDeploy>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(DAT_IS_BUILDING)' != 'true'">
+    <PostBuildEvent>if not exist $(MSBuildProjectDirectory)\Bin mklink /J $(MSBuildProjectDirectory)\Bin $(MSBuildProjectDirectory)\$(OutputPath)</PostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.ComponentModel" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.DataProtection" />
+    <Reference Include="CargoWise.Data.Providers.Common" />
+    <Reference Include="CargoWise.Definitions" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.Integration" />
+    <Reference Include="CargoWise.IO" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="CargoWise.Schema" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="Enterprise.Accounting.Business" />
+    <Reference Include="Enterprise.Accounting.Export" />
+    <Reference Include="Enterprise.Environment" />
+    <Reference Include="Enterprise.Initialisation" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.MasterData.Common" />
+    <Reference Include="Enterprise.MasterFiles.Business" />
+    <Reference Include="Enterprise.MasterFiles.Integration" />
+    <Reference Include="Enterprise.NumberFountain" />
+    <Reference Include="Enterprise.UniversalDataBuss.DataObjects" />
+    <Reference Include="Enterprise.Messaging.Integration" />
+    <Reference Include="Enterprise.UniversalDataBuss.Integration" />
+    <Reference Include="Enterprise.UniversalDataBuss.XmlIO" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="CargoWise.Odyssey.Schema" />
+    <Reference Include="Enterprise.ZArchitecture.Web.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Web.GlobalBase" />
+    <Reference Include="Enterprise.ZArchitecture.Web.Shared" />
+    <Reference Include="Enterprise.ZArchitecture.Web.Utilities" />
+    <Reference Include="Resources" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == true">
+    <Reference Include="System.Web" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == true">
+    <Reference Include="NetCore.WebInfrastructure" />
+    <Reference Include="CargowiseOne.WebInfrastructure" />
+    <Reference Include="CargoWise.DataProtection.SqlExtensions" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == true">
+    <PackageReference Include="CoreWCF.Http" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Extensions.Logging" />
+    <PackageReference Include="Microsoft.IdentityModel.Abstractions" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="AccountingTransactionExportService.asmx.cs">
+      <DependentUpon>AccountingTransactionExportService.asmx</DependentUpon>
+    </Compile>
+    <Compile Update="CreditLimitService.asmx.cs">
+      <DependentUpon>CreditLimitService.asmx</DependentUpon>
+    </Compile>
+    <Compile Update="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Update="UpdateInvoicePaymentDetailsService.asmx.cs">
+      <DependentUpon>UpdateInvoicePaymentDetailsService.asmx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
+    <Content Include="AccountingTransactionExportService.asmx" />
+    <Content Include="readme.txt" />
+    <Content Include="UpdateInvoicePaymentDetailsService.asmx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CargoWise.png" />
+    <Content Include="CreditLimitService.asmx" />
+    <Content Include="default.htm" />
+    <Content Include="Global.asax" />
+  </ItemGroup>
+  <ItemGroup>
+    <T4ParameterValues Include="ProjectDir">
+      <Value>$(ProjectDir)</Value>
+      <Visible>false</Visible>
+    </T4ParameterValues>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Web.Config.Instructions" />
+    <None Include="Web.Base.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.Base.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.Base.config</DependentUpon>
+    </None>
+    <None Include="Web.NetCore.config" />
+    <!--
+      not required as it is default for Sdk="Microsoft.NET.Sdk.Web"
+      BUT REQUIRED for QGL and DAT
+    -->
+    <None Include="Web.config" />
+  </ItemGroup>
+  <Target Name="WebConfig" AfterTargets="PrepareForBuild">
+    <TransformXml Source="Web.Base.config" Transform="Web.$(Configuration).config" Destination="Web.config" StackTrace="true" />
+  </Target>
+
+  <!--The web.config needs to be restored to its original state before publish to prevent transformation errors.-->
+  <Target Name="RestoreWebConfigBeforePublish" AfterTargets="BeforePublish" Condition="'$(IsNetCoreTargetFramework)' == true">
+    <Message Importance="high" Text="Copy from Web.Base.config to Web.config" />
+    <Copy SourceFiles="Web.Base.config" DestinationFiles="Web.config" />
+  </Target>
+
+  <!-- Replaced the content of Web.config with Web.NetCore.config in the publish folder. -->
+  <Target Name="CopyWebConfigToPublishFolder" AfterTargets="AfterPublish" Condition="'$(IsNetCoreTargetFramework)' == true">
+    <Message Importance="high" Text="Copy Web.NetCore.config to publish dir $(PublishDir)" />
+    <Copy SourceFiles="Web.NetCore.config" DestinationFiles="$(PublishDir)\web.config" />
+  </Target>
+
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+
+  <!--The order of PropertyGroup condition matters — PropertyGroup condition define before importing NetCoreCommon.props will not take effect. Always set them after the import-->
+  <PropertyGroup Condition="'$(IsNetCoreTargetFramework)' == true">
+    <TransformOnBuild>false</TransformOnBuild>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(IsNetFrameworkTargetFramework)' == true">
+    <TransformOnBuild>true</TransformOnBuild>
+    <ProjectConfigFileName>Web.Base.config</ProjectConfigFileName>
+    <RunCommand>$(MSBuildExtensionsPath64)\..\IIS Express\iisexpress</RunCommand>
+    <RunArguments>/path:"$(MSBuildProjectDirectory)" /port:55899</RunArguments>
+  </PropertyGroup>
+</Project>

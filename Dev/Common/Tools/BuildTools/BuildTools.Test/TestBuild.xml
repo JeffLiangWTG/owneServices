@@ -1,0 +1,121 @@
+<Build xmlns="http://www.edi.com.au/build.xsd" MSBuild="%SystemRoot%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe">
+	<!-- Please add your Business Object in alphabetical order to make it easier for everyone to find out who owns it -->
+	<BusinessObjects>
+		<!-- Non-Master Files Business Objects -->
+		<BusinessObject Table="AccStatement" Solution="Accounting" PreventDelete="false"/>
+		<BusinessObject Table="AddInfoDataSet.xsd" Solution="AUCustoms" />
+		<BusinessObject Table="AssayCodeDataSet.xsd" Solution="AUCustoms" />
+		<BusinessObject Table="DummyBizo" Solution="ZArchitecture" />
+		<BusinessObject Table="DummyDependentBizo" Solution="ZArchitecture" MasterFileReference="true" />
+		<BusinessObject Table="ConOutstandingDispatch" Solution="ContainerManager" />
+		<!-- Master Files Business Objects -->
+		<BusinessObject Table="AccBankAccount" Solution="MasterFiles" PreventDelete="true" />
+		<BusinessObject Table="AccChargeCode" Solution="MasterFiles" />
+		<BusinessObject Table="vw_UNDGAttribute" Solution="MasterFiles" GenerateBusinessObjects="false"/>
+		<!-- Reference Database Business Objects -->
+		<BusinessObject Database="EDITariff_ReferenceFiles_AU" Table="AUCAHECC" Solution="AUCustoms" />
+		<BusinessObject Database="EDITariff_ReferenceFiles_AU" Table="AUCChapter" ConvertZStringToWesternEuropeanCharacters="true" Solution="AUCustoms" />
+		<!-- Business Objects with AddInfo-->
+		<BusinessObject Table="JobDeclaration" Solution="Enterprise.Customs.Business">
+			<AddInfo View="BRJobDeclaration" Solution="BR"/>
+			<AddInfo View="ZAJobDeclaration" Solution="ZA"/>
+		</BusinessObject>
+		<BusinessObject Table="JobComInvoiceHeader" Solution="Enterprise.Customs.Business">
+			<AddInfo View="BRJobComInvoiceHeader" Solution="BR"/>
+			<AddInfo View="ZAJobComInvoiceHeader" Solution="ZA"/>
+		</BusinessObject>
+	</BusinessObjects>
+	<!-- Add solutions in the order in which they are to be built -->
+	<Solutions>
+		<Solution Sniff="false" Filename="NUnit\NUnit.sln" BuildEngine="VSAutomation" />
+		<Solution Filename="BuildTools\BuildTools.sln" BuildEngine="DevEnv">
+			<Bin DeployToClients="false">BuildTools.dll</Bin>
+			<Bin UnitTest="false">DummyNoTest.dll</Bin>
+		</Solution>
+		<Solution Filename="Resources\Resources.sln" BuildEngine="MSBuild">
+			<Bin>Resources.dll</Bin>
+		</Solution>
+		<Solution Filename="VirtualChannels\VirtualChannels.sln">
+			<!-- The client DLLs are deployed as part of the thin-client setup, not part of Enterprise. -->
+			<Bin DeployToClients="false" SignWithAuthenticode="true">Enterprise.VirtualChannels.CitrixClient.dll</Bin>
+			<Bin DeployToClients="false" CanExistInGAC="true">Enterprise.VirtualChannels.Client.dll</Bin>
+			<Bin>Enterprise.VirtualChannels.Server.dll</Bin>
+		</Solution>
+		<Solution Filename="RemotePrinting\Engine\RemotePrinting.Engine.sln">
+			<Bin CanExistInGAC="true">RemotePrinting.Engine.dll</Bin>
+			<Bin SignWithAuthenticode="false">RemotePrinting.Types.dll</Bin>
+		</Solution>
+		<Solution Filename="DbUpgrader\Resource\DbUpgrader.Resource.sln">
+			<Bin>Enterprise.DbUpgrader.Resource.dll</Bin>
+			<Bin>Enterprise.DbUpgrader.Resource.Version.dll</Bin>
+		</Solution>
+		<Solution Filename="BuildTools\MyCheckOuts\MyCheckOuts.sln" Sniff="false">
+			<Bin UnitTest="false">MyCheckOuts.exe</Bin>
+		</Solution>
+		<Solution Filename="BusinessObjectGenerator\BusinessObjectGenerator.sln" Sniff="false">
+			<Bin DeployToClients="false">BusinessObjectGenerator.dll</Bin>
+		</Solution>
+		<Solution Filename="Clients\WOW\ZClientWOW\ZClientWOW.sln">
+			<Bin>ZClientWOW.dll</Bin>
+		</Solution>
+		<Solution Filename="Clients\ROH\ZClientROH\ZClientROH.sln" BuildWithVSAutomation="true">
+			<Bin>ZClientROH.dll</Bin>
+		</Solution>
+		<Solution Filename="Clients\EDI\ZClientWebEDI\ZClientWebEDI.sln">
+			<Bin>ZClientWebEDI.dll</Bin>
+		</Solution>
+		<Solution Filename="Tracking\Tracking.sln">
+			<Bin>Enterprise.Tracking.Business.dll</Bin>
+			<Bin>Enterprise.Tracking.Web.dll</Bin>
+			<Bin>Enterprise.Tracking.Module.dll</Bin>
+		</Solution>
+	</Solutions>
+	<InstallationProjects>
+		<InstallationProject SolutionPath="Path\To\Solution.sln" ProjectPath="RemotePrinting\Client\RPCSetup\RPCSetup.vdproj"/>
+	</InstallationProjects>
+	<Dependencies>
+		<Dependency Repository="https://devops/repo2" Path="$/Whatever/Foo">
+			<Copy Source="DependencyToDeploy1.dll"/>
+			<Copy DeployToClients="false" Source="DependencyDontDeploy.dll"/>
+			<Copy DeployToClients="true" Source="DependencyToDeploy2.dll"/>
+		</Dependency>
+		<Dependency Path="$/Whatever/Bar" Repository="http://devops/repo1">
+			<Copy Source="DependencyToDeploy3.dll"/>
+		</Dependency>
+		<Dependency Repository="http://devops/repo3">
+		</Dependency>
+	</Dependencies>
+	<OtherFiles>
+		<Directory CopyFrom="Testing" CopyTo="DestDirectory" SignWithAuthenticode="true" />
+		<Filename>NZCusSign.dll</Filename>
+		<Filename SignWithAuthenticode="true">PDF32.dll</Filename>
+		<Filename CopyFrom="some path" SignWithAuthenticode="false">Enterprise.Tracking.Module.dll</Filename>
+		<Filename CopyFrom="temp\1" CanExistInGAC="true">Flexcel.dll</Filename>
+		<Filename CopyFrom="temp\2">server\External.dll</Filename>
+		<Filename CopyFrom="temp\2">client\External.dll</Filename>
+		<Filename>ShouldOnlyBeInOtherDeployedFiles</Filename>
+		<Filename Version="14.5.7.9">Path\To\Assembly.dll</Filename>
+		<Filename CopyFrom="@/Testing\Test.link/\Client">LinkedAssembly.dll</Filename>
+	</OtherFiles>
+	<WebDeploy>
+		<WebSolution Path="Tracking\Tracking.Web" DestFolder="Forwarding"/>
+		<WebSolution Path="WebCFS\WebCFS.Web" DestFolder="CFS"/>
+		<WebSolution Path="ediWeb\Classroom\Classroom.Web" DestFolder="Classroom" Client="EDI"/>
+		<WebSolution Path="ediWeb\Classroom\Classroom.Web2" DestFolder="Classroom2" Client="EDI"/>
+	</WebDeploy>
+	<OtherFilesToSign>
+		<Filename>ediLoadElevate.exe</Filename>
+		<Filename>ShouldOnlyBeInOtherFilesToSign</Filename>
+	</OtherFilesToSign>
+	<PreBuild>
+		<Command>alwaysrunbefore.exe</Command>
+		<Command cacheable="false" mode="RELEASE">releaseonlybefore.exe</Command>
+		<Command cacheable="false" mode="DEBUG">debugonlybefore.exe</Command>
+	</PreBuild>
+	<PostBuild>
+		<Command>alwaysrunafter.exe</Command>
+		<Command mode="RELEASE">Bin\net8.0\WebDeployBuilder.exe</Command>
+		<Command mode="RELEASE">BuildEdiLoad.bat</Command>
+		<Command mode="DEBUG">debugonly.exe</Command>
+	</PostBuild>
+</Build>

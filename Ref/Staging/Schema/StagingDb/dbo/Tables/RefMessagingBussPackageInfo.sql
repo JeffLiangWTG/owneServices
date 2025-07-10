@@ -1,0 +1,6 @@
+CREATE TABLE [RefMessagingBussPackageInfo](
+	[ZMP_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefMessagingBussPackageInfo_ZMP_PK] DEFAULT (NEWID()),
+	[ZMP_PackageName] VARCHAR(200) NOT NULL CONSTRAINT [DF_RefMessagingBussPackageInfo_ZMP_PackageName] DEFAULT (''),
+	CONSTRAINT [PK_RefMessagingBussPackageInfo] PRIMARY KEY NONCLUSTERED([ZMP_PK] ASC)
+)
+GO

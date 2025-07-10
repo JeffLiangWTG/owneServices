@@ -1,0 +1,65 @@
+<Window x:Class="CargoWise.Main.Navigation.ModuleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+        xmlns:local="clr-namespace:CargoWise.Main.Navigation"
+        mc:Ignorable="d"
+        Title="ModuleWindow" MinWidth="1366" MinHeight="760">
+	<Window.Resources>
+		<ResourceDictionary >
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="NextHomeResources.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Window.Resources>
+	<Window.InputBindings>
+		<KeyBinding Key="Q" Modifiers="Control" Command="Search" />
+	</Window.InputBindings>
+	<Window.CommandBindings>
+		<CommandBinding Command="Search" Executed="HandleSearchShortcut" />
+		<CommandBinding Command="{x:Static local:NextAppBar.CloseSearchWindowCommand}" Executed="CloseSearchWindow" />
+	</Window.CommandBindings>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="50" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<wfi:WindowsFormsHost x:Name="winFormsHost" Grid.Row="1">
+			<wfi:WindowsFormsHost.Style>
+				<Style TargetType="wfi:WindowsFormsHost">
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding IsInSearchMode}" Value="True">
+							<Setter Property="Visibility" Value="Hidden"/>
+						</DataTrigger>
+						<DataTrigger Binding="{Binding IsInSearchMode}" Value="False">
+							<Setter Property="Visibility" Value="Visible"/>
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</wfi:WindowsFormsHost.Style>
+		</wfi:WindowsFormsHost>
+		<Image Grid.Row="1" x:Name="WinFormsSnapshot" Stretch="Fill" Visibility="{Binding IsInSearchMode, Converter={StaticResource BooleanToVisibilityConverter}}" />
+		
+		<local:NextAppBar x:Name="NextAppBar" Grid.Row="0"/>
+		<Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Name="SearchWindow" Background="Transparent"
+	  Visibility="{Binding IsInSearchMode, Converter={StaticResource BooleanToVisibilityConverter}}" >
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="1*" />
+				<ColumnDefinition Width="1.89*" />
+				<ColumnDefinition Width="1*" />
+			</Grid.ColumnDefinitions>
+			<Grid.InputBindings>
+				<KeyBinding Key="Escape" Command="{x:Static local:NextAppBar.CloseSearchWindowCommand}" />
+			</Grid.InputBindings>
+			<Border Grid.ColumnSpan="3" Background="Gray" Opacity="0.19" Name="SearchWindowBackground">
+				<Border.InputBindings>
+					<MouseBinding MouseAction="LeftClick" Command="{x:Static local:NextAppBar.CloseSearchWindowCommand}" />
+				</Border.InputBindings>
+			</Border>
+			<local:SearchResultPanel Grid.Column="1" />
+		</Grid>
+	</Grid>
+</Window>

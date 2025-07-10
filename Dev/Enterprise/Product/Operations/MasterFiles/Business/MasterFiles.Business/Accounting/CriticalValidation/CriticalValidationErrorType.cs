@@ -1,0 +1,239 @@
+namespace Enterprise.MasterFiles.Business
+{
+	public enum CriticalValidationErrorType
+	{
+		NoError,
+		DummyErrorKeyForTest,
+		CannotSaveAfterError,
+		AbortOnSavingProcess,
+
+		#region AccTransactionLinesCriticalValidation
+
+		ReversedTransactionLineShouldBeOrNotLinkedToJobCharge_3,
+		ReversedTransactionsShouldNotHaveLinesLinkedToCharges_7,
+		TransactionLineWithoutTransactionHeader_2,
+		JobTransactionLineWithoutRevenueRecognitionType_7,
+		JobTransactionLineWithoutJobCharge_3,
+		UnapprovedCostTransactionLineWithoutJobCharge_4,
+		CostTransactionLineWithoutJobCharge_5,
+		RevenueTransactionLineWithoutJobCharge_6,
+		JobTransactionLineWithMoreThanOneJobCharge_LineSide_5,
+		TransactionLineLocalAmountNotEqualJobChargeLocalAmount_9,
+		TransactionLineTaxCodeNotEqualJobChargeTaxCode_5,
+		TransactionLineTaxClassNotEqualJobChargeTaxClass_4,
+		TransactionLineSupplyTypeNotEqualJobChargeSupplyType_2,
+		JobTransactionLineWithoutJobChargeToSave_3,
+		WIPMustHaveDebtor_1,
+		AccrualMustHaveCreditor_1,
+		TransactionLineLocalAmountNotEqualForeignWithExRate_5,
+		TransactionLineHasNoJobWhenRequiredByChargeCode_2,
+		WIPACROrganisationDoesNotMatchOneOnJobCharge_10,
+		SubAccountDetailsCannotBeSetForJobRelatedLines_1,
+		AccTransactionLineBranchDoesNotBelongToAccTransactionHeaderCompany_2,
+		TransactionLineWithoutGLAccountAndChargeCode_2,
+		TransactionLineNegativeAmountOnAccountReceivableTransactionsIsNotAllowed,
+		TransactionLineAmountExceedMaximumAllowedAmount,
+		TransactionLineTaxBranchDifferentFromChargeTaxBranch,
+		InvalidReverseDate,
+		GLJournalEntriesNumberHasBeenAssigned,
+
+		#endregion
+
+		#region AccTransactionHeaderCriticalValidation
+
+		CreateTransactionRestriction,
+		TransactionHeaderIncorrectOutstandingAmount_12,
+		TransactionHeaderIncorrectOSOutstandingAmount,
+		NonZeroOutstandingAmountOnMiscellaneousTransaction_4,
+		ClearedReceiptWithoutBatchNumber_3,
+		AutoGLJournalWithoutDueDate_2,
+		CashBookExchangeTransactionNeedGeneralLedgerAccount,
+		TransactionLineTypeNotCompatibleWithTransactionHeader_4,
+		TransactionHeaderLedgerNotCompatibleWithTransactionHeaderType_2,
+		TransactionHeaderGstAmountWasModifiedAfterBeingSaved_2,
+		TransactionHeaderWasCriticallyChangedByDataRefreshBus_2,
+		TransactionHeaderPostDateChangesAfterPosted_3,
+		TransactionHeaderWithLinesShouldHaveLines_4,
+		TransactionHeaderMustHaveTransactionNumber_8,
+		TransactionNumberOfHeaderMustNotChangeOnceSaved_5,
+		INTransactionHeaderHasPostedLines_4,
+		TransactionHeaderInvoiceAmountWasModifiedAfterBeingSaved_7,
+		TransactionHeaderOSAmountWasModifiedAfterBeingSaved_2,
+		TransactionHeaderBankAccountWasModifiedAfterBeingSaved_2,
+		TransactionHeaderSkippedDataRefreshBusUpdateButWasSavedSuccessfully_2,
+		TransactionHeaderExchangeRateShouldBeGreaterThanZero_10,
+		NotAllowedToPostCreditNoteDueToRegistryConfiguration,
+		TransactionHeaderAmountExceedMaximumAllowedAmount,
+		SumOfInvoiceBatchLineAmountNotEqualToInvoiceBatchHeaderAmount,
+		TransactionLineTaxIdAndTaxMessageMappingInvalid_1,
+		CancelledInvoiceBatchHeaderAmountIsNonZero,
+		InvalidInvoiceDate,
+
+		#endregion
+
+		#region AccTransactionMatchLinkCriticalValidation
+
+		SavedMachLinkCannotBeModified_1,
+		MatchLinkIsNotAMemberOfMatchGroup_1,
+		MatchLinkWithoutGroupNumber_1,
+		MatchLinkLinkedTransactionHasNotChanged_1,
+		MatchLinkLinkedTransactionIsOSAmountApplicableInconsistent,
+
+		#endregion
+
+		#region JobChargeCriticalValidation
+
+		JobChargeHasPreviouslyLinkedLineThatMustBeReversed_3,
+		JobChargeLinkedLineShouldNotBeReversed_3,
+		JobChargeAmountNotEqualRelatedLineAmount_13,
+		JobChargeOrganisationIsNotSameAsLineOne_5,
+		JobChargeInvoiceDetailsNotEqualConsolCostOnes_8,
+		JobChargeInvoiceDetailsNotEqualConsolCostOnesWithoutChanges,
+		JobChargeReferenceToPostedTransactionLineCannotBeChanged_3,
+		JobChargeTaxCodeNotEqualRelatedLineTaxCode_7,
+		JobChargeRelatedToPostedTransactionLineCannotBeDeleted_4,
+		JobChargeRelatedWIP_ACR_MustBeReversedWhenChargeIsDeleted_3,
+		JobChargeLinkedToConsolCostInvoiceHasZeroCostAmount_11,
+		JobTransactionLineWithMoreThanOneJobCharge_ChargeSide_4,
+		NewJobChargeLinkedToWIPAccrualInDbReferredByOtherJobCharges_3,
+		JobChargeLinkedToPostedConsolCostIsNotCostPosted_3,
+		JobChargeLinkedToPostedConsolCostIsPostedToDifferentInvoice_4,
+		JobChargeLinkedToUnpostedConsolCostIsCostPosted_3,
+		JobChargeOsSellAmountNotEqualLocalSellAmount_8,
+		JobChargeOsCostAmountNotEqualLocalCostAmount_4,
+		JobChargeOsSellAmountNotMatchingSignOfLocalSellAmount_5,
+		JobChargeOsCostAmountNotMatchingSignOfLocalCostAmount_3,
+		JobChargeOSSellExRateShouldBeOneWhenLocalCompanyCurrencyEqualsJobChargeSellCurrency_4,
+		JobChargeOSSellExRateIsNegative,
+		JobChargeOSCostExRateShouldBeOneWhenLocalCompanyCurrencyEqualsJobChargeCostCurrency_9,
+		JobChargeSkippedDataRefreshBusUpdateButWasSavedSuccessfully_4,
+		JobChargeSkippedDataRefreshBusUpdateButWasSavedSuccessfully_DeletedOrUnlinkedFromConsolCost,
+		JobChargeNegativeRevenueIsNotPermitted,
+		JobChargeAmountExceedMaximumAllowedAmount,
+		JobChargeLinkedToClosedJob,
+		JobChargeLinkedToClosedJobWhenCreatingProfitShareCharges,
+		JobChargeLinkedToInactiveJob,
+		JobChargeMoreThanOneFieldLinkToTheSameLine,
+		InvalidJobChargeProFormaCostOrProFormaRevenue,
+
+		#endregion
+
+		#region CashBasisVATCriticalValidation
+
+		CashBasisTaxRecognition_1,
+		CashBasisTaxRecognitionWithIncorrectTotal_1,
+		CashBasisTaxRecognitionWithEmptyMatchGroupNumber_1,
+		CashBasisTaxRecognitionWithOppositeToLineSigns_1,
+		CashBasisTaxRecognitionWithIncorrectPostDate_1,
+		CashBasisTaxRecognitionWithIncorrectTaxRecord_1,
+		CashBasisTaxRecognitionWithDifferentSigns_1,
+
+		#endregion
+
+		#region TransactionMatchlinkGroupCriticalValidation
+
+		TransactionMatchGroupOutOfBalance_2,
+		TransactionMatchGroupNotAllHeaderInSameCompanies_1,
+
+		#endregion
+
+		#region TransactionHeaderCriticalValidation
+
+		MissingRevesingTransactionForCanceledTransaction_2,
+		InvalidFullyPaidDateWithRespectToTheOutstandingAmount_2,
+		LocalInvoiceAmountNotEqualToTheForeignCurrencyInvoiceAmountWhenExRateIs1_4,
+		TransactionWithEmptyGLAccountField_7,
+		NumberFountainBaseDataWasChanged_2,
+		MatchingBasisTaxTransactionsWithEmptyRealisationDate,
+		OSTotalAmountMustNotChangeAfterRoundingLineCreation,
+		DirectDebitBatchLocalAmountIsNotEqualToSumOfAllPaymentLocalAmounts_2,
+		DirectDebitBatchOSAmountIsNotEqualToSumOfAllPaymentOSAmountsWhenBatchIsInForeignCurrency,
+		DirectDebitBatchOSAmountIsNotEqualToLocalAmountWhenBatchIsInLocalCurrency,
+
+		#endregion
+
+		#region TransactionHeaderWithLinesCriticalValidation
+
+		TransactionHeaderBranchDoesNotBelongToTransactionHeaderCompany_2,
+		TransactionLineBranchDoesNotBelongToTransactionHeaderCompany_2,
+		SumOfTransactionLineAmountsDoesNotMatchTransactionHeaderInvoiceAmount_3,
+		SumOfTransactionLineAmountsWillNotMatchTransactionHeaderInvoiceAmountBecauseNotAllLinesWillBeSaved_2,
+		SumOfTransactionLineGSTAmountsDoesNotMatchTransactionHeaderGSTAmount_2,
+		SumOfTransactionLineOSAmountsDoesNotMatchTransactionHeaderOSTotalAmount_3,
+		SumOfTransactionLineAmountsDoesNotEqualToZero_6,
+		CancelledUnapprovedPayableTransactionsShouldNotHaveLines_2,
+		TransactionLineTaxBranchNotEqualToTransactionHeaderTaxBranch,
+
+		#endregion
+
+		#region InvoicingBaseCriticalValidation
+
+		APTransactionNumberAlreadyUsedForAnotherOrganization_2,
+		JobInvoiceNumberExceedTheMaximumNumber,
+		RemittanceReferenceNumberExceedMaxLength,
+
+		#endregion
+
+		#region JobConsolCostCriticalValidation
+
+		OverseasCostAmountNotEqualToSumOfApportionmentsOverseasCostAmount_9,
+		LocalCostAmountNotEqualToSumOfApportionmentsLocalCostAmount_6,
+		OverseasCostTaxAmountNotEqualToSumOfApportionmentsOverseasCostTaxAmount_11,
+		CostNotLinkedToJobDueToEmptyParentID_2,
+		CostNotLinkedToJobDueToEmptyParentTableCode_1,
+		ApportionSplitChargeInvoiceDetailsNotEqualToParentConsolCostInvoiceDetails_8,
+		ApportionSplitChargeInvoiceDetailsNotEqualToParentConsolCostInvoiceDetailsWithoutChanges,
+		PostedConsolCostWithCostUnpostedApportionmentCharge_4,
+		PostedConsolCostWithApportionmentChargePostedToDifferentInvoice_4,
+		PostedConsolCostWithNonOverriddenTaxAmount_2,
+		UnpostedConsolCostWithCostPostedApportionmentCharge_3,
+
+		#endregion
+
+		#region WIPAccrualCriticalValidation
+
+		LineShouldBeRelatedToSameJobAsLinkedJobCharge_3,
+		LineShouldHaveSameAmountAsJobCharge_11,
+		LineCurrencyShouldHaveSameCurrencyAsLocalCurrency_3,
+
+		#endregion
+
+		#region BankTransferCriticalValidation
+
+		LinesOfBankTranferShouldBalanceToZero_3,
+
+		#endregion
+
+		#region JobCriticalValidation
+
+		BranchOfJobShouldNotBeNull,
+		DepartmentOfJobShouldNotBeNull,
+
+		#endregion
+
+		#region AccTaxTransactionCriticalValidation
+
+		TaxTransactionShouldBeCancelledIfAllAmountsAreZero,
+		GLMovementExistsForLocalTaxAmountZero,
+		GLMovementsRecordsNotFound,
+		InvalidTaxTransactionBasis,
+		InvalidGLMovementForNotionalTax,
+		TaxRecordSkippedDataRefreshBusUpdateButWasSavedSuccessfully,
+		TaxTransactionWithoutPivots,
+		TaxTransactionWithSumOfPivotsLocalTaxAmountsMismatch,
+		TaxTransactionWithSomePivotHavingTaxExpenseDataMismatch,
+		TaxTransactionWithLocalTaxAmountChangedAfterSaving,
+		TaxTransactionWithTaxExpenseDataChangedAfterSaving,
+		CancelledTaxTransactionRealisationDateShouldNotBeEmpty,
+
+		#endregion
+
+		#region AccComplianceDocumentHeaderCriticalValidation
+
+		AccComplianceDocumentHeaderWithAddressNotRelatedToHeader_1,
+
+		AccComplianceDocumentNumberAlreadyInUse,
+
+		#endregion
+	}
+}

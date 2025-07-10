@@ -1,0 +1,20 @@
+using System.Data;
+using CargoWise.EntityFramework;
+
+namespace Enterprise.Customs.FR.Business.NCTS
+{
+	public class NctsBill : EU.NCTS.Business.NctsBill
+	{
+		public NctsBill(BusinessObjectFactory factory, DataRow row)
+			: base(factory, row)
+		{
+		}
+
+		[ChildEditable]
+		public new EU.NCTS.Business.INctsDepartureCargoDescCollection<NctsDepartureCargoDesc> GoodsItems
+			=> (EU.NCTS.Business.INctsDepartureCargoDescCollection<NctsDepartureCargoDesc>)base.GoodsItems;
+
+		protected override EU.NCTS.Business.INctsDepartureCargoDescCollection<EU.NCTS.Business.NctsDepartureCargoDesc> GetNewGoodsItems()
+			=> new EU.NCTS.Business.NctsDepartureCargoDescCollection<NctsDepartureCargoDesc>(this);
+	}
+}

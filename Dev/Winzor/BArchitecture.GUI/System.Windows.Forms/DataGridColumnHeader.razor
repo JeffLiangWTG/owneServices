@@ -1,0 +1,91 @@
+@namespace System.Windows.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using System.ComponentModel
+@using WinzorFramework.Extensions
+
+<th @ref=column class="@CssClass" style="@ColumnHeaderStyleString"
+    @oncontextmenu="async (args) => await ContextMenuHandler(args, DataGrid.HitTestType.ColumnHeader)" @oncontextmenu:stopPropagation @oncontextmenu:preventDefault
+    @onmousedown="async (args) => await MouseDownHandler(args, DataGrid.HitTestType.ColumnHeader)" @onmousedown:stopPropagation
+    @onmouseup="async (args) => await MouseUpHandler(args, DataGrid.HitTestType.ColumnHeader)" @onmouseup:stopPropagation>
+    <span draggable="true"
+        @ondragstart="async (args) => await DragStartHandler(args, DataGrid.HitTestType.ColumnHeader)" @ondragstart:stopPropagation
+        @ondrop="async (args) => await DropHandler(args, DataGrid.HitTestType.ColumnHeader)" @ondrop:stopPropagation>@HeaderText</span><div
+            style="@(SortDirection is null ? "display: none;" : string.Empty)"></div><div class="datagrid__column_resizer"
+        @onmousedown="async (args) => await MouseDownHandler(args, DataGrid.HitTestType.ColumnResize)" @onmousedown:stopPropagation
+        @onmouseup="async (args) => await MouseUpHandler(args, DataGrid.HitTestType.ColumnResize)" @onmouseup:stopPropagation>
+    </div>
+</th>
+
+@code
+{
+    [Parameter]
+    public DataGridColumnStyle? ColumnStyle { get; set; }
+
+    [Parameter]
+    public int ColumnIndex { get; set; }
+
+    [Parameter]
+    public string HeaderText { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> MouseDown { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> MouseUp { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> ContextMenu { get; set; }
+
+    [Parameter]
+    public EventCallback<DragEventArgs> DragStart { get; set; }
+
+    [Parameter]
+    public EventCallback<DragEventArgs> Drop { get; set; }
+
+    [Parameter]
+    public ListSortDirection? SortDirection { get; set; }
+
+    ElementReference column;
+
+    async Task MouseDownHandler(Microsoft.AspNetCore.Components.Web.MouseEventArgs args, DataGrid.HitTestType hitTestType)
+    {
+        var hitTestInfo = new DataGrid.HitTestInfo() { type = hitTestType, col = ColumnIndex, row = -1 };
+        await MouseDown.InvokeAsync(new MouseEventArgs(args, hitTestInfo, column));
+    }
+
+    async Task DragStartHandler(Microsoft.AspNetCore.Components.Web.DragEventArgs args, DataGrid.HitTestType hitTestType)
+    {
+        var hitTestInfo = new DataGrid.HitTestInfo() { type = hitTestType, col = ColumnIndex, row = -1 };
+        await DragStart.InvokeAsync(new DragEventArgs(args, hitTestInfo, column));
+    }
+
+    async Task DropHandler(Microsoft.AspNetCore.Components.Web.DragEventArgs args, DataGrid.HitTestType hitTestType)
+    {
+        var hitTestInfo = new DataGrid.HitTestInfo() { type = hitTestType, col = ColumnIndex, row = -1 };
+        await Drop.InvokeAsync(new DragEventArgs(args, hitTestInfo, column));
+    }
+
+    async Task MouseUpHandler(Microsoft.AspNetCore.Components.Web.MouseEventArgs args, DataGrid.HitTestType hitTestType)
+    {
+        var hitTestInfo = new DataGrid.HitTestInfo() { type = hitTestType, col = ColumnIndex, row = -1 };
+        await MouseUp.InvokeAsync(new MouseEventArgs(args, hitTestInfo, column));
+    }
+
+    async Task ContextMenuHandler(Microsoft.AspNetCore.Components.Web.MouseEventArgs args, DataGrid.HitTestType hitTestType)
+    {
+        var hitTestInfo = new DataGrid.HitTestInfo() { type = hitTestType, col = ColumnIndex, row = -1 };
+        await ContextMenu.InvokeAsync(new MouseEventArgs(args, hitTestInfo, column));
+    }
+
+    string CssClass => SortDirection switch
+    {
+        ListSortDirection.Ascending => "datagrid__header--ascending",
+        ListSortDirection.Descending => "datagrid__header--descending",
+        _ => string.Empty,
+    };
+
+    string ColumnHeaderStyleString => ColumnStyle is not null ? $"width: {ColumnStyle.Width}px; {ColumnStyle.TextAlign()}" : string.Empty;
+
+    public record MouseEventArgs(WebMouseEventArgs Args, DataGrid.HitTestInfo HitTest, ElementReference Column);
+    public record DragEventArgs(WebDragEventArgs Args, DataGrid.HitTestInfo HitTest, ElementReference Column);
+}

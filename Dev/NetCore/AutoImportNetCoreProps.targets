@@ -1,0 +1,12 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Import NetCoreCommon.props for non-Winzor NetCore projects that have single NetCore target framework -->
+  <PropertyGroup>
+    <HasAutoImportedNetCoreCommonProps Condition="
+      '$(IsNetCoreCommonPropsImported)' != 'true'
+      And '$(IsWinzorProject)' != 'true'
+      And '$(TargetFrameworks)' == ''
+      And $(TargetFramework.StartsWith($(CWNetCoreVersion)))"
+    >true</HasAutoImportedNetCoreCommonProps>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" Condition="'$(HasAutoImportedNetCoreCommonProps)' == 'true'" />
+</Project>

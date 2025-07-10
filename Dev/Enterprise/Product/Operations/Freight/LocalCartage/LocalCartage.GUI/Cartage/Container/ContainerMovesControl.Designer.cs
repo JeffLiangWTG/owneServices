@@ -1,0 +1,467 @@
+namespace Enterprise.Freight.LocalCartage.GUI
+{
+	partial class ContainerMovesControl
+	{
+		/// <summary> 
+		/// Required designer variable.
+		/// </summary>
+		private System.ComponentModel.IContainer components = null;
+
+		#region Component Designer generated code
+
+		/// <summary> 
+		/// Required method for Designer support - do not modify 
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo1 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo zGuidFindBoxColumnStyleInfo1 = new Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZDropEditColumnStyleInfo zDropEditColumnStyleInfo1 = new Enterprise.ZArchitecture.GUI.ZDropEditColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZGuidDropEditColumnStyleInfo zGuidDropEditColumnStyleInfo1 = new Enterprise.ZArchitecture.GUI.ZGuidDropEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo1 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo1 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZGuidDropEditColumnStyleInfo zGuidDropEditColumnStyleInfo2 = new Enterprise.ZArchitecture.GUI.ZGuidDropEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo2 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo2 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo zCheckBoxColumnStyleInfo1 = new Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo zGuidFindBoxColumnStyleInfo2 = new Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZCodeFindBoxColumnStyleInfo zCodeFindBoxColumnStyleInfo1 = new Enterprise.ZArchitecture.GUI.ZCodeFindBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo3 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZGuidDropEditColumnStyleInfo zGuidDropEditColumnStyleInfo3 = new Enterprise.ZArchitecture.GUI.ZGuidDropEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo4 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo5 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo6 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo7 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo8 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo9 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo10 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.Internal.ZTimeEditExColumnStyleInfo zTimeEditExColumnStyleInfo1 = new Enterprise.ZArchitecture.GUI.Internal.ZTimeEditExColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.Internal.ZTimeEditExColumnStyleInfo zTimeEditExColumnStyleInfo2 = new Enterprise.ZArchitecture.GUI.Internal.ZTimeEditExColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.Internal.ZTimeEditExColumnStyleInfo zTimeEditExColumnStyleInfo3 = new Enterprise.ZArchitecture.GUI.Internal.ZTimeEditExColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo zGuidFindBoxColumnStyleInfo3 = new Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo zGuidFindBoxColumnStyleInfo4 = new Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZDropEditColumnStyleInfo zDropEditColumnStyleInfo2 = new Enterprise.ZArchitecture.GUI.ZDropEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo3 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo4 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo5 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo6 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo7 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo8 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo11 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo12 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo13 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo14 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo15 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo2 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo16 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo3 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo4 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo5 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo17 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo6 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo18 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo7 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo19 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo9 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo10 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo11 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo12 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZMultiLineTextBoxColumnInfo zMultiLineTextBoxColumnInfo1 = new Enterprise.ZArchitecture.GUI.ZMultiLineTextBoxColumnInfo();
+			Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo zGuidFindBoxColumnStyleInfo5 = new Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo20 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo8 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZDropEditColumnStyleInfo zDropEditColumnStyleInfo3 = new Enterprise.ZArchitecture.GUI.ZDropEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo9 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZDropEditColumnStyleInfo zDropEditColumnStyleInfo4 = new Enterprise.ZArchitecture.GUI.ZDropEditColumnStyleInfo();
+			this.ContainerBookingGroupBox = new Enterprise.ZArchitecture.GUI.ZGroupBox();
+			this.BookedMoveControl = new Enterprise.Freight.LocalCartage.GUI.BookedMoveControl();
+			this.MovementLegsGroupBox = new Enterprise.ZArchitecture.GUI.ZGroupBox();
+			this.ContainerCartageLegsGrid = new Enterprise.ZArchitecture.ZGrid();
+			this.CartageLegPanel = new Enterprise.Freight.LocalCartage.GUI.CartageLegControl();
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).BeginInit();
+			this.ContainerBookingGroupBox.SuspendLayout();
+			this.MovementLegsGroupBox.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.ContainerCartageLegsGrid)).BeginInit();
+			this.SuspendLayout();
+			// 
+			// BindingSource
+			// 
+			this.BindingSource.DataSourceType = typeof(Enterprise.Freight.LocalCartage.Business.CommonBookedCtgMoveCollection);
+			// 
+			// ContainerBookingGroupBox
+			// 
+			this.ContainerBookingGroupBox.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|cb207077-7950-4c25-b05d-b87b87442901", "Selected Container Booking");
+			this.ContainerBookingGroupBox.Controls.Add(this.BookedMoveControl);
+			this.ContainerBookingGroupBox.Dock = System.Windows.Forms.DockStyle.Top;
+			this.ContainerBookingGroupBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(0, 0, true);
+			this.ContainerBookingGroupBox.Name = "ContainerBookingGroupBox";
+			this.ContainerBookingGroupBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(990, 146, true);
+			this.ContainerBookingGroupBox.TabIndex = 0;
+			this.ContainerBookingGroupBox.TabStop = false;
+			// 
+			// BookedMoveControl
+			// 
+			this.BookedMoveControl.AllowDrop = true;
+			this.BindingSource.SetBindingMember(this.BookedMoveControl, ".");
+			this.BookedMoveControl.BookedMoveLayout = Enterprise.Freight.LocalCartage.GUI.BookedMoveControl.BookedMovesLayout.Container;
+			this.BookedMoveControl.Dock = System.Windows.Forms.DockStyle.Top;
+			this.BookedMoveControl.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(3, 16, true);
+			this.BookedMoveControl.Name = "BookedMoveControl";
+			this.BookedMoveControl.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(984, 135, true);
+			this.BookedMoveControl.TabIndex = 1;
+			// 
+			// MovementLegsGroupBox
+			// 
+			this.MovementLegsGroupBox.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|84a37cfa-e61d-4edc-88b9-e7dd6157464f", "Selected Container Booking Legs");
+			this.MovementLegsGroupBox.Controls.Add(this.ContainerCartageLegsGrid);
+			this.MovementLegsGroupBox.Controls.Add(this.CartageLegPanel);
+			this.MovementLegsGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.MovementLegsGroupBox.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(0, 146, true);
+			this.MovementLegsGroupBox.Name = "MovementLegsGroupBox";
+			this.MovementLegsGroupBox.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(990, 287, true);
+			this.MovementLegsGroupBox.TabIndex = 1;
+			this.MovementLegsGroupBox.TabStop = false;
+			// 
+			// ContainerCartageLegsGrid
+			// 
+			this.ContainerCartageLegsGrid.AllowNavigation = false;
+			this.BindingSource.SetBindingMember(this.ContainerCartageLegsGrid, "CartageLegs");
+			this.ContainerCartageLegsGrid.CaptionVisible = false;
+			zCalcEditColumnStyleInfo1.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo1.ColumnName = "JU_DisplayOrder";
+			zCalcEditColumnStyleInfo1.Decimals = 0;
+			zCalcEditColumnStyleInfo1.ToolTip = "Display Order on Cartage Job";
+			zCalcEditColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(40);
+			zGuidFindBoxColumnStyleInfo1.ColumnName = "JU_EY_RunSheet";
+			zDropEditColumnStyleInfo1.ColumnName = "JU_AdditionalService";
+			zDropEditColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(50);
+			zGuidDropEditColumnStyleInfo1.ColumnName = "JU_E2PickupAddressID";
+			zGuidDropEditColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zTextBoxColumnStyleInfo1.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|7859a925-11c4-4293-908a-9cee0bf6a781", "P.City", "Pickup City", "");
+			zTextBoxColumnStyleInfo1.ColumnName = "PickupFromDocAddress+E2_City";
+			zTextBoxColumnStyleInfo1.IsReadOnly = true;
+			zTextBoxColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(60);
+			zDateEditColumnStyleInfo1.ColumnName = "QuickPlannedPickupTime";
+			zDateEditColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zGuidDropEditColumnStyleInfo2.ColumnName = "JU_E2DeliveryAddressID";
+			zGuidDropEditColumnStyleInfo2.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zTextBoxColumnStyleInfo2.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|ebe235dd-de9e-4bca-a36f-d614087a3736", "D.City", "Delivery City", "");
+			zTextBoxColumnStyleInfo2.ColumnName = "DeliverToDocAddress+E2_City";
+			zTextBoxColumnStyleInfo2.IsReadOnly = true;
+			zTextBoxColumnStyleInfo2.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(60);
+			zDateEditColumnStyleInfo2.ColumnName = "QuickEstimatedDeliveryTime";
+			zDateEditColumnStyleInfo2.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zCheckBoxColumnStyleInfo1.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|fb19064a-47e9-4c70-b1d7-3bf49b600b2b", "MT Leg");
+			zCheckBoxColumnStyleInfo1.ColumnName = "JU_IsEmptyContainer";
+			zCheckBoxColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(15);
+			zGuidFindBoxColumnStyleInfo2.ColumnName = "QuickRQTruck";
+			zGuidFindBoxColumnStyleInfo2.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|ef263b46-bdde-49e4-a400-aa9d15bebbe2", "Vehicle");
+			zCodeFindBoxColumnStyleInfo1.ColumnName = "QuickGSDriver";
+			zCodeFindBoxColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(35);
+			zTextBoxColumnStyleInfo3.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|b7a92d9b-d710-4a24-b048-270df991e7a7", "Received By");
+			zTextBoxColumnStyleInfo3.ColumnName = "JU_DeliverySignedFor";
+			zTextBoxColumnStyleInfo3.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zGuidDropEditColumnStyleInfo3.ColumnName = "JU_E2WaitPointAddressID";
+			zGuidDropEditColumnStyleInfo3.IsVisible = false;
+			zGuidDropEditColumnStyleInfo3.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zTextBoxColumnStyleInfo4.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|05253047-9896-4287-8c3d-943200ca2ff6", "W.City", "Wait Point City", "");
+			zTextBoxColumnStyleInfo4.ColumnName = "WaitPointDocAddress+E2_City";
+			zTextBoxColumnStyleInfo4.IsReadOnly = true;
+			zTextBoxColumnStyleInfo4.IsVisible = false;
+			zTextBoxColumnStyleInfo4.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(60);
+			zTextBoxColumnStyleInfo5.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|9faf60e7-f08b-4640-a687-c014484b6ee3", "W.Postcode", "Wait Point Postcode", "");
+			zTextBoxColumnStyleInfo5.ColumnName = "WaitPointDocAddress+E2_Postcode";
+			zTextBoxColumnStyleInfo5.IsReadOnly = true;
+			zTextBoxColumnStyleInfo5.IsVisible = false;
+			zTextBoxColumnStyleInfo5.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(40);
+			zTextBoxColumnStyleInfo6.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|24419e61-b5dd-4e66-b583-1bf2617a115e", "Type");
+			zTextBoxColumnStyleInfo6.ColumnName = "WorkSheet+VehicleType";
+			zTextBoxColumnStyleInfo6.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|ef263b46-bdde-49e4-a400-aa9d15bebbe2", "Vehicle");
+			zTextBoxColumnStyleInfo6.IsReadOnly = true;
+			zTextBoxColumnStyleInfo6.IsVisible = false;
+			zTextBoxColumnStyleInfo6.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(35);
+			zTextBoxColumnStyleInfo7.ColumnName = "WorkSheet+EY_DriversName";
+			zTextBoxColumnStyleInfo7.IsReadOnly = true;
+			zTextBoxColumnStyleInfo7.IsVisible = false;
+			zTextBoxColumnStyleInfo8.ColumnName = "WorkSheet+TransportCompanyName";
+			zTextBoxColumnStyleInfo8.IsReadOnly = true;
+			zTextBoxColumnStyleInfo8.IsVisible = false;
+			zTextBoxColumnStyleInfo9.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|c2913058-bdff-4051-935f-891f8d910d2c", "Pic. P/C", "Pic. Postcode", "Pickup Postcode", "");
+			zTextBoxColumnStyleInfo9.ColumnName = "PickupFromDocAddress+E2_Postcode";
+			zTextBoxColumnStyleInfo9.IsVisible = false;
+			zTextBoxColumnStyleInfo9.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(40);
+			zTextBoxColumnStyleInfo10.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|b429c497-4ed0-4861-b0ed-112bcf6abdde", "D.Postcode", "Delivery Postcode", "");
+			zTextBoxColumnStyleInfo10.ColumnName = "DeliverToDocAddress+E2_Postcode";
+			zTextBoxColumnStyleInfo10.IsVisible = false;
+			zTextBoxColumnStyleInfo10.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(40);
+			zTimeEditExColumnStyleInfo1.AllowNegative = false;
+			zTimeEditExColumnStyleInfo1.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|6557654f-70f2-43c2-8b0b-1ef0cc042db2", "Time At Pic.", "Time At Pickup", "");
+			zTimeEditExColumnStyleInfo1.ColumnName = "JU_CartagePickupDemurrage";
+			zTimeEditExColumnStyleInfo1.IsVisible = false;
+			zTimeEditExColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(60);
+			zTimeEditExColumnStyleInfo2.AllowNegative = false;
+			zTimeEditExColumnStyleInfo2.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|427ae633-0746-4f76-988c-07163cefbe95", "Time At Wt Pt.");
+			zTimeEditExColumnStyleInfo2.ColumnName = "JU_CartageWaitPointDemurrage";
+			zTimeEditExColumnStyleInfo2.IsVisible = false;
+			zTimeEditExColumnStyleInfo2.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(60);
+			zTimeEditExColumnStyleInfo3.AllowNegative = false;
+			zTimeEditExColumnStyleInfo3.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|476f427f-0b07-4860-82ed-171aa4b806da", "Time At Dlv.", "Time At Delivery", "");
+			zTimeEditExColumnStyleInfo3.ColumnName = "JU_CartageDeliveryDemurrage";
+			zTimeEditExColumnStyleInfo3.IsVisible = false;
+			zTimeEditExColumnStyleInfo3.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(60);
+			zGuidFindBoxColumnStyleInfo3.ColumnName = "JU_RQ_ExtraEquip1";
+			zGuidFindBoxColumnStyleInfo3.IsVisible = false;
+			zGuidFindBoxColumnStyleInfo4.ColumnName = "JU_RQ_ExtraEquip2";
+			zGuidFindBoxColumnStyleInfo4.IsVisible = false;
+			zDropEditColumnStyleInfo2.ColumnName = "JU_MessageStatus";
+			zDropEditColumnStyleInfo2.IsVisible = false;
+			zDateEditColumnStyleInfo3.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|84a28808-26ba-46fb-b66c-3972e8a7937a", "Deliver Time In");
+			zDateEditColumnStyleInfo3.ColumnName = "JU_DeliverTimeIn";
+			zDateEditColumnStyleInfo3.IsVisible = false;
+			zDateEditColumnStyleInfo3.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zDateEditColumnStyleInfo4.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|f445fe51-a9f3-4689-a7cc-8434e31f5cfe", "Deliver Time Out");
+			zDateEditColumnStyleInfo4.ColumnName = "JU_DeliverTimeOut";
+			zDateEditColumnStyleInfo4.IsVisible = false;
+			zDateEditColumnStyleInfo4.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zDateEditColumnStyleInfo5.ColumnName = "JU_PickupTimeIn";
+			zDateEditColumnStyleInfo5.IsVisible = false;
+			zDateEditColumnStyleInfo5.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zDateEditColumnStyleInfo6.ColumnName = "JU_PickupTimeOut";
+			zDateEditColumnStyleInfo6.IsVisible = false;
+			zDateEditColumnStyleInfo6.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zDateEditColumnStyleInfo7.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|b4fd3d6d-de15-4294-85b9-aee3bb6da125", "Wait Point Time In");
+			zDateEditColumnStyleInfo7.ColumnName = "JU_WaitPointTimeIn";
+			zDateEditColumnStyleInfo7.IsVisible = false;
+			zDateEditColumnStyleInfo7.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zDateEditColumnStyleInfo8.ColumnName = "JU_WaitPointTimeOut";
+			zDateEditColumnStyleInfo8.IsVisible = false;
+			zDateEditColumnStyleInfo8.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zTextBoxColumnStyleInfo11.ColumnName = "PickupWaitTime";
+			zTextBoxColumnStyleInfo11.IsVisible = false;
+			zTextBoxColumnStyleInfo12.ColumnName = "DeliveryWaitTime";
+			zTextBoxColumnStyleInfo12.IsVisible = false;
+			zTextBoxColumnStyleInfo13.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|aa496827-3ba6-41ec-bb33-30aaac917c69", "Pickup", "Pickup Company", "Pickup Company Name", "");
+			zTextBoxColumnStyleInfo13.ColumnName = "PickupFromDocAddress+E2_CompanyName";
+			zTextBoxColumnStyleInfo13.IsReadOnly = true;
+			zTextBoxColumnStyleInfo13.IsVisible = false;
+			zTextBoxColumnStyleInfo13.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zTextBoxColumnStyleInfo14.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|f1316621-8222-4262-b236-867b25677c59", "Delivery", "Delivery Company", "Delivery Company Name", "");
+			zTextBoxColumnStyleInfo14.ColumnName = "DeliverToDocAddress+E2_CompanyName";
+			zTextBoxColumnStyleInfo14.IsReadOnly = true;
+			zTextBoxColumnStyleInfo14.IsVisible = false;
+			zTextBoxColumnStyleInfo14.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zTextBoxColumnStyleInfo15.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|9f027222-41d5-4f35-bcec-9f1ae22a614f", "Wait Point", "Wait Point Company", "Wait Point Company Name", "");
+			zTextBoxColumnStyleInfo15.ColumnName = "WaitPointDocAddress+E2_CompanyName";
+			zTextBoxColumnStyleInfo15.IsReadOnly = true;
+			zTextBoxColumnStyleInfo15.IsVisible = false;
+			zTextBoxColumnStyleInfo15.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zCalcEditColumnStyleInfo2.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo2.ColumnName = "BookedCtgMove+EW_BookedPackCount";
+			zCalcEditColumnStyleInfo2.Decimals = 0;
+			zCalcEditColumnStyleInfo2.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|d805de9f-30db-4f13-b566-2107158d2877", "Booked Packages");
+			zCalcEditColumnStyleInfo2.IsReadOnly = true;
+			zCalcEditColumnStyleInfo2.IsVisible = false;
+			zCalcEditColumnStyleInfo2.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(50);
+			zTextBoxColumnStyleInfo16.ColumnName = "BookedCtgMove+EW_F3_NKPackType";
+			zTextBoxColumnStyleInfo16.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|d805de9f-30db-4f13-b566-2107158d2877", "Booked Packages");
+			zTextBoxColumnStyleInfo16.IsReadOnly = true;
+			zTextBoxColumnStyleInfo16.IsVisible = false;
+			zTextBoxColumnStyleInfo16.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(30);
+			zCalcEditColumnStyleInfo3.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo3.ColumnName = "BookedCtgMove+EW_BookedLength";
+			zCalcEditColumnStyleInfo3.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|373c0942-e1f1-457e-8b84-3819bda06cd6", "Booked Dimensions");
+			zCalcEditColumnStyleInfo3.IsReadOnly = true;
+			zCalcEditColumnStyleInfo3.IsVisible = false;
+			zCalcEditColumnStyleInfo3.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(50);
+			zCalcEditColumnStyleInfo4.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo4.ColumnName = "BookedCtgMove+EW_BookedWidth";
+			zCalcEditColumnStyleInfo4.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|373c0942-e1f1-457e-8b84-3819bda06cd6", "Booked Dimensions");
+			zCalcEditColumnStyleInfo4.IsReadOnly = true;
+			zCalcEditColumnStyleInfo4.IsVisible = false;
+			zCalcEditColumnStyleInfo4.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(50);
+			zCalcEditColumnStyleInfo5.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo5.ColumnName = "BookedCtgMove+EW_BookedHeight";
+			zCalcEditColumnStyleInfo5.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|373c0942-e1f1-457e-8b84-3819bda06cd6", "Booked Dimensions");
+			zCalcEditColumnStyleInfo5.IsReadOnly = true;
+			zCalcEditColumnStyleInfo5.IsVisible = false;
+			zCalcEditColumnStyleInfo5.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(50);
+			zTextBoxColumnStyleInfo17.ColumnName = "BookedCtgMove+EW_DimUnit";
+			zTextBoxColumnStyleInfo17.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|373c0942-e1f1-457e-8b84-3819bda06cd6", "Booked Dimensions");
+			zTextBoxColumnStyleInfo17.IsReadOnly = true;
+			zTextBoxColumnStyleInfo17.IsVisible = false;
+			zTextBoxColumnStyleInfo17.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(30);
+			zCalcEditColumnStyleInfo6.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo6.ColumnName = "BookedCtgMove+EW_BookedWeight";
+			zCalcEditColumnStyleInfo6.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|cb6544d1-ef6c-4dd9-825b-a0cf6abb654d", "Booked Weight");
+			zCalcEditColumnStyleInfo6.IsReadOnly = true;
+			zCalcEditColumnStyleInfo6.IsVisible = false;
+			zCalcEditColumnStyleInfo6.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(60);
+			zTextBoxColumnStyleInfo18.ColumnName = "BookedCtgMove+EW_WeightUQ";
+			zTextBoxColumnStyleInfo18.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|cb6544d1-ef6c-4dd9-825b-a0cf6abb654d", "Booked Weight");
+			zTextBoxColumnStyleInfo18.IsReadOnly = true;
+			zTextBoxColumnStyleInfo18.IsVisible = false;
+			zTextBoxColumnStyleInfo18.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(30);
+			zCalcEditColumnStyleInfo7.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo7.ColumnName = "BookedCtgMove+EW_BookedVolume";
+			zCalcEditColumnStyleInfo7.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|3efe55f0-701b-4e2e-9db6-7d7c1a4db746", "Booked Volume");
+			zCalcEditColumnStyleInfo7.IsReadOnly = true;
+			zCalcEditColumnStyleInfo7.IsVisible = false;
+			zCalcEditColumnStyleInfo7.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(60);
+			zTextBoxColumnStyleInfo19.ColumnName = "BookedCtgMove+EW_VolumeUQ";
+			zTextBoxColumnStyleInfo19.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|3efe55f0-701b-4e2e-9db6-7d7c1a4db746", "Booked Volume");
+			zTextBoxColumnStyleInfo19.IsReadOnly = true;
+			zTextBoxColumnStyleInfo19.IsVisible = false;
+			zTextBoxColumnStyleInfo19.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(30);
+			zDateEditColumnStyleInfo9.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|b03f28f2-19dd-4c6d-aaf9-a583c24655b4", "Pic. From", "Pickup From", "Requested Pickup From", "");
+			zDateEditColumnStyleInfo9.ColumnName = "BookedCtgMove+EW_RequestedPickupTimeStart";
+			zDateEditColumnStyleInfo9.IsReadOnly = true;
+			zDateEditColumnStyleInfo9.IsVisible = false;
+			zDateEditColumnStyleInfo9.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zDateEditColumnStyleInfo10.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|31b94460-3b41-431c-8307-48ca00aba4b4", "Pic. To", "Pickup To", "Requested Pickup To", "");
+			zDateEditColumnStyleInfo10.ColumnName = "BookedCtgMove+EW_RequestedPickupTimeEnd";
+			zDateEditColumnStyleInfo10.IsReadOnly = true;
+			zDateEditColumnStyleInfo10.IsVisible = false;
+			zDateEditColumnStyleInfo10.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zDateEditColumnStyleInfo11.ColumnName = "BookedCtgMove+EW_RequestedDeliveryTimeStart";
+			zDateEditColumnStyleInfo11.IsReadOnly = true;
+			zDateEditColumnStyleInfo11.IsVisible = false;
+			zDateEditColumnStyleInfo11.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zDateEditColumnStyleInfo12.CaptionResourceString = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|df8a9b0b-6693-49e3-a5fc-23e1fb33de4f", "Dlv. To", "Delivery To", "Requested Delivery To", "");
+			zDateEditColumnStyleInfo12.ColumnName = "BookedCtgMove+EW_RequestedDeliveryTimeEnd";
+			zDateEditColumnStyleInfo12.IsReadOnly = true;
+			zDateEditColumnStyleInfo12.IsVisible = false;
+			zDateEditColumnStyleInfo12.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(90);
+			zMultiLineTextBoxColumnInfo1.ColumnName = "JU_LegNotes";
+			zMultiLineTextBoxColumnInfo1.IsVisible = false;
+			zMultiLineTextBoxColumnInfo1.MinimumEditControlWidth = 300;
+			zMultiLineTextBoxColumnInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zGuidFindBoxColumnStyleInfo5.ColumnName = "QuickOHTransportCompany";
+			zGuidFindBoxColumnStyleInfo5.IsVisible = false;
+			zTextBoxColumnStyleInfo20.ColumnName = "TruckDescription";
+			zTextBoxColumnStyleInfo20.IsVisible = false;
+			zCalcEditColumnStyleInfo8.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo8.ColumnName = "PostcodeDistance";
+			zCalcEditColumnStyleInfo8.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|70a5f434-748f-4257-b1b4-7d0c90cad90a", "Postcode Distance");
+			zCalcEditColumnStyleInfo8.IsVisible = false;
+			zDropEditColumnStyleInfo3.ColumnName = "JU_DistanceUnit";
+			zDropEditColumnStyleInfo3.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|70a5f434-748f-4257-b1b4-7d0c90cad90a", "Postcode Distance");
+			zDropEditColumnStyleInfo3.IsReadOnly = true;
+			zDropEditColumnStyleInfo3.IsVisible = false;
+			zDropEditColumnStyleInfo3.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(40);
+			zCalcEditColumnStyleInfo9.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo9.ColumnName = "JU_Distance";
+			zCalcEditColumnStyleInfo9.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|7b32cf59-ed74-47e3-af08-9ffe80e7081a", "Driving Distance");
+			zCalcEditColumnStyleInfo9.IsVisible = false;
+			zDropEditColumnStyleInfo4.ColumnName = "JU_DistanceUnit";
+			zDropEditColumnStyleInfo4.GroupName = Enterprise.Freight.LocalCartage.GUI.Res.GetData("ContainerMovesControl|7b32cf59-ed74-47e3-af08-9ffe80e7081a", "Driving Distance");
+			zDropEditColumnStyleInfo4.IsVisible = false;
+			zDropEditColumnStyleInfo4.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(40);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo1);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zGuidFindBoxColumnStyleInfo1);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDropEditColumnStyleInfo1);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zGuidDropEditColumnStyleInfo1);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo1);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDateEditColumnStyleInfo1);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zGuidDropEditColumnStyleInfo2);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo2);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDateEditColumnStyleInfo2);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zCheckBoxColumnStyleInfo1);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zGuidFindBoxColumnStyleInfo2);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zCodeFindBoxColumnStyleInfo1);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo3);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zGuidDropEditColumnStyleInfo3);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo4);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo5);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo6);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo7);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo8);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo9);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo10);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTimeEditExColumnStyleInfo1);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTimeEditExColumnStyleInfo2);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTimeEditExColumnStyleInfo3);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zGuidFindBoxColumnStyleInfo3);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zGuidFindBoxColumnStyleInfo4);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDropEditColumnStyleInfo2);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDateEditColumnStyleInfo3);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDateEditColumnStyleInfo4);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDateEditColumnStyleInfo5);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDateEditColumnStyleInfo6);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDateEditColumnStyleInfo7);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDateEditColumnStyleInfo8);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo11);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo12);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo13);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo14);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo15);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo2);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo16);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo3);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo4);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo5);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo17);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo6);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo18);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo7);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo19);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDateEditColumnStyleInfo9);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDateEditColumnStyleInfo10);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDateEditColumnStyleInfo11);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDateEditColumnStyleInfo12);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zMultiLineTextBoxColumnInfo1);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zGuidFindBoxColumnStyleInfo5);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo20);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo8);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDropEditColumnStyleInfo3);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo9);
+			this.ContainerCartageLegsGrid.ColumnStyles.Add(zDropEditColumnStyleInfo4);
+			this.ContainerCartageLegsGrid.GridId = "5ffa1730-91eb-4f17-a0ed-3d8495313ef1";
+			this.ContainerCartageLegsGrid.CopySelectedRowsAllowed = true;
+			this.ContainerCartageLegsGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.ContainerCartageLegsGrid.HeaderForeColor = System.Drawing.SystemColors.ControlText;
+			this.ContainerCartageLegsGrid.LayoutKey = "LooseCartageLegs";
+			this.ContainerCartageLegsGrid.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(3, 16, true);
+			this.ContainerCartageLegsGrid.Name = "ContainerCartageLegsGrid";
+			this.ContainerCartageLegsGrid.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(984, 96, true);
+			this.ContainerCartageLegsGrid.TabIndex = 0;
+			this.ContainerCartageLegsGrid.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ContainerCartageLegsGrid_MouseDown);
+			// 
+			// CartageLegPanel
+			// 
+			this.CartageLegPanel.AllowDrop = true;
+			this.BindingSource.SetBindingMember(this.CartageLegPanel, "CartageLegs");
+			this.CartageLegPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+			this.CartageLegPanel.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(3, 112, true);
+			this.CartageLegPanel.MinimumSize = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(984, 172, true);
+			this.CartageLegPanel.Name = "CartageLegPanel";
+			this.CartageLegPanel.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(984, 172, true);
+			this.CartageLegPanel.TabIndex = 1;
+			// 
+			// ContainerMovesControl
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+			this.CaptionRenderingEnabled = true;
+			this.Controls.Add(this.MovementLegsGroupBox);
+			this.Controls.Add(this.ContainerBookingGroupBox);
+			this.Name = "ContainerMovesControl";
+			this.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(990, 433, true);
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).EndInit();
+			this.ContainerBookingGroupBox.ResumeLayout(false);
+			this.MovementLegsGroupBox.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.ContainerCartageLegsGrid)).EndInit();
+			this.ResumeLayout(false);
+
+		}
+
+		#endregion
+
+		private Enterprise.ZArchitecture.GUI.ZGroupBox ContainerBookingGroupBox;
+		private Enterprise.ZArchitecture.GUI.ZGroupBox MovementLegsGroupBox;
+		internal Enterprise.ZArchitecture.ZGrid ContainerCartageLegsGrid;
+		private CartageLegControl CartageLegPanel;
+		private BookedMoveControl BookedMoveControl;
+
+	}
+}

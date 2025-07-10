@@ -1,0 +1,12 @@
+using Enterprise.ZArchitecture.GUI;
+
+namespace Enterprise.Customs.IT.TemporaryStorage.GUI;
+
+public sealed class UCC6TemporaryStorageGridColumnLayoutProviderFactory : EU.TemporaryStorage.GUI.UCC6TemporaryStorageGridColumnLayoutProviderFactory
+{
+	public override IGridColumnLayoutProvider CreateTemporaryStorageGridColumnLayoutProviderForBill() => new UCC6TemporaryStorageBillGridColumnLayout();
+
+	public override IGridColumnLayoutProvider CreateTemporaryStorageGridColumnLayoutProviderForPreviousDocumentsDetails() => new UCC6TemporaryStoragePreviousDocumentsDetailsGridColumnLayout();
+
+	public override IGridColumnLayoutProvider CreateTemporaryStorageGridColumnLayoutProviderForPackedItem() => new UCC6TemporaryStoragePackedItemGridColumnLayout();
+}

@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.SDK.Razor">
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <AssemblyName>CargoWise.Main.Navigation</AssemblyName>
+    <RootNamespace>CargoWise.Main.Navigation</RootNamespace>
+    <UseLegacyRsa>false</UseLegacyRsa>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Converters\**" />
+    <Compile Remove="WPF\**" />
+    <EmbeddedResource Remove="Converters\**" />
+    <EmbeddedResource Remove="WPF\**" />
+    <None Remove="Converters\**" />
+    <None Remove="WPF\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="DragDrop\FrameworkElementDragBehavior.cs" />
+    <Compile Remove="DragDrop\ListBoxAdorner.cs" />
+    <Compile Remove="DragDrop\ListBoxAdornerManager.cs" />
+    <Compile Remove="DragDrop\ListBoxDropBehavior.cs" />
+    <Compile Remove="DragDrop\UIHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Winzor\CargoWiseNext.Blazor.Components\CargoWiseNext.Blazor.Components.csproj" />
+    <ProjectReference Include="..\..\Windows.UI\CargoWise.Windows.UI.Winzor.csproj" />
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <ItemGroup>
+      <CssFiles Include="$(MSBuildProjectDirectory)\Styles\*.css" />
+    </ItemGroup>
+    <Delete Files="@(CssFiles)" />
+    <Exec Command="dotnet tool run webcompiler -- -r Winzor\Styles -z disable -p disable -c cargowise-main-navigation-webcompiler.config.json" StandardOutputImportance="high" />
+  </Target>
+
+  <ItemGroup Condition="!Exists('wwwroot\css\_gen\cargowise.main.navigation.css')">
+    <Content Include="wwwroot\css\_gen\cargowise.main.navigation.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\js\favoriteTooltip.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

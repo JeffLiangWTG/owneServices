@@ -1,0 +1,599 @@
+<UserControl x:Class="Enterprise.MarketingManager.GUI.TouchSummary"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:local="clr-namespace:Enterprise.MarketingManager.GUI"
+			 xmlns:ui="clr-namespace:CargoWise.Main.Navigation.WPF;assembly=CargoWise.Main.Navigation"
+			 xmlns:business="clr-namespace:Enterprise.MarketingManager.Business;assembly=Enterprise.MarketingManager.Business"
+			 mc:Ignorable="d" Height="449.2" Width="732">
+
+	<UserControl.Resources>
+		<local:ColorArgbConverter x:Key="ColorArgbConverter" />
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+		<local:TouchSummaryStringConstants x:Key="touchSummaryStringConstants"/>
+		<Style x:Key="TouchSummaryRow" TargetType="{x:Type Label}">
+			<Setter Property="Padding" Value="1"></Setter>
+			<Setter Property="Margin" Value="0,0,0,0"></Setter>
+			<Setter Property="Height" Value="15"></Setter>
+			<Setter Property="Tag" Value="{Binding}"></Setter>
+			<Setter Property="HorizontalAlignment" Value="Left"></Setter>
+		</Style>
+
+		<Style x:Key="TouchSummaryRowRight" TargetType="{x:Type Label}">
+			<Setter Property="Padding" Value="1"></Setter>
+			<Setter Property="Height" Value="15"></Setter>
+			<Setter Property="Tag" Value="{Binding}"></Setter>
+			<Setter Property="HorizontalAlignment" Value="Right"></Setter>
+			<Setter Property="HorizontalContentAlignment" Value="Right" />
+            <Setter Property="Width" Value="38"></Setter>
+		</Style>
+
+		<Style x:Key="TouchSummaryRowBold" TargetType="{x:Type Label}"  BasedOn="{StaticResource TouchSummaryRow}">
+			<Setter Property="FontWeight" Value="SemiBold"></Setter>
+		</Style>
+
+		<Style x:Key="TouchSummaryRowRightBold" TargetType="{x:Type Label}"  BasedOn="{StaticResource TouchSummaryRowRight}">
+			<Setter Property="FontWeight" Value="SemiBold"></Setter>
+		</Style>
+
+		<Style x:Key="SummaryItem" TargetType="{x:Type ListViewItem}">
+			<Setter Property="Focusable" Value="False" />
+			<EventSetter Event="MouseLeftButtonUp" Handler="SummaryLabelClick_OnHandler"></EventSetter>
+			<Style.Triggers>
+				<Trigger Property="IsMouseOver" Value="True">
+					<Setter Property="Cursor" Value="Hand"></Setter>
+				</Trigger>
+			</Style.Triggers>
+		</Style>
+
+        <Style x:Key="SummarySubItem" TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource SummaryItem}">
+            <Setter Property="Margin" Value="10,0,0,0" />
+        </Style>
+
+        <Style x:Key="SummaryItemUns" TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource SummaryItem}">
+			<EventSetter Event="MouseLeftButtonUp" Handler="UnsubscribeLabelClick_OnHandler"></EventSetter>
+		</Style>
+
+		<Style x:Key="SummaryItemNonSelectable" TargetType="{x:Type ListViewItem}">
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type ListBoxItem}">
+						<Border Name="Border" Padding="5,0,5,0" SnapsToDevicePixels="true">
+							<ContentPresenter />
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsSelected" Value="true">
+								<Setter TargetName="Border" Property="Background" Value="#DDDDDD"/>
+							</Trigger>
+							<Trigger Property="IsEnabled" Value="false">
+								<Setter Property="Foreground" Value="#888888"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style x:Key="TouchSummarySectionHeader" TargetType="{x:Type Label}">
+			<Setter Property="Padding" Value="1"></Setter>
+			<Setter Property="Margin" Value="0"></Setter>
+			<Setter Property="Height" Value="auto"></Setter>
+			<Setter Property="FontWeight" Value="SemiBold"></Setter>
+		</Style>
+
+        <Style x:Key="TouchSummarySectionTotal" TargetType="{x:Type Label}" BasedOn="{StaticResource TouchSummarySectionHeader}">
+            <Setter Property="HorizontalAlignment" Value="Right"></Setter>
+            <Setter Property="HorizontalContentAlignment" Value="Right"></Setter>
+            <Setter Property="Margin" Value="6,0,0,0"></Setter>
+	    </Style>
+
+        <Style x:Key="TouchHeader" TargetType="{x:Type Label}">
+			<Setter Property="Padding" Value="1"></Setter>
+			<Setter Property="Margin" Value="3,0,3,0"></Setter>
+			<Setter Property="Height" Value="20"></Setter>
+			<Setter Property="FontWeight" Value="SemiBold"></Setter>
+            <Setter Property="FontSize" Value="12"></Setter>
+            <Setter Property="Foreground" Value="#fff"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+		</Style>
+
+        <Style x:Key="SummaryBorder" TargetType="{x:Type Border}">
+			<Setter Property="BorderBrush" Value="#e0e0e0"></Setter>
+			<Setter Property="BorderThickness" Value="1,1,1,0"></Setter>
+			<Setter Property="VerticalAlignment" Value="Top"></Setter>
+			<Setter Property="Padding" Value="0"></Setter>
+			<Setter Property="Margin" Value="5,0,5,0"></Setter>
+		</Style>
+
+		<Style x:Key="SummaryBorderRight" BasedOn="{StaticResource SummaryBorder}" TargetType="{x:Type Border}">
+			<Setter Property="Margin" Value="2,3,0,2"></Setter>
+			<Setter Property="BorderThickness" Value="0,0,0,0"></Setter>
+		</Style>
+	    
+		<Style x:Key="SummaryBorderLeft" BasedOn="{StaticResource SummaryBorder}" TargetType="{x:Type Border}">
+			<Setter Property="Margin" Value="3,3,1,3"></Setter>
+		    <Setter Property="BorderThickness" Value="0,0,0,0"></Setter>
+		</Style>
+        <Style x:Key="SummaryBorderABTest" BasedOn="{StaticResource SummaryBorder}" TargetType="{x:Type Border}">
+            <Setter Property="Margin" Value="0,1,0,0"></Setter>
+	        <Setter Property="BorderThickness" Value="1,1,1,1"></Setter>
+            <Setter Property="BorderBrush" Value="DarkGray"></Setter>
+	    </Style>
+
+        <Style x:Key="SummaryBorderBottomRight" BasedOn="{StaticResource SummaryBorderRight}" TargetType="{x:Type Border}">
+            <Setter Property="Margin" Value="2,0,0,3"></Setter>
+        </Style>
+
+        <Style x:Key="ButtonMain" TargetType="{x:Type Button}">
+            <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            <Setter Property="Margin" Value="5,0,5,0"></Setter>
+            <Setter Property="Padding" Value="0"></Setter>
+            <Setter Property="BorderThickness" Value="1,1,1,1"></Setter>
+            <Setter Property="BorderBrush" Value ="#dce1e4"></Setter>
+            <Setter Property="Background" Value ="#dce1e4"></Setter>
+            <Setter Property="Height" Value="20"></Setter>
+        </Style>
+
+		<Style x:Key="StatsItemsControl" TargetType="{x:Type ItemsControl}">
+			<Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+			<Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+			<Setter Property="Height" Value="13"></Setter>
+		</Style>
+
+		<Style x:Key="ColoredRectangle" TargetType="{x:Type Rectangle}">
+			<Setter Property="RadiusY" Value="2"></Setter>
+			<Setter Property="RadiusX" Value="2"></Setter>
+			<Setter Property="Width" Value="14"></Setter>
+			<Setter Property="Height" Value="14"></Setter>
+			<Setter Property="Margin" Value="0,0,0,0"></Setter>
+		</Style>
+
+		<Style x:Key="ColorComboBoxItem" TargetType="{x:Type ComboBoxItem}">
+			<Setter Property="Height" Value="18"></Setter>
+		</Style>
+
+		<RoutedUICommand x:Key="Commands.OpenCampaign" />
+		<RoutedUICommand x:Key="Commands.RemoveCampaign" />
+		<RoutedUICommand x:Key="Commands.AddHorizontal" />
+		<RoutedUICommand x:Key="Commands.AddVertical" />
+		<RoutedUICommand x:Key="Commands.Launch" />
+		<RoutedUICommand x:Key="Commands.Refresh" />
+
+	</UserControl.Resources>
+
+	<UserControl.CommandBindings>
+		<CommandBinding Command="{StaticResource Commands.OpenCampaign}" Executed="OpenCampaign_Executed" />
+		<CommandBinding Command="{StaticResource Commands.RemoveCampaign}" Executed="RemoveCampaign_Executed" />
+		<CommandBinding Command="{StaticResource Commands.AddHorizontal}" Executed="AddHorizontal_Executed" />
+		<CommandBinding Command="{StaticResource Commands.AddVertical}" Executed="AddVertical_Executed" />
+		<CommandBinding Command="{StaticResource Commands.Launch}" Executed="Launch_Executed" />
+		<CommandBinding Command="{StaticResource Commands.Refresh}" Executed="Refresh_Executed" />
+	</UserControl.CommandBindings>
+
+	<UserControl.DataContext>
+		<local:TouchSummaryViewModel />
+	</UserControl.DataContext>
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="40" />
+        </Grid.RowDefinitions>
+
+		<ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" VerticalAlignment="Stretch" Background="White" PreviewMouseLeftButtonDown="ScrollViewer_PreviewMouseLeftButtonDown">
+            <StackPanel Orientation="Vertical" Margin="0,0,0,0" VerticalAlignment="Top" Background="White">
+
+                <ListBox x:Name="HorizontalsList" ItemsSource="{Binding Horizontals}" SelectedItem="{Binding CurrentHorizontal, Mode=TwoWay}" VerticalContentAlignment="Top" BorderThickness="0">
+				<ListBox.ItemContainerStyle>
+					<Style TargetType="ListBoxItem">
+						<Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+						<Setter Property="VerticalAlignment" Value="Top"></Setter>
+						<Setter Property="Background" Value="Transparent" />
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate TargetType="{x:Type ListBoxItem}">
+									<Border Margin="5">
+										<ContentPresenter />
+									</Border>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+					    <Setter Property="Padding" Value="0"/>
+                    </Style>
+				</ListBox.ItemContainerStyle>
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                                    <StackPanel Orientation="Vertical">
+                                    <ListBox BorderThickness="0" x:Name="VerticalsList" SelectedItem="{Binding CurrentCampaign, Mode=TwoWay}" 
+                                             ItemsSource="{Binding Campaigns}" VerticalAlignment="Top" VerticalContentAlignment="Top" 
+                                             PreviewMouseMove="PreviewMouseMove_OnHandler" ScrollViewer.CanContentScroll="False">
+                                        
+									    <ListBox.ItemContainerStyle>
+                                            <Style TargetType="ListBoxItem">
+                                                <Setter Property="Width" Value="337"></Setter>
+                                                <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                                                <Setter Property="VerticalAlignment" Value="Top"></Setter>
+                                                <Setter Property="AllowDrop" Value="True"></Setter>
+                                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListBoxItem_PreviewMouseLeftButtonDown"></EventSetter>
+                                                <EventSetter Event="Drop" Handler="Drop_OnHandler"></EventSetter>
+                                                <EventSetter Event="MouseDoubleClick" Handler="Touch_MouseDoubleClick"/>
+                                                <Setter Property="Padding" Value="0"/>
+                                                <Setter Property="Margin" Value="0,0,0,5"/>
+                                            </Style>
+                                        </ListBox.ItemContainerStyle>
+									<ListBox.ItemTemplate>
+										<DataTemplate>
+                                            <StackPanel Orientation="Vertical">
+												<StackPanel.Background>
+													<SolidColorBrush Color="{Binding CurrentGroupColor, Mode=OneWay, Converter={StaticResource ColorArgbConverter}}" Opacity="0.25"/>
+												</StackPanel.Background>
+												<Border Name="DeliverySummaryBorder"  BorderBrush="#888888" BorderThickness="1"  VerticalAlignment="Top" Padding="0">
+													<Grid HorizontalAlignment="Stretch" VerticalAlignment="Top">
+														<Grid.RowDefinitions>
+															<RowDefinition Height="auto" />
+															<RowDefinition Height="*" />
+														</Grid.RowDefinitions>
+
+                                                        <Grid Name="HeaderPanel" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#aaa" Height="18">
+													        <Grid.ColumnDefinitions>
+													            <ColumnDefinition Width="*"/>
+													            <ColumnDefinition Width="auto"/>
+													        </Grid.ColumnDefinitions>
+
+                                                                <ui:MultilingualTextLabel Grid.Column="0" IsTranslatable="False" Style="{StaticResource TouchHeader}" Content="{Binding G0_CampaignNameMultilingual}" ToolTip = "{Binding TouchFullName}"></ui:MultilingualTextLabel>
+                                                                <ui:MultilingualTextLabel Grid.Column="1" IsTranslatable="False" Content="{Binding TouchId}" Style="{StaticResource TouchHeader}" ToolTip = "{Binding TouchFullName}"></ui:MultilingualTextLabel>
+														
+                                                            </Grid>
+
+                                                            <StackPanel Name="DeliverySummaryPanel" Grid.Row="1" Orientation="Horizontal">
+                                                                <Border Style="{StaticResource SummaryBorderLeft}">
+                                                                    <StackPanel Orientation="Vertical">
+                                                                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*"/>
+                                                                                <ColumnDefinition Width="auto"/>
+                                                                            </Grid.ColumnDefinitions>
+
+                                                                            <ui:MultilingualTextLabel Grid.Column="0" Margin="0,0,5,0" Style="{StaticResource TouchSummarySectionHeader}" IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=DeliverySummaryText}">
+                                                                            </ui:MultilingualTextLabel>
+                                                                            <DockPanel Grid.Column="1" HorizontalAlignment="Stretch" FlowDirection="RightToLeft">
+	                                                                            <ui:MultilingualTextLabel Style="{StaticResource TouchSummarySectionTotal}" Content="{Binding SummaryStats.TotalCount}" IsTranslatable="False">
+																            </ui:MultilingualTextLabel>
+																        </DockPanel>
+                                                                    </Grid>
+                                                                        <ListView SelectionMode="Single" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SnapsToDevicePixels="True" Height="121" HorizontalContentAlignment="Stretch" Tag ="{Binding}">
+																		<ListViewItem Tag="{Binding Source={x:Static business:TrackingStatusCodes+Descriptions.VER}}" Style="{StaticResource SummaryItem}">
+																			<ItemsControl Style="{StaticResource StatsItemsControl}" >
+																				<Grid HorizontalAlignment="Stretch">
+																					<Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="110"/>
+																						<ColumnDefinition Width="Auto"/>
+																					</Grid.ColumnDefinitions>
+																					<ui:MultilingualTextLabel Grid.Column="0" Style="{StaticResource TouchSummaryRow}"
+																							MultilingualText="{Binding TouchSummaryDescriptionVerified}" Grid.IsSharedSizeScope="True"></ui:MultilingualTextLabel>
+																					<ui:MultilingualTextLabel Grid.Column="1" Style="{StaticResource TouchSummaryRowRight}" 
+                                                                                                              IsTranslatable="false" Content="{Binding SummaryStats.TouchSummaryVerifiedCount}"></ui:MultilingualTextLabel>
+																				</Grid>
+																			</ItemsControl>
+																		</ListViewItem>
+																		<ListViewItem Tag="{Binding Source={x:Static business:TrackingStatusCodes+Descriptions.UNV}}" Style="{StaticResource SummaryItem}">
+																			<ItemsControl Style="{StaticResource StatsItemsControl}">
+																				<Grid HorizontalAlignment="Stretch">
+																					<Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="110"/>
+																						<ColumnDefinition Width="Auto"/>
+																					</Grid.ColumnDefinitions>
+																					<ui:MultilingualTextLabel Grid.Column="0" Style="{StaticResource TouchSummaryRow}"
+																								  MultilingualText="{Binding TouchSummaryDescriptionUnverified}" Grid.IsSharedSizeScope="True" ></ui:MultilingualTextLabel>
+																						<ui:MultilingualTextLabel Grid.Column="1" Style="{StaticResource TouchSummaryRowRight}" IsTranslatable="false" Content="{Binding SummaryStats.TouchSummaryUnverifiedCount}" ></ui:MultilingualTextLabel>
+																				</Grid>
+																			</ItemsControl>
+																		</ListViewItem>
+																			<ListViewItem  Tag="{Binding Source={x:Static business:TrackingStatusCodes+Descriptions.NDR}}" Style="{StaticResource SummaryItem}" Visibility="{Binding IsTouchSummaryVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+																			<ItemsControl Style="{StaticResource StatsItemsControl}">
+																				<Grid HorizontalAlignment="Stretch">
+																					<Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="110"/>
+																						<ColumnDefinition Width="Auto"/>
+																					</Grid.ColumnDefinitions>
+																					<ui:MultilingualTextLabel Grid.Column="0" Style="{StaticResource TouchSummaryRow}"
+																								  MultilingualText="{Binding Source={x:Static business:TrackingStatusCodes+Descriptions.NDR}}"></ui:MultilingualTextLabel>
+																					<ui:MultilingualTextLabel Grid.Column="1" Style="{StaticResource TouchSummaryRowRight}" IsTranslatable="false" Content="{Binding SummaryStats.NonDeliveredCount}"></ui:MultilingualTextLabel>
+																				</Grid>
+																			</ItemsControl>
+																		</ListViewItem>
+																			<ListViewItem  Tag="{Binding Source={x:Static business:TrackingStatusCodes+Descriptions.QUE}}" Style="{StaticResource SummaryItem}" Visibility="{Binding IsTouchSummaryVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+																			<ItemsControl Style="{StaticResource StatsItemsControl}">
+																				<Grid HorizontalAlignment="Stretch">
+																					<Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="110"/>
+																						<ColumnDefinition Width="Auto"/>
+																					</Grid.ColumnDefinitions>
+																					<ui:MultilingualTextLabel Grid.Column="0" Style="{StaticResource TouchSummaryRow}" 
+																								  MultilingualText="{Binding Source={x:Static business:TrackingStatusCodes+Descriptions.QUE}}"></ui:MultilingualTextLabel>
+																					<ui:MultilingualTextLabel Grid.Column="1" Style="{StaticResource TouchSummaryRowRight}" IsTranslatable="false" Content="{Binding SummaryStats.QueuedCount}"></ui:MultilingualTextLabel>
+																				</Grid>
+																			</ItemsControl>
+																		</ListViewItem>
+																			<ListViewItem  Tag="{Binding Source={x:Static business:TrackingStatusCodes+Descriptions.SCH}}" Style="{StaticResource SummarySubItem}" Visibility="{Binding IsTouchSummaryVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+																	        <ItemsControl Style="{StaticResource StatsItemsControl}">
+																	            <Grid HorizontalAlignment="Stretch">
+																	                <Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="100"/>
+																	                    <ColumnDefinition Width="Auto"/>
+																	                </Grid.ColumnDefinitions>
+																	                <ui:MultilingualTextLabel Grid.Column="0" Style="{StaticResource TouchSummaryRow}" 
+																	                                          MultilingualText="{Binding Source={x:Static business:TrackingStatusCodes+Descriptions.SCH}}"></ui:MultilingualTextLabel>
+																	                <ui:MultilingualTextLabel Grid.Column="1" Style="{StaticResource TouchSummaryRowRight}" IsTranslatable="false" Content="{Binding SummaryStats.ScheduledCount}"></ui:MultilingualTextLabel>
+																	            </Grid>
+																	        </ItemsControl>
+																	    </ListViewItem>
+																			<ListViewItem  Tag="{Binding Source={x:Static business:TrackingStatusCodes+Descriptions.UNS}}" Style="{StaticResource SummarySubItem}" Visibility="{Binding IsTouchSummaryVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+																	        <ItemsControl Style="{StaticResource StatsItemsControl}">
+																	            <Grid HorizontalAlignment="Stretch">
+																	                <Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="100"/>
+																	                    <ColumnDefinition Width="Auto"/>
+																	                </Grid.ColumnDefinitions>
+																	                <ui:MultilingualTextLabel Grid.Column="0" Style="{StaticResource TouchSummaryRow}" 
+																	                                          MultilingualText="{Binding Source={x:Static business:TrackingStatusCodes+Descriptions.UNS}}"></ui:MultilingualTextLabel>
+                                                                                    <ui:MultilingualTextLabel Grid.Column="1" Style="{StaticResource TouchSummaryRowRight}" IsTranslatable="false" Content="{Binding SummaryStats.UnScheduledCount}"></ui:MultilingualTextLabel>
+																	            </Grid>
+																	        </ItemsControl>
+																	    </ListViewItem>
+	                                                                    <ListViewItem Style="{StaticResource SummaryItemNonSelectable}" Visibility="{Binding IsTouchSummaryVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+																			<ItemsControl Style="{StaticResource StatsItemsControl}">
+																				<Grid HorizontalAlignment="Stretch">
+																					<Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="110"/>
+																						<ColumnDefinition Width="Auto"/>
+																					</Grid.ColumnDefinitions>
+																					<ui:MultilingualTextLabel Grid.Column="0" Style="{StaticResource TouchSummaryRowBold}" 
+																								  MultilingualText="{Binding Source={x:Static business:TrackingSummaryConstants+Descriptions.SNT}}"></ui:MultilingualTextLabel>
+																					<ui:MultilingualTextLabel Grid.Column="1" Style="{StaticResource TouchSummaryRowRightBold}" IsTranslatable="false" Content="{Binding SummaryStats.SentCount}"></ui:MultilingualTextLabel>
+																				</Grid>
+																			</ItemsControl>
+																		</ListViewItem>
+																	</ListView>
+																</StackPanel>
+															</Border>
+																<StackPanel Orientation="Vertical" Visibility="{Binding IsTouchSummaryVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                                    <Border Style="{StaticResource SummaryBorderRight}" >
+                                                                        <StackPanel Orientation="Vertical">
+                                                                            <ui:MultilingualTextLabel Style="{StaticResource TouchSummarySectionHeader}" IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=TransitionProgressText}">
+                                                                                
+                                                                            </ui:MultilingualTextLabel>
+                                                                            <ListView SelectionMode="Single" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Tag ="{Binding}">
+																				<ListViewItem Tag="{Binding Source={x:Static business:TrackingSummaryConstants+Descriptions.UNS}}" Style="{StaticResource SummaryItemUns}">
+                                                                                <ItemsControl Style="{StaticResource StatsItemsControl}" >
+                                                                                    <Grid HorizontalAlignment="Stretch">
+                                                                                        <Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="110"/>
+                                                                                            <ColumnDefinition Width="Auto"/>
+                                                                                        </Grid.ColumnDefinitions>
+                                                                                        <ui:MultilingualTextLabel Grid.Column="0" Style="{StaticResource TouchSummaryRow}" 
+                                                                                                                  MultilingualText="{Binding Source={x:Static business:TrackingSummaryConstants+Descriptions.UNS}}"></ui:MultilingualTextLabel>
+                                                                                        <ui:MultilingualTextLabel Grid.Column="1" Style="{StaticResource TouchSummaryRowRight}" IsTranslatable="false" Content="{Binding SummaryStats.UnsubscribedCount}"></ui:MultilingualTextLabel>
+                                                                                    </Grid>
+                                                                                </ItemsControl>
+                                                                            </ListViewItem>
+																				<ListViewItem Tag="{Binding Source={x:Static business:TrackingSummaryConstants+Descriptions.FAI}}" Style="{StaticResource SummaryItem}" Visibility="{Binding IsTouchSummaryVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                                                <ItemsControl Style="{StaticResource StatsItemsControl}" >
+                                                                                    <Grid HorizontalAlignment="Stretch">
+                                                                                        <Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="110"/>
+                                                                                            <ColumnDefinition Width="Auto"/>
+                                                                                        </Grid.ColumnDefinitions>
+                                                                                        <ui:MultilingualTextLabel Grid.Column="0" Style="{StaticResource TouchSummaryRow}" 
+                                                                                                                  MultilingualText="{Binding Source={x:Static business:TrackingSummaryConstants+Descriptions.FAI}}"></ui:MultilingualTextLabel>
+                                                                                        <ui:MultilingualTextLabel Grid.Column="1" Style="{StaticResource TouchSummaryRowRight}" IsTranslatable="false" Content="{Binding SummaryStats.FailedToTransitionCount}"></ui:MultilingualTextLabel>
+                                                                                    </Grid>
+                                                                                </ItemsControl>
+                                                                            </ListViewItem>
+																				<ListViewItem Tag="{Binding Source={x:Static business:TrackingSummaryConstants+Descriptions.TRN}}" Style="{StaticResource SummaryItem}" Visibility="{Binding IsTouchSummaryVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                                                <ItemsControl Style="{StaticResource StatsItemsControl}" >
+                                                                                    <Grid HorizontalAlignment="Stretch">
+                                                                                        <Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="110"/>
+                                                                                            <ColumnDefinition Width="Auto"/>
+                                                                                        </Grid.ColumnDefinitions>
+                                                                                        <ui:MultilingualTextLabel Grid.Column="0" Style="{StaticResource TouchSummaryRow}" 
+                                                                                                                  MultilingualText="{Binding Source={x:Static business:TrackingSummaryConstants+Descriptions.TRN}}"></ui:MultilingualTextLabel>
+                                                                                        <ui:MultilingualTextLabel Grid.Column="1" Style="{StaticResource TouchSummaryRowRight}" IsTranslatable="false" Content="{Binding SummaryStats.TransitionedToNextTouchCount}"></ui:MultilingualTextLabel>
+                                                                                    </Grid>
+                                                                                </ItemsControl>
+                                                                            </ListViewItem>
+                                                                        </ListView>
+                                                                    </StackPanel>
+                                                                </Border>
+
+                                                                <Border Style="{StaticResource SummaryBorderBottomRight}" >
+                                                                <StackPanel Orientation="Vertical">
+                                                                            <ui:MultilingualTextLabel Style="{StaticResource TouchSummarySectionHeader}" Height="auto" IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=ABContentTestingText}">
+
+                                                                    </ui:MultilingualTextLabel>
+                                                                            <Border Style="{StaticResource SummaryBorderABTest}" SnapsToDevicePixels="true">
+                                                                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Top" SnapsToDevicePixels="true">
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*"/>
+                                                                            </Grid.ColumnDefinitions>
+                                                                            <Grid.RowDefinitions>
+                                                                                <RowDefinition Height="auto" />
+                                                                                <RowDefinition Height="*" />
+                                                                            </Grid.RowDefinitions>
+                                                                            <StackPanel Name="ABTestingPanel"  Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Right" Margin="0,0,5,0">
+                                                                                <ui:MultilingualTextLabel IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=GroupingText}"></ui:MultilingualTextLabel>
+                                                                                <ComboBox Name="GroupSelector" Width="47" SelectedValue="{Binding CurrentGroupColor, Mode=TwoWay, Converter = {StaticResource ColorArgbConverter}}" SelectedValuePath="Tag" Height="20">
+                                                                                    <ComboBoxItem Tag="">
+                                                                                        <ItemsControl>
+                                                                                            <ui:MultilingualTextLabel IsTranslatable="False" Content="" Style="{StaticResource TouchSummaryRow}" Margin="0" ></ui:MultilingualTextLabel>
+                                                                                        </ItemsControl>
+                                                                                    </ComboBoxItem>
+                                                                                    <ComboBoxItem Tag="#f2b1b2" Style="{StaticResource ColorComboBoxItem}">
+                                                                                        <ItemsControl>
+                                                                                            <StackPanel Orientation="Horizontal">
+                                                                                                <Rectangle Fill="{Binding Path=Tag, RelativeSource={RelativeSource AncestorType={x:Type ComboBoxItem}}}" Style="{StaticResource ColoredRectangle}" />
+                                                                                                <ui:MultilingualTextLabel IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=RedCategoryText}" Style="{StaticResource TouchSummaryRow}" ></ui:MultilingualTextLabel>
+                                                                                            </StackPanel>
+                                                                                        </ItemsControl>
+                                                                                    </ComboBoxItem>
+                                                                                    <ComboBoxItem Tag="#c4e8be" Style="{StaticResource ColorComboBoxItem}">
+                                                                                        <ItemsControl>
+                                                                                            <StackPanel Orientation="Horizontal">
+                                                                                                <Rectangle Fill="{Binding Path=Tag, RelativeSource={RelativeSource AncestorType={x:Type ComboBoxItem}}}" Style="{StaticResource ColoredRectangle}" />
+                                                                                                <ui:MultilingualTextLabel IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=GreenCategoryText}" Style="{StaticResource TouchSummaryRow}" ></ui:MultilingualTextLabel>
+                                                                                            </StackPanel>
+                                                                                        </ItemsControl>
+                                                                                    </ComboBoxItem>
+                                                                                    <ComboBoxItem Tag="#b7c9ee" Style="{StaticResource ColorComboBoxItem}">
+                                                                                        <ItemsControl>
+                                                                                            <StackPanel Orientation="Horizontal">
+                                                                                                <Rectangle Fill="{Binding Path=Tag, RelativeSource={RelativeSource AncestorType={x:Type ComboBoxItem}}}" Style="{StaticResource ColoredRectangle}" />
+                                                                                                <ui:MultilingualTextLabel IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=BlueCategoryText}" Style="{StaticResource TouchSummaryRow}" ></ui:MultilingualTextLabel>
+                                                                                            </StackPanel>
+                                                                                        </ItemsControl>
+                                                                                    </ComboBoxItem>
+                                                                                    <ComboBoxItem Tag="#e2cab0" Style="{StaticResource ColorComboBoxItem}">
+                                                                                        <ItemsControl>
+                                                                                            <StackPanel Orientation="Horizontal">
+                                                                                                <Rectangle Fill="{Binding Path=Tag, RelativeSource={RelativeSource AncestorType={x:Type ComboBoxItem}}}" Style="{StaticResource ColoredRectangle}" />
+                                                                                                <ui:MultilingualTextLabel IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=BrownCategoryText}" Style="{StaticResource TouchSummaryRow}" ></ui:MultilingualTextLabel>
+                                                                                            </StackPanel>
+                                                                                        </ItemsControl>
+                                                                                    </ComboBoxItem>
+                                                                                    <ComboBoxItem Tag="#c9c9c9" Style="{StaticResource ColorComboBoxItem}">
+                                                                                        <ItemsControl>
+                                                                                            <StackPanel Orientation="Horizontal">
+                                                                                                <Rectangle Fill="{Binding Path=Tag, RelativeSource={RelativeSource AncestorType={x:Type ComboBoxItem}}}" Style="{StaticResource ColoredRectangle}" />
+                                                                                                <ui:MultilingualTextLabel IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=GrayCategoryText}" Style="{StaticResource TouchSummaryRow}" ></ui:MultilingualTextLabel>
+                                                                                            </StackPanel>
+                                                                                        </ItemsControl>
+                                                                                    </ComboBoxItem>
+                                                                                </ComboBox>
+                                                                            </StackPanel>
+                                                                            <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,5,0">
+                                                                                <ui:MultilingualTextLabel IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=SplitTestingText}"></ui:MultilingualTextLabel>
+                                                                                <TextBox x:Name="NumericRatioTextBox" Width="25" Text="{Binding G0_GroupRatio}" Height="18" VerticalContentAlignment="Center" Margin="5,0,0,0" 
+                                                                                     PreviewTextInput ="NumberValidationTextBox" DataObject.Pasting="TextBoxPasting"
+                                                                                     IsEnabled="{Binding G0_GroupRatio_ReadOnly}"></TextBox>
+                                                                            </StackPanel>
+                                                                        </Grid>
+                                                                    </Border>
+                                                                </StackPanel>
+                                                                </Border>
+                                                            </StackPanel>
+														</StackPanel>
+													</Grid>
+												</Border>
+											</StackPanel>
+										</DataTemplate>
+									</ListBox.ItemTemplate>
+									<ListBox.ItemsPanel>
+										<ItemsPanelTemplate>
+											<StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+										</ItemsPanelTemplate>
+									</ListBox.ItemsPanel>
+								</ListBox>
+                                </StackPanel>
+						</StackPanel>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+				<ListBox.ItemsPanel>
+					<ItemsPanelTemplate>
+						<StackPanel Orientation="Horizontal" VerticalAlignment="Top" />
+					</ItemsPanelTemplate>
+				</ListBox.ItemsPanel>
+			</ListBox>
+		</StackPanel>
+        </ScrollViewer>
+        <Border Grid.Row="1" BorderBrush="White" BorderThickness="0,1,0,0" Padding="0" Margin="0">
+            <Grid HorizontalAlignment="Stretch" Height="40" VerticalAlignment="Top" Background="#dce1e4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal" Margin="10,0,0,0">
+                <Button Style="{StaticResource ButtonMain}" Command="{StaticResource Commands.AddHorizontal}">
+                    <StackPanel Orientation="Horizontal">
+                            <Grid Width="19">
+                                <Path Width="15.096" Height="12" Fill="Black" Stretch="Fill" Margin="2,0,0,0"
+                                  Data="F1 M 19,35L 19,43L 27,43L 27,35L 19,35 Z M 30.9999,35L 30.9999,43L 56.9998,43L 56.9999,35L 30.9999,35 Z M 31,32L 57,32L 57,24L 31,24L 31,32 Z M 32,31L 32,25L 56,25L 56,31L 32,31 Z M 21,33L 25,33L 25,30L 28,30L 28,26L 25,26L 25,23L 21,23L 21,26L 18,26L 18,30L 21,30L 21,33 Z M 22,32L 22,29L 19,29L 19,27L 22,27L 22,24L 24,24L 24,27L 27,27L 27,29L 24,29L 24,32L 22,32 Z M 19.0001,46L 19.0001,54L 27.0001,54L 27.0001,46L 19.0001,46 Z M 31.0001,46L 31.0001,54L 57,54L 57,46L 31.0001,46 Z ">
+                                <Path.LayoutTransform>
+                                    <RotateTransform Angle="90"></RotateTransform>
+                                </Path.LayoutTransform>
+                            </Path>
+                        </Grid>
+                            <ui:MultilingualTextLabel Padding="5,0,5,0" Margin="0,0,3,0" IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=AddHorizontalText}"></ui:MultilingualTextLabel>
+                    </StackPanel>
+                </Button>
+                    <Button Command="{StaticResource Commands.AddVertical}" IsEnabled="{Binding HorizontalIsSelected}"
+                            Tag="{Binding ElementName=HorizontalsList, Path=DataContext.CurrentHorizontal}" 
+                        Style="{StaticResource ButtonMain}">
+                    <StackPanel Orientation="Horizontal">
+                        <Grid>
+                                <Path Width="15.096" Height="12" Fill="Black" Stretch="Fill" Margin="2,0,0,0"
+                                  Data="F1 M 19,42L 19,34L 27,34L 27,42L 19,42 Z M 30.9999,42L 30.9999,34L 56.9999,34L 56.9999,42L 30.9999,42 Z M 31,45L 57,45L 57,53L 31,53L 31,45 Z M 32,46L 32,52L 56,52L 56,46L 32,46 Z M 21,44L 25,44L 25,47L 28,47L 28,51L 25,51L 25,54L 21,54L 21,51L 18,51L 18,47L 21,47L 21,44 Z M 22,45L 22,48L 19,48L 19,50L 22,50L 22,53L 24,53L 24,50L 27,50L 27,48L 24,48L 24,45L 22,45 Z M 19.0001,31L 19.0001,23L 27.0001,23L 27.0001,31L 19.0001,31 Z M 31.0001,31L 31.0001,23L 57,23L 57,31L 31.0001,31 Z ">
+
+                            </Path>
+                        </Grid>
+                            <ui:MultilingualTextLabel Padding="5,0,5,0" Margin="0,0,3,0" IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=AddVerticalText}"></ui:MultilingualTextLabel>
+                    </StackPanel>
+                </Button>
+                   <Button Style="{StaticResource ButtonMain}" Command="{StaticResource Commands.RemoveCampaign}">
+                        
+                    <StackPanel Orientation="Horizontal">
+                        <Grid>
+                                <Path Width="9.078" Height="12" Fill="Black" Stretch="Fill" Margin="2,0,0,0"
+                                  Data="F1 M 25.3333,23.75L 50.6667,23.75C 51.5411,23.75 51.8541,27.3125 51.8541,27.3125L 24.1458,27.3125C 24.1458,27.3125 24.4589,23.75 25.3333,23.75 Z M 35.625,19.7917L 40.375,19.7917C 40.8122,19.7917 41.9583,20.9378 41.9583,21.375C 41.9583,21.8122 40.8122,22.9584 40.375,22.9584L 35.625,22.9584C 35.1878,22.9584 34.0416,21.8122 34.0416,21.375C 34.0416,20.9378 35.1878,19.7917 35.625,19.7917 Z M 27.7083,28.5L 48.2916,28.5C 49.1661,28.5 49.875,29.2089 49.875,30.0834L 48.2916,53.8334C 48.2916,54.7078 47.5828,55.4167 46.7083,55.4167L 29.2917,55.4167C 28.4172,55.4167 27.7083,54.7078 27.7083,53.8334L 26.125,30.0834C 26.125,29.2089 26.8339,28.5 27.7083,28.5 Z M 30.0833,31.6667L 30.4792,52.25L 33.25,52.25L 32.8542,31.6667L 30.0833,31.6667 Z M 36.4167,31.6667L 36.4167,52.25L 39.5833,52.25L 39.5833,31.6667L 36.4167,31.6667 Z M 43.1458,31.6667L 42.75,52.25L 45.5208,52.25L 45.9167,31.6667L 43.1458,31.6667 Z ">
+
+                            </Path>
+                        </Grid>
+                            <ui:MultilingualTextLabel Padding="5,0,5,0" Margin="0,0,3,0" IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=DeleteText}"></ui:MultilingualTextLabel>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource ButtonMain}" Command="{StaticResource Commands.OpenCampaign}" >
+                    <StackPanel Orientation="Horizontal">
+                        <Grid>
+                                <Path Width="13.413" Height="12" Fill="Black" Stretch="Fill" Margin="2,0,0,0"
+                                  Data="F1 M 48,30L 55.75,30L 48,22.25L 48,30 Z M 57,33L 44,33L 44,21L 29,21L 29,31.25L 25,27.25L 25,17L 48.25,17L 61,29.75L 61,59L 25,59L 25,41.75L 29,45.75L 29,55L 57,55L 57,33 Z M 24.5417,28.5L 39.5833,43.5417L 34.0417,49.0833L 19,34.0417L 24.5417,28.5 Z M 17.8125,32.8542L 14.6458,30.314C 13.6303,29.2984 14.0262,27.1405 15.0417,26.125L 16.625,24.5417C 17.6405,23.5262 19.5678,23.1303 20.5833,24.1459L 23.3541,27.3126L 17.8125,32.8542 Z M 41.9715,52.25L 35.2292,50.2709L 40.7708,44.7292L 42.6216,51.5999L 41.9715,52.25 Z ">
+
+                            </Path>
+                        </Grid>
+                            <ui:MultilingualTextLabel Padding="5,0,5,0" Margin="0,0,3,0" IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=EditText}"></ui:MultilingualTextLabel>
+                    </StackPanel>
+                </Button>
+                </StackPanel>
+            <StackPanel Grid.Column="1" HorizontalAlignment="Left" Orientation="Horizontal">
+                <Button Style="{StaticResource ButtonMain}" Command="{StaticResource Commands.Launch}">
+                    <StackPanel Orientation="Horizontal">
+                        <Grid>
+                                <Path Width="13.846" Height="12" Fill="Black" Stretch="Fill" Margin="2,0,0,0"
+                                  Data="F1 M 14.25,45.9166L 20.5834,45.9167L 39.1874,23.75L 47.8958,23.75L 41.1667,17.4167L 51.4583,17.4167L 61.75,26.9166L 51.4583,36.4167L 41.1667,36.4167L 47.8958,30.0833L 41.1667,30.0833L 22.1667,52.25L 14.25,52.25L 14.25,45.9166 Z M 14.25,30.0833L 14.25,23.75L 22.1667,23.75L 29.6875,32.5243L 26.1226,36.6834L 20.5833,30.0833L 14.25,30.0833 Z M 41.1667,45.9167L 47.8958,45.9167L 41.1666,39.5833L 51.4583,39.5834L 61.75,49.0834L 51.4583,58.5833L 41.1666,58.5833L 47.8958,52.25L 39.1873,52.25L 31.9416,43.6167L 35.5684,39.3854L 41.1667,45.9167 Z ">
+
+                            </Path>
+                        </Grid>
+                            <ui:MultilingualTextLabel Padding="5,0,5,0" Margin="0,0,3,0" IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=LaunchText}"></ui:MultilingualTextLabel>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource ButtonMain}" Command="{StaticResource Commands.Refresh}" Margin="0,0,5,0">
+                    <StackPanel Orientation="Horizontal">
+                        <Grid>
+                                <Path Width="10.1535" Height="12" Fill="Black" Stretch="Fill" Margin="2,0,0,0"
+                                  Data="F1 M 38,20.5833C 42.9908,20.5833 47.4912,22.6825 50.6667,26.046L 50.6667,17.4167L 55.4166,22.1667L 55.4167,34.8333L 42.75,34.8333L 38,30.0833L 46.8512,30.0833C 44.6768,27.6539 41.517,26.125 38,26.125C 31.9785,26.125 27.0037,30.6068 26.2296,36.4167L 20.6543,36.4167C 21.4543,27.5397 28.9148,20.5833 38,20.5833 Z M 38,49.875C 44.0215,49.875 48.9963,45.3932 49.7703,39.5833L 55.3457,39.5833C 54.5457,48.4603 47.0852,55.4167 38,55.4167C 33.0092,55.4167 28.5088,53.3175 25.3333,49.954L 25.3333,58.5833L 20.5833,53.8333L 20.5833,41.1667L 33.25,41.1667L 38,45.9167L 29.1487,45.9167C 31.3231,48.3461 34.483,49.875 38,49.875 Z ">
+
+                            </Path>
+                        </Grid>
+                            <ui:MultilingualTextLabel Padding="5,0,5,0" Margin="0,0,3,0" IsTranslatable="False" Content="{Binding Source={StaticResource touchSummaryStringConstants}, Path=RefreshText}"></ui:MultilingualTextLabel>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+                
+        </Grid>
+        </Border>
+    </Grid>
+</UserControl>

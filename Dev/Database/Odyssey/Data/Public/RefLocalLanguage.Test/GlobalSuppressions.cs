@@ -1,0 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.Testing.RefLocalLanguageUpgradeTaskTest.TestDataTables")] // Database/Odyssey/Data/Public/RefLocalLanguage.Test/RefLocalLanguageUpgradeTaskTest.cs:14,3
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.Testing.RefLocalLanguageDataFileTest.TestRefLocalLanguageDataFile")] // Database/Odyssey/Data/Public/RefLocalLanguage.Test/RefLocalLanguageDataFileTest.cs:16,3
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.Testing.RefLocalLanguageDataFileTest.TestUserRowsAreNotLoaded")] // Database/Odyssey/Data/Public/RefLocalLanguage.Test/RefLocalLanguageDataFileTest.cs:33,3

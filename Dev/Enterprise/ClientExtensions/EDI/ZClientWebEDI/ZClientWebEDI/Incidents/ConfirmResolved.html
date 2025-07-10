@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eRequest Resolved</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: auto;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+		.alert {
+			padding: 15px;
+			color: #000000;
+			border-radius: 4px;
+			margin-bottom: 20px;
+		}
+
+        .button-container {
+            text-align: start;
+            padding: 15px;
+        }
+
+		.action-button {
+			padding: 10px 20px;
+			font-size: 16px;
+			color: #fff;
+			background-color: #371ee1;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+		}
+
+		.action-button:hover {
+			background-color: #221098;
+		}
+    </style>
+    <script>
+        function getQueryParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function onButtonClick() {
+            const param = getQueryParameter("token");
+            const rooturlindex = window.location.href.indexOf("/", window.location.origin.length + 1);
+            const rooturl = window.location.href.slice(0, rooturlindex);
+            if (param) {
+				const targetUrl = `${rooturl}/api/incident/resolve?token=${encodeURIComponent(param)}`;
+                window.location.href = targetUrl;
+            }
+        }
+
+        function checkForParam() {
+            const param = getQueryParameter("token");
+            if (!param) {
+                document.getElementById("message").innerText =
+                    "Thank you for confirming the resolution. This eRequest will now be closed.";
+            } else {
+                document.getElementById("button-container").style.display = "block";
+                document.getElementById("message").innerText =
+                    "Please click the below 'Close eRequest' button to confirm this eRequest as resolved and close it.";
+            }
+        }
+    </script>
+</head>
+<body onload="checkForParam()">
+    <div class="container">
+        <div id="message" class="alert" role="alert">
+        </div>
+        <div id="button-container" class="button-container" style="display: none;">
+            <button class="action-button" onclick="onButtonClick()">Close eRequest</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+@namespace System.Windows.Forms
+@inherits Control
+@using WinzorFramework.Extensions
+
+<div title="@ToolTipText" class="label label--border-@(BorderStyle.BorderStyleClass()) @(Enabled ? "" : "label-disabled")" @attributes="DataAttributes" style="@ControlStyleString"
+     @onclick="OnClickAsync" @onclick:stopPropagation
+     @onmouseenter="OnMouseEnterAsync" @onmouseenter:stopPropagation
+     @onmouseleave="OnMouseLeaveAsync" @onmouseleave:stopPropagation
+     @onmousedown="OnMouseDownAsync" allowNoStopPropagation
+     @oncontextmenu="OnContextMenuAsync" @oncontextmenu:stopPropagation @oncontextmenu:preventDefault>
+    @if (Image is not null)
+    {
+        <div class="label__image">
+            <img style="width: @(Width + "px");height: @(Height + "px")" src="@Image.ToBase64DataUrl()" />
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Text))
+    {
+        <span class="@LabelTextClass()" style="@TextStyleString">@FormatText(@Text)</span>
+    }
+</div>
+
+@code {
+	string FormatText(string text) => text.Replace("\t", "");
+
+    string LabelTextClass()
+    {
+        var classString = "label__text";
+        if (!AutoSize && AutoEllipsis)
+        {
+            classString += " label__text--ellipsis";
+        }
+        return classString;
+    }
+}

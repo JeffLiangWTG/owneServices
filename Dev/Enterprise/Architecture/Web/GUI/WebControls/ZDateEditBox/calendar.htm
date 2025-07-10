@@ -1,0 +1,67 @@
+<HTML>
+	<HEAD>
+		<title>dialog</title>
+		<meta name="GENERATOR" Content="Microsoft Visual Studio .NET 7.1">
+		<meta name="CODE_LANGUAGE" Content="C#">
+		<meta name="vs_defaultClientScript" content="JavaScript">
+		<meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5">
+		<style type="text/css">@import url(calendar.css);</style>
+		<script type="text/javascript" src="calendar.js"></script>
+		<script type="text/javascript" src="calendar-en.js"></script>		
+	</HEAD>
+	<BODY leftmargin="0px" topmargin="0px" rightmargin="0px" bottommargin="0px">	
+		<div id="CalendarContainer" style="border-top:solid 1px black;border-left:solid 1px black"></div>
+		<script type="text/javascript">
+			var SelectedDate = '';
+			var Cal;
+			var CurrentOffsetHeight;
+
+			function SetSelectedDate(SelDate)
+			{
+				var Container = document.getElementById('CalendarContainer');
+				SelectedDate = SelDate;
+				if (Cal == null)
+				{
+					Cal = new Calendar(1, null, DateSelected, null);
+					Cal.weekNumbers = false;
+					Cal.setDateFormat("%d-%b-%y");
+					Cal.create(Container);
+	            }
+                try
+                {
+				    Cal.parseDate(SelectedDate);
+                } catch(e) {}
+				Cal.showAt(0,0);
+				CurrentOffsetHeight = Container.offsetHeight;
+				CheckOffsetHeight(true);
+			}
+
+			function DateSelected(calendar) 
+			{
+			    if (calendar.dateClicked) 
+			    {
+			        SelectedDate = calendar.date.print("%d-%b-%y");
+					if (window.parent != null && window.parent.ZTextPopup_SetValueAndHidePopup != null)
+			        {
+			            window.parent.ZTextPopup_SetValueAndHidePopup(SelectedDate);
+			        }					
+			    }
+			    else CheckOffsetHeight();
+			}
+			
+			function CheckOffsetHeight(UpdateHeight)
+			{
+				var NewOffsetHeight = document.getElementById('CalendarContainer').offsetHeight;
+				if (CurrentOffsetHeight != NewOffsetHeight || UpdateHeight)
+				{
+					CurrentOffsetHeight = NewOffsetHeight;
+					if (window.parent != null && window.parent.ZDateEdit_CalendarHeightChanged != null) 
+					{
+						window.parent.ZDateEdit_CalendarHeightChanged(CurrentOffsetHeight);
+					}
+				}
+			}
+		</script>
+	</BODY>
+	
+</HTML>

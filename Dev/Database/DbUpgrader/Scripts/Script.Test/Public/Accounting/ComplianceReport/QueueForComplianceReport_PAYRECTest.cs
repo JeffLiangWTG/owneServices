@@ -1,0 +1,51 @@
+using System;
+using System.Data;
+using System.Linq;
+using CargoWise.Data;
+using CargoWise.DbUpgrader.Scripts.Definitions.Accounting.ComplianceReport;
+using Enterprise.Build.Database.Script.TestFramework;
+using NUnit.Framework;
+
+namespace Enterprise.Build.Database.Script.Public.Accounting.ComplianceReport
+{
+	[TestedType(typeof(QueueForComplianceReport_PAYREC))]
+	class QueueForComplianceReport_PAYRECTest : DbCreateScriptTest
+	{
+		public void TestSampleCall()
+		{
+			var helper = new TestDbHelper(TestConnection);
+
+			var branchPK = helper.InsertBranch("ZZB", TestDbHelper.DefaultCompanyPK);
+			var departmentPK = helper.InsertDepartment("ZZD");
+			InsertTransactions(helper, branchPK, departmentPK);
+
+			DataTable result = DataUtils.GetDataTableFromQuery(TestConnection, string.Format("EXEC QueueForComplianceReport_PAYREC 'LIB', '{0}', NULL, 'Nov 9 2015', 'Nov 10 2015'", TestDbHelper.DefaultCompanyPK));
+			AssertEquals("Result should not have rows", 0, result.Rows.Count);
+
+			result = DataUtils.GetDataTableFromQuery(TestConnection, "SELECT * FROM dbo.AccTransactionComplianceReportQueue");
+			AssertEquals("Result should have rows", 8, result.Rows.Count);
+
+			result = DataUtils.GetDataTableFromQuery(TestConnection, string.Format("SELECT ACQ_ReportSubCode FROM dbo.AccTransactionComplianceReportQueue WHERE ACQ_Date = 'Nov 9 2015' AND ACQ_ReportType = 'LIB' AND ACQ_ParentTableCode = 'AH' AND  ACQ_GC_Company = '{0}' AND ACQ_GB_Branch = '{1}'", TestDbHelper.DefaultCompanyPK, branchPK));
+			AssertEquals("Result should have rows", 8, result.Rows.Count);
+			var expectedCodes = new string[] {
+				"*AR*PAY*Bank*-",
+				"*AR*REC*Bank*-",
+				"*AP*PAY*Bank*-",
+				"*AP*REC*Bank*-",
+				"*AR*PAY*ARCtrl*",
+				"*AR*REC*ARCtrl*",
+				"*AP*PAY*APCtrl*",
+				"*AP*REC*APCtrl*" };
+			AssertContainsExactElementsInAnyOrder("ReportSubCodes", expectedCodes, result.Rows.Cast<DataRow>().Select(x => x[0].ToString().TrimEnd(' ')).ToArray());
+		}
+
+		public static void InsertTransactions(TestDbHelper helper, Guid branchPK, Guid departmentPK)
+		{
+			helper.InsertTransactionHeader("AR", "PAY", "001", 100, helper.ToDate("2015-11-09"), branchPK, departmentPK);
+			helper.InsertTransactionHeader("AR", "REC", "002", 200, helper.ToDate("2015-11-09"), branchPK, departmentPK);
+			helper.InsertTransactionHeader("AP", "PAY", "003", 300, helper.ToDate("2015-11-09"), branchPK, departmentPK);
+			helper.InsertTransactionHeader("AP", "REC", "004", 400, helper.ToDate("2015-11-09"), branchPK, departmentPK);
+		}
+	}
+}
+

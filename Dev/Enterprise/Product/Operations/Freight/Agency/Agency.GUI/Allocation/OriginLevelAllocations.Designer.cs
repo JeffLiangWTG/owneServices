@@ -1,0 +1,221 @@
+namespace Enterprise.Freight.Agency.GUI
+{
+	partial class OriginLevelAllocations
+	{
+		private void InitializeComponent()
+		{
+			Enterprise.ZArchitecture.GUI.ZCodeFindBoxColumnStyleInfo zCodeFindBoxColumnStyleInfo1 = new Enterprise.ZArchitecture.GUI.ZCodeFindBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo1 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo1 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo2 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo zGuidFindBoxColumnStyleInfo1 = new Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZDropEditColumnStyleInfo zDropEditColumnStyleInfo1 = new Enterprise.ZArchitecture.GUI.ZDropEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZDateEditColumnStyleInfo zDateEditColumnStyleInfo2 = new Enterprise.ZArchitecture.ZDateEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo1 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo2 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo3 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo4 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo5 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo6 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo7 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo8 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo9 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo10 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo11 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo12 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo13 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo14 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo15 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo16 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo17 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo zCheckBoxColumnStyleInfo1 = new Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo18 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo zCalcEditColumnStyleInfo19 = new Enterprise.ZArchitecture.ZCalcEditColumnStyleInfo();
+			originBoundGrid = new Enterprise.ZArchitecture.ZGrid();
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(originBoundGrid)).BeginInit();
+			this.SuspendLayout();
+			// 
+			// BindingSource
+			// 
+			this.BindingSource.DataSourceType = typeof(Enterprise.Freight.Agency.Business.AgencyPrincipal);
+			// 
+			// originBoundGrid
+			// 
+			originBoundGrid.AllowNavigation = false;
+			this.BindingSource.SetBindingMember(originBoundGrid, "Origins");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Origin.JA_RL_NKPortOfLoading)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Origin.Lookups.PortOfLoadings)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZDateTime)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Origin.JA_E_DEP)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Origin.JA_Berth)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Origin.JA_DepartReference)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZGuid)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Origin.JA_Calc_DepartureCTOAddressOrg)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Origin.Lookups.CTO_List)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Origin.JA_Calc_DepartureCTOAddressCode)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Origin.Lookups.JA_DepartureCTOAddress_List)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZDateTime)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Origin.JA_A_DEP)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).TEU)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).PowerPoints)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Tonnes)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Volume)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).Area)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).UsedTEU)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).UsedGP_TEU)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).UsedReefer_TEU)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).UsedPowerPoints)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).UsedTonnes)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).UsedVolume)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).UsedArea)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).OverallocatedTEU)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).OverallocatedPowerPoints)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).OverallocatedTonnes)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).OverallocatedVolume)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).OverallocatedArea)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZBool)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).OverrideOverallocationPercent)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).OverallocationPercent)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.INumericZType)(((Enterprise.Freight.Agency.Business.AgencyOrigin)(((System.Collections.IList)(((Enterprise.Freight.Agency.Business.AgencyPrincipal)(null)).Origins)).SyncRoot)).LoadedCargoWeight)));
+			originBoundGrid.CaptionVisible = false;
+			zCodeFindBoxColumnStyleInfo1.BindToList = "Origin+Lookups.PortOfLoadings";
+			zCodeFindBoxColumnStyleInfo1.ColumnName = "Origin+JA_RL_NKPortOfLoading";
+			zCodeFindBoxColumnStyleInfo1.IsMandatory = true;
+			zCodeFindBoxColumnStyleInfo1.IsReadOnly = true;
+			zCodeFindBoxColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(50);
+			zDateEditColumnStyleInfo1.ColumnName = "Origin+JA_E_DEP";
+			zDateEditColumnStyleInfo1.IsMandatory = true;
+			zDateEditColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(110);
+			zTextBoxColumnStyleInfo1.ColumnName = "Origin+JA_Berth";
+			zTextBoxColumnStyleInfo1.IsVisible = false;
+			zTextBoxColumnStyleInfo2.ColumnName = "Origin+JA_DepartReference";
+			zTextBoxColumnStyleInfo2.IsVisible = false;
+			zGuidFindBoxColumnStyleInfo1.BindToList = "Origin+Lookups.CTO_List";
+			zGuidFindBoxColumnStyleInfo1.CaptionResourceString = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|29c083db-1dac-4998-a2df-10950341fb34", "Departure CTO");
+			zGuidFindBoxColumnStyleInfo1.ColumnName = "Origin+JA_Calc_DepartureCTOAddressOrg";
+			zGuidFindBoxColumnStyleInfo1.GroupName = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|dfbd12eb-4f78-4435-9379-97c839bb9996", "Departure CTO");
+			zGuidFindBoxColumnStyleInfo1.IsVisible = false;
+			zDropEditColumnStyleInfo1.BindToList = "Origin+Lookups.JA_DepartureCTOAddress_List";
+			zDropEditColumnStyleInfo1.CaptionResourceString = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|ab415f0d-7d24-4e57-9261-964b5700c971", "Dep. CTO Address", "Departure CTO Address.");
+			zDropEditColumnStyleInfo1.ColumnName = "Origin+JA_Calc_DepartureCTOAddressCode";
+			zDropEditColumnStyleInfo1.GroupName = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|dfbd12eb-4f78-4435-9379-97c839bb9996", "Departure CTO");
+			zDropEditColumnStyleInfo1.IsVisible = false;
+			zDropEditColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(105);
+			zDateEditColumnStyleInfo2.ColumnName = "Origin+JA_A_DEP";
+			zDateEditColumnStyleInfo2.IsVisible = false;
+			zDateEditColumnStyleInfo2.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(110);
+			zCalcEditColumnStyleInfo1.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo1.CaptionResourceString = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|3fc060d6-9b4f-48bb-ae2a-38e2e0f2c6b3", "TEUs", "Allocated TEUs", "The total number of TEUs you have been allocated for shipments leaving this port.");
+			zCalcEditColumnStyleInfo1.ColumnName = "TEU";
+			zCalcEditColumnStyleInfo1.Decimals = 0;
+			zCalcEditColumnStyleInfo2.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo2.CaptionResourceString = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|83238df2-a8ac-428a-a3e9-b82cfcc3600b", "Power", "Power Points", "Allocated Power Points", "The total number of power points you have been allocated for shipments leaving this port.");
+			zCalcEditColumnStyleInfo2.ColumnName = "PowerPoints";
+			zCalcEditColumnStyleInfo2.Decimals = 0;
+			zCalcEditColumnStyleInfo3.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo3.CaptionResourceString = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|f8bdf0fb-5a0d-4317-a46c-d923e212866a", "Tonnes", "Allocated Tonnes", "The total weight in tonnes you have been allocated for shipments leaving this port.");
+			zCalcEditColumnStyleInfo3.ColumnName = "Tonnes";
+			zCalcEditColumnStyleInfo4.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo4.CaptionResourceString = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|5362abe3-30c2-4dad-8f50-8c836b436f56", "Volume", "Allocated Volume", "The total volume of space you have been allocated in cubic meters for shipments leaving this port.\r\n\r\nContainerized shipments count towards the TEUs instead of volume.");
+			zCalcEditColumnStyleInfo4.ColumnName = "Volume";
+			zCalcEditColumnStyleInfo5.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo5.CaptionResourceString = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|7dc60b2a-aac4-4049-b86c-ead75220e15b", "Area", "Allocated Area", "The total floor space in square meters you have been allocated for shipments leaving this port.\r\n\r\nOnly break-bulk and roll-on roll-off count towards area.");
+			zCalcEditColumnStyleInfo5.ColumnName = "Area";
+			zCalcEditColumnStyleInfo5.Decimals = 0;
+			zCalcEditColumnStyleInfo6.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo6.ColumnName = "UsedTEU";
+			zCalcEditColumnStyleInfo7.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo7.ColumnName = "UsedGP_TEU";
+			zCalcEditColumnStyleInfo7.IsVisible = false;
+			zCalcEditColumnStyleInfo8.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo8.ColumnName = "UsedReefer_TEU";
+			zCalcEditColumnStyleInfo8.IsVisible = false;
+			zCalcEditColumnStyleInfo9.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo9.ColumnName = "UsedPowerPoints";
+			zCalcEditColumnStyleInfo9.Decimals = 0;
+			zCalcEditColumnStyleInfo10.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo10.ColumnName = "UsedTonnes";
+			zCalcEditColumnStyleInfo11.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo11.ColumnName = "UsedVolume";
+			zCalcEditColumnStyleInfo12.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo12.ColumnName = "UsedArea";
+			zCalcEditColumnStyleInfo12.Decimals = 3;
+			zCalcEditColumnStyleInfo13.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo13.CaptionResourceString = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|2ed4080d-7900-4cf6-89b3-8dbb0cf05c04", "Over. TEUs", "Over Allocation TEUs", "The upper limit of the TEUs that may be booked for shipments leaving this port.");
+			zCalcEditColumnStyleInfo13.ColumnName = "OverallocatedTEU";
+			zCalcEditColumnStyleInfo14.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo14.CaptionResourceString = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|852e4bc5-245f-49f2-80aa-cd980fefb70f", "Over. Power", "Over. Power Points", "Over Allocation Power Points", "The upper limit on the power points in tonnes that may be booked for shipments leaving this port.");
+			zCalcEditColumnStyleInfo14.ColumnName = "OverallocatedPowerPoints";
+			zCalcEditColumnStyleInfo14.Decimals = 0;
+			zCalcEditColumnStyleInfo15.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo15.CaptionResourceString = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|8ba56571-5116-483d-8f9d-75cfdc832ce8", "Over. Tonnes", "Over Allocation Tonnes", "The upper limit on the weight in tonnes that may be booked for shipments leaving this port.");
+			zCalcEditColumnStyleInfo15.ColumnName = "OverallocatedTonnes";
+			zCalcEditColumnStyleInfo16.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo16.CaptionResourceString = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|1da3ce30-aec2-4af0-87fd-95a1cd9d1b11", "Over. Volume", "Over Allocation Volume", "The upper limit on the volume in cubic meters that may be booked for shipments leaving this port.\r\n\r\nContainerized shipments count towards the TEUs instead of volume.");
+			zCalcEditColumnStyleInfo16.ColumnName = "OverallocatedVolume";
+			zCalcEditColumnStyleInfo17.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo17.CaptionResourceString = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|a7e814dc-1732-4821-80e9-765eb4bd817e", "Over. Area", "Over Allocation Area", "The upper limit on the floor space in square meters that may be booked for shipments leaving this port.\r\n\r\nOnly break-bulk and roll-on roll-off count towards area.");
+			zCalcEditColumnStyleInfo17.ColumnName = "OverallocatedArea";
+			zCalcEditColumnStyleInfo17.Decimals = 3;
+			zCheckBoxColumnStyleInfo1.ColumnName = "OverrideOverallocationPercent";
+			zCheckBoxColumnStyleInfo1.GroupName = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|5e159d4e-e4c6-43e6-af02-0db19a26c700", "Overallocation Percent");
+			zCheckBoxColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(50);
+			zCalcEditColumnStyleInfo18.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo18.ColumnName = "OverallocationPercent";
+			zCalcEditColumnStyleInfo18.Decimals = 0;
+			zCalcEditColumnStyleInfo18.GroupName = Enterprise.Freight.Agency.GUI.Res.GetData("OriginLevelAllocations|5e159d4e-e4c6-43e6-af02-0db19a26c700", "Overallocation Percent");
+			zCalcEditColumnStyleInfo19.BindToDecimalPlaces = null;
+			zCalcEditColumnStyleInfo19.ColumnName = "LoadedCargoWeight";
+			zCalcEditColumnStyleInfo19.Decimals = 0;
+			originBoundGrid.ColumnStyles.Add(zCodeFindBoxColumnStyleInfo1);
+			originBoundGrid.ColumnStyles.Add(zDateEditColumnStyleInfo1);
+			originBoundGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo1);
+			originBoundGrid.ColumnStyles.Add(zTextBoxColumnStyleInfo2);
+			originBoundGrid.ColumnStyles.Add(zGuidFindBoxColumnStyleInfo1);
+			originBoundGrid.ColumnStyles.Add(zDropEditColumnStyleInfo1);
+			originBoundGrid.ColumnStyles.Add(zDateEditColumnStyleInfo2);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo1);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo2);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo3);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo4);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo5);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo6);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo7);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo8);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo9);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo10);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo11);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo12);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo13);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo14);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo15);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo16);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo17);
+			originBoundGrid.ColumnStyles.Add(zCheckBoxColumnStyleInfo1);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo18);
+			originBoundGrid.ColumnStyles.Add(zCalcEditColumnStyleInfo19);
+			originBoundGrid.GridId = "c2221e15-ef67-4658-b092-c36383d151dc";
+			originBoundGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+			originBoundGrid.HeaderForeColor = System.Drawing.SystemColors.ControlText;
+			originBoundGrid.LayoutKey = "JobVoyOriginBoundGrid";
+			originBoundGrid.Location = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledPoint(0, 0, true);
+			originBoundGrid.Name = "originBoundGrid";
+			originBoundGrid.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(589, 157, true);
+			originBoundGrid.TabIndex = 1;
+			// 
+			// OriginLevelAllocations
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+			this.CaptionRenderingEnabled = true;
+			this.Controls.Add(originBoundGrid);
+			this.Name = "OriginLevelAllocations";
+			this.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(589, 157, true);
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(originBoundGrid)).EndInit();
+			this.ResumeLayout(false);
+
+		}
+
+		Enterprise.ZArchitecture.ZGrid originBoundGrid;
+	}
+}

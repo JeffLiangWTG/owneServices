@@ -1,0 +1,14 @@
+@namespace WinzorFramework
+@inherits System.Windows.Forms.Control
+
+@if (NotificationType != null && (NotificationAnchorControl == null || NotificationAnchorControl.Visible))
+{
+	<div style="@(NotificationIconStyle)" class="notification notification--@(NotificationType)" @onmouseover=MouseOverAsync @onmouseover:stopPropagation @onmouseout=MouseOutAsync @onmouseout:stopPropagation @onclick=ClickAsync @onclick:stopPropagation @onmousedown=MouseDownAsync allowNoStopPropagation @onmousedown:preventDefault @ref=ElementReference @key=WinzorControlGuid></div>
+}
+@RenderControls()
+
+@code {
+    string NotificationIconStyle => string.IsNullOrEmpty(NotificationIconBase64DataUrl) ? string.Empty : $"background-image:url({NotificationIconBase64DataUrl});" + NotificationIconDimensions;
+
+    string NotificationIconDimensions => IconDimensions.IsEmpty ? string.Empty : $"width:{IconDimensions.Width}px;height:{IconDimensions.Height}px;background-size:{IconDimensions.Width}px {IconDimensions.Height}px;";
+}

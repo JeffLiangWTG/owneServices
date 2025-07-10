@@ -1,0 +1,836 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <AssemblyName>Enterprise.Registry.Business</AssemblyName>
+    <RootNamespace>Enterprise.Registry.Business</RootNamespace>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+    <CWGenerateXmlSerializationAssemblies>true</CWGenerateXmlSerializationAssemblies>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="AWSSDK.Core" />
+    <Reference Include="AWSSDK.S3" />
+    <Reference Include="CargoWise.ApplicationContext" />
+    <Reference Include="CargoWise.BrandManager" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Data.Shared" />
+    <Reference Include="CargoWise.Database.Shared" />
+    <Reference Include="CargoWise.Definitions" />
+    <Reference Include="CargoWise.FeatureControl.Abstractions" />
+    <Reference Include="CargoWise.FeatureControl" />
+    <Reference Include="CargoWise.Glow.Model.CW.Resources" />
+    <Reference Include="CargoWise.Integration" />
+    <Reference Include="CargoWise.IO" />
+    <Reference Include="CargoWise.Organizations.CodeGeneration" />
+    <Reference Include="CargoWise.Schema" />
+    <Reference Include="CargoWise.ComponentModel" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.SystemToSystemTrust" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="Enterprise.BufferManagement.Integration" />
+    <Reference Include="Enterprise.ComplianceRisk.Integration" />
+    <Reference Include="Enterprise.DeniedPartyScreening.Common" />
+    <Reference Include="Enterprise.DocumentEngine.Macros" />
+    <Reference Include="Enterprise.Freight.Integration" />
+    <Reference Include="Enterprise.Integration" />
+    <Reference Include="Enterprise.MasterFiles.Integration" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="Enterprise.Messaging.Integration" />
+    <Reference Include="Enterprise.Warehouse.Integration" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Enterprise.Environment" />
+    <Reference Include="Enterprise.ZArchitecture.Core.Encryption" />
+    <Reference Include="CargoWise.Odyssey.Schema" />
+    <Reference Include="Enterprise.ZArchitecture.Modules" />
+    <Reference Include="Enterprise.Licensing.Core" />
+    <Reference Include="MailManager.Integration" />
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="Resources" />
+    <Reference Include="Resources.Shared" />
+    <Reference Include="ServiceManager.Integration.Abstractions" />
+    <Reference Include="System.Net.IPNetwork" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="WTG.ErrorReporting" />
+    <Reference Include="WTG.IdentitySecurity" />
+    <Reference Include="WTG.OpenIDConnect.Token" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+    <Reference Include="WTG.TrustedMessaging.MyAccount" />
+    <EmbeddedResource Include="Internal\SystemDefinableRegistryImage\QRB_Flag_of_Switzerland.png" />
+    <EmbeddedResource Include="Organisations\DeniedPartyScreeningUserTerms.txt" />
+    <None Update="Customs\LFRReportingPeriodType.xml">
+      <CustomToolNamespace>Enterprise.Registry.Business.Customs</CustomToolNamespace>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>LFRReportingPeriodType.cs</LastGenOutput>
+    </None>
+    <None Update="Customs\ProductAuditActions.xml">
+      <CustomToolNamespace>Enterprise.Registry.Business.Customs</CustomToolNamespace>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ProductAuditActions.cs</LastGenOutput>
+    </None>
+    <None Update="Customs\US\ExportEntryFilerID\AESEntryFilerIDTypeList.xml">
+      <CustomToolNamespace>Enterprise.Registry.Business.Customs.US</CustomToolNamespace>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>AESEntryFilerIDTypeList.cs</LastGenOutput>
+    </None>
+    <None Update="eServices\eAdaptorNextOutbound\eAdaptorNextOutboundGrantTypesList.xml">
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+      <LastGenOutput>eAdaptorNextOutboundGrantTypesList.cs</LastGenOutput>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+    </None>
+    <None Update="eServices\eAdaptorOutboundProtocolList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>eAdaptorOutboundProtocolList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business.eServices</CustomToolNamespace>
+    </None>
+    <None Update="Freight\HouseBills\PrintChargesBilledToLocalClientAtDestAsCollect\AutoPrintChargesBilledToLocalClientAtDestAsCollect.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoPrintChargesBilledToLocalClientAtDestAsCollect.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="Freight\ShipmentInspection\AdditionalScreeningMethods.xml">
+      <LastGenOutput>AdditionalScreeningMethods.cs</LastGenOutput>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+    </None>
+    <None Update="Freight\ShippingPortsMessagingEHubID\AutoShippingPortsMessagingEHubID.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoShippingPortsMessagingEHubID.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="Freight\ShippingPortsMessagingEHubID\ModuleTypes.xml">
+      <LastGenOutput>ModuleTypes.cs</LastGenOutput>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="OceanCarrier\TariffMatchingModeCodeList.xml">
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>TariffMatchingModeCodeList.cs</LastGenOutput>
+    </None>
+    <None Update="Rating\RateEntryReferenceTypeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>RateEntryReferenceTypeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="SystemToSystemTrust\CARootCodeDescriptionList.xml">
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>CARootCodeDescriptionList.cs</LastGenOutput>
+    </None>
+    <None Update="System\OpenID Connect\OIDCClaimMappingIdentifiers.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>OIDCClaimMappingIdentifiers.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="System\OpenID Connect\OIDCServerTypesList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+      <LastGenOutput>OIDCServerTypesList.cs</LastGenOutput>
+    </None>
+    <None Update="System\ProcessController\KafkaSecuritySettings\AutoKafkaSecurity.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoKafkaSecurity.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="System\StaffManagement\DefaultStaffEmploymentTypes.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>DefaultStaffEmploymentTypes.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="System\SystemToSystemTrust\DataProtectionMechanisms.xml">
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+      <LastGenOutput>DataProtectionMechanisms.cs</LastGenOutput>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+    </None>
+    <None Update="Warehouse\DefaultBilltoPartyForTWConsignmentCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>DefaultBilltoPartyForTWConsignmentCodeList.cs</LastGenOutput>
+    </None>
+    <None Update="Warehouse\DefaultCargoWiseWebPortalCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>DefaultCargoWiseWebPortalCodeList.cs</LastGenOutput>
+    </None>
+    <None Update="Warehouse\DefaultConsignmentDirectionCodeList.xml">
+      <LastGenOutput>DefaultConsignmentDirectionCodeList.cs</LastGenOutput>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+    </None>
+    <None Update="Warehouse\DimsOrVolumeBehaviourModesCodeList.xml">
+      <LastGenOutput>DimsOrVolumeBehaviourModesCodeList.cs</LastGenOutput>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+    </None>
+    <None Update="Warehouse\WhsUnloadModeCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>WhsUnloadModeCodeList.cs</LastGenOutput>
+    </None>
+    <EmbeddedResource Include="WorkflowManager\CompletionMilestoneOutcomeModes.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>CompletionMilestoneOutcomeModes.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </EmbeddedResource>
+    <None Update="WorkflowManager\ContainmentBarrierIterationTypeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ContainmentBarrierIterationTypeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="WorkflowManager\TaskTypes\WorkingStatusChangeTypeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>WorkingStatusChangeTypeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <EmbeddedResource Include="Freight\HouseBills\HouseBillOfLadingImages\HBoL_CPT_Terms.gif" />
+    <None Update="Freight\HouseBills\HouseBillOfLadingImages\PrintLogoOptions.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>PrintLogoOptions.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business.Customs.US</CustomToolNamespace>
+    </None>
+    <Compile Update="Customs\LFRReportingPeriodType.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>LFRReportingPeriodType.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Customs\ProductAuditActions.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ProductAuditActions.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Customs\US\ExportEntryFilerID\AESEntryFilerIDTypeList.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AESEntryFilerIDTypeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="eServices\eAdaptorNextOutbound\eAdaptorNextOutboundGrantTypesList.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>eAdaptorNextOutboundGrantTypesList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="eServices\eAdaptorOutboundProtocolList.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>eAdaptorOutboundProtocolList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\HouseBills\HouseBillOfLadingImages\PrintLogoOptions.cs">
+      <DependentUpon>PrintLogoOptions.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="eServices\HealthCheckSettings\AutoNotificationFrequency.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoNotificationFrequency.xml</DependentUpon>
+    </Compile>
+    <Compile Update="eServices\InboundMessageNotifications\InboundMessageNotificationsNotifyUserTypeList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InboundMessageNotificationsNotifyUserTypeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\BillOfLadingNumberCustomisation\Customisation\AutoBillOfLadingNumberCustomisation.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoBillOfLadingNumberCustomisation.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\BillOfLadingNumberCustomisation\ByServiceLevel\AutoBillOfLadingNumberCustomisationsByServiceLevel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoBillOfLadingNumberCustomisationsByServiceLevel.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\BillOfLadingNumberCustomisation\Element\AutoBillOfLadingNumberCustomisationElement.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoBillOfLadingNumberCustomisationElement.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\HouseBills\PrintChargesBilledToLocalClientAtDestAsCollect\AutoPrintChargesBilledToLocalClientAtDestAsCollect.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AutoPrintChargesBilledToLocalClientAtDestAsCollect.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ExemptionCodesAU.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ExemptionCodesAU.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ExemptionCodesCA.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ExemptionCodesCA.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ExemptionCodesSG.cs">
+      <DependentUpon>ExemptionCodesSG.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ExemptionCodesHK.cs">
+      <DependentUpon>ExemptionCodesHK.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ExemptionCodesJP.cs">
+      <DependentUpon>ExemptionCodesJP.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ExemptionCodes.cs">
+      <DependentUpon>ExemptionCodes.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ExemptionCodesZA.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ExemptionCodesZA.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\AdditionalScreeningMethods.cs">
+      <DependentUpon>AdditionalScreeningMethods.xml</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ScreeningMethodsAU.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ScreeningMethodsAU.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ScreeningMethodsCA.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ScreeningMethodsCA.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ScreeningMethodsZA.cs">
+      <DependentUpon>ScreeningMethodsZA.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ScreeningMethodsSG.cs">
+      <DependentUpon>ScreeningMethodsSG.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ScreeningMethodsHK.cs">
+      <DependentUpon>ScreeningMethodsHK.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ScreeningMethodsJP.cs">
+      <DependentUpon>ScreeningMethodsJP.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Freight\ShipmentInspection\ScreeningMethods.cs">
+      <DependentUpon>ScreeningMethods.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Freight\BookingNewButtonLabelList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BookingNewButtonLabelList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\ShippingPortsMessagingEHubID\AutoShippingPortsMessagingEHubID.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AutoShippingPortsMessagingEHubID.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\ShippingPortsMessagingEHubID\ModuleTypes.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ModuleTypes.xml</DependentUpon>
+    </Compile>
+    <Compile Update="OceanCarrier\TariffMatchingModeCodeList.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>TariffMatchingModeCodeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Organisations\DeDuplicationMinimumConfidenceRating.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DeDuplicationMinimumConfidenceRating.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Organisations\OpportunityStatus\OpportunityTradeStatus.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OpportunityTradeStatus.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Organisations\OrgContactJobCategories.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrgContactJobCategories.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Rating\RateEntryReferenceTypeList.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RateEntryReferenceTypeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="SalesMarketing\CommissionRecognitionDate\CommissionRecognitionDateTypeList.cs">
+      <DependentUpon>CommissionRecognitionDateTypeList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="SalesMarketing\CommissionTransactionJobTrigger\CommissionTransactionJobTriggerList.cs">
+      <DependentUpon>CommissionTransactionJobTriggerList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="SystemToSystemTrust\CARootCodeDescriptionList.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CARootCodeDescriptionList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="System\NewsSection\NewsSectionSortTypeList.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>NewsSectionSortTypeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="System\OpenID Connect\OIDCClaimMappingIdentifiers.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OIDCClaimMappingIdentifiers.xml</DependentUpon>
+    </Compile>
+    <Compile Update="System\OpenID Connect\OIDCServerTypesList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OIDCServerTypesList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="System\ProcessController\KafkaSecuritySettings\AutoKafkaSecurity.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoKafkaSecurity.xml</DependentUpon>
+    </Compile>
+    <Compile Update="System\StaffManagement\DefaultStaffEmploymentTypes.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DefaultStaffEmploymentTypes.xml</DependentUpon>
+    </Compile>
+    <Compile Update="System\StaffManagement\DefaultStaffReportingRoles.cs">
+      <DependentUpon>DefaultStaffReportingRoles.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Organisations\DeniedPartyScreening\DPSFreightMovementRestrictionsOptions.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DPSFreightMovementRestrictionsOptions.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Rating\RateFeeTypeList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RateFeeTypeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Rating\RateLineTypeList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RateLineTypeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="System\NewsSection\NewsSectionTypeList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>NewsSectionTypeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="System\PhoneDialingUriProtocol\SystemPhoneDiallingUriProtocols.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SystemPhoneDiallingUriProtocols.xml</DependentUpon>
+    </Compile>
+    <Compile Update="System\StatisticsInfo\TimeFrameList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TimeFrameList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="System\SystemToSystemTrust\DataProtectionMechanisms.cs">
+      <DependentUpon>DataProtectionMechanisms.xml</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Warehouse\AdjustmentReasonCodesCodeList.cs">
+      <DependentUpon>AdjustmentReasonCodesCodeList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Warehouse\DefaultBilltoPartyForTWConsignmentCodeList.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DefaultBilltoPartyForTWConsignmentCodeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Warehouse\DefaultCargoWiseWebPortalCodeList.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DefaultCargoWiseWebPortalCodeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Warehouse\DefaultConsignmentDirectionCodeList.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DefaultConsignmentDirectionCodeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Warehouse\DimsOrVolumeBehaviourModesCodeList.cs">
+      <DependentUpon>DimsOrVolumeBehaviourModesCodeList.xml</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Warehouse\StocktakeTypeCodeList.cs">
+      <DependentUpon>StocktakeTypeCodeList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Warehouse\DataTypeCodeList.cs">
+      <DependentUpon>DataTypeCodeList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="Warehouse\UOMPackTypes\UOMPackTypesList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>UOMPackTypesList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Warehouse\Web\CodeDescriptionPairLists\MilestoneDatesVisibilityList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MilestoneDatesVisibilityList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Warehouse\Web\CodeDescriptionPairLists\MilestoneSortOrderList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MilestoneSortOrderList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Warehouse\Web\CodeDescriptionPairLists\MilestoneStatusVisibilityList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MilestoneStatusVisibilityList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Warehouse\Web\CodeDescriptionPairLists\MilestoneVisibilityList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MilestoneVisibilityList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Warehouse\Web\CodeDescriptionPairLists\OrderTrackingDatesOrMilestonesList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrderTrackingDatesOrMilestonesList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Warehouse\UnloadCompleteDateForRatingOfStorageList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>UnloadCompleteDateForRatingOfStorageList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Warehouse\WhsABCAnalysisMethodCodeList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WhsABCAnalysisMethodCodeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Warehouse\WhsABCAnalysisPeriodCodeList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WhsABCAnalysisPeriodCodeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Warehouse\WhsUnloadModeCodeList.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WhsUnloadModeCodeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="WorkflowManager\CompletionMilestoneOutcomeModes.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CompletionMilestoneOutcomeModes.xml</DependentUpon>
+    </Compile>
+    <Compile Update="WorkflowManager\ContainmentBarrierIterationTypeList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ContainmentBarrierIterationTypeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="WorkflowManager\IterationReasonValidationList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IterationReasonValidationList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="WorkflowManager\ProcessTaskTriggerPurposeList1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ProcessTaskTriggerPurposeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="Freight\ExportStatement\SEDStatementFieldType.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SEDStatementFieldType.xml</DependentUpon>
+    </Compile>
+    <Compile Update="WorkflowManager\TaskTypeRestrictions\NotificationTypeList.cs">
+      <DependentUpon>NotificationTypeList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="WorkflowManager\TaskTypeRestrictions\ScopeList.cs">
+      <DependentUpon>ScopeList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="WorkflowManager\TaskTypeRestrictions\RestrictionTypeList.cs">
+      <DependentUpon>RestrictionTypeList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="WorkflowManager\TaskTypes\WorkingStatusChangeTypeList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WorkingStatusChangeTypeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="WorkflowManager\WorkflowValidationProcessType\AutoWorkflowValidationProcessType.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AutoWorkflowValidationProcessType.xml</DependentUpon>
+    </Compile>
+    <None Update="Freight\ShipmentInspection\ExemptionCodesAU.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ExemptionCodesAU.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipmentInspection\ExemptionCodesCA.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ExemptionCodesCA.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipmentInspection\ExemptionCodesSG.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ExemptionCodesSG.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipmentInspection\ExemptionCodesZA.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ExemptionCodesZA.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipmentInspection\ScreeningMethodsAU.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ScreeningMethodsAU.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipmentInspection\ScreeningMethodsCA.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ScreeningMethodsCA.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipmentInspection\ScreeningMethodsZA.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ScreeningMethodsZA.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipmentInspection\ScreeningMethodsSG.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ScreeningMethodsSG.cs</LastGenOutput>
+    </None>
+    <None Update="Organisations\OpportunityStatus\OpportunityTradeStatus.xml">
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>OpportunityTradeStatus.cs</LastGenOutput>
+    </None>
+    <None Update="Organisations\OrgContactJobCategories.xml">
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>OrgContactJobCategories.cs</LastGenOutput>
+    </None>
+    <None Update="Organisations\DeDuplicationMinimumConfidenceRating.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+      <LastGenOutput>DeDuplicationMinimumConfidenceRating.cs</LastGenOutput>
+    </None>
+    <None Update="SalesMarketing\CommissionTransactionJobTrigger\CommissionTransactionJobTriggerList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>CommissionTransactionJobTriggerList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="System\StaffManagement\DefaultStaffReportingRoles.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>DefaultStaffReportingRoles.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="Warehouse\UOMPackTypes\UOMPackTypesList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>UOMPackTypesList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="WorkflowManager\IterationReasonValidationList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>IterationReasonValidationList.cs</LastGenOutput>
+    </None>
+    <None Update="eServices\HealthCheckSettings\AutoNotificationFrequency.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoNotificationFrequency.cs</LastGenOutput>
+    </None>
+    <None Update="WorkflowManager\TaskTypeRestrictions\NotificationTypeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>NotificationTypeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="WorkflowManager\TaskTypeRestrictions\ScopeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ScopeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="WorkflowManager\TaskTypeRestrictions\RestrictionTypeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>RestrictionTypeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <EmbeddedResource Include="Freight\HouseBills\HouseBillOfLadingImages\HBoL_FWB_Terms.gif" />
+    <EmbeddedResource Include="Freight\HouseBills\HouseBillOfLadingImages\HBoL_SWB_Terms.gif" />
+    <None Update="eServices\InboundMessageNotifications\InboundMessageNotificationsNotifyUserTypeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>InboundMessageNotificationsNotifyUserTypeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business.eServices</CustomToolNamespace>
+    </None>
+    <None Update="Freight\BillOfLadingNumberCustomisation\Element\AutoBillOfLadingNumberCustomisationElement.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoBillOfLadingNumberCustomisationElement.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="Freight\ExportStatement\SEDStatementFieldType.xml">
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>SEDStatementFieldType.cs</LastGenOutput>
+    </None>
+    <EmbeddedResource Include="Freight\HouseBills\HouseBillOfLadingImages\HBoL-TTC_US_Ltr_Terms.png" />
+    <None Update="Freight\ShipmentInspection\ExemptionCodesHK.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ExemptionCodesHK.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipmentInspection\ExemptionCodesJP.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ExemptionCodesJP.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipmentInspection\ExemptionCodes.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ExemptionCodes.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipmentInspection\ScreeningMethodsHK.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ScreeningMethodsHK.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipmentInspection\ScreeningMethodsJP.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ScreeningMethodsJP.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipmentInspection\ScreeningMethods.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ScreeningMethods.cs</LastGenOutput>
+    </None>
+    <None Update="Freight\ShipperLoadAndCountCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ShipperLoadAndCountCodeList.cs</LastGenOutput>
+    </None>
+    <None Update="Organisations\OrgMatchThresholds.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>OrgMatchThresholds.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <Content Include="Internal\TestFiles\1x1.png" />
+    <Content Include="Internal\TestFiles\TransparentPNG.png" />
+    <EmbeddedResource Include="System\DefaultHtmlEmailBannerImage.gif" />
+    <EmbeddedResource Include="System\DefaultHtmlEmailFooterImage.gif" />
+    <EmbeddedResource Include="Freight\HouseBills\HouseBillOfLadingImages\HBoL-FIATA_Intl_A4_Back.gif" />
+    <EmbeddedResource Include="Freight\HouseBills\HouseBillOfLadingImages\HBoL-ITC_Aus_Backv22.gif" />
+    <EmbeddedResource Include="Freight\HouseBills\HouseBillOfLadingImages\HBoL-TTC_Intl_A4_131anz_TC.gif" />
+    <EmbeddedResource Include="Freight\HouseBills\HouseBillOfLadingImages\HBoL_ITC_NZ_TCv1.gif" />
+    <None Update="Freight\BillOfLadingNumberCustomisation\Customisation\AutoBillOfLadingNumberCustomisation.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoBillOfLadingNumberCustomisation.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="Freight\BillOfLadingNumberCustomisation\ByServiceLevel\AutoBillOfLadingNumberCustomisationsByServiceLevel.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoBillOfLadingNumberCustomisationsByServiceLevel.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="Freight\BookingNewButtonLabelList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>BookingNewButtonLabelList.cs</LastGenOutput>
+    </None>
+    <None Update="Organisations\DeniedPartyScreening\DPSFreightMovementRestrictionsOptions.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>DPSFreightMovementRestrictionsOptions.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="Rating\RateFeeTypeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>RateFeeTypeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="Rating\RateLineTypeList.xml">
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>RateLineTypeList.cs</LastGenOutput>
+    </None>
+    <None Update="SalesMarketing\CommissionRecognitionDate\CommissionRecognitionDateTypeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>CommissionRecognitionDateTypeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="System\NewsSection\NewsSectionTypeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>NewsSectionTypeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="System\PhoneDialingUriProtocol\SystemPhoneDiallingUriProtocols.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>SystemPhoneDiallingUriProtocols.cs</LastGenOutput>
+    </None>
+    <None Update="System\StatisticsInfo\TimeFrameList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>TimeFrameList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+    <None Update="Warehouse\AdjustmentReasonCodesCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>AdjustmentReasonCodesCodeList.cs</LastGenOutput>
+    </None>
+    <None Update="Warehouse\StocktakeTypeCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>StocktakeTypeCodeList.cs</LastGenOutput>
+    </None>
+    <None Update="Warehouse\DataTypeCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>DataTypeCodeList.cs</LastGenOutput>
+    </None>
+    <None Update="Warehouse\Web\CodeDescriptionPairLists\MilestoneDatesVisibilityList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>MilestoneDatesVisibilityList.cs</LastGenOutput>
+    </None>
+    <None Update="Warehouse\Web\CodeDescriptionPairLists\MilestoneSortOrderList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>MilestoneSortOrderList.cs</LastGenOutput>
+    </None>
+    <None Update="Warehouse\Web\CodeDescriptionPairLists\MilestoneStatusVisibilityList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>MilestoneStatusVisibilityList.cs</LastGenOutput>
+    </None>
+    <None Update="Warehouse\Web\CodeDescriptionPairLists\MilestoneVisibilityList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>MilestoneVisibilityList.cs</LastGenOutput>
+    </None>
+    <None Update="Warehouse\Web\CodeDescriptionPairLists\OrderTrackingDatesOrMilestonesList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>OrderTrackingDatesOrMilestonesList.cs</LastGenOutput>
+    </None>
+    <None Update="Warehouse\UnloadCompleteDateForRatingOfStorageList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>UnloadCompleteDateForRatingOfStorageList.cs</LastGenOutput>
+    </None>
+    <None Update="Warehouse\WhsABCAnalysisMethodCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>WhsABCAnalysisMethodCodeList.cs</LastGenOutput>
+    </None>
+    <None Update="Warehouse\WhsABCAnalysisPeriodCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>WhsABCAnalysisPeriodCodeList.cs</LastGenOutput>
+    </None>
+    <None Update="WorkflowManager\ProcessTaskTriggerPurposeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>ProcessTaskTriggerPurposeList1.cs</LastGenOutput>
+    </None>
+    <None Update="WorkflowManager\WorkflowValidationProcessType\AutoWorkflowValidationProcessType.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoWorkflowValidationProcessType.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Registry.Business</CustomToolNamespace>
+    </None>
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Collections.Immutable" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="System.Drawing.Common" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

@@ -1,0 +1,14 @@
+// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CargoWiseOne", "CW1124:new CachedProperty", Scope = "namespaceanddescendants", Target = "~N:Enterprise.Customs.FR.Business", Justification = "Properties using CachedProperty should use CachedValueHelper.")]
+[assembly: SuppressMessage("CargoWiseOne", "CW1123:new CachedValue", Scope = "namespaceanddescendants", Target = "~N:Enterprise.Customs.FR.Business", Justification = "Properties using CachedValue should use CachedValueHelper.")]
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~T:Enterprise.Customs.FR.Business.Reports.FRDeltaGRegularizationMatchDataSet")] // C:\git\wtg\CargoWise\Dev\Enterprise\Product\Operations\Customs\FR\Core\Business\Reports\FRDeltaGRegularizationMatchDataSet.cs:2:127
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~T:Enterprise.Customs.FR.Business.Reports.FRDeltaGRegularizationMatchDataSet.FRDeltaGRegularizationMatchDataSetDataTable")] // C:\git\wtg\CargoWise\Dev\Enterprise\Product\Operations\Customs\FR\Core\Business\Reports\FRDeltaGRegularizationMatchDataSet.cs:5:128
+[assembly: SuppressMessage("CargoWiseOne", "CW1021:Static Fields Are Thread Static Rule", Justification = "Baseline WI00605045", Scope = "member", Target = "~F:Enterprise.Customs.FR.Business.FREDIMessage.TypeDecider")] // Enterprise/Product/Operations/Customs/FR/Core/Business/EDIMessage/FREDIMessage.cs:45,53
+[assembly: SuppressMessage("CargoWiseOne", "CW1021:Static Fields Are Thread Static Rule", Justification = "Baseline WI00605045", Scope = "member", Target = "~F:Enterprise.Customs.FR.Business.CusStatementLine.TypeDecider")] // Enterprise/Product/Operations/Customs/FR/Core/Business/CusStatement/CusStatementLine/CusStatementLine.cs:13,57
+[assembly: SuppressMessage("CargoWiseOne", "CW1021:Static Fields Are Thread Static Rule", Justification = "Baseline WI00605045", Scope = "member", Target = "~F:Enterprise.Customs.FR.Business.CusTempStorage.CusTempStorageLine.TypeDecider")] // Enterprise/Product/Operations/Customs/FR/Core/Business/CusTempStorage/CusTempStorageLine/CusTempStorageLine.cs:28,59
+[assembly: SuppressMessage("CargoWiseOne", "CW1021:Static Fields Are Thread Static Rule", Justification = "Baseline WI00605045", Scope = "member", Target = "~F:Enterprise.Customs.FR.Business.CusTempStorage.CusTempStorageDec.TypeDecider")] // Enterprise/Product/Operations/Customs/FR/Core/Business/CusTempStorage/CusTempStorageDec/CusTempStorageDec.cs:231,58

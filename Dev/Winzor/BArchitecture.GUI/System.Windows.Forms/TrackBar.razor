@@ -1,0 +1,29 @@
+@using WinzorFramework
+@using WinzorFramework.Extensions
+@using WinzorFramework.JSInterop;
+@namespace System.Windows.Forms
+@inherits Control
+
+<div class="trackbar" @attributes="DataAttributes">
+	<input class="trackbar__input" style="@TrackBarStyle" type="range" min="@Minimum" max="@Maximum" step="@TickFrequency" list="markers" @bind="@Value" @bind:event="oninput" tabIndex="@this.TabIndexHtmlAttributeValue(c => c.TabStop)" @ref="ElementReference" @onwinzorfocusin="OnFocusInAsync" @onwinzorfocusin:stopPropagation @onwinzorfocusout="OnFocusOutAsync" @onwinzorfocusout:stopPropagation />
+</div>
+
+@code {
+	protected internal override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		GetJSInterop<ITrackBarJSInterop>()?.PreloadInterop();
+	}
+
+	protected internal override async Task OnAfterRenderAsync(bool firstRender)
+	{
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await (GetJSInterop<ITrackBarJSInterop>()?.UpdateRangeInputStepAsync(ElementReference, SmallChange, LargeChange) ?? Task.CompletedTask);
+            await (GetJSInterop<ITrackBarJSInterop>()?.UpdateTrackBarColorOnDragAsync(ElementReference) ?? Task.CompletedTask);
+        }
+    }
+
+    string TrackBarStyle => $"--track-height: {RunnableTrackHeight}px; --track-left-right-margin: {RunnableTrackLeftRightMargin}px; --track-down-margin: {RunnableTrackDownMargin}px; --thumb-image-width: {SliderThumbImageWidth}px; --thumb-image-height: {SliderThumbImageHeight}px; --thumb-margin-top: {RunnableTrackMarginTop}px; --thumb-default-background-image: {SliderThumbDefaultBackgroundImage}; --thumb-hover-background-image: {SliderThumbHoverBackgroundImage}; --thumb-drag-background-image: {SliderThumbDragBackgroundImage};";
+}

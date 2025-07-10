@@ -1,0 +1,36 @@
+meta {
+  name: Provided C1CCode is not of length 4
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.ServiceProviders = [ {C1CCode : "ABCDE" }, {C1CCode : "ABC" } ];
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided C1CCode ('ABCDE') is not valid. C1CCode length must be 4.", function() {
+    expect(res.body.ModelState['ServiceProviders[0].C1CCode'][0]).to.equal("Provided C1CCode ('ABCDE') is not valid. C1CCode length must be 4.");
+  });
+  
+  test("Should return: Provided C1CCode ('ABC') is not valid. C1CCode length must be 4.", function() {
+    expect(res.body.ModelState['ServiceProviders[1].C1CCode'][0]).to.equal("Provided C1CCode ('ABC') is not valid. C1CCode length must be 4.");
+  });
+  
+  
+}

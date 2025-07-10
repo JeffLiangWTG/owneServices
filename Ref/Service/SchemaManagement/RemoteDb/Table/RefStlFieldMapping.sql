@@ -1,0 +1,19 @@
+CREATE TABLE [RefStlFieldMapping]
+(
+	[SFM_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefStlFieldMapping_SFM_PK]  DEFAULT (NEWID()),
+	[SFM_FeatureCode] CHAR(3) NOT NULL CONSTRAINT [DF_RefStlFieldMapping_SFM_FeatureCode]  DEFAULT (''),
+	[SFM_BillableCount]	VARCHAR(255) NULL,
+	[SFM_Reference1] VARCHAR(255) NULL,
+	[SFM_Reference2] VARCHAR(255) NULL,
+	[SFM_Reference3] VARCHAR(255) NULL,
+	[SFM_Reference4] VARCHAR(255) NULL,
+	[SFM_Reference5] VARCHAR(255) NULL,
+	[SFM_Category] VARCHAR(255) NULL,
+	[SFM_PriceItemCode] VARCHAR(255) NULL,
+	[SFM_ServiceOccuredUTC] VARCHAR(255) NULL,
+	[SFM_ClientStaffCode] VARCHAR(255) NULL,
+	CONSTRAINT [PK_RefStlFieldMapping] PRIMARY KEY CLUSTERED ([SFM_PK] ASC)
+)
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_RefStlFieldMapping_SFM_FeatureCode] ON [RefStlFieldMapping]([SFM_FeatureCode] ASC)
+GO

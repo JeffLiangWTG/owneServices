@@ -1,0 +1,115 @@
+﻿<Project>
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>obj-$(MSBuildProjectName)</BaseIntermediateOutputPath>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <NoWarn>$(NoWarn);CW1143</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>Enterprise.Loader</RootNamespace>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <ApplicationManifest>..\..\..\..\main.manifest</ApplicationManifest>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+    <IsSelfContainedWithILMergeAndReferencesAreCurated>true</IsSelfContainedWithILMergeAndReferencesAreCurated>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.ActiveDirectory" />
+    <Reference Include="CargoWise.ApplicationManager.Common" />
+    <Reference Include="CargoWise.BrandManager" />
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.DataProtection" />
+    <Reference Include="CargoWise.DataProtection.SqlExtensions" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="Enterprise.RemoteDesktopServices.Shared" />
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <Reference Include="Enterprise.Upgrades" />
+    <Reference Include="Enterprise.URLHandler" />
+    <Reference Include="Enterprise.URLHandler.Integration" />
+    <Reference Include="System.Diagnostics.DiagnosticSource" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Management" />
+    <Reference Include="WTG.ApplicationLogging" />
+    <Reference Include="WTG.ApplicationLogging.Abstractions" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CargoWise.Loader.Client\CargoWise.Loader.Client.csproj" />
+    <ProjectReference Include="..\CargoWise.Loader.Common\CargoWise.Loader.Common.csproj" />
+    <ProjectReference Include="..\Enterprise.Client.Common\Enterprise.Client.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\..\..\Enterprise\Product\Main\Enterprise.Main\CargoWiseOneProjects\applog.json" LogicalName="WTG.ApplicationLogging.applog.json" />
+    <None Include="..\..\..\..\Enterprise\Product\Main\Enterprise.Main\App.config">
+      <Link>App.config</Link>
+    </None>
+    <None Include="..\..\..\..\main.manifest">
+      <Link>main.manifest</Link>
+    </None>
+  </ItemGroup>
+  <Target Name="ILMerge" AfterTargets="PostBuildEvent">
+    <Exec Command="
+      cd $(TargetDir)
+      ILMerge.exe /keyfile:..\EDI-Release-private.snk ^
+                  /out:$(MSBuildProjectName).exe ^
+                  /allowDup ^
+                  $(MSBuildProjectName).Unmerged.exe ^
+                  CargoWise.BrandManager.dll  ^
+                  CargoWise.Common.dll  ^
+                  CargoWise.Shared.40.dll  ^
+                  CargoWise.ActiveDirectory.dll ^
+                  CargoWise.Loader.Common.dll ^
+                  CargoWise.Loader.Client.dll ^
+                  Enterprise.Client.Common.dll ^
+                  ServiceManager.Integration.ServiceHostUtilities.dll ^
+                  Enterprise.Upgrades.dll ^
+                  Enterprise.RemoteDesktopServices.Shared.dll ^
+                  Enterprise.URLHandler.dll ^
+                  ICSharpCode.SharpZipLib.dll ^
+                  CargoWise.DataProtection.dll ^
+                  CargoWise.DataProtection.SqlExtensions.dll ^
+                  Microsoft.Bcl.AsyncInterfaces.dll ^
+                  Microsoft.Extensions.DependencyInjection.Abstractions.dll ^
+                  Microsoft.Extensions.DependencyInjection.dll ^
+                  Microsoft.Win32.Registry.dll ^
+                  Newtonsoft.Json.dll ^
+                  System.Memory.dll ^
+                  System.Numerics.Vectors.dll ^
+                  System.Runtime.CompilerServices.Unsafe.dll ^
+                  System.Text.Encodings.Web.dll ^
+                  System.Text.Json.dll ^
+                  System.Threading.Tasks.Extensions.dll ^
+                  System.ValueTuple.dll ^
+                  WTG.Authenticode.dll ^
+                  WTG.Data.SqlClient.dll ^
+                  Microsoft.Extensions.Configuration.dll ^
+                  Microsoft.Extensions.Configuration.Abstractions.dll ^
+                  Microsoft.Extensions.Configuration.Binder.dll ^
+                  Microsoft.Extensions.Configuration.FileExtensions.dll ^
+                  Microsoft.Extensions.Configuration.Json.dll ^
+                  Microsoft.Extensions.FileProviders.Abstractions.dll ^
+                  Microsoft.Extensions.FileProviders.Physical.dll ^
+                  Microsoft.Extensions.FileSystemGlobbing.dll ^
+                  Microsoft.Extensions.Logging.dll ^
+                  Microsoft.Extensions.Logging.Abstractions.dll ^
+                  Microsoft.Extensions.Logging.Configuration.dll ^
+                  Microsoft.Extensions.Options.dll ^
+                  Microsoft.Extensions.Options.ConfigurationExtensions.dll ^
+                  Microsoft.Extensions.Primitives.dll ^
+                  NLog.dll ^
+                  NLog.Extensions.Logging.dll ^
+                  OpenTelemetry.dll ^
+                  OpenTelemetry.Api.dll ^
+                  OpenTelemetry.Api.ProviderBuilderExtensions.dll ^
+                  System.Diagnostics.DiagnosticSource.dll ^
+                  WTG.ApplicationLogging.Abstractions.dll ^
+                  WTG.ApplicationLogging.dll
+       copy $(MSBuildProjectName).Unmerged.exe.config $(MSBuildProjectName).exe.config
+       cd $(ProjectDir)\Setup
+       $(MSBuildProjectName).Build.bat" />
+  </Target>
+</Project>

@@ -1,0 +1,25 @@
+@using CargoWise.Main.Navigation
+@using CargoWise.Main.Navigation.ViewModels
+@using CargoWiseNext.Blazor.Components
+@namespace CargoWise.Main.Navigation.Pages
+
+@inherits CwnComponentBase
+
+@if (NewsViewModel?.Sections?.Any() == true && NewsViewModel?.FilteredNewsItems?.Any() == true)
+{
+    <CwnCard Class="@Classname">
+        <CwnTabs>
+            @if (NewsViewModel?.Sections != null)
+            {
+                @foreach (var newsSection in NewsViewModel.Sections)
+                {
+                    <CwnTabPanel Text="@newsSection.SectionName">
+                        <ChildContent>
+                                <NewsList Model="NewsViewModel" Items="@LoadSection(newsSection)"></NewsList>
+                        </ChildContent>
+                    </CwnTabPanel>
+                }
+            }
+        </CwnTabs>
+    </CwnCard>
+}

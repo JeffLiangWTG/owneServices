@@ -1,0 +1,1 @@
+<%@ Page language="c#" Codebehind="Shipment.aspx.cs" AutoEventWireup="True" Inherits="Enterprise.Tracking.Web.Shipment" %>

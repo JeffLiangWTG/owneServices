@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="Enterprise.DocumentEngineCore" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Design" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreWindowsTargetFramework)' == 'true'">
+    <Reference Include="System.ServiceModel.Primitives" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="ScheduledUpgraderConfig\AutoScheduledUpgraderConfig.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoScheduledUpgraderConfig.xml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="ScheduledUpgraderConfig\AutoScheduledUpgraderConfig.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoScheduledUpgraderConfig.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.ServiceManager.Tasks.ScheduledUpgrader</CustomToolNamespace>
+    </None>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

@@ -1,0 +1,32 @@
+@using System.Collections.ObjectModel
+
+<CwnDropDownList Items="@CodeToNameMap"></CwnDropDownList>
+
+@code {
+	public class NavMenuItem
+	{
+		public string Name { get; set; }
+		public string Code { get; set; }
+		public bool IsActive { get; set; }
+
+		public NavMenuItem(string name, string code, bool isActive)
+		{
+			Name = name;
+			IsActive = isActive;
+			Code = code;
+		}
+	}
+
+	List<NavMenuItem> NavMenuItems => new List<NavMenuItem>()
+	{
+		new NavMenuItem("Shedules","SCH" ,true),
+		new NavMenuItem("Forwarding","FWD" ,true),
+		new NavMenuItem("Customs","CUS" ,true),
+		new NavMenuItem("Transport","PNN" ,true),
+		new NavMenuItem("Warehose", "WRN",true),
+		new NavMenuItem("Line & Agency","SCA" ,true),
+		new NavMenuItem("Productivity Tools", "PNT",true)
+	};
+
+	SortedList<string, string> CodeToNameMap => new(NavMenuItems.ToDictionary(nav => nav.Code, nav => nav.Name));
+}

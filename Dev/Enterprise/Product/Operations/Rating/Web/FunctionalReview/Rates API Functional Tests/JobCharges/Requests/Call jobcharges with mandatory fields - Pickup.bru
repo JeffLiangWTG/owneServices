@@ -1,0 +1,32 @@
+meta {
+  name: Call jobcharges with mandatory fields - Pickup
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+  
+   var query = RatesAPIsHelper.GetRateQueryWithMandatoryFieldsForProvidedVariables(false);
+   query.CalculationScope = RatesAPIsHelper.GetCalculationScope();
+   query.CarrierPayTerm = RatesAPIsHelper.GetCarrierPayTerm();
+   query.Incoterm = RatesAPIsHelper.GetIncoterm();
+   query.RateParties = RatesAPIsHelper.GetRateParties();
+   query.JobInfo = RatesAPIsHelper.GetJobInfo();
+   
+   query.PickupAddress = RatesAPIsHelper.GetValidPickupAddress();
+   
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

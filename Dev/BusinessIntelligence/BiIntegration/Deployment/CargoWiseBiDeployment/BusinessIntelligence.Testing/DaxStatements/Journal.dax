@@ -1,0 +1,63 @@
+DEFINE
+    VAR __DateFilter =
+        FILTER(
+            KEEPFILTERS(VALUES('Period'[Period])),
+            AND('Period'[Period]>= 202207, 'Period'[Period]<= 202208)
+        )
+    VAR __OrgFilter =
+        FILTER(
+            KEEPFILTERS(VALUES('Organization'[Organization Name])),
+            'Organization'[Organization Name]= BLANK()
+        )
+    VAR __DepartmentFilter =
+        FILTER(
+            KEEPFILTERS(VALUES('Department'[Department])),
+            Department[Department]= "{BRN} Branch"
+        )
+    VAR __BranchFilter =
+        FILTER(
+            KEEPFILTERS(VALUES('Branch'[Branch Name])),
+            'Branch'[Branch Name]= "(ATL) US - Atlanta Branch"
+        )
+    VAR __CompanytFilter =
+        FILTER(
+            KEEPFILTERS(VALUES('Company Branch'[Company])),
+            'Company Branch'[Company]= "[DUS] US Demo Company"
+        )
+
+EVALUATE
+SELECTCOLUMNS( 
+    ADDCOLUMNS(
+        CALCULATETABLE(
+            GLTransaction,
+            __DateFilter,
+            __OrgFilter,
+            __DepartmentFilter,
+            __BranchFilter,
+            __CompanytFilter
+        ),
+        "Organization Name", RELATED('Organization'[Organization Name]),
+        "Branch Name", RELATED('Branch'[Branch Name]),
+        "Department", RELATED('Department'[Department]),
+        "Period", RELATED('Period'[Period]),
+        "Company", RELATED('Company Branch'[Company])
+    ),
+    "Report Post Date", 'GLTransaction'[Report Post Date],
+    "GLAmount Credit", 'GLTransaction'[GLAmount Credit],
+    "GLAmount Debit", 'GLTransaction'[GLAmount Debit],
+    "Ledger", 'GLTransaction'[Ledger],
+    "SubType", 'GLTransaction'[SubType],
+    "Transaction Reference", 'GLTransaction'[Transaction Reference],
+    "Transaction Type", 'GLTransaction'[Transaction Type],
+    "Transaction Number", 'GLTransaction'[Transaction Number],
+    "Organization Name", [Organization Name],
+    "Branch Name", [Branch Name],
+    "Department", [Department],
+    "Period", [Period],
+    "Company", [Company],
+    "Branch Key", GLTransaction[Branch Key],
+    "Departmant Key", GLTransaction[Department Key],
+    "Company Key", GLTransaction[Company Key Parameter],
+    "Org Key", GLTransaction[Org Key],
+    "GLD Exchange Rate", GLTransaction[GLD Exchange Rate]
+)

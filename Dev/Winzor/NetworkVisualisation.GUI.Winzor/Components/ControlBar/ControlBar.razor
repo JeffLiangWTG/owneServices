@@ -1,0 +1,36 @@
+@namespace CargoWise.NetworkVisualisation.GUI
+@using CargoWise.NetworkVisualisation.Business;
+@using CargoWise.NetworkVisualisation.Integration;
+@using Enterprise.ZArchitecture.Core;
+
+<div class="controlbar @(IsWRDPopout ? "is-wrdPopout" : "")">
+    @if(UserControl?.StatusMessage is not null)
+    {
+        <p class="controlbar__statusmessage" title=@UserControl.StatusTooltip>@UserControl.StatusMessage</p>
+    }
+    @ControlBarButton(RefreshAction)
+    @if (!IsWRDPopout)
+    {
+        @ControlBarButton(PopoutAction)
+    }
+    @ControlBarButton(FitAction)
+    @ControlBarButton(FillAction)
+    @ControlBarButton(OneHundredPercentAction)
+    <p class="controlbar__zoomlabel" title="Content Scale" aria-role="presentation">@Zoom%</p>
+    @ControlBarButton(ZoomOutAction)
+    <div class="controlbar__zoomslidecontainer">
+        <input type="range" min="10" max="200" class="controlbar__zoomslider" @bind=@Zoom @bind:after="ZoomChangedAsync" @bind:event="oninput" aria-label="Zoom (%)" @onpointerdown="BeforeZoomChangedAsync"/>
+    </div>
+    @ControlBarButton(ZoomInAction)
+</div>
+
+@code {
+
+    [Parameter] public bool IsWRDPopout { get; set; }
+
+    RenderFragment ControlBarButton(INetworkAction action) => action is not null ?
+    @<button class="controlbar__button @(IsWRDPopout ? "is-wrdPopout" : "")" @onclick="async (args) => await PerformActionAsync(action)" @onclick:stopPropagation title=@action.GetDescription()>
+        @action.GetName()
+    </button>
+    : null;
+}

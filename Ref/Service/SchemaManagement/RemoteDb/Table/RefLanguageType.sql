@@ -1,0 +1,12 @@
+CREATE TABLE RefLanguageType
+(
+[ZX6_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefLanguageType_ZX6_PK] DEFAULT(NEWID()),
+[ZX6_Language] VARCHAR(3) NOT NULL CONSTRAINT [DF_RefLanguageType_ZX6_Language] DEFAULT(''),
+[ZX6_Description] NVARCHAR(50) NOT NULL CONSTRAINT [DF_RefLanguageType_ZX6_Description] DEFAULT(''),
+
+CONSTRAINT [PK_RefLanguageType] PRIMARY KEY CLUSTERED ([ZX6_PK] ASC),
+CONSTRAINT [Constraint_ZX6_Language] CHECK (LEN([ZX6_Language])=2 OR LEN([ZX6_Language])=3)
+)
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_RefLanguageType_ZX6_Language ON RefLanguageType (ZX6_Language)
+GO

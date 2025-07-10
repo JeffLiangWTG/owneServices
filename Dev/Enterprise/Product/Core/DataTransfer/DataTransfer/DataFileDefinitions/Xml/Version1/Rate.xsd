@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Elements.xsd" />
+  <xs:include schemaLocation="RateCalculator.xsd" />
+  <xs:element name="Rates">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="Rate">
+          <xs:complexType>
+            <xs:complexContent mixed="false">
+              <xs:extension base="Rate" />
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="RateEntry">
+    <xs:sequence>
+      <xs:element name="Category" type="xs:string" />
+      <xs:element name="Mode" type="xs:string" />
+      <xs:element name="StartDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="EndDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="Currency">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="3" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element minOccurs="0" name="TransitTime" type="xs:string" />
+      <xs:element minOccurs="0" name="Frequency" type="xs:int" />
+      <xs:element minOccurs="0" name="FrequencyUnit" type="xs:string" />
+      <xs:element minOccurs="0" name="ServiceProvider" type="Organisation" />
+      <xs:element minOccurs="0" name="TransportProvider" type="Organisation" />
+      <xs:element minOccurs="0" name="Consignor" type="Organisation" />
+      <xs:element minOccurs="0" name="Consignee" type="Organisation" />
+      <xs:element minOccurs="0" name="ContractNumber" type="xs:string" />
+      <xs:element minOccurs="0" name="CartagePickupAddress" type="AddressReference" />
+      <xs:element minOccurs="0" name="CartageDeliveryAddress" type="AddressReference" />
+      <xs:element minOccurs="0" name="CartagePickupAddressPostCode" type="xs:string" />
+      <xs:element minOccurs="0" name="CartageDeliveryAddressPostCode" type="xs:string" />
+      <xs:element minOccurs="0" name="ServiceLevel" type="xs:string" />
+      <xs:element minOccurs="0" name="Units" type="xs:string" />
+      <xs:element minOccurs="0" name="Origin">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="2" />
+            <xs:maxLength value="5" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element minOccurs="0" name="Destination">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="2" />
+            <xs:maxLength value="5" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element minOccurs="0" name="Via">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="2" />
+            <xs:maxLength value="5" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element minOccurs="0" name="IsCrossTrade" type="TrueFalse" />
+      <xs:element minOccurs="0" name="ContainerType" type="ContainerType" />
+      <xs:element minOccurs="0" name="MatchContainerClass" type="TrueFalse" />
+      <xs:element minOccurs="0" name="CommodityCode" type="xs:string" />
+      <xs:element minOccurs="0" name="CarrierServiceLevel" type="xs:string" />
+      <xs:element minOccurs="0" name="RateLines">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="RateLine" type="RateLine" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Rate">
+    <xs:sequence>
+      <xs:element name="RateType" type="xs:string" />
+      <xs:element minOccurs="0" name="OwnerPK" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Quote" type="Quote" />
+      <xs:element minOccurs="0" name="CompanyTariff" type="CompanyTariff" />
+      <xs:element minOccurs="0" name="CFX" type="CFX" />
+      <xs:element minOccurs="0" name="Owner" type="Organisation" />
+      <xs:element minOccurs="0" name="RateEntries">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="RateEntry" type="RateEntry" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RateLineCondition">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="Type" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="RateLine">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Description" type="xs:string" />
+      <xs:element minOccurs="0" name="Units" type="xs:string" />
+      <xs:element minOccurs="0" name="UnitsMultiple" type="xs:decimal" />
+      <xs:element name="Currency">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="3" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="ChargeCode" type="xs:string" />
+      <xs:element minOccurs="0" name="CompanyTariffLevel" type="xs:int" />
+      <xs:element minOccurs="0" name="Condition" type="RateLineCondition" />
+      <xs:element minOccurs="0" name="UseActual" type="TrueFalse" />
+      <xs:element minOccurs="0" name="ActualPercentage" type="xs:int" />
+      <xs:element minOccurs="0" name="Rounding" type="xs:string" />
+      <xs:element minOccurs="0" name="ContainerOwnership" type="xs:string" />
+      <xs:element minOccurs="0" name="RateCalculator" type="RateCalculatorChoice" />
+      <xs:element minOccurs="0" name="TACT" type="TACT">
+        <xs:annotation>
+          <xs:documentation>This Element is used for TACT only</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+			<xs:element minOccurs="0" name="Notes" type="Notes" />
+		</xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CFX">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ImportAir" type="xs:decimal" />
+      <xs:element minOccurs="0" name="ImportSea" type="xs:decimal" />
+      <xs:element minOccurs="0" name="ExportAir" type="xs:decimal" />
+      <xs:element minOccurs="0" name="ExportSea" type="xs:decimal" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Quote">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Number" type="xs:string" />
+      <xs:element minOccurs="0" name="StartDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="EndDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="AcceptedDateTime" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CompanyTariff">
+    <xs:sequence>
+      <xs:element name="Level" type="xs:int" />
+      <xs:element minOccurs="0" name="Description" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Break">
+    <xs:sequence>
+      <xs:element name="WeightBreak" type="xs:decimal" />
+      <xs:element name="Amount" type="xs:decimal" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TACT">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Minimum" type="xs:decimal" />
+      <xs:element minOccurs="0" name="FlatAmount" type="xs:decimal" />
+      <xs:element minOccurs="0" name="PerUnit" type="xs:decimal" />
+      <xs:element minOccurs="0" name="Breaks">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="Break">
+              <xs:complexType>
+                <xs:complexContent mixed="false">
+                  <xs:extension base="Break" />
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Costing">
+    <xs:sequence>
+      <xs:element name="IsStandardCosts" type="TrueFalse" />
+      <xs:element minOccurs="0" name="StandardCostsDescription" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

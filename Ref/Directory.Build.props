@@ -1,0 +1,19 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">	
+	
+	<PropertyGroup>
+		<WTGBranchRoot>$(MSBuildThisFileDirectory)</WTGBranchRoot>
+		<BranchBuildSettingsDirectory>$(WTGBranchRoot)\BuildSettings\</BranchBuildSettingsDirectory>
+		<WTGPaketPackagesRoot>$(WTGBranchRoot)\packages</WTGPaketPackagesRoot>
+		<CodeAnalysisEnabled Condition="$(Configuration) == 'DEBUG' And !$(MSBuildProjectFullPath.Contains('EUOfficeCodeDataPopulator')) And !$(MSBuildProjectFullPath.Contains('SpecialFileHandling')) And !$(MSBuildProjectFullPath.Contains('ThirdParty')) And !$(MSBuildProjectFullPath.Contains('TaiwanReferenceData')) And !$(MSBuildProjectFullPath.Contains('ZACustomsTariffParserConsole')) And !$(MSBuildProjectFullPath.Contains('ZACustomsProcessStagingTariffsConsole')) And !$(MSBuildProjectFullPath.Contains('EUNTariffPopulator')) And !$(MSBuildProjectFullPath.Contains('EUGBCustomsMeasuresRetrieval'))">True</CodeAnalysisEnabled>
+		<CodeAnalysisRuleSet Condition="!$(MSBuildProjectFullPath.Contains('Test')) And '$(CodeAnalysisEnabled)' == 'True'">$(BranchBuildSettingsDirectory)CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+		<CodeAnalysisRuleSet Condition="$(MSBuildProjectFullPath.Contains('Test'))  And '$(CodeAnalysisEnabled)' == 'True'">$(BranchBuildSettingsDirectory)CodeAnalysisForTest.ruleset</CodeAnalysisRuleSet>
+		<WTGBuildConfigurationPath>$(WTGPaketPackagesRoot)\WTG.BuildConfiguration.Analysis\build\WTG.BuildConfiguration.Analysis.props</WTGBuildConfigurationPath>
+	</PropertyGroup>
+	
+	<!-- Nuget Package Versions -->
+	<PropertyGroup>
+		<NUnitAdaptorVersion>4.5.0</NUnitAdaptorVersion>
+	</PropertyGroup>
+
+	<Import Project="$(WTGBuildConfigurationPath)" Condition="'$(CodeAnalysisEnabled)' == 'True' And Exists('$(WTGBuildConfigurationPath)') And !$(MSBuildProjectFullPath.Contains('NOReferenceData'))"/>
+</Project>

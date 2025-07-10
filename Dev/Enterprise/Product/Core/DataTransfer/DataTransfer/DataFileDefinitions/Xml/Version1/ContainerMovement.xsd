@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.edi.com.au/EnterpriseService/" xmlns:NS="http://www.edi.com.au/EnterpriseService/" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Elements.xsd" />
+	<xs:include schemaLocation="Billing.xsd" />
+	<xs:include schemaLocation="AgencyBillOfLading.xsd" />
+
+	<xs:element name="ContainerMovements">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ContainerMovement" type="ContainerMovement" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:complexType name="ContainerMovement">
+		<xs:sequence>
+			<xs:element name="ContainerNum" type="xs:token" />
+			<xs:element name="ContainerType" type="ContainerType" />
+			<xs:element name="MovementType" type="xs:string" />
+			<xs:element name="MovementDate" type="xs:dateTime" />
+			<xs:element name="IsContainerEmpty" type="xs:boolean" minOccurs="0" />
+			<xs:element name="ContainerCondition" type="xs:token" minOccurs="0" />
+
+			<xs:element name="Depot" type="Organisation" minOccurs="0" />
+      <xs:element name="Stock" type="Stock" minOccurs="0" />
+      
+			<xs:element name="Voyage" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Vessel" type="xs:string" />
+						<xs:element name="Lloyds" type="xs:string" />
+						<xs:element name="VoyageNo" type="xs:string" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+      <xs:element name="RelatedBills" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RelatedBill" type="AgencyBillOfLading" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+  <xs:complexType name="Stock">
+    <xs:sequence>
+      <xs:element name="OwnerType" type="OwnerType" minOccurs="0"/>
+      <xs:element name="Owner" type="Organisation" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="OwnerType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="CAR"/>
+      <xs:enumeration value="LEA"/>
+      <xs:enumeration value="SHP"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>
+
+ 

@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Compile Remove="Winzor\**" />
+    <EmbeddedResource Remove="Winzor\**" />
+    <None Remove="Winzor\**" />
+    <Page Remove="Winzor\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.ApplicationContext">
+      <Aliases>CWAppContext</Aliases>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Collections.Immutable" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Memory" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreWindowsTargetFramework)' == 'true'">
+    <PackageReference Include="System.Management" />
+    <Reference Include="System.ServiceModel.Primitives" />
+    <Reference Include="WinForms.DataVisualization" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.Interop" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Internal\Notifications\Notifications.resources.resources" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Internal\Notifications\Error.ico" />
+    <Content Include="Internal\Notifications\Warning.ico" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties Notes="&lt;Notes Project=&quot;9aa2aee5-4f6b-40ff-8d89-97a255314bcc&quot; xmlns=&quot;clr-namespace:StickyNotes.Model;assembly=StickyNotes&quot;&gt;&lt;Notes.StickyNotes&gt;&lt;Note FilePath=&quot;&quot; Content=&quot;&quot; Date=&quot;2008-03-12T15:02:08.0951409+02:00&quot; /&gt;&lt;/Notes.StickyNotes&gt;&lt;/Notes&gt;" />
+    </VisualStudio>
+  </ProjectExtensions>
+  <ItemGroup>
+    <EmbeddedResource Remove="AutoList\AutoListManager.resx" />
+    <EmbeddedResource Remove="BindingSource\KBindingSource.resx" />
+    <EmbeddedResource Remove="Controls\KCheckBox.resx" />
+    <EmbeddedResource Remove="Controls\TreeView\KTreeView.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Winzor.Test\" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

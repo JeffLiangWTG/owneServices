@@ -1,0 +1,260 @@
+/*
+	Color Dialog
+*/
+
+@import "variables";
+
+.colordialog {
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	user-select: none;
+
+	&__basicpanel {
+		flex: 1 0 var(--panelminwidth);
+		display: flex;
+		flex-direction: column;
+		padding: 2px 10px 10px;
+	}
+
+	&--fullwidth {
+		grid-column-start: 1;
+		grid-column-end: 4;
+	}
+
+	&__basicpalette {
+		flex: 3 3 58%;
+	}
+
+	&__custompalette {
+		flex: 1 1 18%;
+		grid-auto-flow: column;
+		grid-template-rows: repeat(2, 1fr);
+	}
+
+	&__buttonspanel {
+		flex: 1 0 16%;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-column-gap: 4%;
+		grid-row-gap: 10%;
+	}
+
+	&__colorpalette {
+		display: grid;
+		grid-template-columns: repeat(8, 1fr);
+		grid-gap: 5px;
+		padding: 5px;
+		margin-bottom: 5%;
+	}
+
+	&__colorswatch {
+		all: unset;
+		background-color: var(--swatch-color);
+		border: 2px inset #e1e1e1;
+		position: relative;
+	}
+
+	&__colorswatch--selected {
+		outline: 1px solid black !important;
+	}
+
+	&__colorswatch--selected:focus:after {
+		content: "";
+		border: 1px dotted black;
+		position: absolute;
+		top: -5px;
+		bottom: -5px;
+		left: -5px;
+		right: -5px;
+		border-radius: 3px;
+	}
+
+	&__extendedpanel {
+		flex: 1 0 var(--panelminwidth);
+		display: flex;
+		flex-direction: column;
+		padding: 10px 10px 10px 0px;
+	}
+
+	&__properties {
+		flex: 1 1 30%;
+		display: flex;
+		justify-content: space-around;
+		padding-right: 5px;
+		margin: 2% 0;
+	}
+
+	&__propertiespanel {
+		flex: 1 1 20%;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-evenly;
+	}
+
+	&__propertiespanel:first-child {
+		align-items: center;
+	}
+
+	&__addbutton {
+		flex: 1 1 8%;
+	}
+
+	&__previewswatch {
+		width: 100%;
+		height: 60%;
+		background-color: var(--customcolorpreview, black);
+		border: 1px inset;
+	}
+
+	&__property {
+		display: flex;
+		align-items: center;
+		justify-content: end;
+
+		& > input {
+			width: 40%;
+			margin-left: 5px;
+			border: var(--textbox-border);
+		}
+
+		& > inputhover {
+			border-color: $input-border-color;
+		}
+
+		& > input:focus {
+			border-color: $input-border-color--focus;
+		}
+
+		& > input::-webkit-outer-spin-button,
+		& > input::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
+
+		& > input[type="number"] {
+			-moz-appearance: textfield;
+		}
+	}
+
+	&__colorpicker {
+		flex: 1 1 70%;
+		display: flex;
+		padding-right: 5px;
+	}
+
+	&__spectrum {
+		flex: 1 1 85%;
+		margin-right: 10%;
+		display: block;
+		position: relative;
+		overflow: hidden;
+		background:
+			linear-gradient(to bottom, transparent, hsl(0, 0%, 50%)),
+			linear-gradient(
+				to right,
+				hsl(0, 100%, 50%) 0%,
+				hsl(36, 100%, 50%) 10%,
+				hsl(72, 100%, 50%) 20%,
+				hsl(108, 100%, 50%) 30%,
+				hsl(144, 100%, 50%) 40%,
+				hsl(180, 100%, 50%) 50%,
+				hsl(216, 100%, 50%) 60%,
+				hsl(252, 100%, 50%) 70%,
+				hsl(288, 100%, 50%) 80%,
+				hsl(324, 100%, 50%) 90%,
+				hsl(360, 100%, 50%) 100%
+			);
+	}
+
+	&__spectrumguide {
+		position: relative;
+		width: 0;
+		height: 0;
+		top: calc(var(--spectrumguidetopoffset));
+		left: calc(var(--spectrumguideleftoffset));
+
+		&:before {
+			content: "";
+			position: absolute;
+			border-left: 4px solid black;
+			left: -2px;
+			height: 22px;
+			top: -11px;
+			clip-path: polygon(
+				0 0,
+				100% 0,
+				100% 30%,
+				0 30%,
+				0 100%,
+				100% 100%,
+				100% 70%,
+				0 70%
+			);
+		}
+
+		&:after {
+			content: "";
+			position: absolute;
+			border-top: 4px solid black;
+			top: -2px;
+			width: 22px;
+			left: -11px;
+			clip-path: polygon(
+				0 0,
+				0 100%,
+				30% 100%,
+				30% 0,
+				100% 0,
+				100% 100%,
+				70% 100%,
+				70% 0
+			);
+		}
+	}
+
+	&__luminance {
+		flex: 1 1 5%;
+		position: relative;
+		background: linear-gradient(
+			to bottom,
+			white,
+			var(--customcolorluminancepreview, black),
+			black
+		);
+	}
+
+	&__luminanceclickarea {
+		position: absolute;
+		height: 100%;
+		width: calc(100% + 15px);
+	}
+
+	&__luminanceguide {
+		position: absolute;
+		left: 100%;
+		width: 0;
+		height: 0;
+		bottom: calc(var(--luminanceguideoffset) - 15px);
+		border-top: 15px solid transparent;
+		border-bottom: 15px solid transparent;
+		border-right: 15px solid black;
+		pointer-events: none;
+	}
+}
+
+/*
+	Open File Dialog
+*/
+
+.openfiledialog {
+	visibility: hidden;
+}
+
+/*
+	Save File Dialog
+*/
+
+.savefiledialog {
+	visibility: hidden;
+}

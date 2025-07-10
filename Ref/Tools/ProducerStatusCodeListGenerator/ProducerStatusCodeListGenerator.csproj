@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>CargoWise.RefDbRepo.ProducerStatusCodeListGenerator</RootNamespace>
+    <AssemblyName>CargoWise.RefDbRepo.ProducerStatusCodeListGenerator</AssemblyName>
+    <Configurations>Debug;Release;UAT</Configurations>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <OutputPath>..\..\Bin\Tools\</OutputPath>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs" Link="CommonAssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.RefDbRepo.XmlProducer.Common">
+      <HintPath>..\..\Bin\Tools\net8.0\CargoWise.RefDbRepo.XmlProducer.Common.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="call $(OutDir)CargoWise.RefDbRepo.ProducerStatusCodeListGenerator.exe $(OutDir)..\..\..\Web\ReferenceDataUpdateService.Web\src" />
+  </Target>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>

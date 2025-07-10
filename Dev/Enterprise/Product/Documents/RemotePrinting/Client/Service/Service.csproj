@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreTargetFramework)</TargetFrameworks>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Enterprise.RemotePrinting.Client.Service</RootNamespace>
+    <AssemblyName>RemotePrinting.Client.Service</AssemblyName>
+    <ApplicationIcon>..\print.ico</ApplicationIcon>
+    <ApplicationManifest>..\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="NLog" >
+      <!-- Need to keep this HintPath until Client.csproj is not multi-targeted or there will be errors
+      during compilation because EventLogTarget is in another library in NetCore NLog -->
+      <HintPath>$(WTGBranchRoot)\Bin\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="RemotePrinting.Types" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.ServiceProcess" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="System.ServiceProcess.ServiceController" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Client\Client.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\App.config">
+      <Link>App.config</Link>
+    </None>
+    <None Include="..\app.manifest">
+      <Link>app.manifest</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\print.ico">
+      <Link>print.ico</Link>
+    </Content>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,68 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+    <CWGenerateXmlSerializationAssemblies>true</CWGenerateXmlSerializationAssemblies>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="Enterprise.DataTransfer" />
+    <Reference Include="Enterprise.MasterFiles.Business" />
+    <Reference Include="Enterprise.MasterFiles.Integration" />
+    <Reference Include="Resources" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.ServiceModel" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="System.ServiceModel.Http" />
+    <Reference Include="System.ServiceModel.Primitives" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="AIRSValidationService\Xsd\vr_in_1.0.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>vr_in_1.0.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="AIRSValidationService\Xsd\vr_in_2.0.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>vr_in_2.0.xsd</DependentUpon>
+    </Compile>
+    <Compile Update="AIRSValidationService\Xsd\vr_out_1.0.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>vr_out_1.0.xsd</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="AIRSValidationService\Xsd\vr_in_2.0.xsd">
+      <SubType>Designer</SubType>
+      <Generator>XsdClassGenerator</Generator>
+      <CustomToolNamespace>Enterprise.Customs.CA.Services</CustomToolNamespace>
+      <LastGenOutput>vr_in_2.0.cs</LastGenOutput>
+    </None>
+    <None Update="AIRSValidationService\Xsd\vr_in_1.0.xsd">
+      <SubType>Designer</SubType>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>vr_in_1.0.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Customs.CA.Services</CustomToolNamespace>
+    </None>
+    <None Update="AIRSValidationService\Xsd\vr_out_1.0.xsd">
+      <SubType>Designer</SubType>
+      <Generator>XsdClassGenerator</Generator>
+      <LastGenOutput>vr_out_1.0.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Customs.CA.Services</CustomToolNamespace>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\AIRSValidationService\" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

@@ -1,0 +1,86 @@
+@using CargoWiseNext.Blazor.Components
+@using Microsoft.AspNetCore.Components.Web
+@namespace CargoWise.Main.Navigation.Pages
+
+@inherits CwnComponentBase
+
+<CwnCard Class="@Classname">
+    <CwnCardHeader>
+        <CardHeaderContent>
+            <span class="cwn-recent-items__title">
+                @Service?.DisplayName
+            </span>
+        </CardHeaderContent>
+    </CwnCardHeader>
+    <CwnCardContent style="width: 100%;">
+        @if (Service?.Items?.Any() == true)
+        {
+            <table class="cwn-recent-items__table">
+                <thead class="cwn-recent-items__head">
+                    <tr>
+                        <th class="cwn-recent-items__header cwn-recent-items__icon" />
+                        <th class="cwn-recent-items__header cwn-recent-items__id">ID #</th>
+                        <th class="cwn-recent-items__header cwn-recent-items__name">Name</th>
+                        <th class="cwn-recent-items__header cwn-recent-items__module">Module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Service.Items)
+                    {
+                        <CwnElement Key=item.Key
+                            OnSingleClick="(e) => Service.PerformClickAsync(item)"
+                            Class="cwn-recent-items__item"
+                            HtmlTag="tr">
+                            <td class="cwn-recent-items__cell cwn-recent-items__icon cwn-recent-items__icon--row cwn-recent-items__cell--detailed">
+                                <CwnIconButton Icon="@(item.IsInFavorites ? Icon.StarFilled : Icon.StarEmpty)"
+                                               HoverIcon="@(Icon.StarFilled)"
+                                               Color="@(Color.Default)"
+                                               OnSingleClick="@((e) => Service.PerformFavoriteClickAsync(item))"
+                                               title="@(item.IsInFavorites ? item.RemoveFromFavoritesTooltip : item.AddToFavoriteTooltip)" />
+                            </td>
+                            <td class="cwn-recent-items__cell cwn-recent-items__id cwn-recent-items__id--row cwn-recent-items__cell--detailed">@item.ID</td>
+                            <td @oncontextmenu="(MouseEventArgs e) => Service.PerformRightClickAsync(e, item)"
+                                @oncontextmenu:stopPropagation="true"
+                                @oncontextmenu:preventDefault="true"
+                                title="@item.Name"
+                                class="cwn-recent-items__cell cwn-recent-items__name cwn-recent-items__name--row cwn-recent-items__cell--detailed">
+                                @item.Name
+                            </td>
+                            <td class="cwn-recent-items__cell cwn-recent-items__module cwn-recent-items__module--row cwn-recent-items__cell--detailed">@item.Module</td>
+
+                            <td class="cwn-recent-items__cell--compact">
+                                <div class="cwn-recent-items__cell-inner">
+                                    <div class="cwn-recent-items__cell-lines">
+                                        <div class="cwn-recent-items__cell-line">
+                                            <span title="@item.Module" class="cwn-recent-items__compact-module">@item.Module</span>
+                                            <span title="@item.ID" class="cwn-recent-items__compact-id">@item.ID</span>
+			                            </div>
+			                            <div @oncontextmenu="(MouseEventArgs e) => Service.PerformRightClickAsync(e, item)"
+			                                 @oncontextmenu:stopPropagation="true"
+			                                 @oncontextmenu:preventDefault="true"
+			                                 title="@item.Name"
+                                             class="cwn-recent-items__cell-line">
+                                            <span class="cwn-recent-items__compact-name">@item.Name</span>
+			                            </div>
+		                            </div>
+                                    <span class="cwn-recent-items__compact-icon">
+			                            <CwnIconButton
+				                            Icon="@(item.IsInFavorites ? Icon.StarFilled : Icon.StarEmpty)"
+				                            HoverIcon="@(Icon.StarFilled)"
+				                            Color="@(Color.Default)"
+				                            OnSingleClick="@((e) => Service.PerformFavoriteClickAsync(item))"
+				                            title="@(item.IsInFavorites ? item.RemoveFromFavoritesTooltip : item.AddToFavoriteTooltip)"/>
+		                            </span> <!-- Replace with your actual star icon -->
+	                            </div>
+                            </td>
+                        </CwnElement>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="cwn-recent-items__empty">@(Service?.NoItemsLabelText)</div>
+        }
+    </CwnCardContent>
+</CwnCard>

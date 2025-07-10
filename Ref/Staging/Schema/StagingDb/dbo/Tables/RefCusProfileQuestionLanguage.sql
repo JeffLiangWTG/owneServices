@@ -1,0 +1,14 @@
+CREATE TABLE RefCusProfileQuestionLanguage
+(
+	XQL_PK UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_RefCusProfileQuestionLanguage_XQL_PK DEFAULT (NEWID()),
+	XQL_XQ2_Question UNIQUEIDENTIFIER NOT NULL,
+	XQL_Name NVARCHAR(500) NOT NULL,
+	XQL_Text NVARCHAR(1000) NOT NULL,
+	XQL_Note NVARCHAR(2000) NOT NULL CONSTRAINT DF_RefCusProfileQuestionLanguage_XQL_Note DEFAULT(''),
+	XQL_ZX6_NKLanguage VARCHAR(3) NOT NULL,
+	CONSTRAINT PK_RefCusProfileQuestionLanguage PRIMARY KEY CLUSTERED (XQL_PK ASC),
+	CONSTRAINT FK_RefCusProfileQuestionLanguage_XQL_XQ2_Question FOREIGN KEY(XQL_XQ2_Question) REFERENCES RefCusProfileQuestion (XQ2_PK)
+)
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusProfileQuestionLanguage_XQL_XQ2_Question_XQL_Name_XQL_ZX6_NKLanguage ON RefCusProfileQuestionLanguage (XQL_XQ2_Question ASC, XQL_Name ASC, XQL_ZX6_NKLanguage ASC)
+GO

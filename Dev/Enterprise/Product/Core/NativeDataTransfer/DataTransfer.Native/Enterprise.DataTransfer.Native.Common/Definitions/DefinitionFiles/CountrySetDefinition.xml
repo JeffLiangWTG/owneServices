@@ -1,0 +1,36 @@
+<NativeSchemaSet Name="Country" Root="RefCountry">
+	<Entities>
+		<Entity Name="RefCountry"/>
+		<Entity Name="RefCountryRequiredDocument" Suffix="Origin" />
+		<Entity Name="RefCountryRequiredDocument" Suffix="Destination" />
+		<Entity Name="RefCountryRules" Suffix="Origin" />
+		<Entity Name="RefCountryRules" Suffix="Destination" />
+		<Entity Name="RefCountryStates" />
+		<Entity Name="RefLocoMap" />
+		<Entity Name="RefZoneHeader" />
+		<Entity Name="RefCityTown" />
+		<Entity Name="RefPostCode" />
+		<Entity Name="RefLatLongPostcode" />
+		<Entity Name="RefDomesticCartageZone" />
+		<Entity Name="RefUNLOCO">
+			<ExcludedProperty Name="RL_GeoLocation" />
+		</Entity>
+	</Entities>
+	<Associations>
+		<Association From="RefCountryRequiredDocument_Origin" To="RefCountry" Key="RD_RN_NKOrigin"/>
+		<Association From="RefCountryRequiredDocument_Destination" To="RefCountry" Key="RD_RN_NKDestination"/>
+		<Association From="RefCountryRules_Origin" To="RefCountry" Key="R7_RN_NKOrigin"/>
+		<Association From="RefCountryRules_Destination" To="RefCountry" Key="R7_RN_NKDestination"/>
+		<Association From="RefCountryStates" To="RefCountry" Key="RW_RN_NKCountryCode"/>
+		<Association From="RefLocoMap" To="RefCountry" Key="RY_RN"/>
+		<Association From="RefZoneHeader" To="RefCountry" Key="F2_ParentID" Through="RefZonePivot" ChildFK="F2_FZ"/>
+    <Association From="RefCityTown" To="RefCountryStates">
+      <AssociationKey Key="R9_RW_NKState"/>
+      <AssociationKey Key="R9_RN_NKCountry" RefKey="RW_RN_NKCountryCode"/>
+    </Association>
+		<Association From="RefPostCode" To="RefCityTown" Key="R0_R9" Through="RefCityPCodePivot" ChildFK="R0_RK"/>
+		<Association From="RefLatLongPostcode" To="RefCountryStates" Key="RJ_RW_NKState"/>
+		<Association From="RefDomesticCartageZone" To="RefCountryStates" Key="F1_RW_NKState"/>
+		<Association From="RefUNLOCO" To="RefCountry" Key="RL_RN_NKCountryCode"/>
+	</Associations>
+</NativeSchemaSet>

@@ -1,0 +1,17 @@
+using CargoWise.EntityFramework.Testing;
+
+namespace Enterprise.Customs.BR.Manifest.Business.Testing
+{
+	class AsycudaManifestHeaderLookupsTest : BusinessObjectLookupsTestCase
+	{
+		public void TestAMA_MessageStatusList()
+		{
+			var header = Factory.NewWithValidTestData<AsycudaManifestHeader>();
+			var list = header.Lookups.MessageStatusList.GetAllCodes();
+
+			AssertEquals(4, list.Length);
+			AssertContainsExactElementsInAnyOrder(new[] { "ACP", "ERR", "SNT", "CAN" }, list);
+			AssertCollectionNotContains(new[] { "NOT", "UNK", "UPD", "REG", "AWA", "WRN" }, list);
+		}
+	}
+}

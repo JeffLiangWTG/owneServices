@@ -1,0 +1,34 @@
+@using System.Windows.Forms
+@using CargoWise.ComponentModel
+@using CargoWise.Windows.UI
+@using Extensions
+@using Microsoft.AspNetCore.Components.Web
+@using WinzorFramework;
+@using WinzorFramework.Extensions
+@namespace Enterprise.ZArchitecture.GUI.Balloons
+@inherits Control
+@implements IBalloonWindow
+
+@{
+	var descriptor = Descriptor;
+	if (descriptor != null && !descriptor.IsEmpty)
+	{
+		var anchorElement = AnchorControl != null ? AnchorControl.AnchorElement : default(ElementReference);
+        <Popup AnchorElement="@anchorElement" IsBalloonPopup="true" @ref="PopupRef">
+			<div class="balloon" @onmouseout="OnMouseLeaveAsync" @onmouseout:stopPropagation @onclick="OnClickAsync" @onclick:stopPropagation>
+				<div class="balloon__content">
+					<span class="balloon__caption">@descriptor.Caption</span>
+					<p class="balloon__description">@descriptor.Description</p>
+					<ul class="balloon__items">
+						@foreach (var item in descriptor.AllUniqueNotifications ?? Enumerable.Empty<INotification>())
+						{
+							var iconBase64 = NotificationIconScheme.Instance.GetMiniImage(item.Type).ToBase64DataUrl();
+							<li style="background-image: url(@(iconBase64))" class="balloon__item--@(item.Type.EnumValueName.ToLowerHyphen())">@item.Message</li>
+						}
+					</ul>
+				</div>
+            </div>
+            <div class="arrow" />
+        </Popup>
+    }
+}

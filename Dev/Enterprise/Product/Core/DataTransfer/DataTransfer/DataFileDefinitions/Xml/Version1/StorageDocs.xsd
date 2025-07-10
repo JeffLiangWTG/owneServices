@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema"  elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Elements.xsd"/>
+	<xs:include schemaLocation="Event.xsd"/>
+	<xs:complexType name="DocumentMessage">
+		<xs:sequence>
+			<xs:element name="Document" type="Document"/>
+			<xs:element name="DocumentLink" type="DocumentLink"/>
+			<xs:element name="ReferenceKeys" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ReferenceKey" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string">
+										<xs:attribute name="ReferenceKeyName" type="ReferenceType" use="required"/>
+										<xs:attribute name="ReferenceKeyType" type="xs:string"/>
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Events" type="Events"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DocumentMessages">
+		<xs:sequence>
+			<xs:element name="DocumentMessage" type="DocumentMessage" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+  <xs:element name="DocumentMessages" type="DocumentMessages"/>
+</xs:schema>

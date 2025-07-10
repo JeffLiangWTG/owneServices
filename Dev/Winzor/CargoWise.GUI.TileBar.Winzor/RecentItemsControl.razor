@@ -1,0 +1,55 @@
+@namespace CargoWise.GUI.TileBar
+@using CargoWise.Main.Navigation
+@using Microsoft.AspNetCore.Components.Web
+@using CargoWise.Blazor.Controls
+@using System.Collections.Immutable
+
+@inherits System.Windows.Forms.UserControl
+
+<ul class="recentitemscontrol">
+    @{
+        var recentItems = RecentItemsToRender;
+    }
+    @if (recentItems != null)
+	{
+        foreach (var item in recentItems)
+		{
+			var favoriteCssClasses = "recentitemscontrol__button " + (item.IsInFavorites ? "button--module-star-active" : "button--star-inactive");
+			var text = item.IsInFavorites ? item.RemoveFromFavoritesTooltip : item.AddToFavoriteTooltip;
+			<li class="recentitemscontrol__listitem">
+				<Button Description="@text" CssClass="@favoriteCssClasses" OnClick="@(e => OnFavoriteClickAsync(e, item))"></Button>
+				<Button Description="@item.Name" Text="@item.Name" CssClass="recentitemscontrol__button button--link" OnClick="@(e => OnLinkClickAsync(e, item))"></Button>
+			</li>
+		}
+	}
+</ul>
+
+@code {
+	async Task OnFavoriteClickAsync(MouseEventArgs args, MenuItem item)
+	{
+		SetMouseData(args);
+		if (args.Button == 0)
+		{
+			await InvokeWinzorDispatcherAsync(() =>
+			{
+				item.FavoriteAction?.Execute(null);
+			});
+		}
+	}
+
+	async Task OnLinkClickAsync(MouseEventArgs args, MenuItem item)
+	{
+		SetMouseData(args);
+		await InvokeWinzorDispatcherAsync(() =>
+		{
+			if (args.Button == 2)
+			{
+				item.LinkRightClickAction?.Execute(null);
+			}
+			else
+			{
+				item.LinkAction?.Execute(null);
+			}
+		});
+	}
+}

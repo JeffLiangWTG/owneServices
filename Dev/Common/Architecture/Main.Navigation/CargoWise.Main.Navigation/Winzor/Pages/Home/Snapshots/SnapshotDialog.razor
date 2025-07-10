@@ -1,0 +1,60 @@
+@using CargoWiseNext.Blazor.Components
+@namespace CargoWise.Main.Navigation.Pages
+
+@inherits CwnComponentBase
+
+<CwnDialog @ref="dialogRef" Class="@Classname" ClassContent="@ClassnameContent">
+    <CwnCard Class="cwn-snapshots__dialog-card">
+        <CwnCardContent Class="cwn-snapshots__dialog-content">
+            <CwnLabel Text="@Service?.ModuleLabel" IsRequired="true">
+                <CwnAutocomplete ClassList="cwn-snapshots__dialog-search-list"
+                    Items="@ModuleNames"
+                    Placeholder="@Service?.ModulePlaceholder"
+                    NoResultsText="@Service?.NoModulesFoundText"
+                    EndIcon="@Icon.Search"
+                    IconSize="@Size.Medium"
+                    MaxLength="100"
+                    SearchText="@SelectedModuleName"
+                    OnItemSelected="@HandleModuleNameSelectedAsync"
+                    OnItemsVisibilityChanged="@HandleModulesVisibilityChanged"/>
+            </CwnLabel>
+            @if (ShowModuleFilter)
+            {
+                <CwnLabel Text="@Service?.ModuleFilterLabel" IsRequired="true">
+                    <CwnAutocomplete ClassList="cwn-snapshots__dialog-search-list"
+                        Items="@ModuleFilterNames"
+                        Placeholder="@Service?.ModuleFilterPlaceholder"
+                        NoResultsText="@Service?.NoLayoutFiltersFoundText"
+                        EndIcon="@Icon.Search"
+                        IconSize="@Size.Medium"
+                        MaxLength="100"
+                        SearchText="@SelectedModuleFilterName"
+                        OnItemSelected="HandleModuleFilterNameSelected"
+                        OnItemsVisibilityChanged="@HandleModuleFiltersVisibilityChanged"
+                        Disabled="@IsModuleFilterDisabled"/>
+                </CwnLabel>
+            }
+            else
+            {
+                <CwnCallout Type="CargoWiseNext.Blazor.Components.CalloutType.Info">
+                    @Service?.HowToCreateSnapshotText
+                    <CwnLink Class="cwn-snapshots__dialog-link" OnClick="@HandleOpenModuleClickAsync">@Service?.HowToCreateSnapshotLinkText</CwnLink>
+                </CwnCallout>
+            }
+        </CwnCardContent>
+        <CwnCardActions Class="cwn-snapshots__dialog-actions">
+            <CwnButton
+                Class="cwn-snapshots__dialog-button"
+                Color="Color.Brand"
+                Variant="Variant.Filled"
+                OnClick="async () => await HandleAddSnapshotClickAsync()"
+                Disabled="@IsOkButtonDisabled"
+                data-testid="ok-btn">@OkButtonText</CwnButton>
+            <CwnButton
+                Class="cwn-snapshots__dialog-button"
+                Color="Color.Default"
+                OnClick="async () => await HandleCancelClickAsync()"
+                data-testid="cancel-btn">@CancelButtonText</CwnButton>
+        </CwnCardActions>
+    </CwnCard>
+</CwnDialog>

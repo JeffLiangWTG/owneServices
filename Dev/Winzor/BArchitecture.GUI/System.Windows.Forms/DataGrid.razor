@@ -1,0 +1,196 @@
+@namespace System.Windows.Forms
+@using System.ComponentModel
+@using WinzorFramework
+@using WinzorFramework.Enums
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.JSInterop
+@using WebMouseEventArgs = Microsoft.AspNetCore.Components.Web.MouseEventArgs;
+@inherits Control
+
+@{
+    var localColumns = dataGridViewModel.Columns.ToArray();
+    var localRows = dataGridViewModel.Rows.ToArray();
+}
+
+<div class="datagrid" style="@LookStyleString" @attributes="DataAttributes" tabindex="@TabIndex" @ref="ElementReference" @onmousedown=OnMouseDown @onmousedown:stopPropagation @oncontextmenu=OnContextMenu @oncontextmenu:stopPropagation @oncontextmenu:preventDefault @onwinzorfocusin="OnFocusInAsync" @onwinzorfocusin:stopPropagation @onmouseup=OnMouseUp @onmouseup:stopPropagation data-client-side-event-handlers=@ClientSideEventHandlers
+    data-allow-paste="@AllowWinzorPaste.ToString().ToLower()" @onwinzorpaste="OnWinzorPasteAsync" @onwinzorpaste:stopPropagation @onwinzorpaste:preventDefault>
+    <div class="datagrid__notification" @onmousedown=OnFirstCellMouseDown @onmousedown:stopPropagation>
+        <ControlProxyComponent Control=NotificationIcon @key=NotificationIcon.WinzorControlGuid />
+        @if (ErrorProvider != null)
+        {
+            <ControlProxyComponent Control=ErrorProvider @key=ErrorProvider.WinzorControlGuid />
+        }
+    </div>
+	<div class="datagrid__container" style="height:@(tableHeight)px">
+        <table>
+            <thead>
+                <tr>
+					<th style="width:@(HeaderWidth)px;height:@(HeaderHeight)px" @onmousedown=OnFirstCellMouseDown @onmousedown:stopPropagation @oncontextmenu=OnFirstCellContextMenu @oncontextmenu:stopPropagation @oncontextmenu:preventDefault>
+                        @if (GridLayoutConfigurable)
+                        {
+                            <div @onmousedown="@(e => OnMouseDownAsync(e, new HitTestInfo() { type = HitTestType.ColumnHeader, row = -1, col =-1 }))" @onmousedown:stopPropagation class="datagrid__columns_dropdown"></div>
+                        }
+                    </th>
+                    @foreach (var (columnStyle, index, headerText, sortDirection) in localColumns)
+                    {
+                        <DataGridColumnHeader
+                            ColumnStyle="columnStyle"
+                            ColumnIndex="index"
+                            HeaderText="@headerText"
+                            SortDirection="sortDirection"
+                            DragStart="OnHeaderDragStart"
+                            Drop="OnHeaderDrop"
+                            ContextMenu="OnHeaderContextMenu"
+                            MouseDown=OnHeaderMouseDown
+                            MouseUp=OnHeaderMouseUp />
+                    }
+                </tr>
+            </thead>
+            <tbody>
+				@*
+					only render rows that are either in visible range or currently being edited
+					Editing row is always rendered to maintain its states, it needs to be hidden when its outside of visible row range
+				*@
+				@if (editRow is not null && editRow.RowNumber < firstVisibleRow)
+				{
+					editRow.RowHidden = true;
+					<ControlProxyComponent Control="editRow" @key=editRow.WinzorControlGuid />
+				}
+				@for (var rowIndex = firstVisibleRow; rowIndex < firstVisibleRow + visibleRowCount && rowIndex < localRows.Length; rowIndex++)  //only need to Render Visible rows, we don't need to loop through all the rows
+                {
+					var row = localRows[rowIndex];
+					row.RowHidden = false;
+					<ControlProxyComponent Control="row" @key=row.WinzorControlGuid />
+                }
+				@if (editRow is not null && editRow.RowNumber >= firstVisibleRow + visibleRowCount)
+				{
+					editRow.RowHidden = true;
+					<ControlProxyComponent Control="editRow" @key=editRow.WinzorControlGuid />
+				}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+	static HitTestInfo HitNone => new() { type = HitTestType.None, col = -1, row = -1 };
+
+	static HitTestInfo HitFirstCell => new() { type = HitTestType.ColumnHeader | HitTestType.RowHeader, col = -1, row = -1 };
+
+	async Task OnMouseDown(WebMouseEventArgs args)
+	{
+		await OnMouseDownAsync(args, HitNone);
+	}
+
+	async Task OnContextMenu(WebMouseEventArgs args)
+	{
+		await OnContextMenuAsync(args, HitNone);
+	}
+
+	async Task OnMouseUp(WebMouseEventArgs args)
+	{
+		await OnMouseUpAsync(args, HitNone);
+	}
+
+	async Task OnFirstCellMouseDown(WebMouseEventArgs args)
+	{
+		await OnMouseDownAsync(args, HitFirstCell);
+	}
+
+	async Task OnFirstCellContextMenu(WebMouseEventArgs args)
+	{
+		await OnContextMenuAsync(args, HitFirstCell);
+	}
+
+	async Task OnHeaderMouseDown(DataGridColumnHeader.MouseEventArgs args)
+	{
+		await OnMouseDownAsync(args.Args, args.HitTest, args.Column);
+	}
+
+	async Task OnHeaderMouseUp(DataGridColumnHeader.MouseEventArgs args)
+	{
+		await OnMouseUpAsync(args.Args, args.HitTest, args.Column);
+	}
+
+	async Task OnHeaderContextMenu(DataGridColumnHeader.MouseEventArgs args)
+	{
+		await OnContextMenuAsync(args.Args, args.HitTest, args.Column);
+	}
+
+	async Task OnHeaderDragStart(DataGridColumnHeader.DragEventArgs args)
+	{
+		await OnDragStartAsync(args.Args, args.HitTest, args.Column);
+	}
+
+	async Task OnHeaderDrop(DataGridColumnHeader.DragEventArgs args)
+	{
+		await OnDropAsync(args.Args, args.HitTest, args.Column);
+	}
+
+	[JSInvokable("SelectRows")]
+	public async Task SelectRowsAsync(int selectedRowMin, int selectedRowMax)
+	{
+		if (selectedRowMin < 0 || selectedRowMin > selectedRowMax || selectedRowMax >= DataGridRowsLength)
+		{
+			return;
+		}
+
+		await InvokeWinzorDispatcherAsync(() =>
+		{
+			ResetSelection();
+			var localGridRows = DataGridRows;
+			for (var i = selectedRowMin; i <= selectedRowMax; i++)
+			{
+				localGridRows[i].Selected = true;
+				numSelectedRows++;
+			}
+		});
+	}
+
+	[JSInvokable("SetColumnSize")]
+	public async Task SetColumnSize(int columnIndex, int newWidth)
+	{
+		await InvokeWinzorDispatcherAsync(() =>
+		{
+			var localColumns = dataGridViewModel.Columns;
+			if (columnIndex > -1 && columnIndex < localColumns.Length)
+			{
+				var column = localColumns[columnIndex];
+				column.ColumnStyle.Width = newWidth;
+				UpdateProperty(ref dataGridViewModel, new DataGridViewModel(GetDataGridColumnViewModels(), DataGridRows));
+
+				firstVisibleCol = ComputeFirstVisibleColumn();
+				ComputeVisibleColumns();
+
+				ScrollDown(currentRow);
+
+				if (editRow != null && editColumn != null)
+				{
+					Edit();
+				}
+			}
+		});
+	}
+
+	[JSInvokable("OnScrollAsync")]
+	public virtual async Task OnScrollAsync(float scrollTop, float scrollLeft)
+	{
+		await InvokeWinzorDispatcherAsync(() =>
+		{
+			OnVerticalScroll(scrollTop);
+			OnHorizontalScroll(scrollLeft);
+		});
+	}
+
+	[JSInvokable("OnScrollbarsChangedAsync")]
+	public async Task OnScrollbarsChangedAsync(bool vScroll, bool hScroll)
+	{
+		await InvokeWinzorDispatcherAsync(() =>
+		{
+			VertScrollBar.Visible = vScroll;
+			HorizScrollBar.Visible = hScroll;
+		});
+	}
+
+	protected internal virtual int ClientSideEventHandlers => (int)ElementEventHandlers.GridUpdateTextAreaHeightWhenFocusin;
+}

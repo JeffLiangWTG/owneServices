@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+	<xs:element name="Schema">
+	</xs:element>
+
+	<xs:element name="Base64">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="InputHash" maxOccurs="unbounded" minOccurs="0">
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute type="xs:string" name="id" use="optional"/>
+								<xs:attribute type="xs:string" name="hashAlgorithm" use="optional"/>
+								<xs:attribute type="xs:string" name="responseSigType" use="optional"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="SignDocReq">
+		<xs:complexType>
+			<xs:all>
+				<xs:element type="xs:string" name="Docs"/>
+			</xs:all>
+			<xs:attribute type="xs:string" name="version"/>
+			<xs:attribute type="xs:string" name="ts"/>
+			<xs:attribute type="xs:string" name="txn"/>
+			<xs:attribute type="xs:string" name="clientID"/>
+			<xs:attribute type="xs:string" name="keyID"/>
+			<xs:attribute type="xs:string" name="accessKeyhash"/>
+			<xs:attribute type="xs:string" name="partnerID"/>
+			<xs:attribute type="xs:string" name="partnerAccessKey"/>
+			<xs:attribute type="xs:string" name="sessionKey"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="SignDocResp">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="DocSignatures">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="DocSignature" maxOccurs="unbounded" minOccurs="0">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:base64Binary">
+											<xs:attribute name="id" type="xs:string" use="required" />
+											<xs:attribute name="sigHashAlgorithm" type="xs:string" use="required" />
+											<xs:attribute name="docErrorCode" type="xs:string" use="required" />
+											<xs:attribute name="docErrorMessage" type="xs:string" use="required" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="version" type="xs:string" use="required" />
+			<xs:attribute name="status" type="xs:string" use="required" />
+			<xs:attribute name="ts" type="xs:string" use="required" />
+			<xs:attribute name="respCode" type="xs:string" use="required" />
+			<xs:attribute name="txn" type="xs:string" use="required" />
+			<xs:attribute name="errorCode" type="xs:string" use="required" />
+			<xs:attribute name="errorMessage" type="xs:string" use="required" />
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

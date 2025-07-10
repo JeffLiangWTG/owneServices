@@ -1,0 +1,57 @@
+@using WinzorFramework.JSInterop;
+@using Microsoft.JSInterop;
+@namespace WinzorFramework
+@inject IJSRuntime jsRuntime
+
+<div class="popup" @ref="PopupElement">
+    @ChildContent
+</div>
+
+@code {
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
+
+	[Parameter]
+	public ElementReference AnchorElement { get; set; }
+
+	[Parameter]
+	public bool IsBalloonPopup { get; set; } = false;
+
+	[Inject]
+	public IPopupJSInterop? Interop { get; set; }
+
+	ElementReference PopupElement;
+
+	protected override void OnInitialized()
+	{
+		Interop?.PreloadInterop();
+	}
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+
+        if (firstRender)
+        {
+            if (!AnchorElement.Equals(default(ElementReference)) && Interop is not null)
+            {
+                jsObjectReference = await Interop.AttachPopupAsync(PopupElement, AnchorElement);
+                if (IsBalloonPopup)
+                {
+                    OpenedBalloonPopup = this;
+                }
+                else if (OpenedBalloonPopup is not null)
+                {
+                    await Interop.AttachPopupAsync(OpenedBalloonPopup.PopupElement, OpenedBalloonPopup.AnchorElement);
+                }
+            }
+			else
+			{
+				return;
+			}
+
+			IsRendered = true;
+		}
+	}
+}

@@ -1,0 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.Testing.GlbDepartmentUpgradeTaskTest.TestDeleteOrInactivateUnmatchingSystemRows")] // Database/Odyssey/Data/Public/GlbDepartment.Test/GlbDepartmentUpgradeTaskTest.cs:100,3
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.Testing.GlbDepartmentDataFileTest.TestUserRowsAreNotLoaded")] // Database/Odyssey/Data/Public/GlbDepartment.Test/GlbDepartmentDataFileTest.cs:33,3
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.Testing.GlbDepartmentDataFileTest.TestGlbDepartmentDataFile")] // Database/Odyssey/Data/Public/GlbDepartment.Test/GlbDepartmentDataFileTest.cs:16,3

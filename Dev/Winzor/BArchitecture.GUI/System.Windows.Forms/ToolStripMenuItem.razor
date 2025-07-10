@@ -1,0 +1,60 @@
+@namespace System.Windows.Forms
+@inherits ToolStripDropDownItem
+@using WinzorFramework.Extensions
+@using System.Drawing
+
+<button class="toolstrip__menuitem" style="@ButtonStyle()" disabled="@(!Enabled)" @attributes="DataAttributes" @onclick="OnClickAsync" @onclick:stopPropagation>
+    @if (Image is not null)
+    {
+        <div class="toolstrip__menuitem-image-container" style="@ImageStyle()">
+            <img class="toolstrip__menuitem-image" alt="" src="@Image.ToBase64DataUrl()" style="@this.ToolStripItemImageStyleString()" />
+        </div>
+    }
+
+    <div class="toolstrip__menuitem-text" style="@TextStyle() @WritingModeStyle()">
+        @Text.ProcessMnemonicToHtml(true)
+    </div>
+</button>
+
+@code {
+    string WritingModeStyle()
+    {
+        if (TextDirection == ToolStripTextDirection.Vertical90 ||
+            TextDirection == ToolStripTextDirection.Vertical270)
+        {
+            return "writing-mode: vertical-rl;";
+        }
+
+        return string.Empty;
+    }
+
+    string TextStyle()
+    {
+        var textBounds = InternalLayout.LayoutData.TextBounds;
+        var textStyle = $"left:{textBounds.Left}px;top:{textBounds.Top}px;width:{textBounds.Width}px;height:{textBounds.Height}px;";
+
+        return textStyle;
+    }
+
+	string ImageStyle()
+	{
+		var imageBounds = InternalLayout.LayoutData.ImageBounds;
+		return $"left:{imageBounds.Left}px;top:{imageBounds.Top}px;width:{imageBounds.Width}px;height:{imageBounds.Height}px;";
+	}
+
+	string ButtonStyle()
+	{
+		var textStyle = ControlStyleString;
+		textStyle += Font.Style switch
+		{
+			FontStyle.Regular => "font-weight: normal;",
+			FontStyle.Bold => "font-weight: bold;",
+			FontStyle.Italic => "font-style: italic;",
+			FontStyle.Underline => "text-decoration: underline;",
+			FontStyle.Strikeout => "text-decoration: line-through;",
+			_ => "font-weight: normal;",
+		};
+
+		return textStyle;
+	}
+}

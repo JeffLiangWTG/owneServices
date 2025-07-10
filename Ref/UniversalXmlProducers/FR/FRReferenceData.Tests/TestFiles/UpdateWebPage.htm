@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+<script type="text/javascript">
+	$(function() {
+	      
+	});
+</script>
+
+<script type="text/javascript" src="/rita-encyclopedie/js/jquery.tablesorter.min.js" ></script>
+<script type="text/javascript" src="/rita-encyclopedie/js/jquery.tablesorter.widgets.min.js" ></script>
+<script type="text/javascript">
+function apresAppelAjaxRecherche() {
+    afficherDivElement("resultatRechercheMesures");
+    masquerDivElement("divRecherche");
+    masquerDivElement("wait");
+    
+    afficherDivElement('ariane_span_resultat');
+    afficherDivElement('ariane_a_recherche');
+    masquerDivElement("ariane_span_recherche");
+}
+function rechargerTableau() {
+    var div = document.getElementById("affichageColonnesDivTemp");
+    if(div!=null){
+        div.parentNode.removeChild(div);
+    }
+}
+function avantRechargerTableau(form) {
+    var div = document.getElementById("listeResultatMesureDiv");
+    var divAff = document.getElementById("affichageColonnesDiv");
+    if (div!=null){
+        form.appendChild(div);
+    }
+    if (divAff!=null){
+        divAff.id = "affichageColonnesDivTemp";
+        form.appendChild(divAff);
+    }
+}
+</script>
+<script type="text/javascript">
+$(document).ready(function () {
+    masquerDivElement('divRecherche');
+    afficherDivElement('resultatRechercheMesures');
+	   masquerColonne('resultatSuiviMesures', 8, this,'chk_paysexclus');
+	    masquerColonne('resultatSuiviMesures', 9, this,'chk_reglement');
+	    masquerColonne('resultatSuiviMesures', 11, this,'chk_renvois');
+	    masquerColonne('resultatSuiviMesures', 12, this,'chk_numordre');
+	    masquerColonne('resultatSuiviMesures', 13, this,'chk_zoneappli');
+	    
+	    
+	    masquerDivElement("tableauRecharge");
+	
+    $("#resultatSuiviMesures").tablesorter({
+        headers: {
+            0: {lockedOrder: 'asc', sorter: 'text'},
+            1: {lockedOrder: 'asc', sorter: 'text'},
+            2: {lockedOrder: 'asc', sorter: 'text'},
+            3: {lockedOrder: 'asc', sorter: 'text'},
+            4: {lockedOrder: 'asc', sorter: 'text'},
+            5: {lockedOrder: 'asc', sorter: 'text'},
+            6: {sorter: false},
+            7: {sorter: false},
+            8: {sorter: false},
+            9: {lockedOrder: 'asc', sorter: 'text'},
+            10: {sorter: false},
+            11: {sorter: false},
+            12: {sorter: false},
+            13: {sorter: false}
+        },
+        widgets: ["zebra", "columns"],
+        widgetOptions: {
+            zebra: ["ligne1", "ligne2"],
+            columns : ["primary", "secondary", "tertiary", ""],
+            columns_thead : true
+        },
+        sortList: [[0,0]],
+        textExtraction : "complex"
+        
+    });
+ 
+    
+});
+</script>
+<title></title>
+</head>
+<body>
+    
+<ul class="Title2">
+	<li>R�sum� de la recherche :<input id="ouvrir_resume" class="picto visu" type="button"
+		onclick="afficherDivElement('fermer_resume');afficherDivElement('recapitulatifResultats');masquerDivElement('ouvrir_resume');"
+		style=""> <input id="fermer_resume" class="picto fermer"
+		type="button"
+		onclick="afficherDivElement('ouvrir_resume');masquerDivElement('recapitulatifResultats');masquerDivElement('fermer_resume');"
+		style="display: none;"></li>
+</ul>
+<div id="recapitulatifResultats" style="display: none;">
+	<table class="recapitulatif" cellspacing="0" style="width: 250px">
+		<thead>
+			<tr>
+				<th>RECAPITULATIF DES CRITERES SAISIS</th>
+			</tr>
+		</thead>
+		<tbody>
+
+			<tr>
+				<th>P�riode</th>
+			</tr>
+			<tr>
+					<td><span class="valeurCritere"> 01/07/2022 - 01/07/2022</span></td>
+				</tr>
+			<tr>
+					<th>Domaine</th>
+				</tr>
+				<tr>
+					<td><span class="valeurCritere"> Domaines des fiscalit&eacute;s (TVA, taxes...)</span></td>
+				</tr>
+			<tr>
+					<th>Chapitre</th>
+				</tr>
+				<tr>
+						<td><span class="valeurCritere"> 38</span></td>
+					</tr>
+				<tr>
+				<th>Mode de recherche</th>
+			</tr>
+			<tr>
+				<td><span class="valeurCritere"> Modifi&eacute;es</span></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<table id="colonnesOptionnelles">
+	<tbody>
+		<tr>
+			<td>Colonnes optionnelles :</td>
+			<td>
+					 Pays exclus<input
+					 
+				id="chk_paysexclus"
+				type="checkbox"
+				onclick="masquerColonne('resultatSuiviMesures', 8, this)"></td>
+			<td>
+                    R�glement<input 
+					
+				id="chk_reglement" type="checkbox"
+				onclick="masquerColonne('resultatSuiviMesures', 9, this)"></td>
+			<td>
+                    
+			Renvois<input
+					
+				id="chk_renvois" type="checkbox"
+				onclick="masquerColonne('resultatSuiviMesures', 11, this)"></td>
+			<td>
+			N� contingent<input
+					
+				id="chk_numordre" type="checkbox"
+				onclick="masquerColonne('resultatSuiviMesures', 12, this)"></td>
+			<td>
+			Zone application<input
+				 
+				id="chk_zoneappli" type="checkbox"
+				onclick="masquerColonne('resultatSuiviMesures', 13, this)"></td>
+		</tr>
+	</tbody>
+</table>
+<ul class="Title2">
+		<li>R�sultat de la recherche&nbsp;:&nbsp;11&nbsp;mesures trouv�es.</li>
+	</ul>
+	<div id="tableauRecharge"></div>
+	<div id="tableau">
+	<table id="resultatSuiviMesures" class="resultat tablesorter tablesorter-default hasSaveSort" style="width:100%;table-layout:auto;">
+	   <thead>
+		<tr>
+		    <th id="tabResulTr1" style="cursor: pointer;" onclick="triTableau('resultatSuiviMesures', 'th.primary', 'th.secondary', 'th.tertiary', this);">Nomenclature</th>
+		    <th id="tabResulTr2" style="cursor: pointer;" onclick="triTableau('resultatSuiviMesures', 'th.primary', 'th.secondary', 'th.tertiary', this);">Code additionnel</th>
+		    <th id="tabResulTr3" style="cursor: pointer;" onclick="triTableau('resultatSuiviMesures', 'th.primary', 'th.secondary', 'th.tertiary', this);">Type</th>
+		    <th id="tabResulTr4" style="cursor: pointer;" onclick="triTableau('resultatSuiviMesures', 'th.primary', 'th.secondary', 'th.tertiary', this);">D�but</th>
+		    <th id="tabResulTr5" style="cursor: pointer;" onclick="triTableau('resultatSuiviMesures', 'th.primary', 'th.secondary', 'th.tertiary', this);">Fin</th>
+		    <th id="tabResulTr6" style="cursor: pointer;" onclick="triTableau('resultatSuiviMesures', 'th.primary', 'th.secondary', 'th.tertiary', this);">origine / destination</th>
+		    <th id="tabResulTr7">Composants</th>
+		    <th id="tabResulTr8">Pays exclus</th>
+		    <th id="tabResulTr9">R�glement</th>
+		    <th id="tabResulTr10" style="cursor: pointer;" onclick="triTableau('resultatSuiviMesures', 'th.primary', 'th.secondary', 'th.tertiary', this);">Territoire</th>
+		    <th id="tabResulTr11">Renvois</th>
+		    <th id="tabResulTr12">N� contingent</th>
+		    <th id="tabResulTr13">Zone appli.</th>
+		    <th id="tabResulTr14"></th>
+	    </tr>
+	    </thead>
+	    <tbody>
+	    <tr 
+		      
+		    >
+			    <td>
+			         3824999266<a onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoiNomenc.action?sidNomenclatureRenvoi=3824999266&amp;dateJour=01%2F07%2F2022','');" title="Cliquez ici pour voir les renvois associ�s � cette nomenclature (TN -701  ,TN -701  ,TN -702  )">Renvoi</a>
+                   </td>
+                <td>
+                <span title="super&eacute;thanol E85 compos&eacute; d'un minimum de 65 pourcent d'alcool &eacute;thylique et d'un minimum de 15 pourcent de supercarburant, destin&eacute; &agrave; &ecirc;tre utilis&eacute; comme carburant">
+	                      U152</span>
+	                  <sup title="national">(cana)</sup>
+	                  </td>
+                <td>
+                    <span title="R&eacute;mun&eacute;ration au profit du Comit&eacute; Professionnel des Stocks Strat&eacute;giques P&eacute;troliers (CPSSP)">RCP</span>
+                </td>
+                <td>
+                    <span style="font-weight: bold;">01/07/2022</span>
+                    </td>
+                <td>
+                    </td>
+                <td>
+                    <span title="UE + pays tiers + DOM">FR01</span>
+                </td>
+                <td>
+                
+                <span class="valeur Vcondition">
+
+
+
+   <span style="margin:2px;">
+            0,45<span title="EURO">
+                                EUR</span>
+                        
+                    /
+                    <span title="Hectolitre">
+                            HLT</span>
+                    </span>
+    
+    </span></td>
+                <td>
+	                </td>
+                <td>                
+                <a onclick="ouvrirFenetreReglement('','reglement');lienReglement('N9300001');" >
+                    N9300001</a>
+                <form id="reglementFormN9300001" name="reglementFormN9300001" action="/rita-encyclopedie/public/experts/bases/init.action" target="reglement" method="post"><input type="hidden" name="idReglementExt" value="N9300001" id="reglementFormN9300001_idReglementExt"/></form>
+
+
+</td>
+                <td>
+                    METRO</td>
+                <td>
+                <a  onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoi.action?sidRenvoi=-5068&amp;idRenvoi=507&amp;idTypeRenvoi=53','');">Renvoi</a>
+                </td>
+                <td>
+                </td>
+                <td>
+                    </td>
+                <td>
+                    <a onclick="ouvrirFenetre('/rita-encyclopedie/public/core/mesure/affichDetailMesure.action?sid=-855510&amp;date=01%2F07%2F22&amp;nomenclature=3824999266','')">
+                        d�tail
+                    </a>
+                </td>
+                
+		    </tr>
+	    <tr 
+		      
+		    >
+			    <td>
+			         3824999294<a onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoiNomenc.action?sidNomenclatureRenvoi=3824999294&amp;dateJour=01%2F07%2F2022','');" title="Cliquez ici pour voir les renvois associ�s � cette nomenclature (TN -701  ,TN -701  ,TN -702  )">Renvoi</a>
+                   </td>
+                <td>
+                <span title="produits destin&eacute;s &agrave; &ecirc;tre utilis&eacute;s comme combustible.">
+	                      U101</span>
+	                  <sup title="national">(cana)</sup>
+	                  </td>
+                <td>
+                    <span title="Taxe int&eacute;rieure sur les produits p&eacute;troliers">TIP</span>
+                </td>
+                <td>
+                    <span style="font-weight: bold;">01/07/2022</span>
+                    </td>
+                <td>
+                    </td>
+                <td>
+                    <span title="UE + pays tiers + DOM">FR01</span>
+                </td>
+                <td>
+                
+                <span class="valeur Vcondition">
+
+
+
+   <span style="margin:2px;">
+            <span title="Produit de substitution">
+                    SUBST&nbsp;
+                    
+                    <!-- Rajout pour enlever le % au niveau des sigles -->
+                       <!--    -->
+                        %
+                       <!--   -->
+                        </span>
+            </span>
+    
+    </span></td>
+                <td>
+	                </td>
+                <td>                
+                <a onclick="ouvrirFenetreReglement('','reglement');lienReglement('N0500033');" >
+                    N0500033</a>
+                <form id="reglementFormN0500033" name="reglementFormN0500033" action="/rita-encyclopedie/public/experts/bases/init.action" target="reglement" method="post"><input type="hidden" name="idReglementExt" value="N0500033" id="reglementFormN0500033_idReglementExt"/></form>
+
+
+</td>
+                <td>
+                    METRO</td>
+                <td>
+                <a  onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoi.action?sidRenvoi=-5067&amp;idRenvoi=505&amp;idTypeRenvoi=53','');">Renvoi</a>
+                </td>
+                <td>
+                </td>
+                <td>
+                    </td>
+                <td>
+                    <a onclick="ouvrirFenetre('/rita-encyclopedie/public/core/mesure/affichDetailMesure.action?sid=-855515&amp;date=01%2F07%2F22&amp;nomenclature=3824999294','')">
+                        d�tail
+                    </a>
+                </td>
+                
+		    </tr>
+	    <tr 
+		      
+		    >
+			    <td>
+			         3824999295<a onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoiNomenc.action?sidNomenclatureRenvoi=3824999295&amp;dateJour=01%2F07%2F2022','');" title="Cliquez ici pour voir les renvois associ�s � cette nomenclature (TN -701  ,TN -701  ,TN -702  )">Renvoi</a>
+                   </td>
+                <td>
+                <span title="produits destin&eacute;s &agrave; &ecirc;tre utilis&eacute;s comme combustible.">
+	                      U101</span>
+	                  <sup title="national">(cana)</sup>
+	                  </td>
+                <td>
+                    <span title="Taxe int&eacute;rieure sur les produits p&eacute;troliers">TIP</span>
+                </td>
+                <td>
+                    <span style="font-weight: bold;">01/07/2022</span>
+                    </td>
+                <td>
+                    </td>
+                <td>
+                    <span title="UE + pays tiers + DOM">FR01</span>
+                </td>
+                <td>
+                
+                <span class="valeur Vcondition">
+
+
+
+   <span style="margin:2px;">
+            <span title="Produit de substitution">
+                    SUBST&nbsp;
+                    
+                    <!-- Rajout pour enlever le % au niveau des sigles -->
+                       <!--    -->
+                        %
+                       <!--   -->
+                        </span>
+            </span>
+    
+    </span></td>
+                <td>
+	                </td>
+                <td>                
+                <a onclick="ouvrirFenetreReglement('','reglement');lienReglement('N0500033');" >
+                    N0500033</a>
+                <form id="reglementFormN0500033" name="reglementFormN0500033" action="/rita-encyclopedie/public/experts/bases/init.action" target="reglement" method="post"><input type="hidden" name="idReglementExt" value="N0500033" id="reglementFormN0500033_idReglementExt"/></form>
+
+
+</td>
+                <td>
+                    METRO</td>
+                <td>
+                <a  onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoi.action?sidRenvoi=-5067&amp;idRenvoi=505&amp;idTypeRenvoi=53','');">Renvoi</a>
+                </td>
+                <td>
+                </td>
+                <td>
+                    </td>
+                <td>
+                    <a onclick="ouvrirFenetre('/rita-encyclopedie/public/core/mesure/affichDetailMesure.action?sid=-855519&amp;date=01%2F07%2F22&amp;nomenclature=3824999295','')">
+                        d�tail
+                    </a>
+                </td>
+                
+		    </tr>
+	    <tr 
+		      
+		    >
+			    <td>
+			         3824999294<a onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoiNomenc.action?sidNomenclatureRenvoi=3824999294&amp;dateJour=01%2F07%2F2022','');" title="Cliquez ici pour voir les renvois associ�s � cette nomenclature (TN -701  ,TN -701  ,TN -702  )">Renvoi</a>
+                   </td>
+                <td>
+                <span title="produits destin&eacute;s &agrave; &ecirc;tre utilis&eacute;s autrement que comme carburants ou combustibles">
+	                      U111</span>
+	                  <sup title="national">(cana)</sup>
+	                  </td>
+                <td>
+                    <span title="Taxe int&eacute;rieure sur les produits p&eacute;troliers">TIP</span>
+                </td>
+                <td>
+                    <span style="font-weight: bold;">01/07/2022</span>
+                    </td>
+                <td>
+                    </td>
+                <td>
+                    <span title="UE + pays tiers + DOM">FR01</span>
+                </td>
+                <td>
+                
+                <span class="valeur Vcondition">
+
+
+
+   <span style="margin:2px;">
+            <span title="Non application">
+                        NAPPL&nbsp;
+                    </span> 
+                </span>
+    
+    </span></td>
+                <td>
+	                </td>
+                <td>                
+                <a onclick="ouvrirFenetreReglement('','reglement');lienReglement('N0500033');" >
+                    N0500033</a>
+                <form id="reglementFormN0500033" name="reglementFormN0500033" action="/rita-encyclopedie/public/experts/bases/init.action" target="reglement" method="post"><input type="hidden" name="idReglementExt" value="N0500033" id="reglementFormN0500033_idReglementExt"/></form>
+
+
+</td>
+                <td>
+                    METRO</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                    </td>
+                <td>
+                    <a onclick="ouvrirFenetre('/rita-encyclopedie/public/core/mesure/affichDetailMesure.action?sid=-855516&amp;date=01%2F07%2F22&amp;nomenclature=3824999294','')">
+                        d�tail
+                    </a>
+                </td>
+                
+		    </tr>
+	    <tr 
+		      
+		    >
+			    <td>
+			         3824999295<a onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoiNomenc.action?sidNomenclatureRenvoi=3824999295&amp;dateJour=01%2F07%2F2022','');" title="Cliquez ici pour voir les renvois associ�s � cette nomenclature (TN -701  ,TN -701  ,TN -702  )">Renvoi</a>
+                   </td>
+                <td>
+                <span title="produits destin&eacute;s &agrave; &ecirc;tre utilis&eacute;s autrement que comme carburants ou combustibles">
+	                      U111</span>
+	                  <sup title="national">(cana)</sup>
+	                  </td>
+                <td>
+                    <span title="Taxe int&eacute;rieure sur les produits p&eacute;troliers">TIP</span>
+                </td>
+                <td>
+                    <span style="font-weight: bold;">01/07/2022</span>
+                    </td>
+                <td>
+                    </td>
+                <td>
+                    <span title="UE + pays tiers + DOM">FR01</span>
+                </td>
+                <td>
+                
+                <span class="valeur Vcondition">
+
+
+
+   <span style="margin:2px;">
+            <span title="Non application">
+                        NAPPL&nbsp;
+                    </span> 
+                </span>
+    
+    </span></td>
+                <td>
+	                </td>
+                <td>                
+                <a onclick="ouvrirFenetreReglement('','reglement');lienReglement('N0500033');" >
+                    N0500033</a>
+                <form id="reglementFormN0500033" name="reglementFormN0500033" action="/rita-encyclopedie/public/experts/bases/init.action" target="reglement" method="post"><input type="hidden" name="idReglementExt" value="N0500033" id="reglementFormN0500033_idReglementExt"/></form>
+
+
+</td>
+                <td>
+                    METRO</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                    </td>
+                <td>
+                    <a onclick="ouvrirFenetre('/rita-encyclopedie/public/core/mesure/affichDetailMesure.action?sid=-855520&amp;date=01%2F07%2F22&amp;nomenclature=3824999295','')">
+                        d�tail
+                    </a>
+                </td>
+                
+		    </tr>
+	    <tr 
+		      
+		    >
+			    <td>
+			         3824999294<a onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoiNomenc.action?sidNomenclatureRenvoi=3824999294&amp;dateJour=01%2F07%2F2022','');" title="Cliquez ici pour voir les renvois associ�s � cette nomenclature (TN -701  ,TN -701  ,TN -702  )">Renvoi</a>
+                   </td>
+                <td>
+                <span title="Produit destin&eacute; &agrave; &ecirc;tre utilis&eacute; comme combustible et &eacute;ligible au r&eacute;gime privil&eacute;gi&eacute; vis&eacute; aux alin&eacute;as 1 et 2 de l'article 265 nonies du Code des douanes national">
+	                      U800</span>
+	                  <sup title="communautaire">(caco)</sup>
+	                  </td>
+                <td>
+                    <span title="Taxe int&eacute;rieure sur les produits p&eacute;troliers">TIP</span>
+                </td>
+                <td>
+                    <span style="font-weight: bold;">01/07/2022</span>
+                    </td>
+                <td>
+                    </td>
+                <td>
+                    <span title="UE + pays tiers + DOM">FR01</span>
+                </td>
+                <td>
+                
+                <span class="valeur Vcondition">
+
+
+
+   <span style="margin:2px;">
+            <span title="Produit de substitution">
+                    SUBST&nbsp;
+                    
+                    <!-- Rajout pour enlever le % au niveau des sigles -->
+                       <!--    -->
+                        %
+                       <!--   -->
+                        </span>
+            </span>
+    
+    </span></td>
+                <td>
+	                </td>
+                <td>                
+                <a onclick="ouvrirFenetreReglement('','reglement');lienReglement('N0500033');" >
+                    N0500033</a>
+                <form id="reglementFormN0500033" name="reglementFormN0500033" action="/rita-encyclopedie/public/experts/bases/init.action" target="reglement" method="post"><input type="hidden" name="idReglementExt" value="N0500033" id="reglementFormN0500033_idReglementExt"/></form>
+
+
+</td>
+                <td>
+                    METRO</td>
+                <td>
+                <a  onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoi.action?sidRenvoi=-866&amp;idRenvoi=501&amp;idTypeRenvoi=53','');">Renvoi</a>
+                </td>
+                <td>
+                </td>
+                <td>
+                    </td>
+                <td>
+                    <a onclick="ouvrirFenetre('/rita-encyclopedie/public/core/mesure/affichDetailMesure.action?sid=-855517&amp;date=01%2F07%2F22&amp;nomenclature=3824999294','')">
+                        d�tail
+                    </a>
+                </td>
+                
+		    </tr>
+	    <tr 
+		      
+		    >
+			    <td>
+			         3824999295<a onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoiNomenc.action?sidNomenclatureRenvoi=3824999295&amp;dateJour=01%2F07%2F2022','');" title="Cliquez ici pour voir les renvois associ�s � cette nomenclature (TN -701  ,TN -701  ,TN -702  )">Renvoi</a>
+                   </td>
+                <td>
+                <span title="Produit destin&eacute; &agrave; &ecirc;tre utilis&eacute; comme combustible et &eacute;ligible au r&eacute;gime privil&eacute;gi&eacute; vis&eacute; aux alin&eacute;as 1 et 2 de l'article 265 nonies du Code des douanes national">
+	                      U800</span>
+	                  <sup title="communautaire">(caco)</sup>
+	                  </td>
+                <td>
+                    <span title="Taxe int&eacute;rieure sur les produits p&eacute;troliers">TIP</span>
+                </td>
+                <td>
+                    <span style="font-weight: bold;">01/07/2022</span>
+                    </td>
+                <td>
+                    </td>
+                <td>
+                    <span title="UE + pays tiers + DOM">FR01</span>
+                </td>
+                <td>
+                
+                <span class="valeur Vcondition">
+
+
+
+   <span style="margin:2px;">
+            <span title="Produit de substitution">
+                    SUBST&nbsp;
+                    
+                    <!-- Rajout pour enlever le % au niveau des sigles -->
+                       <!--    -->
+                        %
+                       <!--   -->
+                        </span>
+            </span>
+    
+    </span></td>
+                <td>
+	                </td>
+                <td>                
+                <a onclick="ouvrirFenetreReglement('','reglement');lienReglement('N0500033');" >
+                    N0500033</a>
+                <form id="reglementFormN0500033" name="reglementFormN0500033" action="/rita-encyclopedie/public/experts/bases/init.action" target="reglement" method="post"><input type="hidden" name="idReglementExt" value="N0500033" id="reglementFormN0500033_idReglementExt"/></form>
+
+
+</td>
+                <td>
+                    METRO</td>
+                <td>
+                <a  onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoi.action?sidRenvoi=-866&amp;idRenvoi=501&amp;idTypeRenvoi=53','');">Renvoi</a>
+                </td>
+                <td>
+                </td>
+                <td>
+                    </td>
+                <td>
+                    <a onclick="ouvrirFenetre('/rita-encyclopedie/public/core/mesure/affichDetailMesure.action?sid=-855521&amp;date=01%2F07%2F22&amp;nomenclature=3824999295','')">
+                        d�tail
+                    </a>
+                </td>
+                
+		    </tr>
+	    <tr 
+		      
+		    >
+			    <td>
+			         3824999294<a onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoiNomenc.action?sidNomenclatureRenvoi=3824999294&amp;dateJour=01%2F07%2F2022','');" title="Cliquez ici pour voir les renvois associ�s � cette nomenclature (TN -701  ,TN -701  ,TN -702  )">Renvoi</a>
+                   </td>
+                <td>
+                <span title="produit destin&eacute; &agrave; &ecirc;tre utilis&eacute; comme combustible et &eacute;ligible au r&eacute;gime privil&eacute;gi&eacute; vis&eacute; &agrave; l'alin&eacute;a 3 de l'article 265 nonies du code des douanes national">
+	                      U809</span>
+	                  <sup title="communautaire">(caco)</sup>
+	                  </td>
+                <td>
+                    <span title="Taxe int&eacute;rieure sur les produits p&eacute;troliers">TIP</span>
+                </td>
+                <td>
+                    <span style="font-weight: bold;">01/07/2022</span>
+                    </td>
+                <td>
+                    </td>
+                <td>
+                    <span title="UE + pays tiers + DOM">FR01</span>
+                </td>
+                <td>
+                
+                <span class="valeur Vcondition">
+
+
+
+   <span style="margin:2px;">
+            <span title="Produit de substitution">
+                    SUBST&nbsp;
+                    
+                    <!-- Rajout pour enlever le % au niveau des sigles -->
+                       <!--    -->
+                        %
+                       <!--   -->
+                        </span>
+            </span>
+    
+    </span></td>
+                <td>
+	                </td>
+                <td>                
+                <a onclick="ouvrirFenetreReglement('','reglement');lienReglement('N0500033');" >
+                    N0500033</a>
+                <form id="reglementFormN0500033" name="reglementFormN0500033" action="/rita-encyclopedie/public/experts/bases/init.action" target="reglement" method="post"><input type="hidden" name="idReglementExt" value="N0500033" id="reglementFormN0500033_idReglementExt"/></form>
+
+
+</td>
+                <td>
+                    METRO</td>
+                <td>
+                <a  onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoi.action?sidRenvoi=-866&amp;idRenvoi=501&amp;idTypeRenvoi=53','');">Renvoi</a>
+                </td>
+                <td>
+                </td>
+                <td>
+                    </td>
+                <td>
+                    <a onclick="ouvrirFenetre('/rita-encyclopedie/public/core/mesure/affichDetailMesure.action?sid=-855518&amp;date=01%2F07%2F22&amp;nomenclature=3824999294','')">
+                        d�tail
+                    </a>
+                </td>
+                
+		    </tr>
+	    <tr 
+		      
+		    >
+			    <td>
+			         3824999295<a onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoiNomenc.action?sidNomenclatureRenvoi=3824999295&amp;dateJour=01%2F07%2F2022','');" title="Cliquez ici pour voir les renvois associ�s � cette nomenclature (TN -701  ,TN -701  ,TN -702  )">Renvoi</a>
+                   </td>
+                <td>
+                <span title="produit destin&eacute; &agrave; &ecirc;tre utilis&eacute; comme combustible et &eacute;ligible au r&eacute;gime privil&eacute;gi&eacute; vis&eacute; &agrave; l'alin&eacute;a 3 de l'article 265 nonies du code des douanes national">
+	                      U809</span>
+	                  <sup title="communautaire">(caco)</sup>
+	                  </td>
+                <td>
+                    <span title="Taxe int&eacute;rieure sur les produits p&eacute;troliers">TIP</span>
+                </td>
+                <td>
+                    <span style="font-weight: bold;">01/07/2022</span>
+                    </td>
+                <td>
+                    </td>
+                <td>
+                    <span title="UE + pays tiers + DOM">FR01</span>
+                </td>
+                <td>
+                
+                <span class="valeur Vcondition">
+
+
+
+   <span style="margin:2px;">
+            <span title="Produit de substitution">
+                    SUBST&nbsp;
+                    
+                    <!-- Rajout pour enlever le % au niveau des sigles -->
+                       <!--    -->
+                        %
+                       <!--   -->
+                        </span>
+            </span>
+    
+    </span></td>
+                <td>
+	                </td>
+                <td>                
+                <a onclick="ouvrirFenetreReglement('','reglement');lienReglement('N0500033');" >
+                    N0500033</a>
+                <form id="reglementFormN0500033" name="reglementFormN0500033" action="/rita-encyclopedie/public/experts/bases/init.action" target="reglement" method="post"><input type="hidden" name="idReglementExt" value="N0500033" id="reglementFormN0500033_idReglementExt"/></form>
+
+
+</td>
+                <td>
+                    METRO</td>
+                <td>
+                <a  onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoi.action?sidRenvoi=-866&amp;idRenvoi=501&amp;idTypeRenvoi=53','');">Renvoi</a>
+                </td>
+                <td>
+                </td>
+                <td>
+                    </td>
+                <td>
+                    <a onclick="ouvrirFenetre('/rita-encyclopedie/public/core/mesure/affichDetailMesure.action?sid=-855522&amp;date=01%2F07%2F22&amp;nomenclature=3824999295','')">
+                        d�tail
+                    </a>
+                </td>
+                
+		    </tr>
+	    <tr 
+		      
+		    >
+			    <td>
+			         3824999294<a onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoiNomenc.action?sidNomenclatureRenvoi=3824999294&amp;dateJour=01%2F07%2F2022','');" title="Cliquez ici pour voir les renvois associ�s � cette nomenclature (TN -701  ,TN -701  ,TN -702  )">Renvoi</a>
+                   </td>
+                <td>
+                </td>
+                <td>
+                    <span title="TVA normale">TVA</span>
+                </td>
+                <td>
+                    <span style="font-weight: bold;">01/07/2022</span>
+                    </td>
+                <td>
+                    </td>
+                <td>
+                    <span title="UE + pays tiers + DOM">FR01</span>
+                </td>
+                <td>
+                
+                <span class="valeur Vcondition">
+
+
+
+   <span style="margin:2px;">
+            20%</span>
+    
+    </span></td>
+                <td>
+	                </td>
+                <td>                
+                <a onclick="ouvrirFenetreReglement('','reglement');lienReglement('N0500005');" >
+                    N0500005</a>
+                <form id="reglementFormN0500005" name="reglementFormN0500005" action="/rita-encyclopedie/public/experts/bases/init.action" target="reglement" method="post"><input type="hidden" name="idReglementExt" value="N0500005" id="reglementFormN0500005_idReglementExt"/></form>
+
+
+</td>
+                <td>
+                    METRO</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                    </td>
+                <td>
+                    <a onclick="ouvrirFenetre('/rita-encyclopedie/public/core/mesure/affichDetailMesure.action?sid=-855513&amp;date=01%2F07%2F22&amp;nomenclature=3824999294','')">
+                        d�tail
+                    </a>
+                </td>
+                
+		    </tr>
+	    <tr 
+		      
+		    >
+			    <td>
+			         3824999295<a onclick="ouvrirFenetre('/rita-encyclopedie/public/experts/mesures/ajaxAffichRenvoiNomenc.action?sidNomenclatureRenvoi=3824999295&amp;dateJour=01%2F07%2F2022','');" title="Cliquez ici pour voir les renvois associ�s � cette nomenclature (TN -701  ,TN -701  ,TN -702  )">Renvoi</a>
+                   </td>
+                <td>
+                </td>
+                <td>
+                    <span title="TVA normale">TVA</span>
+                </td>
+                <td>
+                    <span style="font-weight: bold;">01/07/2022</span>
+                    </td>
+                <td>
+                    </td>
+                <td>
+                    <span title="UE + pays tiers + DOM">FR01</span>
+                </td>
+                <td>
+                
+                <span class="valeur Vcondition">
+
+
+
+   <span style="margin:2px;">
+            20%</span>
+    
+    </span></td>
+                <td>
+	                </td>
+                <td>                
+                <a onclick="ouvrirFenetreReglement('','reglement');lienReglement('N0500005');" >
+                    N0500005</a>
+                <form id="reglementFormN0500005" name="reglementFormN0500005" action="/rita-encyclopedie/public/experts/bases/init.action" target="reglement" method="post"><input type="hidden" name="idReglementExt" value="N0500005" id="reglementFormN0500005_idReglementExt"/></form>
+
+
+</td>
+                <td>
+                    METRO</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                    </td>
+                <td>
+                    <a onclick="ouvrirFenetre('/rita-encyclopedie/public/core/mesure/affichDetailMesure.action?sid=-855514&amp;date=01%2F07%2F22&amp;nomenclature=3824999295','')">
+                        d�tail
+                    </a>
+                </td>
+                
+		    </tr>
+	    </tbody>
+	</table>
+	
+		<table id="grid">
+			<tr>
+				<td/>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+using CargoWise.ComponentModel;
+using Enterprise.Accounting.Business.EInvoicing;
+using Enterprise.Accounting.ElectronicMessaging.Common.GlobalElectronicInvoice;
+using Enterprise.Accounting.ElectronicMessaging.GlobalEInvoicing;
+using Enterprise.MasterFiles.Business;
+using UniversalTransactionBatch = Enterprise.UniversalDataBuss.DataObjects.Accounting.TransactionBatch;
+
+namespace Enterprise.Accounting.ElectronicMessaging.Common.AdditionalDataItems
+{
+	public interface IAdditionalDataItemsProvider
+	{
+		GlobalElectronicInvoicingHeaderElectronicInvoiceBatchRequestAdditionalDataItemCollection GetAdditionalHeaderDataItems(AccEInvoicingBatch batch, GlbBranch branch, UniversalTransactionBatch universalTransactionBatch, ICountryEInvoicingObjectFactory countryFactory, INotifications warnings);
+	}
+}

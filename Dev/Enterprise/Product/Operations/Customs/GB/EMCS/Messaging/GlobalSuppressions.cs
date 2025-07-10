@@ -1,0 +1,1 @@
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("CargoWiseOne", "CW1123:new CachedValue", Scope = "namespaceanddescendants", Target = "~N:Enterprise.Customs.GB.EMCS.Messaging", Justification = "Properties using CachedValue should use CachedValueHelper.")]

@@ -1,0 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.StmEventUpgradeTaskTest.TestMixOfInsertUpdateDelete")] // Database/Odyssey/Data/Public/StmEvent.Test/StmEventUpgradeTaskTest.cs:23,3
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.StmEventDataFileTest.TestStmEventDataFile")] // Database/Odyssey/Data/Public/StmEvent.Test/StmEventDataFileTest.cs:26,3
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.Testing.StmEventUpgradeTaskTest.TestMixOfInsertUpdateDelete")] // Database/Odyssey/Data/Public/StmEvent.Test/StmEventUpgradeTaskTest.cs:23,3
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.Testing.StmEventDataFileTest.TestStmEventDataFile")] // Database/Odyssey/Data/Public/StmEvent.Test/StmEventDataFileTest.cs:26,3

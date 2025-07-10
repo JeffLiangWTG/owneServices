@@ -1,0 +1,75 @@
+﻿package car;
+
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Vector;
+
+public class VectorToCar
+{
+  public void createCar(Vector paramVector, String paramString)
+  {
+    int i = 0;
+    try
+    {
+      DataOutputStream localDataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(paramString)));
+      synchronized (localDataOutputStream)
+      {
+        localDataOutputStream.writeBytes(((Vector)paramVector.elementAt(0)).elementAt(0).toString());
+        localDataOutputStream.writeByte(i);
+        
+        localDataOutputStream.writeBytes(((Vector)paramVector.elementAt(0)).elementAt(1).toString());
+        localDataOutputStream.write(i);
+        int k;
+        for (int j = 2; j < 5; j++)
+        {
+          localDataOutputStream.writeByte(Integer.valueOf(((Vector)paramVector.elementAt(0)).elementAt(j).toString()).byteValue());
+          for (k = 1; k <= 3; k++) {
+            localDataOutputStream.writeByte(i);
+          }
+        }
+        for (j = 5; j < ((Vector)paramVector.elementAt(0)).size(); j++)
+        {
+          localDataOutputStream.writeBytes(((Vector)paramVector.elementAt(0)).elementAt(j).toString());
+          localDataOutputStream.writeByte(i);
+        }
+        j = ((Vector)paramVector.elementAt(1)).size() - 1;
+        
+        localDataOutputStream.writeBytes(Integer.valueOf(j).toString());
+        localDataOutputStream.writeByte(i);
+        int m;
+        if (j != 0) {
+          for (k = 1; k < ((Vector)paramVector.elementAt(1)).size(); k++) {
+            for (m = 0; m < 10; m++)
+            {
+              localDataOutputStream.writeBytes(((Vector)((Vector)paramVector.elementAt(1)).elementAt(k)).elementAt(m).toString());
+              localDataOutputStream.writeByte(i);
+            }
+          }
+        }
+        if (((Vector)paramVector.elementAt(2)).size() > 0)
+        {
+          for (k = 0; k < ((Vector)paramVector.elementAt(2)).size(); k++) {
+            for (m = 0; m < 71; m++)
+            {
+              localDataOutputStream.writeBytes(((Vector)((Vector)paramVector.elementAt(2)).elementAt(k)).elementAt(m).toString());
+              localDataOutputStream.writeByte(i);
+            }
+          }
+          if (((Vector)paramVector.elementAt(3)).size() > 0) {
+            for (k = 0; k < ((Vector)paramVector.elementAt(3)).size(); k++) {
+              for (m = 0; m < 101; m++)
+              {
+                localDataOutputStream.writeBytes(((Vector)((Vector)paramVector.elementAt(3)).elementAt(k)).elementAt(m).toString());
+                localDataOutputStream.writeByte(i);
+              }
+            }
+          }
+        }
+      }
+      localDataOutputStream.close();
+    }
+    catch (IOException localIOException) {}
+  }
+}

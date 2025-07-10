@@ -1,0 +1,27 @@
+meta {
+  name: Token Grant Type is authorization_code
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: authorization_code
+  username: {{UserName}}
+  password: {{Password}}
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return error as unsupported_grant_type.", function() {
+    expect(res.body.error).to.equal('unsupported_grant_type');
+  });
+}

@@ -1,0 +1,207 @@
+namespace Enterprise.MasterFiles.Module
+{
+	public partial class ProcessTaskTemplateFilterControl
+	{
+		private void InitializeComponent()
+		{
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo1 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo2 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo3 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo4 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo zCheckBoxColumnStyleInfo1 = new Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo zCheckBoxColumnStyleInfo2 = new Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo zCheckBoxColumnStyleInfo3 = new Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo5 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo6 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo7 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo8 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.MasterFiles.GUI.ZOrganisationFindBoxColumnStyleInfo zOrganisationFindBoxColumnStyleInfo1 = new Enterprise.MasterFiles.GUI.ZOrganisationFindBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo9 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo10 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo11 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo zGuidFindBoxColumnStyleInfo1 = new Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo zGuidFindBoxColumnStyleInfo2 = new Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo zGuidFindBoxColumnStyleInfo3 = new Enterprise.ZArchitecture.GUI.ZGuidFindBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo12 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo13 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo14 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo15 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo16 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo17 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo18 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo zTextBoxColumnStyleInfo19 = new Enterprise.ZArchitecture.ZTextBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo zCheckBoxColumnStyleInfo4 = new Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo();
+			Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo zCheckBoxColumnStyleInfo5 = new Enterprise.ZArchitecture.ZCheckBoxColumnStyleInfo();
+			((System.ComponentModel.ISupportInitialize)(this.grid)).BeginInit();
+			this.grid.SuspendLayout();
+			this.AddStripButton.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).BeginInit();
+			this.SuspendLayout();
+			// 
+			// grid
+			// 
+			this.BindingSource.SetBindingMember(this.grid, ".");
+			// The line(s) below are a compile-time check for a binding member. Reflection is used to determine the return type of collection indexes and may require an up to date compilation of your solution. If compilation fails below, try removing them and rebuild your solution. Then, open the form, move a control up and then down, and re-compile again.
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((System.Collections.IList)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)))));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_ProcessType)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).WorkflowTypeDescription)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_Name)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_Description)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZBool)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_IsSystem)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZBool)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_IsActive)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZBool)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).GlobalTemplate)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).SubType1Description)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).SubType2Description)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).SubType3Description)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).SubType4Description)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZGuid)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_OH_Client)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).SubType5Description)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_LoadPortCountry)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_DischargePortCountry)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZGuid)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_WW)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZGuid)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_GB)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZGuid)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_GE)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_SubType1)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_SubType2)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_SubType3)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_SubType4)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_SubType5)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_TaskFallbackMethod)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_MilestoneFallbackMethod)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZString)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_TriggerFallbackMethod)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZBool)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_IsPartialTemplate)));
+			CargoWise.ComponentModel.Design.CompileTimeCheckBindingMember.Check(((CargoWise.Types.ZBool)(((Enterprise.MasterFiles.Business.ProcessTaskTemplate)(null)).P0_IsUniversal)));
+			zTextBoxColumnStyleInfo1.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("ProcessTaskTemplateFilterControl|0cba6c48-57dc-4e25-9ce3-4f9f650d31e7", "Type");
+			zTextBoxColumnStyleInfo1.ColumnName = "P0_ProcessType";
+			zTextBoxColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(70);
+			zTextBoxColumnStyleInfo2.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("ProcessTaskTemplateFilterControl|713b3b94-92be-4843-a4db-d7ac60b21fe8", "Workflow Type");
+			zTextBoxColumnStyleInfo2.ColumnName = "WorkflowTypeDescription";
+			zTextBoxColumnStyleInfo2.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(130);
+			zTextBoxColumnStyleInfo3.ColumnName = "P0_Name";
+			zTextBoxColumnStyleInfo3.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zTextBoxColumnStyleInfo4.ColumnName = "P0_Description";
+			zTextBoxColumnStyleInfo4.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(200);
+			zCheckBoxColumnStyleInfo1.ColumnName = "P0_IsSystem";
+			zCheckBoxColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(45);
+			zCheckBoxColumnStyleInfo2.ColumnName = "P0_IsActive";
+			zCheckBoxColumnStyleInfo2.IsMandatory = true;
+			zCheckBoxColumnStyleInfo2.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(45);
+			zCheckBoxColumnStyleInfo3.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("ProcessTaskTemplateFilterControl|f63c1ad1-797e-4784-8afd-a3b635a1e3ec", "Global");
+			zCheckBoxColumnStyleInfo3.ColumnName = "GlobalTemplate";
+			zCheckBoxColumnStyleInfo3.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(45);
+			zTextBoxColumnStyleInfo5.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("ProcessTaskTemplateFilterControl|6954651b-b23c-4123-ac77-37de4ea32467", "Criteria 1");
+			zTextBoxColumnStyleInfo5.ColumnName = "SubType1Description";
+			zTextBoxColumnStyleInfo5.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(130);
+			zTextBoxColumnStyleInfo6.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("ProcessTaskTemplateFilterControl|20ed559f-efa0-4178-a2c4-5e3e1469aedd", "Criteria 2");
+			zTextBoxColumnStyleInfo6.ColumnName = "SubType2Description";
+			zTextBoxColumnStyleInfo6.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(130);
+			zTextBoxColumnStyleInfo7.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("ProcessTaskTemplateFilterControl|1ecc3949-b0ad-4909-857c-6edf9249ca32", "Criteria 3");
+			zTextBoxColumnStyleInfo7.ColumnName = "SubType3Description";
+			zTextBoxColumnStyleInfo7.IsVisible = false;
+			zTextBoxColumnStyleInfo7.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(130);
+			zTextBoxColumnStyleInfo8.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("ProcessTaskTemplateFilterControl|3634cd87-c4eb-4180-9cfd-4a62b7c0de5c", "Criteria 4");
+			zTextBoxColumnStyleInfo8.ColumnName = "SubType4Description";
+			zTextBoxColumnStyleInfo8.IsVisible = false;
+			zTextBoxColumnStyleInfo8.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(130);
+			zOrganisationFindBoxColumnStyleInfo1.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("ProcessTaskTemplateFilterControl|a9859050-3605-46e3-8445-3b3a00de47a1", "Client");
+			zOrganisationFindBoxColumnStyleInfo1.ColumnName = "P0_OH_Client";
+			zOrganisationFindBoxColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo9.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("ProcessTaskTemplateFilterControl|dcdcd2ef-2b9a-4c95-a4cb-c945b4670894", "Criteria 5");
+			zTextBoxColumnStyleInfo9.ColumnName = "SubType5Description";
+			zTextBoxColumnStyleInfo9.IsVisible = false;
+			zTextBoxColumnStyleInfo9.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(130);
+			zTextBoxColumnStyleInfo10.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("ProcessTaskTemplateFilterControl|f508aa19-6b5e-4cde-b0d8-e8cef46c0785", "Load Port");
+			zTextBoxColumnStyleInfo10.ColumnName = "P0_LoadPortCountry";
+			zTextBoxColumnStyleInfo10.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zTextBoxColumnStyleInfo11.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("ProcessTaskTemplateFilterControl|56e37645-bd52-4422-bd19-5782ed9ffd03", "Discharge Port");
+			zTextBoxColumnStyleInfo11.ColumnName = "P0_DischargePortCountry";
+			zTextBoxColumnStyleInfo11.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zGuidFindBoxColumnStyleInfo1.ColumnName = "P0_WW";
+			zGuidFindBoxColumnStyleInfo1.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zGuidFindBoxColumnStyleInfo2.ColumnName = "P0_GB";
+			zGuidFindBoxColumnStyleInfo2.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(80);
+			zGuidFindBoxColumnStyleInfo3.ColumnName = "P0_GE";
+			zGuidFindBoxColumnStyleInfo3.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zTextBoxColumnStyleInfo12.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("86e1e349-98f2-49b3-9ec1-a8eccdafb165", "Criteria 1 Code");
+			zTextBoxColumnStyleInfo12.ColumnName = "P0_SubType1";
+			zTextBoxColumnStyleInfo12.IsVisible = false;
+			zTextBoxColumnStyleInfo12.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zTextBoxColumnStyleInfo13.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("73b1af49-a292-4bec-be87-4b24a97839ef", "Criteria 2 Code");
+			zTextBoxColumnStyleInfo13.ColumnName = "P0_SubType2";
+			zTextBoxColumnStyleInfo13.IsVisible = false;
+			zTextBoxColumnStyleInfo13.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zTextBoxColumnStyleInfo14.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("9866e8e6-6af8-4316-9d85-a6df163ebac9", "Criteria 3 Code");
+			zTextBoxColumnStyleInfo14.ColumnName = "P0_SubType3";
+			zTextBoxColumnStyleInfo14.IsVisible = false;
+			zTextBoxColumnStyleInfo14.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zTextBoxColumnStyleInfo15.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("62ff3eee-2adf-4236-854b-872ad4427dbf", "Criteria 4 Code");
+			zTextBoxColumnStyleInfo15.ColumnName = "P0_SubType4";
+			zTextBoxColumnStyleInfo15.IsVisible = false;
+			zTextBoxColumnStyleInfo15.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zTextBoxColumnStyleInfo16.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("c3177a2b-ef3b-4b0b-8799-43cb9fb54035", "Criteria 5 Code");
+			zTextBoxColumnStyleInfo16.ColumnName = "P0_SubType5";
+			zTextBoxColumnStyleInfo16.IsVisible = false;
+			zTextBoxColumnStyleInfo16.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zTextBoxColumnStyleInfo17.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("3cd60b2d-f267-4dce-a4a3-c1abb548e0be", "Task Fallback Method");
+			zTextBoxColumnStyleInfo17.ColumnName = "P0_TaskFallbackMethod";
+			zTextBoxColumnStyleInfo17.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(133);
+			zTextBoxColumnStyleInfo18.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("dffeaad2-3b55-4d09-841f-302ce43b765a", "Milestone Fallback Method");
+			zTextBoxColumnStyleInfo18.ColumnName = "P0_MilestoneFallbackMethod";
+			zTextBoxColumnStyleInfo18.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(133);
+			zTextBoxColumnStyleInfo19.CaptionResourceString = Enterprise.MasterFiles.Module.Res.GetData("8085fe34-9f13-49bf-9433-cedcd65b9b72", "Trigger Fallback Method");
+			zTextBoxColumnStyleInfo19.ColumnName = "P0_TriggerFallbackMethod";
+			zTextBoxColumnStyleInfo19.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(133);
+			zCheckBoxColumnStyleInfo4.ColumnName = "P0_IsPartialTemplate";
+			zCheckBoxColumnStyleInfo4.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(100);
+			zCheckBoxColumnStyleInfo5.ColumnName = "P0_IsUniversal";
+			zCheckBoxColumnStyleInfo5.Width = CargoWise.Windows.UI.ControlDpiScalingHelper.ScaleToCurrentDpiX(120);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo1);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo2);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo3);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo4);
+			this.grid.ColumnStyles.Add(zCheckBoxColumnStyleInfo1);
+			this.grid.ColumnStyles.Add(zCheckBoxColumnStyleInfo2);
+			this.grid.ColumnStyles.Add(zCheckBoxColumnStyleInfo3);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo5);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo6);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo7);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo8);
+			this.grid.ColumnStyles.Add(zOrganisationFindBoxColumnStyleInfo1);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo9);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo10);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo11);
+			this.grid.ColumnStyles.Add(zGuidFindBoxColumnStyleInfo1);
+			this.grid.ColumnStyles.Add(zGuidFindBoxColumnStyleInfo2);
+			this.grid.ColumnStyles.Add(zGuidFindBoxColumnStyleInfo3);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo12);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo13);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo14);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo15);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo16);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo17);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo18);
+			this.grid.ColumnStyles.Add(zTextBoxColumnStyleInfo19);
+			this.grid.ColumnStyles.Add(zCheckBoxColumnStyleInfo4);
+			this.grid.ColumnStyles.Add(zCheckBoxColumnStyleInfo5);
+			this.grid.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(744, 272, true);
+			// 
+			// BindingSource
+			// 
+			this.BindingSource.DataSourceType = typeof(Enterprise.MasterFiles.Business.ProcessTaskTemplate);
+			// 
+			// ProcessTaskTemplateFilterControl
+			// 
+			this.CaptionRenderingEnabled = true;
+			this.Name = "ProcessTaskTemplateFilterControl";
+			this.Size = CargoWise.Windows.UI.ControlDpiScalingHelper.NewScaledSize(744, 424, true);
+			((System.ComponentModel.ISupportInitialize)(this.grid)).EndInit();
+			this.grid.ResumeLayout(false);
+			this.grid.PerformLayout();
+			this.AddStripButton.ResumeLayout(true);
+			this.AddStripButton.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.BindingSource)).EndInit();
+			this.ResumeLayout(false);
+			this.PerformLayout();
+		}
+	}
+}

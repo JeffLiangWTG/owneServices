@@ -1,0 +1,27 @@
+using CargoWise.EntityFramework.Testing;
+using CargoWise.Types;
+
+namespace Enterprise.Customs.CN.Business.Testing
+{
+	class AdditionalElementStrategyProviderTest : TestCaseWithFactory
+	{
+		public void TestGetAdditionalElementStrategy()
+		{
+			AssertType<CommonAdditionalElementStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(ZString.Empty));
+			AssertType<NameOfGoodsElementStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(NameOfGoodsElementStrategy.AdditionalElementCode));
+			AssertType<PackSpecElementStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(PackSpecElementStrategy.AdditionalElementCode));
+			AssertType<SpecModelElementStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(SpecModelElementStrategy.AdditionalElementCode));
+			AssertType<ManufactureDateElementStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(ManufactureDateElementStrategy.AdditionalElementCode));
+			AssertType<BrandTypeElementStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(BrandTypeElementStrategy.AdditionalElementCode));
+			AssertType<PreferentialTariffTreatmentOnDestinationStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(PreferentialTariffTreatmentOnDestinationStrategy.AdditionalElementCode));
+			AssertType<GTINElementStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(GTINElementStrategy.AdditionalElementCode));
+			AssertType<CASElementStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(CASElementStrategy.AdditionalElementCode));
+			AssertType<OthersElementStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(OthersElementStrategy.AdditionalElementCode));
+			AssertType<OriginalManufacturerNameCNStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(OriginalManufacturerNameCNStrategy.AdditionalElementCode));
+			AssertType<OriginalManufacturerNameENStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(OriginalManufacturerNameENStrategy.AdditionalElementCode));
+			AssertType<AntiDumpingDutyRateStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(AntiDumpingDutyRateStrategy.AdditionalElementCode));
+			AssertType<CountervailingDutyRateStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(CountervailingDutyRateStrategy.AdditionalElementCode));
+			AssertType<MeetsPricePromiseStrategy>(AdditionalElementStrategyProvider.GetAdditionalElementStrategy(MeetsPricePromiseStrategy.AdditionalElementCode));
+		}
+	}
+}

@@ -1,0 +1,9 @@
+// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+using System.Diagnostics.CodeAnalysis;
+[assembly: SuppressMessage("CargoWiseOne", "CW1060:Do not use System.DateTime.Now Rule", Justification = "Baseline WI00586871", Scope = "member", Target = "~M:Enterprise.Customs.BE.NCTS.Business.Testing.CC022CMessageInterpreterTest.TestInterpret")] // Enterprise/Product/Operations/Customs/BE/NCTS/Business.Test/Messaging/Incoming/MessageInterpreter/CC022CMessageInterpreterTest.cs:21,25
+[assembly: SuppressMessage("CargoWiseOne", "CW1060:Do not use System.DateTime.Now Rule", Justification = "Baseline WI00586871", Scope = "member", Target = "~M:Enterprise.Customs.BE.NCTS.Business.Testing.CC009CDataProviderTest.TestDecisionDateTime")] // Enterprise/Product/Operations/Customs/BE/NCTS/Business.Test/Messaging/Incoming/MessageProviders/CC009CDataProviderTest.cs:49,26
+[assembly: SuppressMessage("CargoWiseOne", "CW1060:Do not use System.DateTime.Now Rule", Justification = "Baseline WI00586871", Scope = "member", Target = "~M:Enterprise.Customs.BE.NCTS.Business.Testing.CC009CDataProviderTest.TestRequestDateTime")] // Enterprise/Product/Operations/Customs/BE/NCTS/Business.Test/Messaging/Incoming/MessageProviders/CC009CDataProviderTest.cs:59,25
+[assembly: SuppressMessage("CargoWiseOne", "CW1060:Do not use System.DateTime.Now Rule", Justification = "Baseline WI00586871", Scope = "member", Target = "~M:Enterprise.Customs.BE.NCTS.Business.Testing.CC022CMessageProcessorTest.TestProcessCC022CMessageDeclaration")] // Enterprise/Product/Operations/Customs/BE/NCTS/Business.Test/Messaging/Incoming/MessageProcessor/CC022CMessageProcessorTest.cs:34,25

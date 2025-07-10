@@ -1,0 +1,21 @@
+CREATE TABLE [RefRepairCode] (
+    [RRC_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefRepairCode_RRC_PK] DEFAULT (NEWID()),
+    [RRC_IsActive] BIT NOT NULL CONSTRAINT [DF_RefRepairCode_RRC_IsActive] DEFAULT (''),
+    [RRC_Code] VARCHAR(10) NOT NULL CONSTRAINT [DF_RefRepairCode_RRC_Code] DEFAULT (''),
+    [RRC_Description] VARCHAR(100) NOT NULL CONSTRAINT [DF_RefRepairCode_RRC_Description] DEFAULT (''),
+    [RRC_Group] VARCHAR(15) NOT NULL CONSTRAINT [DF_RefRepairCode_RRC_Group] DEFAULT (''),
+    [RRC_ServiceType] CHAR(3) NOT NULL CONSTRAINT [DF_RefRepairCode_RRC_ServiceType] DEFAULT (''),
+    [RRC_SysStartTime] DATETIME2 GENERATED ALWAYS AS ROW START NOT NULL CONSTRAINT [DF_RRC_SysStartTime] DEFAULT SYSUTCDATETIME(),
+    [RRC_SysEndTime] DATETIME2 GENERATED ALWAYS AS ROW END NOT NULL CONSTRAINT [DF_RRC_SysEndTime] DEFAULT CONVERT(DATETIME2, '9999-12-31 23:59:59.9999999'),
+	PERIOD FOR SYSTEM_TIME ([RRC_SysStartTime], [RRC_SysEndTime]),
+    CONSTRAINT [PK_RefRepairCode] PRIMARY KEY CLUSTERED ([RRC_PK] ASC),
+    CONSTRAINT [CK_RefRepairCode_RRC_Code] CHECK  ([RRC_Code] <> ''),
+    CONSTRAINT [CK_RefRepairCode_RRC_Description] CHECK  ([RRC_Description] <> ''),
+    CONSTRAINT [CK_RefRepairCode_RRC_Group] CHECK  ([RRC_Group] = 'CEDEX' OR [RRC_Group] = 'MERC'),
+    CONSTRAINT [CK_RefRepairCode_RRC_ServiceType] CHECK ([RRC_ServiceType] = 'RPR' OR [RRC_ServiceType] = 'PRP' OR [RRC_ServiceType] = 'CLN' OR [RRC_ServiceType] = 'UPG')
+)
+WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.RefRepairCodeHistory))
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_RefRepairCode_RRC_Code_RRC_Group] ON [RefRepairCode] ([RRC_Code] ASC, [RRC_Group] ASC)
+GO
+ALTER TABLE RefRepairCode SET (LOCK_ESCALATION = DISABLE);

@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(CWNetCoreTargetFramework)</TargetFrameworks>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup Condition="'$(IsNetCoreTargetFramework)' == 'true'">
+    <PackageReference Include="System.Security.Cryptography.Xml" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="System.Security" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.Customs.ES.MessageDefinitions" />
+    <Reference Include="CargoWise.Customs.Shared.MessageContracts" />
+    <Reference Include="CargoWise.EntityFramework" />
+    <Reference Include="CargoWise.ResourceStrings" />
+    <Reference Include="CargoWise.ResourceStrings.Cache" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="CargoWise.Types" />
+    <Reference Include="Edifact" />
+    <Reference Include="Enterprise.Customs.Common" />
+    <Reference Include="Enterprise.Edifact.V921ES" />
+    <Reference Include="Enterprise.MasterFiles.Business" />
+    <Reference Include="Enterprise.Messaging.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Business" />
+    <Reference Include="Enterprise.ZArchitecture.Core" />
+    <Reference Include="Resources" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="CodeDescriptionPairList\DeclarationMessageTypeListPartial.cs">
+      <DependentUpon>DeclarationMessageTypeList.xml</DependentUpon>
+    </Compile>
+    <Compile Update="CodeDescriptionPairList\SpanishCustomsTypeCodeList.cs">
+      <DependentUpon>SpanishCustomsTypeCodeList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="CodeDescriptionPairList\DeclarationMessageSubTypeList.cs">
+      <DependentUpon>DeclarationMessageSubTypeList.xml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Update="CodeDescriptionPairList\DeclarationMessageTypeList.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DeclarationMessageTypeList.xml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="CodeDescriptionPairList\SpanishCustomsTypeCodeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>SpanishCustomsTypeCodeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Customs.ES.Messaging</CustomToolNamespace>
+    </None>
+    <None Update="CodeDescriptionPairList\DeclarationMessageSubTypeList.xml">
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>DeclarationMessageSubTypeList.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.Customs.ES.Messaging</CustomToolNamespace>
+    </None>
+    <None Update="CodeDescriptionPairList\DeclarationMessageTypeList.xml">
+      <CustomToolNamespace>Enterprise.Customs.ES.Messaging</CustomToolNamespace>
+      <Generator>CodeDescriptionPairListGenerator</Generator>
+      <LastGenOutput>DeclarationMessageTypeList.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

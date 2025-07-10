@@ -1,0 +1,6 @@
+CREATE VIEW RefCusProcedureLanguageTableView_V1 AS
+SELECT ZXV_PK,
+ZXV_ZZ6_Procedure,
+ZXV_ZX6_NKLanguage,
+ZXV_Description
+FROM RefCusProcedureLanguage

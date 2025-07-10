@@ -1,0 +1,26 @@
+﻿<!--
+  This project will copy all packages listed in Directory.Package.props that apply to Winzor projects into shared TargetFramework output directory.
+  This is required because all other Winzor projects have UseCommonOutputDirectory=true and only output their own dlls without package references.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>NetCore.PackageCopier</AssemblyName>
+    <RootNamespace>NetCore.PackageCopier</RootNamespace>
+    <TargetFramework>$(CWNetCoreTargetFramework)</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DisableResourceStringsAnalyzer>true</DisableResourceStringsAnalyzer>
+    <CWGenerateXmlSerializationAssemblies>false</CWGenerateXmlSerializationAssemblies>
+  </PropertyGroup>
+  <Import Project="NetCore.PackageCopier.Common.props" />
+  <ItemGroup>
+    <!--
+    netstandard version of Microsoft.SqlServer.Types is incompatible with System.Data.SqlClient.
+    Winzor only need the native lib of this package.
+    This line can be removed after migrating to Microsoft.Data.SqlClient.
+    -->
+    <PackageReference Remove="Microsoft.SqlServer.Types" />
+  </ItemGroup>
+</Project>

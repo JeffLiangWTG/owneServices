@@ -1,0 +1,11 @@
+using CargoWise.DbUpgrader.Scripts.Definitions.Customs.US;
+using NUnit.Framework;
+
+namespace Enterprise.Build.Database.Script.Public.Customs.US
+{
+	[TestedType(typeof(vw_USLatestDispositionDates))]
+	class vw_USLatestDispositionDatesTest : DbCreateScriptTest
+	{
+	}
+}
+

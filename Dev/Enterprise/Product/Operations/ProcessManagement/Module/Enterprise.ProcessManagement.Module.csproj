@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;$(Temp_CWNetCoreWindowsTargetFramework)</TargetFrameworks>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EmbeddedResourceUseDependentUponConvention>true</EmbeddedResourceUseDependentUponConvention>
+  </PropertyGroup>
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+  <ItemGroup>
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="Enterprise.MasterData.Common" />
+    <Reference Include="System.Resources.Extensions" />
+    <Reference Include="WTG.SecurityRights" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IsNetFrameworkTargetFramework)' == 'true'">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Design" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Project\ProjectImport\Autos\AutoProjectFlattened.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoProjectFlattened.xml</DependentUpon>
+    </Compile>
+    <Compile Update="WorkItem\WorkItemImport\Autos\AutoWorkItemFlattened.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AutoWorkItemFlattened.xml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Project\ProjectImport\Autos\AutoProjectFlattened.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoProjectFlattened.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.ProcessManagement.Module</CustomToolNamespace>
+    </None>
+    <None Update="WorkItem\WorkItemImport\Autos\AutoWorkItemFlattened.xml">
+      <Generator>NonPersistentBusinessObjectGenerator</Generator>
+      <LastGenOutput>AutoWorkItemFlattened.cs</LastGenOutput>
+      <CustomToolNamespace>Enterprise.ProcessManagement.Module</CustomToolNamespace>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GUI\Enterprise.ProcessManagement.GUI.csproj" />
+  </ItemGroup>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

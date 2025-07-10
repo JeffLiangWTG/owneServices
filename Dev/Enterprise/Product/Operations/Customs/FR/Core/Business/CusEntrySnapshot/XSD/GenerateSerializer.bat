@@ -1,0 +1,1 @@
+xsd FrenchEntryLineChildSnapshot.xsd /outputdir:C:\git\wtg\CargoWise\Dev\Enterprise\Product\Operations\Customs\FR\Core\Business\CusEntrySnapshot\Serializer /c /namespace:Enterprise.Customs.FR.Business.Snapshot /language:CS

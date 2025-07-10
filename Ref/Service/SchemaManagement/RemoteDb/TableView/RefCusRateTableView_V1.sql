@@ -1,0 +1,13 @@
+CREATE VIEW RefCusRateTableView_V1 AS
+SELECT ZZ2_PK,
+ZZ2_ZZ1_Tariff,
+ZZ2_ZZW_TariffNationalCode,
+ZZ2_StartDate,
+ZZ2_EndDate,
+ZZ2_ZY1_RateCode,
+ZZ2_RateFormula,
+ZZ2_ZZS_Preference,
+ZZ2_ZZZ_NKDataGrouping,
+ZZ2_RateFormulaDerivedFrom,
+ZZ2_RX_NKCurrencyOverride
+FROM RefCusRate

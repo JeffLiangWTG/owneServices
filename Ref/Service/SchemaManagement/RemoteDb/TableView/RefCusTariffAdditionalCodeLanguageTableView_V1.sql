@@ -1,0 +1,6 @@
+CREATE VIEW RefCusTariffAdditionalCodeLanguageTableView_V1 AS
+SELECT ZY4_PK,
+ZY4_ZX6_NKLanguage,
+ZY4_ZY2_TariffAdditionalCode,
+ZY4_Description
+FROM RefCusTariffAdditionalCodeLanguage

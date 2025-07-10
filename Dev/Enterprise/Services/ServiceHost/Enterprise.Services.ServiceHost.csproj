@@ -1,0 +1,98 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputPath>..\..\..\bin\</OutputPath>
+    <OutputType>Library</OutputType>
+    <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
+    <TransformOnBuild>true</TransformOnBuild>
+    <OverwriteReadOnlyOutputFiles>true</OverwriteReadOnlyOutputFiles>
+    <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+    <ProjectConfigFileName>Web.Base.config</ProjectConfigFileName>
+    <TargetFramework>net48</TargetFramework>
+    <RunCommand>$(MSBuildExtensionsPath64)\..\IIS Express\iisexpress</RunCommand>
+    <RunArguments>/path:"$(MSBuildProjectDirectory)" /port:80</RunArguments>
+    <SuppressObsoleteWarnings>SYSLIB0051</SuppressObsoleteWarnings>
+    <CWUsesSqlClient>true</CWUsesSqlClient>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(DAT_IS_BUILDING)' != 'true'">
+    <PostBuildEvent>if not exist $(MSBuildProjectDirectory)\Bin goto Make
+echo found : $(MSBuildProjectDirectory)\Bin
+goto end
+:Make
+echo Making junction from $(MSBuildProjectDirectory)\Bin to $(MSBuildProjectDirectory)\$(OutputPath)
+mklink /J $(MSBuildProjectDirectory)\Bin $(MSBuildProjectDirectory)\$(OutputPath)
+:end</PostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="WebAPI\Controllers\System\WebHyperlinkTrampolineLandingPage.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <T4ParameterValues Include="ProjectDir">
+      <Value>$(ProjectDir)</Value>
+      <Visible>false</Visible>
+    </T4ParameterValues>
+  </ItemGroup>
+  <!--NOTE: If you need to add a new reference, please add it to the Project.CommonReferences.props file.-->
+  <Import Project="../Project.CommonReferences.props" />
+  <!--Below section is for .NET Framework references only-->
+  <ItemGroup>
+    <Reference Include="CargoWise.FeatureControl.Abstractions" />
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <Reference Include="System.Collections.Immutable" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Memory" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Activation" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Http" />
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="WebAPI\Controllers\System\WebHyperlinkTrampolineLandingPage.css" />
+    <EmbeddedResource Include="WebAPI\Controllers\System\WebHyperlinkTrampolineLandingPage.html" />
+    <EmbeddedResource Include="ApplicationContext\Configuration.xml" />
+    <Content Include="eAdapterStreamedService.svc" />
+    <Content Include="Global.asax" />
+    <Content Include="OrganizationMerge.svc" />
+    <Content Include="privatekey.xml" />
+    <EmbeddedResource Include="Web.Config.Instructions">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="Web.Base.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.Base.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.Base.config</DependentUpon>
+    </None>
+    <!--
+      not required as it is default for Sdk="Microsoft.NET.Sdk.Web"
+      BUT REQUIRED for QGL and DAT
+    -->
+    <None Include="Web.config" />
+    <None Include="eAdapterStreamedService.wsdl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="eAdapterStreamedService.svc.cs">
+      <DependentUpon>eAdapterStreamedService.svc</DependentUpon>
+    </Compile>
+    <Compile Update="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Update="OrganizationMerge.svc.cs">
+      <DependentUpon>OrganizationMerge.svc</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <Target Name="WebConfig" AfterTargets="PrepareForBuild">
+    <TransformXml Source="Web.Base.config" Transform="Web.$(Configuration).config" Destination="Web.config" StackTrace="true" />
+  </Target>
+  <Import Project="$(WTGBinRoot)CargoWiseOne.ResourceStrings.Transform.targets" />
+</Project>

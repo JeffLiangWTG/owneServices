@@ -1,0 +1,104 @@
+﻿<Project>
+  <!-- Only specific OS version Node needed for.playwright -->
+  <PropertyGroup>
+    <PlaywrightPlatform Condition="$([MSBuild]::IsOSPlatform('Linux'))">linux</PlaywrightPlatform>
+    <PlaywrightPlatform Condition="$([MSBuild]::IsOSPlatform('Windows'))">win</PlaywrightPlatform>
+    <PlaywrightPlatform Condition="$([MSBuild]::IsOSPlatform('OSX'))">osx</PlaywrightPlatform>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      Overwrite value from NetCoreCommon.props.
+      Copy all required files with this project only
+    -->
+    <UseCommonOutputDirectory>false</UseCommonOutputDirectory>
+    <!--Required for Release build to copy over PackageReferences files-->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <!--
+    Reference all possible PackageReferences from Directory.Packages.props that apply to NetCore projects.
+    That allows us to set UseCommonOutputDirectory to true for all other NetCore projects.
+  -->
+  <ItemGroup>
+    <!-- Exclude CargoWise.XmlSerializer.Generator if CWGenerateXmlSerializationAssemblies is false -->
+    <PackageReference Include="@(PackageVersion->'%(Identity)')" Version="" />
+    <PackageReference Remove="CargoWise.XmlSerializer.Generator" Condition="$(CWGenerateXmlSerializationAssemblies) == 'false'" />
+  </ItemGroup>
+
+  <!--
+    Remove any PackageReferences referenced outside of the project (e.g. System.Text.Json in Directory.Build.Targets) to prevent errors like:
+    "NU1504: Duplicate 'PackageReference' items found."
+  -->
+  <Target Name="RemoveDuplicatePackageReferences" BeforeTargets="CollectPackageReferences">
+    <RemoveDuplicates Inputs="@(PackageReference)">
+      <Output TaskParameter="Filtered" ItemName="DistinctPackageReferences"/>
+      <Output TaskParameter="HadAnyDuplicates" PropertyName="HasDuplicatedPackageReferences"/>
+    </RemoveDuplicates>
+
+    <ItemGroup>
+      <PackageReference Remove="@(PackageReference->'%(Identity)')" />
+      <PackageReference Condition="'%(Identity)' != 'Microsoft.Build'" Include="@(DistinctPackageReferences->'%(Identity)')" />
+      <!--A PackageReference to Microsoft.Build.* without ExcludeAssets="runtime" exists in your project.
+      This will cause MSBuild assemblies to be copied to your output directory, causing your application to load them at runtime.-->
+      <PackageReference Condition="'%(Identity)' == 'Microsoft.Build'" Include="Microsoft.Build" ExcludeAssets="runtime" />
+    </ItemGroup>
+    <Message Condition="'$(HasDuplicatedPackageReferences)' == 'true'"
+      Importance="high" Text="Found duplicated package references" />
+  </Target>
+
+  <!-- Force copy missing files for some packages
+    https://github.com/WiseTechGlobal/Modernization.Content/blob/main/Services/netcore-packagecopier-package-update.md
+    If Winzor or NetCore have different requirements for files to be manually copied, FileToCopy bits can be moved to the corresponding csproj file before the import of these props.
+  -->
+  <ItemGroup>
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.Security.Cryptography.Xml\lib\net8.0\System.Security.Cryptography.Xml.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Caching.Abstractions\lib\net8.0\Microsoft.Extensions.Caching.Abstractions.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.DependencyInjection\lib\net8.0\Microsoft.Extensions.DependencyInjection.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.DependencyInjection.Abstractions\lib\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Configuration\lib\net8.0\Microsoft.Extensions.Configuration.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Configuration.Abstractions\lib\net8.0\Microsoft.Extensions.Configuration.Abstractions.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Configuration.CommandLine\lib\net8.0\Microsoft.Extensions.Configuration.CommandLine.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Configuration.EnvironmentVariables\lib\net8.0\Microsoft.Extensions.Configuration.EnvironmentVariables.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Configuration.Json\lib\net8.0\Microsoft.Extensions.Configuration.Json.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Hosting\lib\net8.0\Microsoft.Extensions.Hosting.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Logging\lib\net8.0\Microsoft.Extensions.Logging.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Logging.Configuration\lib\net8.0\Microsoft.Extensions.Logging.Configuration.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Logging.Console\lib\net8.0\Microsoft.Extensions.Logging.Console.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Options\lib\net8.0\Microsoft.Extensions.Options.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Options.ConfigurationExtensions\lib\net8.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Extensions.Primitives\lib\net8.0\Microsoft.Extensions.Primitives.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.Collections.Immutable\lib\net7.0\System.Collections.Immutable.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.Data.DataSetExtensions\lib\netstandard2.0\System.Data.DataSetExtensions.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.Formats.Asn1\lib\net8.0\System.Formats.Asn1.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.Memory\lib\netstandard2.0\System.Memory.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.Security.Cryptography.Pkcs\lib\net8.0\System.Security.Cryptography.Pkcs.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.ServiceModel.Web\System.ServiceModel.Web.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.Text.Json\lib\net8.0\System.Text.Json.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\NUnit\lib\net6.0\nunit.framework.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.Diagnostics.EventLog\lib\net8.0\System.Diagnostics.EventLog.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.Diagnostics.EventLog\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.Messages.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.Diagnostics.EventLog\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll" DestinationFolder="$(OutputPath)runtimes\win\lib\net8.0" />
+    <!-- Package name OxyPlot.Core does not match the assembly name. -->
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\OxyPlot.Core\lib\netstandard2.0\OxyPlot.dll" DestinationFolder="$(OutputPath)" />
+    <!-- Package name Serilog.Sinks.Confluent.Kafka does not match the assembly name. -->
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Serilog.Sinks.Confluent.Kafka\lib\netstandard2.0\Serilog.Sinks.Kafka.dll" DestinationFolder="$(OutputPath)" />
+    <!-- Package name Microsoft.TestPlatform.ObjectModel does not match the assembly name. -->
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.TestPlatform.ObjectModel\lib\netstandard2.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\NuGet.Frameworks\lib\netstandard2.0\NuGet.Frameworks.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.IO.FileSystem.AccessControl\lib\netstandard2.0\System.IO.FileSystem.AccessControl.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\System.IO.FileSystem.AccessControl\runtimes\win\lib\net461\System.IO.FileSystem.AccessControl.dll" DestinationFolder="$(CWNetFrameworkOutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\System.Text.Encodings.Web\lib\netstandard2.0\System.Text.Encodings.Web.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.Data.SqlClient\runtimes\win\lib\net8.0\Microsoft.Data.SqlClient.dll" DestinationFolder="$(OutputPath)" />
+    <FileToCopy Include="$(WTGBranchRoot)packages\netcore\Microsoft.AspNetCore.Http\lib\netstandard2.0\Microsoft.AspNetCore.Http.dll" DestinationFolder="$(CWNetCoreOutputPath)" />
+
+    <!-- For some packages we want win runtime package in the output folder because not all dependencies have a package reference that makes use of runtimes folder -->
+    <FileToCopy Include="$(WTGBranchRoot)packages\System.ServiceProcess.ServiceController\runtimes\win\lib\net8.0\System.ServiceProcess.ServiceController.dll" DestinationFolder="$(CWNetCoreOutputPath)" />
+  </ItemGroup>
+
+  <Target Name="CopyFilesPostBuild" AfterTargets="PostBuildEvent">
+    <Message Text="----------------" Importance="high" />
+    <Message Text="Copying files..." Importance="high" />
+    <Copy SourceFiles="@(FileToCopy)" DestinationFolder="%(FileToCopy.DestinationFolder)" />
+    <Message Text="Copied %(FileToCopy.Identity) to %(FileToCopy.DestinationFolder)" Importance="high" />
+  </Target>
+</Project>

@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema xmlns="http://www.wisetechglobal.com/Schemas/Configuration" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.wisetechglobal.com/Schemas/Configuration" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="Configuration">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Annotations" type="Annotations" minOccurs="0" />
+				<xs:element name="Group" type="Group" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+			<xs:attribute name="Name" type="xs:string" use="required" />
+			<xs:attribute name="Version" fixed="1.0" type="xs:string" use="required" />
+			<xs:attribute name="Timestamp" type="xs:dateTime" use="optional" />
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="Group">
+		<xs:sequence>
+			<xs:element name="Annotations" type="Annotations" minOccurs="0" />
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="Group" type="Group" />
+				<xs:element name="Item" type="Item" />
+				<xs:element name="File" type="File" />
+				<xs:element name="Credential" type="Credential" />
+				<xs:element name="Certificate" type="Certificate" />
+				<xs:element name="FTP" type="FTP" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="Type" type="xs:string" use="required" />
+		<xs:attribute name="Reference" type="xs:string" use="optional" />
+		<xs:attribute name="Status" type="xs:string" use="optional" />
+	</xs:complexType>
+	<xs:complexType name="Item">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="Name" type="xs:string" use="required" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="Annotations">
+		<xs:sequence>
+			<xs:element name="Item" type="Item" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="File">
+		<xs:simpleContent>
+			<xs:extension base="xs:base64Binary">
+				<xs:attribute name="Name" type="xs:string" use="optional" />
+				<xs:attribute name="Filename" type="xs:string" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="Credential">
+		<xs:sequence>
+			<xs:element name="UserName" type="xs:string" minOccurs="0" />
+			<xs:element name="Password" type="xs:base64Binary" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute name="Name" type="xs:string" use="optional" />
+	</xs:complexType>
+	<xs:complexType name="Certificate">
+		<xs:sequence>
+			<xs:element name="File" type="File" />
+			<xs:element name="Passphrase" type="xs:base64Binary" minOccurs="0" />
+			<xs:element name="ActiveFrom" type="xs:dateTime" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute name="Name" type="xs:string" use="optional" />
+	</xs:complexType>
+	<xs:complexType name="FTP">
+		<xs:sequence>
+			<xs:element name="Server" type="xs:string" />
+			<xs:element name="Port" type="xs:int" minOccurs="0" default="21" />
+			<xs:element name="UserName" type="xs:string" />
+			<xs:element name="Password" type="xs:base64Binary" />
+			<xs:element name="SendFolder" type="xs:string" minOccurs="0" />
+			<xs:element name="ReceiveFolder" type="xs:string" minOccurs="0" />
+			<xs:element name="ActiveFrom" type="xs:dateTime" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

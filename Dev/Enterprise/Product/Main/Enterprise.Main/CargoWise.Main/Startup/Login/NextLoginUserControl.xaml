@@ -1,0 +1,162 @@
+<UserControl x:Class="CargoWise.Main.Startup.Login.NextLoginUserControl"
+			xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			xmlns:ui="clr-namespace:CargoWise.Main.Navigation.WPF;assembly=CargoWise.Main.Navigation"
+			mc:Ignorable="d">
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="./Resources/LoginStyles.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
+	<Grid Background="Transparent">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*" />
+			<RowDefinition Height="67" />
+		</Grid.RowDefinitions>
+		<!--#region * Main Content * -->
+		<Grid Grid.Row="0" Background="{StaticResource PrimaryColor}">
+			<Image VerticalAlignment="Bottom" Source="{StaticResource CWNextLoginIllustrationImage}" Margin="0,0,0,35"/>
+			<StackPanel Orientation="Vertical" Width="360" VerticalAlignment="Center" Margin="0,0,0,140">
+				<Image Margin="30" Source="{StaticResource CWNextLogoImage}" />
+				<Border x:Name="LoginPanel" CornerRadius="8" BorderThickness="0" Background="{StaticResource NeutralColor}" Padding="32">
+					<StackPanel>
+						<ui:MultilingualTextLabel x:Name="Title" Style="{StaticResource TitleLabel}" MultilingualText="{Binding Title}" Content="{Binding Title}" />
+						<StackPanel x:Name="InputsPanel"
+									Visibility="{Binding IsUserPasswordLogin, Converter={StaticResource BooleanToVisibilityConverter}}">
+							<StackPanel Style="{StaticResource InputGroup}">
+								<ui:MultilingualTextLabel x:Name="UsernameLabel" Style="{StaticResource BaseLabel}" MultilingualText="{Binding UsernameLabel}" Content="{Binding UsernameLabel}" />
+								<ui:MultilingualTextLabel IsTranslatable="False" HorizontalContentAlignment="Stretch" Padding="0">
+									<TextBox x:Name="UsernameTextBox" Style="{StaticResource TextBoxInput}" Text="{Binding Username}" TextChanged="UsernameTextBox_TextChanged" GotFocus="UsernameTextBox_GotFocus" />
+								</ui:MultilingualTextLabel>
+							</StackPanel>
+							<StackPanel Style="{StaticResource InputGroup}">
+								<ui:MultilingualTextLabel x:Name="PasswordLabel" Style="{StaticResource BaseLabel}" MultilingualText="{Binding PasswordLabel}" Content="{Binding PasswordLabel}" />
+								<PasswordBox x:Name="PasswordTextBox" Style="{StaticResource PasswordBoxInput}" PasswordChanged="PasswordTextBox_PasswordChanged" KeyDown="PasswordTextBox_KeyDown" GotFocus="PasswordTextBox_GotFocus"/>
+							</StackPanel>
+							<StackPanel Style="{StaticResource InputGroup}" Visibility="{Binding IsTwoFactorAuthentication, Converter={StaticResource BooleanToVisibilityConverter}}">
+								<ui:MultilingualTextLabel x:Name="VerificationCodeLabel" Style="{StaticResource BaseLabel}" MultilingualText="{Binding VerificationCodeLabel}" Content="{Binding VerificationCodeLabel}" />
+								<TextBox x:Name="VerificationCodeTextBox" Style="{StaticResource TextBoxInput}" Text="{Binding VerificationCode}" />
+							</StackPanel>
+						</StackPanel>
+						<StackPanel x:Name="CalloutsPanel">
+							<Border
+								x:Name="ErrorCallout"
+								Margin="0,0,0,12"
+								Style="{StaticResource ErrorCallout}"
+								Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}">
+								<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+									<Image Margin="0,0,8,0" Source="{StaticResource CWNextStatusCriticalImage}" />
+									<ui:MultilingualTextLabel IsTranslatable="False" Style="{StaticResource CalloutLabel}">
+										<TextBlock x:Name="ErrorTextBlock" Width="250" TextWrapping="Wrap" Text="{Binding ErrorMessage}" />
+									</ui:MultilingualTextLabel>
+								</StackPanel>
+							</Border>
+							<Border
+								x:Name="WarningCallout"
+								Margin="0,0,0,12"
+								Style="{StaticResource WarningCallout}"
+								Visibility="{Binding WarningMessage, Converter={StaticResource StringToVisibilityConverter}}">
+								<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+									<Image Margin="0,0,8,0" Source="{StaticResource CWNextStatusWarningImage}" />
+									<ui:MultilingualTextLabel IsTranslatable="False" Style="{StaticResource CalloutLabel}">
+										<TextBlock x:Name="WarningTextBlock" Width="250" TextWrapping="Wrap" Text="{Binding WarningMessage}" />
+									</ui:MultilingualTextLabel>
+								</StackPanel>
+							</Border>
+							<Border
+								x:Name="InfoCallout"
+								Margin="0,0,0,12"
+								Style="{StaticResource InfoCallout}"
+								Visibility="{Binding InfoMessage, Converter={StaticResource StringToVisibilityConverter}}">
+								<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+									<Image Margin="0,0,8,0" Source="{StaticResource CWNextStatusInfoImage}" />
+									<ui:MultilingualTextLabel IsTranslatable="False" Style="{StaticResource CalloutLabel}">
+										<TextBlock x:Name="InfoTextBlock" Width="250" TextWrapping="Wrap" Text="{Binding InfoMessage}" />
+									</ui:MultilingualTextLabel>
+								</StackPanel>
+							</Border>
+						</StackPanel>
+						<Grid x:Name="Buttons">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="auto" />
+								<ColumnDefinition Width="*" />
+							</Grid.ColumnDefinitions>
+							<ui:MultilingualTextLabel x:Name="EmailTemporaryPassword"
+								Grid.Column="0"
+								MultilingualText="{Binding TemporaryLoginButtonCaption}"
+								Visibility="{Binding IsTemporaryLoginRequired, Converter={StaticResource BooleanToVisibilityConverter}}"
+								Padding="0" Margin="0,8,0,0" HorizontalContentAlignment="Stretch">
+								<Button
+									x:Name="TemporaryLoginButton"
+									MinWidth="150"
+									Style="{StaticResource NeutralButton}"
+									Content="{Binding TemporaryLoginButtonCaption}"
+									Click="TemporaryLoginButton_Click" />
+							</ui:MultilingualTextLabel>
+							<ui:MultilingualTextLabel x:Name="Cancel"
+													  Grid.Column="0"
+													  MultilingualText="{Binding CancelButtonCaption}"
+													  Visibility="{Binding IsCancelButtonVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+													  Padding="0" Margin="0,8,0,0" HorizontalContentAlignment="Stretch">
+								<Button x:Name="CancelButton"
+										MinWidth="150"
+										Style="{StaticResource FilledNeutralButton}"
+										Content="{Binding CancelButtonCaption}"
+										Click="CancelButton_Click" />
+							</ui:MultilingualTextLabel>
+							<ui:MultilingualTextLabel x:Name="LoginWithSSO"
+								Grid.Column="0"
+								MultilingualText="{Binding OIDCLoginButtonCaption}"
+								Visibility="{Binding IsOIDCButtonVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+								Padding="0" Margin="0,8,0,0" HorizontalContentAlignment="Stretch">
+								<Button x:Name="OIDCLoginButton" MinWidth="150" Style="{StaticResource PrimaryButton}" Content="{Binding OIDCLoginButtonCaption}" Click="OpenIDConnectLogin_Click" />
+							</ui:MultilingualTextLabel>
+							<ui:MultilingualTextLabel x:Name="SupportLogin"
+								Grid.Column="1"
+								MultilingualText="{Binding SupportLoginButtonCaption}"
+								Visibility="{Binding IsSupportLoginButtonVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+								Padding="0" Margin="0,8,0,0" HorizontalContentAlignment="Stretch">
+								<Button x:Name="SupportLoginButton" Style="{StaticResource NeutralButton}" Content="{Binding SupportLoginButtonCaption}" Click="SupportLoginButton_Click" />
+							</ui:MultilingualTextLabel>
+							<ui:MultilingualTextLabel x:Name="Back"
+								Grid.Column="0"
+								MultilingualText="{Binding BackButtonCaption}"
+								Visibility="{Binding IsBackButtonVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+								Padding="0" Margin="0,8,0,0" HorizontalContentAlignment="Stretch">
+								<Button x:Name="BackButton" MinWidth="50" Style="{StaticResource NeutralButton}" Content="{Binding BackButtonCaption}" Click="BackButton_Click" />
+							</ui:MultilingualTextLabel>
+							<ui:MultilingualTextLabel x:Name="Login"
+								Grid.Column="1"
+								MultilingualText="{Binding LoginButtonCaption}"
+								Visibility="{Binding IsLoginButtonVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+								Padding="0" Margin="0,8,0,0" HorizontalContentAlignment="Stretch">
+								<Button x:Name="LoginButton" Style="{StaticResource PrimaryButton}" Content="{Binding LoginButtonCaption}" Click="LoginButton_Click" />
+							</ui:MultilingualTextLabel>
+						</Grid>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+		</Grid>
+		<!--#endregion Main Content -->
+		<!--#region * Footer * -->
+		<Grid x:Name="Footer" Grid.Row="1">
+			<Border Padding="32,16" Background="{StaticResource PrimaryColor}" >
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition />
+						<ColumnDefinition />
+					</Grid.ColumnDefinitions>
+					<ui:MultilingualTextLabel Grid.Column="0" VerticalAlignment="Center" Foreground="{StaticResource PrimaryTextColor}" IsTranslatable="False">
+						© 2024 WiseTech Global
+					</ui:MultilingualTextLabel>
+					<Image Grid.Column="1" Source="{StaticResource WiseTechGlobalLogoImage}" HorizontalAlignment="Right" />
+				</Grid>
+			</Border>
+		</Grid>
+		<!--#endregion Footer -->
+	</Grid>
+</UserControl>

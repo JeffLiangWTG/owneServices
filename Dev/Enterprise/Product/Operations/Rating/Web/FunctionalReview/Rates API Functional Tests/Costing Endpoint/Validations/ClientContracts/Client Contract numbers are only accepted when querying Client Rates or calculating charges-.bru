@@ -1,0 +1,31 @@
+meta {
+  name: Client Contract numbers are only accepted when querying Client Rates or calculating charges-
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.ClientContracts = ["ABC", "DEF", "GHIJKLMNO", "P", "28374293779237"];
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Client Contract numbers are only accepted when querying Client Rates or calculating charges.", function() {
+    expect(res.body.ModelState['ClientContracts'][0]).to.equal("Client Contract numbers are only accepted when querying Client Rates or calculating charges.");
+  });
+  
+}

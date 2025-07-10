@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.edi.com.au/EnterpriseService/" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Elements.xsd"/>
+	<xs:include schemaLocation="Invoice.xsd"/>
+	<xs:include schemaLocation="Order.xsd"/>
+	<xs:include schemaLocation="Event.xsd"/>
+	<xs:include schemaLocation="FinancialInvoice.xsd"/>
+	<xs:include schemaLocation="Billing.xsd"/>
+	<xs:include schemaLocation="Declaration.xsd"/>
+	<xs:include schemaLocation="ExportAWBHeader.xsd"/>
+	<xs:complexType name="ShipmentIdentifier">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="ShipmentIdentifierType" type="ShipmentIdentifierType" use="required"/>
+				<xs:attribute name="Masterbill" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="Shipment">
+		<xs:sequence>
+			<xs:element name="Events" type="Events" minOccurs="0"/>
+			<xs:element name="Notes" type="Notes" minOccurs="0"/>
+			<xs:element name="ShipmentIdentifier" type="ShipmentIdentifier" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Unique identifier of the shipment</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ShipmentDetails" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="DateCreated" type="xs:dateTime" minOccurs="0"/>
+						<xs:element name="TransportMode" type="TransportMode" minOccurs="0"/>
+						<xs:element name="PortOfOrigin" type="Movement" minOccurs="0"/>
+						<xs:element name="PortofDestination" type="Movement" minOccurs="0"/>
+						<xs:element name="Consignee" type="Organisation" minOccurs="0"/>
+						<xs:element name="Consignor" type="Organisation" minOccurs="0"/>
+						<xs:element name="ShipmentStatus" type="xs:NMTOKEN" minOccurs="0"/>
+						<xs:element name="PackingMode" type="ContainerMode" minOccurs="0"/>
+						<xs:element name="ForwardingShipmentType" type="ForwardingShipmentType" minOccurs="0"/>
+						<xs:element name="TotalInnerPacksQty" type="DimensionValue" minOccurs="0"/>
+						<xs:element name="TotalOuterPacksQty" type="DimensionValue" minOccurs="0"/>
+						<xs:element name="Weight" type="DimensionValue" minOccurs="0"/>
+						<xs:element name="Volume" type="DimensionValue" minOccurs="0"/>
+						<xs:element name="LoadingMeters" type="xs:decimal" minOccurs="0"/>
+						<xs:element name="GoodsValue" type="FinancialValue" minOccurs="0"/>
+						<xs:element name="InsuranceValue" type="FinancialValue" minOccurs="0"/>
+						<xs:element name="GoodsDescription" type="xs:string" minOccurs="0"/>
+						<xs:element name="ChargeableWeight" type="DimensionValue" minOccurs="0"/>
+						<xs:element name="FreightRate" type="FinancialValue" minOccurs="0"/>
+						<xs:element name="MarksAndNumbers" type="xs:string" minOccurs="0"/>
+						<xs:element name="ServiceLevel" minOccurs="0">
+							<xs:simpleType>
+								<xs:restriction base="xs:NMTOKEN">
+									<xs:minLength value="1"/>
+									<xs:maxLength value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="Incoterm" minOccurs="0">
+							<xs:simpleType>
+								<xs:restriction base="INCOTERM">
+									<xs:length value="3"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="AdditionalTerms" type="xs:string" minOccurs="0"/>
+						<xs:element name="ReleaseType" type="ReleaseType" minOccurs="0"/>
+						<xs:element name="NotifyParty" type="ContactReference" minOccurs="0"/>
+						<xs:element name="OwnerReference" type="xs:NMTOKEN" minOccurs="0"/>
+						<xs:element name="OrderReferences" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="OrderReference" type="xs:string" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="Packages" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Package" type="Package" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="ImportBroker" type="Organisation" minOccurs="0"/>
+						<xs:element name="ExportBroker" type="Organisation" minOccurs="0"/>
+						<xs:element name="AgentReference" type="xs:string" minOccurs="0"/>
+						<xs:element name="BookingReference" type="xs:string" minOccurs="0"/>
+						<xs:element name="InterimReceipt" type="xs:string" minOccurs="0"/>
+						<xs:element name="OnForwardTo" type="xs:string" minOccurs="0"/>
+						<xs:element name="OnForwardToETA" type="xs:dateTime" minOccurs="0"/>
+						<xs:element name="HBLIssueDate" type="xs:dateTime" minOccurs="0"/>
+						<xs:element name="HBLContainerMode" type="xs:string" minOccurs="0"/>
+						<xs:element name="ShippedOnBoardDate" type="xs:dateTime" minOccurs="0"/>
+						<xs:element name="ShippedOnBoardType" type="ShippedOnBoardType" minOccurs="0"/>
+						<xs:element name="NoOriginalBills" type="xs:string" minOccurs="0"/>
+						<xs:element name="NoCopyBills" type="xs:string" minOccurs="0"/>
+						<xs:element name="CustomsEntryNumbers" type="CustomsEntryNumbers" minOccurs="0"/>
+						<xs:element name="CustomsEntries" type="CustomsEntries" minOccurs="0"/>
+						<xs:element name="Deliver" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="DeliveryFrom" type="xs:dateTime" minOccurs="0"/>
+									<xs:element name="DeliveryRequiredBy" type="xs:dateTime" minOccurs="0"/>
+									<xs:element name="CartageAdvised" type="xs:dateTime" minOccurs="0"/>
+									<xs:element name="GoodsDelivered" type="xs:dateTime" minOccurs="0"/>
+									<xs:element name="DeliveryAgent" type="Organisation" minOccurs="0"/>
+									<xs:element name="Address" type="OrgAddress" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Address for delivery of goods</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="CartageCompany" type="Organisation" minOccurs="0"/>
+									<xs:element name="CFS" type="CFSAddress" minOccurs="0"/>
+									<xs:element name="DeliveryLegs" minOccurs="0">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="DeliveryLeg" type="ContainerLeg" maxOccurs="unbounded"/>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+									<xs:element name="Zones" minOccurs="0">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="Zone" type="Zone" maxOccurs="unbounded"/>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="Pickup" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="PickupFrom" type="xs:dateTime" minOccurs="0"/>
+									<xs:element name="PickupRequiredBy" type="xs:dateTime" minOccurs="0"/>
+									<xs:element name="CartageAdvised" type="xs:dateTime" minOccurs="0"/>
+									<xs:element name="GoodsPickup" type="xs:dateTime" minOccurs="0"/>
+									<xs:element name="DateOfReceipt" type="xs:dateTime" minOccurs="0"/>
+									<xs:element name="Address" type="OrgAddress" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Address for pickup of goods</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="CartageCompany" type="Organisation" minOccurs="0"/>
+									<xs:element name="CFS" type="CFSAddress" minOccurs="0"/>
+									<xs:element name="Zones" minOccurs="0">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="Zone" type="Zone" maxOccurs="unbounded"/>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="Custom" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="CustomAttribute1" type="xs:string" minOccurs="0"/>
+									<xs:element name="CustomAttribute2" type="xs:string" minOccurs="0"/>
+									<xs:element name="Date1" type="xs:dateTime" minOccurs="0"/>
+									<xs:element name="Date2" type="xs:dateTime" minOccurs="0"/>
+									<xs:element name="Decimal1" type="xs:decimal" minOccurs="0"/>
+									<xs:element name="Decimal2" type="xs:decimal" minOccurs="0"/>
+									<xs:element name="Flag1" type="TrueFalse" minOccurs="0"/>
+									<xs:element name="Flag2" type="TrueFalse" minOccurs="0"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="CustomValues" type="CustomValues" minOccurs="0"/>
+						<xs:element name="TransportPlan" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="PlannedLeg" type="PlannedLeg" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="DocAddresses" type="DocAddresses" minOccurs="0"/>
+						<xs:element name="ShipmentType" type="ShipmentType" minOccurs="0"/>
+						<xs:element name="InnerPackages" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="InnerPackage" type="PackageBase" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="DeclarationStyle" type="xs:string" minOccurs="0"/>
+						<xs:element name="SalesRep" type="xs:string" minOccurs="0"/>
+						<xs:element name="LocalClient" type="Organisation" minOccurs="0"/>
+						<xs:element name="TEU" type="xs:decimal" minOccurs="0"/>
+						<xs:element name="ReferenceNumbers" type="ReferenceNumbers" minOccurs="0" />
+						<xs:element name="ConsignorCODAmount" type="xs:decimal" minOccurs="0"/>
+						<xs:element name="ConsignorCODType" type="xs:string" minOccurs="0"/>
+						<xs:element name="BookedDate" type="xs:dateTime" minOccurs="0"/>
+						<xs:element name="ExporterStatement" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Invoices" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="InvoiceHeader" type="InvoiceHeader" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Declaration" type="Declaration" minOccurs="0"/>
+			<xs:element name="Orders" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Order" type="Order" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Documents" type="Documents" minOccurs="0"/>
+			<xs:element name="ARInvoices" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="TxnHeader" type="TxnHeader" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Billing" type="Billing" minOccurs="0"/>
+			<xs:element name="DocData" type="DocData" minOccurs="0"/>
+			<xs:element name="AWBHeaders" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AWBHeader" type="AWBHeader" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Shipments">
+		<xs:sequence>
+			<xs:element name="Shipment" type="Shipment" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Shipments" type="Shipments"/>
+	<xs:simpleType name="ShipmentIdentifierType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="Housebill"/>
+			<xs:enumeration value="CoLoadMaster"/>
+			<xs:enumeration value="PreadviceIdentifier"/>
+			<xs:enumeration value="Other"/>
+			<xs:enumeration value="Branch"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ForwardingShipmentType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="STD"/>
+			<xs:enumeration value="ASM"/>
+			<xs:enumeration value="BCN"/>
+			<xs:enumeration value="CLD"/>
+			<xs:enumeration value="SCN"/>
+			<xs:enumeration value="HLS"/>
+			<xs:enumeration value="CLB"/>
+			<xs:enumeration value="HVL"/>
+			<xs:enumeration value="HVM"/>
+			<xs:enumeration value="3PT"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ShippedOnBoardType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="SHP"/>
+			<xs:enumeration value="CLN"/>
+			<xs:enumeration value="LDN"/>
+			<xs:enumeration value="RFS"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="TransportPlan">
+		<xs:sequence>
+			<xs:element name="PlannedLeg" type="PlannedLeg" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CFSAddress">
+		<xs:sequence>
+			<xs:element name="Address" type="AddressReference" minOccurs="0"/>
+			<xs:element name="Location" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Zone">
+		<xs:sequence>
+			<xs:element name="Type">
+				<xs:simpleType>
+					<xs:restriction base="xs:NMTOKEN">
+						<xs:enumeration value="ACIZone"/>
+						<xs:enumeration value="CartageZone"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Code" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
+<!--Dummy change to trigger xsd schema uploading -->

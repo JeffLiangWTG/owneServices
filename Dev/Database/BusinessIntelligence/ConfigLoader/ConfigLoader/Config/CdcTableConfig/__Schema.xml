@@ -1,0 +1,95 @@
+	<xs:schema id="CdcTableConfig" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xs:element name="CdcTableConfig" msdata:IsDataSet="true" msdata:Locale="">
+			<xs:complexType>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="CdcTableConfig" msdata:CaseSensitive="False" msdata:Locale="">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="CdcColumnConfig" msdata:CaseSensitive="False" msdata:Locale="" minOccurs="0" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:attribute name="SourceTable" type="xs:string" />
+										<xs:attribute name="SourceColumn" use="required">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255" />
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+										<xs:attribute name="DataType" use="required">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255" />
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+										<xs:attribute name="MaxLength" type="xs:int" msdata:DefaultValue="0" use="required" />
+										<xs:attribute name="Precision" type="xs:int" default="0" />
+										<xs:attribute name="Scale" type="xs:int" default="0" />
+										<xs:attribute name="Nullable" type="xs:boolean" default="false" />
+										<xs:attribute name="IsPrimaryKey" type="xs:boolean" default="false" />
+										<xs:attribute name="Action" type="xs:string" msdata:DefaultValue="Unchanged" use="prohibited" />
+										<xs:attribute name="Message" type="xs:string" use="prohibited" />
+										<xs:attribute name="CdcEnabled" type="xs:boolean" default="true" />
+										<xs:attribute name="ReferenceSchema">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255" />
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+										<xs:attribute name="ReferenceTable">
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:maxLength value="255" />
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:attribute>
+										<xs:attribute name="ColumnInAudit" type="xs:boolean" default="false" />
+										<xs:attribute name="ColumnInEdw" type="xs:boolean" default="false" />
+										<xs:attribute name="ModelViewColumn" type="xs:string" use="prohibited" />
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+							<xs:attribute name="SourceSchema" use="required">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
+							<xs:attribute name="SourceTable" use="required">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
+							<xs:attribute name="EdwSchema" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
+							<xs:attribute name="Action" type="xs:string" msdata:DefaultValue="Unchanged" use="prohibited" />
+							<xs:attribute name="Message" type="xs:string" use="prohibited" />
+							<xs:attribute name="TableInAudit" type="xs:boolean" default="false" />
+							<xs:attribute name="TableInEdw" type="xs:boolean" default="false" />
+							<xs:attribute name="AuditFilter" type="xs:string" />
+							<xs:attribute name="EdwFilter" type="xs:string" />
+							<xs:attribute name="IndexedColumn" type="xs:string" />
+							<xs:attribute name="IsEdiClient" type="xs:boolean" default="false" />
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+			</xs:complexType>
+			<xs:unique name="Constraint1">
+				<xs:selector xpath=".//CdcTableConfig" />
+				<xs:field xpath="@SourceTable" />
+			</xs:unique>
+			<xs:keyref name="FK_CdcTableConfig_CdcColumnConfig" refer="Constraint1" msdata:IsNested="true">
+				<xs:selector xpath=".//CdcColumnConfig" />
+				<xs:field xpath="@SourceTable" />
+			</xs:keyref>
+		</xs:element>
+	</xs:schema>

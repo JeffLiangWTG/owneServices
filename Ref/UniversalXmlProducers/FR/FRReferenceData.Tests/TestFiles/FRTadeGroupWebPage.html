@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+<script type="text/javascript">
+	$(function() {
+	      
+	});
+</script>
+
+<script type="text/javascript" src="/rita-encyclopedie/js/jquery.tablesorter.min.js" ></script>
+<script type="text/javascript" src="/rita-encyclopedie/js/jquery.tablesorter.widgets.min.js" ></script>
+<script type="text/javascript">
+$(function() {
+	afficherDivElement("resultat");
+	$(".resultatTable:last").tablesorter({
+        headers: {
+            0: {lockedOrder: 'asc', sorter: 'text'},
+            1: {lockedOrder: 'asc', sorter: 'text'},
+            2: {lockedOrder: 'asc', sorter: 'text'},
+            3: {lockedOrder: 'asc', sorter: 'text'},
+            4: {lockedOrder: 'asc', sorter: 'text'},
+            5: {lockedOrder: 'asc', sorter: 'text'},
+            6: {sorter: false}
+        },
+        widgets: ["zebra", "columns"],
+        widgetOptions: {
+            zebra: ["ligne1", "ligne2"],
+            columns : ["primary", "secondary", "tertiary", ""],
+            columns_thead : true
+        },
+        sortList: [[0,0]],
+        textExtraction : "complex"
+        
+    });
+});
+
+ function rechercheColonneType(paramTypeZone) {
+     
+     $('#radTYPE_ZONE_' +  paramTypeZone).prop('checked', true);
+     
+     var idListeDeroulante =  "divSelGR_PAYS";
+     
+     $("#" + idListeDeroulante + " option").filter(function() {
+         return $(this).text().trim() == ""; 
+     }).prop('selected', true);
+     
+     idListeDeroulante = "divSelMEMBRE_PAYS";
+     
+     $("#" + idListeDeroulante + " option").filter(function() {
+         return $(this).text().trim() == ""; 
+     }).prop('selected', true);
+     
+     $('#inpIDENTIFIANT').val('');
+     $('#inpMOT_CLE').val('');
+     $('#typeRecherche').val('PAYS_REGION_GROUPE');
+     $("#btnRECHERCHE").trigger('click');
+
+}
+
+function rechercheColonneRechDispo(paramTypeZone, codeListe, libelleListe) {
+  
+  $('#radTYPE_ZONE_TOUS').prop('checked', true);
+ 
+  var idListeDeroulante,idListeNonChoisie;
+  if(paramTypeZone == "Z" ) {
+      idListeDeroulante = "divSelMEMBRE_PAYS";
+      idListeNonChoisie = "divSelGR_PAYS";
+  }
+  else {
+      idListeDeroulante =  "divSelGR_PAYS";
+      idListeNonChoisie = "divSelMEMBRE_PAYS";
+  }
+  
+  $("#" + idListeDeroulante + " option").filter(function() {
+      return $(this).val().trim() == codeListe + ":" +  libelleListe; 
+  }).prop('selected', true);
+  
+  $("#" + idListeNonChoisie + " option").filter(function() {
+      return $(this).val().trim() == ""; 
+  }).prop('selected', true);
+  
+  $('#inpIDENTIFIANT').val('');
+  $('#inpMOT_CLE').val('');
+  $('#typeRecherche').val('PAYS_REGION_GROUPE');
+  $("#btnRECHERCHE").trigger('click');
+}
+
+</script>
+<title></title>
+</head>
+<body>
+    
+<form id="formTelecharger" name="formTelecharger" action="/rita-encyclopedie/public/experts/reference/ajaxRecherchePaysRegGr.action" method="post"><div id="divTelecharger"
+           >
+            <span class="libelle">T�l�charger&nbsp;:</span>
+            <a href="/rita-encyclopedie/public/experts/reference/exporter.action?expertsReferenceConversation.formatExport=XLS&expertsReferenceConversation.typeExport=CODES_GEOGRAPHIQUES_VALIDES" style="margin:0 0.2em"><img src="/rita-encyclopedie/img/bouton/B_ExportXlsP_1.gif"/></a><a href="/rita-encyclopedie/public/experts/reference/exporter.action?expertsReferenceConversation.formatExport=XML&expertsReferenceConversation.typeExport=CODES_GEOGRAPHIQUES_VALIDES" style="margin:0 0.2em"><img src="/rita-encyclopedie/img/bouton/B_ExportXmlP_1.gif"/></a><a href="/rita-encyclopedie/public/experts/reference/exporter.action?expertsReferenceConversation.formatExport=CSV&expertsReferenceConversation.typeExport=CODES_GEOGRAPHIQUES_VALIDES" style="margin:0 0.2em"><img src="/rita-encyclopedie/img/bouton/B_ExportCsvP_1.gif"/></a></div>
+        </form>
+
+
+<table id="recapitulatifPaysGroupe" class="recapitulatif" style="margin: 1em;">
+		<thead>
+			<tr>
+				<th colspan="2">R�capitulatif des crit�res saisis</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr>
+				<th>Type de donn�es&nbsp;:</th>
+				<td>Pays, r&eacute;gion ou groupe</td>
+			</tr>
+			
+			<tr>
+				<th>Date&nbsp;:</th>
+				<td>24/02/2022</td>
+			</tr>
+			<tr>
+				<th>Type&nbsp;:</th>
+				<td>
+				Groupe</td>
+			</tr>
+			</tbody>
+	</table>
+	
+<div style="margin: 0.5em">
+        <span style="font-weight: bolder;">Pays, r&eacute;gion ou groupe</span>:
+        59r�sultats.
+        </div><table id="tabPaysRegion" class="resultat tablesorter tablesorter-default hasSaveSort resultatTable" style="width:100%;table-layout:auto;">
+			<thead> 
+				<tr>
+					<th id="tabResulTr1" style="cursor: pointer;" onclick="triTableau('tabPaysRegion', 'th.primary', 'th.secondary', 'th.tertiary', this);" title='Cliquez ici pour trier sur cette colonne.'>Code</th>
+                    <th id="tabResulTr2" style="cursor: pointer;" onclick="triTableau('tabPaysRegion', 'th.primary', 'th.secondary', 'th.tertiary', this);" title='Cliquez ici pour trier sur cette colonne.'>Description</th>
+                    <th id="tabResulTr3" style="cursor: pointer;" onclick="triTableau('tabPaysRegion', 'th.primary', 'th.secondary', 'th.tertiary', this);" title='Cliquez ici pour trier sur cette colonne.'>Type</th>
+                    <th id="tabResulTr4" style="cursor: pointer;" onclick="triTableau('tabPaysRegion', 'th.primary', 'th.secondary', 'th.tertiary', this);" title='Cliquez ici pour trier sur cette colonne.'>D�but</th>
+                    <th id="tabResulTr5" style="cursor: pointer;" onclick="triTableau('tabPaysRegion', 'th.primary', 'th.secondary', 'th.tertiary', this);" title='Cliquez ici pour trier sur cette colonne.'>Fin</th>
+					<th id="tabResulTr6" >Recherches disponibles</th>
+				</tr>
+			</thead>
+			
+			<tbody>
+				<tr>
+					<td>1005</td>
+					<td style="text-align:left">Surveillance statistique</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1005', 'Surveillance statistique')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1006</td>
+					<td style="text-align:left">Accord Union europ&eacute;enne-Canada: marchandises r&eacute;import&eacute;es</td>
+					<td>
+					Groupe</td>
+					<td>21/09/2017</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1006', 'Accord Union europ&eacute;enne-Canada: marchandises r&eacute;import&eacute;es')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1007</td>
+					<td style="text-align:left">Accord Union europ&eacute;enne-Suisse: marchandises r&eacute;import&eacute;es</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2007</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1007', 'Accord Union europ&eacute;enne-Suisse: marchandises r&eacute;import&eacute;es')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1008</td>
+					<td style="text-align:left">Tous les pays tiers</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2007</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1008', 'Tous les pays tiers')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1009</td>
+					<td style="text-align:left">Toutes destinations &ndash; Restitution &agrave; l'exportation</td>
+					<td>
+					Groupe</td>
+					<td>01/09/2004</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1009', 'Toutes destinations &ndash; Restitution &agrave; l'exportation')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1010</td>
+					<td style="text-align:left">Union europ&eacute;enne</td>
+					<td>
+					Groupe</td>
+					<td>01/01/1958</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1010', 'Union europ&eacute;enne')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1011</td>
+					<td style="text-align:left">ERGA OMNES</td>
+					<td>
+					Groupe</td>
+					<td>01/01/1958</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1011', 'ERGA OMNES')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1013</td>
+					<td style="text-align:left">Union europ&eacute;enne (y compris code &quot;EU&quot;)</td>
+					<td>
+					Groupe</td>
+					<td>01/07/2007</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1013', 'Union europ&eacute;enne (y compris code &quot;EU&quot;)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1014</td>
+					<td style="text-align:left">OECD</td>
+					<td>
+					Groupe</td>
+					<td>18/08/2016</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1014', 'OECD')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1016</td>
+					<td style="text-align:left">Programme Douane 2020 (UE + pays candidats)</td>
+					<td>
+					Groupe</td>
+					<td>01/07/2017</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1016', 'Programme Douane 2020 (UE + pays candidats)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1021</td>
+					<td style="text-align:left">AELE (CH; IS; NO; LI)</td>
+					<td>
+					Groupe</td>
+					<td>20/12/1972</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1021', 'AELE (CH; IS; NO; LI)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1030</td>
+					<td style="text-align:left">SPG (Syst&egrave;me de Pr&eacute;f&eacute;rences G&eacute;n&eacute;ralis&eacute;es) - Pays admissibles</td>
+					<td>
+					Groupe</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1030', 'SPG (Syst&egrave;me de Pr&eacute;f&eacute;rences G&eacute;n&eacute;ralis&eacute;es) - Pays admissibles')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1032</td>
+					<td style="text-align:left">Accords de Partenariats &Eacute;conomiques</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2008</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1032', 'Accords de Partenariats &Eacute;conomiques')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1033</td>
+					<td style="text-align:left">CARIFORUM</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2008</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1033', 'CARIFORUM')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1034</td>
+					<td style="text-align:left">&Eacute;tats d'Afrique orientale et australe</td>
+					<td>
+					Groupe</td>
+					<td>14/05/2012</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1034', '&Eacute;tats d'Afrique orientale et australe')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1035</td>
+					<td style="text-align:left">SADC EPA</td>
+					<td>
+					Groupe</td>
+					<td>10/10/2016</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1035', 'SADC EPA')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1054</td>
+					<td style="text-align:left">MAGHREB (DZ; MA; TN)</td>
+					<td>
+					Groupe</td>
+					<td>01/11/1978</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1054', 'MAGHREB (DZ; MA; TN)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1098</td>
+					<td style="text-align:left">Pays des Balkans occidentaux (AL, BA, ME, MK, XK, XS)</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2018</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1098', 'Pays des Balkans occidentaux (AL, BA, ME, MK, XK, XS)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1500</td>
+					<td style="text-align:left">Pays de destination des exportations de m&eacute;thyl&eacute;thylc&eacute;tone, tolu&egrave;ne, ac&eacute;tone et &eacute;ther &eacute;thylique</td>
+					<td>
+					Groupe</td>
+					<td>18/08/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1500', 'Pays de destination des exportations de m&eacute;thyl&eacute;thylc&eacute;tone, tolu&egrave;ne, ac&eacute;tone et &eacute;ther &eacute;thylique')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>1501</td>
+					<td style="text-align:left">Pays de destination des exportations d'acide chlorhydrique et acide sulfurique</td>
+					<td>
+					Groupe</td>
+					<td>18/08/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '1501', 'Pays de destination des exportations d'acide chlorhydrique et acide sulfurique')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2005</td>
+					<td style="text-align:left">GSP-EBA (r&eacute;gime sp&eacute;cial en faveur des pays les moins avanc&eacute;s - tout sauf les armes)</td>
+					<td>
+					Groupe</td>
+					<td>01/01/1997</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2005', 'GSP-EBA (r&eacute;gime sp&eacute;cial en faveur des pays les moins avanc&eacute;s - tout sauf les armes)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2006</td>
+					<td style="text-align:left">Pays REX - p&eacute;riode transitoire</td>
+					<td>
+					Groupe</td>
+					<td>20/12/2016</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2006', 'Pays REX - p&eacute;riode transitoire')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2007</td>
+					<td style="text-align:left">Pays appliquant pleinement le syst&egrave;me REX (pas de Formulaire A)</td>
+					<td>
+					Groupe</td>
+					<td>20/12/2016</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2007', 'Pays appliquant pleinement le syst&egrave;me REX (pas de Formulaire A)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2008</td>
+					<td style="text-align:left">Pays SPG non autoris&eacute;s &agrave; &eacute;mettre de Formule A</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2018</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2008', 'Pays SPG non autoris&eacute;s &agrave; &eacute;mettre de Formule A')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2012</td>
+					<td style="text-align:left">Espace Economique Europ&eacute;en</td>
+					<td>
+					Groupe</td>
+					<td>01/01/1994</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2012', 'Espace Economique Europ&eacute;en')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2014</td>
+					<td style="text-align:left">Espace Economique Europ&eacute;en - Islande</td>
+					<td>
+					Groupe</td>
+					<td>01/05/2018</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2014', 'Espace Economique Europ&eacute;en - Islande')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2020</td>
+					<td style="text-align:left">SPG - R&eacute;gime g&eacute;n&eacute;ral</td>
+					<td>
+					Groupe</td>
+					<td>01/01/1984</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2020', 'SPG - R&eacute;gime g&eacute;n&eacute;ral')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2027</td>
+					<td style="text-align:left">SPG+ (r&eacute;gime sp&eacute;cial d'encouragement en faveur du d&eacute;velop. durable et de la bonne gouvernance)</td>
+					<td>
+					Groupe</td>
+					<td>01/01/1992</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2027', 'SPG+ (r&eacute;gime sp&eacute;cial d'encouragement en faveur du d&eacute;velop. durable et de la bonne gouvernance)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2080</td>
+					<td style="text-align:left">PTOM (Pays et territoires d'outre-mer)</td>
+					<td>
+					Groupe</td>
+					<td>01/03/1985</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2080', 'PTOM (Pays et territoires d'outre-mer)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2110</td>
+					<td style="text-align:left">MACHRAK (EG; JO; LB; SY)</td>
+					<td>
+					Groupe</td>
+					<td>01/11/1978</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2110', 'MACHRAK (EG; JO; LB; SY)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2200</td>
+					<td style="text-align:left">Am&eacute;rique centrale</td>
+					<td>
+					Groupe</td>
+					<td>01/08/2013</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2200', 'Am&eacute;rique centrale')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2300</td>
+					<td style="text-align:left">Produits de soie ou de coton, tiss&eacute;s sur m&eacute;tiers &agrave; main</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2002</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2300', 'Produits de soie ou de coton, tiss&eacute;s sur m&eacute;tiers &agrave; main')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2301</td>
+					<td style="text-align:left">Certains produits faits main (Handicrafts)</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2002</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2301', 'Certains produits faits main (Handicrafts)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2400</td>
+					<td style="text-align:left">Cumul diagonal &quot;paneurop&eacute;en&quot;</td>
+					<td>
+					Groupe</td>
+					<td>01/01/1997</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2400', 'Cumul diagonal &quot;paneurop&eacute;en&quot;')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2500</td>
+					<td style="text-align:left">Pays membres de l'OMC</td>
+					<td>
+					Groupe</td>
+					<td>01/01/1988</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2500', 'Pays membres de l'OMC')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>2501</td>
+					<td style="text-align:left">Pays non membres de l'OMC</td>
+					<td>
+					Groupe</td>
+					<td>01/07/2001</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '2501', 'Pays non membres de l'OMC')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>3000</td>
+					<td style="text-align:left">Pays non coop&eacute;rants dans le cadre de la lutte contre la p&ecirc;che illicite, non d&eacute;clar&eacute;e et non r&eacute;glement&eacute;e</td>
+					<td>
+					Groupe</td>
+					<td>10/12/2013</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '3000', 'Pays non coop&eacute;rants dans le cadre de la lutte contre la p&ecirc;che illicite, non d&eacute;clar&eacute;e et non r&eacute;glement&eacute;e')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>3100</td>
+					<td style="text-align:left">Countries - export restriction protective equipment R 2020/568</td>
+					<td>
+					Groupe</td>
+					<td>21/03/2020</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '3100', 'Countries - export restriction protective equipment R 2020/568')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>3200</td>
+					<td style="text-align:left">Countries - export restrictions - SARS-related coronaviruses (SARS-CoV species)</td>
+					<td>
+					Groupe</td>
+					<td>28/01/2021</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '3200', 'Countries - export restrictions - SARS-related coronaviruses (SARS-CoV species)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>3300</td>
+					<td style="text-align:left">Countries - export restrictions - SARS-related coronaviruses (SARS-CoV species)</td>
+					<td>
+					Groupe</td>
+					<td>26/03/2021</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '3300', 'Countries - export restrictions - SARS-related coronaviruses (SARS-CoV species)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>3500</td>
+					<td style="text-align:left">Territoires hors territoire douanier</td>
+					<td>
+					Groupe</td>
+					<td>27/03/2017</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '3500', 'Territoires hors territoire douanier')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>5001</td>
+					<td style="text-align:left">Pays sujets aux mesures de sauvegarde</td>
+					<td>
+					Groupe</td>
+					<td>19/07/2018</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '5001', 'Pays sujets aux mesures de sauvegarde')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>5002</td>
+					<td style="text-align:left">Pays sujets aux mesures de sauvegarde</td>
+					<td>
+					Groupe</td>
+					<td>02/02/2019</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', '5002', 'Pays sujets aux mesures de sauvegarde')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR01</td>
+					<td style="text-align:left">UE + pays tiers + DOM</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR01', 'UE + pays tiers + DOM')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR02</td>
+					<td style="text-align:left">Pays tiers &agrave; l'UE + DOM</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR02', 'Pays tiers &agrave; l'UE + DOM')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR04</td>
+					<td style="text-align:left">PAYS DE L'UE + 5 DOM</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR04', 'PAYS DE L'UE + 5 DOM')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR05</td>
+					<td style="text-align:left">Pays Tiers &agrave; l'U.E. + U.E.</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR05', 'Pays Tiers &agrave; l'U.E. + U.E.')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR06</td>
+					<td style="text-align:left">5 DOM (Guadeloupe, Guyane, Martinique, Mayotte et Reunion)</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR06', '5 DOM (Guadeloupe, Guyane, Martinique, Mayotte et Reunion)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR07</td>
+					<td style="text-align:left">Guyane et Martinique</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR07', 'Guyane et Martinique')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR08</td>
+					<td style="text-align:left">Guadeloupe et Guyane</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR08', 'Guadeloupe et Guyane')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR09</td>
+					<td style="text-align:left">Guadeloupe et Martinique</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR09', 'Guadeloupe et Martinique')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR10</td>
+					<td style="text-align:left">Liechtenstein, Norv&egrave;ge et Islande</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR10', 'Liechtenstein, Norv&egrave;ge et Islande')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR11</td>
+					<td style="text-align:left">pays tiers repris &agrave; l'annexe 1 et vis&eacute;s &agrave; l'article 1 paragraphe 1 du r&egrave;glement d'ex&eacute;cution 2020/1158 paru au JOUE L 257 du 06/08/2020.</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR11', 'pays tiers repris &agrave; l'annexe 1 et vis&eacute;s &agrave; l'article 1 paragraphe 1 du r&egrave;glement d'ex&eacute;cution 2020/1158 paru au JOUE L 257 du 06/08/2020.')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR13</td>
+					<td style="text-align:left">UE (sans la France) et tous les pays tiers</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2005</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR13', 'UE (sans la France) et tous les pays tiers')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR15</td>
+					<td style="text-align:left">APE,CARIFORUM,PAPOUASIE-NOUVELLE GUINEE - MESURES OPR</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2014</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR15', 'APE,CARIFORUM,PAPOUASIE-NOUVELLE GUINEE - MESURES OPR')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR16</td>
+					<td style="text-align:left">BALKANS: ALBANIE, BOSNIE, MACEDOINE, SERBIE, MONTENEGRO - mesures OPR</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2014</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR16', 'BALKANS: ALBANIE, BOSNIE, MACEDOINE, SERBIE, MONTENEGRO - mesures OPR')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR17</td>
+					<td style="text-align:left">MACHRACK: JORDANIE,LIBAN,EGYPTE -MESURES OPR</td>
+					<td>
+					Groupe</td>
+					<td>01/01/2014</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR17', 'MACHRACK: JORDANIE,LIBAN,EGYPTE -MESURES OPR')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR18</td>
+					<td style="text-align:left">PAYS TIERS SOUS SANCTIONS INTERNATIONALES: HELICOPTERES CIVILS ET LEURS PIECES DETACHEEES ESSENTIELLES (MESURES STE)</td>
+					<td>
+					Groupe</td>
+					<td>08/08/2014</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR18', 'PAYS TIERS SOUS SANCTIONS INTERNATIONALES: HELICOPTERES CIVILS ET LEURS PIECES DETACHEEES ESSENTIELLES (MESURES STE)')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				<tr>
+					<td>FR19</td>
+					<td style="text-align:left">Islande et Norv&egrave;ge</td>
+					<td>
+					Groupe</td>
+					<td>01/02/2022</td>
+					<td></td>
+					<td>
+					<a href="#" title="Cliquez ici pour voir la liste des zones contenues."
+					   onclick="rechercheColonneRechDispo('G', 'FR19', 'Islande et Norv&egrave;ge')">
+					   zones contenues</a>
+					</td>
+					</tr>
+				</tbody>
+			
+			
+		</table>
+	
+	<script type="text/javascript">
+	$(".recapitulatif").hide();
+	$('#btnCriteres').removeClass("fermer");
+	$('#btnCriteres').addClass("visu");
+</script>
+
+</body>
+</html>

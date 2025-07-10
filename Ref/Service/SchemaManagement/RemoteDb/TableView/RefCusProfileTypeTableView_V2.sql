@@ -1,0 +1,7 @@
+CREATE VIEW RefCusProfileTypeTableView_V2 AS
+SELECT XXX_PK,
+XXX_ProfileType,
+XXX_ZZI_TariffType,
+XXX_Description,
+XXX_ZZZ_NKDataGrouping
+FROM RefCusProfileType

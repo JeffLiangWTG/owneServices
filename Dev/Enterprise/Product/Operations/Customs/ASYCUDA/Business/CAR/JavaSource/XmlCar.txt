@@ -1,0 +1,75 @@
+﻿package car;
+
+import java.io.File;
+import java.io.PrintStream;
+import java.net.URI;
+import java.util.Vector;
+import javax.swing.JOptionPane;
+import utils.PropertyFileReader;
+
+public class XmlCar
+{
+  PropertyFileReader PFR = new PropertyFileReader();
+  public String ss = "";
+  public boolean Validxml = false;
+  
+  public boolean XmlCarCheck(File paramFile)
+  {
+    String str1 = paramFile.toURI().toString();
+    String str2 = paramFile.getName().substring(0, paramFile.getName().length() - 4);
+    String str3 = "";
+    String str4 = "";
+    Object localObject = null;
+    str4 = this.PFR.readParaFile("LOGDESTIN");
+    str3 = str4 + "/" + str2 + ".log";
+    if ((str4 != null) && (new File(str4).exists()))
+    {
+      this.ss = str4;
+      System.out.println(this.ss);
+    }
+    else
+    {
+      JOptionPane.showMessageDialog(null, "Destination path : " + str4 + " Does not Exist.\n" + "Please Verify");
+      
+      System.exit(0);
+    }
+    xmlSchemaTester localxmlSchemaTester = new xmlSchemaTester();
+    this.Validxml = localxmlSchemaTester.valid(str1, str3);
+    
+
+
+    System.out.println(this.Validxml);
+    return this.Validxml;
+  }
+  
+  public void Xml2Car(File paramFile)
+  {
+    String str1 = paramFile.toURI().toString();
+    String str2 = paramFile.getName().substring(0, paramFile.getName().length() - 4);
+    String str3 = "";
+    String str4 = "";
+    Object localObject = null;
+    str4 = this.PFR.readParaFile("CARDESTIN");
+    str3 = str4 + "/" + str2 + ".car";
+    if ((str4 != null) && (new File(str4).exists()))
+    {
+      this.ss = str4;
+      System.out.println(this.ss);
+    }
+    else
+    {
+      JOptionPane.showMessageDialog(null, "Destination path : " + str4 + " Does not Exist.\n" + "Please Verify");
+      
+      System.exit(0);
+    }
+    ReadcarXmlToVector localReadcarXmlToVector = new ReadcarXmlToVector();
+    VectorToCar localVectorToCar = new VectorToCar();
+    Vector localVector = new Vector();
+    
+    localVector = localReadcarXmlToVector.XmlToVector(str1);
+    
+
+
+    localVectorToCar.createCar(localVector, str3);
+  }
+}

@@ -1,0 +1,87 @@
+<UserControl x:Class="CargoWise.Main.Navigation.WPF.Test.UserControlForTesting"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+	         xmlns:UI="clr-namespace:CargoWise.Main.Navigation.WPF;assembly=CargoWise.Main.Navigation"
+             d:DesignHeight="300" d:DesignWidth="174.793">
+    <UserControl.Resources>
+        <DataTemplate x:Key="TestItemTemplate">
+            <UI:MultilingualTextLabel IsTranslatable="False">
+                <Hyperlink>
+                    <UI:MultilingualTextLabel IsTranslatable="{Binding IsTranslatable}" MultilingualText="{Binding MultilingualText}" />
+                    <Hyperlink.ToolTip>
+                        <TextBlock Text="{Binding Name}" />
+                    </Hyperlink.ToolTip>
+                </Hyperlink>
+            </UI:MultilingualTextLabel>
+        </DataTemplate>
+        
+        <DataTemplate x:Key="TestTemplate">
+            <StackPanel>
+                <Border
+				BorderThickness="0 0 0 1"
+				Margin="0 2 0 0">
+                    <UI:MultilingualTextLabel MultilingualText="{Binding MultilingualText}">
+                        <TextBlock
+						Opacity="0.6" />
+                    </UI:MultilingualTextLabel>
+                </Border>
+                <ItemsControl
+				Padding="1"
+				Focusable="False"
+				ItemTemplate="{StaticResource TestItemTemplate}"
+				ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+        
+        <DataTemplate x:Key="TestContentPresenterItemPlate" >
+            <UI:MultilingualTextLabel>
+                <Hyperlink>
+                    <UI:MultilingualTextLabel IsTranslatable="{Binding IsTranslatable}" MultilingualText="{Binding MultilingualText}" />
+				<Hyperlink.ToolTip>
+					<StackPanel>
+                        <TextBlock Text="{Binding Name}" Margin="0 0 0 10" />
+					</StackPanel>
+				</Hyperlink.ToolTip>
+			</Hyperlink>
+		</UI:MultilingualTextLabel>
+        </DataTemplate>
+        
+    </UserControl.Resources>
+    
+    <Grid>
+        <Button Name="cancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="90,254,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.011,0.293"/>
+        <TextBox Name="cancelBox" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="OK" VerticalAlignment="Top" Width="155" RenderTransformOrigin="-0.047,0.535"/>
+        <TextBox Name="okBox" HorizontalAlignment="Left" Height="23" Margin="10,38,0,0" TextWrapping="Wrap" Text="{Binding Content, ElementName=okButton}" VerticalAlignment="Top" Width="155"/>
+        <Button Name="okButton" Content="OK" HorizontalAlignment="Left" Margin="10,254,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.061,0.626"/>
+        <UI:MultilingualTextLabel Name="multilingualXamlString" Margin="10,60,0,0" VerticalAlignment="Top"  Height="23">
+            <TextBlock Text="Test XAML string literal" />
+        </UI:MultilingualTextLabel>
+		<UI:MultilingualTextLabel IsTranslatable="False" Name="nonTranslatableMultilingualXamlString" Margin="10,60,0,0" VerticalAlignment="Top"  Height="23">
+			<TextBlock Text="Test XAML string literal" />
+		</UI:MultilingualTextLabel>
+		<UI:MultilingualTextLabel Name="multilingualBindingAttribute" MultilingualText="{Binding MultilingualText}" Margin="10,88,0,0" VerticalAlignment="Top"  Height="23">            
+        </UI:MultilingualTextLabel>
+        <ItemsControl ItemTemplate="{StaticResource TestTemplate}" Margin="10,105,0,0" VerticalAlignment="Top"  Height="23">            
+        </ItemsControl>
+        <ContentPresenter
+				VerticalAlignment="Center"
+				Grid.Column="1"
+				Margin="0"
+				ContentTemplate="{StaticResource TestContentPresenterItemPlate}">
+        </ContentPresenter>
+        <StackPanel Name="stackPanelToSkip">
+            <UI:MultilingualTextLabel Name="multilingualXamlStringToSkip">
+                <TextBlock Text="This part of XAML will be skipped during analysis" />
+            </UI:MultilingualTextLabel>
+        </StackPanel>
+    </Grid>
+</UserControl>

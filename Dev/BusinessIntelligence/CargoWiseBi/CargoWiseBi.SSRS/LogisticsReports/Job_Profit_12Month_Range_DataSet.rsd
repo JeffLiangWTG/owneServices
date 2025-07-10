@@ -1,0 +1,595 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSet Name="DataSet1">
+    <Query>
+      <DataSourceReference>LogisticsModel</DataSourceReference>
+      <DataSetParameters>
+        <DataSetParameter Name="Report_Month">
+          <DefaultValue>DATE( 2015, 10, 1)</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>true</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>DateTime</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Date_Type">
+          <DefaultValue>Date_Type</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Branch_Key">
+          <DefaultValue>0</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Int32</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Analyse_Type">
+          <DefaultValue>Analyse_Type</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>String</rd:DbType>
+        </DataSetParameter>
+        <DataSetParameter Name="Department_Key">
+          <DefaultValue>0</DefaultValue>
+          <ReadOnly>false</ReadOnly>
+          <Nullable>false</Nullable>
+          <OmitFromQuery>false</OmitFromQuery>
+          <rd:DbType>Int32</rd:DbType>
+        </DataSetParameter>
+      </DataSetParameters>
+      <CommandText>DEFINE
+    VAR MaxEdDt =
+        ADDCOLUMNS (
+            GROUPBY (
+                SELECTCOLUMNS (
+                    FILTER (
+                        SUMMARIZECOLUMNS (
+                            'Recognition Date'[Month Date],
+                            'Post Date'[Month Date],
+                            FILTER (
+                                VALUES ( 'Recognition Date'[Month Date] ),
+                                (
+                                    'Recognition Date'[Month Date] &lt;= EDATE ( VALUE ( @Report_Month ), 11 )
+                                        &amp;&amp; 'Recognition Date'[Month Date] &gt;= EDATE ( VALUE ( @Report_Month ), -24 )
+                                        &amp;&amp; @Date_Type = "Recognition"
+                                )
+                                    || @Date_Type = "Post"
+                            ),
+                            FILTER (
+                                VALUES ( 'Post Date'[Month Date] ),
+                                (
+                                    'Post Date'[Month Date] &lt;= EDATE ( VALUE ( @Report_Month ), 11 )
+                                        &amp;&amp; 'Post Date'[Month Date] &gt;= EDATE ( VALUE ( @Report_Month ), -24 )
+                                        &amp;&amp; @Date_Type = "Post"
+                                )
+                                    || @Date_Type = "Recognition"
+                            ),
+                            FILTER (
+                                'Company Branch',
+                                (
+                                    PATHCONTAINS ( @Branch_Key, 'Company Branch'[Branch Key] )
+                                        &amp;&amp; @Analyse_Type = "Job"
+                                )
+                                    || @Analyse_Type = "Transaction"
+                            ),
+                            FILTER (
+                                'Transaction Company Branch',
+                                (
+                                    PATHCONTAINS (
+                                        @Branch_Key,
+                                        'Transaction Company Branch'[Transaction Branch Key]
+                                    )
+                                        &amp;&amp; @Analyse_Type = "Transaction"
+                                )
+                                    || @Analyse_Type = "Job"
+                            ),
+                            FILTER (
+                                'Department',
+                                (
+                                    PATHCONTAINS ( @Department_Key, 'Department'[Department Key] )
+                                        &amp;&amp; @Analyse_Type = "Job"
+                                )
+                                    || @Analyse_Type = "Transaction"
+                            ),
+                            FILTER (
+                                'Transaction Department',
+                                (
+                                    PATHCONTAINS (
+                                        @Department_Key,
+                                        'Transaction Department'[Transaction Department Key]
+                                    )
+                                        &amp;&amp; @Analyse_Type = "Transaction"
+                                )
+                                    || @Analyse_Type = "Job"
+                            ),
+                            FILTER (
+                                VALUES ( 'Shipment'[__Is Shipping] ),
+                                NOT ( ISBLANK ( 'Shipment'[__Is Shipping] ) )
+                            ),
+                            // filter only shipments
+                            "CountRS", COUNTROWS ( 'Shipment' )
+                        ),
+                        [CountRS] &gt; 0
+                    ),
+                    "MonthDate", SWITCH (
+                        @Date_Type,
+                        "Recognition", 'Recognition Date'[Month Date],
+                        "Post", 'Post Date'[Month Date]
+                    )
+                ),
+                "MinStDt", MINX ( CURRENTGROUP (), [MonthDate] ),
+                "MaxEdDt", MAXX ( CURRENTGROUP (), [MonthDate] )
+            ),
+            "ReportMonth", EDATE ( VALUE ( @Report_Month ), 0 ),
+            "Minus6Month", EDATE ( VALUE ( @Report_Month ), -6 ),
+            "Plus5Month", EDATE ( VALUE ( @Report_Month ), 5 ),
+            "Minus18Month", EDATE ( VALUE ( @Report_Month ), -18 )
+        )
+EVALUATE
+UNION (
+   ROW (
+    "StartDate", EDATE ( VALUE ( @Report_Month ), -6 ),
+    "EndDate", EDATE ( VALUE ( @Report_Month ), 5 ),
+    "Start24Date", EDATE ( VALUE ( @Report_Month ), -18 )
+	)
+,
+    SELECTCOLUMNS (
+        MaxEdDt,
+        "StartDate", IF (
+            [MaxEdDt] &gt;= [Plus5Month]
+                &amp;&amp; [MinStDt] &lt;= [Minus6Month],
+            [Minus6Month],
+            IF (
+                [MaxEdDt] &lt; [Plus5Month],
+                IF (
+                    [MinStDt]
+                        &lt;= EDATE ( [Minus6Month], - DATEDIFF ( [MaxEdDt], [Plus5Month], MONTH ) ),
+                    EDATE ( [Minus6Month], - DATEDIFF ( [MaxEdDt], [Plus5Month], MONTH ) ),
+                    [MinStDt]
+                ),
+                IF ( [MinStDt] &gt; [Minus6Month], [MinStDt] )
+            )
+        ),
+        "EndDate", IF (
+            [MaxEdDt] &gt;= [Plus5Month]
+                &amp;&amp; [MinStDt] &lt;= [Minus6Month],
+            [Plus5Month],
+            IF (
+                [MaxEdDt] &lt; [Plus5Month],
+                [MaxEdDt],
+                IF (
+                    [MinStDt] &gt; [Minus6Month],
+                    IF (
+                        [MaxEdDt]
+                            &gt;= EDATE ( [Plus5Month], DATEDIFF ( [Minus6Month], [MinStDt], MONTH ) ),
+                        EDATE ( [Plus5Month], DATEDIFF ( [Minus6Month], [MinStDt], MONTH ) ),
+                        [MaxEdDt]
+                    )
+                )
+            )
+        ),
+        "Start24Date", IF (
+            [MaxEdDt] &gt;= [Plus5Month]
+                &amp;&amp; [MinStDt] &lt;= [Minus18Month],
+            [Minus18Month],
+            IF (
+                [MaxEdDt] &lt; [Plus5Month],
+                IF (
+                    [MinStDt]
+                        &lt;= EDATE ( [Minus18Month], - DATEDIFF ( [MaxEdDt], [Plus5Month], MONTH ) ),
+                    EDATE ( [Minus18Month], - DATEDIFF ( [MaxEdDt], [Plus5Month], MONTH ) ),
+                    [MinStDt]
+                ),
+                IF ( [MinStDt] &gt; [Minus18Month], [MinStDt] )
+            )
+        )
+    )
+)</CommandText>
+      <rd:DesignerState>
+        <QueryDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/AnalysisServices/QueryDefinition">
+          <CommandType>DMX</CommandType>
+          <Type>Query</Type>
+          <QuerySpecification xsi:type="DMXQuerySpecification">
+            <Select>
+              <Items>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[StartDate]</ColumnName>
+                  </ID>
+                  <ItemCaption>[StartDate]</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[EndDate]</ColumnName>
+                  </ID>
+                  <ItemCaption>[EndDate]</ItemCaption>
+                </Item>
+                <Item>
+                  <ID xsi:type="Column">
+                    <ColumnName>[Start24Date]</ColumnName>
+                  </ID>
+                  <ItemCaption>[Start24Date]</ItemCaption>
+                </Item>
+              </Items>
+            </Select>
+            <AutoExecute>false</AutoExecute>
+            <Data>&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;DataminingQueryBuilderState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;SelectTablesControlState&gt;
+    &lt;Tables /&gt;
+  &lt;/SelectTablesControlState&gt;
+  &lt;IsSingletonQuery&gt;false&lt;/IsSingletonQuery&gt;
+  &lt;View&gt;Text&lt;/View&gt;
+  &lt;QueryText&gt;DEFINE
+    VAR MaxEdDt =
+        ADDCOLUMNS (
+            GROUPBY (
+                SELECTCOLUMNS (
+                    FILTER (
+                        SUMMARIZECOLUMNS (
+                            'Recognition Date'[Month Date],
+                            'Post Date'[Month Date],
+                            FILTER (
+                                VALUES ( 'Recognition Date'[Month Date] ),
+                                (
+                                    'Recognition Date'[Month Date] &amp;lt;= EDATE ( VALUE ( @Report_Month ), 11 )
+                                        &amp;amp;&amp;amp; 'Recognition Date'[Month Date] &amp;gt;= EDATE ( VALUE ( @Report_Month ), -24 )
+                                        &amp;amp;&amp;amp; @Date_Type = "Recognition"
+                                )
+                                    || @Date_Type = "Post"
+                            ),
+                            FILTER (
+                                VALUES ( 'Post Date'[Month Date] ),
+                                (
+                                    'Post Date'[Month Date] &amp;lt;= EDATE ( VALUE ( @Report_Month ), 11 )
+                                        &amp;amp;&amp;amp; 'Post Date'[Month Date] &amp;gt;= EDATE ( VALUE ( @Report_Month ), -24 )
+                                        &amp;amp;&amp;amp; @Date_Type = "Post"
+                                )
+                                    || @Date_Type = "Recognition"
+                            ),
+                            FILTER (
+                                'Company Branch',
+                                (
+                                    PATHCONTAINS ( @Branch_Key, 'Company Branch'[Branch Key] )
+                                        &amp;amp;&amp;amp; @Analyse_Type = "Job"
+                                )
+                                    || @Analyse_Type = "Transaction"
+                            ),
+                            FILTER (
+                                'Transaction Company Branch',
+                                (
+                                    PATHCONTAINS (
+                                        @Branch_Key,
+                                        'Transaction Company Branch'[Transaction Branch Key]
+                                    )
+                                        &amp;amp;&amp;amp; @Analyse_Type = "Transaction"
+                                )
+                                    || @Analyse_Type = "Job"
+                            ),
+                            FILTER (
+                                'Department',
+                                (
+                                    PATHCONTAINS ( @Department_Key, 'Department'[Department Key] )
+                                        &amp;amp;&amp;amp; @Analyse_Type = "Job"
+                                )
+                                    || @Analyse_Type = "Transaction"
+                            ),
+                            FILTER (
+                                'Transaction Department',
+                                (
+                                    PATHCONTAINS (
+                                        @Department_Key,
+                                        'Transaction Department'[Transaction Department Key]
+                                    )
+                                        &amp;amp;&amp;amp; @Analyse_Type = "Transaction"
+                                )
+                                    || @Analyse_Type = "Job"
+                            ),
+                            FILTER (
+                                VALUES ( 'Shipment'[__Is Shipping] ),
+                                NOT ( ISBLANK ( 'Shipment'[__Is Shipping] ) )
+                            ),
+                            // filter only shipments
+                            "CountRS", COUNTROWS ( 'Shipment' )
+                        ),
+                        [CountRS] &amp;gt; 0
+                    ),
+                    "MonthDate", SWITCH (
+                        @Date_Type,
+                        "Recognition", 'Recognition Date'[Month Date],
+                        "Post", 'Post Date'[Month Date]
+                    )
+                ),
+                "MinStDt", MINX ( CURRENTGROUP (), [MonthDate] ),
+                "MaxEdDt", MAXX ( CURRENTGROUP (), [MonthDate] )
+            ),
+            "ReportMonth", EDATE ( VALUE ( @Report_Month ), 0 ),
+            "Minus6Month", EDATE ( VALUE ( @Report_Month ), -6 ),
+            "Plus5Month", EDATE ( VALUE ( @Report_Month ), 5 ),
+            "Minus18Month", EDATE ( VALUE ( @Report_Month ), -18 )
+        )
+EVALUATE
+SELECTCOLUMNS (
+    MaxEdDt,
+    "StartDate", IF (
+        [MaxEdDt] &amp;gt;= [Plus5Month]
+            &amp;amp;&amp;amp; [MinStDt] &amp;lt;= [Minus6Month],
+        [Minus6Month],
+        IF (
+            [MaxEdDt] &amp;lt; [Plus5Month],
+            IF (
+                [MinStDt]
+                    &amp;lt;= EDATE ( [Minus6Month], - DATEDIFF ( [MaxEdDt], [Plus5Month], MONTH ) ),
+                EDATE ( [Minus6Month], - DATEDIFF ( [MaxEdDt], [Plus5Month], MONTH ) ),
+                [MinStDt]
+            ),
+            IF ( [MinStDt] &amp;gt; [Minus6Month], [MinStDt] )
+        )
+    ),
+    "EndDate", IF (
+        [MaxEdDt] &amp;gt;= [Plus5Month]
+            &amp;amp;&amp;amp; [MinStDt] &amp;lt;= [Minus6Month],
+        [Plus5Month],
+        IF (
+            [MaxEdDt] &amp;lt; [Plus5Month],
+            [MaxEdDt],
+            IF (
+                [MinStDt] &amp;gt; [Minus6Month],
+                IF (
+                    [MaxEdDt]
+                        &amp;gt;= EDATE ( [Plus5Month], DATEDIFF ( [Minus6Month], [MinStDt], MONTH ) ),
+                    EDATE ( [Plus5Month], DATEDIFF ( [Minus6Month], [MinStDt], MONTH ) ),
+                    [MaxEdDt]
+                )
+            )
+        )
+    ),
+    "Start24Date", IF (
+        [MaxEdDt] &amp;gt;= [Plus5Month]
+            &amp;amp;&amp;amp; [MinStDt] &amp;lt;= [Minus18Month],
+        [Minus18Month],
+        IF (
+            [MaxEdDt] &amp;lt; [Plus5Month],
+            IF (
+                [MinStDt]
+                    &amp;lt;= EDATE ( [Minus18Month], - DATEDIFF ( [MaxEdDt], [Plus5Month], MONTH ) ),
+                EDATE ( [Minus18Month], - DATEDIFF ( [MaxEdDt], [Plus5Month], MONTH ) ),
+                [MinStDt]
+            ),
+            IF ( [MinStDt] &amp;gt; [Minus18Month], [MinStDt] )
+        )
+    )
+)&lt;/QueryText&gt;
+  &lt;DatabaseId /&gt;
+  &lt;MiningStructureId /&gt;
+  &lt;MiningModelId /&gt;
+  &lt;ColumnMappings /&gt;
+  &lt;GridRows /&gt;
+&lt;/DataminingQueryBuilderState&gt;</Data>
+          </QuerySpecification>
+          <Query>
+            <Statement>DEFINE
+    VAR MaxEdDt =
+        ADDCOLUMNS (
+            GROUPBY (
+                SELECTCOLUMNS (
+                    FILTER (
+                        SUMMARIZECOLUMNS (
+                            'Recognition Date'[Month Date],
+                            'Post Date'[Month Date],
+                            FILTER (
+                                VALUES ( 'Recognition Date'[Month Date] ),
+                                (
+                                    'Recognition Date'[Month Date] &lt;= EDATE ( VALUE ( @Report_Month ), 11 )
+                                        &amp;&amp; 'Recognition Date'[Month Date] &gt;= EDATE ( VALUE ( @Report_Month ), -24 )
+                                        &amp;&amp; @Date_Type = "Recognition"
+                                )
+                                    || @Date_Type = "Post"
+                            ),
+                            FILTER (
+                                VALUES ( 'Post Date'[Month Date] ),
+                                (
+                                    'Post Date'[Month Date] &lt;= EDATE ( VALUE ( @Report_Month ), 11 )
+                                        &amp;&amp; 'Post Date'[Month Date] &gt;= EDATE ( VALUE ( @Report_Month ), -24 )
+                                        &amp;&amp; @Date_Type = "Post"
+                                )
+                                    || @Date_Type = "Recognition"
+                            ),
+                            FILTER (
+                                'Company Branch',
+                                (
+                                    PATHCONTAINS ( @Branch_Key, 'Company Branch'[Branch Key] )
+                                        &amp;&amp; @Analyse_Type = "Job"
+                                )
+                                    || @Analyse_Type = "Transaction"
+                            ),
+                            FILTER (
+                                'Transaction Company Branch',
+                                (
+                                    PATHCONTAINS (
+                                        @Branch_Key,
+                                        'Transaction Company Branch'[Transaction Branch Key]
+                                    )
+                                        &amp;&amp; @Analyse_Type = "Transaction"
+                                )
+                                    || @Analyse_Type = "Job"
+                            ),
+                            FILTER (
+                                'Department',
+                                (
+                                    PATHCONTAINS ( @Department_Key, 'Department'[Department Key] )
+                                        &amp;&amp; @Analyse_Type = "Job"
+                                )
+                                    || @Analyse_Type = "Transaction"
+                            ),
+                            FILTER (
+                                'Transaction Department',
+                                (
+                                    PATHCONTAINS (
+                                        @Department_Key,
+                                        'Transaction Department'[Transaction Department Key]
+                                    )
+                                        &amp;&amp; @Analyse_Type = "Transaction"
+                                )
+                                    || @Analyse_Type = "Job"
+                            ),
+                            FILTER (
+                                VALUES ( 'Shipment'[__Is Shipping] ),
+                                NOT ( ISBLANK ( 'Shipment'[__Is Shipping] ) )
+                            ),
+                            // filter only shipments
+                            "CountRS", COUNTROWS ( 'Shipment' )
+                        ),
+                        [CountRS] &gt; 0
+                    ),
+                    "MonthDate", SWITCH (
+                        @Date_Type,
+                        "Recognition", 'Recognition Date'[Month Date],
+                        "Post", 'Post Date'[Month Date]
+                    )
+                ),
+                "MinStDt", MINX ( CURRENTGROUP (), [MonthDate] ),
+                "MaxEdDt", MAXX ( CURRENTGROUP (), [MonthDate] )
+            ),
+            "ReportMonth", EDATE ( VALUE ( @Report_Month ), 0 ),
+            "Minus6Month", EDATE ( VALUE ( @Report_Month ), -6 ),
+            "Plus5Month", EDATE ( VALUE ( @Report_Month ), 5 ),
+            "Minus18Month", EDATE ( VALUE ( @Report_Month ), -18 )
+        )
+EVALUATE
+SELECTCOLUMNS (
+    MaxEdDt,
+    "StartDate", IF (
+        [MaxEdDt] &gt;= [Plus5Month]
+            &amp;&amp; [MinStDt] &lt;= [Minus6Month],
+        [Minus6Month],
+        IF (
+            [MaxEdDt] &lt; [Plus5Month],
+            IF (
+                [MinStDt]
+                    &lt;= EDATE ( [Minus6Month], - DATEDIFF ( [MaxEdDt], [Plus5Month], MONTH ) ),
+                EDATE ( [Minus6Month], - DATEDIFF ( [MaxEdDt], [Plus5Month], MONTH ) ),
+                [MinStDt]
+            ),
+            IF ( [MinStDt] &gt; [Minus6Month], [MinStDt] )
+        )
+    ),
+    "EndDate", IF (
+        [MaxEdDt] &gt;= [Plus5Month]
+            &amp;&amp; [MinStDt] &lt;= [Minus6Month],
+        [Plus5Month],
+        IF (
+            [MaxEdDt] &lt; [Plus5Month],
+            [MaxEdDt],
+            IF (
+                [MinStDt] &gt; [Minus6Month],
+                IF (
+                    [MaxEdDt]
+                        &gt;= EDATE ( [Plus5Month], DATEDIFF ( [Minus6Month], [MinStDt], MONTH ) ),
+                    EDATE ( [Plus5Month], DATEDIFF ( [Minus6Month], [MinStDt], MONTH ) ),
+                    [MaxEdDt]
+                )
+            )
+        )
+    ),
+    "Start24Date", IF (
+        [MaxEdDt] &gt;= [Plus5Month]
+            &amp;&amp; [MinStDt] &lt;= [Minus18Month],
+        [Minus18Month],
+        IF (
+            [MaxEdDt] &lt; [Plus5Month],
+            IF (
+                [MinStDt]
+                    &lt;= EDATE ( [Minus18Month], - DATEDIFF ( [MaxEdDt], [Plus5Month], MONTH ) ),
+                EDATE ( [Minus18Month], - DATEDIFF ( [MaxEdDt], [Plus5Month], MONTH ) ),
+                [MinStDt]
+            ),
+            IF ( [MinStDt] &gt; [Minus18Month], [MinStDt] )
+        )
+    )
+)</Statement>
+            <ParameterDefinitions>
+              <ParameterDefinition>
+                <Name>Report_Month</Name>
+                <DefaultValues>
+                  <DefaultValue>DATE( 2015, 10, 1)</DefaultValue>
+                </DefaultValues>
+                <Caption>Report_Month</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Date_Type</Name>
+                <DefaultValues>
+                  <DefaultValue>Date_Type</DefaultValue>
+                </DefaultValues>
+                <Caption>Date_Type</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Branch_Key</Name>
+                <DefaultValues>
+                  <DefaultValue>0</DefaultValue>
+                </DefaultValues>
+                <Caption>Branch_Key</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Analyse_Type</Name>
+                <DefaultValues>
+                  <DefaultValue>Analyse_Type</DefaultValue>
+                </DefaultValues>
+                <Caption>Analyse_Type</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+              <ParameterDefinition>
+                <Name>Department_Key</Name>
+                <DefaultValues>
+                  <DefaultValue>0</DefaultValue>
+                </DefaultValues>
+                <Caption>Department_Key</Caption>
+                <ParameterValuesQuery>
+                  <ParameterizedStatement>
+                    <ReferencedParameters />
+                  </ParameterizedStatement>
+                </ParameterValuesQuery>
+              </ParameterDefinition>
+            </ParameterDefinitions>
+          </Query>
+        </QueryDefinition>
+      </rd:DesignerState>
+    </Query>
+    <Fields>
+      <Field Name="StartDate">
+        <DataField>[StartDate]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="EndDate">
+        <DataField>[EndDate]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Start24Date">
+        <DataField>[Start24Date]</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

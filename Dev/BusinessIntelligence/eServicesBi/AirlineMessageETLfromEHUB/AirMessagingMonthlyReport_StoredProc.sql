@@ -1,0 +1,544 @@
+USE [AirMessagingDB]
+GO
+
+/****** Object:  StoredProcedure [dbo].[AirMessagingMonthlyReport]    Script Date: 21/05/2019 3:21:20 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[AirMessagingMonthlyReport]
+AS
+BEGIN
+DECLARE @dt0 DATE = dateadd(dd, - DATEDIFF(DD, 01, datepart(dd,getdate())) ,DateAdd(mm, -1 , GETDATE()));
+DECLARE @dt1 DATE = DATEADD(DAY, + 31, @dt0);
+DECLARE @dt2 DATE = DATEADD(DAY, + 32, @dt0);
+
+IF OBJECT_ID('tempdb..#T1') IS NOT NULL
+       DROP TABLE #T1;
+
+CREATE TABLE #T1 (
+       [AWB Serial # 1] NVARCHAR(8)
+	   ,[HBS Serial # 1] NVARCHAR(80)
+       ,[AWB Prefix 1] NVARCHAR(3)
+       ,[Client System Code 1] NVARCHAR(6)
+       ,[Client Licence Code 1] NVARCHAR(36)
+       ,[Client Licence Name 1] NVARCHAR(128)
+       ,[Service Provider 1] NVARCHAR(36)
+       ,[Airline Code] NVARCHAR(2)
+       ,[Origin City] NVARCHAR(3)
+       ,[Origin Country] NVARCHAR(2)
+	   ,[Destination City] NVARCHAR(3)
+	   ,[Destination Country] NVARCHAR(2)
+       ,[Type 1] NVARCHAR(8)
+	   ,[Weight 1] NVARCHAR(20)
+	   ,[Weight Unit 1] NVARCHAR(20)
+	   ,[AGT Reference 1] NVARCHAR(40)
+	   ,[IATA Number 1] NVARCHAR(20)
+	   ,[CASS Number 1] NVARCHAR(20)
+       ,[Sub-Type 1] NVARCHAR(20)
+	   ,[Airline Sub-Type 1] NVARCHAR(20)
+       ,[Sent UTC 1] DATETIME
+       ,[MAWBNumber] NVARCHAR(15)
+	   ,[eHub TrackingID 1] NVARCHAR(150)
+	   ,[IRJ Reason 1] NVARCHAR(max)
+       )
+
+INSERT INTO #T1
+SELECT SUBSTRING([MAWBNumber], 4, 8)
+	   ,CASE When SUBSTRING([messageBody], 2, 3) = 'FWB'
+			Then 'Not Applicable'
+			When SUBSTRING([messageBody], 2, 3) = 'FHL'
+			Then SUBSTRING([messageBody], CHARINDEX('HBS/', [messageBody])+4, CHARINDEX('/', substring([messageBody],CHARINDEX('HBS/', [messageBody])+4,50))-1) 
+			Else 'Unknown'
+		End
+       ,SUBSTRING([MAWBNumber], 1, 3)
+       ,[Client System Code]
+       ,[Client Licence Code]
+       ,[Client Licence Name]
+       ,[Service Provider]
+       ,[Airline Code]
+       ,CASE When SUBSTRING(MessageBody, 2, 3) = 'FWB'
+			Then SUBSTRING(MessageBody, 21, 3)
+			When SUBSTRING(MessageBody, 2, 3) = 'FHL'
+			Then SUBSTRING([messageBody], CHARINDEX('HBS/', [messageBody])+4+(CHARINDEX('/', substring([messageBody],CHARINDEX('HBS/', [messageBody])+4,50))), 3 )
+		End
+       ,CASE When SUBSTRING(MessageBody, 2, 3) = 'FWB'
+			Then SUBSTRING(MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10) + 'SHP' + CHAR(10), MessageBody, 1) + 5) + 1) + 1) + 2, 2)
+			When SUBSTRING(MessageBody, 2, 3) = 'FHL'
+			Then SUBSTRING(MessageBody,  
+			CHARINDEX(Char(10), MessageBody, 
+			CHARINDEX(CHAR(10), MessageBody, 
+			CHARINDEX(CHAR(10), MessageBody, 
+			CHARINDEX(CHAR(10)+'SHP/', MessageBody, 1) + 5)+1)+1)+2, 2)
+		END
+		---- new columns --
+		 ,CASE When SUBSTRING(MessageBody, 2, 3) = 'FWB'
+			Then SUBSTRING(MessageBody, 24, 3)
+			When SUBSTRING(MessageBody, 2, 3) = 'FHL'
+			Then SUBSTRING([messageBody], CHARINDEX('HBS/', [messageBody])+4+(CHARINDEX('/', substring([messageBody],CHARINDEX('HBS/', [messageBody])+4,50))+3), 3 )
+		End
+       ,CASE When SUBSTRING(MessageBody, 2, 3) = 'FWB'
+			Then SUBSTRING(MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10), MessageBody, CHARINDEX(CHAR(10) + 'CNE' + CHAR(10), MessageBody, 1) + 5) + 1) + 1) + 2, 2)
+			When SUBSTRING(MessageBody, 2, 3) = 'FHL'
+			Then SUBSTRING(MessageBody,  
+			CHARINDEX(Char(10), MessageBody, 
+			CHARINDEX(CHAR(10), MessageBody, 
+			CHARINDEX(CHAR(10), MessageBody, 
+			CHARINDEX(CHAR(10) +'CNE/', MessageBody, 1) + 5)+1)+1)+2, 2)
+		END
+       ,SUBSTRING(MessageBody, 2, 3)
+	   ,CASE When SUBSTRING([MessageBody], 2, 3) = 'FWB' AND
+	 SUBSTRING([MessageBody],CHARINDEX('FLT/', [MessageBody]), 4) = 'FLT/' AND
+	 SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody])+3,4), CHARINDEX('K', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody])+3,4)), 1)  = 'K'
+	 THEN  SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50),
+			 CHARINDEX('K', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50))+1, 
+			(CHARINDEX('F', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50)) -  (CHARINDEX('K', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50))+1)))
+	When SUBSTRING([MessageBody], 2, 3) = 'FWB' AND
+	 SUBSTRING([MessageBody],CHARINDEX('FLT/', [MessageBody]), 4) ! = 'FLT/' AND
+	 SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody])+3,4), CHARINDEX('K', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody])+3,4)), 1)  = 'K'
+	 THEN  SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50),
+			 CHARINDEX('K', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50))+1, 
+			(CHARINDEX('R', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50)) -  (CHARINDEX('K', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50))+1)))
+
+		When SUBSTRING([MessageBody], 2, 3) = 'FWB' AND
+	 SUBSTRING([MessageBody],CHARINDEX('FLT/', [MessageBody]), 4) = 'FLT/' AND
+	 SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody])+3,4), CHARINDEX('L', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody])+3,4)), 1)  = 'L'
+	 THEN  SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50),
+			 CHARINDEX('L', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50))+1, 
+			(CHARINDEX('F', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50)) -  (CHARINDEX('L', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50))+1)))
+	When SUBSTRING([MessageBody], 2, 3) = 'FWB' AND
+	 SUBSTRING([MessageBody],CHARINDEX('FLT/', [MessageBody]), 4) ! = 'FLT/' AND
+	 SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody])+3,4), CHARINDEX('L', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody])+3,4)), 1)  = 'L'
+	 THEN  SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50),
+			 CHARINDEX('L', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50))+1, 
+			(CHARINDEX('R', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50)) -  (CHARINDEX('L', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody]),50))+1)))
+
+
+
+	When SUBSTRING([MessageBody], 2, 3) = 'FHL' AND 
+	SUBSTRING(SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 50),
+			 CHARINDEX('/K', SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 13))+1,
+			  1) = 'K'
+		THEN SUBSTRING(SUBSTRING(SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 50),
+			 CHARINDEX('/K', SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 50))+2,
+			  30), 1, 
+			  (CHARINDEX('/', SUBSTRING(SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 50),
+			 CHARINDEX('/K', SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 50))+2,
+		  30))-1))
+
+		  	When SUBSTRING([MessageBody], 2, 3) = 'FHL' AND 
+	SUBSTRING(SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 50),
+			 CHARINDEX('/L', SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 13))+1,
+			  1) = 'L'
+		THEN SUBSTRING(SUBSTRING(SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 50),
+			 CHARINDEX('/L', SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 50))+2,
+			  30), 1, 
+			  (CHARINDEX('/', SUBSTRING(SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 50),
+			 CHARINDEX('/L', SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 50))+2,
+		  30))-1))
+		ELSE null
+			END
+		,CASE 
+		When  SUBSTRING([MessageBody], 2, 3) = 'FWB'
+		AND SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody])+3,4), CHARINDEX('K', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody])+3,4)), 1) = 'K'
+		THEN 'Kilos'
+		WHEN SUBSTRING([MessageBody], 2, 3) = 'FWB'
+		AND SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody])+3,4), CHARINDEX('L', SUBSTRING([MessageBody], CHARINDEX('/T',[MessageBody])+3,4)), 1)  = 'L'
+		THEN 'Pounds'
+
+		WHEN SUBSTRING([MessageBody], 2, 3) = 'FHL' AND 
+	SUBSTRING(SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 50),
+			 CHARINDEX('/K', SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 13))+1,
+			  1) = 'K'
+		THEN 'Kilos'
+		WHEN SUBSTRING([MessageBody], 2, 3) = 'FHL' AND 
+		SUBSTRING(SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 50),
+			 CHARINDEX('/L', SUBSTRING(SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50), CHARINDEX('/', SUBSTRING([MessageBody], CHARINDEX('HBS/',[MessageBody])+4,50))+1, 13))+1,
+			  1) = 'L'
+		THEN 'Pounds'
+		ELSE 'Invalid Unit'
+		END
+		,CASE When SUBSTRING([messageBody], 2, 3) = 'FHL'
+			Then 'Not Applicable'
+			When SUBSTRING([messageBody], 2, 3) = 'FWB' AND SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody]), 4) = 'AGT/' AND PATINDEX('%[ a-z]%', SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35)) > 0
+			Then SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,PATINDEX('%[ a-z]%', SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35))-1)
+			Else 'No AGT'
+			END 
+		,CASE When SUBSTRING([messageBody], 2, 3) = 'FHL'
+			Then 'Not Applicable'
+			When SUBSTRING([messageBody], 2, 3) = 'FWB' AND SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody]), 4) = 'AGT/' AND 
+			PATINDEX('%/%[0-9]%/%', SUBSTRING(SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35), PATINDEX('%/%/%[0-9]%/%',SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35))+1, 35)) > 0
+			Then SUBSTRING(SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+4,35), CHARINDEX('/',SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+4,35))+1, 7)
+			Else 'No AGT'
+			END 
+		,CASE When SUBSTRING([messageBody], 2, 3) = 'FHL'
+			Then 'Not Applicable'
+			When SUBSTRING([messageBody], 2, 3) = 'FWB' AND SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody]), 4) = 'AGT/' AND PATINDEX('%/_____/%[ A-Z]%', SUBSTRING(SUBSTRING(SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35),
+				PATINDEX('%/%/%/_____/%[ A-Z]%',SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35))+1, 35),
+				PATINDEX('%/%/_____/%[ A-Z]%', SUBSTRING(SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35), PATINDEX('%/%/%/_____/%[ A-Z]%',SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35))+1, 35))+1, 35)) > 0
+			Then SUBSTRING(SUBSTRING(SUBSTRING(SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35), PATINDEX('%/%/%/_____/%[ A-Z]%',SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35))+1, 35),
+				PATINDEX('%/%/_____/%[ A-Z]%', SUBSTRING(SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35), PATINDEX('%/%/%/_____/%[ A-Z]%',SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35))+1, 35))+1, 35),
+				PATINDEX('%/_____/%[ A-Z]%', SUBSTRING(SUBSTRING(SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35), PATINDEX('%/%/%/_____/%[ A-Z]%',SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35))+1, 35),
+				PATINDEX('%/%/_____/%[ A-Z]%', SUBSTRING(SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35), PATINDEX('%/%/%/_____/%[ A-Z]%',SUBSTRING([MessageBody],CHARINDEX('AGT/', [MessageBody])+3,35))+1, 35))+1, 35))+1, 4) 
+			Else 'No AGT'
+			END 
+       ,'No Sub-Type'
+	   ,'No Sub-Type'
+       ,[Sent UTC]
+       ,[MAWBNumber]
+	   ,[All eHub TrackingID]
+	   ,NULL
+FROM (
+       SELECT [Client System Code]
+              ,[Client Licence Code]
+              ,[Client Licence Name]
+              ,[Service Provider]
+       ,SenderMessage.value('(/*:CargoIMP/*:Carrier)[1]', 'NVARCHAR(MAX)') AS [Airline Code]
+           ,SenderMessage.value('(/*:CargoIMP/*:MAWB)[1]', 'NVARCHAR(MAX)') AS [MAWBNumber]
+           ,SenderMessage.value('(/*:CargoIMP/*:Body)[1]', 'NVARCHAR(MAX)') AS [MessageBody]
+		   ,[All eHub TrackingID]
+              ,[Sent UTC]
+       FROM (
+SELECT LEFT([Sender ID], 3) + RIGHT([Sender ID], 3) AS [Client System Code]
+                     ,[Sender ID] AS [Client Licence Code]
+                     ,rtrim(ltrim(replace(replace(replace([Sender Name],char(9),' '),char(10),' '),char(13),' '))) AS [Client Licence Name]
+                     ,CASE 
+                           WHEN CHARINDEX('_', [Recipient ID]) = 0
+                                  THEN [Recipient ID]
+                           ELSE LEFT([Recipient ID], CHARINDEX('_', [Recipient ID]) - 1)
+                           END AS [Service Provider],
+                     AM_ReceivedFromSenderUTC AS [Sent UTC]
+                     ,CONVERT(XML, [Raw Message]) AS 'SenderMessage'
+					 , [All eHub TrackingID]
+              FROM (select * from AirMessagingDB.dbo.AirMessaging
+			  Where AM_ApplicationCode = 'CIM'
+			  AND AM_ReceivedFromSenderUTC >= @dt0
+                     AND AM_ReceivedFromSenderUTC < @dt1 )myTable)myTable2)MyTable3
+			  CREATE INDEX IDX_T1_AWBSerialAndClientSystemCode ON #T1 (
+       [MAWBNumber]
+       ,[Client System Code 1]
+       )
+
+----------------------------------------------------------------------------------------------------------------------------------------
+IF OBJECT_ID('tempdb..#T2') IS NOT NULL
+       DROP TABLE #T2;
+
+CREATE TABLE #T2 (
+       [AWB Serial # 2] NVARCHAR(8)
+       ,[AWB Prefix 2] NVARCHAR(3)
+       ,[Client System Code 2] NVARCHAR(6)
+       ,[Client Licence Code 2] NVARCHAR(36)
+       ,[Client Licence Name 2] NVARCHAR(128)
+       ,[Service Provider 2] NVARCHAR(36)
+       ,[Type 2] NVARCHAR(8)
+       ,[Sub-Type 2] NVARCHAR(20)
+	   ,[Airline Sub-Type 2] NVARCHAR(20)
+       ,[Sent UTC 2] DATETIME
+       ,[MAWBNumber] NVARCHAR(15)
+	   ,[eHub TrackingID 2] NVARCHAR(150)
+	   ,[IRJ Reason 2] NVARCHAR(max)
+       )
+
+INSERT INTO #T2
+SELECT SUBSTRING(MAWBNumber, 4, 8)
+       ,SUBSTRING([MAWBNumber], 1, 3)
+       ,[Client System Code]
+       ,[Client Licence Code]
+       ,[Client Licence Name]
+       ,[Service Provider]
+       ,CASE 
+               WHEN EventType = 'IRA-FWB'
+                     OR EventType = 'IRJ-FWB'
+					 OR EventType = 'IRA-FHL'
+					 OR EventType = 'IRJ-FHL'
+                     THEN EventType
+              ELSE 'FSU'
+              END
+       ,CASE 
+              WHEN  EventType = 'IRA-FWB'
+                     OR EventType = 'IRJ-FWB'
+					 OR EventType = 'IRA-FHL'
+					 OR EventType = 'IRJ-FHL'
+                     THEN 'No Sub-Type'
+              ELSE EventType
+              END
+       ,CASE 
+              WHEN  AirlineEventType = 'IRA-FWB'
+                     OR AirlineEventType = 'IRJ-FWB'
+					 OR AirlineEventType = 'IRA-FHL'
+					 OR AirlineEventType = 'IRJ-FHL'
+                     THEN 'No Sub-Type'
+              ELSE AirlineEventType
+              END
+       ,[Sent UTC]
+       ,[MAWBNumber]
+	   ,[eHub TrackingID 2]
+	   ,[IRJ Reason 2]
+FROM (
+select 
+CASE 
+When AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event[*:EventType="IRJ"]/*:EventParameters/*:MessageType)[1]', 'NVARCHAR(MAX)') = 'FHL'
+THEN AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event[*:EventType="IRJ"]/*:ContextCollection/*:Context/*:Value)[5]', 'NVARCHAR(MAX)') 
+When AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event[*:EventType="IRJ"]/*:EventParameters/*:MessageType)[1]', 'NVARCHAR(MAX)') = 'FWB' 
+THEN AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event[*:EventType="IRJ"]/*:ContextCollection/*:Context/*:Value)[4]', 'NVARCHAR(MAX)')
+ELSE 'No Reason Received'
+END AS [IRJ REASON 2]
+	   ,COALESCE(Left(AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:EventType)[1]', 'NVARCHAR(3)') +'-'+
+AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:ContextCollection/*:Context[*:Type="OriginalFWBFHLMessage"]/*:Value)[1]', 'NVARCHAR(MAX)'), 7), 
+AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:EventType)[1]', 'NVARCHAR(3)')) AS EventType
+
+,COALESCE(Left(AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:EventType)[1]', 'NVARCHAR(3)') +'-'+
+AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:ContextCollection/*:Context[*:Type="OriginalFWBFHLMessage"]/*:Value)[1]', 'NVARCHAR(MAX)'), 7), 
+AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:ContextCollection/*:Context[*:Type="SourceEventCode"]/*:Value)[1]', 'NVARCHAR(3)')) AS AirlineEventType
+
+       ,CASE When 
+len(REplace(Replace(REPLACE(AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:ContextCollection/*:Context/*:Value)[1]', 'NVARCHAR(20)'), '-', ''), CHAR(13), ''), CHAR(10), '')) >= 11
+Then left(REplace(Replace(REPLACE(AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:ContextCollection/*:Context/*:Value)[1]', 'NVARCHAR(20)'), '-', ''), CHAR(13), ''), CHAR(10), ''), 11)
+Else REplace(Replace(REPLACE(AM_RecipientMessageXML.value('(/*:UniversalInterchange/*:Body/*:UniversalEvent/*:Event/*:ContextCollection/*:Context/*:Value)[1]', 'NVARCHAR(20)'), '-', ''), CHAR(13), ''), CHAR(10), '')  
+End AS [MAWBNumber]
+              ,
+			  AM_ReceivedFromSenderUTC AS [Sent UTC]
+              ,LEFT([Recipient ID], 3) + RIGHT([Recipient ID], 3) AS [Client System Code]
+              ,[Recipient ID] AS [Client Licence Code]
+              ,[Recipient Name] AS [Client Licence Name]
+              ,[Sender ID] AS [Service Provider]
+					 , [All eHub TrackingID] AS [eHub TrackingID 2]
+
+
+
+
+from (SELECT * FROM AirMessaging
+where AM_ApplicationCode = 'biz' and [Recipient EnterpriseClient] = 'Enterprise'
+AND AM_ReceivedFromSenderUTC >= @dt0
+              AND AM_ReceivedFromSenderUTC < @dt1)MyTable )MyTable2
+CREATE INDEX IDX_T2_AWBSerialAndClientSystemCode ON #T2 (
+       [MAWBNumber]
+       ,[Client System Code 2]
+       )
+--------------------------------------------------------------------------------------------------
+IF OBJECT_ID('tempdb..#T3') IS NOT NULL
+       DROP TABLE #T3;
+
+CREATE TABLE #T3 (
+       [AWB Serial # 1] NVARCHAR(8)
+	   ,[HBS Serial # 1] NVARCHAR(80)
+       ,[AWB Prefix 1] NVARCHAR(3)
+       ,[Client System Code 1] NVARCHAR(6)
+       ,[Client Licence Code 1] NVARCHAR(36)
+       ,[Client Licence Name 1] NVARCHAR(128)
+       ,[Service Provider 1] NVARCHAR(36)
+       ,[Airline Code] NVARCHAR(2)
+       ,[Origin City] NVARCHAR(3)
+       ,[Origin Country] NVARCHAR(2)
+	   ,[Destination City] NVARCHAR(3)
+	   ,[Destination Country] NVARCHAR(2)
+       ,[Type 1] NVARCHAR(8)
+	   ,[Weight 1] NVARCHAR(20)
+	   ,[Weight Unit 1] NVARCHAR(20)
+	   ,[AGT Reference 1] NVARCHAR(40)
+	   ,[IATA Number 1] NVARCHAR(20)
+	   ,[CASS Number 1] NVARCHAR(20)
+       ,[Sub-Type 1] NVARCHAR(20)
+	   ,[Airline Sub-Type 1] NVARCHAR(20)
+       ,[Sent UTC 1] DATETIME
+       ,[AWB Serial # 2] NVARCHAR(8)
+       ,[AWB Prefix 2] NVARCHAR(3)
+       ,[Client System Code 2] NVARCHAR(6)
+       ,[Client Licence Code 2] NVARCHAR(36)
+       ,[Client Licence Name 2] NVARCHAR(128)
+       ,[Service Provider 2] NVARCHAR(36)
+       ,[Type 2] NVARCHAR(8)
+       ,[Sub-Type 2] NVARCHAR(20)
+	   ,[Airline Sub-Type 2] NVARCHAR(20)
+	   ,[eHub TrackingID 2] NVARCHAR(150)
+	   ,[IRJ Reason 2] NVARCHAR(max)
+       ,[Sent UTC 2] DATETIME
+       )
+
+INSERT INTO #T3
+SELECT [AWB Serial # 1]
+	   ,[HBS Serial # 1]
+       ,[AWB Prefix 1]
+       ,[Client System Code 1]
+       ,[Client Licence Code 1]
+       ,[Client Licence Name 1]
+       ,[Service Provider 1]
+       ,[Airline Code]
+       ,[Origin City]
+       ,[Origin Country]
+	   ,[Destination City]
+	   ,[Destination Country]
+       ,[Type 1]
+	   ,[Weight 1]
+	   ,[Weight Unit 1]
+	   ,[AGT Reference 1]
+	   ,[IATA Number 1]
+	   ,[CASS Number 1]
+       ,[Sub-Type 1]
+	   ,[Airline Sub-Type 1]
+       ,[Sent UTC 1]
+       ,[AWB Serial # 2]
+       ,[AWB Prefix 2]
+       ,[Client System Code 2]
+       ,[Client Licence Code 2]
+       ,[Client Licence Name 2]
+       ,[Service Provider 2]
+       ,[Type 2]
+       ,[Sub-Type 2]
+	   ,[Airline Sub-Type 2]
+	   ,[eHub TrackingID 2]
+	   ,[IRJ Reason 2]
+       ,[Sent UTC 2]
+FROM #T1
+FULL JOIN #T2 ON #T1.[MAWBNumber] = #T2.[MAWBNumber]
+       AND #T1.[Client System Code 1] = #T2.[Client System Code 2]
+
+-----------------------------------------------------------------------------------------------------------
+-- Response messages that can be joined back to an FWB
+--INSERT Into dbo.AirMessaging
+
+SELECT [AWB Serial # 2] AS [AWB Serial #]
+		,[HBS Serial # 1] AS [HSB Serial #]
+       ,[AWB Prefix 2] AS [AWB Prefix]
+       ,[Client System Code 2] AS [Client System Code]
+       ,[Client Licence Code 2] AS [Client Licence Code]
+       ,[Client Licence Name 2] AS [Client Licence Name]
+       ,[Service Provider 2] AS [Service Provider]
+       ,[Airline Code]
+       ,[Origin City]
+       ,[Origin Country]
+	   ,[Destination City]
+	   ,[Destination Country]
+       ,[Type 2] AS [Type]
+	   ,[Weight 1] AS [Weight]
+	   ,[Weight Unit 1] AS [Weight Unit]
+	   ,[AGT Reference 1] AS [AGT Reference]
+	   ,[IATA Number 1] AS [IATA Number]
+	   ,[CASS Number 1] AS [CASS Number]
+       ,[Sub-Type 2] AS [Sub-Type]
+	   ,[Airline Sub-Type 2] AS [Airline Sub-Type]
+	   ,[eHub TrackingID 2] AS [eHub TrackingID]
+	   ,[IRJ Reason 2] AS [IRJ Reason]
+       ,[Sent UTC 2] AS [Sent UTC]
+FROM (
+       SELECT ROW_NUMBER() OVER (
+                     PARTITION BY [AWB Serial # 2]
+                     ,[Type 2]
+                     ,[Sub-Type 2]
+					 ,[Airline Sub-Type 2]
+                     ,[Sent UTC 2] ORDER BY [Sent UTC 1] DESC
+                     ) AS rn
+              ,*
+       FROM #T3
+       WHERE [AWB Serial # 1] IS NOT NULL
+              AND [AWB Serial # 2] IS NOT NULL
+              AND [Sent UTC 1] < [Sent UTC 2]
+       ) MyTable
+WHERE rn = 1
+
+UNION ALL
+
+-- Response messages that cannot be joined back to an FWB sent before the response was received
+SELECT [AWB Serial # 2] AS [AWB Serial #]
+		,[HBS Serial # 1] AS [HSB Serial #]
+       ,[AWB Prefix 2] AS [AWB Prefix]
+       ,[Client System Code 2] AS [Client System Code]
+       ,[Client Licence Code 2] AS [Client Licence Code]
+       ,[Client Licence Name 2] AS [Client Licence Name]
+       ,[Service Provider 2] AS [Service Provider]
+       ,'Unknown Airline Code' AS [Airline Code]
+       ,'Unknown Origin City' AS [Origin City]
+       ,'Unknown Origin Country' AS [Origin Country]
+	   ,'Unknown Destination City' AS [Destination City]
+	   ,'Unknown Destination Country' AS [Destination Country]
+       ,[Type 2] AS [Type]
+	   ,[Weight 1] AS [Weight]
+	   ,[Weight Unit 1] AS [Weight Unit]
+	   ,[AGT Reference 1] AS [AGT Reference]
+	   ,[IATA Number 1] AS [IATA Number]
+	   ,[CASS Number 1] AS [CASS Number]
+       ,[Sub-Type 2] AS [Sub-Type]
+	   ,[Airline Sub-Type 2] AS [Airline Sub-Type]
+	   ,[eHub TrackingID 2] AS [eHub TrackingID]
+	   ,[IRJ Reason 2] AS [IRJ Reason]
+       ,[Sent UTC 2] AS [Sent UTC]
+FROM (
+       SELECT ROW_NUMBER() OVER (
+                     PARTITION BY [AWB Serial # 2]
+                     ,[Type 2]
+                     ,[Sub-Type 2]
+					 ,[Airline Sub-Type 2]
+                     ,[Sent UTC 2] ORDER BY [Sent UTC 1]
+                     ) AS rn
+              ,*
+       FROM #T3
+       WHERE [AWB Serial # 1] IS NOT NULL
+              AND [AWB Serial # 2] IS NOT NULL
+       ) MyTable
+WHERE rn = 1
+       AND [Sent UTC 1] >= [Sent UTC 2]
+
+UNION ALL
+
+-- Response messages that cannot be joined back to an FWB
+SELECT [AWB Serial # 2] AS [AWB Serial #]
+		,[HBS Serial # 1] AS [HSB Serial #]
+       ,[AWB Prefix 2] AS [AWB Prefix]
+       ,[Client System Code 2] AS [Client System Code]
+       ,[Client Licence Code 2] AS [Client Licence Code]
+       ,[Client Licence Name 2] AS [Client Licence Name]
+       ,[Service Provider 2] AS [Service Provider]
+       ,'Unknown Airline Code' AS [Airline Code]
+       ,'Unknown Origin City' AS [Origin City]
+       ,'Unknown Origin Country' AS [Origin Country]
+	   ,'Unknown Destination City' AS [Destination City]
+	   ,'Unknown Destination Country' AS [Destination Country]
+       ,[Type 2] AS [Type]
+	   ,[Weight 1] AS [Weight]
+	   ,[Weight Unit 1] AS [Weight Unit]
+	   ,[AGT Reference 1] AS [AGT Reference]
+	   ,[IATA Number 1] AS [IATA Number]
+	   ,[CASS Number 1] AS [CASS Number]
+       ,[Sub-Type 2] AS [Sub-Type]
+	   ,[Airline Sub-Type 2] AS [Airline Sub-Type]
+	   ,[eHub TrackingID 2] AS [eHub TrackingID]
+	   ,[IRJ Reason 2] AS [IRJ Reason]
+       ,[Sent UTC 2] AS [Sent UTC]
+FROM #T3
+WHERE [AWB Serial # 1] IS NULL
+       AND [AWB Serial # 2] <> ''
+	   AND [Sent UTC 2] <   @dt1
+
+UNION ALL
+
+-- FWBs
+
+SELECT [AWB Serial # 1] AS [AWB Serial #]
+		,[HBS Serial # 1] AS [HSB Serial #]
+       ,[AWB Prefix 1] AS [AWB Prefix]
+       ,[Client System Code 1] AS [Client System Code]
+       ,[Client Licence Code 1] AS [Client Licence Code]
+       ,[Client Licence Name 1] AS [Client Licence Name]
+       ,[Service Provider 1] AS [Service Provider]
+       ,[Airline Code]
+       ,[Origin City]
+       ,[Origin Country]
+	   ,[Destination City]
+	   ,[Destination Country]
+       ,[Type 1] AS [Type]
+	   ,[Weight 1] AS [Weight]
+	   ,[Weight Unit 1] AS [Weight Unit]
+	   ,[AGT Reference 1] AS [AGT Reference]
+	   ,[IATA Number 1] AS [IATA Number]
+	   ,[CASS Number 1] AS [CASS Number]
+       ,[Sub-Type 1] AS [Sub-Type]
+	   ,[Airline Sub-Type 1] AS [Airline Sub-Type]
+	   ,[eHub TrackingID 1] AS [eHub TrackingID]
+	   ,[IRJ Reason 1] AS [IRJ Reason]
+       ,[Sent UTC 1] AS [Sent UTC]
+FROM #T1	   
+END
+GO

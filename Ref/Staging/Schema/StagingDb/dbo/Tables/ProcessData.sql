@@ -1,0 +1,10 @@
+﻿CREATE TABLE ProcessData
+(
+	ID uniqueidentifier NOT NULL CONSTRAINT DF_ProcessData_ID DEFAULT (newid()),
+	Name VARCHAR(200) NOT NULL,
+	Type VARCHAR(200) NOT NULL,
+	Data VARCHAR(MAX),
+	CONSTRAINT PK_ProcessData PRIMARY KEY CLUSTERED (ID)
+)
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_ProcessData_Name_Type ON ProcessData (Name, Type)

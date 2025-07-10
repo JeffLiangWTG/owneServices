@@ -1,0 +1,31 @@
+meta {
+  name: Incoterm is empty string
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQueryForJobCharges();
+   query.Incoterm = "";
+   
+   req.setBody(query);
+   
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Incoterm is Mandatory.", function() {
+    expect(res.body.ModelState['Incoterm'][0]).to.equal("Incoterm is Mandatory.");
+  });
+}

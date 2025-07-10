@@ -1,0 +1,13 @@
+CREATE TABLE [RefMRComponentCode] (
+	[RCC_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefMRComponentCode_RCC_PK] DEFAULT NEWID(),
+	[RCC_IsActive] BIT NOT NULL CONSTRAINT [DF_RefMRComponentCode_RCC_IsActive] DEFAULT 1,
+	[RCC_Code] VARCHAR(10) NOT NULL CONSTRAINT [DF_RefMRComponentCode_RCC_Code] DEFAULT '',
+	[RCC_Description] VARCHAR(100) NOT NULL CONSTRAINT [DF_RefMRComponentCode_RCC_Description] DEFAULT '',
+	[RCC_Group] VARCHAR(15) NOT NULL CONSTRAINT [DF_RefMRComponentCode_RCC_Group] DEFAULT '',
+	[RCC_Machinery] BIT NOT NULL CONSTRAINT [DF_RefMRComponentCode_RCC_Machinery] DEFAULT 0,
+	[RCC_Structural] BIT NOT NULL CONSTRAINT [DF_RefMRComponentCode_RCC_Structural] DEFAULT 0,
+	[RCC_TankCleaning] BIT NOT NULL CONSTRAINT [DF_RefMRComponentCode_RCC_TankCleaning] DEFAULT 0,
+	[RCC_TankRepair] BIT NOT NULL CONSTRAINT [DF_RefMRComponentCode_RCC_TankRepair] DEFAULT 0,
+	CONSTRAINT [PK_RefMRComponentCode] PRIMARY KEY CLUSTERED  ([RCC_PK] ASC),
+	CONSTRAINT [CK_RefMRComponentCode_RCC_Group] CHECK ([RCC_Group] = 'CEDEX' OR [RCC_Group] = 'MERC'),
+);

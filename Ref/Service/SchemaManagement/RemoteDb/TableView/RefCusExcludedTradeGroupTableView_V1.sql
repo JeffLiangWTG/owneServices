@@ -1,0 +1,3 @@
+CREATE VIEW RefCusExcludedTradeGroupTableView_V1 AS
+SELECT ZZC_PK, ZZC_ZZT_Applicability, ZZC_ZZA_TradeGroup
+FROM RefCusExcludedTradeGroup

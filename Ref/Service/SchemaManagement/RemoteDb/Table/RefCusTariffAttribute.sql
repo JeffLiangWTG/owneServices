@@ -1,0 +1,20 @@
+CREATE TABLE RefCusTariffAttribute
+(
+	ZZ3_PK UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF_RefCusTariffAttribute_ZZ3_PK DEFAULT (NEWID()),
+	ZZ3_ZZ1_Tariff UNIQUEIDENTIFIER NULL,
+	ZZ3_ZZW_TariffNationalCode UNIQUEIDENTIFIER NULL,
+	ZZ3_Name VARCHAR(50) NOT NULL,
+	ZZ3_Value NVARCHAR(MAX) NOT NULL,
+	CONSTRAINT PK_RefCusTariffAttribute PRIMARY KEY CLUSTERED( ZZ3_PK ASC ),
+	CONSTRAINT FK_RefCusTariffAttribute_RefCusTariff FOREIGN KEY(ZZ3_ZZ1_Tariff) REFERENCES RefCusTariff (ZZ1_PK) ON DELETE CASCADE,
+	CONSTRAINT FK_RefCusTariffAttribute_RefCusTariffNationalCode FOREIGN KEY (ZZ3_ZZW_TariffNationalCode) REFERENCES RefCusTariffNationalCode (ZZW_PK) ON DELETE CASCADE,
+	CONSTRAINT CK_RefCusTariffAttribute_ZZ3_Name CHECK (ZZ3_Name <>''),
+	CONSTRAINT CK_RefCusTariffAttribute_ZZ3_Value CHECK (ZZ3_Value <>''),
+	CONSTRAINT CK_RefCusTariffAttribute_ZZ3_ZZ1_Tariff_ZZ3_ZZW_TariffNationalCode CHECK ((ZZ3_ZZ1_Tariff IS NOT NULL AND ZZ3_ZZW_TariffNationalCode IS NULL) OR (ZZ3_ZZ1_Tariff IS NULL AND ZZ3_ZZW_TariffNationalCode IS NOT NULL)),
+)
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusTariffAttribute_ZZ3_ZZ1_Tariff_ZZ3_Name ON RefCusTariffAttribute(ZZ3_ZZ1_Tariff ASC, ZZ3_Name ASC) WHERE ZZ3_ZZ1_Tariff IS NOT NULL
+GO
+CREATE NONCLUSTERED INDEX IX_RefCusTariffAttribute_ZZ3_ZZW_TariffNationalCode_ZZ3_Name ON RefCusTariffAttribute(ZZ3_ZZW_TariffNationalCode ASC, ZZ3_Name ASC) WHERE ZZ3_ZZW_TariffNationalCode IS NOT NULL
+GO
+ALTER TABLE RefCusTariffAttribute SET (LOCK_ESCALATION = DISABLE);

@@ -1,0 +1,23 @@
+CREATE TABLE RefExchangeRateZZ 
+(
+[ZZN_PK] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF_RefExchangeRateZZ_ZZN_PK] DEFAULT (NEWID()),
+[ZZN_ExRateType] VARCHAR(3) NOT NULL,
+[ZZN_StartDate] SMALLDATETIME NOT NULL CONSTRAINT [DF_RefExchangeRateZZ_ZZN_StartDate] DEFAULT GetUtcDate(),
+[ZZN_EndDate] SMALLDATETIME NOT NULL CONSTRAINT [DF_RefExchangeRateZZ_ZZN_EndDate] DEFAULT '2079-06-06 23:59',
+[ZZN_Rate] DECIMAL(18,9) NOT NULL,
+[ZZN_RX_NKExCurrency] CHAR(3) NOT NULL,
+[ZZN_RN_NKCountry] CHAR(2) NOT NULL,
+[ZZN_AsPublished] VARCHAR(35) NOT NULL CONSTRAINT [DF_RefExchangeRateZZ_ZZN_AsPublished] DEFAULT (''),
+CONSTRAINT [PK_RefExchangeRateZZ] PRIMARY KEY CLUSTERED ([ZZN_PK] ASC),
+CONSTRAINT [CK_RefExchangeRateZZ_ZZN_ExRateType] CHECK ([ZZN_ExRateType]='CUE' OR [ZZN_ExRateType]='CUS' OR [ZZN_ExRateType]='CUD' OR [ZZN_ExRateType]='IAT' OR [ZZN_ExRateType]='BNB' OR [ZZN_ExRateType]='BNS' OR [ZZN_ExRateType]='BUY' OR [ZZN_ExRateType]='SEL'),
+CONSTRAINT [CK_RefExchangeRateZZ_ZZN_Rate] CHECK ([ZZN_Rate] <> 0),
+CONSTRAINT [CK_RefExchangeRateZZ_ZZN_RX_NKExCurrency] CHECK ([ZZN_RX_NKExCurrency] <> ''),
+CONSTRAINT [CK_RefExchangeRateZZ_ZZN_RN_NKCountry] CHECK ([ZZN_RN_NKCountry] <> ''),
+)
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_RefExchangeRateZZ_ZZN_RN_NKCountry_ZZN_ExRateType_ZZN_RX_NKExCurrency_ZZN_StartDate ON RefExchangeRateZZ(ZZN_RN_NKCountry ASC, ZZN_ExRateType ASC, ZZN_RX_NKExCurrency ASC, ZZN_StartDate ASC)
+GO
+CREATE UNIQUE NONCLUSTERED INDEX IX_RefExchangeRateZZ_ZZN_RN_NKCountry_ZZN_ExRateType_ZZN_RX_NKExCurrency_ZZN_EndDate ON RefExchangeRateZZ(ZZN_RN_NKCountry ASC, ZZN_ExRateType ASC, ZZN_RX_NKExCurrency ASC, ZZN_EndDate ASC)
+GO
+CREATE NONCLUSTERED INDEX IX_RefExchangeRateZZ_ZZN_RN_NKCountry_ZZN_ExRateType_ZZN_RX_NKExCurrency_ZZN_StartDate_ZZN_EndDate ON RefExchangeRateZZ(ZZN_RN_NKCountry ASC, ZZN_ExRateType ASC, ZZN_RX_NKExCurrency ASC, ZZN_StartDate DESC, ZZN_EndDate ASC) INCLUDE (ZZN_Rate, ZZN_AsPublished)
+GO

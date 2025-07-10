@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NativeSchemaSet Name="Organization" Root="OrgHeader">
+  <Entities>
+    <Entity Name="OrgHeader" HasCustomFields="true">
+      <ExcludedFromImportProperty Name="OH_ScreeningStatus" />
+    </Entity>
+    <Entity Name="OrgContact" IsLogged="false">
+      <ExcludedProperty Name ="OC_PER"/>
+    </Entity>
+    <Entity Name="OrgAddress">
+      <ExcludedFromExportProperty Name ="OA_SuppressAddressValidationError" />
+      <ExcludedFromExportProperty Name="OA_AdditionalAddressInformation" />
+      <ExcludedProperty Name="OA_GeoLocation" />
+      <ExcludedProperty Name="OA_GeofencePolygon" />
+      <ExcludedProperty Name="OA_ValidationStatus" />
+    </Entity>
+    <Entity Name="OrgAddressAdditionalInfo" />
+    <Entity Name="OrgTimetable" />
+    <Entity Name="OrgTranslatedAddress" >
+      <StripPropertyCRLF Name="OTA_CompanyName" />
+      <ExcludedProperty Name="OTA_ValidationStatus" />
+    </Entity>
+    <Entity Name="OrgTranslatedAddressAdditionalInfo" />
+    <Entity Name="OrgAddressCapability" />
+    <Entity Name="OrgSupplierBuyerLink" Suffix="Supplier" />
+    <Entity Name="OrgSupplierBuyerLink" Suffix="Buyer" />
+    <Entity Name="OrgSupBuyLinkTrnMode" />
+    <Entity Name="OrgAppointedAgentPorts" />
+    <Entity Name="OrgExclusiveGatewayService" />
+    <Entity Name="OrgCompanyData">
+      <ExcludedProperty Name ="OB_ARCreditCardType"/>
+      <ExcludedProperty Name ="OB_ARCreditCardNum"/>
+      <ExcludedProperty Name ="OB_ARCreditCardAdditionalInfo"/>
+      <ExcludedProperty Name ="OB_ARCreditCardExpire"/>
+      <ExcludedProperty Name ="OB_ARCreditCardHolder"/>
+    </Entity>
+    <Entity Name="OrgMiscServ" />
+    <Entity Name="OrgARTerms" />
+    <Entity Name="OrgARTermsCycle" />
+    <Entity Name="OrgBrandOrRelatedName" />
+    <Entity Name="OrgCarrierAccount" Suffix="BillToParty" />
+    <Entity Name="OrgCarrierAccount" Suffix="Carrier" />
+    <Entity Name="OrgCarrierNamedAccount" />
+    <Entity Name="OrgCarrierServiceLevel" />
+    <Entity Name="OrgCollectionNote" />
+    <Entity Name="OrgContactAttribute" />
+    <Entity Name="OrgCountryData" />
+    <Entity Name="OrgCusAccount">
+      <ExcludedProperty Name="CZ_Password" />
+    </Entity>
+    <Entity Name="OrgCusCode">
+      <ExcludedProperty Name ="OK_UnSignedCustomsRegNo"/>
+    </Entity>
+    <Entity Name="OrgCustomLabels" />
+    <Entity Name="OrgDocument" />
+    <Entity Name="OrgDocumentCopyRecipient" />
+    <Entity Name="OrgInvoiceRollupOrGroup" />
+    <Entity Name="OrgInvoiceType" />
+    <Entity Name="OrgInvTypeDeferredCharges" />
+    <Entity Name="OrgLandedCostingPrefs" />
+    <Entity Name="OrgLandedCostingPrefCharges" />
+    <Entity Name="OrgParkContainerType" />
+    <Entity Name="OrgRateTariffLevel" Behaviour="OrgRateTariffLevelDateRangeUpdate" DateRangeStartField="P7_StartDate" DateRangeEndField="P7_ExpiryDate">
+      <UniqueCriteria>
+        <ExcludedProperties>
+          <Property Name="P7_IsValid"></Property>
+          <Property Name="P7_TariffLevel"></Property>
+          <Property Name="P7_ApplyGroupRate"></Property>
+          <Property Name="P7_SystemCreateTimeUtc"></Property>
+          <Property Name="P7_SystemLastEditTimeUtc"></Property>
+          <Property Name="P7_SystemCreateUser"></Property>
+          <Property Name="P7_SystemLastEditUser"></Property>
+        </ExcludedProperties>
+      </UniqueCriteria>
+    </Entity>
+    <Entity Name="OrgRelatedParty" />
+    <Entity Name="OrgCompetitor" />
+    <Entity Name="OrgSales" Suffix="Buyer" />
+    <Entity Name="OrgSales" Suffix="Supplier" />
+    <Entity Name="OrgSalesCall" />
+    <Entity Name="OrgSalesCallAdditionalAttendee" />
+    <Entity Name="OrgSecurity" />
+    <Entity Name="OrgSecurityContacts" />
+    <Entity Name="OrgServiceLevel" />
+    <Entity Name="OrgStaffAssignments" />
+    <Entity Name="OrgTradeDetail" />
+    <Entity Name="OrgWebURL" />
+    <Entity Name="OrgWhsChgAttribGrpBy" />
+    <Entity Name="OrgWhsClientAccountAssociation" />
+    <Entity Name="GenRegCertAccredMaintList" />
+    <Entity Name="AccAPAccountDetails" EntityName="APAccountDetails" />
+    <Entity Name="CusBondDetail"/>
+    <Entity Name="JobRequiredDocument"/>
+    <Entity Name="StmNote">
+      <ExcludedProperty Name="ST_AutoVersion" />
+		</Entity>
+    <Entity Name="AccCFXUpliftConfigurationView"/>
+    <Entity Name="AccExchangeRateConfigurationView"/>
+    <Entity Name="OrgPatternMatchOverride"
+            OptionalEntityCondition="Organization_OrgPatternMatchOverride"/>
+    <Entity Name="EDICommunicationsMode">
+      <ExcludedFromExportProperty Name="EK_Password" />
+      <ExcludedProperty Name="EK_ECC_CommunicationPartyConfig" />
+    </Entity>
+    <Entity Name="GlbGroupOrgLink"/>
+    <Entity Name="GlbGroupOrgContactLink"/>
+    <Entity Name="GlbGroup"/>
+  </Entities>
+  <Associations>
+    <Association From="OrgContact" To="OrgHeader" Key="OC_OH"/>
+    <Association From="OrgAddress" To="OrgHeader" Key="OA_OH"/>
+    <Association From="OrgAddressAdditionalInfo" To="OrgAddress" Key="OAI_OA_Address"/>
+    <Association From="OrgTranslatedAddress" To="OrgAddress" Key="OTA_OA"/>
+    <Association From="OrgTranslatedAddressAdditionalInfo" To="OrgAddressAdditionalInfo" Key="OTI_OAI"/>
+    <Association From="OrgAddressCapability" To="OrgAddress" Key="PZ_OA"/>
+    <Association From="OrgTimetable" To="OrgAddress" Key="OTT_OA"/>
+    <Association From="OrgCarrierAccount_BillToParty" To="OrgHeader" Key="OAN_OH_BillToParty"/>
+    <Association From="OrgCarrierAccount_Carrier" To="OrgHeader" Key="OAN_OH_Carrier"/>
+    <Association From="OrgCarrierNamedAccount" To="OrgHeader" Key="ONA_OH_Carrier"/>
+    <Association From="OrgSupplierBuyerLink_Supplier" To="OrgHeader" Key="OL_OH_Buyer"/>
+    <Association From="OrgSupplierBuyerLink_Buyer" To="OrgHeader" Key="OL_OH_Supplier"/>
+    <Association From="OrgSupBuyLinkTrnMode" Key="PF_OL"/>
+    <Association From="OrgAppointedAgentPorts" To="OrgHeader" Key="O5_OH"/>
+    <Association From="OrgExclusiveGatewayService" To="OrgAppointedAgentPorts" Key="O7_O5_AgentPort"/>
+    <Association From="OrgCompanyData" To="OrgHeader" Key="OB_OH"/>
+    <Association From="OrgMiscServ" To="OrgHeader" Key="OM_OH" Cardinality="1"/>
+    <Association From="OrgARTerms" To="OrgCompanyData" Key="PY_OB"/>
+    <Association From="OrgARTermsCycle" To="OrgARTerms" Key="P5_PY"/>
+    <Association From="OrgBrandOrRelatedName" To="OrgHeader" Key="P1_OH"/>
+    <Association From="OrgCarrierServiceLevel" To="OrgMiscServ" Key="PL_OM"/>
+    <Association From="OrgCollectionNote" To="OrgCompanyData" Key="PN_OB"/>
+    <Association From="OrgContactAttribute" To="OrgContact" Key="PC_OC"/>
+    <Association From="GenRegCertAccredMaintList" To="OrgContact" Key="XZ_ParentID"/>
+    <Association From="OrgCountryData" To="OrgHeader" Key="OV_OH_OrgHeader"/>
+    <Association From="OrgCusAccount" To="OrgHeader" Key="CZ_OH"/>
+    <Association From="OrgCusCode" To="OrgHeader" Key="OK_OH"/>
+    <Association From="OrgCustomLabels" To="OrgHeader" Key="OT_OH"/>
+    <Association From="OrgDocument" To="OrgContact" Key="OD_OC"/>
+    <Association From="OrgDocumentCopyRecipient" To="OrgDocument" Key="ODR_OD"/>
+    <Association From="OrgInvoiceRollupOrGroup" To="OrgCompanyData" Key="PG_OB"/>
+    <Association From="OrgInvoiceType" To="OrgCompanyData" Key="PI_OB"/>
+    <Association From="OrgInvTypeDeferredCharges" To="OrgInvoiceType" Key="PO_PI"/>
+    <Association From="OrgLandedCostingPrefs" To="OrgHeader" Key="O9_OH"/>
+    <Association From="OrgLandedCostingPrefCharges" To="OrgLandedCostingPrefs" Key="O0_O9"/>
+    <Association From="OrgParkContainerType" Key="PT_O5"/>
+    <Association From="OrgRateTariffLevel" Key="P7_OH"/>
+    <Association From="OrgRelatedParty" Key="PR_OH_Parent"/>
+    <Association From="OrgCompetitor" Key="OCP_OH_Parent"/>
+    <Association From="OrgSales_Buyer" Key="OW_OH_Supplier"/>
+    <Association From="OrgSales_Supplier" Key="OW_OH_Buyer"/>
+    <Association From="OrgSecurity" Key="OX_OH"/>
+    <Association From="OrgSecurityContacts" Key="OZ_OC"/>
+    <Association From="OrgServiceLevel" Key="PM_OH"/>
+    <Association From="OrgStaffAssignments" Key="O8_OH"/>
+    <Association From="OrgTradeDetail" Key="PA_OW"/>
+    <Association From="OrgWebURL" Key="PU_OH"/>
+    <Association From="OrgWhsChgAttribGrpBy" Key="PX_OB"/>
+    <Association From="OrgWhsClientAccountAssociation" To="OrgHeader" Key="OWC_OH_Client"/>
+    <Association From="APAccountDetails" To="OrgCompanyData" Key="A1_OB"/>
+    <Association From="CusBondDetail" To="OrgHeader" Key="PW_ParentID"/>
+    <Association From="CusBondDetail" To="RefCountry" Key="PW_RN_NKCountryOfIssue"/>
+    <Association From="CusBondDetail" To="RefCurrency" Key="PW_RX_NKCurrency"/>
+    <Association From="JobRequiredDocument" To="OrgHeader" Key="EQ_ParentID"/>
+    <Association From="StmNote" To="OrgHeader" Key="ST_ParentID"/>
+    <Association From="AccCFXUpliftConfigurationView" To="OrgHeader" Key="JCF_ParentID"/>
+    <Association From="AccExchangeRateConfigurationView" To="OrgHeader" Key="JCE_ParentID"/>
+    <Association From="OrgPatternMatchOverride" To="OrgHeader" Key="OO_OH"/>
+    <Association From="EDICommunicationsMode" To="OrgHeader" Key="EK_ParentID"/>
+    <Association From="GlbGroupOrgLink" To="OrgHeader" Key="GOK_OH_Org"/>
+    <Association From="GlbGroupOrgLink" To="GlbGroup" Key="GOK_GG_Group"/>
+    <Association From="GlbGroupOrgContactLink" To="OrgContact" Key="GCK_OC_Contact"/>
+    <Association From="GlbGroupOrgContactLink" To="GlbGroup" Key="GCK_GG_Group"/>
+  </Associations>
+</NativeSchemaSet>

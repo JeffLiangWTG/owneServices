@@ -1,0 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.Testing.InventoryHeldCodeDataFileTest.TestInventoryHeldCodeDataFile")] // Database/Odyssey/Data/Public/WhsInventoryHeldCode.Test/InventoryHeldCodeDataFileTest.cs:27,3
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.Testing.InventoryHeldCodeUpgradeTaskTest.TestContainsAllSystemDefinedHoldCode")] // Database/Odyssey/Data/Public/WhsInventoryHeldCode.Test/InventoryHeldCodeUpgradeTaskTest.cs:12,3
+[assembly: SuppressMessage("CargoWiseOne", "CW1108:Do Not Use DataSet", Justification = "Baseline WI00585389", Scope = "member", Target = "~M:Enterprise.DbUpgrader.Data.Testing.InventoryHeldCodeUpgradeTaskTest.TestMixOfInsertUpdateDelete")] // Database/Odyssey/Data/Public/WhsInventoryHeldCode.Test/InventoryHeldCodeUpgradeTaskTest.cs:48,3

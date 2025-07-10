@@ -1,0 +1,41 @@
+@using Microsoft.AspNetCore.Components.Web
+@namespace Enterprise.ZArchitecture.GUI.Internal
+
+<tr @onclick=Item.OnClick @onclick:stopPropagation class="@Item.ItemClassString" @onmousedown:preventDefault title="@Item.Title">
+    @if (@Item.ShowCode)
+    {
+        <td class="@(IsSelectable ? "selected" : string.Empty)" style="@CodeStyleString">
+            <div>
+                <span class="@Item.CodeSpanClassString">
+                    @Item.Code
+                    @if (@Item.IsCommonItem)
+                    {
+                        <span class="zdropform__item--common">(Common)</span>
+                    }
+                </span>
+            </div>
+        </td>
+    }
+
+    @if (@Item.ShowDescription)
+    {
+        <td class="@(Item.IsSelectable(Item.Index) ? "selected__description" : string.Empty)">
+            <div><span class="@Item.DescriptionSpanClassString">@Item.Description</span></div>
+        </td>
+    }
+
+    @if (Item.ShowColor)
+    {
+        <td style="@Item.ColorStyleString"></td>
+    }
+</tr>
+
+@code
+{
+    [Parameter]
+    public ZDropForm.ItemToRender Item { get; set; }
+
+    bool IsSelectable => Item.IsSelectable(Item.Index);
+
+    string CodeStyleString => Item.CodeStyleString(Item.ItemClassString, Item.Index);
+}

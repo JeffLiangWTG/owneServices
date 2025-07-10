@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(CWNetCoreTargetFramework)</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <OutputType>Exe</OutputType>
+    <OutputPath>$(WTGBinRoot)</OutputPath>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationManifest>..\..\..\main.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <Import Project="$(WTGBranchRoot)NetCore\NetCoreCommon.props" />
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="System.Management" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="System.Threading.AccessControl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="CargoWise.Common" />
+    <Reference Include="CargoWise.Data" />
+    <Reference Include="CargoWise.Database.Abstractions" />
+    <Reference Include="WTG.StaticAnalysis.Annotation" />
+    <Reference Include="ICSharpCode.SharpZipLib" />
+    <Reference Include="CargoWise.Data.Providers.Common" />
+    <Reference Include="CargoWise.Data.SqlProxy.Interface" />
+    <Reference Include="CargoWise.Shared.40" />
+    <Reference Include="System.Management" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="NLog" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- net core only: add package to Microsoft.Data.SqlClient and make Microsoft.Data.SqlClient a global using-->
+    <PackageReference Condition="'$(IsNetCoreTargetFramework)' == 'true'" Include="Microsoft.Data.SqlClient" />
+    <Using Condition="'$(IsNetCoreTargetFramework)' == 'true'" Include="Microsoft.Data.SqlClient" />
+  </ItemGroup>
+</Project>

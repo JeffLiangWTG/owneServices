@@ -1,0 +1,43 @@
+meta {
+  name: Call jobcharges with all applicable variables
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/jobcharges/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+  
+   var query = RatesAPIsHelper.GetRateQueryWithMandatoryFieldsForProvidedVariables(false);
+   query.CalculationScope = RatesAPIsHelper.GetCalculationScope();
+   query.CarrierPayTerm = RatesAPIsHelper.GetCarrierPayTerm();
+   query.PaymentTermOverride = RatesAPIsHelper.GetPaymentTermOverride();
+   query.Incoterm = RatesAPIsHelper.GetIncoterm();
+   query.RateParties = RatesAPIsHelper.GetRateParties();
+   query.JobInfo = RatesAPIsHelper.GetJobInfo();
+   query.JobInfo.CustomFields = RatesAPIsHelper.GetValidCustomFields();
+   
+   query.CarrierContracts = RatesAPIsHelper.GetCarrierContracts();
+   query.CarrierServiceLevels = RatesAPIsHelper.GetAllCarrierServiceLevels();
+   query.ServiceLevels = RatesAPIsHelper.GetServiceLevels();
+   query.NamedAccounts = RatesAPIsHelper.GetAllNamedAccounts();
+   query.CSFilter = RatesAPIsHelper.GetCSFilter();
+   query.CGFilter = RatesAPIsHelper.GetCGFilter();
+   query.Via = RatesAPIsHelper.GetVia();
+   query.PickupAddress = RatesAPIsHelper.GetValidPickupAddress();
+   query.DeliveryAddress = RatesAPIsHelper.GetValidDeliveryAddress();
+   query.HBLDeliveryMode = RatesAPIsHelper.GetHBLDeliveryMode();
+   query.Locations = RatesAPIsHelper.GetLocations();
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

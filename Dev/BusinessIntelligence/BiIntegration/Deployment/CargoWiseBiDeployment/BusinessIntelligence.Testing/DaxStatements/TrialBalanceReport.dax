@@ -1,0 +1,212 @@
+﻿DEFINE
+  MEASURE 'Report Measures'[AccountDescription] = 
+    (/* USER DAX BEGIN */
+
+VAR des =  SWITCH(
+TRUE(),
+ [IsLevelThreeInHierarchy], VALUES(GLAccount[Description]),
+ [IsLevelTwoInHierarchy],var acc = FIRSTNONBLANK(GLAccount[Level 2],true()) return CALCULATE(FIRSTNONBLANK(GLAccount[Description],true()),GLAccount[Account No.]=acc),
+  var acc = FIRSTNONBLANK(GLAccount[Level 1],true()) return CALCULATE(FIRSTNONBLANK(GLAccount[Description],true()),GLAccount[Account No.]=acc)
+)
+return
+SWITCH (
+TRUE(),
+[IsGrandTotal],BLANK(),
+[CreditAmount]>0,des,
+[CreditAmount]=0 && VALUES('Include Zero Balance'[Include Zero Balance])="Yes",des)
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[IsLevelThreeInHierarchy] = 
+    (/* USER DAX BEGIN */
+ISFILTERED(GLAccount[Level 1]) && ISFILTERED(GLAccount[Level 2]) && ISFILTERED(GLAccount[Level 3])
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[IsLevelTwoInHierarchy] = 
+    (/* USER DAX BEGIN */
+ISFILTERED(GLAccount[Level 1]) && ISFILTERED(GLAccount[Level 2])
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[IsGrandTotal] = 
+    (/* USER DAX BEGIN */
+COUNTROWS(VALUES(GLAccount[Level 1]))>1
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[CreditAmount] = 
+    (/* USER DAX BEGIN */
+
+var amount =IF (NOT ISFILTERED('Presentation Journal'[Code]), [Sum Of Credit],CALCULATE([Sum Of Credit],
+KEEPFILTERS(
+FILTER(
+     ALL (GLTransaction[Presentation Journal Status],GLTransaction[Transaction Category],GLTransaction[GLAmount Credit]),
+    [Presentation Journal Status] =2 && SEARCH([Transaction Category],CONCATENATEX(VALUES('Presentation Journal'[Code]),'Presentation Journal'[Code],","),,0)>0 || [Presentation Journal Status] =1
+    ))))
+return 
+IF( amount = 0 , if (VALUES('Include Zero Balance'[Include Zero Balance])="Yes",0),amount)
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[AccountDescriptionTranslated] = 
+    (/* USER DAX BEGIN */
+
+var translationKey = 
+SWITCH(
+TRUE(),
+ [IsLevelThreeInHierarchy], VALUES(GLAccount[Translation Key]),
+ [IsLevelTwoInHierarchy],var acc = FIRSTNONBLANK(GLAccount[Level 2],true()) return CALCULATE(FIRSTNONBLANK(GLAccount[Translation Key],true()),GLAccount[Account No.]=acc),
+  var acc = FIRSTNONBLANK(GLAccount[Level 1],true()) return CALCULATE(FIRSTNONBLANK(GLAccount[Translation Key],true()),GLAccount[Account No.]=acc)
+)
+VAR translation = CALCULATE(
+FIRSTNONBLANK('Translation Lookup'[Translation Text],TRUE()),
+'Translation Lookup'[Translation Key]=translationKey)
+
+return
+SWITCH (
+TRUE(),
+[IsGrandTotal],BLANK(),
+[CreditAmount]>0,translation,
+[CreditAmount]=0 && VALUES('Include Zero Balance'[Include Zero Balance])="Yes",translation)
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[AccountType] = 
+    (/* USER DAX BEGIN */
+
+var Acctype = SWITCH(
+TRUE(),
+ [IsLevelThreeInHierarchy], VALUES(GLAccount[Account Type]),
+ [IsLevelTwoInHierarchy],var acc = FIRSTNONBLANK(GLAccount[Level 2],true()) return CALCULATE(FIRSTNONBLANK(GLAccount[Account Type],true()),GLAccount[Account No.]=acc),
+  var acc = FIRSTNONBLANK(GLAccount[Level 1],true()) return CALCULATE(FIRSTNONBLANK(GLAccount[Account Type],true()),GLAccount[Account No.]=acc)
+)
+return
+SWITCH (
+TRUE(),
+[IsGrandTotal], BLANK(),
+[CreditAmount]>0,Acctype,
+[CreditAmount]=0 && VALUES('Include Zero Balance'[Include Zero Balance])="Yes",Acctype)
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[BudgetPeriodRangeCurrentCredit] = 
+    (/* USER DAX BEGIN */
+[Budget Period Range Current Credit] 
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[BudgetPeriodRangeCurrentDebit] = 
+    (/* USER DAX BEGIN */
+[Budget Period Range Current Debit]
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[BudgetClosingCredit] = 
+    (/* USER DAX BEGIN */
+[Budget Closing Credit]
+/* USER DAX END */)
+
+  MEASURE 'Report Measures'[BudgetClosingDebit] = 
+    (/* USER DAX BEGIN */
+[Budget Closing Debit]
+/* USER DAX END */)
+
+  VAR __DS0FilterTable = 
+    FILTER(
+      KEEPFILTERS(VALUES('GLAccount'[Level 1])),
+      NOT(ISBLANK('GLAccount'[Level 1]))
+    )
+
+  VAR __DS0FilterTable2 = 
+    FILTER(KEEPFILTERS(VALUES('Period'[Period])), 'Period'[Period] = 201703)
+
+  VAR __DS0FilterTable3 = 
+    FILTER(KEEPFILTERS(VALUES('Language'[Description])), 'Language'[Description] = "Dutch")
+
+  VAR __DS0FilterTable4 = 
+    FILTER(
+      KEEPFILTERS(VALUES('Company Branch Helper'[Company Code])),
+      'Company Branch Helper'[Company Code] = "EDI"
+    )
+
+  VAR __DS0FilterTable5 = 
+    FILTER(
+      KEEPFILTERS(VALUES('Company Branch'[Company Code])),
+      'Company Branch'[Company Code] = "EDI"
+    )
+
+  VAR __DS0FilterTable6 = 
+    FILTER(
+      KEEPFILTERS(VALUES('Include Zero Balance'[Include Zero Balance])),
+      'Include Zero Balance'[Include Zero Balance] = "Yes"
+    )
+
+EVALUATE
+  TOPN(
+    502,
+    FILTER(
+      KEEPFILTERS(
+        SUMMARIZECOLUMNS(
+          ROLLUPADDISSUBTOTAL(
+            'GLAccount'[Level 1], "IsGrandTotalRowTotal",
+            'GLAccount'[Level 2], "IsDM1Total",
+            'GLAccount'[Level 3], "IsDM3Total"
+          ),
+          __DS0FilterTable,
+          __DS0FilterTable2,
+          __DS0FilterTable3,
+          __DS0FilterTable4,
+          __DS0FilterTable5,
+          __DS0FilterTable6,
+          "AccountDescription", 'Report Measures'[AccountDescription],
+          "AccountDescriptionTranslated", 'Report Measures'[AccountDescriptionTranslated],
+          "AccountType", 'Report Measures'[AccountType],
+          "CreditAmount", 'Report Measures'[CreditAmount],
+          "BudgetPeriodRangeCurrentCredit", 'Report Measures'[BudgetPeriodRangeCurrentCredit],
+          "BudgetPeriodRangeCurrentDebit", 'Report Measures'[BudgetPeriodRangeCurrentDebit],
+          "BudgetClosingCredit", 'Report Measures'[BudgetClosingCredit],
+          "BudgetClosingDebit", 'Report Measures'[BudgetClosingDebit]
+        )
+      ),
+      OR(
+        OR(
+          OR([IsGrandTotalRowTotal], AND(NOT([IsGrandTotalRowTotal]), [IsDM1Total])),
+          AND(
+            AND(NOT([IsDM1Total]), [IsDM3Total]),
+            OR(
+              OR(
+                OR('GLAccount'[Level 1] = "2050.00.00", 'GLAccount'[Level 1] = "3430.00.00"),
+                'GLAccount'[Level 1] = "3530.00.00"
+              ),
+              'GLAccount'[Level 1] = "3550.00.00"
+            )
+          )
+        ),
+        AND(
+          AND(
+            NOT([IsDM3Total]),
+            OR(
+              OR(
+                OR('GLAccount'[Level 1] = "2050.00.00", 'GLAccount'[Level 1] = "3430.00.00"),
+                'GLAccount'[Level 1] = "3530.00.00"
+              ),
+              'GLAccount'[Level 1] = "3550.00.00"
+            )
+          ),
+          AND('GLAccount'[Level 1] = "2050.00.00", 'GLAccount'[Level 2] = "2050.10.00")
+        )
+      )
+    ),
+    [IsGrandTotalRowTotal],
+    0,
+    'GLAccount'[Level 1],
+    1,
+    [IsDM1Total],
+    0,
+    'GLAccount'[Level 2],
+    1,
+    [IsDM3Total],
+    0,
+    'GLAccount'[Level 3],
+    1
+  )
+
+ORDER BY
+  [IsGrandTotalRowTotal] DESC,
+  'GLAccount'[Level 1],
+  [IsDM1Total] DESC,
+  'GLAccount'[Level 2],
+  [IsDM3Total] DESC,
+  'GLAccount'[Level 3]

@@ -1,0 +1,42 @@
+@namespace CargoWise.NetworkVisualisation.GUI
+@inherits UserControl
+@using System.Windows.Forms
+@using CargoWise.NetworkVisualisation.GUI.Components
+@using WinzorFramework
+@using CargoWiseOne.ResourceStrings
+
+<NetworkUserControlErrorBoundary>
+    <ChildContent>
+        <CascadingValue Value=this IsFixed=true>
+            <div class="networkusercontrol" spellcheck="false" @onthrottledwheel=OnWheel>
+                @if (ViewModel?.RibbonViewModel is not null)
+                {
+                    <Ribbon @ref="RibbonReference" ViewModel="ViewModel.RibbonViewModel" />
+                }
+                <div class="networkusercontrol__diagramareacontrols">
+                    @if (MainDiagramControl is not null)
+                    {
+                        <ControlProxyComponent Control="MainDiagramControl" @key=MainDiagramControl.WinzorControlGuid />
+                    }
+                    @if (NonScheduledDiagramControl is not null)
+                    {
+                        <div class="networkusercontrol__resizer" @ref="splitterReference" @onmousedown=BeginSplitterMoveAsync @onmousedown:stopPropagation @onsplittermoved="HandleSplitterMoveAsync" @onsplittermoved:stopPropagation></div>
+                        <div class="networkusercontrol__nonscheduleditems" style=@nonScheduledSectionStyleString>
+                            <ControlProxyComponent Control="NonScheduledDiagramControl" @key=NonScheduledDiagramControl.WinzorControlGuid />
+                        </div>
+                    }
+                    @if (ViewModel is { ShapeInspectorVisible: true })
+                    {
+                        <ShapeInspector ViewModel="ViewModel?.ShapeInspectorNodeViewModel"/>
+                    }
+                </div>
+                <ControlBar IsWRDPopout="@IsWRDPopout" @bind-zoom="@zoomPercent" @bind-zoom:after="ControlBar_ZoomChanged"
+                            RefreshAction=refreshAction PopoutAction=popoutAction FitAction=fitAction FillAction=fillAction
+                            OneHundredPercentAction=oneHundredPercentAction ZoomOutAction=zoomOutAction ZoomInAction=zoomInAction BeforeZoomChanged=ControlBar_BeforeZoomChanged />
+            </div>
+        </CascadingValue>
+    </ChildContent>
+    <ErrorContent>
+        <p>@($"{Res.GetString("96B6665C-9AAD-49D9-A6DA-97032248E2B6", "An error has occured. Network Diagram could not be loaded.")}")</p>
+    </ErrorContent>
+</NetworkUserControlErrorBoundary>

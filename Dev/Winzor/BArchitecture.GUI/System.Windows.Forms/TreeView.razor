@@ -1,0 +1,122 @@
+@namespace System.Windows.Forms
+@inherits Control
+@using WinzorFramework
+@using WinzorFramework.Extensions
+@using WinzorFramework.JSInterop
+@using Microsoft.JSInterop
+
+@{
+	var nodesArray = Nodes.ToArray();
+}
+<div class="treeview  treeview--border-@(BorderStyle.BorderStyleClass())" @attributes="DataAttributes" @ref=ElementReference style="@ControlStyleString" @onwinzorfocusin="OnFocusInAsync" @onwinzorfocusin:stopPropagation @onmousedown=OnBlankSelectAsync @onmousedown:stopPropagation @onmousedown:preventDefault @oncontextmenu=OnBlankContextMenuAsync @oncontextmenu:stopPropagation @oncontextmenu:preventDefault>
+    @if (nodesArray.Length > 0)
+	{
+		<ul class="treeview__nodes">
+			@for (int i = 0; i < nodesArray.Length; i++)
+			{
+                <TreeViewNode Node=nodesArray[i] Sorted=Sorted ShowCheckbox=CheckBoxes OnSelect=OnNodeSelectAsync OnToggleExpand=OnToggleExpandAsync OnClickNodeButton=TriggerNodeMouseClickAsync OnDragDrop=OnDragDropAsync InitialTabIndex="@(i == 0 ? 0 : -1)" />
+			}
+		</ul>
+	}
+</div>
+
+@code {
+	internal async Task OnBlankSelectAsync(WebMouseEventArgs args)
+	{
+		await OnMouseDownAsync(args, new TreeViewHitTestInfo(null, TreeViewHitTestLocations.None));
+	}
+
+	internal async Task OnBlankContextMenuAsync(WebMouseEventArgs args)
+	{
+		await OnContextMenuAsync(args, new TreeViewHitTestInfo(null, TreeViewHitTestLocations.None));
+	}
+
+	internal async Task OnNodeSelectAsync((WebMouseEventArgs, TreeViewHitTestInfo) args)
+	{
+		var (e, hitTestInfo) = args;
+		await InvokeWinzorDispatcherAsync(() =>
+			{
+				try
+				{
+					TreeViewAction = TreeViewAction.ByMouse;
+					SelectedNode = hitTestInfo.Node;
+					OnNodeMouseClick(new TreeNodeMouseClickEventArgs(hitTestInfo.Node, e.GetMouseButtons(), (int)e.Detail, MousePosition.X, MousePosition.Y));
+				}
+				finally
+				{
+					TreeViewAction = TreeViewAction.Unknown;
+				}
+			});
+		await OnMouseDownAsync(e, hitTestInfo);
+	}
+
+	internal async Task TriggerNodeMouseClickAsync((WebMouseEventArgs, TreeViewHitTestInfo) args)
+	{
+		//If node button of a tree clicked, trigger node mouse click event, for further callback logic
+		var (e, hitTestInfo) = args;
+		await InvokeWinzorDispatcherAsync(() =>
+		{
+			OnNodeMouseClick(new TreeNodeMouseClickEventArgs(hitTestInfo.Node, e.GetMouseButtons(), (int)e.Detail, MousePosition.X, MousePosition.Y));
+		});
+		await OnMouseDownAsync(e, hitTestInfo);
+	}
+
+	internal async Task OnToggleExpandAsync(TreeNode node)
+	{
+		await InvokeWinzorDispatcherAsync(() =>
+		{
+			if (node.IsExpanded && SelectedNode != null)
+			{
+				if (SelectedNode.IsDescendantOf(node))
+				{
+					SelectedNode = node;
+				}
+			}
+			node.Toggle();
+		});
+		await ExpandedNodeScrollIntoViewAsync(node);
+	}
+
+	protected internal override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		GetJSInterop<ITreeViewJSInterop>()?.PreloadInterop();
+	}
+
+	protected internal override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+		if (firstRender)
+		{
+			await (GetJSInterop<ITreeViewJSInterop>()?.InitializeAsync(ElementReference, dotNetObjectReference) ?? Task.CompletedTask);
+		}
+	}
+
+	[JSInvokable("UpdateNodesPerPage")]
+	public void UpdateNodesPerPage(int newValue)
+	{
+		if (newValue > 0)
+		{
+			nodesPerPage = newValue;
+		}
+	}
+
+	[JSInvokable("HandleNavigationKeyAsync")]
+	public async Task HandleNavigationKeyAsync(KeyboardEventArgs args)
+	{
+		await InvokeWinzorDispatcherAsync(() =>
+		{
+			try
+			{
+				TreeViewAction = TreeViewAction.ByKeyboard;
+				var key = JSKeyMap.Get(args);
+				OnKeyDown(new KeyEventArgs(key));
+				HandleNavigationKey(key);
+			}
+			finally
+			{
+				TreeViewAction = TreeViewAction.Unknown;
+			}
+		});
+	}
+}

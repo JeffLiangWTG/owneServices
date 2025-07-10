@@ -1,0 +1,42 @@
+using Enterprise.ZArchitecture.Business;
+
+namespace Enterprise.Customs.IT.TemporaryStorage.Module;
+
+public sealed class UCC6TemporaryStorageFilterInflatorFactory : EU.TemporaryStorage.Module.UCC6TemporaryStorageFilterInflatorFactory
+{
+	#region IT.UCC6TemporaryStorageFilterInflatorFactory Factory Methods
+
+	public IFilterInflator CreateCustomsStatusDateFilterInflator(UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new CustomsStatusDateFilterInflator(bizObj);
+	public IFilterInflator CreateLocationOfGoodsAuthorizationNumberFilterInflator(UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new LocationOfGoodsAuthorizationNumberFilterInflator(bizObj);
+	public IFilterInflator CreateLocationOfGoodsOrganizationFilterInflator(UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new LocationOfGoodsOrganizationFilterInflator(bizObj);
+	public IFilterInflator CreateLocationOfGoodsPlaceIdFilterInflator(UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new LocationOfGoodsPlaceIdFilterInflator(bizObj);
+	public IFilterInflator CreateMessageStatusFilterInflator(UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new MessageStatusFilterInflator(bizObj);
+	public IFilterInflator CreateRegistrationNumberFilterInflator(UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new RegistrationNumberFilterInflator(bizObj);
+	public IFilterInflator CreateReleaseDateFilterInflator(UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new ReleaseDateFilterInflator(bizObj);
+
+	#endregion
+
+	#region EU.UCC6TemporaryStorageFilterInflatorFactory Core Method Overrides
+
+	protected override IFilterInflator CreateCustomsOfficeFilterInflatorCore(EU.TemporaryStorage.Module.UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new SupervisingCustomsOfficeFilterInflator(bizObj as UCC6TemporaryStorageFilterStripBusinessObject);
+	protected override IFilterInflator CreateDeclarantFilterInflatorCore(EU.TemporaryStorage.Module.UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new DeclarantFilterInflator(bizObj as UCC6TemporaryStorageFilterStripBusinessObject);
+	protected override IFilterInflator CreateLocalReferenceNumberFilterInflatorCore(EU.TemporaryStorage.Module.UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new LocalReferenceNumberFilterInflator(bizObj as UCC6TemporaryStorageFilterStripBusinessObject);
+	protected override IFilterInflator CreateMovementReferenceNumberFilterInflatorCore(EU.TemporaryStorage.Module.UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new MovementReferenceNumberFilterInflator(bizObj as UCC6TemporaryStorageFilterStripBusinessObject);
+	protected override IFilterInflator CreatePresentationCustomsOfficeFilterInflatorCore(EU.TemporaryStorage.Module.UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new PresentationCustomsOfficeFilterInflator(bizObj as UCC6TemporaryStorageFilterStripBusinessObject);
+	protected override IFilterInflator CreateRepresentativeFilterInflatorCore(EU.TemporaryStorage.Module.UCC6TemporaryStorageFilterStripBusinessObject bizObj)
+		=> new RepresentativeFilterInflator(bizObj as UCC6TemporaryStorageFilterStripBusinessObject);
+
+	#endregion
+}

@@ -1,0 +1,18 @@
+﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)..\..\'))" />
+  
+  <ItemGroup Condition="'$(CodeAnalysisEnabled)' == 'true' and $(MSBuildProjectName.StartsWith('CargoWise.Blazor.'))">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" >
+		<PrivateAssets>all</PrivateAssets>
+		<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+	</PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(CodeAnalysisEnabled)' == 'true' and '$(Configuration)' == 'Debug' and $(MSBuildProjectName.StartsWith('CargoWise.Blazor.')) and $(MSBuildProjectName.Contains('Test'))">
+    <PackageReference Include="NUnit.Analyzers" />
+  </ItemGroup>
+
+  <Target Name="_MvcCopyDependencyFiles" AfterTargets="Build;_ResolveMvcTestProjectReferences" Condition="'$(TargetFramework)'!=''">
+  </Target>
+</Project>

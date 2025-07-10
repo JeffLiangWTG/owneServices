@@ -1,0 +1,7 @@
+// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("CargoWiseOne", "CW1052:Do Not Cast Factory Method", Justification = "Auto generated baseline suppressions - WI00545660", Scope = "member", Target = "~P:Enterprise.Customs.TR.ETrade.Business.AsycudaBill.ContainerNumber")] // C:\git\wtg\CargoWise\Dev\Enterprise\Product\Operations\Customs\TR\ETrade\Business\BusinessObjects\AsycudaBill\AsycudaBill.cs:113:19

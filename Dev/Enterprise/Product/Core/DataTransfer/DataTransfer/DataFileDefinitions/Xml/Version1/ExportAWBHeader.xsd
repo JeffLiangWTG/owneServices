@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Richard White (Eagle Datamation International) -->
+<xs:schema targetNamespace="http://www.edi.com.au/EnterpriseService/" xmlns="http://www.edi.com.au/EnterpriseService/" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Elements.xsd"/>
+	<xs:element name="AWBHeaders">
+		<xs:annotation>
+			<xs:documentation>This XSD is for INTERNAL USE ONLY. </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="AWBHeader" type="AWBHeader" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="AWBOrganisationAddress">
+		<xs:choice>
+			<xs:element name="OrgDocAddress" type="AWBOrgDocAddress"/>
+			<xs:element name="OrgAddressOverride" type="AWBOrgAddressOverride"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="AWBOrgContactInfo">
+		<xs:sequence>
+			<xs:element name="ContactInfoType" type="xs:token" minOccurs="0"/>
+			<xs:element name="ContactDetail" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AWBOrgDocAddress">
+		<xs:complexContent>
+			<xs:extension base="AddressBase">
+				<xs:sequence>
+					<xs:element name="AccountCode" type="xs:string" minOccurs="0"/>
+					<xs:element name="CountryCode" type="xs:token" minOccurs="0"/>
+					<xs:element name="CompanyName" type="xs:string" minOccurs="0"/>
+					<xs:element name="ContactInfo" type="AWBOrgContactInfo" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="AWBOrgAddressOverride">
+		<xs:sequence>
+			<xs:element name="AddressLine1" type="xs:string" minOccurs="0"/>
+			<xs:element name="AddressLine2" type="xs:string" minOccurs="0"/>
+			<xs:element name="AddressLine3" type="xs:string" minOccurs="0"/>
+			<xs:element name="AddressLine4" type="xs:string" minOccurs="0"/>
+			<xs:element name="AddressLine5" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AWBRoutingAndDestinationInfo">
+		<xs:sequence>
+			<xs:element name="Destination" type="xs:string" minOccurs="0"/>
+			<xs:element name="CarrierCode" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AWBHeader">
+		<xs:sequence>
+			<xs:element name="AWBIdentifier" type="AWBHeaderIdentifier"/>
+			<xs:element name="MAWB" type="xs:string" minOccurs="0"/>
+			<xs:element name="HAWB" type="xs:string" minOccurs="0"/>
+			<xs:element name="FinalizationDate" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="OriginCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="IssueDate" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="IssuedBy" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="CompanyName" type="xs:string" minOccurs="0"/>
+						<xs:element name="AddressLine1" type="xs:string" minOccurs="0"/>
+						<xs:element name="AddressLine2" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="IssuePlace" type="xs:string" minOccurs="0"/>
+			<xs:element name="AirportOfDepartureAndRouting" type="xs:string" minOccurs="0"/>
+			<xs:element name="AirportOfDestination" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Code" type="xs:string" minOccurs="0"/>
+						<xs:element name="Text" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Shipper" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="AWBOrganisationAddress">
+							<xs:sequence>
+								<xs:element name="ExtraInfos" minOccurs="0">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="Line1" type="xs:string" minOccurs="0"/>
+											<xs:element name="Line2" type="xs:string" minOccurs="0"/>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="AWBSignature" type="xs:string" minOccurs="0"/>
+							</xs:sequence>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Consignee" type="AWBOrganisationAddress" minOccurs="0"/>
+			<xs:element name="AlsoNotify" type="AWBOrganisationAddress" minOccurs="0"/>
+			<xs:element name="Agent" type="AWBAgentInfo" minOccurs="0"/>
+			<xs:element name="AccountingInfos" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AccountingInfo" type="AWBAccountingInfo" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="RoutingAndDestination" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Route1" type="AWBRoutingAndDestinationInfo" minOccurs="0"/>
+						<xs:element name="Route2" type="AWBRoutingAndDestinationInfo" minOccurs="0"/>
+						<xs:element name="Route3" type="AWBRoutingAndDestinationInfo" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="NatureAndQuantityOfGoods" type="xs:string" minOccurs="0"/>
+			<xs:element name="DeclaredValueForCarriage" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="DeclaredValueForCustoms" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="Currency" type="CurrencyType" minOccurs="0"/>
+			<xs:element name="RateLines" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="RateLine" type="AWBRateLine" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="PrepaidCharges" type="AWBPrepaidOrCollectAmount" minOccurs="0"/>
+			<xs:element name="CollectCharges" type="AWBPrepaidOrCollectAmount" minOccurs="0"/>
+			<xs:element name="RequestedFlight" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Flight1" type="AWBRequestedFlightInfo" minOccurs="0"/>
+						<xs:element name="Flight2" type="AWBRequestedFlightInfo" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="InsuranceAmount" type="FinancialValue" minOccurs="0"/>
+			<xs:element name="HandlingInformation" type="xs:string" minOccurs="0"/>
+			<xs:element name="OtherCharges" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="OtherCharge" type="AWBOtherCharge" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ReplaceRateWithAsAgreedOn1stSet" type="xs:string" minOccurs="0"/>
+			<xs:element name="ReplaceRateWithAsAgreedOn2ndSet" type="xs:string" minOccurs="0"/>
+			<xs:element name="ReferenceNumber" type="xs:string" minOccurs="0"/>
+			<xs:element name="OptionalShippingInfo" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Text1" type="xs:string" minOccurs="0"/>
+						<xs:element name="Text2" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="NetRate" type="xs:token" minOccurs="0"/>
+			<xs:element name="SCI" type="xs:token" minOccurs="0"/>
+			<xs:element name="ExtraCarrierInfo" type="xs:string" minOccurs="0"/>
+			<xs:element name="ShippersLoadAndCount" type="xs:int" minOccurs="0"/>
+			<xs:element name="ChargesCode" type="xs:token" minOccurs="0"/>
+			<xs:element name="WTVALPrepaidOrCollect" type="xs:token" minOccurs="0"/>
+			<xs:element name="OtherPrepaidOrCollect" type="xs:token" minOccurs="0"/>
+			<xs:element name="TotalNoOfPieces" type="xs:int" minOccurs="0"/>
+			<xs:element name="TotalGrossWeight" type="xs:decimal" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AWBRateLine">
+		<xs:sequence>
+			<xs:element name="LineCount" type="xs:int" minOccurs="0"/>
+			<xs:element name="NoOfPiecesOrRCP" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="CommodityItem" type="xs:string" minOccurs="0"/>
+			<xs:element name="RateClass" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="GrossWeight" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="CharageableWeight" type="DimensionValue" minOccurs="0"/>
+			<xs:element name="RateOrCharge" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Total" type="xs:decimal" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AWBOtherCharge">
+		<xs:sequence>
+			<xs:element name="Entitlement" type="xs:token" minOccurs="0"/>
+			<xs:element name="PrepaidOrCollect" type="xs:token" minOccurs="0"/>
+			<xs:element name="ChargeCode" type="xs:string" minOccurs="0"/>
+			<xs:element name="Description" type="xs:string" minOccurs="0"/>
+			<xs:element name="ChargeAmount" type="xs:decimal" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AWBAccountingInfo">
+		<xs:sequence>
+			<xs:element name="Code" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="Information" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AWBAgentInfo">
+		<xs:sequence>
+			<xs:element name="AccountNo" type="xs:string" minOccurs="0"/>
+			<xs:element name="Name" type="xs:string" minOccurs="0"/>
+			<xs:element name="City" type="xs:string" minOccurs="0"/>
+			<xs:element name="IATACode" type="xs:token" minOccurs="0"/>
+			<xs:element name="ApprovedExportNumber" type="xs:string" minOccurs="0"/>
+			<xs:element name="AWBSignature" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AWBPrepaidOrCollectAmount">
+		<xs:sequence>
+			<xs:element name="Weight" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Valuation" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="Tax" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="OtherChargeDueAgent" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="OtherChargeDueCarrier" type="xs:decimal" minOccurs="0"/>
+			<xs:element name="TotalChargesAmount" type="xs:decimal" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="AWBHeaderIdentifierType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="Consol"/>
+			<xs:enumeration value="Shipment"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="AWBHeaderIdentifier">
+		<xs:attribute name="JobNumber" type="xs:token" use="optional"/>
+		<xs:attribute name="Type" type="AWBHeaderIdentifierType" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="AWBRequestedFlightInfo">
+		<xs:sequence>
+			<xs:element name="Carrier" type="xs:string" minOccurs="0"/>
+			<xs:element name="FlightNo" type="xs:string" minOccurs="0"/>
+			<xs:element name="FlightDate" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

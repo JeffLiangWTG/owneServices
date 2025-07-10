@@ -1,0 +1,29 @@
+meta {
+  name: Provided Universal Commodity Group Code is more than 10 characters
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{BaseApplicationURL}}/api/rating/costing/{{BranchCode}}/{{DepartmentCode}}
+  body: json
+  auth: none
+}
+
+script:pre-request {
+   await RatesAPIsHelper.SetAuthorizationForRequests();
+
+   var query = RatesAPIsHelper.GetAValidRateQuery();
+   query.Commodities = [{ Type: "UCG", Value: "ABCDEFGHJIK" }];
+   req.setBody(query);
+}
+
+tests {
+  test("Should return status code 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("Should return: Provided universal commodity group ('ABCDEFGHJIK') is not valid. It can be a string of maximum 10 characters.", function() {
+    expect(res.body.ModelState['Commodities[0].Value'][0]).to.equal("Provided universal commodity group ('ABCDEFGHJIK') is not valid. It can be a string of maximum 10 characters.");
+  });
+}
