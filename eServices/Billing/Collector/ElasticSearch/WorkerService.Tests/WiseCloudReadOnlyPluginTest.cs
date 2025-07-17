@@ -15,21 +15,13 @@ public class WiseCloudReadOnlyPluginTest
     [Test]
     public void TestGetTransaction()
     {
-        var defectiveQueryHashesDictionary = new Dictionary<string, string[]>();
-        string defectiveQueryHashesJson = JsonConvert.SerializeObject(defectiveQueryHashesDictionary);
-
         var prodsettings = new PluginSettings
         {
             Parameters = new PluginParameter[]
             {
                 new PluginParameter("ElasticEndpoint", "https://elastic.apac-prod-1.wtg.zone"),
                 new PluginParameter("ElasticApiKey", "bZYGaEEythS7mCsj4EoC6ivpn24fMoD87l/3dq85L7/qlXKcs84R1UslZFJcYtZ8hPnUvvE2834ZKLpHx98LICtRw2ELux1iVUPrF4O8GQaRmKtdKHtGh9oYUS9hdeUYrU+0swl4NUguOQ2tLP0lBekILmwHrYZxrn7X3k6T+KI="),
-                new PluginParameter("CpuMonitoringIndex", "logs-haproxy.logfile-wtg"),
-                new PluginParameter("GatewayNonBilledUsage", "idx-*-*-ehubgatewaynonbilledusage*"),
-                new PluginParameter("BatchSize", "20"),
-                new PluginParameter("DefectiveQueryHashesDictionary", defectiveQueryHashesJson),
-                new PluginParameter("ElasticRetryMaxAttempts", "1440"),
-                new PluginParameter("ElasticRetryDelayInSecond", "60")
+                new PluginParameter("HaproxyLogIndex", "logs-haproxy.logfile-wtg")
             }
         };
 
