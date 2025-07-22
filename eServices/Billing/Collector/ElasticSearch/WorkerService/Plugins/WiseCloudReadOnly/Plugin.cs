@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using CargoWise.Billing.API;
 using CargoWise.Billing.CollectorService.Plugin;
@@ -19,9 +20,9 @@ public class Plugin : ElasticSearchPluginBase
 
     public override IEnumerable<TimeStampedTransaction> GetTransactions(DateTime start, DateTime end)
     {
-        var response = Client.SearchAsync<HaproxyLogEntry>(s => s
+        var searchResponse = Client.SearchAsync<HaproxyLogEntry>(s => s
                 .Index(HAProxyIndex)
-                .Size(1000)
+                .Size(0)
                 .Query(q => q
                     .Bool(b => b
                         .Filter(f => f
@@ -31,31 +32,54 @@ public class Plugin : ElasticSearchPluginBase
                                     .Gte(start)
                                     .Lte(end)
                                 )))))
-                .Source(sf => sf
-                    .Includes(new[]
-                    {
-                        new Field("haproxy.client.ip"),
-                        new Field("haproxy.bytes.read"),
-                        new Field("haproxy.bytes_uploaded"),
-                        new Field("haproxy.server_name")
-                    }))
+                .Aggregations(aggs => aggs
+                    .Add("ip_group", c => c
+                        .Composite(comp => comp
+                            .Size(10000)
+                            .Sources(new List<IDictionary<string, CompositeAggregationSource>>
+                            {
+                                new Dictionary<string, CompositeAggregationSource>
+                                {
+                                    {"client_ip", new () { Terms = new() { Field = "haproxy.client.ip.keyword" } } }
+                                }
+                            })
+                            .Aggregations(sub => sub
+                                .Sum("sum_read", sum => sum.Field("haproxy.bytes.read"))
+                                .Sum("sum_uploaded", sum => sum.Field("haproxy.bytes_uploaded"))
+                                .TopHits("server", th => th
+                                    .Size(1)
+                                    .Source(sf => sf
+                                        .Includes(new[] { new Field("haproxy.server_name") }))
+                                )
+                            )
+                        )
+                    )
             ).GetAwaiter().GetResult();
 
-        var grouped = response.Documents
-            .GroupBy(d => d.ClientIp);
-
-        foreach (var group in grouped)
+        var ipBuckets = searchResponse.Aggregations?.GetComposite("ip_group")?.Buckets;
+        if (ipBuckets == null)
         {
-            double total = group.Sum(g => g.BytesRead + g.BytesUploaded);
-            var first = group.First();
+            yield break;
+        }
+
+        foreach (var bucket in ipBuckets)
+        {
+            var ip = bucket.Key.TryGetValue("client_ip", out var ipObj) && ipObj.Value != null
+                ? ipObj.Value.ToString() ?? string.Empty
+                : string.Empty;
+            var bytesRead = bucket.Aggregations.GetSum("sum_read")?.Value ?? 0;
+            var bytesUploaded = bucket.Aggregations.GetSum("sum_uploaded")?.Value ?? 0;
+            var server = bucket.Aggregations.GetTopHits("server")?.Hits<HaproxyLogEntry>()?.FirstOrDefault()?.ServerName ?? string.Empty;
+            var total = bytesRead + bytesUploaded;
+
             yield return new TimeStampedTransaction(end,
                 new BillingTransaction
                 {
                     BillableCount = (int)Math.Ceiling(total),
                     Category = "WCR",
                     PriceItemCode = "WCR",
-                    ClientID = group.Key,
-                    Reference1 = first.ServerName,
+                    ClientID = ip,
+                    Reference1 = server,
                     ReportingSource = "MSC",
                     ServiceOccuredUTC = end,
                     Version = 1
