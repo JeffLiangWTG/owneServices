@@ -25,16 +25,12 @@ public class Plugin : ElasticSearchPluginBase
         ElasticRetryMaxAttempts = GetIntParameter(settings, "ElasticRetryMaxAttempts", 1440);
         ElasticRetryDelayInSecond = GetIntParameter(settings, "ElasticRetryDelayInSecond", 60);
         BatchSize = GetIntParameter(settings, "BatchSize", 20);
-
-        if (!string.IsNullOrEmpty(ReferenceFilePath))
-        {
-            IpMappings = IPReferenceFileProcessor.ProcessReferenceFile(ReferenceFilePath, Logger);
-        }
     }
 
 
     public override IEnumerable<TimeStampedTransaction> GetTransactions(DateTime start, DateTime end)
     {
+        LoadReferenceFile();
         var searchResponse = Client.SearchAsync<HaproxyLogEntry>(s => s
             .Index(HAProxyIndex)
             .Size(10000)
@@ -114,6 +110,14 @@ public class Plugin : ElasticSearchPluginBase
                     Logger.LogWarning($"IP {clientIp} not found in reference file");
                 }
             }
+        }
+    }
+
+    private void LoadReferenceFile()
+    {
+        if (!string.IsNullOrEmpty(ReferenceFilePath) && IpMappings.Count == 0)
+        {
+            IpMappings = IPReferenceFileProcessor.ProcessReferenceFile(ReferenceFilePath, Logger);
         }
     }
 
