@@ -33,5 +33,9 @@ public class WiseCloudReadOnlyPluginTest
         var end = new DateTime(2025, 1, 1, 1, 0, 0, DateTimeKind.Utc);
         var timeStampedTransactions = plugin.GetTransactions(start, end).ToList();
         Assert.IsEmpty(timeStampedTransactions);
+        Assert.That(plugin.HAProxyIndex, Is.EqualTo("logs-haproxy.logfile-wtg"));
+        Assert.That(plugin.ElasticRetryMaxAttempts, Is.EqualTo(1440));
+        Assert.That(plugin.ElasticRetryDelayInSecond, Is.EqualTo(60));
+        Assert.That(plugin.BatchSize, Is.EqualTo(20));
     }
 }

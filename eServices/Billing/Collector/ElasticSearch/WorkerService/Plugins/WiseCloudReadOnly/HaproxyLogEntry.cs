@@ -1,21 +1,36 @@
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace CargoWise.eServices.Billing.Collector.NET.ElasticSearch.WorkerService.Plugins.WiseCloudReadOnly;
 
-internal class HaproxyLogEntry
+public class HaproxyLogEntry
 {
-    [JsonPropertyName("haproxy.client.ip")]
-    public string ClientIp { get; set; } = string.Empty;
-
-    [JsonPropertyName("haproxy.bytes.read")]
-    public double BytesRead { get; set; }
-
-    [JsonPropertyName("haproxy.bytes_uploaded")]
-    public double BytesUploaded { get; set; }
-
-    [JsonPropertyName("haproxy.server_name")]
-    public string ServerName { get; set; } = string.Empty;
-
-    [JsonPropertyName("@timestamp")]
+    [JsonProperty("@timestamp")]
     public DateTime Timestamp { get; set; }
+
+    [JsonProperty("haproxy")]
+    public HaproxyData Haproxy { get; set; }
+}
+
+public class HaproxyData
+{
+    [JsonProperty("client")]
+    public HaproxyClient Client { get; set; }
+
+    [JsonProperty("bytes_uploaded")]
+    public string BytesUploaded { get; set; }
+
+    [JsonProperty("bytes")]
+    public HaproxyBytes Bytes { get; set; }
+}
+
+public class HaproxyClient
+{
+    [JsonProperty("ip")]
+    public string Ip { get; set; }
+}
+
+public class HaproxyBytes
+{
+    [JsonProperty("read")]
+    public int Read { get; set; }
 }
