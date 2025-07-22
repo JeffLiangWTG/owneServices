@@ -21,7 +21,7 @@ public class WiseCloudReadOnlyPluginTest
             {
                 new PluginParameter("ElasticEndpoint", "https://elastic.apac-prod-1.wtg.zone"),
                 new PluginParameter("ElasticApiKey", "bZYGaEEythS7mCsj4EoC6ivpn24fMoD87l/3dq85L7/qlXKcs84R1UslZFJcYtZ8hPnUvvE2834ZKLpHx98LICtRw2ELux1iVUPrF4O8GQaRmKtdKHtGh9oYUS9hdeUYrU+0swl4NUguOQ2tLP0lBekILmwHrYZxrn7X3k6T+KI="),
-                new PluginParameter("HaproxyLogIndex", "logs-haproxy.logfile-wtg")
+                new PluginParameter("HAProxyIndex", "logs-haproxy.logfile-wtg")
             }
         };
 

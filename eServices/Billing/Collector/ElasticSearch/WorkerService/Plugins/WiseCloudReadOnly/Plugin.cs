@@ -14,16 +14,23 @@ public class Plugin : ElasticSearchPluginBase
     public override void UpdateSettings(PluginSettings settings)
     {
         base.UpdateSettings(settings);
-        LogIndex = settings.Parameters.FirstOrDefault(x => x.Name.Equals("HaproxyLogIndex"))?.Value ?? string.Empty;
+        HAProxyIndex = settings.Parameters.FirstOrDefault(x => x.Name.Equals("HAProxyIndex"))?.Value ?? string.Empty;
     }
 
     public override IEnumerable<TimeStampedTransaction> GetTransactions(DateTime start, DateTime end)
     {
         var response = Client.SearchAsync<HaproxyLogEntry>(s => s
-                .Index(LogIndex)
-                .Size(10000)
+                .Index(HAProxyIndex)
+                .Size(1000)
                 .Query(q => q
-                    .DateRange(r => r.Field("@timestamp").Gte(start).Lte(end)))
+                    .Bool(b => b
+                        .Filter(f => f
+                            .Range(r => r
+                                .DateRange(dr => dr
+                                    .Field("@timestamp")
+                                    .Gte(start)
+                                    .Lte(end)
+                                )))))
                 .Source(sf => sf
                     .Includes(new[]
                     {
@@ -56,5 +63,5 @@ public class Plugin : ElasticSearchPluginBase
         }
     }
 
-    public string LogIndex { get; set; } = string.Empty;
+    public string HAProxyIndex { get; set; } = string.Empty;
 }
