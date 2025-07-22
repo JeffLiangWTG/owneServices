@@ -21,7 +21,8 @@ public class WiseCloudReadOnlyPluginTest
             {
                 new PluginParameter("ElasticEndpoint", "https://elastic.apac-prod-1.wtg.zone"),
                 new PluginParameter("ElasticApiKey", "bZYGaEEythS7mCsj4EoC6ivpn24fMoD87l/3dq85L7/qlXKcs84R1UslZFJcYtZ8hPnUvvE2834ZKLpHx98LICtRw2ELux1iVUPrF4O8GQaRmKtdKHtGh9oYUS9hdeUYrU+0swl4NUguOQ2tLP0lBekILmwHrYZxrn7X3k6T+KI="),
-                new PluginParameter("HAProxyIndex", "logs-haproxy.logfile-wtg")
+                new PluginParameter("HAProxyIndex", "logs-haproxy.logfile-wtg"),
+                new PluginParameter("ReferenceFilePath", "TestData/test_reference.csv")
             }
         };
 
@@ -34,6 +35,7 @@ public class WiseCloudReadOnlyPluginTest
         var timeStampedTransactions = plugin.GetTransactions(start, end).ToList();
         Assert.IsEmpty(timeStampedTransactions);
         Assert.That(plugin.HAProxyIndex, Is.EqualTo("logs-haproxy.logfile-wtg"));
+        Assert.That(plugin.ReferenceFilePath, Is.EqualTo("TestData/test_reference.csv"));
         Assert.That(plugin.ElasticRetryMaxAttempts, Is.EqualTo(1440));
         Assert.That(plugin.ElasticRetryDelayInSecond, Is.EqualTo(60));
         Assert.That(plugin.BatchSize, Is.EqualTo(20));

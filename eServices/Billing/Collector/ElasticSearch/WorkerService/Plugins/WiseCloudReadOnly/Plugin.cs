@@ -1,7 +1,9 @@
 using System.Diagnostics;
+using System.Collections.Generic;
 using CargoWise.Billing.API;
 using CargoWise.Billing.CollectorService.Plugin;
 using CargoWise.eServices.Billing.Collector.NET.BackgroundService.Common;
+using CargoWise.eServices.Billing.Collector.NET.ElasticSearch.WorkerService.Plugins.WiseCloudReadOnly;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.Core.MSearch;
@@ -19,9 +21,15 @@ public class Plugin : ElasticSearchPluginBase
     {
         base.UpdateSettings(settings);
         HAProxyIndex = settings.Parameters.FirstOrDefault(x => x.Name.Equals("HAProxyIndex"))?.Value ?? string.Empty;
+        ReferenceFilePath = settings.Parameters.FirstOrDefault(x => x.Name.Equals("ReferenceFilePath"))?.Value ?? string.Empty;
         ElasticRetryMaxAttempts = GetIntParameter(settings, "ElasticRetryMaxAttempts", 1440);
         ElasticRetryDelayInSecond = GetIntParameter(settings, "ElasticRetryDelayInSecond", 60);
         BatchSize = GetIntParameter(settings, "BatchSize", 20);
+
+        if (!string.IsNullOrEmpty(ReferenceFilePath))
+        {
+            IpMappings = IPReferenceFileProcessor.ProcessReferenceFile(ReferenceFilePath, Logger);
+        }
     }
 
 
@@ -80,19 +88,31 @@ public class Plugin : ElasticSearchPluginBase
                 var sumUploaded = bucket.Aggregations.GetSum("sum_uploaded")?.Value ?? 0;
 
                 var total = sumRead + sumUploaded;
-                Logger.LogInformation($"Processing system {clientIp}: sumRead={sumRead}, sumUploaded={sumUploaded},  total={total},");
-            }
-        }
 
-        var tasks = new List<Task<(string EnterpriseCode, string ServerCode, IEnumerable<TimeStampedTransaction> Transactions)>>();
-        int currentIndex = 0;
+                if (IpMappings.TryGetValue(clientIp, out var codes) && codes.Count > 0)
+                {
+                    var code = codes[0];
+                    var enterpriseCode = code.Substring(0, 3);
+                    var serverCode = code.Substring(3);
+                    var occurredUtc = start;
 
-        foreach (var remaining in tasks)
-        {
-            var result = remaining.Result;
-            foreach (var tx in result.Transactions)
-            {
-                yield return tx;
+                    yield return new TimeStampedTransaction(occurredUtc,
+                        new BillingTransaction
+                        {
+                            BillableCount = total,
+                            Category = "WGR",
+                            PriceItemCode = "WGR",
+                            ClientID = $"{enterpriseCode}???{serverCode}",
+                            Reference1 = clientIp,
+                            ReportingSource = "MSC",
+                            ServiceOccuredUTC = occurredUtc,
+                            Version = 1
+                        });
+                }
+                else
+                {
+                    Logger.LogWarning($"IP {clientIp} not found in reference file");
+                }
             }
         }
     }
@@ -100,6 +120,8 @@ public class Plugin : ElasticSearchPluginBase
     #region Settings
 
     public string HAProxyIndex { get; set; } = string.Empty;
+    public string ReferenceFilePath { get; set; } = string.Empty;
+    internal Dictionary<string, List<string>> IpMappings { get; private set; } = new();
     public int ElasticRetryMaxAttempts { get; set; }
     public int ElasticRetryDelayInSecond { get; set; }
     public int BatchSize { get; set; }
