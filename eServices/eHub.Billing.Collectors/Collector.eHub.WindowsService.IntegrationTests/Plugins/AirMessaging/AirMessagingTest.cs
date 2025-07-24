@@ -12,9 +12,9 @@ namespace CargoWise.eServices.Billing.Collector.eHub.WindowsService.IntegrationT
 {
 	class AirMessagingTest : PluginTest<Plugin>
 	{
-		[Test]
-		public void TestMessageToProvider()
-		{
+                [Test]
+                public void TestMessageToProvider()
+                {
 			var messageReceivedTime = new DateTime(2015, 1, 11, 9, 31, 0);
 			var messageArchivedTime = new DateTime(2015, 1, 11, 9, 35, 0);
 			var messageToProvider = new eHubArchiveMessage
@@ -59,7 +59,57 @@ namespace CargoWise.eServices.Billing.Collector.eHub.WindowsService.IntegrationT
 				})
 			};
 			Assert.That(RunPlugin(messageArchivedTime.AddMinutes(-1), messageArchivedTime.AddMinutes(1)), Is.EquivalentTo(expectedTransactions));
-		}
+                }
+
+                [Test]
+                public void TestMessageToProvider_SenderOverride()
+                {
+                        var messageReceivedTime = new DateTime(2015, 1, 11, 10, 31, 0);
+                        var messageArchivedTime = new DateTime(2015, 1, 11, 10, 35, 0);
+                        var messageToProvider = new eHubArchiveMessage
+                        {
+                                AM_Status = 3,
+                                AM_ArchivedUTC = messageArchivedTime,
+                                AM_CC_SenderInbox = specialSender.CC_PK,
+                                AM_CC_RecipientInbox = service.CC_PK,
+                                AM_CC_RecipientOutbox = provider.CC_PK,
+                                AM_SenderMessageRaw = GetMessageRaw("MessageToProvider", "xml"),
+                                AM_ReceivedFromSenderUTC = messageReceivedTime,
+                                AM_InboxMessageTrackingID = new Guid("{11111111-1111-1111-1111-111111111111}"),
+                                AM_EmailSubjectOverride = "OVERRIDECLIENT"
+                        };
+                        AddArchiveMessage(messageToProvider);
+
+                        var expectedTransactions = new[]
+                        {
+                                new TimeStampedTransaction(messageArchivedTime, new BillingTransaction
+                                {
+                                        BillableCount = 1,
+                                        ReportingSource = "HUB",
+                                        ClientID = "OVERRIDECLIENT",
+                                        Reference1 = "11111111-1111-1111-1111-111111111111",
+                                        Reference2 = "APROVIDER",
+                                        ServiceOccuredUTC = messageReceivedTime,
+                                        Category = "AMG",
+                                        PriceItemCode = "ALM",
+                                        MessageTrackingID = "11111111-1111-1111-1111-111111111111",
+                                }),
+                                new TimeStampedTransaction(messageArchivedTime, new BillingTransaction
+                                {
+                                        BillableCount = 1,
+                                        ReportingSource = "HUB",
+                                        ClientID = "OVERRIDECLIENT",
+                                        Reference1 = "20581530046",
+                                        Reference2 = "YUS01448403",
+                                        Reference3 = "NH",
+                                        Reference4 = "APROVIDER",
+                                        ServiceOccuredUTC = messageReceivedTime,
+                                        Category = "AMG",
+                                        PriceItemCode = "FHL",
+                                })
+                        };
+                        Assert.That(RunPlugin(messageArchivedTime.AddMinutes(-1), messageArchivedTime.AddMinutes(1)), Is.EquivalentTo(expectedTransactions));
+                }
 
 		[Test]
 		public void TestMessageFromProvider()
@@ -196,26 +246,30 @@ namespace CargoWise.eServices.Billing.Collector.eHub.WindowsService.IntegrationT
 		{
 			base.SetUpCore();
 			client = eHubClientFactory.CreateeHubClient(eHubClientType.CW1Client, "TSTCLIENT");
-			provider = eHubClientFactory.CreateeHubClient(eHubClientType.ServiceProvider, "APROVIDER");
-			providerBT = eHubClientFactory.CreateeHubClient(eHubClientType.ServiceProvider, "BT");
-			provider.CC_IsAirServiceProvider = true;
-			providerBT.CC_IsAirServiceProvider = true;
+                        provider = eHubClientFactory.CreateeHubClient(eHubClientType.ServiceProvider, "APROVIDER");
+                        providerBT = eHubClientFactory.CreateeHubClient(eHubClientType.ServiceProvider, "BT");
+                        specialSender = eHubClientFactory.CreateeHubClient(eHubClientType.ServiceProvider, "Air_CARGO_MESSAGEING");
+                        specialSender.CC_PK = Guid.Parse("25582C3A-A669-4E8A-8792-FF231D26971A");
+                        provider.CC_IsAirServiceProvider = true;
+                        providerBT.CC_IsAirServiceProvider = true;
 			providerGLSHK = eHubClientFactory.CreateeHubClient(eHubClientType.ServiceProvider, "GLSHK");
 			providerGLSHK.CC_IsAirServiceProvider = true;
 			service = eHubClientFactory.CreateeHubClient(eHubClientType.ServiceProvider, "eHubAirService");
 			service.CC_PK = Guid.Parse("9819EFF9-9CD8-4622-B58E-32A251115722");
 			messageType = new eHubMessageType("http://www.cargowise.com/Schemas#MessageType");
 			AddClient(client);
-			AddClient(provider);
-			AddClient(providerBT);
-			AddClient(providerGLSHK);
+                        AddClient(provider);
+                        AddClient(providerBT);
+                        AddClient(specialSender);
+                        AddClient(providerGLSHK);
 			AddClient(service);
 			AddMessageType(messageType);
 		}
 
 		eHubClient client;
-		eHubClient provider;
-		eHubClient service;
+                eHubClient provider;
+                eHubClient specialSender;
+                eHubClient service;
 		eHubClient providerBT;
 		eHubClient providerGLSHK;
 		private eHubMessageType messageType;
