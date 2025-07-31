@@ -477,41 +477,42 @@ namespace CargoWise.eServices.Billing.Collector.NET.ElasticSearch.WorkerService.
 		public void TestGetTransaction()
 		{
 			string defectiveQueryHashesJson = JsonConvert.SerializeObject(testDefectiveQueryHashesDictionary);
-			//var testSettings = new PluginSettings()
-			//{
-			//	Parameters = new PluginParameter[]
-			//	{
-			//		new PluginParameter("ElasticEndpoint", "https://r.test-1.es.wtg.ws:443"),
-			//		new PluginParameter("ElasticApiKey", "k++HhEyGTc2m1oj0+YUCAGzS43thuQnQDJqwNkeCH45ceU8sGwy+6ZzpSAwk/i8mLDMJBJcZd9feTPjq3dJhYW8wI5x0ocuuWlFwa1Vo8UG8rGHwszb/6foHBxPoJ8Wm2COM/0IO8bW4P6JKy+DN5PNFlU8fb29asLNsRmu0U4s="),
-			//		new PluginParameter("CpuMonitoringIndex", "idx-*-sqlcpumonitoring-test-ro*"),
-			//		new PluginParameter("GatewayNonBilledUsage", "idx-*-*-ehubgatewaynonbilledusage*"),
-			//		new PluginParameter("DefectiveQueryHashesDictionary", defectiveQueryHashesJson)
-			//	}
-			//};
-
-			var prodsettings = new PluginSettings()
+			var testSettings = new PluginSettings()
 			{
 				Parameters = new PluginParameter[]
 				{
-					new PluginParameter("ElasticEndpoint", "https://r.prod-1.es.wtg.ws:443"),
-					new PluginParameter("ElasticApiKey", "GuphOosrYRrRoWF9Bs3RJtzWi+TwhjYvzZkXgC1Wn2umapfvhqwyL2pkQ5lVnOtMvqVNTuOm2mdFPwVtWigtq9Gc/QIfofzn2Ohmee8hT52H91dadB8hmfqte4Z8RGi+mIb6rmmIcGH/ApYCOf+ZoRXzVUuO/H3oRJwNE0zgmc0="),
-					new PluginParameter("CpuMonitoringIndex", "idx-*-prod-sqlcpumonitoring-prod*"),
+					new PluginParameter("ElasticEndpoint", "https://r.test-1.es.wtg.ws:443"),
+					new PluginParameter("ElasticApiKey", "k++HhEyGTc2m1oj0+YUCAGzS43thuQnQDJqwNkeCH45ceU8sGwy+6ZzpSAwk/i8mLDMJBJcZd9feTPjq3dJhYW8wI5x0ocuuWlFwa1Vo8UG8rGHwszb/6foHBxPoJ8Wm2COM/0IO8bW4P6JKy+DN5PNFlU8fb29asLNsRmu0U4s="),
+					new PluginParameter("CpuMonitoringIndex", "idx-*-sqlcpumonitoring-test-ro*"),
 					new PluginParameter("GatewayNonBilledUsage", "idx-*-*-ehubgatewaynonbilledusage*"),
-					new PluginParameter("BatchSize", "20"),
-					new PluginParameter("DefectiveQueryHashesDictionary", defectiveQueryHashesJson),
-					new PluginParameter("ElasticRetryMaxAttempts", "1440"),
-					new PluginParameter("ElasticRetryDelayInSecond", "60")
+					new PluginParameter("DefectiveQueryHashesDictionary", defectiveQueryHashesJson)
 				}
 			};
 
+			//var prodsettings = new PluginSettings()
+			//{
+			//	Parameters = new PluginParameter[]
+			//	{
+			//		new PluginParameter("ElasticEndpoint", "https://r.prod-1.es.wtg.ws:443"),
+			//		new PluginParameter("ElasticApiKey", "GuphOosrYRrRoWF9Bs3RJtzWi+TwhjYvzZkXgC1Wn2umapfvhqwyL2pkQ5lVnOtMvqVNTuOm2mdFPwVtWigtq9Gc/QIfofzn2Ohmee8hT52H91dadB8hmfqte4Z8RGi+mIb6rmmIcGH/ApYCOf+ZoRXzVUuO/H3oRJwNE0zgmc0="),
+			//		new PluginParameter("CpuMonitoringIndex", "idx-*-prod-sqlcpumonitoring-prod*"),
+			//		new PluginParameter("GatewayNonBilledUsage", "idx-*-*-ehubgatewaynonbilledusage*"),
+			//		new PluginParameter("BatchSize", "20"),
+			//		new PluginParameter("DefectiveQueryHashesDictionary", defectiveQueryHashesJson),
+			//		new PluginParameter("ElasticRetryMaxAttempts", "1440"),
+			//		new PluginParameter("ElasticRetryDelayInSecond", "60")
+			//	}
+			//};
+
 			var plugin = new Plugins.WGReport.Plugin();
-			plugin.UpdateSettings(prodsettings);
+			plugin.UpdateSettings(testSettings);
 			var logger = new LoggerConfiguration().WriteTo.File("C:\\TestElasticSearchSearchHalfYear.log", rollOnFileSizeLimit: true, retainedFileCountLimit: 10).CreateLogger();
 			plugin.SetLoggerFactory(new LoggerFactory().AddSerilog(logger));
-			var start = new DateTime(2025, 1, 01, 00, 0, 0, DateTimeKind.Utc);
-			var end = new DateTime(2025, 1, 01, 01, 0, 0, DateTimeKind.Utc);
+			var start = new DateTime(2025, 7, 01, 00, 0, 0, DateTimeKind.Utc);
+			var end = new DateTime(2025, 7, 30, 01, 0, 0, DateTimeKind.Utc);
 			var timeStampedTransactions = plugin.GetTransactions(start, end).ToList();
 		}
+
 
 		[Test]
 		public void TestGeneratedTransaction()

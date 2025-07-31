@@ -31,6 +31,12 @@ public abstract class ElasticSearchPluginBase : AbstractPlugin
 		return new ElasticsearchClient(connectionSettings);
 	}
 
+	protected int GetIntParameter(PluginSettings settings, string key, int defaultValue)
+	{
+		var raw = settings.Parameters.FirstOrDefault(x => x.Name == key)?.Value;
+		return int.TryParse(raw, out var result) && result > 0 ? result : defaultValue;
+	}
+
 	#region Settings
 	public string ElasticEndpoint { get; set; }
 	public string ApiKey { get; set; }

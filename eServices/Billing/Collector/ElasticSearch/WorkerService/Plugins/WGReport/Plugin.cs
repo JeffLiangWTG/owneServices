@@ -130,6 +130,23 @@ namespace CargoWise.eServices.Billing.Collector.NET.ElasticSearch.WorkerService.
 		public IEnumerable<(string EnterpriseCode, string ServerCode)> GetClientSystems(DateTime start, DateTime end, ElasticsearchClient client)
 		{
 			Logger.LogInformation("Retrieving systems");
+
+			var response = client.SearchAsync<DynamicResponse>(s => s
+				.Index(CpuMonitoringIndex)
+				.Size(10000)
+				.Query(q => q
+					.Bool(b => b
+						.Filter(f => f
+							.Range(r => r
+								.DateRange(dr => dr
+									.Field("@timestamp")
+									.Gte(start)
+									.Lte(end)
+								))
+						)
+					)
+				)
+			).GetAwaiter().GetResult();
 			var querySystemsResponse = client.SearchAsync<(string EnterpriseCode, string ServerCode)>(s => s
 				.Query(q => q
 					.Bool(b => b
