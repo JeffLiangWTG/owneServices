@@ -14,8 +14,9 @@ namespace CargoWise.eServices.Billing.DataAccess
 		DataTable SelectELKTransaction(int maxTransactions);
 		int CountStaging();
 		DateTime? OldestSystemCreateUTCInStaging();
-		bool DoesELKBacklogExceedThreshold(int threshold);
-		void UpdateChargeable(DateTime? utcNow = null, int firstPeriodOfNewCollection = 202110, bool performMonthlyAggregation = true, bool updateBillingCube = false);
+        bool DoesELKBacklogExceedThreshold(int threshold);
+        IEnumerable<CargoWise.Billing.API.LicenseInfo> GetLatestLicenses();
+        void UpdateChargeable(DateTime? utcNow = null, int firstPeriodOfNewCollection = 202110, bool performMonthlyAggregation = true, bool updateBillingCube = false);
 		void SPExecution(SPExecutionParam param);
 	}
 }

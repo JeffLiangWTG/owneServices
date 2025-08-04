@@ -176,19 +176,56 @@ namespace CargoWise.eServices.Billing.DataAccess
 			}
 		}
 
-		public bool DoesELKBacklogExceedThreshold(int threshold)
-		{
-			using (var con = sqlConnectionFactory.Invoke())
-			{
-				con.Open();
-				using (var cmd = con.CreateCommand())
-				{
-					cmd.CommandText = "SELECT CASE WHEN COUNT(RT_PK) > @threshold THEN 'TRUE' ELSE 'FALSE' END FROM ELKResubmitTransaction";
-					cmd.Parameters.Add("@threshold", SqlDbType.Int).Value = threshold;
-					return (bool.Parse(cmd.ExecuteScalar().ToString()));
-				}
-			}
-		}
+                public bool DoesELKBacklogExceedThreshold(int threshold)
+                {
+                        using (var con = sqlConnectionFactory.Invoke())
+                        {
+                                con.Open();
+                                using (var cmd = con.CreateCommand())
+                                {
+                                        cmd.CommandText = "SELECT CASE WHEN COUNT(RT_PK) > @threshold THEN 'TRUE' ELSE 'FALSE' END FROM ELKResubmitTransaction";
+                                        cmd.Parameters.Add("@threshold", SqlDbType.Int).Value = threshold;
+                                        return (bool.Parse(cmd.ExecuteScalar().ToString()));
+                                }
+                        }
+                }
+
+                public IEnumerable<CargoWise.Billing.API.LicenseInfo> GetLatestLicenses()
+                {
+                        var result = new List<CargoWise.Billing.API.LicenseInfo>();
+                        using (var con = sqlConnectionFactory.Invoke())
+                        {
+                                con.Open();
+                                using (var cmd = con.CreateCommand())
+                                {
+                                        cmd.CommandText = @"SELECT EnterpriseCode, DatabaseNumber, ServerCode, HostedLocation, IsActive, IsTeardownInProgress, LicenceType
+FROM (
+        SELECT EnterpriseCode, DatabaseNumber, ServerCode, HostedLocation, IsActive, IsTeardownInProgress, LicenceType,
+               ROW_NUMBER() OVER(PARTITION BY DatabaseNumber ORDER BY ValidFromUtc DESC) AS LicenseRow
+        FROM edi.LicenceDatabaseCodeHistory
+) H
+WHERE H.LicenseRow = 1";
+                                        using (var reader = cmd.ExecuteReader())
+                                        {
+                                                while (reader.Read())
+                                                {
+                                                        result.Add(new CargoWise.Billing.API.LicenseInfo
+                                                        {
+                                                                EnterpriseCode = reader["EnterpriseCode"].ToString(),
+                                                                DatabaseNumber = Convert.ToInt32(reader["DatabaseNumber"]),
+                                                                ServerCode = reader["ServerCode"].ToString(),
+                                                                HostedLocation = reader["HostedLocation"].ToString(),
+                                                                LicenseType = reader["LicenceType"].ToString(),
+                                                                IsActive = Convert.ToBoolean(reader["IsActive"]),
+                                                                IsTeardownInProgress = Convert.ToBoolean(reader["IsTeardownInProgress"])
+                                                        });
+                                                }
+                                        }
+                                }
+                        }
+
+                        return result.Where(l => !string.Equals(l.LicenseType, "PRD", StringComparison.OrdinalIgnoreCase));
+                }
 
 		static DataTable CreateBillingTransactionTableType()
 		{

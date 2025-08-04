@@ -172,17 +172,41 @@ namespace CargoWise.Billing.Client
 			client = null;
 		}
 
-		public bool Ping()
-		{
-			try
-			{
-				return WebServiceClient.Ping();
-			}
-			catch
-			{
-				return false;
-			}
-		}
+                public bool Ping()
+                {
+                        try
+                        {
+                                return WebServiceClient.Ping();
+                        }
+                        catch
+                        {
+                                return false;
+                        }
+                }
+
+                public IEnumerable<LicenseInfo> GetLatestLicenses()
+                {
+                        var webLicenses = WebServiceClient.GetLatestLicenses();
+                        if (webLicenses == null)
+                                return Enumerable.Empty<LicenseInfo>();
+
+                        var result = new List<LicenseInfo>(webLicenses.Length);
+                        foreach (var webLicense in webLicenses)
+                        {
+                                result.Add(new LicenseInfo
+                                {
+                                        EnterpriseCode = webLicense.EnterpriseCode,
+                                        DatabaseNumber = webLicense.DatabaseNumber,
+                                        ServerCode = webLicense.ServerCode,
+                                        HostedLocation = webLicense.HostedLocation,
+                                        LicenseType = webLicense.LicenseType,
+                                        IsActive = webLicense.IsActive,
+                                        IsTeardownInProgress = webLicense.IsTeardownInProgress
+                                });
+                        }
+
+                        return result;
+                }
 
 #if NETFRAMEWORK
 

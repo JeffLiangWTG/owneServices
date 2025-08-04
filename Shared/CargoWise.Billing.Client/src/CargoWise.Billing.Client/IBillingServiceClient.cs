@@ -18,7 +18,9 @@ namespace CargoWise.Billing.Client
 
 		void AddUsageTransactionRange(IEnumerable<UsageTransaction> transactions);
 
-		bool Ping();
+        bool Ping();
+
+        IEnumerable<LicenseInfo> GetLatestLicenses();
 
     }
 }

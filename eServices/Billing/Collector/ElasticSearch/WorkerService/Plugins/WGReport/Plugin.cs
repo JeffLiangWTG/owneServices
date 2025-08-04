@@ -15,16 +15,16 @@ namespace CargoWise.eServices.Billing.Collector.NET.ElasticSearch.WorkerService.
 {
 	public class Plugin : ElasticSearchPluginBase
 	{
-		public override void UpdateSettings(PluginSettings settings)
-		{
-			base.UpdateSettings(settings);
-			CpuMonitoringIndex = settings.Parameters.FirstOrDefault(x => x.Name.Equals("CpuMonitoringIndex"))?.Value ?? string.Empty;
-			GatewayNonBilledUsage = settings.Parameters.FirstOrDefault(x => x.Name.Equals("GatewayNonBilledUsage"))?.Value ?? string.Empty;
+                public override void UpdateSettings(PluginSettings settings)
+                {
+                        base.UpdateSettings(settings);
+                        CpuMonitoringIndex = settings.Parameters.FirstOrDefault(x => x.Name.Equals("CpuMonitoringIndex"))?.Value ?? string.Empty;
+                        GatewayNonBilledUsage = settings.Parameters.FirstOrDefault(x => x.Name.Equals("GatewayNonBilledUsage"))?.Value ?? string.Empty;
 			ElasticRetryMaxAttempts = GetIntParameter(settings, "ElasticRetryMaxAttempts", 1440);
 			ElasticRetryDelayInSecond = GetIntParameter(settings, "ElasticRetryDelayInSecond", 60);
-			BatchSize = GetIntParameter(settings, "BatchSize", 20);
+                        BatchSize = GetIntParameter(settings, "BatchSize", 20);
 
-			var jsonString = settings.Parameters.FirstOrDefault(x => x.Name.Equals("DefectiveQueryHashesDictionary"))?.Value;
+                        var jsonString = settings.Parameters.FirstOrDefault(x => x.Name.Equals("DefectiveQueryHashesDictionary"))?.Value;
 			DefectiveQueryHashesDictionary = string.IsNullOrWhiteSpace(jsonString)
 				? new Dictionary<string, string[]>()
 				: JsonConvert.DeserializeObject<Dictionary<string, string[]>>(jsonString) ?? new Dictionary<string, string[]>();
@@ -127,8 +127,8 @@ namespace CargoWise.eServices.Billing.Collector.NET.ElasticSearch.WorkerService.
 				Logger.LogInformation($"Yielded transaction for EnterpriseCode={enterpriseCode}, ServerCode={serverCode}");
 			}
 		}
-		public IEnumerable<(string EnterpriseCode, string ServerCode)> GetClientSystems(DateTime start, DateTime end, ElasticsearchClient client)
-		{
+        public IEnumerable<(string EnterpriseCode, string ServerCode)> GetClientSystems(DateTime start, DateTime end, ElasticsearchClient client)
+        {
 			Logger.LogInformation("Retrieving systems");
 
 			var response = client.SearchAsync<DynamicResponse>(s => s
@@ -198,8 +198,9 @@ namespace CargoWise.eServices.Billing.Collector.NET.ElasticSearch.WorkerService.
 				.Where(s => !string.IsNullOrEmpty(s.EnterpriseCode) && !string.IsNullOrEmpty(s.ServerCode));
 
 			Logger.LogInformation($"Found {systems.Count()} systems");
-			return systems;
-		}
+                        return systems;
+                }
+
 
 		void AwaitAndProcessTransactions(List<Task<IEnumerable<TimeStampedTransaction>>> tasks, List<TimeStampedTransaction> transactions)
 		{
@@ -696,8 +697,8 @@ namespace CargoWise.eServices.Billing.Collector.NET.ElasticSearch.WorkerService.
 		public string GatewayNonBilledUsage { get; set; } = string.Empty;
 		public int ElasticRetryMaxAttempts { get; set; }
 		public int ElasticRetryDelayInSecond { get; set; }
-		public int BatchSize { get; set; }
-		public Dictionary<string, string[]> DefectiveQueryHashesDictionary { get; set; }  = new();
-		#endregion
-	}
+                public int BatchSize { get; set; }
+                public Dictionary<string, string[]> DefectiveQueryHashesDictionary { get; set; }  = new();
+                #endregion
+        }
 }

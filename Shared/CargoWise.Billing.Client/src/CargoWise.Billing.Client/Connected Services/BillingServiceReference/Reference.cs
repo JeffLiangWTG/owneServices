@@ -677,7 +677,104 @@ namespace CargoWise.Billing.Client.BillingServiceReference
             }
         }
     }
-    
+
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="LicenseInfo", Namespace="http://schemas.datacontract.org/2004/07/CargoWise.eServices.Billing.WcfService")]
+    [System.SerializableAttribute()]
+    internal partial class LicenseInfo : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged
+    {
+
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string EnterpriseCodeField;
+
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int DatabaseNumberField;
+
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ServerCodeField;
+
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string HostedLocationField;
+
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string LicenseTypeField;
+
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool IsActiveField;
+
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool IsTeardownInProgressField;
+
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData
+        {
+            get { return this.extensionDataField; }
+            set { this.extensionDataField = value; }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        internal string EnterpriseCode
+        {
+            get { return this.EnterpriseCodeField; }
+            set { if ((object.ReferenceEquals(this.EnterpriseCodeField, value) != true)) { this.EnterpriseCodeField = value; this.RaisePropertyChanged("EnterpriseCode"); } }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        internal int DatabaseNumber
+        {
+            get { return this.DatabaseNumberField; }
+            set { if ((this.DatabaseNumberField.Equals(value) != true)) { this.DatabaseNumberField = value; this.RaisePropertyChanged("DatabaseNumber"); } }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        internal string ServerCode
+        {
+            get { return this.ServerCodeField; }
+            set { if ((object.ReferenceEquals(this.ServerCodeField, value) != true)) { this.ServerCodeField = value; this.RaisePropertyChanged("ServerCode"); } }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        internal string HostedLocation
+        {
+            get { return this.HostedLocationField; }
+            set { if ((object.ReferenceEquals(this.HostedLocationField, value) != true)) { this.HostedLocationField = value; this.RaisePropertyChanged("HostedLocation"); } }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        internal string LicenseType
+        {
+            get { return this.LicenseTypeField; }
+            set { if ((object.ReferenceEquals(this.LicenseTypeField, value) != true)) { this.LicenseTypeField = value; this.RaisePropertyChanged("LicenseType"); } }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        internal bool IsActive
+        {
+            get { return this.IsActiveField; }
+            set { if ((this.IsActiveField.Equals(value) != true)) { this.IsActiveField = value; this.RaisePropertyChanged("IsActive"); } }
+        }
+
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        internal bool IsTeardownInProgress
+        {
+            get { return this.IsTeardownInProgressField; }
+            set { if ((this.IsTeardownInProgressField.Equals(value) != true)) { this.IsTeardownInProgressField = value; this.RaisePropertyChanged("IsTeardownInProgress"); } }
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+
+        protected void RaisePropertyChanged(string propertyName)
+        {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null))
+            {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="BillingServiceReference.IBillingService")]
     internal interface IBillingService
@@ -700,6 +797,9 @@ namespace CargoWise.Billing.Client.BillingServiceReference
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IBillingService/Ping", ReplyAction="http://tempuri.org/IBillingService/PingResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(CargoWise.Billing.Client.BillingServiceReference.ValidationFault), Action="http://tempuri.org/IBillingService/PingValidationFaultFault", Name="ValidationFault", Namespace= "http://schemas.datacontract.org/2004/07/CargoWise.eServices.Billing.WcfService")]
         bool Ping();
+
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IBillingService/GetLatestLicenses", ReplyAction="http://tempuri.org/IBillingService/GetLatestLicensesResponse")]
+        CargoWise.Billing.Client.BillingServiceReference.LicenseInfo[] GetLatestLicenses();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -759,6 +859,11 @@ namespace CargoWise.Billing.Client.BillingServiceReference
         public bool Ping()
         {
             return base.Channel.Ping();
+        }
+
+        public CargoWise.Billing.Client.BillingServiceReference.LicenseInfo[] GetLatestLicenses()
+        {
+            return base.Channel.GetLatestLicenses();
         }
     }
 }

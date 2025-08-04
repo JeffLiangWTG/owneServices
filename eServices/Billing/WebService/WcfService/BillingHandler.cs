@@ -58,8 +58,10 @@ namespace CargoWise.eServices.Billing.WcfService
 		public void AddUsageTransaction(API.UsageTransaction transaction) =>
 			repository.InsertELKResubmitTransaction(TransactionHelper.ConvertUsageInfoToJson(transaction));
 
-		public void AddUsageTransactions(IEnumerable<API.UsageTransaction> transactions) =>
-			repository.InsertELKResubmitTransactions(transactions.Select(transaction => TransactionHelper.ConvertUsageInfoToJson(transaction)));
+                public void AddUsageTransactions(IEnumerable<API.UsageTransaction> transactions) =>
+                        repository.InsertELKResubmitTransactions(transactions.Select(transaction => TransactionHelper.ConvertUsageInfoToJson(transaction)));
+
+                public IEnumerable<API.LicenseInfo> GetLatestLicenses() => repository.GetLatestLicenses();
 
 		void HandleBillingTransaction(API.BillingTransaction transaction, Action<API.BillingTransaction> handleTransactionAction, Action<API.BillingTransaction> handleUsageTransactionAction, Action<API.BillingTransaction> handleNonBilledTransactionAction)
 		{

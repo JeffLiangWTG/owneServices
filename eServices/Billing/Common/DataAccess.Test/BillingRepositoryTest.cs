@@ -314,12 +314,12 @@ namespace CargoWise.eServices.Billing.DataAccess.Tests
 		}
 
 		[Test]
-		public void TestOldestSystemCreateUTCInStaging()
-		{
-			using (var con = BillingDataTestHelper.GetNewOpenConnection())
-			{
-				BillingDataTestHelper.TruncateStagingTable(con);
-				Assert.IsFalse(BillingDataTestHelper.OldestSystemCreateUTCInStaging().HasValue);
+                public void TestOldestSystemCreateUTCInStaging()
+                {
+                        using (var con = BillingDataTestHelper.GetNewOpenConnection())
+                        {
+                                BillingDataTestHelper.TruncateStagingTable(con);
+                                Assert.IsFalse(BillingDataTestHelper.OldestSystemCreateUTCInStaging().HasValue);
 
 				var addedTime = DateTime.UtcNow.AddMinutes(-1); //Bypass the possibly tiny gap of time between the SQL server and .Net
 				var transaction = GetValidTransaction();
@@ -328,9 +328,30 @@ namespace CargoWise.eServices.Billing.DataAccess.Tests
 
 				var oldest = BillingDataTestHelper.OldestSystemCreateUTCInStaging();
 				Assert.IsTrue(oldest.HasValue);
-				Assert.GreaterOrEqual(oldest.Value.Ticks, addedTime.Ticks);
-			}
-		}
+                                Assert.GreaterOrEqual(oldest.Value.Ticks, addedTime.Ticks);
+                        }
+                }
+
+                [Test]
+                public void TestGetLatestLicenses()
+                {
+                        using (var con = BillingDataTestHelper.GetNewOpenConnection())
+                        {
+                                BillingDataTestHelper.ClearDatabaseAndCompanyList(con);
+                                BillingDataTestHelper.ExecuteNonQuery(con,
+                                        "INSERT INTO edi.LicenceDatabaseCodeHistory(SystemId, DatabaseNumber, EnterpriseCode, ServerCode, ValidFromUtc, HostedLocation, IsActive, IsTeardownInProgress, LicenceType) " +
+                                        "VALUES('AAA', 1, 'ENT', 'SRV', '2000-01-01', 'OLD', 1, 0, 'PRD')");
+                                BillingDataTestHelper.ExecuteNonQuery(con,
+                                        "INSERT INTO edi.LicenceDatabaseCodeHistory(SystemId, DatabaseNumber, EnterpriseCode, ServerCode, ValidFromUtc, HostedLocation, IsActive, IsTeardownInProgress, LicenceType) " +
+                                        "VALUES('AAA', 1, 'ENT', 'SRV', '2001-01-01', 'NEW', 1, 0, 'DEV')");
+
+                                var licenses = BillingDataTestHelper.GetLatestLicenses().ToList();
+                                Assert.That(licenses.Count, Is.EqualTo(1));
+                                Assert.That(licenses[0].DatabaseNumber, Is.EqualTo(1));
+                                Assert.That(licenses[0].HostedLocation, Is.EqualTo("NEW"));
+                                Assert.That(licenses[0].LicenseType, Is.EqualTo("DEV"));
+                        }
+                }
 
 		static API.BillingTransaction GetValidTransaction()
 		{
