@@ -22,5 +22,8 @@ namespace CargoWise.Billing.Service
 		[OperationContract]
 		[FaultContract(typeof(ValidationFault))]
 		bool Ping();
+
+		[OperationContract]
+		LicenceInfo[] GetLatestLicences();
 	}
 }
