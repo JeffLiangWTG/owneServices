@@ -6,7 +6,9 @@ DECLARE @backdateUTC DATETIME = DATEADD(DAY, -30, @startUTC)
 IF  OBJECT_ID(N'TempDB..#ToProvider') IS NOT NULL DROP TABLE #ToProvider;
 IF  OBJECT_ID(N'TempDB..#FromProvider') IS NOT NULL DROP TABLE #FromProvider;
 
-SELECT  Sender.CC_ID ClientID,
+SELECT  CASE WHEN m.AM_CC_SenderInbox = '25582C3A-A669-4E8A-8792-FF231D26971A'
+                 THEN m.AM_EmailSubjectOverride
+                 ELSE Sender.CC_ID END ClientID,
         Recipient.CC_ID Network,
         AM_ReceivedFromSenderUTC,
         CAST(dbo.DecodeAndDecompress(AM_SenderMessageRaw) AS XML) MessageXml,
@@ -19,8 +21,9 @@ FROM (
 		FROM eHubArchiveMessage
 		WHERE (@startUTC < AM_ArchivedUTC AND AM_ArchivedUTC <= @endUTC)
 		AND  (AM_ReceivedFromSenderUTC > @backdateUTC AND AM_ReceivedFromSenderUTC <= @endUTC)
-		AND	AM_CC_RecipientInbox = '9819EFF9-9CD8-4622-B58E-32A251115722' -- ri.CC_ID = 'eHubAirService'
-		AND	AM_Status < 255
+		AND     (AM_CC_RecipientInbox = '9819EFF9-9CD8-4622-B58E-32A251115722' -- ri.CC_ID = 'eHubAirService'
+                        OR AM_CC_SenderInbox = '25582C3A-A669-4E8A-8792-FF231D26971A')
+                AND     AM_Status < 255
 ) m
 JOIN [dbo].eHubClient Sender ON m.AM_CC_SenderInbox = Sender.CC_PK
 JOIN [dbo].eHubClient Recipient ON m.AM_CC_RecipientOutbox = Recipient.CC_PK
